@@ -1,7 +1,8 @@
-"""Exact production generation, checker-pool and API registry ownership tests.
+"""Exact production generation, registry and request-print scratch tests.
 
 These two S09-4 criteria do not complete E3, certify checker algorithms or
-extend the arena example's allocation counters to checker storage.
+extend the arena example's allocation counters to checker storage. The scoped
+decode/print scratch observation is informational; full S09-3 remains pending.
 """
 
 from pathlib import Path
@@ -10,13 +11,16 @@ import sys
 
 from s04_common import strict_json_loads
 from s06_ownership import validate_output
+import s09_printing
 
 
 SUITES = {
     "generation": ("ts_arena", "lease::"),
     "pool": ("ts_project", "tests::"),
     "registry": ("ts_api", "tests::"),
+    "scratch": ("ts_api", "printing::scratch_checks::"),
 }
+OWNERSHIP_SUITES = ("generation", "pool", "registry")
 MODES = {"debug", "release", "miri", "address_sanitizer"}
 CRITERIA = ("shared_pool_panic_retirement", "release_boundaries")
 
@@ -28,7 +32,7 @@ def load_cases(root):
 
 def validate_manifest(manifest):
     if (type(manifest) is not dict or set(manifest) != {"version", "suites"}
-            or type(manifest["version"]) is not int or manifest["version"] != 1
+            or type(manifest["version"]) is not int or manifest["version"] != 2
             or type(manifest["suites"]) is not dict
             or set(manifest["suites"]) != set(SUITES)):
         raise ValueError("invalid S09 ownership inventory")
@@ -53,6 +57,13 @@ def measure(root, invoke, prefix, options, env, manifest, mode):
         raise ValueError("invalid S09 ownership measurement mode")
     outcomes = {}
     for name, suite in manifest["suites"].items():
+        if name == "scratch":
+            try:
+                s09_printing.verify_frozen(root=root)
+            except (ValueError, OSError) as error:
+                print(f"S09 printing fixture {mode} failed verification: {error}", file=sys.stderr)
+                outcomes[name] = False
+                continue
         args = [*prefix, "test", "--package", suite["package"], "--lib", "--locked",
                 *options, suite["filter"], "--", "--test-threads=1", "--nocapture"]
         try:
@@ -77,14 +88,19 @@ def publish_metrics(report, modes, arena_modes, manifest):
         raise ValueError("S09 release boundaries require the arena suite in all four modes")
     metrics = report["metrics"]
     for mode, outcomes in modes.items():
-        for name, passed in outcomes.items():
-            metrics[f"checker_ownership_{name}_{mode}"] = passed
-        metrics[f"shared_pool_panic_retirement_{mode}"] = all(outcomes.values())
-        metrics[f"release_boundaries_{mode}"] = all(outcomes.values()) and arena_modes[mode]
+        for name in OWNERSHIP_SUITES:
+            metrics[f"checker_ownership_{name}_{mode}"] = outcomes[name]
+        ownership_passed = all(outcomes[name] for name in OWNERSHIP_SUITES)
+        metrics[f"shared_pool_panic_retirement_{mode}"] = ownership_passed
+        metrics[f"release_boundaries_{mode}"] = ownership_passed and arena_modes[mode]
+        metrics[f"api_print_scratch_disposal_{mode}"] = outcomes["scratch"]
     for criterion in CRITERIA:
         metrics[criterion] = all(metrics[f"{criterion}_{mode}"] for mode in MODES)
     # Count a suite only after every inventoried test has a validated passing
     # observation in every mode. This is not a heap or live-owner measurement.
     metrics["checker_ownership_tests"] = sum(
         len(suite["cases"]) for name, suite in manifest["suites"].items()
-        if all(outcomes[name] for outcomes in modes.values()))
+        if name in OWNERSHIP_SUITES and all(outcomes[name] for outcomes in modes.values()))
+    metrics["api_print_scratch_disposal"] = all(outcomes["scratch"] for outcomes in modes.values())
+    metrics["api_print_scratch_tests"] = (
+        len(manifest["suites"]["scratch"]["cases"]) if metrics["api_print_scratch_disposal"] else 0)

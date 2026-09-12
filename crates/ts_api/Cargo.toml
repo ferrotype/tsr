@@ -9,10 +9,13 @@ publish.workspace = true
 [dependencies]
 ts_arena = { version = "0.1.0", path = "../ts_arena" }
 ts_checker = { version = "0.1.0", path = "../ts_checker" }
+ts_encoder = { version = "0.1.0", path = "../ts_encoder" }
+ts_printer = { version = "0.1.0", path = "../ts_printer" }
 ts_project = { version = "0.1.0", path = "../ts_project" }
 
 [dev-dependencies]
 ts_arena = { version = "0.1.0", path = "../ts_arena", features = ["harness"] }
+serde_json = "1"
 
 [lints]
 workspace = true

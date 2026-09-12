@@ -4,6 +4,9 @@
 //! never appear in serialized response bytes.
 #![forbid(unsafe_code)]
 
+mod printing;
+pub use printing::{print_node, PrintError, PrintNodeOptions};
+
 use std::collections::{HashMap, VecDeque};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Arc, Mutex};

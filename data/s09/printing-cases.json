@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "scope": "Bounded API decode/print bytes; unsupported Rust syntax remains named. This is not insertion-format or complete S09-3 evidence.",
+  "cases": [
+    {"name": "identifier", "tree": "identifier", "text": "answer", "options": {}, "rust_expected": "text"},
+    {"name": "string-default-escape", "tree": "string", "text": "caf\u00e9 \ud83d\ude00\n\"", "options": {}, "rust_expected": "text"},
+    {"name": "string-never-ascii-escape", "tree": "string", "text": "caf\u00e9 \ud83d\ude00\n\"", "options": {"never_ascii_escape": true}, "rust_expected": "text"},
+    {"name": "union", "tree": "union", "options": {}, "rust_expected": "text"},
+    {"name": "type-literal", "tree": "type-literal", "options": {}, "rust_expected": "text"},
+    {"name": "unterminated-string", "tree": "unterminated-string", "text": "unfinished", "options": {"terminate_unterminated_literals": true}, "rust_expected": "text"},
+    {"name": "statement-boundary", "tree": "expression-statement", "text": "answer", "options": {}, "rust_expected": "unsupported", "rust_unsupported": "statements, declarations and JSDoc nodes"},
+    {"name": "source-newlines-boundary", "tree": "type-literal", "options": {"preserve_source_newlines": true}, "rust_expected": "unsupported", "rust_unsupported": "PreserveSourceNewlines"},
+    {"name": "malformed-short", "wire_hex": "000102", "options": {}, "rust_expected": "decode_error"},
+    {"name": "malformed-version", "wire_hex": "0000000900000000000000000000000000000000000000000000000000000000000000000000000000000000", "options": {}, "rust_expected": "decode_error"},
+    {"name": "nil-root", "tree": "identifier", "text": "answer", "mutation": "root-list-sentinel", "options": {}, "rust_expected": "panic", "panic_class": "nil-root", "expected_panic": "runtime error: invalid memory address or nil pointer dereference"},
+    {"name": "synthetic-expression-panic", "tree": "type-literal", "mutation": "root-synthetic-expression", "options": {}, "rust_expected": "panic", "panic_class": "synthetic-expression", "expected_panic": "SyntheticExpression should never be decoded"}
+  ]
+}

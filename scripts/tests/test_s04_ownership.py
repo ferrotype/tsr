@@ -60,7 +60,7 @@ def program_manifest():
 
 
 def checker_manifest():
-    return {"version": 1, "suites": {
+    return {"version": 2, "suites": {
         name: {"package": package, "filter": prefix, "cases": [prefix + "generation_boundary"]}
         for name, (package, prefix) in ownership.s09_ownership.SUITES.items()
     }}
@@ -103,12 +103,40 @@ def successful_invoke(root, args, env=None):
 
 
 class OwnershipProducerTests(unittest.TestCase):
+    def setUp(self):
+        # Synthetic roots isolate E3 orchestration from independently tested
+        # native print-fixture provenance validation.
+        verifier = patch.object(ownership.s09_ownership.s09_printing, "verify_frozen", return_value=None)
+        self.verify_frozen = verifier.start()
+        self.addCleanup(verifier.stop)
+
+    def test_stale_print_fixture_cannot_publish_scratch_or_instrumentation_success(self):
+        calls = []
+        self.verify_frozen.side_effect = ValueError("changed native print requests")
+
+        def invoke(root, args, env=None):
+            calls.append(args)
+            return successful_invoke(root, args, env)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            fixture(root)
+            with patch.object(ownership, "invoke", invoke):
+                report = ownership.run(root)
+        self.assertEqual(self.verify_frozen.call_count, 4)
+        self.assertFalse(any("printing::scratch_checks::" in args for args in calls))
+        self.assertTrue(report["metrics"]["shared_pool_panic_retirement"])
+        self.assertTrue(report["metrics"]["release_boundaries"])
+        for metric in ("api_print_scratch_disposal", "miri", "address_sanitizer"):
+            self.assertFalse(report["metrics"][metric])
+        self.assertNotIn("api_scratch_disposal", report["metrics"])
+
     def test_missing_registry_case_blocks_s09_and_instrumentation_without_hiding_other_modes(self):
         for mode in ("debug", "release", "miri", "address_sanitizer"):
             def invoke(root, args, env=None):
                 actual_mode = ("miri" if "miri" in args else "address_sanitizer" if "-Zbuild-std" in args
                                else "release" if "--release" in args else "debug")
-                if "ts_api" in args and actual_mode == mode:
+                if "ts_api" in args and "tests::" in args and actual_mode == mode:
                     return named_suite_output([])
                 return successful_invoke(root, args, env)
 
@@ -124,6 +152,30 @@ class OwnershipProducerTests(unittest.TestCase):
                 self.assertEqual(report["metrics"]["checker_ownership_tests"], 2)
                 self.assertEqual(report["metrics"]["miri"], mode != "miri")
                 self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
+
+    def test_missing_scratch_output_blocks_instrumentation_but_preserves_s09_4_scope(self):
+        for mode in ("debug", "release", "miri", "address_sanitizer"):
+            def invoke(root, args, env=None):
+                actual_mode = ("miri" if "miri" in args else "address_sanitizer" if "-Zbuild-std" in args
+                               else "release" if "--release" in args else "debug")
+                if "printing::scratch_checks::" in args and actual_mode == mode:
+                    return named_suite_output([])
+                return successful_invoke(root, args, env)
+
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                fixture(root)
+                with patch.object(ownership, "invoke", invoke):
+                    report = ownership.run(root)
+                self.assertTrue(report["metrics"]["shared_pool_panic_retirement"])
+                self.assertTrue(report["metrics"]["release_boundaries"])
+                self.assertFalse(report["metrics"]["api_print_scratch_disposal"])
+                self.assertFalse(report["metrics"][f"api_print_scratch_disposal_{mode}"])
+                self.assertEqual(report["metrics"]["api_print_scratch_tests"], 0)
+                self.assertEqual(report["metrics"]["checker_ownership_tests"], 3)
+                self.assertEqual(report["metrics"]["miri"], mode != "miri")
+                self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
+                self.assertNotIn("api_scratch_disposal", report["metrics"])
 
     def test_arena_boundary_failure_cannot_be_hidden_by_passing_pool_tests(self):
         def invoke(root, args, env=None):

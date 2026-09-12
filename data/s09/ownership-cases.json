@@ -44,7 +44,18 @@
       ],
       "filter": "tests::",
       "package": "ts_api"
+    },
+    "scratch": {
+      "cases": [
+        "printing::scratch_checks::decoded_scratch_is_live_only_until_emission_returns",
+        "printing::scratch_checks::decoder_panic_drops_scratch_and_retires_snapshot_request",
+        "printing::scratch_checks::native_decode_print_outputs_and_named_boundaries_match",
+        "printing::scratch_checks::printer_error_drops_allocated_scratch_without_retiring_snapshot",
+        "printing::scratch_checks::printing_does_not_grow_snapshot_roots_and_text_survives_scratch"
+      ],
+      "filter": "printing::scratch_checks::",
+      "package": "ts_api"
     }
   },
-  "version": 1
+  "version": 2
 }

@@ -271,6 +271,7 @@ jobs:
             'run.e3.retained_snapshot_edit == true' \
             'run.e3.shared_pool_panic_retirement == true' \
             'run.e3.release_boundaries == true' \
+            'run.e3.api_print_scratch_disposal == true' \
             'run.e3.ast_runtime == true' \
             'run.e3.id_exhaustion == true' \
             'run.e3.wrong_owner_rejected == true' \
