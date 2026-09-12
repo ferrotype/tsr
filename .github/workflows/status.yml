@@ -269,6 +269,8 @@ jobs:
             'run.e2.frozen_subset == true' \
             'run.e3.shared_bound_file == true' \
             'run.e3.retained_snapshot_edit == true' \
+            'run.e3.shared_pool_panic_retirement == true' \
+            'run.e3.release_boundaries == true' \
             'run.e3.ast_runtime == true' \
             'run.e3.id_exhaustion == true' \
             'run.e3.wrong_owner_rejected == true' \

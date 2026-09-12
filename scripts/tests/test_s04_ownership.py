@@ -59,13 +59,22 @@ def program_manifest():
     }
 
 
+def checker_manifest():
+    return {"version": 1, "suites": {
+        name: {"package": package, "filter": prefix, "cases": [prefix + "generation_boundary"]}
+        for name, (package, prefix) in ownership.s09_ownership.SUITES.items()
+    }}
+
+
 def fixture(root):
     (root / "data/s04").mkdir(parents=True)
     (root / "data/s06").mkdir(parents=True)
     (root / "data/s07").mkdir(parents=True)
+    (root / "data/s09").mkdir(parents=True)
     inventory = SOURCE.parent.parent / "data/s06/ownership-cases.json"
     (root / "data/s06/ownership-cases.json").write_bytes(inventory.read_bytes())
     (root / "data/s07/ownership-cases.json").write_text(json.dumps(program_manifest()))
+    (root / "data/s09/ownership-cases.json").write_text(json.dumps(checker_manifest()))
     (root / "data/s04/e3-cases.json").write_text(json.dumps(sorted(ownership.SCENARIOS)))
     (root / "data/s04/toolchains.toml").write_text(
         'nightly = "nightly-2026-09-05"\ngo = "go1.27.1"\nmsrv = "1.96.0"\n')
@@ -87,10 +96,51 @@ def successful_invoke(root, args, env=None):
             return named_suite_output(suite["cases"])
     if "ts_ast" in args and "storage_tests::" in args:
         return ast_suite_output(root)
+    for suite in ownership.s09_ownership.load_cases(root)["suites"].values():
+        if suite["package"] in args and suite["filter"] in args:
+            return named_suite_output(suite["cases"])
     return suite_output()
 
 
 class OwnershipProducerTests(unittest.TestCase):
+    def test_missing_registry_case_blocks_s09_and_instrumentation_without_hiding_other_modes(self):
+        for mode in ("debug", "release", "miri", "address_sanitizer"):
+            def invoke(root, args, env=None):
+                actual_mode = ("miri" if "miri" in args else "address_sanitizer" if "-Zbuild-std" in args
+                               else "release" if "--release" in args else "debug")
+                if "ts_api" in args and actual_mode == mode:
+                    return named_suite_output([])
+                return successful_invoke(root, args, env)
+
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                fixture(root)
+                with patch.object(ownership, "invoke", invoke):
+                    report = ownership.run(root)
+                self.assertFalse(report["metrics"]["shared_pool_panic_retirement"])
+                self.assertFalse(report["metrics"]["release_boundaries"])
+                self.assertFalse(report["metrics"][f"checker_ownership_registry_{mode}"])
+                self.assertTrue(report["metrics"][f"checker_ownership_pool_{mode}"])
+                self.assertEqual(report["metrics"]["checker_ownership_tests"], 2)
+                self.assertEqual(report["metrics"]["miri"], mode != "miri")
+                self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
+
+    def test_arena_boundary_failure_cannot_be_hidden_by_passing_pool_tests(self):
+        def invoke(root, args, env=None):
+            if "miri" in args and "ts_arena" in args and "lease::" not in args:
+                raise RuntimeError("arena owner boundary failed")
+            return successful_invoke(root, args, env)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            fixture(root)
+            with patch.object(ownership, "invoke", invoke):
+                report = ownership.run(root)
+        self.assertTrue(report["metrics"]["shared_pool_panic_retirement"])
+        self.assertFalse(report["metrics"]["release_boundaries"])
+        self.assertFalse(report["metrics"]["release_boundaries_miri"])
+        self.assertTrue(report["metrics"]["release_boundaries_release"])
+
     def test_missing_exclusive_suite_cannot_leave_shared_e3_metrics_passing(self):
         def invoke(root, args, env=None):
             if "miri" in args and "exclusive_tests::" in args:
@@ -196,7 +246,8 @@ class OwnershipProducerTests(unittest.TestCase):
             fixture(root)
             with patch.object(ownership, "invoke", invoke), patch.dict(ownership.os.environ, {"CARGO_ENCODED_RUSTFLAGS": ""}):
                 report = ownership.run(root)
-        asan = [(args, env) for args, env in calls if "-Zbuild-std" in args and "ts_arena" in args]
+        asan = [(args, env) for args, env in calls
+                if "-Zbuild-std" in args and "ts_arena" in args and "lease::" not in args]
         self.assertEqual(len(asan), 1)
         args, env = asan[0]
         self.assertNotIn("CARGO_ENCODED_RUSTFLAGS", env)
@@ -329,7 +380,8 @@ class OwnershipProducerTests(unittest.TestCase):
             fixture(root)
             with patch.object(ownership, "invoke", invoke):
                 ownership.run(root)
-        runs = [(args, env) for args, env in calls if "miri" in args and "test" in args and "ts_arena" in args]
+        runs = [(args, env) for args, env in calls
+                if "miri" in args and "test" in args and "ts_arena" in args and "lease::" not in args]
         docs = [args for args, _ in calls if "--doc" in args]
         self.assertEqual(docs, [["cargo", "test", "--package", "ts_arena", "--doc", "--locked"]])
         self.assertEqual(len(runs), 1)

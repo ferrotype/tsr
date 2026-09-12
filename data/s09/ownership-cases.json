@@ -1,0 +1,50 @@
+{
+  "suites": {
+    "generation": {
+      "cases": [
+        "lease::gate_tests::a_poisoned_gate_never_recovers_as_active",
+        "lease::gate_tests::nested_gates_and_checker_acquisition_are_rejected_before_waiting",
+        "lease::gate_tests::panic_retires_regardless_of_gate_and_lease_drop_order",
+        "lease::gate_tests::retirement_waits_for_the_committing_gate",
+        "lease::gate_tests::retirement_while_holding_the_same_gate_closes_without_relocking",
+        "lease::tests::a_contended_lease_acquires_after_the_held_permit_is_released",
+        "lease::tests::a_tls_held_lease_drops_after_the_reentry_records_are_destroyed",
+        "lease::tests::adoption_does_not_outlive_retirement_checks",
+        "lease::tests::identity_adopts_its_symbol_arena_exactly_once"
+      ],
+      "filter": "lease::",
+      "package": "ts_arena"
+    },
+    "pool": {
+      "cases": [
+        "tests::api_checker_is_persistent_across_idle_eviction",
+        "tests::callback_resume_rechecks_retirement_after_permit_release",
+        "tests::final_retained_result_controls_checker_disposal",
+        "tests::idle_replacement_retains_the_old_checker_but_rejects_its_types",
+        "tests::initializer_panic_retires_generation_and_prevents_retry",
+        "tests::lazy_initialization_and_same_slot_contention_share_one_owner",
+        "tests::panic_retires_shared_snapshots_but_not_a_fresh_pool",
+        "tests::same_slot_initializer_reentry_is_rejected_before_waiting",
+        "tests::snapshots_share_the_pool_until_the_last_root_is_dropped"
+      ],
+      "filter": "tests::",
+      "package": "ts_project"
+    },
+    "registry": {
+      "cases": [
+        "tests::callback_reentry_requires_releasing_the_operation_and_rechecks_retirement",
+        "tests::commit_holds_generation_gate_through_queue_publication",
+        "tests::commitment_before_retirement_survives_delivery_but_handles_are_invalidated",
+        "tests::equal_numeric_ids_cannot_cross_checkers_snapshots_or_replacement_generations",
+        "tests::lookup_releases_registry_and_gate_before_permit_acquisition_and_revalidates",
+        "tests::queue_backpressure_leaves_no_partial_registration_or_shared_publication",
+        "tests::registry_shared_result_and_queue_retain_storage_until_their_final_roots_drop",
+        "tests::retirement_before_commit_suppresses_registry_shared_result_and_success",
+        "tests::serialization_panic_without_a_lease_retires_all_snapshots"
+      ],
+      "filter": "tests::",
+      "package": "ts_api"
+    }
+  },
+  "version": 1
+}

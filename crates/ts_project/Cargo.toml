@@ -1,0 +1,14 @@
+[package]
+name = "ts_project"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ts_arena = { version = "0.1.0", path = "../ts_arena" }
+ts_checker = { version = "0.1.0", path = "../ts_checker" }
+
+[lints]
+workspace = true

@@ -373,6 +373,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
+name = "ts_api"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_checker",
+ "ts_project",
+]
+
+[[package]]
 name = "ts_arena"
 version = "0.1.0"
 dependencies = [
@@ -587,6 +596,14 @@ dependencies = [
  "ts_jsstring",
  "ts_nodebuilder",
  "ts_scanner",
+]
+
+[[package]]
+name = "ts_project"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_checker",
 ]
 
 [[package]]

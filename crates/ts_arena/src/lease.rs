@@ -1,5 +1,5 @@
 use crate::{counters::Track, ids::next_arena, ArenaId, Counters, Error, SymbolArena};
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc, Mutex, MutexGuard,
@@ -7,17 +7,88 @@ use std::sync::{
 
 thread_local! {
     static ACTIVE_LEASES: RefCell<Vec<ArenaId>> = const { RefCell::new(Vec::new()) };
+    // Gates cannot be nested, including across generations. Cell has no TLS
+    // destructor, so this record remains available to late lease destructors.
+    static ACTIVE_GATE: Cell<Option<ArenaId>> = const { Cell::new(None) };
+}
+
+#[cfg(any(test, feature = "harness"))]
+thread_local! {
+    static CONTENTION_PROBE: RefCell<Option<std::sync::mpsc::Sender<()>>> = const { RefCell::new(None) };
+    static RETIREMENT_PROBE: RefCell<Option<std::sync::mpsc::Sender<()>>> = const { RefCell::new(None) };
+}
+
+/// Arms this thread's next checker acquisition to observe real permit
+/// contention. Harness code must arrange for that permit to be held; an
+/// uncontended or poisoned permit fails the observation instead of signaling.
+/// The production blocking acquisition still runs after the notification.
+#[cfg(any(test, feature = "harness"))]
+pub fn observe_next_lease_contention(attempted: std::sync::mpsc::Sender<()>) {
+    CONTENTION_PROBE.with(|probe| {
+        assert!(
+            probe.borrow_mut().replace(attempted).is_none(),
+            "an unconsumed lease contention probe is already armed"
+        );
+    });
+}
+
+#[cfg(any(test, feature = "harness"))]
+fn observe_contention(operation: &Mutex<()>) {
+    CONTENTION_PROBE.with(|probe| {
+        if let Some(attempted) = probe.borrow_mut().take() {
+            assert!(
+                matches!(
+                    operation.try_lock(),
+                    Err(std::sync::TryLockError::WouldBlock)
+                ),
+                "the observed checker permit must actually be contended"
+            );
+            attempted
+                .send(())
+                .expect("lease contention observer is waiting");
+        }
+    });
+}
+
+/// Arms this thread's next retirement to observe contention on its generation
+/// gate. The harness must keep a commitment gate held until notified. The real
+/// retirement still acquires that gate after the observed `WouldBlock`.
+#[cfg(any(test, feature = "harness"))]
+pub fn observe_next_retirement_contention(attempted: std::sync::mpsc::Sender<()>) {
+    RETIREMENT_PROBE.with(|probe| {
+        assert!(
+            probe.borrow_mut().replace(attempted).is_none(),
+            "an unconsumed retirement contention probe is already armed"
+        );
+    });
+}
+
+#[cfg(any(test, feature = "harness"))]
+fn observe_retirement_contention(gate: &Mutex<()>) {
+    RETIREMENT_PROBE.with(|probe| {
+        if let Some(attempted) = probe.borrow_mut().take() {
+            assert!(
+                matches!(gate.try_lock(), Err(std::sync::TryLockError::WouldBlock)),
+                "the observed generation gate must actually be contended"
+            );
+            attempted
+                .send(())
+                .expect("retirement contention observer is waiting");
+        }
+    });
 }
 
 struct GenerationState {
     id: ArenaId,
     active: AtomicBool,
+    gate: Mutex<()>,
     _owner: Track,
 }
 
 /// A pool generation's permanent invalidation state. Retirement does not dispose
-/// storage retained by owners/leases. The server publication gate is a later
-/// integration requirement; this primitive never claims to commit responses.
+/// storage retained by owners/leases. The gate orders retirement against
+/// registry insertion and response commitment (ownership design §2.7).
+/// Checking `validate` alone does not authorize a later publication.
 #[derive(Clone)]
 pub struct Generation(Arc<GenerationState>);
 impl Generation {
@@ -25,6 +96,7 @@ impl Generation {
         Self(Arc::new(GenerationState {
             id: next_arena(),
             active: AtomicBool::new(true),
+            gate: Mutex::new(()),
             _owner: counters.owner(),
         }))
     }
@@ -32,7 +104,46 @@ impl Generation {
         self.0.id
     }
     pub fn retire(&self) {
+        if ACTIVE_GATE.get() == Some(self.id()) {
+            // An unwinding lease can be dropped before its caller's gate.
+            // That gate already excludes every other retirement/commitment.
+            self.0.active.store(false, Ordering::Release);
+            return;
+        }
+        #[cfg(any(test, feature = "harness"))]
+        observe_retirement_contention(&self.0.gate);
+        // A poisoned gate never permits recovery into an active generation.
+        // Retirement itself still has to close it before releasing a lease.
+        let _gate = self
+            .0
+            .gate
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         self.0.active.store(false, Ordering::Release);
+    }
+
+    /// Enters the short retirement/commitment critical section.
+    ///
+    /// Compute, serialize and reserve output capacity first. While holding this
+    /// guard, callers may take their registry/output locks, but must not invoke
+    /// callbacks, wait for a checker permit, perform transport I/O or retire a
+    /// different generation. Nested gates and checker acquisition are rejected
+    /// before waiting. This primitive does not itself publish any result.
+    pub fn enter(&self) -> Result<GenerationGuard<'_>, Error> {
+        self.validate()?;
+        if ACTIVE_GATE.get().is_some() {
+            return Err(Error::Reentry);
+        }
+        let gate = self.0.gate.lock().map_err(|_| {
+            self.0.active.store(false, Ordering::Release);
+            Error::Retired
+        })?;
+        self.validate()?;
+        ACTIVE_GATE.set(Some(self.id()));
+        Ok(GenerationGuard {
+            generation: self,
+            _gate: gate,
+        })
     }
     pub fn validate(&self) -> Result<(), Error> {
         if self.0.active.load(Ordering::Acquire) {
@@ -40,6 +151,37 @@ impl Generation {
         } else {
             Err(Error::Retired)
         }
+    }
+}
+
+/// A non-transferable proof that this generation cannot concurrently retire.
+/// Registry callers must additionally check the exact checker to which their
+/// retained handle belongs; membership in a shared generation is insufficient.
+pub struct GenerationGuard<'a> {
+    generation: &'a Generation,
+    _gate: MutexGuard<'a, ()>,
+}
+
+impl GenerationGuard<'_> {
+    /// Checks that this gate protects the supplied checker's live generation.
+    pub fn validate_checker(&self, checker: &CheckerIdentity) -> Result<(), Error> {
+        self.generation.validate()?;
+        if Arc::ptr_eq(&self.generation.0, &checker.generation.0) {
+            Ok(())
+        } else {
+            Err(Error::WrongOwner)
+        }
+    }
+}
+
+impl Drop for GenerationGuard<'_> {
+    fn drop(&mut self) {
+        if std::thread::panicking() {
+            // A partially completed registry/publication mutation cannot be
+            // recovered merely because its lock could be unpoisoned.
+            self.generation.0.active.store(false, Ordering::Release);
+        }
+        ACTIVE_GATE.set(None);
     }
 }
 
@@ -80,11 +222,13 @@ impl CheckerIdentity {
     }
     pub fn lease(&self) -> Result<CheckerLease<'_>, Error> {
         self.generation.validate()?;
-        if ACTIVE_LEASES.with(|active| active.borrow().contains(&self.id)) {
+        if ACTIVE_GATE.get().is_some()
+            || ACTIVE_LEASES.with(|active| active.borrow().contains(&self.id))
+        {
             return Err(Error::Reentry);
         }
-        #[cfg(test)]
-        tests::observe_contention(&self.operation);
+        #[cfg(any(test, feature = "harness"))]
+        observe_contention(&self.operation);
         let permit = self.operation.lock().map_err(|_| {
             self.generation.retire();
             Error::Retired
@@ -97,6 +241,10 @@ impl CheckerIdentity {
         })
     }
 }
+
+#[cfg(test)]
+#[path = "generation_tests.rs"]
+mod gate_tests;
 
 /// A non-transferable operation scope. Reentry must drop it and acquire another;
 /// every import validates exact identity, active generation and published bounds.
@@ -151,26 +299,10 @@ impl CheckerLease<'_> {
 mod tests {
     use super::*;
     use std::panic::{catch_unwind, AssertUnwindSafe};
-    use std::sync::{mpsc, OnceLock, TryLockError};
+    use std::sync::{mpsc, OnceLock};
 
     thread_local! {
-        static CONTENTION_PROBE: RefCell<Option<mpsc::Sender<()>>> = const { RefCell::new(None) };
         static HELD_LEASE: RefCell<Option<TlsLease>> = const { RefCell::new(None) };
-    }
-
-    // Installed only on the contender's thread. A failed try_lock establishes
-    // that acquisition was actually attempted while another lease held the
-    // permit; the lease still uses the production blocking lock afterwards.
-    pub(super) fn observe_contention(operation: &Mutex<()>) {
-        CONTENTION_PROBE.with(|probe| {
-            if let Some(probe) = probe.borrow_mut().take() {
-                assert!(matches!(
-                    operation.try_lock(),
-                    Err(TryLockError::WouldBlock)
-                ));
-                probe.send(()).unwrap();
-            }
-        });
     }
 
     struct TlsLease {
@@ -201,7 +333,7 @@ mod tests {
         let contender = {
             let identity = identity.clone();
             std::thread::spawn(move || {
-                CONTENTION_PROBE.with(|probe| *probe.borrow_mut() = Some(attempted));
+                observe_next_lease_contention(attempted);
                 let lease = identity.lease();
                 finished.send(lease.is_ok()).unwrap();
             })
