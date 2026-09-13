@@ -18,7 +18,7 @@ class WalkerContract(unittest.TestCase):
         self.observed = strict_json_loads((self.native / 'observations.json').read_bytes())
 
     def test_native_inventory_and_empty_states(self):
-        self.assertEqual(validate(self.request, self.observed), 23)
+        self.assertEqual(validate(self.request, self.observed), 24)
         rows = self.observed['cases']
         self.assertEqual(rows[0]['types'], {'state': 'disabled'})
         self.assertEqual(rows[1]['types'], {'state': 'no_content'})

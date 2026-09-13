@@ -230,8 +230,21 @@ impl<'a> NodeBuilder<'a> {
     fn symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
         let read = self.checker.symbol(symbol)?;
         let declarations = self.checker.symbol_declarations(symbol)?;
-        if read.name_bytes() == ts_ast::internal_symbol_names::DEFAULT && declarations.is_empty() {
-            return Ok(JsString::from_bytes(b"default".as_slice()));
+        if read.name_bytes() == ts_ast::internal_symbol_names::DEFAULT
+            && self.flags & nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0
+        {
+            let external =
+                if self.flags & nf::IN_INITIAL_ENTITY_NAME == 0 || declarations.is_empty() {
+                    true
+                } else if let Some(enclosing) = self.enclosing {
+                    self.default_binding_context(declarations.first().flatten())?
+                        != self.default_binding_context(Some(enclosing))?
+                } else {
+                    false
+                };
+            if external {
+                return Ok(JsString::from_bytes(b"default".as_slice()));
+            }
         }
         for declaration in declarations.iter().flatten() {
             let view = self.checker.ast(declaration)?;
@@ -285,6 +298,19 @@ impl<'a> NodeBuilder<'a> {
         Ok(JsString::from_bytes(
             ts_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
         ))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:isDefaultBindingContext
+    fn default_binding_context(&self, mut node: Option<NodeId>) -> Result<Option<NodeId>, Error> {
+        while let Some(id) = node {
+            let view = self.checker.ast(id)?;
+            let read = view.node(id)?;
+            if read.kind() == K::SourceFile || ts_ast::is_ambient_module(view, id)? {
+                return Ok(node);
+            }
+            node = read.parent();
+        }
+        Ok(None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolFromNameType
@@ -374,9 +400,6 @@ impl<'a> NodeBuilder<'a> {
     }
 
     fn type_reference(&mut self, symbol: SymbolId, arguments: &[TypeId]) -> Result<NodeId, Error> {
-        if self.name_external_module(symbol)? {
-            return self.module_type_node(symbol, false, arguments);
-        }
         let arguments = if arguments.is_empty() {
             None
         } else {

@@ -1,6 +1,6 @@
 # Focused P5 native walker observations
 
-Twenty-three programs produce 844 ordered public checker/builder requests. The Go
+Twenty-four programs produce 930 ordered public checker/builder requests. The Go
 driver uses the original pinned `tsbaseline` walker through the existing
 access-only P0 hooks. It does not implement another walker. The Rust adapter
 traverses its own AST and invokes production APIs; it never reads expected
@@ -13,14 +13,15 @@ imports/re-exports, overload declaration truncation, reparsed JSDoc, computed
 and indexed properties, flow narrowing, renamed destructuring, assertions,
 `noCheck` and `skipLibCheck`, numeric/quoted class members, and unresolved
 aliases with raw symbol parent chains, and computed binding names containing calls
-and parenthesized assignments. Computed index components also distinguish
+and parenthesized assignments. CommonJS exports distinguish `default` property
+access from names requiring brackets. Computed index components also distinguish
 reusable entity names from call-expression keys that require an index signature.
 
 `requests.json` contains the exact captured input bytes. `observations.json`
 retains raw result bytes as hex and native type IDs. `provenance.json` records
 the pinned source, effective Go version and request/observation/overlay hashes.
 `sources.json` records the producer source hashes at capture time. The local
-capture with all overlay sources is `target/s08/p5-walker-native-23`; the committed
+capture with all overlay sources is `target/s08/p5-walker-default-native-01`; the committed
 fixture is about 120 KB, without duplicate source snapshots or executables.
 
 The supplemental comparison renames numeric type IDs by first occurrence within

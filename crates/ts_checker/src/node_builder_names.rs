@@ -298,28 +298,6 @@ impl NodeBuilder<'_> {
         Ok(JsString::from_bytes(view.source_file(source)?.file_name()))
     }
 
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
-    pub(super) fn module_type_node(
-        &mut self,
-        symbol: SymbolId,
-        is_type_of: bool,
-        arguments: &[crate::TypeId],
-    ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
-        let specifier = self.context_free_module_specifier(symbol)?;
-        self.approximate_length += specifier.len() + 10;
-        let literal = self.string_literal(specifier);
-        let argument = self.ast.new_literal_type_node(Some(literal));
-        let arguments = if arguments.is_empty() {
-            None
-        } else {
-            Some(self.type_list(arguments, false)?)
-        };
-        Ok(self
-            .ast
-            .new_import_type_node(is_type_of, Some(argument), None, None, arguments))
-    }
-
     // Keep symbol/container selection here; generation uses the immutable
     // program host, including retained import modes and package identity.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
@@ -729,6 +707,16 @@ impl NodeBuilder<'_> {
         enclosing: Option<NodeId>,
         meaning: u32,
     ) -> Result<Vec<SymbolId>, Error> {
+        self.display_name_chain_with_module(symbol, enclosing, meaning, false)
+    }
+
+    fn display_name_chain_with_module(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        yield_module: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
         if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
             || self.internal_flags & ts_nodebuilder::internal_flags::DO_NOT_INCLUDE_SYMBOL_CHAIN
                 != 0
@@ -745,6 +733,7 @@ impl NodeBuilder<'_> {
                 external_only: self.flags & ts_nodebuilder::flags::USE_ONLY_EXTERNAL_ALIASING != 0,
             },
             true,
+            yield_module,
         )
     }
 
@@ -753,9 +742,10 @@ impl NodeBuilder<'_> {
         &mut self,
         query: NameQuery,
         end_of_chain: bool,
+        yield_module: bool,
     ) -> Result<Vec<SymbolId>, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.qualified_name_chain_worker(query, end_of_chain)
+            self.qualified_name_chain_worker(query, end_of_chain, yield_module)
         })
     }
 
@@ -763,6 +753,7 @@ impl NodeBuilder<'_> {
         &mut self,
         query: NameQuery,
         end_of_chain: bool,
+        yield_module: bool,
     ) -> Result<Vec<SymbolId>, Error> {
         let mut chain = self.accessible_name_chain(query)?;
         let qualifier_meaning = if chain.len() > 1 {
@@ -827,6 +818,7 @@ impl NodeBuilder<'_> {
                         ..query
                     },
                     false,
+                    yield_module,
                 )?;
                 if parent_chain.is_empty() {
                     continue;
@@ -865,7 +857,7 @@ impl NodeBuilder<'_> {
             || self.checker.symbol(query.symbol)?.flags() & (sf::TYPE_LITERAL | sf::OBJECT_LITERAL)
                 == 0
         {
-            if !end_of_chain && self.name_external_module(query.symbol)? {
+            if !end_of_chain && !yield_module && self.name_external_module(query.symbol)? {
                 return Ok(vec![]);
             }
             return Ok(vec![query.symbol]);
@@ -1032,21 +1024,26 @@ fn is_late_bound_name(name: &[u8]) -> bool {
 }
 
 impl NodeBuilder<'_> {
-    /// `lookupSymbolChain` for type-node construction; the module-root case is
-    /// handled by the callers through `module_type_node`.
+    /// `lookupSymbolChain` for type-node construction, preserving a module root
+    /// when alias policy requires an import type.
     pub(super) fn type_symbol_chain(
         &mut self,
         symbol: SymbolId,
         meaning: u32,
     ) -> Result<Vec<SymbolId>, Error> {
-        let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
+        let chain = self.display_name_chain_with_module(
+            symbol,
+            self.enclosing,
+            meaning,
+            self.flags & ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0,
+        )?;
         if chain.is_empty() {
             return Err(Error::MissingLink("symbol type node chain"));
         }
         Ok(chain)
     }
 
-    /// The non-module-root tail of `symbolToTypeNode`.
+    /// Resolve aliases before deciding between an entity name and an import type.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
     pub(super) fn symbol_type_node_from_chain(
         &mut self,
@@ -1054,11 +1051,23 @@ impl NodeBuilder<'_> {
         meaning: u32,
         type_arguments: Option<ts_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
         let chain = self.type_symbol_chain(symbol, meaning)?;
+        self.symbol_type_node_from_resolved_chain(&chain, meaning, type_arguments)
+    }
+
+    fn symbol_type_node_from_resolved_chain(
+        &mut self,
+        chain: &[SymbolId],
+        meaning: u32,
+        type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
         let is_type_of = meaning == sf::VALUE;
+        if self.name_external_module(chain[0])? {
+            return self.import_type_from_symbol_chain(chain, is_type_of, type_arguments);
+        }
         let entity_name =
-            self.access_from_symbol_chain(&chain, chain.len() - 1, 0, type_arguments)?;
+            self.access_from_symbol_chain(chain, chain.len() - 1, 0, type_arguments)?;
         let kind = self.ast.view().node(entity_name)?.kind();
         if kind == K::IndexedAccessType {
             // Indexed accesses can never be `typeof`
@@ -1075,6 +1084,77 @@ impl NodeBuilder<'_> {
         Err(Error::Unsupported(
             "symbolToTypeNode: expression with type arguments",
         ))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
+    fn import_type_from_symbol_chain(
+        &mut self,
+        chain: &[SymbolId],
+        is_type_of: bool,
+        type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        let qualifier = if chain.len() > 1 {
+            Some(self.access_from_symbol_chain(chain, chain.len() - 1, 1, type_arguments)?)
+        } else {
+            None
+        };
+        let arguments = match type_arguments {
+            Some(arguments) => Some(arguments),
+            None => self.qualified_type_parameter_nodes(chain, 0)?,
+        };
+        let specifier = self.module_specifier_with_context(chain[0], self.enclosing)?;
+        self.approximate_length += specifier.len() + 10;
+        let literal = self.string_literal(specifier);
+        let argument = self.ast.new_literal_type_node(Some(literal));
+        if let Some(mut node) = qualifier {
+            if self.ast.view().node(node)?.kind() == K::IndexedAccessType {
+                // getTopmostIndexedAccessType follows the object side to its
+                // first indexed access. Preserve that exact pinned extraction.
+                loop {
+                    let object = self
+                        .ast
+                        .view()
+                        .node(node)?
+                        .as_indexed_access_type_node()
+                        .unwrap()
+                        .object_type()
+                        .unwrap();
+                    if self.ast.view().node(object)?.kind() != K::IndexedAccessType {
+                        break;
+                    }
+                    node = object;
+                }
+                let indexed = self
+                    .ast
+                    .view()
+                    .node(node)?
+                    .data_source()
+                    .as_indexed_access_type_node()
+                    .unwrap()
+                    .to_owned();
+                let qualifier = self
+                    .ast
+                    .view()
+                    .node(indexed.object_type.unwrap())?
+                    .as_type_reference_node()
+                    .unwrap()
+                    .type_name();
+                let imported = self.ast.new_import_type_node(
+                    is_type_of,
+                    Some(argument),
+                    None,
+                    qualifier,
+                    arguments,
+                );
+                return Ok(self
+                    .ast
+                    .new_indexed_access_type_node(Some(imported), indexed.index_type));
+            }
+        }
+        Ok(self
+            .ast
+            .new_import_type_node(is_type_of, Some(argument), None, qualifier, arguments))
     }
 
     /// Type arguments written for a non-final chain component.

@@ -336,29 +336,29 @@ impl NodeBuilder<'_> {
         } else {
             Some(self.list(type_parameters)?)
         };
-        let mut parameters = Vec::new();
-        if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
-            if let Some(this) = sig.this_parameter {
-                parameters.push(self.parameter_node(this)?);
+        // Parameters do not inherit suppression of the enclosing signature's
+        // top-level `any` return type.
+        let flags = self.flags;
+        self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
+        let parameters = (|| {
+            let mut parameters = Vec::new();
+            if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
+                if let Some(this) = sig.this_parameter {
+                    parameters.push(self.parameter_node(this)?);
+                }
             }
-        }
-        for &parameter in expanded {
-            parameters.push(self.parameter_node(parameter)?);
-        }
-        let parameters = self.list(parameters)?;
-        let mut return_type = self.checker.return_type_of_signature(signature)?;
-        if let Some(declaration) = sig.declaration {
-            if self.checker.ast(declaration)?.node(declaration)?.flags()
-                & ts_ast::node_flags::SYNTHESIZED
-                == 0
-            {
-                return_type = self.checker.instantiate_type(return_type, self.mapper)?;
+            for &parameter in expanded {
+                parameters.push(self.parameter_node(parameter)?);
             }
+            self.list(parameters)
+        })();
+        self.flags = flags;
+        let parameters = parameters?;
+        let mut return_type = self.serialize_signature_return(signature, true)?;
+        if return_type.is_none() && matches!(kind, K::FunctionType | K::ConstructorType) {
+            let empty = self.ast.new_identifier(JsString::default());
+            return_type = Some(self.ast.new_type_reference_node(Some(empty), None));
         }
-        let return_type = match self.checker.type_predicate_of_signature(signature)? {
-            Some(predicate) => self.predicate_node(predicate)?,
-            None => self.type_node(return_type)?,
-        };
         let modifiers = if kind == K::ConstructorType && sig.flags & sg::ABSTRACT != 0 {
             let abstract_modifier = self.ast.new_modifier(K::AbstractKeyword.into());
             Some(self.list(vec![abstract_modifier])?)
@@ -366,33 +366,32 @@ impl NodeBuilder<'_> {
             None
         };
         Ok(match kind {
-            K::FunctionType => self.ast.new_function_type_node(
-                type_parameters,
-                Some(parameters),
-                Some(return_type),
-            ),
+            K::FunctionType => {
+                self.ast
+                    .new_function_type_node(type_parameters, Some(parameters), return_type)
+            }
             K::ConstructorType => self.ast.new_constructor_type_node(
                 modifiers,
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::CallSignature => self.ast.new_call_signature_declaration(
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::ConstructSignature => self.ast.new_construct_signature_declaration(
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::GetAccessor => self.ast.new_get_accessor_declaration(
                 None,
                 name,
                 None,
                 Some(parameters),
-                Some(return_type),
+                return_type,
                 None,
                 None,
             ),
@@ -411,7 +410,7 @@ impl NodeBuilder<'_> {
                 question,
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             _ => {
                 return Err(Error::Unsupported(

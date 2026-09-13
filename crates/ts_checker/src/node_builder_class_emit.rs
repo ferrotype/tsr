@@ -300,9 +300,6 @@ impl NodeBuilder<'_> {
         if meaning == sf::TYPE {
             return self.type_reference(symbol, &[]);
         }
-        if self.name_external_module(symbol)? {
-            return self.module_type_node(symbol, true, &[]);
-        }
         self.track_symbol(symbol, meaning)?;
         self.approximate_length += 6;
         self.symbol_type_node_from_chain(symbol, meaning, None)

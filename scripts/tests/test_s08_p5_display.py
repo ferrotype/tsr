@@ -17,7 +17,7 @@ class DisplayProtocol(unittest.TestCase):
         self.observed = strict_json_loads((self.native / 'observations.json').read_bytes())
 
     def test_native_inventory_has_valid_states(self):
-        self.assertEqual(validate(self.request, self.observed), 82)
+        self.assertEqual(validate(self.request, self.observed), 126)
 
     def test_missing_reordered_or_duplicate_queries_fail(self):
         for mutation in ('missing', 'reordered', 'duplicate'):

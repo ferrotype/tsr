@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These eighty-two source-selected requests exercise explicit builder calls and
+These 126 source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -47,3 +47,9 @@ recursive tuple displays with distinct enclosing declarations and quote flags.
 The latest complete direct-display capture is
 `target/s08/p5-display-cache-native-01`: 82/82 exact results. Allocation counts
 and cache-hit equivalence are not inferred from matching output bytes.
+
+The current complete capture is `target/s08/p5-display-return-native-02`:
+126/126 exact results. Its 44 added requests cover namespace aliases (including
+an arbitrary self-export name), inferred cross-file import qualifiers, preserved
+signature return annotations (`typeof` private names, unique symbols and union
+order), and suppressed top-level `any` returns with unsuppressed callback types.

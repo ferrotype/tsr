@@ -381,6 +381,26 @@
       ],
       "header": "computed-index-name-reuse.ts",
       "allow_js": false
+    },
+    {
+      "id": "commonjs-default-property-name",
+      "files": [
+        {
+          "name": "/mod.js",
+          "content": "exports[\"default\"] = { value: 1 }; exports[\"x-y\"] = { value: 2 };"
+        },
+        {
+          "name": "/main.js",
+          "content": "const imported = require(\"./mod\"); imported.default; imported[\"x-y\"];"
+        }
+      ],
+      "roots": [
+        "/main.js"
+      ],
+      "header": "commonjs-default-property-name.js",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": true
     }
   ]
 }

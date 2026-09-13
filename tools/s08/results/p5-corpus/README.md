@@ -37,3 +37,24 @@ the two computed-destructuring cases retain structured diagnostic differences.
 This is a separate five-case result, not a new full-corpus total. Raw data lives
 in `target/s08/p5-corpus-display-recheck-04`; intermediate rechecks `-02` and
 `-03` remain available and are not added to the final counts.
+
+`pre-module-recheck-summary.json` records the 95 completed-but-different rows
+from the 637-row selection at `df01608`: 12 match and 83 differ, with no failed
+execution. `module-and-return-recheck-summary.json` repeats exactly that selection
+after the module-root and signature-reuse fixes: 30 match and 65 differ, again
+with no failed execution. Of the latter 65, 23 match type/symbol output and query
+contracts but differ in diagnostics; 42 still differ in types, symbols or queries.
+The records retain every row, tier and source/build fingerprint.
+
+`default-name-recheck-summary.json` is a separate one-case verification of the
+CommonJS `default` spelling fix: all bytes and queries match. It must not be
+added to the 95-case report to manufacture a newly measured aggregate.
+Intermediate alias and module-root captures are also retained locally under
+`target/s08/p5-corpus-{module-alias,module-root}-recheck-01`.
+
+The inspected remaining differences include absent symbols for private `this`,
+missing optional/expando properties, inferred property/return types and widening,
+and diagnostics affecting the native intrinsic-`any` fast path. The latter changes
+the query schedule even where emitted text agrees. The formatter must preserve
+that branch rather than fabricate queries to match Go. These are P6 investigation
+items; this attribution is not an accepted divergence or an E2 pass claim.

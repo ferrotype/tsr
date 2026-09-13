@@ -923,12 +923,8 @@ impl NodeBuilder<'_> {
             return Ok(None);
         }
         self.track_symbol(resolved, meaning)?;
-        let name = self.symbol_expression_with_meaning(resolved, self.enclosing, meaning)?;
-        Ok(Some(if is_type_of {
-            self.ast.new_type_query_node(Some(name), args)
-        } else {
-            self.ast.new_type_reference_node(Some(name), args)
-        }))
+        self.symbol_type_node_from_chain(resolved, meaning, args)
+            .map(Some)
     }
     fn reuse_simple_type(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let mut inner = node;

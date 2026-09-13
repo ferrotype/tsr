@@ -1528,7 +1528,6 @@
       "tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration",
       "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType",
       "tsc/internal/checker/nodebuilderimpl.go:hasTypeAnnotation",
-      "tsc/internal/checker/nodebuilderimpl.go:isDefaultBindingContext",
       "tsc/internal/checker/nodebuilderimpl.go:isIdentifierTypeReference",
       "tsc/internal/checker/nodebuilderimpl.go:newNodeBuilderImpl",
       "tsc/internal/checker/nodebuilderimpl.go:startsWithSingleOrDoubleQuote",

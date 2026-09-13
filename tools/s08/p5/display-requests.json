@@ -679,6 +679,407 @@
           "flags": 276824064
         }
       ]
+    },
+    {
+      "id": "module-alias-display",
+      "files": {
+        "/lib.ts": "export const marker = 1;",
+        "/main.ts": "import * as ns from \"./lib\"; const local = ns; type Remote = typeof import(\"./lib\");"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "local-None-type_string",
+          "declaration": "local",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "local-None-type_node",
+          "declaration": "local",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "local-declaration-type_string",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "local-declaration-type_node",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Remote-None-type_string",
+          "declaration": "Remote",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Remote-None-type_node",
+          "declaration": "Remote",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Remote-declaration-type_string",
+          "declaration": "Remote",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Remote-declaration-type_node",
+          "declaration": "Remote",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "self-module-alias-display",
+      "files": {
+        "/main.ts": "export * as \"<Self>\" from \"./main\"; import { \"<Self>\" as selfAlias } from \"./main\"; const same = selfAlias;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "same-None-type_string",
+          "declaration": "same",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "same-None-type_node",
+          "declaration": "same",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "same-declaration-type_string",
+          "declaration": "same",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "same-declaration-type_node",
+          "declaration": "same",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "inferred-import-qualifier",
+      "files": {
+        "/lib.ts": "export interface RemoteItem { value: number }; export function make(): RemoteItem { return {value: 1}; }",
+        "/main.ts": "import { make } from \"./lib\"; const inferred = make(); const factory = make;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-none-type_string",
+          "declaration": "inferred",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-none-type_node",
+          "declaration": "inferred",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "inferred-declaration-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-declaration-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-none-type_string",
+          "declaration": "factory",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-none-type_node",
+          "declaration": "factory",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-declaration-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-declaration-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "inferred-import-namespace",
+      "files": {
+        "/lib.ts": "export namespace Nested { export const marker = 1; } export function expose() { return Nested; }",
+        "/main.ts": "import { expose } from \"./lib\"; const namespaceValue = expose();"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "namespaceValue-none-type_string",
+          "declaration": "namespaceValue",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "namespaceValue-none-type_node",
+          "declaration": "namespaceValue",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "namespaceValue-declaration-type_string",
+          "declaration": "namespaceValue",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "namespaceValue-declaration-type_node",
+          "declaration": "namespaceValue",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "signature-return-annotation",
+      "files": {
+        "/main.ts": "declare const uniqueResult: unique symbol; function uniqueReturn(): typeof uniqueResult { return uniqueResult; } const uniqueFn = uniqueReturn;\nfunction reordered(x: string | number): number | string { return x; } const orderedFn = reordered;\nfunction numericReturn(): 0x10 { return 16; } const literalFn = numericReturn;\nclass Secret { #value = 1; method(a: Secret): typeof a.#value { return a.#value; } } const privateFn = new Secret().method;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "uniqueFn-none-type_string",
+          "declaration": "uniqueFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "uniqueFn-none-type_node",
+          "declaration": "uniqueFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "uniqueFn-declaration-type_string",
+          "declaration": "uniqueFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "uniqueFn-declaration-type_node",
+          "declaration": "uniqueFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "orderedFn-none-type_string",
+          "declaration": "orderedFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "orderedFn-none-type_node",
+          "declaration": "orderedFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "orderedFn-declaration-type_string",
+          "declaration": "orderedFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "orderedFn-declaration-type_node",
+          "declaration": "orderedFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "literalFn-none-type_string",
+          "declaration": "literalFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "literalFn-none-type_node",
+          "declaration": "literalFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "literalFn-declaration-type_string",
+          "declaration": "literalFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "literalFn-declaration-type_node",
+          "declaration": "literalFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "privateFn-none-type_string",
+          "declaration": "privateFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "privateFn-none-type_node",
+          "declaration": "privateFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "privateFn-declaration-type_string",
+          "declaration": "privateFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "privateFn-declaration-type_node",
+          "declaration": "privateFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "suppressed-signature-return",
+      "files": {
+        "/main.ts": "declare const arbitrary: (callback: () => any) => any; declare const constructor: new (callback: () => any) => any;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "arbitrary-79659013",
+          "declaration": "arbitrary",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "arbitrary-79659269",
+          "declaration": "arbitrary",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659269,
+          "internal_flags": 8
+        },
+        {
+          "id": "constructor-79659013",
+          "declaration": "constructor",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "constructor-79659269",
+          "declaration": "constructor",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659269,
+          "internal_flags": 8
+        }
+      ]
     }
   ]
 }
