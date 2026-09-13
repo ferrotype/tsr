@@ -657,7 +657,7 @@ impl<'a> NodeBuilder<'a> {
                     "typeReferenceToTypeNode: applied outer arguments",
                 ));
             }
-            let arity = interface.type_parameters().len();
+            let arity = self.reference_display_arity(ty, &arguments)?;
             return self.type_reference(
                 record
                     .symbol
@@ -946,9 +946,9 @@ impl<'a> NodeBuilder<'a> {
             for &index in indexes.iter() {
                 if self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0 {
                     let placeholder = self.elided_type();
-                    nodes.push(self.index_signature_node_with_type(index, Some(placeholder))?);
+                    nodes.extend(self.object_index_nodes(index, Some(placeholder))?);
                 } else {
-                    nodes.push(self.index_signature_node(index)?);
+                    nodes.extend(self.object_index_nodes(index, None)?);
                 }
             }
             nodes.extend(self.object_members(&properties)?);

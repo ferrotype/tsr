@@ -54,54 +54,6 @@ impl CheckerState {
         Ok(false)
     }
 
-    // port: tsc/internal/checker/emitresolver.go:EmitResolver.requiresAddingImplicitUndefinedWorker
-    pub(crate) fn parameter_requires_implicit_undefined(
-        &mut self,
-        parameter: NodeId,
-        enclosing: Option<NodeId>,
-    ) -> Result<bool, Error> {
-        if !self.options.strict_null_checks
-            || self.ast(parameter)?.node(parameter)?.kind() != K::Parameter
-        {
-            return Ok(false);
-        }
-        let read = self.ast(parameter)?.node(parameter)?;
-        let initializer = read.initializer();
-        let annotation = read.type_node();
-        let property =
-            read.modifier_flags(self.ast(parameter)?)? & mf::PARAMETER_PROPERTY_MODIFIER != 0;
-        let optional = self.is_optional_source_parameter(parameter)?;
-        let needed = if optional {
-            initializer.is_none() && property
-        } else if initializer.is_some() {
-            !property
-                || enclosing
-                    .map(|node| {
-                        self.ast(node)?
-                            .node(node)
-                            .map(|read| ts_ast::utilities::is_function_like(Some(&read)))
-                            .map_err(Error::from)
-                    })
-                    .transpose()?
-                    .unwrap_or(false)
-        } else {
-            false
-        };
-        if !needed {
-            return Ok(false);
-        }
-        if let Some(annotation) = annotation {
-            let ty = self.get_type_from_type_node(annotation)?;
-            if self.is_error_type(ty)? {
-                return Ok(false);
-            }
-            if self.class_type_contains_undefined(ty)? {
-                return Ok(false);
-            }
-        }
-        Ok(true)
-    }
-
     pub(crate) fn is_optional_source_parameter(
         &mut self,
         parameter: NodeId,

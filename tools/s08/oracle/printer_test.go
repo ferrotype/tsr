@@ -42,6 +42,24 @@ type s08Builder struct {
 	t  *testing.T
 }
 
+func init() {
+	s08Kinds["EqualsToken"] = ast.KindEqualsToken
+	s08Kinds["CommaToken"] = ast.KindCommaToken
+	s08Kinds["QuestionQuestionToken"] = ast.KindQuestionQuestionToken
+	s08Kinds["BarBarToken"] = ast.KindBarBarToken
+	s08Kinds["AmpersandAmpersandToken"] = ast.KindAmpersandAmpersandToken
+	s08Kinds["BarToken"] = ast.KindBarToken
+	s08Kinds["CaretToken"] = ast.KindCaretToken
+	s08Kinds["AmpersandToken"] = ast.KindAmpersandToken
+	s08Kinds["EqualsEqualsToken"] = ast.KindEqualsEqualsToken
+	s08Kinds["LessThanToken"] = ast.KindLessThanToken
+	s08Kinds["LessThanLessThanToken"] = ast.KindLessThanLessThanToken
+	s08Kinds["AsteriskToken"] = ast.KindAsteriskToken
+	s08Kinds["SlashToken"] = ast.KindSlashToken
+	s08Kinds["AsteriskAsteriskToken"] = ast.KindAsteriskAsteriskToken
+	s08Kinds["PlusEqualsToken"] = ast.KindPlusEqualsToken
+}
+
 func (b *s08Builder) kind(v any) ast.Kind {
 	kind, ok := s08Kinds[v.(string)]
 	if !ok {
@@ -153,6 +171,18 @@ func (b *s08Builder) build(v any) *ast.Node {
 		return f.NewPrefixUnaryExpression(b.kind(m["operator"]), b.build(m["operand"]))
 	case "PropertyAccess":
 		return f.NewPropertyAccessExpression(b.build(m["expression"]), nil, b.build(m["name"]), ast.NodeFlagsNone)
+	case "Call":
+        flags := ast.NodeFlagsNone
+        if b.flag(m, "optional") { flags = ast.NodeFlagsOptionalChain }
+        return f.NewCallExpression(b.build(m["expression"]), b.optToken(m, "optional", ast.KindQuestionDotToken), b.list(m["typeArguments"]), b.list(m["arguments"]), flags)
+    case "ElementAccess":
+        flags := ast.NodeFlagsNone
+        if b.flag(m, "optional") { flags = ast.NodeFlagsOptionalChain }
+        return f.NewElementAccessExpression(b.build(m["expression"]), b.optToken(m, "optional", ast.KindQuestionDotToken), b.build(m["argument"]), flags)
+    case "ParenthesizedExpression":
+        return f.NewParenthesizedExpression(b.build(m["expression"]))
+    case "Binary":
+        return f.NewBinaryExpression(nil, b.build(m["left"]), nil, f.NewToken(b.kind(m["operator"])), b.build(m["right"]))
 	case "ExpressionWithTypeArguments":
 		return f.NewExpressionWithTypeArguments(b.build(m["expression"]), b.list(m["typeArguments"]))
 	case "UnionType":

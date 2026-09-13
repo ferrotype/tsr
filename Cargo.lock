@@ -563,6 +563,7 @@ name = "ts_printer"
 version = "0.1.0"
 dependencies = [
  "serde_json",
+ "stacker",
  "ts_arena",
  "ts_ast",
  "ts_core",

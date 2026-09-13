@@ -668,7 +668,7 @@ impl NodeBuilder<'_> {
             && ts_ast::is_declaration(&view.node(parent)?)
             && view.node(parent)?.name() == Some(node))
     }
-    fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
         let first = ts_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let text = self.checker.ast(first)?.node_text(first)?.into_js_string();
         let symbol = self.checker.resolve_name(

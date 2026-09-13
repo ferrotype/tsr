@@ -11,8 +11,8 @@ were compared independently.
 whose type/symbol walk failed in that full capture, after porting element-access
 printing and raw alias parent chains. It is not a new full-corpus measurement;
 do not add its counts to the original report to infer a current full result.
-Five explicit failures remain in that selection. Additional completed queries
-still have exact-byte or diagnostic differences.
+Five explicit failures remained in that historical selection. Additional
+completed queries had exact-byte or diagnostic differences.
 
 The raw captures remain local rather than adding hundreds of MB to Git:
 
@@ -28,3 +28,12 @@ are review records, not self-contained replacement evidence for the raw
 captures. Reproduction commands and remaining P5 work are in
 [`docs/S08-P5.md`](../../../../docs/S08-P5.md). The small, independent native
 walker fixtures run in the Rust regression suite.
+
+`final-display-recheck-summary.json` covers those five remaining failures after
+expression printing, mapped wrappers, iterable default-argument elision,
+parameter annotation reuse and computed index-name reuse were ported. All five
+match type/symbol bytes and query schedules. Three also match error baselines;
+the two computed-destructuring cases retain structured diagnostic differences.
+This is a separate five-case result, not a new full-corpus total. Raw data lives
+in `target/s08/p5-corpus-display-recheck-04`; intermediate rechecks `-02` and
+`-03` remain available and are not added to the final counts.

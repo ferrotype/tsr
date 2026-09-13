@@ -138,3 +138,162 @@ fn last_rune_follows_go_standard_decoding() {
     );
     assert_eq!(decode_last_rune(&[0x80, 0x80, 0x80, 0x80, 0x80]), None);
 }
+
+// Native stack segments, rather than wasm/Miri's execution-stack model.
+#[cfg(not(any(miri, target_family = "wasm")))]
+#[test]
+fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
+    use crate::{EmitContext, Printer, PrinterOptions};
+    use ts_ast::{AstBuilder, FactoryMethods, JsString, SyntaxKind as K};
+    struct StackWriter {
+        writer: TextWriter,
+        greatest_remaining: usize,
+        panic_on_keyword: bool,
+    }
+    impl StackWriter {
+        fn observe_stack(&mut self) {
+            self.greatest_remaining = self.greatest_remaining.max(
+                stacker::remaining_stack()
+                    .expect("native growth test needs observable stack bounds"),
+            );
+        }
+    }
+    macro_rules! text_methods {
+        ($($name:ident),* $(,)?) => {$(
+            fn $name(&mut self, text: &[u8]) {
+                self.observe_stack();
+                self.writer.$name(text);
+            }
+        )*};
+    }
+    impl EmitTextWriter for StackWriter {
+        text_methods!(
+            write,
+            write_trailing_semicolon,
+            write_comment,
+            write_operator,
+            write_punctuation,
+            write_space,
+            write_string_literal,
+            write_parameter,
+            write_property,
+            raw_write,
+            write_literal
+        );
+        fn write_keyword(&mut self, text: &[u8]) {
+            self.observe_stack();
+            assert!(!self.panic_on_keyword, "writer panic after stack growth");
+            self.writer.write_keyword(text);
+        }
+        fn write_symbol(&mut self, text: &[u8], symbol: Option<ts_ast::SymbolId>) {
+            self.observe_stack();
+            self.writer.write_symbol(text, symbol);
+        }
+        fn write_line(&mut self) {
+            self.writer.write_line();
+        }
+        fn write_line_force(&mut self, force: bool) {
+            self.writer.write_line_force(force);
+        }
+        fn increase_indent(&mut self) {
+            self.writer.increase_indent();
+        }
+        fn decrease_indent(&mut self) {
+            self.writer.decrease_indent();
+        }
+        fn clear(&mut self) {
+            self.writer.clear();
+        }
+        fn text(&self) -> &[u8] {
+            self.writer.text()
+        }
+        fn get_text_pos(&self) -> usize {
+            self.writer.get_text_pos()
+        }
+        fn get_line(&self) -> isize {
+            self.writer.get_line()
+        }
+        fn get_column(&self) -> isize {
+            self.writer.get_column()
+        }
+        fn get_indent(&self) -> isize {
+            self.writer.get_indent()
+        }
+        fn is_at_start_of_line(&self) -> bool {
+            self.writer.is_at_start_of_line()
+        }
+        fn has_trailing_comment(&self) -> bool {
+            self.writer.has_trailing_comment()
+        }
+        fn has_trailing_whitespace(&self) -> bool {
+            self.writer.has_trailing_whitespace()
+        }
+    }
+    const STACK: usize = 512 * 1024;
+    std::thread::Builder::new()
+        .stack_size(STACK)
+        .spawn(|| {
+            let counters = ts_arena::Counters::new();
+            let before = counters.snapshot();
+            {
+                let emit = EmitContext::new();
+                let mut ast = AstBuilder::new(
+                    ts_jsstring::SourceText::from_bytes(b"".as_slice()),
+                    &counters,
+                );
+                let mut typ = ast.new_keyword_type_node(K::StringKeyword.into());
+                let identifier = ast.new_identifier(JsString::from_bytes(b"x".as_slice()));
+                let plus = ast.new_token(K::PlusToken.into());
+                let mut expression = identifier;
+                let depth = 3000;
+                for _ in 0..depth {
+                    typ = ast.new_parenthesized_type_node(Some(typ));
+                    expression = ast.new_binary_expression(
+                        None,
+                        Some(expression),
+                        None,
+                        Some(plus),
+                        Some(identifier),
+                    );
+                }
+                let printer = Printer::new(PrinterOptions::default(), &emit);
+                let mut writer = StackWriter {
+                    writer: TextWriter::new(b"", 0),
+                    greatest_remaining: 0,
+                    panic_on_keyword: false,
+                };
+                printer
+                    .write(ast.view(), expression, None, &mut writer)
+                    .unwrap();
+                assert_eq!(writer.text().len(), 1 + depth * 4);
+                assert!(
+                    writer.greatest_remaining > STACK,
+                    "expression printer must visit a grown stack segment"
+                );
+                writer.greatest_remaining = 0;
+                writer.panic_on_keyword = true;
+                let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    printer.write(ast.view(), typ, None, &mut writer)
+                }));
+                assert!(panic.is_err());
+                assert!(
+                    writer.greatest_remaining > STACK,
+                    "the writer panic must occur after native growth"
+                );
+                writer.panic_on_keyword = false;
+                printer.write(ast.view(), typ, None, &mut writer).unwrap();
+                assert_eq!(
+                    writer.text(),
+                    format!("{}string{}", "(".repeat(depth), ")".repeat(depth)).as_bytes()
+                );
+            }
+            assert_eq!(
+                counters.snapshot(),
+                before,
+                "printer failure must not retain AST storage"
+            );
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}

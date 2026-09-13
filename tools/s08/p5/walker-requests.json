@@ -349,6 +349,38 @@
       "had_errors": true,
       "enabled": true,
       "allow_js": false
+    },
+    {
+      "id": "computed-binding-expressions",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "declare function key(): string;\nfunction called({[key()]: value}: {item: number}) {}\nfunction assigned(a: string, {[(a = \"\")]: b}: any) {}\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "computed-binding-expressions.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "computed-index-name-reuse",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "let key: string = \"item\";\nlet bar: any;\n({[key]: bar} = {bar: \"bar\"});\n[{[key]: bar}] = [{bar: \"bar\"}];\nfunction getKey(): string { return key; }\n({[getKey()]: bar} = {bar: \"bar\"});\n"
+        }
+      ],
+      "enabled": true,
+      "had_errors": true,
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "computed-index-name-reuse.ts",
+      "allow_js": false
     }
   ]
 }

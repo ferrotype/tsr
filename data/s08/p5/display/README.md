@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These thirteen source-selected requests exercise explicit builder calls and
+These forty source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -25,3 +25,9 @@ The tests compare actual node kinds and exact text bytes, including qualifiers.
 
 Enum property names use their computed form when the enum is accessible from
 the enclosing declaration; context-free display keeps the literal name.
+
+The expanded matrix exercises both modifier-preserving mapped wrappers,
+`T`/`T_1` shadowing, generated-name flags on and off, parameter annotation
+reuse, and trailing default arguments for the four native global iterable
+identities. A namespaced `Iterable` is a negative identity case.
+The latest native capture is `target/s08/p5-mapped-display-native-03`.

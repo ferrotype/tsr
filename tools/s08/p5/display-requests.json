@@ -5,7 +5,7 @@
     {
       "id": "annotations-and-symbols",
       "files": {
-        "/main.ts": "type Hex = { a: 0x10; b: 0b11; text: 'é' };\nconst unique: unique symbol = Symbol();\nnamespace N { export interface Inner { n: number } }\nlet value: N.Inner;\ntype Literal = 'hello';\nlet café = 1;\nnamespace N { export const inside = 0; }\nenum Keys { Named = \"x\" }\ntype EnumKeys = { [Keys.Named]: number };\n"
+        "/main.ts": "type Hex = { a: 0x10; b: 0b11; text: '\u00e9' };\nconst unique: unique symbol = Symbol();\nnamespace N { export interface Inner { n: number } }\nlet value: N.Inner;\ntype Literal = 'hello';\nlet caf\u00e9 = 1;\nnamespace N { export const inside = 0; }\nenum Keys { Named = \"x\" }\ntype EnumKeys = { [Keys.Named]: number };\n"
       },
       "roots": [
         "/main.ts"
@@ -89,7 +89,7 @@
         },
         {
           "id": "symbol-unicode",
-          "declaration": "café",
+          "declaration": "caf\u00e9",
           "context": "source",
           "operation": "symbol_string",
           "flags": 4,
@@ -108,6 +108,244 @@
           "context": "declaration",
           "operation": "type_string",
           "flags": 8388608
+        }
+      ]
+    },
+    {
+      "id": "mapped-modifier-wrappers",
+      "files": {
+        "/main.ts": "type KeyofMap<T> = { readonly [P in keyof T]?: T[P] };\ntype KeysMap<T, K extends keyof T> = { readonly [P in K]?: T[P] };\ntype Naked = KeyofMap<any>;\ntype KeySubset = KeysMap<{readonly a?: number; b: string}, \"a\">;\ntype Deferred<U> = KeysMap<U, keyof U>;\ntype Shadow<T> = KeyofMap<any>;\ntype Indexed<U extends { x: object }> = KeyofMap<U[\"x\"]>;\ntype IndexedShadow<T extends { x: { field: number } }> = KeyofMap<T[\"x\"]>;\ntype KeysShadow<T> = KeysMap<T, keyof T>;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "KeyofMap-generated",
+          "declaration": "KeyofMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeyofMap-plain",
+          "declaration": "KeyofMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysMap-generated",
+          "declaration": "KeysMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysMap-plain",
+          "declaration": "KeysMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Naked-generated",
+          "declaration": "Naked",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Naked-plain",
+          "declaration": "Naked",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeySubset-generated",
+          "declaration": "KeySubset",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeySubset-plain",
+          "declaration": "KeySubset",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Deferred-generated",
+          "declaration": "Deferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Deferred-plain",
+          "declaration": "Deferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Shadow-generated",
+          "declaration": "Shadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Shadow-plain",
+          "declaration": "Shadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Indexed-generated",
+          "declaration": "Indexed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Indexed-plain",
+          "declaration": "Indexed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "IndexedShadow-generated",
+          "declaration": "IndexedShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "IndexedShadow-plain",
+          "declaration": "IndexedShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysShadow-generated",
+          "declaration": "KeysShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysShadow-plain",
+          "declaration": "KeysShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "reference-defaults-and-parameter-reuse",
+      "files": {
+        "/main.ts": "interface Iterable<T, R = any, N = any> { a: T; r: R; n: N }\ninterface IterableIterator<T, R = any, N = any> { a: T; r: R; n: N }\ninterface AsyncIterable<T, R = any, N = any> { a: T; r: R; n: N }\ninterface AsyncIterableIterator<T, R = any, N = any> { a: T; r: R; n: N }\nnamespace Local { export interface Iterable<T, R = any, N = any> { a: T; r: R; n: N } }\nlet short: Iterable<string>;\nlet explicit: Iterable<string, any, any>;\nlet different: Iterable<string, number>;\nlet local: Local.Iterable<string>;\nlet iterator: IterableIterator<string>;\nlet asynchronous: AsyncIterable<string>;\nlet asyncIterator: AsyncIterableIterator<string>;\nconst unionParameter = function(a: number | string | undefined, required: unknown) {};\nconst optionalParameter = function(a: number | string | undefined = 1, required: unknown) {};\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "short",
+          "declaration": "short",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "explicit",
+          "declaration": "explicit",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "different",
+          "declaration": "different",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "local",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "iterator",
+          "declaration": "iterator",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "asynchronous",
+          "declaration": "asynchronous",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "asyncIterator",
+          "declaration": "asyncIterator",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "unionParameter",
+          "declaration": "unionParameter",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "optionalParameter",
+          "declaration": "optionalParameter",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
         }
       ]
     }

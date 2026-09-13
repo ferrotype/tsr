@@ -8,6 +8,9 @@
 //! [`Session`] over one AST view and one writer; nothing about a node is cached
 //! across sessions.
 
+#[path = "printer_expressions.rs"]
+mod expressions;
+
 use crate::emit_flags as ef;
 use crate::list_format as lf;
 use crate::literal_text::{with_flag, LiteralTextFlags};
@@ -2162,6 +2165,16 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeNode
     fn emit_type_node(&mut self, node: NodeId, precedence: TypePrecedence) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_type_node_worker(node, precedence)
+        })
+    }
+
+    fn emit_type_node_worker(
+        &mut self,
+        node: NodeId,
+        precedence: TypePrecedence,
+    ) -> Result<(), Error> {
         let mut precedence = precedence;
         if self.in_extends && precedence <= TypePrecedence::Conditional {
             // In the `extends` clause of a conditional or infer type a conditional
@@ -2320,12 +2333,17 @@ impl<'a> Session<'a, '_> {
                 | K::Identifier
                 | K::PrivateIdentifier,
             ) => Some(op::PRIMARY),
-            Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
+            Some(K::PropertyAccessExpression | K::ElementAccessExpression | K::CallExpression) => {
                 Some(if ts_ast::utilities::is_optional_chain(&read) {
                     op::OPTIONAL_CHAIN
                 } else {
                     op::MEMBER
                 })
+            }
+            Some(K::ParenthesizedExpression) => Some(op::PARENTHESES),
+            Some(K::BinaryExpression) => {
+                let (_, operator, _) = self.binary_parts(node)?;
+                Some(self.binary_precedence(operator)?)
             }
             // Upstream ranks every prefix unary expression, `++` and `--` included, as unary.
             Some(K::PrefixUnaryExpression) => Some(op::UNARY),
@@ -2336,6 +2354,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitExpression
     fn emit_expression(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_expression_worker(node, precedence)
+        })
+    }
+
+    fn emit_expression_worker(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
         let kind = self.known_kind(node)?;
         let node_precedence = self.expression_precedence(node)?.ok_or(Error::Unsupported(
             "expressions outside literal types and entity names",
@@ -2360,6 +2384,9 @@ impl<'a> Session<'a, '_> {
             K::PrivateIdentifier => self.emit_private_identifier(node)?,
             K::PropertyAccessExpression => self.emit_property_access_expression(node)?,
             K::ElementAccessExpression => self.emit_element_access_expression(node)?,
+            K::CallExpression => self.emit_call_expression(node)?,
+            K::ParenthesizedExpression => self.emit_parenthesized_expression(node)?,
+            K::BinaryExpression => self.emit_binary_expression(node)?,
             K::PrefixUnaryExpression => self.emit_prefix_unary_expression(node)?,
             K::ExpressionWithTypeArguments => self.emit_expression_with_type_arguments(node)?,
             kind => {
