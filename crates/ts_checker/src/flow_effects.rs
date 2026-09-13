@@ -225,10 +225,10 @@ impl CheckerState {
         symbol: SymbolId,
         diagnostic: Option<usize>,
     ) -> Result<Option<TypeId>, Error> {
-        let symbol = if self.symbol(symbol)?.flags()
-            & (sf::ALIAS | sf::VALUE | sf::TYPE | sf::NAMESPACE)
-            == sf::ALIAS
-        {
+        let symbol = if ts_ast::is_non_local_alias(
+            Some(&self.symbol(symbol)?),
+            sf::VALUE | sf::TYPE | sf::NAMESPACE,
+        ) {
             self.resolve_alias(symbol)?
         } else {
             symbol

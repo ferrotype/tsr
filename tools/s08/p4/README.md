@@ -83,3 +83,8 @@ Use fresh output paths. `cargo run` selects the current compiler artifact; the
 comparison checks the native requests and every recorded observation rather
 than accepting a successful process exit alone. The compiler tests separately
 keep a real JSX expression as an explicit repeated failure.
+
+`review-followups.json` uses the same capture/compare commands for DOM
+intersections, assignment-backed CommonJS exports/re-exports, and absent rest
+arguments. Use separate native, Rust and comparison output paths. It does not
+change the frozen full-corpus requests or their options.

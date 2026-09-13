@@ -29,8 +29,10 @@ impl CheckerState {
             return Ok(None);
         };
         if !dont_resolve_alias
-            && self.symbol(symbol)?.flags() & (sf::ALIAS | sf::VALUE | sf::TYPE | sf::NAMESPACE)
-                == sf::ALIAS
+            && ts_ast::is_non_local_alias(
+                Some(&self.symbol(symbol)?),
+                sf::VALUE | sf::TYPE | sf::NAMESPACE,
+            )
         {
             self.resolve_alias(symbol).map(Some)
         } else {

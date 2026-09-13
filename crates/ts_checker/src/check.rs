@@ -54,24 +54,27 @@ impl CheckerState {
                 result?;
             }
         }
-        if check_unused && !self.query.unused_checked.contains(&source) {
-            // The unused identifiers check relies on a full type check having first been performed
-            if !self.ast(source)?.source_file(source)?.is_declaration_file {
-                let nodes = self
-                    .query
-                    .identifier_check_nodes
-                    .remove(&source)
-                    .unwrap_or_default();
-                if let Err(error) = self.check_unused_identifiers(nodes) {
-                    // The queue has been consumed and may have emitted some
-                    // diagnostics. A retry must not turn an empty queue into
-                    // success after a failed suggestion/unused pass.
-                    self.source_checks
-                        .insert(source, SourceCheckStatus::Failed(error));
-                    return Err(error);
-                }
+        if check_unused {
+            if let Some(&result) = self.query.unused_checks.get(&source) {
+                return result;
             }
-            self.query.unused_checked.insert(source);
+            // This pass depends on a completed type check, but its own failure
+            // must not poison later requests that need only type checking.
+            let result = (|| {
+                if !self.ast(source)?.source_file(source)?.is_declaration_file {
+                    let nodes = self
+                        .query
+                        .identifier_check_nodes
+                        .remove(&source)
+                        .unwrap_or_default();
+                    self.check_unused_identifiers(nodes)?;
+                }
+                Ok(())
+            })();
+            // The queue has been consumed: retrying this phase must return its
+            // recorded failure, not succeed on the now-empty queue.
+            self.query.unused_checks.insert(source, result);
+            result?;
         }
         Ok(())
     }

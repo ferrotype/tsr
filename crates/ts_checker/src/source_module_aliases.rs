@@ -411,7 +411,7 @@ impl CheckerState {
             {
                 self.mark_module_export_referenced(node)?;
                 if let Some(symbol) = symbol {
-                    if self.symbol(symbol)?.flags() & (sf::ALIAS | sf::VALUE) == sf::ALIAS
+                    if ts_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
                         && !self.module_aliases.type_only.contains_key(&symbol)
                     {
                         self.mark_module_alias_referenced(symbol)?;

@@ -376,9 +376,10 @@ impl CheckerState {
         let Some(mut symbol) = self.resolve_external_module_symbol(Some(module), true)? else {
             return Ok(None);
         };
-        if self.symbol(symbol)?.flags() & (sf::ALIAS | sf::VALUE | sf::TYPE | sf::NAMESPACE)
-            == sf::ALIAS
-        {
+        if ts_ast::is_non_local_alias(
+            Some(&self.symbol(symbol)?),
+            sf::VALUE | sf::TYPE | sf::NAMESPACE,
+        ) {
             let source = self
                 .get_symbol_of_declaration(node)?
                 .ok_or(Error::MissingLink("namespace alias source"))?;

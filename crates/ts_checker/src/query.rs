@@ -21,8 +21,9 @@ pub(crate) struct QueryState {
     pub references: LinkStore<SymbolId, SymbolFlags>,
     /// `sourceFileLinks.identifierCheckNodes`, keyed by source file.
     pub identifier_check_nodes: crate::types::Map<NodeId, Vec<NodeId>>,
-    /// `sourceFileLinks.unusedChecked`.
-    pub unused_checked: crate::types::Set<NodeId>,
+    /// `sourceFileLinks.unusedChecked`, with sticky Rust errors scoped to that
+    /// phase rather than invalidating a completed type check.
+    pub unused_checks: crate::types::Map<NodeId, Result<(), Error>>,
     /// `Checker.renamedBindingElementsInTypes`.
     pub renamed_binding_elements_in_types: Vec<NodeId>,
     pub scope_changes: LinkStore<NodeId, ts_core::Tristate>,

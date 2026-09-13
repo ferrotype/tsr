@@ -240,9 +240,10 @@ impl CheckerState {
             let mut target = self
                 .target_of_alias_declaration(declaration)?
                 .unwrap_or(self.builtins.unknown_symbol);
-            if self.symbol(target)?.flags() & (sf::ALIAS | sf::VALUE | sf::TYPE | sf::NAMESPACE)
-                == sf::ALIAS
-            {
+            if ts_ast::is_non_local_alias(
+                Some(&self.symbol(target)?),
+                sf::VALUE | sf::TYPE | sf::NAMESPACE,
+            ) {
                 let alias = target;
                 let resolved = self.resolve_alias(alias)?;
                 target = self.get_merged_symbol(resolved);

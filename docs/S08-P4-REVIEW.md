@@ -123,3 +123,51 @@ remain under `target/`; they are not promoted to committed acceptance evidence.
    type/symbol baseline walker and exact display/error-baseline work; later
    parity, storage and performance checkpoints remain separate. No S08 or E2
    gate is marked complete by this review.
+
+## Follow-up corrections — 2026-09-13
+
+The owner approved folding the subsequent review findings into this checkpoint,
+with no CI changes or new remote CI runs. These changes are saved locally; do not
+push merely to trigger validation.
+
+- The range-loop lint cleanup in `6ed7264` introduced a panic when a rest
+  parameter's index exceeded the argument count. Claude's pending correction
+  restores the empty-loop behavior, and its two IIFE regressions now also assert
+  that semantic diagnostics are empty. The affected frozen rows are
+  06694/06695/06696, the default-parameter function-expression fixtures.
+- DOM-name recognition now expands intersections as well as unions, matching
+  `everyContainedType`. `missingDomElements.ts` now produces TS2812 for
+  `EventTarget & HTMLInputElement`; its non-DOM and nonempty-object controls still
+  produce TS2339.
+- The unused-check result is cached separately from the completed type check.
+  A late failure remains an error on repeated unused/suggestion requests without
+  poisoning type-only requests or another source file. An injected unsupported
+  registered node exercises the actual failure/queue-consumption path across
+  operations, rather than merely seeding a cached error.
+- Circularity reporting tolerates an alias with no declaration, returning `any`
+  without a diagnostic as Go does. Callers that require a declaration retain
+  their existing failure contract.
+- Five duplicated non-local-alias predicates now use
+  `ts_ast::is_non_local_alias`. This preserves Go's assignment-backed JavaScript
+  alias case even when another symbol meaning is present. Tests distinguish that
+  case from a local merged alias and exercise CommonJS export/re-export paths.
+
+Local verification: 48 checker unit tests and 70 compiler semantic tests pass;
+clippy for the affected crates/all targets/all features passes with warnings
+denied. `tools/s08/p4/review-followups.json` matches pinned Go for all four
+programs/queries and the four shared-source merge schedules, with no unsupported
+operation. The capture uses explicit strict options; the separate IIFE unit
+test also checks the original non-strict fixture behavior.
+
+Native capture: `target/s08/p4-followups-native-02`; comparison:
+`target/s08/p4-followups-comparison-01.json`. Native observation SHA-256:
+`a982496b90b0b5005983899505e04d4b7d588dd721ccee659bec76ad6c8bd67a`.
+The code and schema are unchanged in the existing oracle and inventory drivers.
+
+`p4-inventory-08` was stopped before the known rest-argument failure. The later
+`p4-inventory-10` has now been interrupted at 1,548 completed rows because its
+immutable executable predates these four corrections. Its partial records and
+source snapshot are retained. They must not be combined with a new binary and
+called a complete current-source capture. The next full capture uses a fresh
+build/source snapshot; the 60-second timeout and both acceptance tiers are
+unchanged. The large-flow performance follow-up remains open.

@@ -307,7 +307,7 @@ impl CheckerState {
         {
             return Ok(false);
         }
-        let parts: Vec<TypeId> = if self.types.flags(containing)? & tf::UNION != 0 {
+        let parts: Vec<TypeId> = if self.types.flags(containing)? & tf::UNION_OR_INTERSECTION != 0 {
             self.types.types_of(containing)?.to_vec()
         } else {
             vec![containing]

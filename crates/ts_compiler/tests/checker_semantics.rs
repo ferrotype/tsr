@@ -2540,3 +2540,64 @@ fn reentrant_effects_signature_resolution_terminates_like_upstream() {
         ]
     );
 }
+
+#[test]
+fn iife_rest_parameters_past_the_argument_list_check_without_panicking() {
+    // `getSpreadArgumentType`'s `for i := index; i < argCount; i++` simply does
+    // not run when a rest parameter sits past the argument list, so the window is
+    // empty. Both shapes are lines 9 and 10 of the pinned fixture
+    // emitDefaultParametersFunctionExpression.ts, which Go checks without error.
+    for text in [
+        b"var y = (function (num = 10, boo = false, ...rest) { })();".as_slice(),
+        b"var z = (function (num: number, boo = false, ...rest) { })(10);",
+    ] {
+        let (checker, source) = checker(
+            text,
+            CompilerOptions {
+                strict: Tristate::FALSE,
+                ..options()
+            },
+        );
+        let first = checker.operation().unwrap().semantic_diagnostics(source);
+        assert!(first.is_ok(), "source {text:?}: {first:?}");
+        assert!(
+            first.as_ref().unwrap().is_empty(),
+            "source {text:?}: {first:?}"
+        );
+        for _ in 0..2 {
+            assert_eq!(
+                checker.operation().unwrap().semantic_diagnostics(source),
+                first,
+                "source {text:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn missing_dom_intersections_use_the_native_lib_diagnostic() {
+    // The six accesses and expected diagnostics are from the pinned
+    // compiler/missingDomElements.ts fixture, including its negative controls.
+    let text =
+        include_bytes!("../../../upstream/tsc/testdata/tests/cases/compiler/missingDomElements.ts");
+    let (checker, source) = checker(text, options());
+    for _ in 0..2 {
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(
+            diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+            [2812, 2812, 2812, 2812, 2339, 2339]
+        );
+        assert_eq!(
+            diagnostics[3]
+                .message_args
+                .iter()
+                .map(JsString::as_bytes)
+                .collect::<Vec<_>>(),
+            [b"textContent".as_slice(), b"EventTarget & HTMLInputElement"]
+        );
+    }
+}

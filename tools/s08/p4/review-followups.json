@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "scope": "S08 P4 review follow-ups: DOM intersections, assignment-backed CommonJS aliases and absent rest arguments",
+  "options": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "missing-dom-intersection",
+      "files": {
+        "/case.ts": "// @target: es2015\n// @lib: esnext\n\ninterface Element {}\ninterface EventTarget {}\ninterface HTMLElement {}\ninterface HTMLInputElement {}\n\n({} as any as Element).textContent;\n({} as any as HTMLElement).textContent;\n({} as any as HTMLInputElement).textContent;\n({} as any as EventTarget & HTMLInputElement).textContent\n\ninterface HTMLElementFake {}\ninterface Node {\n    actuallyNotTheSame: number;    \n};\n\n({} as any as HTMLElementFake).textContent;\n({} as any as Node).textContent;\n\ntype Query = EventTarget & HTMLInputElement;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "assignment-backed-export",
+      "files": {
+        "/value.js": "class Widget { constructor() { this.value = 1; } }\nexports.Widget = Widget;\nexports.Widget.version = 1;",
+        "/case.ts": "import { Widget } from \"./value\"; const widget = new Widget(); type Query = typeof Widget;"
+      },
+      "roots": [
+        "/value.js",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "assignment-backed-export-equals",
+      "files": {
+        "/value.js": "class Widget { constructor() { this.value = 1; } }\nexports.Widget = Widget;\nexports.Widget.version = 1;",
+        "/reexport.js": "module.exports = require(\"./value\").Widget;\nmodule.exports.extra = 2;",
+        "/case.ts": "import Widget = require(\"./reexport\"); const widget = new Widget(); type Query = typeof Widget;"
+      },
+      "roots": [
+        "/value.js",
+        "/reexport.js",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "absent-rest-arguments",
+      "files": {
+        "/case.ts": "var y = (function (num = 10, boo = false, ...rest) { })();\nvar z = (function (num: number, boo = false, ...rest) { })(10);\ntype Query = typeof y;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -188,7 +188,15 @@ impl CheckerState {
         }
         let mut types = Vec::new();
         let mut infos = Vec::new();
-        for (offset, &argument) in args[start..count].iter().enumerate() {
+        // Upstream's `for i := index; i < argCount; i++` simply does not run when a
+        // rest parameter sits past the argument list, so the window is empty here
+        // rather than an out-of-range slice.
+        for (offset, &argument) in args
+            .get(start..count)
+            .unwrap_or_default()
+            .iter()
+            .enumerate()
+        {
             let index = start + offset;
             let synthetic = self.ast(argument)?.node(argument)?.kind() == K::SyntheticExpression;
             let (ty, flags) = if self.is_spread_argument(argument)? {

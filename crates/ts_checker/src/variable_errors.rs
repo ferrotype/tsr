@@ -29,13 +29,14 @@ impl CheckerState {
                 self.error_at(Some(declaration), ts_diagnostics::X_0_implicitly_has_type_any_because_it_does_not_have_a_type_annotation_and_is_referenced_directly_or_indirectly_in_its_own_initializer, vec![name])?;
             }
         } else if self.symbol(symbol)?.flags() & ts_ast::symbol_flags::ALIAS != 0 {
-            let declaration = self.alias_declaration(symbol)?;
-            let name = self.symbol_to_string(symbol)?;
-            self.error_at(
-                Some(declaration),
-                ts_diagnostics::Circular_definition_of_import_alias_0,
-                vec![name],
-            )?;
+            if let Some(declaration) = self.alias_declaration_or_none(symbol)? {
+                let name = self.symbol_to_string(symbol)?;
+                self.error_at(
+                    Some(declaration),
+                    ts_diagnostics::Circular_definition_of_import_alias_0,
+                    vec![name],
+                )?;
+            }
         }
         Ok(self.builtins.any_type)
     }
