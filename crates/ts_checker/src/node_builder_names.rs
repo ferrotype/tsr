@@ -104,6 +104,15 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createEntityNameFromSymbolChain
     fn entity_name_from_symbol_chain(&mut self, chain: &[SymbolId]) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.entity_name_from_symbol_chain_worker(chain)
+        })
+    }
+
+    fn entity_name_from_symbol_chain_worker(
+        &mut self,
+        chain: &[SymbolId],
+    ) -> Result<NodeId, Error> {
         use ts_ast::FactoryMethods;
         let (&symbol, prefix) = chain
             .split_last()
@@ -412,6 +421,12 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChainEx
     fn accessible_name_chain(&mut self, query: NameQuery) -> Result<Vec<SymbolId>, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.accessible_name_chain_worker(query)
+        })
+    }
+
+    fn accessible_name_chain_worker(&mut self, query: NameQuery) -> Result<Vec<SymbolId>, Error> {
         let declarations: Vec<_> = self
             .checker
             .symbol_declarations(query.symbol)?
@@ -739,6 +754,16 @@ impl NodeBuilder<'_> {
         query: NameQuery,
         end_of_chain: bool,
     ) -> Result<Vec<SymbolId>, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.qualified_name_chain_worker(query, end_of_chain)
+        })
+    }
+
+    fn qualified_name_chain_worker(
+        &mut self,
+        query: NameQuery,
+        end_of_chain: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
         let mut chain = self.accessible_name_chain(query)?;
         let qualifier_meaning = if chain.len() > 1 {
             left_meaning(query.meaning)
@@ -866,6 +891,16 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionFromSymbolChain
     fn expression_from_name_chain(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+    ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.expression_from_name_chain_worker(chain, index)
+        })
+    }
+
+    fn expression_from_name_chain_worker(
         &mut self,
         chain: &[SymbolId],
         index: usize,
@@ -1077,6 +1112,18 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessFromSymbolChain
     pub(super) fn access_from_symbol_chain(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+        stopper: usize,
+        override_type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.access_from_symbol_chain_worker(chain, index, stopper, override_type_arguments)
+        })
+    }
+
+    fn access_from_symbol_chain_worker(
         &mut self,
         chain: &[SymbolId],
         index: usize,

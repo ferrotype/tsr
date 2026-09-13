@@ -194,6 +194,9 @@ jobs:
       - name: Text leaves against the pinned Go oracle
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run e4
+      - name: Checker literal types and printer bytes against pinned Go
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: cargo xtask run checkertext
       - name: Regeneration drift and original client byte parity
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run gen
@@ -222,6 +225,8 @@ jobs:
         run: |
           cargo xtask check-metrics \
             'run.workspace.build == true' \
+            'run.checkertext.token_literal_bytes == true' \
+            'run.checkertext.helper_printer_semantics == true' \
             'run.oracle.build == true' \
             'run.oracle.smoke == true' \
             'run.fmt.clean == true' \
@@ -303,6 +308,7 @@ jobs:
             status/unmapped-functions.json
             docs/status.html
             status/evidence/
+            target/s08/checkertext-*/
             target/s05-reports/
             target/s06-reports/
             target/s07-binder-reports/

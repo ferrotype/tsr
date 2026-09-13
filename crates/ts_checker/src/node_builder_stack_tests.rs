@@ -72,6 +72,16 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                 }
                 ty = root;
                 let expected = format!("{}string", "keyof ".repeat(DEPTH));
+                let chain = (0..DEPTH)
+                    .map(|_| {
+                        checker
+                            .new_symbol(
+                                ts_ast::symbol_flags::TYPE_ALIAS,
+                                ts_ast::JsString::from_bytes(b"n".as_slice()),
+                            )
+                            .unwrap()
+                    })
+                    .collect::<Vec<_>>();
                 let storage_before = counters.snapshot();
                 {
                     let mut builder = NodeBuilder::new(checker, nf::NO_TRUNCATION);
@@ -95,6 +105,26 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                         .as_bytes(),
                     expected.as_bytes()
                 );
+                largest_stack.store(0, Ordering::Relaxed);
+                {
+                    let mut builder = NodeBuilder::new(
+                        checker,
+                        nf::NO_TRUNCATION | nf::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES,
+                    );
+                    observe(&mut builder, &largest_stack, false);
+                    let name = builder
+                        .access_from_symbol_chain(&chain, chain.len() - 1, 0, None)
+                        .unwrap();
+                    assert!(
+                        largest_stack.load(Ordering::Relaxed) > STACK,
+                        "symbol access construction must grow the stack"
+                    );
+                    let mut writer = TextWriter::new(b"", 0);
+                    Printer::new(PrinterOptions::default(), &builder.emit)
+                        .write(builder.ast.view(), name, None, &mut writer)
+                        .unwrap();
+                    assert_eq!(writer.text(), vec!["n"; DEPTH].join(".").as_bytes());
+                }
                 assert_eq!(
                     counters.snapshot(),
                     storage_before,

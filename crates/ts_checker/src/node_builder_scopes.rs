@@ -206,33 +206,36 @@ impl NodeBuilder<'_> {
 
     fn add_binding_scope_names(
         &mut self,
-        pattern: NodeId,
+        mut pattern: NodeId,
         locals: &mut SymbolTable,
     ) -> Result<(), Error> {
-        // Preserve the pinned walk's return after its first element, including
-        // an omitted element. This is not a general binding-pattern traversal.
-        let list = self.checker.ast(pattern)?.node(pattern)?.element_list();
-        if let Some(element) = self.checker.source_list(pattern, list)?.first().copied() {
-            let read = self.checker.ast(element)?.node(element)?;
-            if read.kind() == K::OmittedExpression {
-                return Ok(());
-            }
-            if read.kind() != K::BindingElement {
-                return Err(ts_arena::Error::InvalidGraph.into());
-            }
-            if let Some(name) = read.name() {
-                if matches!(
-                    self.checker.ast(name)?.node(name)?.kind().known(),
-                    Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
-                ) {
-                    return self.add_binding_scope_names(name, locals);
+        loop {
+            // Preserve the pinned walk's return after its first element, including
+            // an omitted element. This is not a general binding-pattern traversal.
+            let list = self.checker.ast(pattern)?.node(pattern)?.element_list();
+            if let Some(element) = self.checker.source_list(pattern, list)?.first().copied() {
+                let read = self.checker.ast(element)?.node(element)?;
+                if read.kind() == K::OmittedExpression {
+                    return Ok(());
+                }
+                if read.kind() != K::BindingElement {
+                    return Err(ts_arena::Error::InvalidGraph.into());
+                }
+                if let Some(name) = read.name() {
+                    if matches!(
+                        self.checker.ast(name)?.node(name)?.kind().known(),
+                        Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
+                    ) {
+                        pattern = name;
+                        continue;
+                    }
+                }
+                if let Some(symbol) = self.checker.get_symbol_of_declaration(element)? {
+                    locals.insert(self.checker.symbol(symbol)?.name_to_owned(), Some(symbol));
                 }
             }
-            if let Some(symbol) = self.checker.get_symbol_of_declaration(element)? {
-                locals.insert(self.checker.symbol(symbol)?.name_to_owned(), Some(symbol));
-            }
+            return Ok(());
         }
-        Ok(())
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToName

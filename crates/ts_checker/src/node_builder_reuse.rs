@@ -700,6 +700,17 @@ impl NodeBuilder<'_> {
         node: NodeId,
         symbol: Option<SymbolId>,
     ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.reuse_attach_symbol_worker(leftmost, node, symbol)
+        })
+    }
+
+    fn reuse_attach_symbol_worker(
+        &mut self,
+        leftmost: NodeId,
+        node: NodeId,
+        symbol: Option<SymbolId>,
+    ) -> Result<NodeId, Error> {
         if node == leftmost {
             let mut result = None;
             if let Some(symbol) = symbol {

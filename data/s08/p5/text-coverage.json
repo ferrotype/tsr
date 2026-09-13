@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "request_sha256": "4d10fa9ec8b6c1e75d5e244710c711ac9368ad9d308b1c7f892179818c3a12a6",
+  "groups": [
+    {
+      "id": "lossless-source-and-regenerated-literals",
+      "criteria": [
+        "token_literal_bytes",
+        "helper_printer_semantics"
+      ],
+      "queries": [
+        "High-None-type_string",
+        "High-None-type_node",
+        "High-declaration-type_string",
+        "High-declaration-type_node",
+        "Low-None-type_string",
+        "Low-None-type_node",
+        "Low-declaration-type_string",
+        "Low-declaration-type_node",
+        "Pair-None-type_string",
+        "Pair-None-type_node",
+        "Pair-declaration-type_string",
+        "Pair-declaration-type_node",
+        "Control-None-type_string",
+        "Control-None-type_node",
+        "Control-declaration-type_string",
+        "Control-declaration-type_node",
+        "RawSurrogate-None-type_string",
+        "RawSurrogate-None-type_node",
+        "RawSurrogate-declaration-type_string",
+        "RawSurrogate-declaration-type_node",
+        "Malformed-None-type_string",
+        "Malformed-None-type_node",
+        "Malformed-declaration-type_string",
+        "Malformed-declaration-type_node",
+        "Unicode-None-type_string",
+        "Unicode-None-type_node",
+        "Unicode-declaration-type_string",
+        "Unicode-declaration-type_node"
+      ]
+    },
+    {
+      "id": "numeric-and-bigint-literals",
+      "criteria": [
+        "token_literal_bytes",
+        "helper_printer_semantics"
+      ],
+      "queries": [
+        "NegativeZero-None-type_string",
+        "NegativeZero-None-type_node",
+        "NegativeZero-declaration-type_string",
+        "NegativeZero-declaration-type_node",
+        "Small-None-type_string",
+        "Small-None-type_node",
+        "Small-declaration-type_string",
+        "Small-declaration-type_node",
+        "Large-None-type_string",
+        "Large-None-type_node",
+        "Large-declaration-type_string",
+        "Large-declaration-type_node",
+        "Hex-None-type_string",
+        "Hex-None-type_node",
+        "Hex-declaration-type_string",
+        "Hex-declaration-type_node",
+        "Big-None-type_string",
+        "Big-None-type_node",
+        "Big-declaration-type_string",
+        "Big-declaration-type_node",
+        "BigZero-None-type_string",
+        "BigZero-None-type_node",
+        "BigZero-declaration-type_string",
+        "BigZero-declaration-type_node"
+      ]
+    },
+    {
+      "id": "source-annotation-and-regeneration",
+      "criteria": [
+        "helper_printer_semantics"
+      ],
+      "queries": [
+        "Raw-None-type_string",
+        "Raw-None-type_node",
+        "Raw-declaration-type_string",
+        "Raw-declaration-type_node"
+      ]
+    },
+    {
+      "id": "byte-truncation-boundaries",
+      "criteria": [
+        "helper_printer_semantics"
+      ],
+      "queries": [
+        "Limit317-None-type_string",
+        "Limit317-None-type_node",
+        "Limit317-declaration-type_string",
+        "Limit317-declaration-type_node",
+        "Limit318-None-type_string",
+        "Limit318-None-type_node",
+        "Limit318-declaration-type_string",
+        "Limit318-declaration-type_node"
+      ]
+    }
+  ]
+}
