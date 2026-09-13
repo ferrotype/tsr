@@ -8,6 +8,64 @@ use crate::{element_flags as ef, signature_flags as sg, IndexInfoId, SignatureId
 
 impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode
+    pub(super) fn reference_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        if self.checker.is_array_type(ty)? || self.checker.is_tuple_type(ty)? {
+            return self.array_or_tuple_node(ty);
+        }
+        if self.inaccessible_class_reference(ty)? {
+            return self.anonymous_type_node(ty);
+        }
+        let target = self.checker.types.target(ty)?;
+        let arguments = self.checker.get_type_arguments(ty)?;
+        let interface = self.checker.types.interface(target)?;
+        let outer = interface.outer_type_parameter_count as usize;
+        if arguments[..outer] != interface.type_parameters()[..outer] {
+            return Err(Error::Unsupported(
+                "typeReferenceToTypeNode: applied outer arguments",
+            ));
+        }
+        let arity = self.reference_display_arity(ty, &arguments)?;
+        self.type_reference(
+            self.checker
+                .types
+                .get(ty)?
+                .symbol
+                .ok_or(Error::MissingLink("reference symbol"))?,
+            &arguments[outer..arity],
+        )
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.conditionalTypeToTypeNode
+    pub(super) fn conditional_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        if self.check_truncation() {
+            return self.elision(b"...");
+        }
+        let data = *self.checker.types.conditional(ty)?;
+        let root = self.checker.conditional_root(data.root)?.clone();
+        if self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
+            && root.distributive
+            && self.checker.types.flags(data.check_type)? & crate::type_flags::TYPE_PARAMETER == 0
+        {
+            return Err(Error::Unsupported(
+                "conditionalTypeToTypeNode: shadowed distribution parameter",
+            ));
+        }
+        let check = self.type_node(data.check_type)?;
+        self.approximate_length += 15;
+        let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
+        let extends = self.type_node(data.extends_type);
+        self.infer_parameters = previous;
+        let extends = extends?;
+        let yes = self.checker.conditional_true_type(ty, false)?;
+        let no = self.checker.conditional_false_type(ty)?;
+        let yes = self.type_node_or_circularity_elision(yes)?;
+        let no = self.type_node_or_circularity_elision(no)?;
+        Ok(self
+            .ast
+            .new_conditional_type_node(Some(check), Some(extends), Some(yes), Some(no)))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode
     pub(super) fn array_or_tuple_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let target = self.checker.types.target(ty)?;
         let arguments = self.checker.element_types(ty)?;

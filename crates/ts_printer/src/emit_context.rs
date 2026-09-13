@@ -86,7 +86,8 @@ impl SideTables {
     }
 }
 
-#[derive(Debug, Default)]
+/// Clones share non-owning metadata; allocation owners remain the caller's responsibility.
+#[derive(Clone, Debug, Default)]
 pub struct EmitContext {
     tables: Arc<Mutex<SideTables>>,
 }
@@ -103,6 +104,47 @@ impl EmitContext {
     /// hooks from a different context would separate the metadata from its AST.
     pub fn factory_hooks(&self) -> Arc<dyn FactoryHooks> {
         Arc::new(EmitHooks(Arc::clone(&self.tables)))
+    }
+
+    /// Prune a released allocation frame against the caller's retained owners.
+    /// Keys are non-owning: the caller must retain every live key and every
+    /// original/generated-name target reachable from it. No entry is changed
+    /// if a live key would be left with an unretained metadata dependency.
+    pub fn retain_metadata(
+        &mut self,
+        mut retained: impl FnMut(NodeId) -> bool,
+    ) -> Result<(), crate::Error> {
+        let mut tables = self.tables();
+        if tables
+            .original
+            .iter()
+            .any(|(&key, &value)| retained(key) && !retained(value))
+            || tables
+                .auto_generate
+                .iter()
+                .any(|(&key, info)| retained(key) && info.node.is_some_and(|node| !retained(node)))
+        {
+            return Err(crate::Error::MissingNode(
+                "retained emit metadata dependency",
+            ));
+        }
+        tables.emit_flags.retain(|&key, _| retained(key));
+        tables.original.retain(|&key, _| retained(key));
+        tables.comment_ranges.retain(|&key, _| retained(key));
+        tables.leading_comments.retain(|&key, _| retained(key));
+        tables.auto_generate.retain(|&key, _| retained(key));
+        Ok(())
+    }
+
+    /// Occupied side-table entries. This is not an allocation-byte measurement:
+    /// the standard maps retain capacity and comments/names own variable text.
+    pub fn metadata_entries(&self) -> usize {
+        let tables = self.tables();
+        tables.emit_flags.len()
+            + tables.original.len()
+            + tables.comment_ranges.len()
+            + tables.leading_comments.len()
+            + tables.auto_generate.len()
     }
 
     // port: tsc/internal/printer/emitcontext.go:EmitContext.EmitFlags
@@ -455,5 +497,59 @@ mod original_overwrite_tests {
         emit.set_original_ex(result, second, true);
         assert_eq!(emit.original(result), Some(second));
         assert_eq!(emit.emit_flags(result), crate::emit_flags::NO_COMMENTS);
+    }
+}
+
+#[cfg(test)]
+mod retention_tests {
+    use super::*;
+    use ts_ast::{AstBuilder, FactoryMethods};
+
+    #[test]
+    fn metadata_pruning_requires_original_and_generated_name_dependencies() {
+        let mut emit = EmitContext::new();
+        let shared = emit.clone();
+        let mut ast = AstBuilder::with_hooks(
+            ts_jsstring::SourceText::default(),
+            &ts_arena::Counters::new(),
+            emit.factory_hooks(),
+        );
+        let source = ast.new_identifier(JsString::from_bytes(b"source".as_slice()));
+        let generated =
+            emit.new_generated_name_for_node_ex(&mut ast, source, AutoGenerateOptions::default());
+        let cloned = ast.clone_identifier(generated);
+        let garbage = ast.new_identifier(JsString::from_bytes(b"garbage".as_slice()));
+        emit.set_emit_flags(garbage, crate::emit_flags::NO_COMMENTS);
+        emit.set_comment_range(cloned, ts_core::TextRange::new(1, 2));
+        emit.add_synthetic_leading_comment(
+            cloned,
+            ts_ast::SyntaxKind::MultiLineCommentTrivia,
+            JsString::from_bytes(b"keep".as_slice()),
+            false,
+        );
+        // A live key requires the complete original chain AND the generated-name target.
+        for live in [vec![cloned], vec![cloned, generated]] {
+            assert!(emit.retain_metadata(|id| live.contains(&id)).is_err());
+            assert_eq!(
+                shared.emit_flags(garbage),
+                crate::emit_flags::NO_COMMENTS,
+                "validation failure must not partially prune the shared tables"
+            );
+        }
+        emit.retain_metadata(|id| [source, generated, cloned].contains(&id))
+            .unwrap();
+        assert_eq!(shared.emit_flags(garbage), 0);
+        assert_eq!(shared.most_original(cloned), generated);
+        assert_eq!(shared.node_for_generated_name(&ast, cloned), source);
+        assert_eq!(
+            shared.comment_range(cloned),
+            Some(ts_core::TextRange::new(1, 2))
+        );
+        assert_eq!(
+            shared.synthetic_leading_comments(cloned)[0].text.as_bytes(),
+            b"keep"
+        );
+        emit.retain_metadata(|_| false).unwrap();
+        assert_eq!(shared.metadata_entries(), 0);
     }
 }

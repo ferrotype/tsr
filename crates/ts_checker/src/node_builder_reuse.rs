@@ -333,7 +333,7 @@ impl NodeBuilder<'_> {
             let previous = result;
             result = ts_ast::clone_node(&mut self.ast, result);
             self.ast.set_node_range(result, TextRange::new(-1, -1));
-            if let Some(&symbol) = self.id_to_symbol.get(&previous) {
+            if let Some(&symbol) = self.identifier_symbol(previous) {
                 self.id_to_symbol.insert(result, symbol);
             }
         }

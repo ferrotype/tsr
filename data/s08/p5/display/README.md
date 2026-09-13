@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These sixty-eight source-selected requests exercise explicit builder calls and
+These eighty-two source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -32,7 +32,7 @@ reuse, and trailing default arguments for the four native global iterable
 identities. A namespaced `Iterable` is a negative identity case.
 The latest native capture is `target/s08/p5-mapped-display-native-03`.
 
-The final 28 requests exercise source reuse and regeneration through public
+The raw-byte group's 28 requests exercise source reuse and regeneration through public
 checker display and explicit builder APIs. A BOM-prefixed source travels as
 hex, preserving raw malformed UTF-8 and raw surrogate encodings; the other
 literals include escaped lone surrogates, a surrogate pair, controls, astral
@@ -41,3 +41,9 @@ source bytes into text. Go and Rust parse their own identical byte input, and
 all output is compared as hex. The latest capture is
 `target/s08/p5-display-bytes-native-01`. These are production-path E4 probes;
 they do not replace the existing complete E4 producer or its evidence.
+
+Fourteen additional requests repeat symbol-backed object, conditional and
+recursive tuple displays with distinct enclosing declarations and quote flags.
+The latest complete direct-display capture is
+`target/s08/p5-display-cache-native-01`: 82/82 exact results. Allocation counts
+and cache-hit equivalence are not inferred from matching output bytes.

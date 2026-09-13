@@ -570,6 +570,115 @@
           "internal_flags": 8
         }
       ]
+    },
+    {
+      "id": "cached-contexts-and-repeats",
+      "files": {
+        "/main.ts": "type Shape = { readonly quote: \"\u00e9\"; next?: Shape };\ntype Conditional<T> = T extends string ? { value: T } : { fallback: T };\ntype Recur<T> = [T, Recur<T>[]];\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Shape-declaration-0",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-declaration-1",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-source-0",
+          "declaration": "Shape",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-source-1",
+          "declaration": "Shape",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-declaration-0",
+          "declaration": "Conditional",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-declaration-1",
+          "declaration": "Conditional",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-source-0",
+          "declaration": "Conditional",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-source-1",
+          "declaration": "Conditional",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-declaration-0",
+          "declaration": "Recur",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-declaration-1",
+          "declaration": "Recur",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-source-0",
+          "declaration": "Recur",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-source-1",
+          "declaration": "Recur",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-single-quotes-0",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 276824064
+        },
+        {
+          "id": "Shape-single-quotes-1",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 276824064
+        }
+      ]
     }
   ]
 }

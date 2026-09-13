@@ -61,6 +61,7 @@ impl CheckerState {
             self.builtins.silent_never_signature,
         ]);
         work.types(roots.iter().copied());
+        work.types(self.display_builder.type_roots());
         work.types(self.flow.type_roots());
         work.types(self.module_aliases.type_roots());
         work.types(self.iteration.type_roots());

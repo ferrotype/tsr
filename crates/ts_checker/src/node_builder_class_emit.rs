@@ -288,44 +288,7 @@ impl NodeBuilder<'_> {
     // revisit a symbol with an unbounded sequence of distinct types.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.visitAndTransformType
     fn visit_object_type(&mut self, ty: TypeId) -> Result<NodeId, Error> {
-        let record = *self.checker.types.get(ty)?;
-        let mut identity = if record.object_flags & of::REFERENCE != 0 {
-            self.checker
-                .types
-                .type_reference(ty)?
-                .node
-                .map(SymbolIdentity::Node)
-        } else {
-            None
-        };
-        if identity.is_none() {
-            if let Some(symbol) = record.symbol {
-                identity = Some(SymbolIdentity::Symbol {
-                    constructor: record.object_flags & of::ANONYMOUS != 0
-                        && self.checker.symbol(symbol)?.flags() & sf::CLASS != 0,
-                    symbol,
-                });
-            }
-        }
-        if let Some(identity) = identity {
-            if self
-                .symbol_depth
-                .iter()
-                .filter(|id| **id == identity)
-                .count()
-                > 10
-            {
-                return Ok(self.elided_type());
-            }
-            self.symbol_depth.push(identity);
-        }
-        self.visited.push(ty);
-        let result = self.object_type_members_node(ty);
-        self.visited.pop();
-        if identity.is_some() {
-            self.symbol_depth.pop();
-        }
-        result
+        self.visit_transform_type(ty, Self::object_type_members_node)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode

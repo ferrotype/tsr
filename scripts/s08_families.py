@@ -181,6 +181,10 @@ P4_UNPAIRED_FAMILIES = {
 }
 
 
+# Persistent diagnostic serialization is new in P5; native pairing is deferred to P7.
+P5_UNPAIRED_FAMILIES = {"display_cache", "display_ast", "display_emit"}
+
+
 def validate(request, rust, go):
     for name in ("roots", "named", "counts", "prefix_counts"):
         if not same_json_value(rust[name], go[name]):
@@ -190,11 +194,11 @@ def validate(request, rust, go):
     for key in ("families", "types", "unavailable"):
         if key not in rust["census"] or key not in go["census"]:
             raise ValueError(f"census is missing {key}")
-    unpaired = P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES
+    unpaired = P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES | P5_UNPAIRED_FAMILIES
     if set(rust["census"]["families"]) != set(go["census"]["families"]) | unpaired:
-        raise ValueError("census families differ from the P1 inventory plus named P3/P4 additions")
+        raise ValueError("census families differ from the P1 inventory plus named P3/P4/P5 additions")
     if unpaired & set(go["census"]["families"]):
-        raise ValueError("Go now measures a P3/P4 family; review the paired inventory")
+        raise ValueError("Go now measures a P3/P4/P5 family; review the paired inventory")
 
 
 def run_go(directory, request):
@@ -285,13 +289,13 @@ def capture(directory, freeze):
               "native_sources": {p: digest((upstream / "tsc" / p).read_bytes()) for p in NATIVE_SOURCES},
               "runtime": {key: frozen_observations[key] for key in ("go", "goos", "goarch")},
               "scope": "P1 storage families over a checker prepared as NewChecker's type prefix; not the subset census, not E5",
-              "unpaired_rust_families": sorted(P3_UNPAIRED_FAMILIES),
+              "unpaired_rust_families": sorted(P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES | P5_UNPAIRED_FAMILIES),
               "limitations": [
                   "Go structural bytes are struct sizes, slice and arena-chunk capacities and hinted-replica map allocations; Rust bytes are vector capacities, Arc allocations and hashbrown allocation sizes",
                   "Requested bytes are reported for NewChecker's prefix and for the trace's constructor calls separately: Go as TotalAlloc traffic and malloc calls, Rust as mimalloc requested allocations; neither interval includes observation or census work",
                   "The Go checker also creates globalThis's object type and autoArrayType in initializeChecker; the trace checker stops before it and real_counts records the difference",
                   "The checker AST arenas are unavailable on both sides and reported as a named gap",
-                  "Rust additionally charges P3 stores and full shared text backings; the P1 Go observer has not been extended to those stores, so aggregate bytes are not a paired footprint result",
+                  "Rust additionally charges P3/P4/P5 stores and full shared text backings; the P1 Go observer has not been extended to those stores, so aggregate bytes are not a paired footprint result",
                   "No timing conclusion; the subset's type distribution is not modeled",
               ],
               "traces": traces}

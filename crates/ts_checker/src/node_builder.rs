@@ -1,6 +1,8 @@
 //! The executable type-display slice of checker/nodebuilderimpl.go. Each builder
 //! owns its synthetic syntax and emit flags until printing finishes.
 
+#[path = "node_builder_cache.rs"]
+pub(crate) mod cache;
 #[path = "node_builder_class_emit.rs"]
 mod class_emit;
 #[path = "node_builder_enum.rs"]
@@ -57,6 +59,10 @@ pub(crate) struct NodeBuilder<'a> {
     infer_parameters: crate::TypeList,
     reverse_mapped_stack: Vec<SymbolId>,
     name_access: names::NameAccess,
+    serialized: crate::types::Map<cache::SerializedKey, cache::SerializedType>,
+    tracked_symbols: Vec<cache::TrackedSymbol>,
+    reported_diagnostic: bool,
+    cached: bool,
 }
 
 impl<'a> NodeBuilder<'a> {
@@ -88,11 +94,20 @@ impl<'a> NodeBuilder<'a> {
         self.infer_parameters = [].into();
         self.reverse_mapped_stack.clear();
         self.name_access = names::NameAccess::default();
+        self.tracked_symbols.clear();
+        self.reported_diagnostic = false;
         Ok(())
     }
 
     pub(crate) fn new(checker: &'a mut CheckerState, flags: ts_nodebuilder::Flags) -> Self {
-        let emit = EmitContext::new();
+        Self::with_emit(checker, flags, EmitContext::new())
+    }
+
+    fn with_emit(
+        checker: &'a mut CheckerState,
+        flags: ts_nodebuilder::Flags,
+        emit: EmitContext,
+    ) -> Self {
         let ast = AstBuilder::with_hooks(
             SourceText::from_bytes(b"".as_slice()),
             &checker.counters,
@@ -120,6 +135,10 @@ impl<'a> NodeBuilder<'a> {
             infer_parameters: [].into(),
             reverse_mapped_stack: Vec::new(),
             name_access: names::NameAccess::default(),
+            serialized: crate::types::Map::default(),
+            tracked_symbols: Vec::new(),
+            reported_diagnostic: false,
+            cached: false,
         }
     }
 
@@ -159,6 +178,15 @@ impl<'a> NodeBuilder<'a> {
         if self.defer_reuse_report(&event) {
             return;
         }
+        use ts_printer::emit_resolver::DeclarationTrackerEvent as Event;
+        if !matches!(
+            event,
+            Event::InferenceFallback(_)
+                | Event::PushErrorFallbackNode(_)
+                | Event::PopErrorFallbackNode
+        ) {
+            self.reported_diagnostic = true;
+        }
         if let Some(tracker) = self.tracker.as_deref_mut() {
             tracker.report(event);
         }
@@ -168,30 +196,34 @@ impl<'a> NodeBuilder<'a> {
         if self.defer_reuse_symbol(symbol, self.enclosing, meaning) {
             return Ok(false);
         }
-        if self.tracker.is_none() || self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
-        {
-            return Ok(false);
+        let mut reported = false;
+        if let Some(tracker) = self.tracker.as_deref_mut() {
+            if tracker.track_symbol_without_accessibility(symbol) {
+                return Ok(false);
+            }
+            let accessibility = self.checker.emit_symbol_accessible(
+                Some(symbol),
+                self.enclosing,
+                meaning,
+                true,
+                true,
+            )?;
+            reported = self
+                .tracker
+                .as_deref_mut()
+                .expect("tracker was checked")
+                .track_symbol(symbol, self.enclosing, meaning, accessibility);
         }
-        if self
-            .tracker
-            .as_deref_mut()
-            .expect("tracker was checked")
-            .track_symbol_without_accessibility(symbol)
-        {
-            return Ok(false);
+        if reported {
+            self.reported_diagnostic = true;
+        } else if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER == 0 {
+            self.tracked_symbols.push(cache::TrackedSymbol {
+                symbol,
+                enclosing: self.enclosing,
+                meaning,
+            });
         }
-        let accessibility = self.checker.emit_symbol_accessible(
-            Some(symbol),
-            self.enclosing,
-            meaning,
-            true,
-            true,
-        )?;
-        Ok(self
-            .tracker
-            .as_deref_mut()
-            .expect("tracker was checked")
-            .track_symbol(symbol, self.enclosing, meaning, accessibility))
+        Ok(reported)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolAsWritten
@@ -646,28 +678,11 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         if record.object_flags & of::REFERENCE != 0 {
-            if self.checker.is_array_type(ty)? || self.checker.is_tuple_type(ty)? {
-                return self.array_or_tuple_node(ty);
-            }
-            if self.inaccessible_class_reference(ty)? {
-                return self.anonymous_type_node(ty);
-            }
-            let target = self.checker.types.target(ty)?;
-            let arguments = self.checker.get_type_arguments(ty)?;
-            let interface = self.checker.types.interface(target)?;
-            let outer = interface.outer_type_parameter_count as usize;
-            if arguments[..outer] != interface.type_parameters()[..outer] {
-                return Err(Error::Unsupported(
-                    "typeReferenceToTypeNode: applied outer arguments",
-                ));
-            }
-            let arity = self.reference_display_arity(ty, &arguments)?;
-            return self.type_reference(
-                record
-                    .symbol
-                    .ok_or(Error::MissingLink("reference symbol"))?,
-                &arguments[outer..arity],
-            );
+            return if self.checker.types.type_reference(ty)?.node.is_some() {
+                self.visit_transform_type(ty, Self::reference_type_node)
+            } else {
+                self.reference_type_node(ty)
+            };
         }
         if record.flags & tf::TYPE_PARAMETER != 0 && self.infer_parameters.contains(&ty) {
             let mut constraint_node = None;
@@ -773,35 +788,7 @@ impl<'a> NodeBuilder<'a> {
             return self.type_node(base);
         }
         if record.flags & tf::CONDITIONAL != 0 {
-            if self.check_truncation() {
-                return self.elision(b"...");
-            }
-            let data = *self.checker.types.conditional(ty)?;
-            let root = self.checker.conditional_root(data.root)?.clone();
-            if self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
-                && root.distributive
-                && self.checker.types.flags(data.check_type)? & tf::TYPE_PARAMETER == 0
-            {
-                return Err(Error::Unsupported(
-                    "conditionalTypeToTypeNode: shadowed distribution parameter",
-                ));
-            }
-            let check = self.type_node(data.check_type)?;
-            self.approximate_length += 15;
-            let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
-            let extends = self.type_node(data.extends_type);
-            self.infer_parameters = previous;
-            let extends = extends?;
-            let yes = self.checker.conditional_true_type(ty, false)?;
-            let no = self.checker.conditional_false_type(ty)?;
-            let yes = self.type_node(yes)?;
-            let no = self.type_node(no)?;
-            return Ok(self.ast.new_conditional_type_node(
-                Some(check),
-                Some(extends),
-                Some(yes),
-                Some(no),
-            ));
+            return self.visit_transform_type(ty, Self::conditional_type_node);
         }
         if record.flags & tf::TEMPLATE_LITERAL != 0 {
             let data = self.checker.types.template_literal(ty)?;

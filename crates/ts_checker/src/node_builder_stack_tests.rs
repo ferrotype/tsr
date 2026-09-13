@@ -104,9 +104,12 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
             largest_stack.store(0, Ordering::Relaxed);
             let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let mut operation = owner.operation().unwrap();
-                let mut builder = NodeBuilder::new(operation.state_mut(), nf::NO_TRUNCATION);
-                observe(&mut builder, &largest_stack, true);
-                builder.type_node(ty).unwrap();
+                NodeBuilder::with_cached(operation.state_mut(), nf::NO_TRUNCATION, |builder| {
+                    observe(builder, &largest_stack, true);
+                    builder.type_node(ty)?;
+                    Ok(ts_ast::JsString::default())
+                })
+                .unwrap();
             }));
             assert!(panic.is_err());
             assert!(
