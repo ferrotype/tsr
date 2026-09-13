@@ -20,6 +20,14 @@ def validate(request, result):
         if spec['id'] in ids:
             raise ValueError('duplicate program identity')
         ids.add(spec['id'])
+        files, encoded = spec.get('files'), spec.get('file_bytes', {})
+        if not isinstance(files, dict) or not isinstance(encoded, dict) or files.keys() & encoded.keys():
+            raise ValueError('invalid or overlapping source encodings')
+        if any(not isinstance(path, str) or not isinstance(value, str) for path, value in files.items()):
+            raise ValueError('invalid text source')
+        for path, value in encoded.items():
+            if not isinstance(path, str) or not isinstance(value, str) or bytes.fromhex(value).hex() != value:
+                raise ValueError('invalid canonical source hex')
         if [q['id'] for q in observed['queries']] != [q['id'] for q in spec['queries']]:
             raise ValueError('missing, extra or reordered display query')
         query_ids = set()

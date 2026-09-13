@@ -22,6 +22,20 @@ fn array(value: &Value) -> Result<&[Value]> {
         .ok_or_else(|| "expected array".into())
 }
 
+fn decode_hex(value: &str) -> Result<Vec<u8>> {
+    if !value.len().is_multiple_of(2) {
+        return Err("odd source hex length".into());
+    }
+    value
+        .as_bytes()
+        .chunks_exact(2)
+        .map(|pair| {
+            let digit = |b: u8| char::from(b).to_digit(16).ok_or("invalid source hex");
+            Ok(u8::try_from(digit(pair[0])? * 16 + digit(pair[1])?)?)
+        })
+        .collect()
+}
+
 fn hex(bytes: &[u8]) -> String {
     const DIGITS: &[u8] = b"0123456789abcdef";
     bytes
@@ -112,6 +126,14 @@ pub fn observe(request: &Value) -> Result<Value> {
         let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
         for (path, content) in r["files"].as_object().ok_or("expected files")? {
             fs.insert_loaded(path.as_bytes(), text(content)?.as_bytes());
+        }
+        if let Some(files) = r.get("file_bytes") {
+            for (path, content) in files.as_object().ok_or("expected hex files")? {
+                if r["files"].get(path).is_some() {
+                    return Err("duplicate source encoding".into());
+                }
+                fs.insert_loaded(path.as_bytes(), decode_hex(text(content)?)?);
+            }
         }
         let roots = array(&r["roots"])?
             .iter()

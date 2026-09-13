@@ -482,6 +482,10 @@ impl<'a> NodeBuilder<'a> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode
     pub(crate) fn type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.type_node_worker(ty))
+    }
+
+    fn type_node_worker(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let in_alias = self.flags & nf::IN_TYPE_ALIAS != 0;
         self.flags &= !nf::IN_TYPE_ALIAS;
         let ty = if self.flags & nf::NO_TYPE_REDUCTION == 0 {
@@ -1298,3 +1302,7 @@ impl<'a> NodeBuilder<'a> {
             || left.alias.is_some() && left.alias == right.alias)
     }
 }
+
+#[cfg(all(test, not(any(miri, target_family = "wasm"))))]
+#[path = "node_builder_stack_tests.rs"]
+mod stack_tests;

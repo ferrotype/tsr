@@ -943,6 +943,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitEntityName
     fn emit_entity_name(&mut self, node: NodeId) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_entity_name_worker(node)
+        })
+    }
+
+    fn emit_entity_name_worker(&mut self, node: NodeId) -> Result<(), Error> {
         match self.known_kind(node)? {
             K::Identifier => self.emit_identifier_reference(node),
             K::QualifiedName => self.emit_qualified_name(node),
@@ -957,6 +963,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitBindingName
     fn emit_binding_name(&mut self, node: Option<NodeId>) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_binding_name_worker(node)
+        })
+    }
+
+    fn emit_binding_name_worker(&mut self, node: Option<NodeId>) -> Result<(), Error> {
         let Some(node) = node else {
             return Ok(());
         };

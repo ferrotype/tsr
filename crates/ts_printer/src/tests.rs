@@ -245,9 +245,19 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                 let identifier = ast.new_identifier(JsString::from_bytes(b"x".as_slice()));
                 let plus = ast.new_token(K::PlusToken.into());
                 let mut expression = identifier;
+                let mut qualified = identifier;
+                let mut binding = identifier;
                 let depth = 3000;
                 for _ in 0..depth {
                     typ = ast.new_parenthesized_type_node(Some(typ));
+                    qualified = ast.new_qualified_name(Some(qualified), Some(identifier));
+                    let element = ast.new_binding_element(None, None, Some(binding), None);
+                    let nodes = ast.node_slice(vec![Some(element)]).unwrap();
+                    let elements = ast
+                        .new_list(ts_core::TextRange::new(-1, -1), nodes)
+                        .unwrap();
+                    binding =
+                        ast.new_binding_pattern(K::ArrayBindingPattern.into(), Some(elements));
                     expression = ast.new_binary_expression(
                         None,
                         Some(expression),
@@ -270,6 +280,19 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                     writer.greatest_remaining > STACK,
                     "expression printer must visit a grown stack segment"
                 );
+                let binding =
+                    ast.new_parameter_declaration(None, None, Some(binding), None, None, None);
+                for (node, expected_length) in
+                    [(qualified, 1 + 2 * depth), (binding, 1 + 2 * depth)]
+                {
+                    writer.greatest_remaining = 0;
+                    printer.write(ast.view(), node, None, &mut writer).unwrap();
+                    assert_eq!(writer.text().len(), expected_length);
+                    assert!(
+                        writer.greatest_remaining > STACK,
+                        "nested name printing must grow the stack"
+                    );
+                }
                 writer.greatest_remaining = 0;
                 writer.panic_on_keyword = true;
                 let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {

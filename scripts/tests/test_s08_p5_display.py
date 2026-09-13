@@ -17,7 +17,7 @@ class DisplayProtocol(unittest.TestCase):
         self.observed = strict_json_loads((self.native / 'observations.json').read_bytes())
 
     def test_native_inventory_has_valid_states(self):
-        self.assertEqual(validate(self.request, self.observed), 40)
+        self.assertEqual(validate(self.request, self.observed), 68)
 
     def test_missing_reordered_or_duplicate_queries_fail(self):
         for mutation in ('missing', 'reordered', 'duplicate'):
@@ -49,3 +49,14 @@ class DisplayProtocol(unittest.TestCase):
                 actual.write_bytes(canonical(value))
                 with self.subTest(mutation=mutation), self.assertRaises(ValueError), contextlib.redirect_stdout(io.StringIO()):
                     compare(self.native, actual)
+
+    def test_raw_source_encoding_rejects_overlap_and_malformed_hex(self):
+        for bad in ('ff0', 'not hex', 'FF', 'ff 00', None):
+            request = copy.deepcopy(self.request)
+            request['programs'][-1]['file_bytes']['/main.ts'] = bad
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                validate(request, self.observed)
+        request = copy.deepcopy(self.request)
+        request['programs'][-1]['files']['/main.ts'] = 'different source'
+        with self.assertRaises(ValueError):
+            validate(request, self.observed)

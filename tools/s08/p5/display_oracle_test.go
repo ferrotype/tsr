@@ -30,6 +30,7 @@ func TestS08P5Display(t *testing.T) {
 		Programs []struct {
 			ID      string            `json:"id"`
 			Files   map[string]string `json:"files"`
+            FileBytes map[string]string `json:"file_bytes"`
 			Roots   []string          `json:"roots"`
 			Queries []struct {
 				ID            string  `json:"id"`
@@ -50,6 +51,12 @@ func TestS08P5Display(t *testing.T) {
 	}
 	programs := []any{}
 	for _, r := range request.Programs {
+        for name, data := range r.FileBytes {
+            if _, exists := r.Files[name]; exists { t.Fatal("duplicate source encoding") }
+            decoded, err := hex.DecodeString(data)
+            if err != nil { t.Fatal(err) }
+            r.Files[name] = string(decoded)
+        }
 		host := compiler.NewCompilerHost("/", vfstest.FromMap(r.Files, true), "/no-default-lib", nil, nil, nil)
 		opts := &core.CompilerOptions{Target: core.ScriptTargetESNext, Module: core.ModuleKindESNext, Strict: core.TSTrue, NoLib: core.TSTrue}
 		config := tsoptions.NewParsedCommandLine(opts, r.Roots, nil, tspath.ComparePathsOptions{})
