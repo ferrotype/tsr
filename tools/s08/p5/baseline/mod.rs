@@ -3,6 +3,8 @@
 //! query list. Types are walked before symbols on the same checker operation.
 mod classify;
 mod decorate;
+#[path = "../paths.rs"]
+mod paths;
 mod query;
 
 use serde_json::{json, Value};

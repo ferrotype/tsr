@@ -6,6 +6,7 @@ mod checker_diagnostics;
 mod checker_host;
 mod checker_module_specifiers;
 mod declaration_diagnostics;
+pub mod diagnostic_writer;
 mod include_reason;
 mod output_paths;
 mod plain_js_errors;
