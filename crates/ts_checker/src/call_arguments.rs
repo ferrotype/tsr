@@ -760,17 +760,16 @@ impl CheckerState {
             let view = self.ast(node)?;
             let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
                 .ok_or(Error::MissingLink("arity source"))?;
-            let mut start = i64::from(view.node(args[maximum])?.pos());
-            let mut end = i64::from(
-                view.node(
-                    *args
-                        .last()
-                        .ok_or(Error::MissingLink("arity last argument"))?,
-                )?
-                .end(),
-            );
+            // Spread arguments expand to synthetic expressions owned by the
+            // checker factory; they carry the spread element's range.
+            let first_extra = args[maximum];
+            let last = *args
+                .last()
+                .ok_or(Error::MissingLink("arity last argument"))?;
+            let mut start = i64::from(self.ast(first_extra)?.node(first_extra)?.pos());
+            let mut end = i64::from(self.ast(last)?.node(last)?.end());
             if end == start {
-                end += 1
+                end += 1;
             }
             start = ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), start);
             end = end.max(start);

@@ -434,13 +434,19 @@ phase, no new reason, no panic. Regressions cover each port (`checker_semantics.
 the deprecation test uses a multi-line tag, the nominal-class test a `.d.ts`
 Array declaration).
 
+**Eighth pass.** `the scope does not retain this arena` (3, class
+`checker_error`) was a Rust bug in `getArgumentArityError`: the too-many-arguments
+span read the extra arguments through the call expression's view, but arguments
+expanded from a spread are synthetic expressions owned by the checker factory.
+They now read their positions through their own views; the three programs
+complete. Regression: `too_many_arguments_through_a_spread_report_the_extra_argument_span`.
+
 Remaining inventory-05 acceptance buckets, largest first:
 
 | Bucket | Variants | Needs |
 | --- | ---: | --- |
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
 | `checkPrivateIdentifierPropertyAccess: unchecked JavaScript private field` | 4 | unchecked-JS private fields |
-| `the scope does not retain this arena` | 3 | a checker-error investigation |
 | `getDeclarationSpaces: export assignment alias` | 2 | alias declaration spaces |
 | `onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict` | 2 | the isolatedModules conflict report |
 | `getPrimitiveTypeAliasSuggestions` | 2 | checker-owned primitive suggestion identity |

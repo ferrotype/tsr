@@ -1920,3 +1920,33 @@ fn nominal_classes_are_not_subtype_reduced_unless_derived() {
     // B derives from A and is removed; C is structurally identical to A but nominal.
     assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"(A | C)[]");
 }
+
+#[test]
+fn too_many_arguments_through_a_spread_report_the_extra_argument_span() {
+    // Pinned Go: functionParameterArityMismatch.errors.txt, the last two calls.
+    let text = b"interface Array<T> { length: number }\ndeclare function f2();\ndeclare function f2(a: number, b: number, c: number, d: number, e: number, f: number);\nf2(1, 2, 3, 4, 5, 6, 7);\nf2(1, 2, 3, 4, 5, ...[6, 7]);\n";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            strict: Tristate::FALSE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let expected = ts_diagnostics::Expected_0_arguments_but_got_1.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (expected, vec!["0-6".to_string(), "7".to_string()]),
+            (expected, vec!["0-6".to_string(), "7".to_string()]),
+        ]
+    );
+    // The second span starts at the spread element that carries the extra argument.
+    let spread = text.windows(8).position(|w| w == b"...[6, 7").unwrap() as i64;
+    assert_eq!(diagnostics[1].loc.pos(), spread);
+}
