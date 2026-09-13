@@ -234,7 +234,19 @@ impl CheckerState {
                     {
                         self.error_at(Some(expression),if export_equals{d::X_0_resolves_to_a_type_and_must_be_marked_type_only_in_this_file_before_re_exporting_when_1_is_enabled_Consider_using_import_type_where_0_is_imported}else{d::X_0_resolves_to_a_type_and_must_be_marked_type_only_in_this_file_before_re_exporting_when_1_is_enabled_Consider_using_export_type_0_as_default},vec![text.clone(),self.module_isolated_flag_name()])?;
                     } else if type_only.is_some() && other_file {
-                        return Err(Error::Unsupported("checkExportAssignment: isolated inherited type-only related diagnostic"));
+                        // import { SomeTypeOnlyValue } from "./someModule";
+                        // export default SomeTypeOnlyValue; OR
+                        // export = SomeTypeOnlyValue;
+                        let index = self.error_at(
+                            Some(expression),
+                            if export_equals {
+                                d::X_0_resolves_to_a_type_only_declaration_and_must_be_marked_type_only_in_this_file_before_re_exporting_when_1_is_enabled_Consider_using_import_type_where_0_is_imported
+                            } else {
+                                d::X_0_resolves_to_a_type_only_declaration_and_must_be_marked_type_only_in_this_file_before_re_exporting_when_1_is_enabled_Consider_using_export_type_0_as_default
+                            },
+                            vec![text.clone(), self.module_isolated_flag_name()],
+                        )?;
+                        self.alias_type_only_related(index, type_only, text.clone())?;
                     }
                 }
             }

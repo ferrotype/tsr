@@ -330,12 +330,12 @@ mod tests {
             .unwrap();
         state.types.get_mut(other).unwrap().alias = Some(other_alias);
         let union = state.get_union_type(&[object, other]).unwrap();
-        assert!(matches!(
-            state.type_to_string(union, 0),
-            Err(Error::Unsupported(
-                "mapToTypeNodes: colliding names require qualified display"
-            ))
-        ));
+        // Distinct aliases spelled the same are regenerated fully qualified;
+        // these synthetic aliases have no containers, so the spelling repeats.
+        assert_eq!(
+            state.type_to_string(union, 0).unwrap().as_bytes(),
+            b"Shape | Shape"
+        );
         // The source permits duplicate spellings when both types share the
         // same alias record; only distinct references need qualification.
         state.types.get_mut(other).unwrap().alias = Some(alias);

@@ -6,10 +6,20 @@ use ts_arena::NodeId;
 
 #[derive(Clone, Copy)]
 pub(crate) enum DeferredCheck {
-    MissingProperty { name: NodeId, containing: TypeId },
-    Iteration { index: usize },
-    WeakMapSetCollision { node: NodeId },
-    ReflectCollision { node: NodeId },
+    MissingProperty {
+        name: NodeId,
+        containing: TypeId,
+        unchecked_js: bool,
+    },
+    Iteration {
+        index: usize,
+    },
+    WeakMapSetCollision {
+        node: NodeId,
+    },
+    ReflectCollision {
+        node: NodeId,
+    },
 }
 
 #[derive(Default)]
@@ -25,10 +35,19 @@ impl CheckerState {
             .pending
             .push(DeferredCheck::Iteration { index });
     }
-    pub(crate) fn defer_missing_property(&mut self, name: NodeId, containing: TypeId) {
+    pub(crate) fn defer_missing_property_ex(
+        &mut self,
+        name: NodeId,
+        containing: TypeId,
+        unchecked_js: bool,
+    ) {
         self.deferred_checks
             .pending
-            .push(DeferredCheck::MissingProperty { name, containing });
+            .push(DeferredCheck::MissingProperty {
+                name,
+                containing,
+                unchecked_js,
+            });
     }
 
     // port: tsc/internal/checker/checker.go:Checker.produceDeferredDiagnostics
@@ -39,9 +58,11 @@ impl CheckerState {
             .get(self.deferred_checks.cursor)
         {
             match check {
-                DeferredCheck::MissingProperty { name, containing } => {
-                    self.report_missing_property(name, containing)?
-                }
+                DeferredCheck::MissingProperty {
+                    name,
+                    containing,
+                    unchecked_js,
+                } => self.report_missing_property(name, containing, unchecked_js)?,
                 DeferredCheck::Iteration { index } => self.report_iteration_diagnostic(index)?,
                 DeferredCheck::WeakMapSetCollision { node } => {
                     self.check_weak_map_set_collision(node)?
@@ -54,7 +75,12 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.reportNonexistentProperty
-    fn report_missing_property(&mut self, name: NodeId, containing: TypeId) -> Result<(), Error> {
+    fn report_missing_property(
+        &mut self,
+        name: NodeId,
+        containing: TypeId,
+        unchecked_js: bool,
+    ) -> Result<(), Error> {
         if self.deferred_checks.reported_properties.contains(&name) {
             return Ok(());
         }
@@ -168,7 +194,11 @@ impl CheckerState {
                 .find(|(name, _)| name.as_bytes() == suggestion)
                 .ok_or(Error::MissingLink("property suggestion"))?;
             (
-                ts_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_2,
+                if unchecked_js {
+                    ts_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2
+                } else {
+                    ts_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_2
+                },
                 vec![spelling, display, self.symbol(*symbol)?.name_to_owned()],
                 Some(*symbol),
             )
@@ -197,7 +227,16 @@ impl CheckerState {
                 ));
             }
         }
-        self.add_diagnostic(diagnostic)?;
+        // port: tsc/internal/checker/checker.go:Checker.addErrorOrSuggestion
+        if !unchecked_js
+            || diagnostic.code
+                != ts_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2.code
+        {
+            self.add_diagnostic(diagnostic)?;
+        } else {
+            diagnostic.category = ts_diagnostics::Category::Suggestion as i32;
+            self.add_suggestion_diagnostic(diagnostic)?;
+        }
         self.deferred_checks.reported_properties.insert(name);
         Ok(())
     }
@@ -234,12 +273,7 @@ impl CheckerState {
             properties
                 .iter()
                 .copied()
-                .find(|&property| {
-                    self.symbol(property).is_ok_and(|read| {
-                        read.value_declaration().is_none()
-                            && read.check_flags() & ts_ast::check_flags::CONTAINS_PRIVATE != 0
-                    })
-                })
+                .find(|&property| self.is_conflicting_private_property(property).unwrap_or(false))
                 .map(|property| {
                     (
                         ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some,

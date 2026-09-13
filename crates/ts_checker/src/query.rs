@@ -169,26 +169,125 @@ impl CheckerState {
                 }
                 Ok(None)
             }
+            Some(K::ThisKeyword) => {
+                let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
+                if ts_ast::utilities::is_function_like(Some(&self.ast(container)?.node(container)?))
+                {
+                    let signature = self.signature_from_declaration(container)?;
+                    if let Some(this_parameter) = self.signatures.get(signature)?.this_parameter {
+                        return Ok(Some(this_parameter));
+                    }
+                }
+                if is_in_expression_context(self.ast(node)?, node)? {
+                    let ty = self.check_expression(node)?;
+                    return Ok(self.types.get(ty)?.symbol);
+                }
+                let ty = self.type_from_this_node(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ThisType) => {
+                let ty = self.type_from_this_node(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::SuperKeyword | K::MetaProperty) => {
+                let ty = self.check_expression(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ConstructorKeyword) => {
+                // constructor keyword for an overload, should take us to the definition if it exist
+                match read.parent() {
+                    Some(constructor)
+                        if self.ast(constructor)?.node(constructor)?.kind() == K::Constructor =>
+                    {
+                        match self.ast(constructor)?.node(constructor)?.parent() {
+                            Some(class) => self.raw_declaration_symbol(class),
+                            None => Ok(None),
+                        }
+                    }
+                    _ => Ok(None),
+                }
+            }
             Some(
-                K::PrivateIdentifier
-                | K::PropertyAccessExpression
-                | K::QualifiedName
-                | K::ThisKeyword
-                | K::ThisType
-                | K::SuperKeyword
-                | K::ConstructorKeyword
-                | K::DefaultKeyword
+                K::DefaultKeyword
                 | K::FunctionKeyword
                 | K::EqualsGreaterThanToken
-                | K::ClassKeyword
-                | K::ImportType
-                | K::ExportKeyword
-                | K::ImportKeyword
-                | K::NewKeyword
-                | K::InstanceOfKeyword
-                | K::MetaProperty
-                | K::JsxNamespacedName,
-            ) => Err(Error::Unsupported("getSymbolAtLocation: node context")),
+                | K::ClassKeyword,
+            ) => match read.parent() {
+                Some(parent) => self.get_symbol_of_declaration(parent),
+                None => Ok(None),
+            },
+            Some(K::ExportKeyword) => match read.parent() {
+                Some(parent) if self.ast(parent)?.node(parent)?.kind() == K::ExportAssignment => {
+                    self.raw_declaration_symbol(parent)
+                }
+                _ => Ok(None),
+            },
+            Some(K::ImportKeyword | K::NewKeyword) => {
+                let Some(parent) = read.parent() else {
+                    return Ok(None);
+                };
+                let parent_read = self.ast(parent)?.node(parent)?;
+                if parent_read.kind() != K::MetaProperty {
+                    return Ok(None);
+                }
+                if read.kind() == K::ImportKeyword {
+                    if let Some(name) = parent_read.name() {
+                        if self.ast(name)?.node_text(name)?.as_bytes() == b"defer" {
+                            return Ok(None);
+                        }
+                    }
+                }
+                let ty = self.check_meta_property(parent)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::InstanceOfKeyword) => {
+                let Some(parent) = read.parent() else {
+                    return Ok(None);
+                };
+                let parent_read = self.ast(parent)?.node(parent)?;
+                let Some(right) = parent_read
+                    .data_source()
+                    .as_binary_expression()
+                    .and_then(|data| data.right())
+                else {
+                    return Ok(None);
+                };
+                let ty = self.check_expression_cached(right)?;
+                if let Some(has_instance) = self.symbol_has_instance_method_of_object_type(ty)? {
+                    if let Some(symbol) = self.types.get(has_instance)?.symbol {
+                        return Ok(Some(symbol));
+                    }
+                }
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ImportType) => {
+                let literal = read
+                    .data_source()
+                    .as_import_type_node()
+                    .and_then(|data| data.argument())
+                    .map(|argument| {
+                        Ok::<_, Error>(
+                            self.ast(argument)?
+                                .node(argument)?
+                                .data_source()
+                                .as_literal_type_node()
+                                .and_then(|data| data.literal()),
+                        )
+                    })
+                    .transpose()?
+                    .flatten();
+                match literal {
+                    Some(literal)
+                        if self.ast(literal)?.node(literal)?.kind() == K::StringLiteral =>
+                    {
+                        self.get_symbol_at_location(literal)
+                    }
+                    _ => Ok(None),
+                }
+            }
+            Some(K::JsxNamespacedName) => Err(Error::Unsupported(
+                "getSymbolAtLocation: JSX namespaced name",
+            )),
             _ => Ok(None),
         }
     }
@@ -1133,4 +1232,223 @@ impl CheckerState {
             ))?;
         Ok(Some(apparent))
     }
+}
+
+// port: tsc/internal/ast/utilities.go:IsInExpressionContext
+pub(crate) fn is_in_expression_context(
+    view: ts_ast::AstView<'_>,
+    node: NodeId,
+) -> Result<bool, Error> {
+    let Some(parent) = view.node(node)?.parent() else {
+        return Ok(false);
+    };
+    let read = view.node(parent)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::VariableDeclaration
+            | K::Parameter
+            | K::PropertyDeclaration
+            | K::PropertySignature
+            | K::EnumMember
+            | K::PropertyAssignment
+            | K::BindingElement,
+        ) => read.initializer() == Some(node),
+        Some(
+            K::ExpressionStatement
+            | K::IfStatement
+            | K::DoStatement
+            | K::WhileStatement
+            | K::ReturnStatement
+            | K::WithStatement
+            | K::SwitchStatement
+            | K::CaseClause
+            | K::DefaultClause
+            | K::ThrowStatement
+            | K::TypeAssertionExpression
+            | K::AsExpression
+            | K::TemplateSpan
+            | K::ComputedPropertyName
+            | K::SatisfiesExpression,
+        ) => read.expression() == Some(node),
+        Some(K::ForStatement) => {
+            let data = read
+                .data_source()
+                .as_for_statement()
+                .ok_or(ts_arena::Error::InvalidGraph)?;
+            data.initializer() == Some(node)
+                && view.node(node)?.kind() != K::VariableDeclarationList
+                || data.condition() == Some(node)
+                || data.incrementor() == Some(node)
+        }
+        Some(K::ForInStatement | K::ForOfStatement) => {
+            let (initializer, expression) = match read.data_source().as_for_in_or_of_statement() {
+                Some(data) => (data.initializer(), data.expression()),
+                None => (None, None),
+            };
+            initializer == Some(node) && view.node(node)?.kind() != K::VariableDeclarationList
+                || expression == Some(node)
+        }
+        Some(K::Decorator | K::JsxExpression | K::JsxSpreadAttribute | K::SpreadAssignment) => true,
+        Some(K::ExpressionWithTypeArguments) => {
+            read.expression() == Some(node) && !part_of_type_node(view, parent)?
+        }
+        Some(K::ShorthandPropertyAssignment) => {
+            read.data_source()
+                .as_shorthand_property_assignment()
+                .and_then(|data| data.object_assignment_initializer())
+                == Some(node)
+        }
+        _ => is_expression_node(view, parent)?,
+    })
+}
+
+// port: tsc/internal/ast/utilities.go:IsExpressionNode
+pub(crate) fn is_expression_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::SuperKeyword
+            | K::NullKeyword
+            | K::TrueKeyword
+            | K::FalseKeyword
+            | K::RegularExpressionLiteral
+            | K::ArrayLiteralExpression
+            | K::ObjectLiteralExpression
+            | K::PropertyAccessExpression
+            | K::ElementAccessExpression
+            | K::CallExpression
+            | K::NewExpression
+            | K::TaggedTemplateExpression
+            | K::AsExpression
+            | K::TypeAssertionExpression
+            | K::SatisfiesExpression
+            | K::NonNullExpression
+            | K::ParenthesizedExpression
+            | K::FunctionExpression
+            | K::ClassExpression
+            | K::ArrowFunction
+            | K::VoidExpression
+            | K::DeleteExpression
+            | K::TypeOfExpression
+            | K::PrefixUnaryExpression
+            | K::PostfixUnaryExpression
+            | K::BinaryExpression
+            | K::ConditionalExpression
+            | K::SpreadElement
+            | K::TemplateExpression
+            | K::OmittedExpression
+            | K::JsxElement
+            | K::JsxSelfClosingElement
+            | K::JsxFragment
+            | K::YieldExpression
+            | K::AwaitExpression,
+        ) => true,
+        Some(K::MetaProperty) => {
+            // `import.defer` in `import.defer(...)` is not an expression
+            match read.parent() {
+                Some(parent) => {
+                    let parent_read = view.node(parent)?;
+                    !crate::external_resolution::is_import_call(view, &parent_read)?
+                        || parent_read.expression() != Some(node)
+                }
+                None => true,
+            }
+        }
+        Some(K::ExpressionWithTypeArguments) => match read.parent() {
+            Some(parent) => view.node(parent)?.kind() != K::HeritageClause,
+            None => true,
+        },
+        Some(K::QualifiedName) => {
+            let mut current = node;
+            while let Some(parent) = view.node(current)?.parent() {
+                if view.node(parent)?.kind() != K::QualifiedName {
+                    break;
+                }
+                current = parent;
+            }
+            match view.node(current)?.parent() {
+                Some(parent) => matches!(
+                    view.node(parent)?.kind().known(),
+                    Some(
+                        K::TypeQuery
+                            | K::JSDocLink
+                            | K::JSDocLinkCode
+                            | K::JSDocLinkPlain
+                            | K::JSDocNameReference
+                    )
+                ),
+                None => false,
+            }
+        }
+        Some(K::PrivateIdentifier) => match read.parent() {
+            Some(parent) => {
+                let parent_read = view.node(parent)?;
+                match parent_read.data_source().as_binary_expression() {
+                    Some(data) => {
+                        data.left() == Some(node)
+                            && data
+                                .operator_token()
+                                .map(|token| view.node(token).map(|read| read.kind()))
+                                .transpose()?
+                                == Some(K::InKeyword.into())
+                    }
+                    None => false,
+                }
+            }
+            None => false,
+        },
+        Some(K::Identifier) => {
+            let type_context = match read.parent() {
+                Some(parent) => matches!(
+                    view.node(parent)?.kind().known(),
+                    Some(
+                        K::TypeQuery
+                            | K::JSDocLink
+                            | K::JSDocLinkCode
+                            | K::JSDocLinkPlain
+                            | K::JSDocNameReference
+                    )
+                ),
+                None => false,
+            };
+            type_context || is_in_expression_context(view, node)?
+        }
+        Some(
+            K::NumericLiteral
+            | K::BigIntLiteral
+            | K::StringLiteral
+            | K::NoSubstitutionTemplateLiteral
+            | K::ThisKeyword,
+        ) => is_in_expression_context(view, node)?,
+        _ => false,
+    })
+}
+
+// port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    let kind = read.kind();
+    if ts_ast::utilities::is_type_node_kind(kind) {
+        return Ok(true);
+    }
+    Ok(match kind.known() {
+        Some(
+            K::AnyKeyword
+            | K::UnknownKeyword
+            | K::NumberKeyword
+            | K::BigIntKeyword
+            | K::StringKeyword
+            | K::BooleanKeyword
+            | K::SymbolKeyword
+            | K::ObjectKeyword
+            | K::UndefinedKeyword
+            | K::NullKeyword
+            | K::NeverKeyword,
+        ) => true,
+        Some(K::VoidKeyword) => match read.parent() {
+            Some(parent) => view.node(parent)?.kind() != K::VoidExpression,
+            None => true,
+        },
+        _ => false,
+    })
 }

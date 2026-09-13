@@ -8,6 +8,8 @@ use ts_ast::{symbol_flags as sf, SyntaxKind as K};
 #[derive(Default)]
 pub(crate) struct ModuleAliasState {
     pub(crate) global_import_attributes: Option<TypeId>,
+    /// The export symbol of the alias whose type is being resolved (`reportCircularityError` target).
+    pub(crate) circular_alias_export: Option<SymbolId>,
     pub(crate) attributes_types: crate::types::Map<SymbolId, TypeId>,
     pub(crate) referenced: crate::types::Set<SymbolId>,
     pub(crate) exports_checked: crate::types::Set<SymbolId>,
@@ -553,10 +555,11 @@ impl CheckerState {
         }
         let result: Result<TypeId, Error> = (|| {
             let target = self.resolve_alias(symbol)?;
-            let _export = match self.alias_declaration_or_none(symbol)? {
+            let export = match self.alias_declaration_or_none(symbol)? {
                 Some(declaration) => self.target_of_alias_declaration(declaration)?,
                 None => None,
             };
+            self.module_aliases.circular_alias_export = export;
             if let Some(ty) = self
                 .value_symbol_links
                 .try_get(symbol)
@@ -575,7 +578,13 @@ impl CheckerState {
         let complete = self.resolution.pop();
         let ty = result?;
         if !complete {
-            return Err(Error::Unsupported("getTypeOfAlias: reportCircularityError"));
+            let export = self.module_aliases.circular_alias_export.take();
+            self.report_symbol_circularity(export.unwrap_or(symbol))?;
+            let links = self.value_symbol_links.get_or_default(symbol);
+            if links.resolved_type.is_none() {
+                links.resolved_type = Some(self.builtins.error_type);
+            }
+            return Ok(links.resolved_type.unwrap_or(ty));
         }
         Ok(ty)
     }

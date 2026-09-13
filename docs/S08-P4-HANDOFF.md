@@ -441,12 +441,62 @@ expanded from a spread are synthetic expressions owned by the checker factory.
 They now read their positions through their own views; the three programs
 complete. Regression: `too_many_arguments_through_a_spread_report_the_extra_argument_span`.
 
+**Ninth pass: the long tail.** Every remaining named boundary the inventory
+reached, outside JSX:
+
+- `isNeverReducedProperty` (private declarations) and the never-intersection
+  elaboration share `isConflictingPrivateProperty`; `getTypeOfAlias` reports
+  circularity through `reportCircularityError`; `mergeSymbol`-style alias
+  resolution now also covers export assignments in `getDeclarationSpaces`.
+- isolatedModules: an import that conflicts with a global value used in the file
+  reports TS1275 unless the import is type-only.
+- Unchecked JavaScript: `isUncheckedJSSuggestion` is ported and drives the
+  `Could_not_find_name_0_Did_you_mean_1` / `Property_0_may_not_exist_on_type_1`
+  suggestion messages through `addErrorOrSuggestion`; the deferred
+  missing-property report carries the flag. `IsPlainJSFile` backs the
+  "private field must be declared in an enclosing class" grammar error.
+- `readonly` type operators outside arrays and tuples report TS1354;
+  `maybeMappedType` produces the `K in ...` hint; the primitive alias
+  suggestions (`string` for a misspelled `String`) are six transient symbols
+  created on first use outside `SymbolCount`, as upstream's heap symbols are.
+- `constructorVisibilitiesAreCompatible` reports the two visibilities;
+  the export-assignment type-only re-export adds its related information;
+  `mapToTypeNodes` regenerates colliding single-identifier references with
+  `UseFullyQualifiedType` instead of refusing.
+- `removeSubtypes` reports the too-complex union and `getUnionType` returns
+  the error type; `reportFlowControlError` reports at the block's first token
+  and flow analysis continues disabled, as upstream does.
+- `getSymbolAtLocation` handles `this`, `this` types, `super`, the
+  `constructor`/`default`/`function`/`class`/`=>` keywords, `export`,
+  `import`/`new` meta-properties, `instanceof` and literal import types, with
+  `IsInExpressionContext`/`IsExpressionNode` ported as helpers.
+- Modifier keywords visited through `forEachChild` are no-ops in
+  `checkSourceElementWorker`, as in upstream's switch; the node builder tolerates
+  a binding-pattern parent for a function expression's variable, as upstream's
+  nil symbol does.
+- The inventory example now runs `GetSuggestionDiagnostics` per file instead of
+  recording the suggestion phase as absent.
+
+Rerunning the 246 inventory-05 failure variants outside P5 and JSX: 238
+complete every phase. The rest: 4 reach `getContainersOfSymbol:
+class-expression CommonJS assignment` in declaration emit (newly reachable
+through the fully-qualified regeneration), 1 `getEffectsSignature: reentrant
+effects resolution`, 1 `combineValueAndTypeSymbols: split external export`, and
+2 run past 60 seconds in the debug build: `circularOptionalityRemoval` (already
+the inventory's timeout) and `largeControlFlowGraph`, which previously stopped
+at the flow-depth boundary and now checks the whole file (139 s debug).
+Unit tests cover each port; `families_tests` guards the symbol census, which is
+why the primitive alias symbols bypass `SymbolCount`.
+
 Remaining inventory-05 acceptance buckets, largest first:
 
 | Bucket | Variants | Needs |
 | --- | ---: | --- |
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
-| `checkPrivateIdentifierPropertyAccess: unchecked JavaScript private field` | 4 | unchecked-JS private fields |
+| `getContainersOfSymbol: class-expression CommonJS assignment` | 4 (declaration) | CommonJS class-expression containers in the node builder |
+| `largeControlFlowGraph` / `circularOptionalityRemoval` over 60 s | 2 | flow-analysis performance (P7) |
+| `getEffectsSignature: reentrant effects resolution` | 1 | upstream recurses without a guard; needs the terminating path |
+| `combineValueAndTypeSymbols: split external export` | 1 | the combined symbol construction |
 | `getDeclarationSpaces: export assignment alias` | 2 | alias declaration spaces |
 | `onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict` | 2 | the isolatedModules conflict report |
 | `getPrimitiveTypeAliasSuggestions` | 2 | checker-owned primitive suggestion identity |

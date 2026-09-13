@@ -301,6 +301,9 @@ impl CheckerState {
             // checked through its alias target and a stray `;` class member has
             // nothing to check.
             Some(K::NamespaceExportDeclaration | K::SemicolonClassElement) => Ok(()),
+            // Upstream visits modifier keywords through forEachChild and its
+            // switch has no case for them.
+            _ if ts_ast::is_modifier_kind(read.kind()) && read.kind() != K::Decorator => Ok(()),
             _ => Err(Error::Unsupported(
                 "checkSourceElementWorker: statement/type family",
             )),

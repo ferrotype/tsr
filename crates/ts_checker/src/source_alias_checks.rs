@@ -100,7 +100,7 @@ impl CheckerState {
         Ok(true)
     }
     // port: tsc/internal/checker/checker.go:Checker.addTypeOnlyDeclarationRelatedInfo
-    fn alias_type_only_related(
+    pub(crate) fn alias_type_only_related(
         &mut self,
         diagnostic: Option<usize>,
         declaration: Option<NodeId>,

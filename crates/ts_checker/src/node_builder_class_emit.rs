@@ -67,6 +67,7 @@ impl NodeBuilder<'_> {
         }
         let mut nonlocal_function = false;
         let mut function_expression = false;
+        let mut parent_symbol_missing = false;
         if flags & sf::FUNCTION != 0 {
             if self.checker.symbol(symbol)?.parent().is_some() {
                 nonlocal_function = true;
@@ -141,18 +142,25 @@ impl NodeBuilder<'_> {
             if let Some(declaration) = self.checker.symbol(symbol)?.value_declaration() {
                 if let Some(parent) = self.checker.ast(declaration)?.node(declaration)?.parent() {
                     if Some(parent) != self.enclosing {
-                        symbol = self.checker.get_merged_symbol(
-                            self.checker
-                                .raw_declaration_symbol(parent)?
-                                .ok_or(Error::MissingLink("function expression variable symbol"))?,
-                        );
+                        // A binding-pattern declaration has no symbol; upstream then
+                        // carries a nil symbol, which is trivially accessible.
+                        match self.checker.raw_declaration_symbol(parent)? {
+                            Some(parent_symbol) => {
+                                symbol = self.checker.get_merged_symbol(parent_symbol);
+                            }
+                            None => parent_symbol_missing = true,
+                        }
                     }
                 }
             }
         }
         let use_typeof = (self.flags & nf::USE_TYPE_OF_FUNCTION != 0 || self.visited.contains(&ty))
             && (self.flags & nf::USE_STRUCTURAL_FALLBACK == 0
+                || parent_symbol_missing
                 || self.value_symbol_accessible(symbol)?);
+        if use_typeof && parent_symbol_missing {
+            return Err(Error::MissingLink("function expression variable symbol"));
+        }
         Ok((use_typeof, symbol))
     }
 

@@ -141,10 +141,21 @@ impl CheckerState {
                     .modifier_flags(self.ast(node)?)?
                     & mf::EXPORT
                     != 0
+                && self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS
             {
-                return Err(Error::Unsupported(
-                    "checkModuleDeclaration: verbatim emitted module format",
-                ));
+                let modifiers = self.source_list(node, self.ast(node)?.node(node)?.modifiers())?;
+                let mut export_modifier = None;
+                for modifier in modifiers {
+                    if self.ast(modifier)?.node(modifier)?.kind() == K::ExportKeyword {
+                        export_modifier = Some(modifier);
+                        break;
+                    }
+                }
+                self.error_at(
+                    export_modifier,
+                    d::A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled,
+                    vec![],
+                )?;
             }
         }
         if external {
@@ -295,7 +306,19 @@ impl CheckerState {
                 | K::FunctionDeclaration
                 | K::ImportSpecifier,
             ) => Ok(2),
-            Some(K::ImportEqualsDeclaration | K::NamespaceImport | K::ImportClause) => {
+            Some(K::ExportAssignment | K::BinaryExpression)
+                if !self.export_assignment_declares_alias(node)? =>
+            {
+                Ok(2)
+            }
+            // Export assigned entity name expressions act as aliases and should fall through, otherwise they export values.
+            Some(
+                K::ExportAssignment
+                | K::BinaryExpression
+                | K::ImportEqualsDeclaration
+                | K::NamespaceImport
+                | K::ImportClause,
+            ) => {
                 let symbol = required(
                     self.get_symbol_of_declaration(node)?,
                     "declaration spaces alias",
@@ -312,9 +335,7 @@ impl CheckerState {
                 }
                 Ok(spaces)
             }
-            Some(K::ExportAssignment | K::BinaryExpression) => Err(Error::Unsupported(
-                "getDeclarationSpaces: export assignment alias",
-            )),
+
             _ => Err(Error::Unsupported(
                 "getDeclarationSpaces: declaration family",
             )),
@@ -439,5 +460,29 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let exports = Some(self.module_exports(symbol)?);
         self.set_structured_type_members(ty, exports, &[], &[], &[])
+    }
+
+    /// The alias half of `getDeclarationSpaces` for export assignments: an
+    /// entity-name expression whose symbol is an alias.
+    // port: tsc/internal/checker/checker.go:Checker.getDeclarationSpaces
+    fn export_assignment_declares_alias(&mut self, node: NodeId) -> Result<bool, Error> {
+        let read = self.ast(node)?.node(node)?;
+        let expression = if read.kind() == K::ExportAssignment {
+            read.expression()
+        } else {
+            read.data_source()
+                .as_binary_expression()
+                .and_then(|data| data.right())
+        };
+        let Some(expression) = expression else {
+            return Ok(false);
+        };
+        if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+            return Ok(false);
+        }
+        let Some(symbol) = self.get_symbol_of_declaration(node)? else {
+            return Ok(false);
+        };
+        Ok(self.symbol(symbol)?.flags() & sf::ALIAS != 0)
     }
 }

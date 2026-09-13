@@ -430,10 +430,11 @@ impl CheckerState {
     fn type_at_flow(&mut self, query: &mut FlowQuery, mut flow: FlowId) -> Result<FlowType, Error> {
         if query.depth == 2000 {
             self.flow.disabled = true;
-            // Precise native token range is still a named diagnostic boundary.
-            return Err(Error::Unsupported(
-                "reportFlowControlError: depth-limit token range",
-            ));
+            self.report_flow_control_error(query.reference)?;
+            return Ok(FlowType {
+                ty: self.builtins.error_type,
+                incomplete: false,
+            });
         }
         query.depth += 1;
         let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
@@ -1294,5 +1295,31 @@ impl FlowAnalysis {
             types.extend([declared, assigned, reduced]);
         }
         types
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/flow.go:Checker.reportFlowControlError
+    fn report_flow_control_error(&mut self, node: NodeId) -> Result<(), Error> {
+        let view = self.ast(node)?;
+        let block = ts_ast::utilities::find_ancestor(view, Some(node), |candidate| {
+            ts_ast::utilities::is_function_or_module_block(view, candidate.id()).unwrap_or(false)
+        })?
+        .ok_or(Error::MissingLink("flow control block"))?;
+        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+            .ok_or(Error::MissingLink("flow control source"))?;
+        let statements = view
+            .node(block)?
+            .statement_list()
+            .ok_or(Error::MissingLink("flow control statements"))?;
+        let position = view.list(statements)?.loc().pos();
+        let range = ts_scanner::get_range_of_token_at_position(view, source, position)?;
+        self.add_diagnostic(ts_ast::Diagnostic::new(
+            Some(source),
+            range,
+            ts_diagnostics::The_containing_function_or_module_body_is_too_large_for_control_flow_analysis,
+            vec![],
+        ))?;
+        Ok(())
     }
 }

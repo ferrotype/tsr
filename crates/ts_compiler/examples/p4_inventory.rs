@@ -131,8 +131,17 @@ fn observe(request: &Value) -> Value {
         row["phases"]["declaration"] = json!({"state":if declarations.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":declarations,"api":"Program.getDeclarationDiagnostics"});
     }
     if row["phases"].get("suggestion").is_some() {
-        row["phases"]["suggestion"] =
-            absent("GetSuggestionDiagnostics additional unused-code pass");
+        let mut suggestions = Vec::new();
+        for file in program.files() {
+            let source = file.bound().view().source_file().expect("published source");
+            let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
+            let result = match op.recorded_suggestions(file.source()) {
+                Ok(values) => diagnostics::phase(&program, &values),
+                Err(error) => checker_failure(error),
+            };
+            suggestions.push(json!({"file_hex":name,"result":result}));
+        }
+        row["phases"]["suggestion"] = json!({"state":if suggestions.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":suggestions,"api":"Checker.GetSuggestionDiagnostics"});
     }
     row
 }

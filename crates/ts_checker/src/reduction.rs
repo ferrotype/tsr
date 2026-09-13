@@ -25,7 +25,7 @@ impl CheckerState {
                 let reduced = (|| {
                     let properties = self.get_properties_of_union_or_intersection_type(ty)?;
                     for prop in properties {
-                        if self.is_discriminant_with_never_type(prop)? {
+                        if self.is_never_reduced_property(prop)? {
                             return Ok(true);
                         }
                     }
@@ -70,11 +70,6 @@ impl CheckerState {
         prop: SymbolId,
     ) -> Result<bool, Error> {
         let symbol = self.symbol(prop)?;
-        if symbol.check_flags() & cf::CONTAINS_PRIVATE != 0 {
-            return Err(Error::Unsupported(
-                "isNeverReducedProperty: private declarations",
-            ));
-        }
         if symbol.flags() & sf::OPTIONAL != 0
             || symbol.check_flags() & (cf::NON_UNIFORM_AND_LITERAL | cf::HAS_NEVER_TYPE)
                 != cf::NON_UNIFORM_AND_LITERAL
@@ -83,5 +78,21 @@ impl CheckerState {
         }
         let ty = self.get_type_of_symbol(prop)?;
         Ok(self.types.flags(ty)? & tf::NEVER != 0)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isNeverReducedProperty
+    pub(crate) fn is_never_reduced_property(&mut self, prop: SymbolId) -> Result<bool, Error> {
+        Ok(self.is_discriminant_with_never_type(prop)?
+            || self.is_conflicting_private_property(prop)?)
+    }
+
+    // port: tsc/internal/checker/checker.go:isConflictingPrivateProperty
+    pub(crate) fn is_conflicting_private_property(&self, prop: SymbolId) -> Result<bool, Error> {
+        // Return true for a synthetic property with multiple declarations, at least one of which is private.
+        let symbol = self.symbol(prop)?;
+        Ok(
+            symbol.value_declaration().is_none()
+                && symbol.check_flags() & cf::CONTAINS_PRIVATE != 0,
+        )
     }
 }

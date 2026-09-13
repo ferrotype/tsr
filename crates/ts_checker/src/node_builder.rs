@@ -360,7 +360,11 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         let mut nodes = Vec::new();
-        let mut seen_names: Vec<(JsString, TypeId)> = Vec::new();
+        // To avoid printing types like `[Foo, Foo]` or `Bar & Bar` where occurrences
+        // of the same name come from different namespaces, single-identifier
+        // references are regenerated fully qualified when a name is not homogeneous.
+        let may_have_name_collisions = self.flags & nf::USE_FULLY_QUALIFIED_TYPE == 0;
+        let mut seen_names: Vec<(JsString, TypeId, usize)> = Vec::new();
         for (index, &ty) in types.iter().enumerate() {
             let display_index = index + 1;
             if self.check_truncation() && display_index + 2 < types.len().saturating_sub(1) {
@@ -375,30 +379,52 @@ impl<'a> NodeBuilder<'a> {
             self.approximate_length += 2;
             let node = self.type_node(ty)?;
             let view = self.ast.view();
-            if let Some(reference) = view.node(node)?.data_source().as_type_reference_node() {
-                if let Some(name) = reference.type_name() {
-                    if view.node(name)?.kind() == K::Identifier {
-                        let name = JsString::from_bytes(view.node_text(name)?.as_bytes());
-                        for (_, previous) in seen_names.iter().filter(|(seen, _)| *seen == name) {
-                            let current = self.checker.types.get(ty)?;
-                            let previous_record = self.checker.types.get(*previous)?;
-                            // typesAreSameReference: shared type, symbol, or alias record.
-                            if ty != *previous
-                                && !(current.symbol.is_some()
-                                    && current.symbol == previous_record.symbol)
-                                && !(current.alias.is_some()
-                                    && current.alias == previous_record.alias)
-                            {
-                                return Err(Error::Unsupported(
-                                    "mapToTypeNodes: colliding names require qualified display",
-                                ));
-                            }
+            if may_have_name_collisions {
+                if let Some(reference) = view.node(node)?.data_source().as_type_reference_node() {
+                    if let Some(name) = reference.type_name() {
+                        if view.node(name)?.kind() == K::Identifier {
+                            let name = JsString::from_bytes(view.node_text(name)?.as_bytes());
+                            seen_names.push((name, ty, nodes.len()));
                         }
-                        seen_names.push((name, ty));
                     }
                 }
             }
             nodes.push(node);
+        }
+        if may_have_name_collisions && !seen_names.is_empty() {
+            let saved = self.flags;
+            self.flags |= nf::USE_FULLY_QUALIFIED_TYPE;
+            let result: Result<(), Error> = (|| {
+                let mut names: Vec<JsString> = Vec::new();
+                for (name, _, _) in &seen_names {
+                    if !names.contains(name) {
+                        names.push(name.clone());
+                    }
+                }
+                for name in names {
+                    let group: Vec<(TypeId, usize)> = seen_names
+                        .iter()
+                        .filter(|(seen, _, _)| *seen == name)
+                        .map(|(_, ty, index)| (*ty, *index))
+                        .collect();
+                    let first = group[0].0;
+                    let mut homogeneous = true;
+                    for &(ty, _) in &group[1..] {
+                        if !self.types_are_same_reference(first, ty)? {
+                            homogeneous = false;
+                            break;
+                        }
+                    }
+                    if !homogeneous {
+                        for (ty, index) in group {
+                            nodes[index] = self.type_node(ty)?;
+                        }
+                    }
+                }
+                Ok(())
+            })();
+            self.flags = saved;
+            result?;
         }
         self.list(nodes)
     }
@@ -1193,5 +1219,16 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         Ok((string_named, single_quote))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:typesAreSameReference
+    fn types_are_same_reference(&self, a: TypeId, b: TypeId) -> Result<bool, Error> {
+        if a == b {
+            return Ok(true);
+        }
+        let left = self.checker.types.get(a)?;
+        let right = self.checker.types.get(b)?;
+        Ok(left.symbol.is_some() && left.symbol == right.symbol
+            || left.alias.is_some() && left.alias == right.alias)
     }
 }

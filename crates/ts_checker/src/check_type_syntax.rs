@@ -187,9 +187,11 @@ impl CheckerState {
                     self.ast(annotation)?.node(annotation)?.kind().known(),
                     Some(K::ArrayType | K::TupleType)
                 ) {
-                    return Err(Error::Unsupported(
-                        "checkGrammarTypeOperatorNode: invalid readonly diagnostic",
-                    ));
+                    self.grammar_error_first_token(
+                        node,
+                        ts_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types,
+                        vec![ts_ast::JsString::from_bytes(b"symbol".as_slice())],
+                    )?;
                 }
                 self.check_source_element(annotation)
             }

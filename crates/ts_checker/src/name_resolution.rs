@@ -101,20 +101,12 @@ impl Hooks<'_> {
                 }
             }
             if meaning & sf::GLOBAL_LOOKUP != 0 {
+                // port: tsc/internal/checker/checker.go:getPrimitiveTypeAliasSuggestions
                 let table = self.state.table(table_id)?;
-                for (builtin, primitive) in [
-                    (b"String".as_slice(), b"string".as_slice()),
-                    (b"Number", b"number"),
-                    (b"Boolean", b"boolean"),
-                    (b"Object", b"object"),
-                    (b"BigInt", b"bigint"),
-                    (b"Symbol", b"symbol"),
-                ] {
-                    if table.get(builtin).is_some()
-                        && ts_scanner::get_spelling_suggestion_for_strings(name, [primitive])
-                            .is_some()
-                    {
-                        return Err(Error::Unsupported("getPrimitiveTypeAliasSuggestions: checker-owned primitive suggestion identity"));
+                for &(builtin, suggestion) in &self.state.builtins.primitive_alias_suggestions {
+                    if table.get(builtin).is_some() {
+                        let text = self.state.symbol(suggestion)?.name_to_owned();
+                        candidates.push((text, suggestion));
                     }
                 }
             }
@@ -507,6 +499,7 @@ impl CheckerState {
         name: &[u8],
         meaning: SymbolFlags,
     ) -> Result<Option<SymbolId>, Error> {
+        self.ensure_primitive_alias_suggestions();
         self.resolve_name_mode(location, name, meaning, None, false, false, true)
     }
     fn resolve_name_mode(
@@ -695,7 +688,18 @@ impl CheckerState {
                                                 | ts_ast::SyntaxKind::ImportEqualsDeclaration
                                         )
                                     ) {
-                                        return Err(Error::Unsupported("onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict"));
+                                        let view = self.ast(declaration)?;
+                                        if !crate::external_resolution::type_only_import_or_export_declaration(
+                                            view,
+                                            &view.node(declaration)?,
+                                        )? {
+                                            self.error_at(
+                                                Some(declaration),
+                                                ts_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled,
+                                                vec![name.clone()],
+                                            )?;
+                                        }
+                                        break;
                                     }
                                 }
                             }

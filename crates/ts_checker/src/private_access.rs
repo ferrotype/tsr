@@ -76,11 +76,13 @@ impl CheckerState {
                 return Ok(PrivateAccessResult::Type(self.builtins.error_type));
             }
             if let Some(class) = self.private_containing_class(right)? {
-                if self.ast(class)?.node(class)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
-                {
-                    return Err(Error::Unsupported(
-                        "checkPrivateIdentifierPropertyAccess: unchecked JavaScript private field",
-                    ));
+                if self.is_plain_js_node(class)? {
+                    let text = self.ast(right)?.node_text(right)?.into_js_string();
+                    self.grammar_error_node(
+                        right,
+                        d::Private_field_0_must_be_declared_in_an_enclosing_class,
+                        vec![text],
+                    )?;
                 }
             }
         } else if let Some(property) = property {
@@ -318,13 +320,25 @@ impl CheckerState {
             .is_none()
             && ts_ast::utilities::get_containing_class(self.ast(left)?, left)?.is_some()
         {
-            if self.ast(left)?.node(left)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0 {
-                return Err(Error::Unsupported(
-                    "checkInExpression: unchecked JavaScript suggestion",
-                ));
-            }
-            self.defer_missing_property(left, right);
+            let right_symbol = self.types.get(right)?.symbol;
+            let unchecked_js = self.is_unchecked_js_suggestion(Some(left), right_symbol, true)?;
+            self.defer_missing_property_ex(left, right, unchecked_js);
         }
         Ok(())
+    }
+
+    /// `IsPlainJSFile(GetSourceFileOfNode(node), checkJs)`.
+    // port: tsc/internal/ast/utilities.go:IsPlainJSFile
+    pub(crate) fn is_plain_js_node(&self, node: NodeId) -> Result<bool, Error> {
+        let view = self.ast(node)?;
+        let Some(source) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+            return Ok(false);
+        };
+        let file = view.source_file(source)?;
+        Ok(matches!(
+            file.script_kind,
+            ts_core::ScriptKind::JS | ts_core::ScriptKind::JSX
+        ) && file.check_js_directive.is_none()
+            && self.program()?.host.options().check_js == ts_core::Tristate::UNKNOWN)
     }
 }

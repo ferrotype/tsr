@@ -1950,3 +1950,199 @@ fn too_many_arguments_through_a_spread_report_the_extra_argument_span() {
     let spread = text.windows(8).position(|w| w == b"...[6, 7").unwrap() as i64;
     assert_eq!(diagnostics[1].loc.pos(), spread);
 }
+
+#[test]
+fn readonly_type_operators_are_limited_to_array_and_tuple_literals() {
+    let (owner, source) = checker(b"type T = readonly string;\n", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types.code,
+            vec!["symbol".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn conflicting_private_members_reduce_intersections_to_never_with_an_explanation() {
+    let text =
+        b"class A { private p = 1 }\nclass B { private p = 1 }\ndeclare const x: A & B;\nx.p;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["p".to_string(), "never".to_string()]
+        )]
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
+        vec![(
+            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some.code,
+            vec!["A & B".to_string(), "p".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn circular_import_aliases_report_the_circularity() {
+    let (owner, source) = checker(b"import a = a;\na;\n", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert!(
+        diagnostics
+            .iter()
+            .any(|d| d.code == ts_diagnostics::Circular_definition_of_import_alias_0.code),
+        "{:?}",
+        codes_and_args(&diagnostics)
+    );
+}
+
+#[test]
+fn misspelled_mapped_types_suggest_the_in_keyword() {
+    let text = b"type Keys = \"a\" | \"b\";\ntype M = { [Keys]: number };\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Did_you_mean_to_use_1_in_0.code,
+            vec!["Keys".to_string(), "K".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn misspelled_builtin_names_suggest_the_primitive_alias() {
+    // A case difference costs 0.1 in the spelling distance, so `strng` prefers the
+    // primitive alias while `Strng` would pick the `String` interface.
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"let value: strng = \"\";\nvalue;\n"),
+            (b"/globals.d.ts", b"interface String {}\n"),
+        ],
+        options(),
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Cannot_find_name_0_Did_you_mean_1.code,
+            vec!["strng".to_string(), "string".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn exported_namespaces_in_commonjs_files_are_rejected_under_verbatim_module_syntax() {
+    let (owner, source) = checker(
+        b"export namespace N { export const x = 1; }\n",
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            verbatim_module_syntax: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled.code,
+            vec![]
+        )]
+    );
+    assert_eq!(diagnostics[0].loc.pos(), 0);
+}
+
+#[test]
+fn constructor_visibility_mismatches_report_the_visibilities() {
+    let text = b"class A { private constructor() {} }\nclass B { protected constructor() {} }\nlet x: typeof B = A;\nx;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(
+        diagnostics[0].code,
+        ts_diagnostics::Type_0_is_not_assignable_to_type_1.code
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
+        vec![(
+            ts_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type.code,
+            vec!["private".to_string(), "protected".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn imports_conflicting_with_global_values_need_type_only_imports_under_isolated_modules() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import { Foo } from \"./a\";\nFoo;\n"),
+            (b"/a.ts", b"export interface Foo { x: number }\n"),
+            (b"/globals.d.ts", b"declare var Foo: number;\n"),
+        ],
+        CompilerOptions {
+            isolated_modules: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert!(
+        diagnostics.iter().any(|d| d.code
+            == ts_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled.code),
+        "{:?}",
+        codes_and_args(&diagnostics)
+    );
+}
+
+#[test]
+fn uncalled_function_checks_resolve_this_property_symbols() {
+    let text = b"class C {\n    f = () => 1;\n    m() { return this.f ? 1 : 2; }\n}\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![ts_diagnostics::This_condition_will_always_return_true_since_this_function_is_always_defined_Did_you_mean_to_call_it_instead.code]
+    );
+}

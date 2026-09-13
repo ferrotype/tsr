@@ -431,7 +431,14 @@ impl CheckerState {
                     return Ok(self.builtins.any_type);
                 }
                 if !name.as_bytes().is_empty() {
-                    self.defer_missing_property(right, if this { apparent } else { left_type });
+                    let left_symbol = self.types.get(left_type)?.symbol;
+                    let unchecked_js =
+                        self.is_unchecked_js_suggestion(Some(node), left_symbol, true)?;
+                    self.defer_missing_property_ex(
+                        right,
+                        if this { apparent } else { left_type },
+                        unchecked_js,
+                    );
                 }
                 return Ok(self.builtins.error_type);
             };

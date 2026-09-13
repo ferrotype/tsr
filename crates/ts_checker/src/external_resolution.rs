@@ -914,7 +914,10 @@ impl CheckerState {
 }
 
 // port: tsc/internal/ast/utilities.go:IsImportCall
-fn is_import_call(view: ts_ast::AstView<'_>, node: &ts_ast::NodeRead<'_>) -> Result<bool, Error> {
+pub(crate) fn is_import_call(
+    view: ts_ast::AstView<'_>,
+    node: &ts_ast::NodeRead<'_>,
+) -> Result<bool, Error> {
     if node.kind() != K::CallExpression {
         return Ok(false);
     }
@@ -1009,7 +1012,7 @@ impl CheckerState {
 }
 
 // port: tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration
-fn type_only_import_or_export_declaration(
+pub(crate) fn type_only_import_or_export_declaration(
     view: ts_ast::AstView<'_>,
     node: &ts_ast::NodeRead<'_>,
 ) -> Result<bool, Error> {

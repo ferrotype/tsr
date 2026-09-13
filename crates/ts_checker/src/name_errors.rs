@@ -1,6 +1,6 @@
 //! Missing names run contextual meaning diagnostics before lexical spelling
 //! suggestions. Resolution side effects are dispatched after the lexical borrow.
-use crate::{CheckerState, Error};
+use crate::{type_flags as tf, CheckerState, Error};
 use ts_arena::NodeId;
 use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
 use ts_diagnostics as d;
@@ -168,35 +168,28 @@ impl CheckerState {
             };
             if !global {
                 let text = self.symbol_to_string(suggestion)?;
-                let unchecked = if let Some(location) = location {
-                    self.ast(location)?.node(location)?.flags()
-                        & ts_ast::node_flags::JAVA_SCRIPT_FILE
-                        != 0
-                        && !self.program()?.host.options().check_js.is_true()
-                } else {
-                    false
-                };
-                if unchecked {
-                    return Err(Error::Unsupported(
-                        "isUncheckedJSSuggestion: name reference",
-                    ));
-                }
+                let unchecked_js =
+                    self.is_unchecked_js_suggestion(location, Some(suggestion), false)?;
                 let message = if meaning == sf::NAMESPACE {
                     d::Cannot_find_namespace_0_Did_you_mean_1
+                } else if unchecked_js {
+                    d::Could_not_find_name_0_Did_you_mean_1
                 } else {
                     d::Cannot_find_name_0_Did_you_mean_1
                 };
-                if let Some(index) =
-                    self.error_at(location, message, vec![declaration, text.clone()])?
-                {
-                    if let Some(value) = value {
-                        let related = self.diagnostic_for_node(
-                            Some(value),
-                            d::X_0_is_declared_here,
-                            vec![text],
-                        )?;
-                        self.add_related_diagnostic(index, related)?;
-                    }
+                let mut diagnostic =
+                    self.diagnostic_for_node(location, message, vec![declaration, text.clone()])?;
+                if let Some(value) = value {
+                    diagnostic.related_information.push(std::sync::Arc::new(
+                        self.diagnostic_for_node(Some(value), d::X_0_is_declared_here, vec![text])?,
+                    ));
+                }
+                // port: tsc/internal/checker/checker.go:Checker.addErrorOrSuggestion
+                if unchecked_js {
+                    diagnostic.category = d::Category::Suggestion as i32;
+                    self.add_suggestion_diagnostic(diagnostic)?;
+                } else {
+                    self.add_diagnostic(diagnostic)?;
                 }
                 return Ok(());
             }
@@ -429,6 +422,7 @@ impl CheckerState {
                     return Ok(true);
                 }
                 let mut message = d::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here;
+                let mut args = vec![JsString::from_bytes(name)];
                 if primitive {
                     if let Some(parent) = parent {
                         if let Some(grand) = self.ast(parent)?.node(parent)?.parent() {
@@ -460,14 +454,17 @@ impl CheckerState {
                     b"Promise" | b"Symbol" | b"Map" | b"WeakMap" | b"Set" | b"WeakSet"
                 ) {
                     message=d::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_es2015_or_later;
-                } else if let Some(parent) = parent {
-                    if self.ast(parent)?.node(parent)?.kind() == K::ComputedPropertyName {
-                        return Err(Error::Unsupported(
-                            "maybeMappedType: misspelled mapped type diagnostic",
-                        ));
+                } else if let Some(symbol) = symbol {
+                    if self.maybe_mapped_type(node, symbol)? {
+                        message = d::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Did_you_mean_to_use_1_in_0;
+                        args.push(JsString::from_bytes(if name == b"K" {
+                            b"P".as_slice()
+                        } else {
+                            b"K".as_slice()
+                        }));
                     }
                 }
-                self.error_at(Some(node), message, vec![JsString::from_bytes(name)])?;
+                self.error_at(Some(node), message, args)?;
                 return Ok(true);
             }
         }
@@ -482,5 +479,142 @@ impl CheckerState {
             }
         }
         Ok(false)
+    }
+
+    // port: tsc/internal/checker/utilities.go:Checker.isUncheckedJSSuggestion
+    pub(crate) fn is_unchecked_js_suggestion(
+        &mut self,
+        node: Option<NodeId>,
+        suggestion: Option<ts_arena::SymbolId>,
+        exclude_classes: bool,
+    ) -> Result<bool, Error> {
+        let Some(node) = node else {
+            return Ok(false);
+        };
+        let view = self.ast(node)?;
+        let Some(file_id) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+            return Ok(false);
+        };
+        let file = view.source_file(file_id)?;
+        if self.program()?.host.options().check_js != ts_core::Tristate::UNKNOWN
+            || file.check_js_directive.is_some()
+            || !matches!(
+                file.script_kind,
+                ts_core::ScriptKind::JS | ts_core::ScriptKind::JSX
+            )
+        {
+            return Ok(false);
+        }
+        let mut declaration_file = None;
+        let mut suggestion_has_no_extends_or_decorators = true;
+        let mut suggestion_is_class = false;
+        if let Some(suggestion) = suggestion {
+            if let Some(first) = self.symbol_declarations(suggestion)?.first().flatten() {
+                declaration_file =
+                    ts_ast::utilities::get_source_file_of_node(self.ast(first)?, Some(first))?;
+            }
+            suggestion_is_class = self.symbol(suggestion)?.flags() & sf::CLASS != 0;
+            if let Some(value) = self.symbol(suggestion)?.value_declaration() {
+                let read = self.ast(value)?.node(value)?;
+                if ts_ast::utilities::is_class_like(&read) {
+                    suggestion_has_no_extends_or_decorators = !self
+                        .class_heritage_nodes(value, K::ExtendsKeyword)?
+                        .is_empty()
+                        || self.class_or_constructor_parameter_is_decorated(value)?;
+                }
+            }
+        }
+        let foreign_global = match declaration_file {
+            Some(declaration_file) if declaration_file != file_id => {
+                ts_ast::utilities_middle::is_global_source_file(
+                    self.ast(declaration_file)?,
+                    declaration_file,
+                )?
+            }
+            _ => false,
+        };
+        let read = view.node(node)?;
+        let this_access = read.kind() == K::PropertyAccessExpression
+            && read
+                .expression()
+                .map(|expression| Ok::<_, Error>(view.node(expression)?.kind() == K::ThisKeyword))
+                .transpose()?
+                .unwrap_or(false);
+        if foreign_global {
+            return Ok(false);
+        }
+        if exclude_classes
+            && suggestion_has_no_extends_or_decorators
+            && (suggestion_is_class || this_access)
+        {
+            return Ok(false);
+        }
+        Ok(true)
+    }
+
+    // port: tsc/internal/ast/utilities.go:ClassOrConstructorParameterIsDecorated
+    fn class_or_constructor_parameter_is_decorated(&self, class: NodeId) -> Result<bool, Error> {
+        if self.has_decorators(class)? {
+            return Ok(true);
+        }
+        for member in self.source_list(class, self.ast(class)?.node(class)?.member_list())? {
+            let read = self.ast(member)?.node(member)?;
+            if read.kind() == K::Constructor && read.body().is_some() {
+                for parameter in self.source_list(member, read.parameter_list())? {
+                    if self.has_decorators(parameter)? {
+                        return Ok(true);
+                    }
+                }
+            }
+        }
+        Ok(false)
+    }
+
+    // port: tsc/internal/ast/utilities.go:HasDecorators
+    fn has_decorators(&self, node: NodeId) -> Result<bool, Error> {
+        for modifier in self.source_list(node, self.ast(node)?.node(node)?.modifiers())? {
+            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.maybeMappedType
+    fn maybe_mapped_type(
+        &mut self,
+        node: NodeId,
+        symbol: ts_arena::SymbolId,
+    ) -> Result<bool, Error> {
+        let view = self.ast(node)?;
+        let mut current = node;
+        loop {
+            let Some(parent) = view.node(current)?.parent() else {
+                return Ok(false);
+            };
+            current = parent;
+            if !matches!(
+                view.node(current)?.kind().known(),
+                Some(K::ComputedPropertyName | K::PropertySignature)
+            ) {
+                break;
+            }
+        }
+        let read = view.node(current)?;
+        if read.kind() != K::TypeLiteral
+            || self.source_list(current, read.member_list())?.len() != 1
+        {
+            return Ok(false);
+        }
+        let ty = self.get_declared_type_of_symbol(symbol)?;
+        if self.types.flags(ty)? & tf::UNION == 0 {
+            return Ok(false);
+        }
+        for &part in self.types.compound_types(ty)?.clone().iter() {
+            if !self.type_assignable_to_kind_strict(part, tf::STRING_OR_NUMBER_LITERAL)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 }
