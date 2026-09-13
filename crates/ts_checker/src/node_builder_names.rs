@@ -9,6 +9,9 @@ use std::cmp::Ordering;
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
 
+#[path = "node_builder_imports.rs"]
+mod imports;
+
 #[path = "node_builder_containers.rs"]
 mod containers;
 #[path = "node_builder_scope.rs"]
@@ -209,13 +212,8 @@ impl NodeBuilder<'_> {
         Ok(false)
     }
 
-    // The diagnostic symbolToString API has no enclosing declaration or file.
-    // Keep that native branch separate from declaration-emit specifier ranking.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
-    pub(super) fn context_free_module_specifier(
-        &mut self,
-        symbol: SymbolId,
-    ) -> Result<JsString, Error> {
+    fn module_file_declaration(&mut self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         let declarations: Vec<_> = self
             .checker
             .symbol_declarations(symbol)?
@@ -258,6 +256,23 @@ impl NodeBuilder<'_> {
                 }
             }
         }
+        Ok(file)
+    }
+
+    // The diagnostic symbolToString API has no enclosing declaration or file.
+    // Keep that native branch separate from declaration-emit specifier ranking.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
+    pub(super) fn context_free_module_specifier(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<JsString, Error> {
+        let declarations: Vec<_> = self
+            .checker
+            .symbol_declarations(symbol)?
+            .iter()
+            .flatten()
+            .collect();
+        let file = self.module_file_declaration(symbol)?;
         if file.is_none() {
             for &declaration in &declarations {
                 let view = self.checker.ast(declaration)?;
@@ -276,9 +291,19 @@ impl NodeBuilder<'_> {
         ) {
             return Ok(JsString::from_bytes(specifier));
         }
+        let source = self
+            .module_source_file(symbol)?
+            .ok_or(Error::MissingLink("module source file"))?;
+        Ok(JsString::from_bytes(
+            self.checker.ast(source)?.source_file(source)?.file_name(),
+        ))
+    }
+
+    // port: tsc/internal/ast/utilities.go:GetSourceFileOfModule
+    fn module_source_file(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         let mut declaration = self.checker.symbol(symbol)?.value_declaration();
         if declaration.is_none() {
-            for candidate in declarations {
+            for candidate in self.checker.symbol_declarations(symbol)?.iter().flatten() {
                 let view = self.checker.ast(candidate)?;
                 let read = view.node(candidate)?;
                 let external_augmentation = read.kind() == K::ModuleDeclaration
@@ -291,11 +316,13 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        let declaration = declaration.ok_or(Error::MissingLink("module source declaration"))?;
-        let view = self.checker.ast(declaration)?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(declaration))?
-            .ok_or(Error::MissingLink("module source file"))?;
-        Ok(JsString::from_bytes(view.source_file(source)?.file_name()))
+        match declaration {
+            Some(node) => Ok(ts_ast::utilities::get_source_file_of_node(
+                self.checker.ast(node)?,
+                Some(node),
+            )?),
+            None => Ok(None),
+        }
     }
 
     // Keep symbol/container selection here; generation uses the immutable
@@ -328,15 +355,7 @@ impl NodeBuilder<'_> {
             .iter()
             .flatten()
             .collect();
-        let mut source = None;
-        for &declaration in &declarations {
-            let view = self.checker.ast(declaration)?;
-            let read = view.node(declaration)?;
-            if read.kind() == K::SourceFile {
-                source = Some(declaration);
-                break;
-            }
-        }
+        let source = self.module_file_declaration(symbol)?;
         if source.is_none() {
             // Ambient declarations precede file-specifier generation.
             for &declaration in &declarations {
@@ -350,9 +369,11 @@ impl NodeBuilder<'_> {
                     }
                 }
             }
-            return Err(Error::Unsupported(
-                "getSpecifierForModuleSymbol: contextual export-equals container",
-            ));
+            if let Some(name) = ts_ast::try_get_ambient_module_name_from_symbol_name(
+                self.checker.symbol(symbol)?.name_bytes(),
+            ) {
+                return Ok(JsString::from_bytes(name));
+            }
         }
         let source = source.ok_or(Error::MissingLink("module source"))?;
         let target = self
@@ -1103,7 +1124,8 @@ impl NodeBuilder<'_> {
             Some(arguments) => Some(arguments),
             None => self.qualified_type_parameter_nodes(chain, 0)?,
         };
-        let specifier = self.module_specifier_with_context(chain[0], self.enclosing)?;
+        let (specifier, attributes) =
+            self.import_type_specifier(chain[0], *chain.last().unwrap())?;
         self.approximate_length += specifier.len() + 10;
         let literal = self.string_literal(specifier);
         let argument = self.ast.new_literal_type_node(Some(literal));
@@ -1143,7 +1165,7 @@ impl NodeBuilder<'_> {
                 let imported = self.ast.new_import_type_node(
                     is_type_of,
                     Some(argument),
-                    None,
+                    attributes,
                     qualifier,
                     arguments,
                 );
@@ -1152,9 +1174,13 @@ impl NodeBuilder<'_> {
                     .new_indexed_access_type_node(Some(imported), indexed.index_type));
             }
         }
-        Ok(self
-            .ast
-            .new_import_type_node(is_type_of, Some(argument), None, qualifier, arguments))
+        Ok(self.ast.new_import_type_node(
+            is_type_of,
+            Some(argument),
+            attributes,
+            qualifier,
+            arguments,
+        ))
     }
 
     /// Type arguments written for a non-final chain component.

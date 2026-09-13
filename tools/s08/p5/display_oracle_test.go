@@ -32,6 +32,7 @@ func TestS08P5Display(t *testing.T) {
 			Files   map[string]string `json:"files"`
             FileBytes map[string]string `json:"file_bytes"`
 			Roots   []string          `json:"roots"`
+			Module  string            `json:"module"`
 			Queries []struct {
 				ID            string  `json:"id"`
 				Declaration   string  `json:"declaration"`
@@ -59,6 +60,12 @@ func TestS08P5Display(t *testing.T) {
         }
 		host := compiler.NewCompilerHost("/", vfstest.FromMap(r.Files, true), "/no-default-lib", nil, nil, nil)
 		opts := &core.CompilerOptions{Target: core.ScriptTargetESNext, Module: core.ModuleKindESNext, Strict: core.TSTrue, NoLib: core.TSTrue}
+		switch r.Module {
+		case "", "esnext":
+		case "node16": opts.Module = core.ModuleKindNode16
+		case "nodenext": opts.Module = core.ModuleKindNodeNext
+		default: t.Fatal("unknown display module option")
+		}
 		config := tsoptions.NewParsedCommandLine(opts, r.Roots, nil, tspath.ComparePathsOptions{})
 		program := compiler.NewProgram(compiler.ProgramOptions{Config: config, Host: host})
 		program.BindSourceFiles()

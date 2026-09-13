@@ -20,6 +20,8 @@ def validate(request, result):
         if spec['id'] in ids:
             raise ValueError('duplicate program identity')
         ids.add(spec['id'])
+        if spec.get('module', 'esnext') not in ('esnext', 'node16', 'nodenext'):
+            raise ValueError('invalid display module option')
         files, encoded = spec.get('files'), spec.get('file_bytes', {})
         if not isinstance(files, dict) or not isinstance(encoded, dict) or files.keys() & encoded.keys():
             raise ValueError('invalid or overlapping source encodings')

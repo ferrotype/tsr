@@ -1080,6 +1080,548 @@
           "internal_flags": 8
         }
       ]
+    },
+    {
+      "id": "import-mode-node16-cts-to-mts",
+      "module": "node16",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.cts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-node16-mts-to-cts",
+      "module": "node16",
+      "files": {
+        "/lib.cts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.cjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-node16-mts-to-mts",
+      "module": "node16",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-cts-to-mts",
+      "module": "nodenext",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.cts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-mts-to-cts",
+      "module": "nodenext",
+      "files": {
+        "/lib.cts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.cjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-mts-to-mts",
+      "module": "nodenext",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-attributes-virtual",
+      "files": {
+        "/types.d.ts": "declare module \"virtual\" with { type: \"css\", format: \"module\" } { export interface Style { value: number }; export function make(): Style; }",
+        "/main.ts": "import { make } from \"virtual\" with { type: \"css\", format: \"module\" }; const value = make(); const factory = make; type Annotation = import(\"virtual\", { with: { type: \"css\", format: \"module\" } }).Style;"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "value-type_string-8388608",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "value-type_node-79659013",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "value-type_node-348094469",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string-8388608",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node-79659013",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_node-348094469",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_string-8388608",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Annotation-type_node-79659013",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_node-348094469",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-attributes-button.style",
+      "files": {
+        "/types.d.ts": "declare module \"*.style\" with { type: \"css\", format: \"module\" } { export interface Style { value: number }; export function make(): Style; }",
+        "/main.ts": "import { make } from \"button.style\" with { type: \"css\", format: \"module\" }; const value = make(); const factory = make; type Annotation = import(\"button.style\", { with: { type: \"css\", format: \"module\" } }).Style;"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "value-type_string-8388608",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "value-type_node-79659013",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "value-type_node-348094469",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string-8388608",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node-79659013",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_node-348094469",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_string-8388608",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Annotation-type_node-79659013",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_node-348094469",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-portability-True",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-portability-False",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": \"./other.d.cts\"}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "export-equals-contextual-name",
+      "module": "nodenext",
+      "files": {
+        "/lib.cts": "namespace Container { export interface Value { x: number }; export function make(): Value { return {x: 1}; } } export = Container;",
+        "/bridge.cts": "import C = require(\"./lib.cjs\"); export const derived = C.make();",
+        "/main.cts": "import {derived} from \"./bridge.cjs\"; const result = derived;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-None",
+          "declaration": "result",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-None",
+          "declaration": "result",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_string-declaration",
+          "declaration": "result",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-declaration",
+          "declaration": "result",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
     }
   ]
 }

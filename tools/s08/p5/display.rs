@@ -139,12 +139,18 @@ pub fn observe(request: &Value) -> Result<Value> {
             .iter()
             .map(|v| text(v).map(|s| JsString::from_bytes(s.as_bytes())))
             .collect::<Result<Vec<_>>>()?;
+        let module = match r.get("module").map(text).transpose()?.unwrap_or("esnext") {
+            "esnext" => ModuleKind::ESNEXT,
+            "node16" => ModuleKind::NODE16,
+            "nodenext" => ModuleKind::NODE_NEXT,
+            _ => return Err("unknown display module option".into()),
+        };
         let program = Arc::new(Program::load(
             ProgramOptions {
                 config: ts_tsoptions::ParsedCommandLine::new(
                     CompilerOptions {
                         target: ScriptTarget::ESNEXT,
-                        module: ModuleKind::ESNEXT,
+                        module,
                         strict: Tristate::TRUE,
                         no_lib: Tristate::TRUE,
                         ..Default::default()

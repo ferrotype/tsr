@@ -2137,8 +2137,10 @@ impl<'a> Session<'a, '_> {
         self.write_keyword(b"import");
         self.write_punctuation(b"(");
         self.emit_type_node_outside_extends(argument)?;
-        if attributes.is_some() {
-            return Err(Error::Unsupported("import type attributes"));
+        if let Some(attributes) = attributes {
+            self.write_punctuation(b",");
+            self.write_space();
+            self.emit_import_type_attributes(attributes)?;
         }
         self.write_punctuation(b")");
         if let Some(qualifier) = qualifier {
@@ -2146,6 +2148,60 @@ impl<'a> Session<'a, '_> {
             self.emit_entity_name(qualifier)?;
         }
         self.emit_type_arguments(node, type_arguments)
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitImportTypeNodeAttributes
+    fn emit_import_type_attributes(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let data = read
+            .data_source()
+            .as_import_attributes()
+            .ok_or(Error::MissingNode("import attributes payload"))?;
+        let (token, attributes) = (data.token(), data.attributes());
+        self.write_punctuation(b"{");
+        self.write_space();
+        self.write_keyword(if token == K::AssertKeyword {
+            b"assert"
+        } else {
+            b"with"
+        });
+        self.write_punctuation(b":");
+        self.write_space();
+        self.emit_list(
+            Self::emit_import_attribute,
+            node,
+            attributes,
+            lf::IMPORT_ATTRIBUTES,
+        )?;
+        self.write_space();
+        self.write_punctuation(b"}");
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitImportAttribute
+    fn emit_import_attribute(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let data = read
+            .data_source()
+            .as_import_attribute()
+            .ok_or(Error::MissingNode("import attribute payload"))?;
+        let (name, value) = (data.name(), data.value());
+        match name.ok_or(Error::MissingNode("import attribute name"))? {
+            name if self.known_kind(name)? == K::Identifier => self.emit_identifier_name(name)?,
+            name if self.known_kind(name)? == K::StringLiteral => self.emit_string_literal(name)?,
+            name => {
+                return Err(Error::UnexpectedKind {
+                    context: "ImportAttributeName",
+                    kind: self.node(name)?.kind(),
+                })
+            }
+        }
+        self.write_punctuation(b":");
+        self.write_space();
+        self.emit_expression(
+            value.ok_or(Error::MissingNode("import attribute value"))?,
+            op::DISALLOW_COMMA,
+        )
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeNodeInExtends

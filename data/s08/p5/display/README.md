@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These 126 source-selected requests exercise explicit builder calls and
+These 178 source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -53,3 +53,13 @@ The current complete capture is `target/s08/p5-display-return-native-02`:
 an arbitrary self-export name), inferred cross-file import qualifiers, preserved
 signature return annotations (`typeof` private names, unique symbols and union
 order), and suppressed top-level `any` returns with unsuppressed callback types.
+
+The import-mode increment extends the matrix to 178 exact requests. The latest
+complete capture is `target/s08/p5-display-imports-native-final-01`. It adds
+Node16/NodeNext ESM/CommonJS boundaries, sorted ambient-module attributes (named
+and wildcard modules), single quotes, a package-path portability check with an
+explicit absent result when unsafe paths are disallowed, and a contextual
+export-equals namespace. The positive package case selects its package name
+without a mode retry; it does not establish branch coverage of a successful
+swapped-mode portability retry. The direct adapter accepts only its three named
+module configurations, identically in Rust and Go.
