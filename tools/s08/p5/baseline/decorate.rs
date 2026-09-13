@@ -96,7 +96,7 @@ fn without_line_delimiters(output: &mut Vec<u8>, bytes: &[u8]) {
     }
 }
 
-pub use super::paths::remove_prefixes;
+pub use crate::paths::remove_prefixes;
 
 pub fn file(name: &[u8], content: &[u8], rows: &[Row]) -> Result<Vec<u8>> {
     let lines = code_lines(content);

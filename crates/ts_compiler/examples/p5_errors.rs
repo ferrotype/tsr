@@ -2,6 +2,8 @@
 mod error_requests;
 #[path = "../../../tools/s08/p5/errors.rs"]
 mod errors;
+#[path = "../../../tools/s08/p5/paths.rs"]
+mod paths;
 use sha2::{Digest, Sha256};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();

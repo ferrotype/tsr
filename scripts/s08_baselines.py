@@ -68,7 +68,7 @@ def replace_exact(source, before, after, count=1):
     return source.replace(before, after)
 
 
-def overlay_sources(upstream, *, walker_inputs=False):
+def overlay_sources(upstream, *, walker_inputs=False, error_inputs=False):
     harness = (upstream / "tsc/internal/testutil/harnessutil/harnessutil.go").read_text()
     harness = replace_exact(harness, "\t// Parse harness and compiler options from the test configuration\n",
                             '\tif S08ObserveStage != nil { S08ObserveStage("native_options") }\n\t// Parse harness and compiler options from the test configuration\n')
@@ -105,6 +105,58 @@ def overlay_sources(upstream, *, walker_inputs=False):
             '\t\t\t\tfor _, f := range allFiles { inputs = append(inputs, map[string]string{"name_hex":hex.EncodeToString([]byte(f.UnitName)), "content_hex":hex.EncodeToString([]byte(f.Content))}) }\n'
             '\t\t\t\trow["baseline_inputs"] = inputs\n'
             '\t\t\t\trow["baseline_header"] = header\n' + anchor)
+    if error_inputs:
+        # Reuse the exact native verifyDiagnostics selection block. Metadata
+        # records the unfiltered inputs too; expected diagnostics never become
+        # Rust inputs. Default/P0 capture semantics remain unchanged.
+        driver += '''
+// Error comparison preserves bytes before JSON's invalid-UTF8 replacement.
+func s08ErrorDiagnostics(values []*ast.Diagnostic) []map[string]any {
+    result := s08Diagnostics(values)
+    for i, d := range values {
+        row := result[i]
+        var file any
+        if d.File() != nil { file = hex.EncodeToString([]byte(d.File().FileName())) }
+        args := []string{}
+        for _, arg := range d.MessageArgs() { args = append(args, hex.EncodeToString([]byte(arg))) }
+        delete(row, "file"); delete(row, "args")
+        row["file_hex"] = file; row["args_hex"] = args
+        row["chain"] = s08ErrorDiagnostics(d.MessageChain())
+        row["related"] = s08ErrorDiagnostics(d.RelatedInformation())
+    }
+    return result
+}
+'''
+        for phase, value in (("pre", "pre"), ("post", "post")):
+            anchor = f'row["{phase}_diagnostics"] = s08Diagnostics({value})'
+            driver = replace_exact(driver, anchor, anchor + f'\nrow["error_{phase}_diagnostics"] = s08ErrorDiagnostics({value})')
+        runner = (upstream / "tsc/internal/testrunner/compiler_runner.go").read_text()
+        start = runner.index("\t\tfiles := core.Concatenate", runner.index("func (c *compilerTest) verifyDiagnostics("))
+        end = runner.index("\t\ttsbaseline.DoErrorBaseline", start)
+        selection = runner[start:end]
+        start = driver.index("\t\t\terrorValue := baseline.NoContent\n")
+        end = driver.index('\t\t\tfor _, d := range c.result.Diagnostics {', start)
+        replacement = '''
+            errorInputs := core.Concatenate(c.tsConfigFiles, core.Concatenate(c.toBeCompiled, c.otherFiles))
+            observeInputs := func(files []*harnessutil.TestFile) []map[string]string {
+                inputs := []map[string]string{}
+                for _, f := range files { inputs = append(inputs, map[string]string{"name_hex":hex.EncodeToString([]byte(f.UnitName)), "content_hex":hex.EncodeToString([]byte(f.Content))}) }
+                return inputs
+            }
+            row["error_inputs"] = observeInputs(errorInputs)
+            row["error_pretty"] = c.options.Pretty.IsTrue()
+            row["errors"] = func() tsbaseline.S08Baseline {
+''' + selection + '''
+                row["error_render_inputs"] = observeInputs(files)
+                row["error_diagnostics"] = s08ErrorDiagnostics(diagnostics)
+                if len(diagnostics) == 0 { return tsbaseline.S08BaselineValue(baseline.NoContent) }
+                stage("native_error_baseline")
+                value := tsbaseline.GetErrorBaseline(t, files, diagnosticwriter.WrapASTDiagnostics(diagnostics), diagnosticwriter.CompareASTDiagnostics, c.options.Pretty.IsTrue())
+                stage("harness_observation")
+                return tsbaseline.S08BaselineValue(value)
+            }()
+'''
+        driver = driver[:start] + replacement + driver[end:]
     return {"testutil/harnessutil/harnessutil.go":harness,
             "testutil/harnessutil/s08_diagnostics_observer.go":(BRIDGES/"diagnostics_observer.go").read_text(),
             "testutil/tsbaseline/type_symbol_baseline.go":walker,
@@ -199,7 +251,7 @@ def validate_observations(rows, requests, observed, file_observations, *, legacy
     return mismatches
 
 
-def capture(directory, smoke=False, case_id=None, include_informational=False, *, walker_inputs=False):
+def capture(directory, smoke=False, case_id=None, include_informational=False, *, walker_inputs=False, error_inputs=False):
     directory = Path(directory).resolve()
     directory.mkdir(parents=True,exist_ok=False)
     upstream = verified_upstream()
@@ -208,7 +260,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False, *
     rows, requests = requests_from_subset(subset,smoke,case_id)
     raw = canonical(requests)+b"\n"
     (directory/"requests.json").write_bytes(raw)
-    sources = overlay_sources(upstream, walker_inputs=walker_inputs)
+    sources = overlay_sources(upstream, walker_inputs=walker_inputs, error_inputs=error_inputs)
     replacements = {}
     for name, source in sources.items():
         path = directory/"overlay"/name
@@ -251,6 +303,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False, *
         raise ValueError("capture inputs changed")
     report = {"version":3,"pin":subset["pin"],"smoke":smoke,"case_id":case_id,"source_inputs":inputs,
               "include_informational":include_informational, "walker_inputs":walker_inputs, "walker_input_encoding":"hex-v1" if walker_inputs else None,
+              "error_inputs":error_inputs, "error_input_encoding":"native-hex-v2" if error_inputs else None,
               "request_sha256":digest(raw),"observation_sha256":digest((directory/"observations.ndjson").read_bytes()),
               "requests":len(requests),"states":dict(states),"test_exit":completed.returncode,
               "states_by_tier":{tier:dict(Counter(r["state"] for r in observed if r["acceptance_tier"]==tier)) for tier in ("acceptance","informational")},
@@ -371,6 +424,7 @@ if __name__=="__main__":
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--include-informational",action="store_true",help="collect available baselines beyond native option guards for informational cases only")
     parser.add_argument("--walker-inputs",action="store_true",help="retain native ordered input files and header for the P5 walker")
+    parser.add_argument("--error-inputs",action="store_true",help="retain native error input/selection metadata for P5")
     selection=parser.add_mutually_exclusive_group()
     selection.add_argument("--smoke",action="store_true")
     selection.add_argument("--case",dest="case_id",help="one exact frozen variant ID, for diagnosis only")
@@ -380,7 +434,7 @@ if __name__=="__main__":
         if args.review_capture:
             review_capture(args.review_capture,args.output)
         else:
-            capture(args.output,args.smoke,args.case_id,args.include_informational,walker_inputs=args.walker_inputs)
+            capture(args.output,args.smoke,args.case_id,args.include_informational,walker_inputs=args.walker_inputs,error_inputs=args.error_inputs)
     except (OSError,ValueError,RuntimeError,KeyError,TypeError,subprocess.TimeoutExpired) as error:
         print(f"S08 baseline capture failed: {error}",file=sys.stderr)
         raise SystemExit(1) from error

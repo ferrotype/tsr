@@ -1,5 +1,7 @@
 #[path = "../../../tools/s08/p5/baseline/mod.rs"]
 mod baseline;
+#[path = "../../../tools/s08/p5/paths.rs"]
+mod paths;
 #[path = "../../../tools/s08/p5/walker.rs"]
 mod walker;
 use serde_json::{json, Value};

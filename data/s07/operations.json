@@ -32895,7 +32895,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
-          "line": 207
+          "line": 222
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33079,6 +33079,10 @@
         {
           "file": "crates/ts_compiler/examples/p2/diagnostics.rs",
           "line": 24
+        },
+        {
+          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "line": 207
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",

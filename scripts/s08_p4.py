@@ -146,9 +146,10 @@ def fatal(request, kind, reason):
             'fatal': {'state': 'failed', 'class': kind, 'reason': reason}}
 
 
-def build(directory):
+def build(directory, *, example='p4_inventory', source_fn=None, optimize=False):
+    source_fn = source_fn or sources
     directory.mkdir(parents=True, exist_ok=False)
-    before = sources()
+    before = source_fn()
     snapshot = directory / 'source-snapshot'
     for name, expected in before.items():
         content = (ROOT / name).read_bytes()
@@ -157,18 +158,21 @@ def build(directory):
         target = snapshot / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
-    command = ['cargo', 'build', '--locked', '-p', 'ts_compiler', '--example', 'p4_inventory', '--message-format=json']
+    command = ['cargo', 'build', '--locked', '-p', 'ts_compiler', '--example', example, '--message-format=json']
+    if optimize:
+        command += ['--config', 'profile.dev.opt-level=1', '--config', 'profile.dev.debug-assertions=true',
+                    '--config', 'profile.dev.overflow-checks=true']
     with (directory / 'build.stdout').open('wb') as out, (directory / 'build.stderr').open('wb') as err:
         result = subprocess.run(command, cwd=ROOT, stdout=out, stderr=err, check=False)
     if result.returncode:
-        raise ValueError('P4 adapter build failed; raw output retained in ' + str(directory))
+        raise ValueError(example + ' adapter build failed; raw output retained in ' + str(directory))
     binaries = set()
     for line in (directory / 'build.stdout').read_bytes().splitlines():
         event = strict_json_loads(line)
-        if (event.get('reason') == 'compiler-artifact' and event.get('target', {}).get('name') == 'p4_inventory'
+        if (event.get('reason') == 'compiler-artifact' and event.get('target', {}).get('name') == example
                 and event['target']['kind'] == ['example'] and event.get('executable')):
             binaries.add(event['executable'])
-    if len(binaries) != 1 or sources() != before:
+    if len(binaries) != 1 or source_fn() != before:
         raise ValueError('ambiguous executable or sources changed during build')
     executable = Path(next(iter(binaries)))
     record = {'version': 1, 'command': command, 'binary': str(executable.resolve()),
@@ -219,7 +223,9 @@ def summarize(requests, rows):
             'requested': len(requests), 'observed': len(rows), 'tiers': tiers}
 
 
-def replay(directory, allow_partial=False):
+def replay(directory, allow_partial=False, *, validator=None, summarizer=None):
+    validator = validator or validate_row
+    summarizer = summarizer or summarize
     metadata = read(directory / 'capture.json')
     if 'source_snapshot' in metadata.get('build', {}):
         verify_source_snapshot(directory / 'source-snapshot', metadata['build']['sources'])
@@ -243,12 +249,50 @@ def replay(directory, allow_partial=False):
         for name, expected in envelope['artifacts'].items():
             if name not in ('stdout', 'stderr', 'observation.json') or digest((path.parent / name).read_bytes()) != expected:
                 raise ValueError('case raw artifact changed')
-        rows.append(validate_row(request, envelope['row']))
+        if (path.parent / 'observation.json').exists() and 'observation.json' not in envelope['artifacts']:
+            raise ValueError('case observation artifact omitted')
+        if ('observation.json' in envelope['artifacts']
+                and ('fatal' not in envelope['row'] or envelope['row']['fatal']['class'] == 'panic')
+                and read(path.parent / 'observation.json') != envelope['row']):
+            raise ValueError('completion differs from raw observation')
+        rows.append(validator(request, envelope['row']))
     if any((directory / 'cases' / f'{i:05}' / 'result.json').exists() for i in range(len(rows), len(requests))):
         raise ValueError('noncontiguous completion records')
-    report = summarize(requests[:len(rows)], rows)
+    report = summarizer(requests[:len(rows)], rows)
     report.update(requested=len(requests), complete=len(rows) == len(requests), capture_sha256=digest(canonical(metadata) + b'\n'))
     return requests, rows, report
+
+
+def begin_case(case_dir, request):
+    """Retain an interrupted attempt before writing the new immutable request."""
+    if case_dir.exists():
+        attempt = 0
+        while case_dir.with_name(case_dir.name + f'.interrupted-{attempt}').exists(): attempt += 1
+        case_dir.rename(case_dir.with_name(case_dir.name + f'.interrupted-{attempt}'))
+    case_dir.mkdir()
+    write_new(case_dir / 'request.json', request)
+
+
+def execute_case(binary, case_dir, request, timeout, *, validator=None):
+    """Retain interrupted attempts and classify the real child-process outcome."""
+    validator = validator or validate_row
+    begin_case(case_dir, request)
+    observation = case_dir / 'observation.json'
+    with (case_dir / 'stdout').open('wb') as out, (case_dir / 'stderr').open('wb') as err:
+        try:
+            proc = subprocess.run([str(binary), str(case_dir / 'request.json'), str(observation)],
+                                  cwd=ROOT, stdout=out, stderr=err, timeout=timeout, check=False)
+            return fatal(request, 'process_exit', str(proc.returncode)) if proc.returncode else validator(request, read(observation))
+        except subprocess.TimeoutExpired:
+            return fatal(request, 'timeout', f'variant exceeded {timeout:g} seconds')
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            return fatal(request, 'harness_protocol', str(error))
+
+
+def complete_case(case_dir, request, metadata, row):
+    artifacts = {name: digest((case_dir / name).read_bytes()) for name in ('stdout', 'stderr', 'observation.json') if (case_dir / name).exists()}
+    write_new(case_dir / 'result.json', {'request_sha256': digest(canonical(request) + b'\n'),
+              'capture_sha256': digest(canonical(metadata) + b'\n'), 'artifacts': artifacts, 'row': row})
 
 
 def run(args):
@@ -286,27 +330,8 @@ def run(args):
     for index in range(start, len(requests)):
         request = requests[index]
         case_dir = directory / 'cases' / f'{index:05}'
-        # A killed producer may have raw files but no committed result. Preserve
-        # that attempt before retrying; never overwrite completed observations.
-        if case_dir.exists():
-            attempt = 0
-            while case_dir.with_name(case_dir.name + f'.interrupted-{attempt}').exists(): attempt += 1
-            case_dir.rename(case_dir.with_name(case_dir.name + f'.interrupted-{attempt}'))
-        case_dir.mkdir()
-        write_new(case_dir / 'request.json', request)
-        observation = case_dir / 'observation.json'
-        with (case_dir / 'stdout').open('wb') as out, (case_dir / 'stderr').open('wb') as err:
-            try:
-                proc = subprocess.run([str(captured_binary), str(case_dir / 'request.json'), str(observation)],
-                                      cwd=ROOT, stdout=out, stderr=err, timeout=args.timeout, check=False)
-                row = fatal(request, 'process_exit', str(proc.returncode)) if proc.returncode else validate_row(request, read(observation))
-            except subprocess.TimeoutExpired:
-                row = fatal(request, 'timeout', f'variant exceeded {args.timeout:g} seconds')
-            except (OSError, ValueError, KeyError, TypeError) as error:
-                row = fatal(request, 'harness_protocol', str(error))
-        artifacts = {name: digest((case_dir / name).read_bytes()) for name in ('stdout', 'stderr', 'observation.json') if (case_dir / name).exists()}
-        write_new(case_dir / 'result.json', {'request_sha256': digest(canonical(request) + b'\n'),
-                  'capture_sha256': digest(canonical(metadata) + b'\n'), 'artifacts': artifacts, 'row': row})
+        row = execute_case(captured_binary, case_dir, request, args.timeout)
+        complete_case(case_dir, request, metadata, row)
         if (index + 1) % 100 == 0 or index + 1 == len(requests):
             print(f'P4 inventory {index + 1}/{len(requests)}', file=sys.stderr, flush=True)
     _, _, report = replay(directory)

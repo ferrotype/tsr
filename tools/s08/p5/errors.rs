@@ -1,14 +1,12 @@
 //! Native `.errors.txt` annotation, over production diagnostic formatting.
 //! This does not produce diagnostics or infer file order from Program.files().
+use crate::paths::remove_prefixes;
 use serde_json::{json, Value};
 use ts_ast::Diagnostic;
 use ts_compiler::{
     diagnostic_writer::{category, flattened, DiagnosticWriter, FormattingOptions},
     Program,
 };
-#[path = "paths.rs"]
-mod paths;
-use paths::remove_prefixes;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 const NL: &[u8] = b"\r\n";
 pub struct InputFile<'a> {

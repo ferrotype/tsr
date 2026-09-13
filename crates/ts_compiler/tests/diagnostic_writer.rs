@@ -2,6 +2,8 @@
 mod error_requests;
 #[path = "../../../tools/s08/p5/errors.rs"]
 mod errors;
+#[path = "../../../tools/s08/p5/paths.rs"]
+mod paths;
 use serde_json::Value;
 
 #[test]

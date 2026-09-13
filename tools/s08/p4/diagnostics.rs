@@ -50,3 +50,15 @@ fn payload(program: &Program, d: &ts_ast::Diagnostic) -> Value {
 pub fn phase(program: &Program, values: &[ts_ast::Diagnostic]) -> Value {
     json!({"state":"executed","diagnostics":values.iter().map(|d|payload(program,d)).collect::<Vec<_>>()})
 }
+
+/// Collect only when P5 requests aggregation; P4 keeps its diagnostic-only cost.
+pub fn captured_phase(
+    program: &Program,
+    values: &[ts_ast::Diagnostic],
+    captured: &mut Option<Vec<ts_ast::Diagnostic>>,
+) -> Value {
+    if let Some(captured) = captured {
+        captured.extend_from_slice(values);
+    }
+    phase(program, values)
+}
