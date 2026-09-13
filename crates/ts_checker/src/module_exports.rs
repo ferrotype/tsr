@@ -178,11 +178,7 @@ impl CheckerState {
                         .module_specifier()
                         .ok_or(Error::MissingLink("export-star module specifier"))?;
                     let type_only = data.is_type_only();
-                    if data.attributes().is_some() {
-                        return Err(Error::Unsupported(
-                            "getExportsOfModule: import attributes type",
-                        ));
-                    }
+                    // The attributes type travels with the specifier (`import_attributes_type_for_specifier`).
                     let resolved = self.resolve_external_module_name(declaration, name, false)?;
                     if let Some(resolved) = resolved {
                         if let Some(exported) = self.visit_module_exports(

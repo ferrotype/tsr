@@ -328,18 +328,20 @@ impl CheckerState {
         }
         let reduced = self.get_reduced_type(base)?;
         if !self.is_valid_base_type(reduced)? {
-            // Never-intersection elaboration is shared with class checking;
-            // until that callback is available retain an explicit boundary.
-            if self.types.flags(reduced)? & tf::NEVER != 0
-                && self.types.flags(base)? & tf::INTERSECTION != 0
-            {
-                return Err(Error::Unsupported(
-                    "resolveBaseTypesOfClass: elaborateNeverIntersection",
-                ));
-            }
-            let expression = self.ast(base_node)?.node(base_node)?.expression();
+            let expression = self
+                .ast(base_node)?
+                .node(base_node)?
+                .expression()
+                .ok_or(Error::MissingLink("base type expression"))?;
+            let chain = self.elaborate_never_intersection(None, expression, base)?;
             let text = self.type_to_string(reduced, crate::type_display::DEFAULT_FLAGS)?;
-            self.error_at(expression, messages::Base_constructor_return_type_0_is_not_an_object_type_or_intersection_of_object_types_with_statically_known_members, vec![text])?;
+            let message = messages::Base_constructor_return_type_0_is_not_an_object_type_or_intersection_of_object_types_with_statically_known_members;
+            let diagnostic = if chain.is_some() {
+                ts_ast::Diagnostic::chain(chain, message, vec![text])
+            } else {
+                self.diagnostic_for_node(Some(expression), message, vec![text])?
+            };
+            self.add_diagnostic(diagnostic)?;
         } else if ty == reduced || self.has_base_type(reduced, ty)? {
             let symbol = self
                 .types

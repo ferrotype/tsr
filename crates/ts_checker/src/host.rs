@@ -76,6 +76,14 @@ pub trait CheckerHost: Send + Sync {
     /// `GetPackagesMap()[packageName]`: `None` when no resolution named the
     /// package, otherwise whether any resolution of it was a `.d.ts`.
     fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error>;
+    /// `Node.JSDoc(file)`: the JSDoc roots of `parent`, parsing them on first
+    /// use when the file carries lazy JSDoc.
+    fn jsdoc(
+        &self,
+        view: ts_ast::AstView<'_>,
+        source: NodeId,
+        parent: NodeId,
+    ) -> Result<ts_ast::JSDocRoots, Error>;
     fn source_file_may_be_emitted(
         &self,
         file: &CompletedFile,

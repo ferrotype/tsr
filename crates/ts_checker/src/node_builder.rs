@@ -432,7 +432,13 @@ impl<'a> NodeBuilder<'a> {
                 return Ok(self.ast.new_type_reference_node(Some(name), arguments));
             }
             if ty == self.checker.builtins.unresolved_type {
-                return Err(Error::Unsupported("unresolved type synthetic comment"));
+                let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
+                return Ok(self.emit.add_synthetic_leading_comment(
+                    node,
+                    K::MultiLineCommentTrivia,
+                    JsString::from_bytes(b"unresolved".as_slice()),
+                    false,
+                ));
             }
             return Ok(self.keyword(
                 if ty == self.checker.builtins.intrinsic_marker_type {

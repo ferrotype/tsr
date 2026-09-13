@@ -230,6 +230,19 @@ impl CheckerHost for ProgramCheckerHost {
         self.file_metadata(self.required_file(file_name)?)
     }
 
+    // port: tsc/internal/ast/ast.go:Node.JSDoc
+    fn jsdoc(
+        &self,
+        view: ts_ast::AstView<'_>,
+        source: NodeId,
+        parent: NodeId,
+    ) -> Result<ts_ast::JSDocRoots, Error> {
+        use ts_ast::JsDocProvider;
+        ts_parser::ParserJsDocProvider::default()
+            .jsdoc(view, source, parent)
+            .map_err(Error::from)
+    }
+
     // port: tsc/internal/compiler/program.go:Program.GetPackagesMap
     fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error> {
         let mut found = None;

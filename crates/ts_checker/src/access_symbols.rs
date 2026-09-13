@@ -338,18 +338,17 @@ impl CheckerState {
         node: NodeId,
         left: NodeId,
     ) -> Result<(), Error> {
-        let mut first = left;
-        while self.ast(first)?.node(first)?.kind() == K::PropertyAccessExpression {
-            first = self
-                .ast(first)?
-                .node(first)?
-                .expression()
-                .ok_or(Error::MissingLink("self access receiver"))?;
-        }
-        let self_access = self.ast(left)?.node(left)?.kind() == K::ThisKeyword
-            || self.ast(first)?.node(first)?.kind() == K::Identifier
-                && self.query.resolved_symbols.try_get(left).copied().flatten()
-                    == Some(self.resolved_value_symbol(first)?);
+        // port: tsc/internal/checker/checker.go:Checker.isSelfTypeAccess
+        let view = self.ast(left)?;
+        let parent = self.query.resolved_symbols.try_get(left).copied().flatten();
+        let self_access = view.node(left)?.kind() == K::ThisKeyword
+            || match parent {
+                Some(parent) if is_entity_name_expression(view, left)? => {
+                    let first = ts_ast::utilities_middle::get_first_identifier(view, left)?;
+                    parent == self.resolved_value_symbol(first)?
+                }
+                _ => false,
+            };
         self.mark_property_as_referenced(property, Some(node), self_access)
     }
 
@@ -608,5 +607,27 @@ impl CheckerState {
             .map(|initializer| Ok::<_, Error>(view.node(initializer)?.kind() == K::ThisKeyword))
             .transpose()?
             .unwrap_or(false))
+    }
+}
+
+// port: tsc/internal/ast/utilities.go:IsEntityNameExpression
+fn is_entity_name_expression(view: ts_ast::AstView<'_>, mut node: NodeId) -> Result<bool, Error> {
+    loop {
+        let read = view.node(node)?;
+        match read.kind().known() {
+            Some(K::Identifier) => return Ok(true),
+            Some(K::PropertyAccessExpression) => {
+                let name = read
+                    .name()
+                    .ok_or(Error::MissingLink("property access name"))?;
+                if view.node(name)?.kind() != K::Identifier {
+                    return Ok(false);
+                }
+                node = read
+                    .expression()
+                    .ok_or(Error::MissingLink("property access receiver"))?;
+            }
+            _ => return Ok(false),
+        }
     }
 }

@@ -396,18 +396,58 @@ type query scope` 1), none panic, no new reason. Regressions:
 `global_augmentations_merging_into_aliases_resolve_the_alias` (pinned
 `checkMergedGlobalUMDSymbol`).
 
-Remaining inventory-05 acceptance buckets, largest first, with what each needs:
+**Seventh pass.** The nine buckets of two to eleven variants:
+
+- `getPropertyTypeForIndexType: unique symbol` (11): the `[Symbol]` spelling
+  through `getFullyQualifiedName`.
+- `resolveExternalModule: rewriteRelativeImportExtensions` (9): the three
+  safety diagnostics with `ShouldRewriteModuleSpecifier`, `PathIsRelative`,
+  `HasTSFileExtension`, `GetAnyExtensionFromPath`, `IsLiteralImportTypeNode` and
+  `IsPartOfTypeOnlyImportOrExportDeclaration` as local helpers; the
+  project-reference redirect comparison stays a boundary because loading rejects
+  project references.
+- `checkDeprecatedProperty` (8): `isDeprecatedSymbol` and
+  `addDeprecatedSuggestion` are ported. Finding the tag needed lazy JSDoc: the
+  checker now asks the host (`CheckerHost::jsdoc`, `ParserJsDocProvider` in
+  `checker_host.rs`) when the eager roots are absent, as `Node.JSDoc` does.
+  Follow-up: a same-line `/** @deprecated */` before a property signature yields
+  no roots from the lazy provider; compare `get_jsdoc_comment_ranges` with Go.
+- `removeSubtypes: nominal class derivation` (8): two classes reduce only when
+  `isTypeDerivedFrom` holds, as upstream's condition reads.
+- `elaborateNeverIntersection` (6): ported for both the property report and the
+  base-type check, with `containerSeemsToBeEmptyDomElement` selecting the DOM
+  lib message.
+- `getExportsOfModule: import attributes type` (6): the boundary was redundant;
+  the specifier resolver already carries the attributes type.
+- `isTypeParameterPossiblyReferenced: type query scope` (7): the `typeof` scope
+  walk over the first identifier's declarations. The `this.x` case exposed
+  `isSelfTypeAccess` taking the receiver's resolved symbol unconditionally, which
+  reported TS2304 for `this`; it now follows upstream (parent symbol first, then
+  `getFirstIdentifier` over entity-name expressions).
+- `unresolved type synthetic comment` (6): the `/*unresolved*/ any` keyword with
+  its synthetic leading comment; the comment-free display printer shows `any`.
+- `getContainersOfSymbol: class-expression CommonJS assignment` (4): reached
+  only through the paths above; all four programs complete.
+
+Rerunning the 64 inventory-05 variants of those buckets: all complete every
+phase, no new reason, no panic. Regressions cover each port (`checker_semantics.rs`,
+the deprecation test uses a multi-line tag, the nominal-class test a `.d.ts`
+Array declaration).
+
+Remaining inventory-05 acceptance buckets, largest first:
 
 | Bucket | Variants | Needs |
 | --- | ---: | --- |
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
-| `getPropertyTypeForIndexType: unique symbol fully qualified diagnostic` | 11 | the fully qualified symbol display |
-| `resolveExternalModule: rewriteRelativeImportExtensions safety checks` | 9 | the rewrite safety checks |
-| `checkDeprecatedProperty: JSDoc deprecation suggestion` | 8 | JSDoc deprecation |
-| `removeSubtypes: nominal class derivation` | 8 | nominal class subtype reduction |
-| `elaborateNeverIntersection` | 6 | the never-intersection elaboration |
-| `getExportsOfModule: import attributes type` | 6 | attributes-typed export maps |
-| `isTypeParameterPossiblyReferenced: type query scope` | 6 (+1 declaration) | the type-query scope walk |
+| `checkPrivateIdentifierPropertyAccess: unchecked JavaScript private field` | 4 | unchecked-JS private fields |
+| `the scope does not retain this arena` | 3 | a checker-error investigation |
+| `getDeclarationSpaces: export assignment alias` | 2 | alias declaration spaces |
+| `onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict` | 2 | the isolatedModules conflict report |
+| `getPrimitiveTypeAliasSuggestions` | 2 | checker-owned primitive suggestion identity |
+| `getTypeOfAlias: reportCircularityError` | 2 | alias circularity |
+| `isNeverReducedProperty: private declarations` | 2 | private never-reduction |
+| `maybeMappedType: misspelled mapped type diagnostic` | 2 | the mapped-type spelling hint |
+| singletons | 5 | one each |
 | the single 60-second timeout | 1 | profiling |
 
 Eight pre-existing tests in `checker_semantics.rs` still assert `Unsupported`

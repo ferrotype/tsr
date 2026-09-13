@@ -157,9 +157,20 @@ impl CheckerState {
                 vec![JsString::from_bytes(text), object_text.clone()],
             )?)
         } else if index_flags & tf::UNIQUE_ES_SYMBOL != 0 {
-            return Err(Error::Unsupported(
-                "getPropertyTypeForIndexType: unique symbol fully qualified diagnostic",
-            ));
+            let symbol = self
+                .types
+                .get(index)?
+                .symbol
+                .ok_or(Error::MissingLink("unique symbol index symbol"))?;
+            let qualified = self.fully_qualified_name(symbol, Some(node))?;
+            let mut text = vec![b'['];
+            text.extend_from_slice(qualified.as_bytes());
+            text.push(b']');
+            Some(self.diagnostic_for_node(
+                Some(node),
+                d::Property_0_does_not_exist_on_type_1,
+                vec![JsString::from_bytes(text), object_text.clone()],
+            )?)
         } else if index_flags & (tf::STRING_LITERAL | tf::NUMBER_LITERAL) != 0 {
             let value = self.index_literal_display(index)?;
             Some(self.diagnostic_for_node(

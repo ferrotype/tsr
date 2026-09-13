@@ -1748,3 +1748,175 @@ fn global_augmentations_merging_into_aliases_resolve_the_alias() {
         ]
     );
 }
+
+#[test]
+fn unique_symbol_index_errors_name_the_symbol_fully_qualified() {
+    let text = b"declare const s: unique symbol;\ndeclare const o: { a: number };\no[s];\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Element_implicitly_has_an_any_type_because_expression_of_type_0_can_t_be_used_to_index_type_1.code,
+            vec!["unique symbol".to_string(), "{ a: number; }".to_string()]
+        )]
+    );
+    let chain = &diagnostics[0].message_chain;
+    assert_eq!(chain.len(), 1);
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&chain[0])),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["[s]".to_string(), "{ a: number; }".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn deprecated_contextual_properties_are_suggested_with_their_tag() {
+    let text = b"interface Opts {\n    /** @deprecated use fresh */\n    old?: number;\n    fresh?: number;\n}\nexport const o: Opts = { old: 1 };\n";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(source).unwrap().is_empty());
+    let suggestions = op.recorded_suggestions(source).unwrap();
+    assert_eq!(
+        codes_and_args(&suggestions),
+        vec![(
+            ts_diagnostics::X_0_is_deprecated.code,
+            vec!["old".to_string()]
+        )]
+    );
+    assert_eq!(suggestions[0].related_information.len(), 1);
+    assert_eq!(
+        suggestions[0].related_information[0].code,
+        ts_diagnostics::The_declaration_was_marked_as_deprecated_here.code
+    );
+}
+
+#[test]
+fn typeof_this_in_a_method_signature_checks_without_a_boundary() {
+    // Pinned Go: typeofThisInMethodSignature has no errors.
+    let text = b"export class A {\n\tx = 1\n\ta(x: typeof this.x): void {}\n}\n\nconst a = new A().a(1);\n";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            ..options()
+        },
+    );
+    let diagnostics = owner.operation().unwrap().semantic_diagnostics(source);
+    assert!(diagnostics.is_ok(), "{diagnostics:?}");
+    assert_eq!(codes_and_args(&diagnostics.unwrap()), vec![]);
+}
+
+#[test]
+fn rewritten_relative_imports_that_resolve_to_directories_are_reported() {
+    // Pinned Go: rewriteRelativeImportExtensions/cjsErrors(module=node18).errors.txt.
+    let (owner, program, _) = fixture_files(
+        b"/index.ts",
+        &[
+            (
+                b"/index.ts",
+                b"import foo = require(\"./foo.ts\"); // Error\nimport type _foo = require(\"./foo.ts\"); // Ok\nfoo;\n",
+            ),
+            (b"/foo.ts/index.ts", b"export = {};\n"),
+        ],
+        CompilerOptions {
+            target: ScriptTarget::ES2022,
+            module: ModuleKind::NODE18,
+            module_resolution: ts_core::ModuleResolutionKind::NODE16,
+            rewrite_relative_import_extensions: Tristate::TRUE,
+            verbatim_module_syntax: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let source = program.file(b"/index.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::This_relative_import_path_is_unsafe_to_rewrite_because_it_looks_like_a_file_name_but_actually_resolves_to_0.code,
+            vec!["./foo.ts/index.ts".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn never_intersections_explain_the_conflicting_property() {
+    let text = b"type A = { kind: \"a\" } & { kind: \"b\" };\ndeclare const a: A;\na.kind;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    // The head message displays the reduced type; the chain keeps the alias
+    // through NoTypeReduction.
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["kind".to_string(), "never".to_string()]
+        )]
+    );
+    let chain = &diagnostics[0].message_chain;
+    assert_eq!(chain.len(), 1);
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&chain[0])),
+        vec![(
+            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents.code,
+            vec!["A".to_string(), "kind".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn nominal_classes_are_not_subtype_reduced_unless_derived() {
+    let text = b"class A { x = 1 }\nclass B extends A {}\nclass C { x = 1 }\ndeclare const a: A;\ndeclare const b: B;\ndeclare const c: C;\nexport const arr = [a, b, c];\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", text),
+            (b"/globals.d.ts", b"interface Array<T> { length: number }\n"),
+        ],
+        options(),
+    );
+    let export = *declarations(&program).last().unwrap();
+    let view = program.file(b"/main.ts").unwrap().bound().view().ast();
+    let list = view
+        .node(export)
+        .unwrap()
+        .data_source()
+        .as_variable_statement()
+        .unwrap()
+        .declaration_list()
+        .unwrap();
+    let declarations_list = view
+        .node(list)
+        .unwrap()
+        .data_source()
+        .as_variable_declaration_list()
+        .unwrap()
+        .declarations()
+        .unwrap();
+    let declaration = view
+        .node_slice(view.list(declarations_list).unwrap().nodes())
+        .unwrap()
+        .get(0)
+        .unwrap()
+        .unwrap();
+    let name = declaration_name(&program, declaration);
+    let mut op = owner.operation().unwrap();
+    let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+    let ty = op.get_type_of_symbol(symbol).unwrap();
+    // B derives from A and is removed; C is structurally identical to A but nominal.
+    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"(A | C)[]");
+}

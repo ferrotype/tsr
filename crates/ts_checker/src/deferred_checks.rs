@@ -173,14 +173,13 @@ impl CheckerState {
                 Some(*symbol),
             )
         } else {
-            if self.types.flags(containing)? & tf::INTERSECTION != 0 {
-                return Err(Error::Unsupported("elaborateNeverIntersection"));
-            }
-            (
-                ts_diagnostics::Property_0_does_not_exist_on_type_1,
-                vec![spelling, display],
-                None,
-            )
+            child = self.elaborate_never_intersection(child, name, containing)?;
+            let message = if self.container_seems_to_be_empty_dom_element(containing)? {
+                ts_diagnostics::Property_0_does_not_exist_on_type_1_Try_changing_the_lib_compiler_option_to_include_dom
+            } else {
+                ts_diagnostics::Property_0_does_not_exist_on_type_1
+            };
+            (message, vec![spelling, display], None)
         };
         let mut diagnostic = if child.is_some() {
             ts_ast::Diagnostic::chain(child, message, args)
@@ -201,5 +200,98 @@ impl CheckerState {
         self.add_diagnostic(diagnostic)?;
         self.deferred_checks.reported_properties.insert(name);
         Ok(())
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.elaborateNeverIntersection
+    pub(crate) fn elaborate_never_intersection(
+        &mut self,
+        chain: Option<std::sync::Arc<ts_ast::Diagnostic>>,
+        node: NodeId,
+        ty: TypeId,
+    ) -> Result<Option<std::sync::Arc<ts_ast::Diagnostic>>, Error> {
+        let record = *self.types.get(ty)?;
+        if record.flags & tf::INTERSECTION == 0
+            || record.object_flags & crate::object_flags::IS_NEVER_INTERSECTION == 0
+        {
+            return Ok(chain);
+        }
+        let properties = self.get_properties_of_union_or_intersection_type(ty)?;
+        let mut never_property = None;
+        for &property in &properties {
+            if self.is_discriminant_with_never_type(property)? {
+                never_property = Some(property);
+                break;
+            }
+        }
+        let message_and_property = if let Some(property) = never_property {
+            Some((
+                ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents,
+                property,
+            ))
+        } else {
+            properties
+                .iter()
+                .copied()
+                .find(|&property| {
+                    self.symbol(property).is_ok_and(|read| {
+                        read.value_declaration().is_none()
+                            && read.check_flags() & ts_ast::check_flags::CONTAINS_PRIVATE != 0
+                    })
+                })
+                .map(|property| {
+                    (
+                        ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some,
+                        property,
+                    )
+                })
+        };
+        let Some((message, property)) = message_and_property else {
+            return Ok(chain);
+        };
+        let display = self.type_to_string(ty, crate::type_format_flags::NO_TYPE_REDUCTION)?;
+        let name = self.symbol_to_string(property)?;
+        let diagnostic = if chain.is_some() {
+            ts_ast::Diagnostic::chain(chain, message, vec![display, name])
+        } else {
+            self.diagnostic_for_node(Some(node), message, vec![display, name])?
+        };
+        Ok(Some(std::sync::Arc::new(diagnostic)))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.containerSeemsToBeEmptyDomElement
+    fn container_seems_to_be_empty_dom_element(
+        &mut self,
+        containing: TypeId,
+    ) -> Result<bool, Error> {
+        let options = self.program()?.host.options();
+        if options
+            .lib
+            .as_ref()
+            .is_some_and(|libs| libs.iter().any(|lib| lib.as_bytes() == b"lib.dom.d.ts"))
+        {
+            return Ok(false);
+        }
+        let parts: Vec<TypeId> = if self.types.flags(containing)? & tf::UNION != 0 {
+            self.types.types_of(containing)?.to_vec()
+        } else {
+            vec![containing]
+        };
+        for part in parts {
+            let Some(symbol) = self.types.get(part)?.symbol else {
+                return Ok(false);
+            };
+            let name = self.symbol(symbol)?.name_to_owned();
+            let name = name.as_bytes();
+            let common = name == b"EventTarget"
+                || name == b"Node"
+                || name == b"Element"
+                || name.starts_with(b"HTML") && name.ends_with(b"Element");
+            if !common {
+                return Ok(false);
+            }
+        }
+        self.empty_object_type(containing)
     }
 }

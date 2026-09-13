@@ -380,10 +380,15 @@ mod tests {
         );
         assert_eq!(state.serialization_level, MAX_SERIALIZATION_LEVEL as u32);
         state.serialization_level = 0;
-        assert!(matches!(
-            state.type_to_string(state.builtins.unresolved_type, 0),
-            Err(Error::Unsupported("unresolved type synthetic comment"))
-        ));
+        // The `/*unresolved*/` synthetic comment is dropped by the comment-free
+        // display printer, leaving the `any` keyword.
+        assert_eq!(
+            state
+                .type_to_string(state.builtins.unresolved_type, 0)
+                .unwrap()
+                .as_bytes(),
+            b"any"
+        );
         assert_eq!(state.serialization_level, 0);
         assert_eq!(
             state

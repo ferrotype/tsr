@@ -1,8 +1,8 @@
 //! JSDoc signature checks consume the parser's eager documentation and reparsed
 //! annotation edges. They never trigger lazy documentation parsing.
 use crate::{types::Set, CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
+use ts_arena::{NodeId, SymbolId};
+use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
 use ts_diagnostics as d;
 
 impl CheckerState {
@@ -244,9 +244,29 @@ impl CheckerState {
 }
 
 impl CheckerState {
+    /// `Node.JSDoc(nil)`: eager roots when already parsed, otherwise the host
+    /// parses the file's lazy JSDoc for this node.
+    // port: tsc/internal/ast/ast.go:Node.JSDoc
+    pub(crate) fn jsdoc_for_node(&self, node: NodeId) -> Result<Option<ts_ast::JSDocRoots>, Error> {
+        let view = self.ast(node)?;
+        if view.node(node)?.flags() & nf::HAS_JS_DOC == 0 {
+            return Ok(None);
+        }
+        if let Some(roots) = self.eager_jsdoc_for_node(node)? {
+            return Ok(Some(roots));
+        }
+        let Some(source) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+            return Ok(None);
+        };
+        if !view.source_file(source)?.has_lazy_jsdoc {
+            return Ok(None);
+        }
+        Ok(Some(self.program()?.host.jsdoc(view, source, node)?))
+    }
+
     // port: tsc/internal/ast/utilities.go:GetJSDocDeprecatedTag
     pub(crate) fn direct_deprecated_tag(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        if let Some(docs) = self.eager_jsdoc_for_node(node)? {
+        if let Some(docs) = self.jsdoc_for_node(node)? {
             for &doc in docs.iter() {
                 let list = self
                     .ast(doc)?
@@ -540,5 +560,69 @@ impl CheckerState {
             .ok_or(Error::MissingLink("heritage clause"))?
             .token()
             == K::ImplementsKeyword)
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.isDeprecatedSymbol
+    pub(crate) fn is_deprecated_symbol(&mut self, symbol: SymbolId) -> Result<bool, Error> {
+        let declarations = self.symbol_declarations(symbol)?.to_vec();
+        let parent = self.parent_of_symbol(symbol)?;
+        if let Some(parent) = parent {
+            if declarations.len() > 1 {
+                let interface = self.symbol(parent)?.flags() & sf::INTERFACE != 0;
+                let mut any = false;
+                let mut all = true;
+                for declaration in declarations.iter().flatten() {
+                    let deprecated = self.is_deprecated_declaration(*declaration)?;
+                    any |= deprecated;
+                    all &= deprecated;
+                }
+                return Ok(if interface { any } else { all });
+            }
+        }
+        if let Some(value_declaration) = self.symbol(symbol)?.value_declaration() {
+            if self.is_deprecated_declaration(value_declaration)? {
+                return Ok(true);
+            }
+        }
+        if declarations.is_empty() {
+            return Ok(false);
+        }
+        for declaration in declarations.iter().flatten() {
+            if !self.is_deprecated_declaration(*declaration)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestion
+    // port: tsc/internal/checker/checker.go:Checker.addDeprecatedSuggestionWorker
+    pub(crate) fn add_deprecated_suggestion(
+        &mut self,
+        location: NodeId,
+        declarations: &[Option<NodeId>],
+        deprecated_entity: JsString,
+    ) -> Result<(), Error> {
+        let mut diagnostic = self.diagnostic_for_node(
+            Some(location),
+            d::X_0_is_deprecated,
+            vec![deprecated_entity],
+        )?;
+        for declaration in declarations.iter().flatten() {
+            if let Some(tag) = self.direct_deprecated_tag(*declaration)? {
+                diagnostic.related_information.push(std::sync::Arc::new(
+                    self.diagnostic_for_node(
+                        Some(tag),
+                        d::The_declaration_was_marked_as_deprecated_here,
+                        vec![],
+                    )?,
+                ));
+                break;
+            }
+        }
+        self.add_suggestion_diagnostic(diagnostic)?;
+        Ok(())
     }
 }

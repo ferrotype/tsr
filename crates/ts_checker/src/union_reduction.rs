@@ -218,14 +218,14 @@ impl CheckerState {
                     } else {
                         target
                     };
+                    // Two classes are only subtype-reducible when one derives from the other.
                     if self.types.object_flags(source_target)?
                         & self.types.object_flags(target_target)?
                         & of::CLASS
                         != 0
+                        && !self.is_type_derived_from(source, target)?
                     {
-                        return Err(Error::Unsupported(
-                            "removeSubtypes: nominal class derivation",
-                        ));
+                        continue;
                     }
                     remove = true;
                     break;

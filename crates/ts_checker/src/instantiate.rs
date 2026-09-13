@@ -742,9 +742,65 @@ impl CheckerState {
                 }
             }
             Some(K::TypeQuery) => {
-                return Err(Error::Unsupported(
-                    "isTypeParameterPossiblyReferenced: type query scope",
-                ))
+                let view = self.ast(node)?;
+                let entity_name = read
+                    .data_source()
+                    .as_type_query_node()
+                    .and_then(|data| data.expr_name())
+                    .ok_or(Error::MissingLink("type query name"))?;
+                let first = ts_ast::utilities_middle::get_first_identifier(view, entity_name)?;
+                let type_arguments = read.type_argument_list();
+                let is_this = view.node(first)?.kind() == K::Identifier
+                    && view.node_text(first)?.as_bytes() == b"this";
+                if !is_this {
+                    let first_symbol = self.resolved_value_symbol(first)?;
+                    let symbol = self
+                        .types
+                        .get(parameter)?
+                        .symbol
+                        .ok_or(Error::MissingLink("type parameter symbol"))?;
+                    // There is exactly one declaration, otherwise `containsReference` is not called
+                    let declaration = self
+                        .symbol_declarations(symbol)?
+                        .first()
+                        .flatten()
+                        .ok_or(Error::MissingLink("type parameter declaration"))?;
+                    let declaration_read = self.ast(declaration)?.node(declaration)?;
+                    let scope = if declaration_read.kind() == K::TypeParameter {
+                        // Type parameter is a regular type parameter, e.g. foo<T>
+                        declaration_read.parent()
+                    } else if is_this {
+                        Some(declaration)
+                    } else if self.types.type_parameter(parameter)?.is_this_type {
+                        // Type parameter is the this type, and its declaration is the class declaration.
+                        Some(declaration)
+                    } else {
+                        None
+                    };
+                    if let Some(scope) = scope {
+                        for candidate in self
+                            .symbol_declarations(first_symbol)?
+                            .to_vec()
+                            .into_iter()
+                            .flatten()
+                        {
+                            if ts_ast::utilities::is_node_descendant_of(
+                                self.ast(candidate)?,
+                                Some(candidate),
+                                Some(scope),
+                            )? {
+                                return Ok(true);
+                            }
+                        }
+                        for argument in self.source_list(node, type_arguments)? {
+                            if self.contains_type_parameter_reference(parameter, argument)? {
+                                return Ok(true);
+                            }
+                        }
+                        return Ok(false);
+                    }
+                }
+                return Ok(true);
             }
             Some(K::MethodDeclaration | K::MethodSignature)
                 if read.type_node().is_none() && read.body().is_some() =>

@@ -532,15 +532,13 @@ impl CheckerState {
             if let Some(name) = self.ast(property)?.node(property)?.name() {
                 if self.ast(name)?.node(name)?.kind() != K::ComputedPropertyName {
                     let text = self.ast(name)?.node_text(name)?.into_js_string();
+                    // port: tsc/internal/checker/checker.go:Checker.checkDeprecatedProperty
                     if let Some(symbol) = self.constituent_property(ty, text.as_bytes(), false)? {
-                        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
-                            if self.ast(declaration)?.node(declaration)?.flags() & nf::HAS_JS_DOC
-                                != 0
-                            {
-                                return Err(Error::Unsupported(
-                                    "checkDeprecatedProperty: JSDoc deprecation suggestion",
-                                ));
-                            }
+                        if !self.symbol_declarations(symbol)?.is_empty()
+                            && self.is_deprecated_symbol(symbol)?
+                        {
+                            let declarations = self.symbol_declarations(symbol)?.to_vec();
+                            self.add_deprecated_suggestion(name, &declarations, text)?;
                         }
                     }
                 }

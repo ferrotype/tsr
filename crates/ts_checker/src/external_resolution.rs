@@ -255,6 +255,7 @@ impl CheckerState {
                     &module_reference,
                     resolved,
                     mode,
+                    file,
                 )?;
             }
             if let Some(symbol) = file
@@ -472,6 +473,7 @@ impl CheckerState {
         name: &JsString,
         resolved: &ts_module::ResolvedModule,
         mode: ModuleKind,
+        target: &ts_ast::CompletedFile,
     ) -> Result<(), Error> {
         let (_, source_name) = self.module_source(location)?;
         let emittable = self.module_import_emittable(location)?;
@@ -536,14 +538,93 @@ impl CheckerState {
             .is_true()
             && self.ast(location)?.node(location)?.flags() & ts_ast::node_flags::AMBIENT == 0
             && !path::is_declaration_file_name(name.as_bytes())
-            && emittable
+            && !self.is_literal_import_type_node(location)?
+            && !self.is_part_of_type_only_import_or_export_declaration(location)?
         {
-            return Err(Error::Unsupported(
-                "resolveExternalModule: rewriteRelativeImportExtensions safety checks",
-            ));
+            // port: tsc/internal/core/core.go:ShouldRewriteModuleSpecifier
+            let should_rewrite =
+                specifier_is_relative(name.as_bytes()) && has_ts_file_extension(name.as_bytes());
+            let host = self.program()?.host.clone();
+            if !resolved.resolved_using_ts_extension && should_rewrite {
+                let cwd = host.get_current_directory();
+                let from = path::absolute(source_name.as_bytes(), cwd);
+                let relative = path::relative_from_file(
+                    &from,
+                    resolved.resolved_file_name.as_bytes(),
+                    cwd,
+                    host.use_case_sensitive_file_names(),
+                );
+                self.error_at(
+                    Some(error),
+                    d::This_relative_import_path_is_unsafe_to_rewrite_because_it_looks_like_a_file_name_but_actually_resolves_to_0,
+                    vec![JsString::from_bytes(relative.as_slice())],
+                )?;
+            } else if resolved.resolved_using_ts_extension
+                && !should_rewrite
+                && host.source_file_may_be_emitted(target, false)?
+            {
+                self.error_at(
+                    Some(error),
+                    d::This_import_uses_a_0_extension_to_resolve_to_an_input_TypeScript_file_but_will_not_be_rewritten_during_emit_because_it_is_not_a_relative_path,
+                    vec![JsString::from_bytes(any_extension(name.as_bytes()))],
+                )?;
+            } else if resolved.resolved_using_ts_extension && should_rewrite {
+                // Loading rejects project references, so the redirect comparison
+                // upstream performs here has nothing to compare.
+                let target_name = target
+                    .view()
+                    .source_file()?
+                    .parse_options()
+                    .file_name
+                    .clone();
+                if host
+                    .get_redirect_for_resolution(target_name.as_bytes())?
+                    .is_some()
+                {
+                    return Err(Error::Unsupported(
+                        "resolveExternalModule: rewrite across project references",
+                    ));
+                }
+            }
         }
         Ok(())
     }
+
+    // port: tsc/internal/ast/utilities.go:IsLiteralImportTypeNode
+    fn is_literal_import_type_node(&self, node: NodeId) -> Result<bool, Error> {
+        let view = self.ast(node)?;
+        let read = view.node(node)?;
+        let Some(data) = read.data_source().as_import_type_node() else {
+            return Ok(false);
+        };
+        let Some(argument) = data.argument() else {
+            return Ok(false);
+        };
+        let argument_read = view.node(argument)?;
+        let Some(literal) = argument_read
+            .data_source()
+            .as_literal_type_node()
+            .and_then(|data| data.literal())
+        else {
+            return Ok(false);
+        };
+        Ok(view.node(literal)?.kind() == K::StringLiteral)
+    }
+
+    // port: tsc/internal/ast/utilities.go:IsPartOfTypeOnlyImportOrExportDeclaration
+    fn is_part_of_type_only_import_or_export_declaration(
+        &self,
+        node: NodeId,
+    ) -> Result<bool, Error> {
+        let view = self.ast(node)?;
+        Ok(
+            ts_ast::utilities::find_ancestor(view, Some(node), |candidate| {
+                type_only_import_or_export_declaration(view, candidate).unwrap_or(false)
+            })?
+            .is_some(),
+        )
+    }
+
     // port: tsc/internal/ast/utilities.go:IsEmittableImport
     fn module_import_emittable(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
@@ -924,5 +1005,66 @@ impl CheckerState {
             )
         };
         self.diagnostic_for_node(Some(error_node), message, args)
+    }
+}
+
+// port: tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration
+fn type_only_import_or_export_declaration(
+    view: ts_ast::AstView<'_>,
+    node: &ts_ast::NodeRead<'_>,
+) -> Result<bool, Error> {
+    let parent_type_only = |depth: usize| -> Result<bool, Error> {
+        let mut current = node.parent();
+        for _ in 1..depth {
+            current = match current {
+                Some(id) => view.node(id)?.parent(),
+                None => None,
+            };
+        }
+        Ok(match current {
+            Some(id) => view.node(id)?.is_type_only(),
+            None => false,
+        })
+    };
+    Ok(match node.kind().known() {
+        Some(K::ImportSpecifier | K::ExportSpecifier) => {
+            node.is_type_only() || parent_type_only(2)?
+        }
+        Some(K::NamespaceImport | K::NamespaceExport) => parent_type_only(1)?,
+        Some(K::ImportClause | K::ImportEqualsDeclaration) => node.is_type_only(),
+        Some(K::ExportDeclaration) => {
+            let data = node
+                .data_source()
+                .as_export_declaration()
+                .ok_or(ts_arena::Error::InvalidGraph)?;
+            data.is_type_only()
+                && data.module_specifier().is_some()
+                && data.export_clause().is_none()
+        }
+        _ => false,
+    })
+}
+
+// port: tsc/internal/tspath/path.go:PathIsRelative
+fn specifier_is_relative(path: &[u8]) -> bool {
+    path == b"."
+        || path == b".."
+        || path.len() >= 2 && path[0] == b'.' && matches!(path[1], b'/' | b'\\')
+        || path.len() >= 3 && path[0] == b'.' && path[1] == b'.' && matches!(path[2], b'/' | b'\\')
+}
+
+// port: tsc/internal/tspath/extension.go:HasTSFileExtension
+fn has_ts_file_extension(path: &[u8]) -> bool {
+    TS_EXTENSIONS
+        .iter()
+        .any(|extension| path.ends_with(extension))
+}
+
+// port: tsc/internal/tspath/path.go:GetAnyExtensionFromPath
+fn any_extension(path: &[u8]) -> &[u8] {
+    let base = path::base_name(path);
+    match base.iter().rposition(|&byte| byte == b'.') {
+        Some(index) => &base[index..],
+        None => b"",
     }
 }
