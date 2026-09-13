@@ -178,7 +178,7 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 | E2: Checker slice | types_parity | `run.e2.types_parity == 1` matching .types outcomes / E2 acceptance variants | missing | pending |
 | E2: Checker slice | errors_parity | `run.e2.errors_parity == 1` matching .errors.txt outcomes / E2 acceptance variants | missing | pending |
 | E2: Checker slice | comparators | `run.e2.comparators == true` comparator consistency and residual ID-sensitive fixtures pass | missing | pending |
-| E2: Checker slice | frozen_subset | `run.e2.frozen_subset == true` the complete source inventory and owner-approved E2 acceptance/informational partition match the committed S07-3 review; no missing required variants | true | pass |
+| E2: Checker slice | frozen_subset | `run.e2.frozen_subset == true` the complete source inventory and owner-approved E2 acceptance/informational partition match the committed S07-3 review; no missing required variants | missing | pending |
 | E2: Checker slice | divergences_approved | `run.e2.divergences_approved == true` every baseline difference the comparison accepts is covered by an owner-approved entry in data/divergences.toml (ADR 0004) | missing | pending |
 | E2: Checker slice | checker_throughput | `run.checkerbench.throughput_ratio > 0` measured Rust/Go checker throughput on the frozen query workload; positive finite measurement, not a speed target | missing | pending |
 | E2: Checker slice | checker_allocated_bytes | `run.checkerbench.allocated_bytes_ratio >= 0` measured Rust/Go bytes allocated during the fixed checker query phase, with raw samples and a positive Go denominator | missing | pending |
@@ -254,7 +254,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/44f293c40525a7b8a95f3260513f2f642e4ad5b7e92a9c8453730daaaff7c404.json) |
 | deny | stale: source, pin, command or inputs changed | [result](status/evidence/15576dbef02793bf57c9fe6ea001049e7fb50445aee3c5c1a77efa734c3b4caa.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/8475c96bcb9a17161ade95d00164c73369b45b736c4b50a6ce7668b8c78fc027.json) |
-| e2 | current | [result](status/evidence/977685191da1d565651bb44e65255c86f52b936d68275f946998d13efe5ce415.json) |
+| e2 | stale: source, pin, command or inputs changed | [result](status/evidence/977685191da1d565651bb44e65255c86f52b936d68275f946998d13efe5ce415.json) |
 | e3 | stale: source, pin, command or inputs changed | [result](status/evidence/c5f349a2e0439f58d74d532183e48e33f428aa984cf85ba0339f93deb734c3ee.json) |
 | e4 | stale: source, pin, command or inputs changed | [result](status/evidence/bd37e12efba7dedbec65804f52dc0fb91fb7efd482b7e65f0349b02e6787ff4e.json) |
 | e5 | stale: source, pin, command or inputs changed | [result](status/evidence/b759d3fd808558dba3f4af4412874a414a65e12198d300fd3fd7b59088a43ff8.json) |
@@ -438,7 +438,7 @@ Exit checks:
 - [ ] `run.binder.depth == true` (unknown metric)
 - [ ] `run.bindworkload.parity == 1` (unknown metric)
 - [ ] `run.program.subset_loads == true` (unknown metric)
-- [x] `exp.E2.frozen_subset.pass == 1`
+- [ ] `exp.E2.frozen_subset.pass == 1`
 - [ ] `exp.E3.shared_bound_file.pass == 1`
 - [ ] `exp.E3.retained_snapshot_edit.pass == 1`
 - [ ] `exp.E5.peak_rss.pass == 1`
@@ -452,7 +452,7 @@ Items:
 
 - [ ] S07-1 ts_binder with file-owned symbols and flow nodes (ADR 0007); bind parity over the corpus against the oracle's symbol dump
 - [ ] S07-2 ts_core, ts_tsoptions, ts_module and ts_vfs slices; the in-memory program host; pinned lib loading through ts_bundled; unsupported operations fail explicitly and are listed in the slice manifest
-- [x] S07-3 Frozen spike subset (PLAN.md, section 13, item 16): the checked-in rule, manifest, options, exclusions and the dependency operations E2, E7 and E8 need
+- [ ] S07-3 Frozen spike subset (PLAN.md, section 13, item 16): the checked-in rule, manifest, options, exclusions and the dependency operations E2, E7 and E8 need
 - [ ] S07-4 Parse-and-bind benchmark on the pinned VS Code workload, Rust against Go, at 1 and 8 threads, with peak RSS and bytes allocated
 - [ ] S07-5 Program and snapshot owners in the E3 harness: a bound file shared by two programs; an edit while an old snapshot answers
 - [x] S07-6 Function-level traceability for the binder package

@@ -101,7 +101,9 @@ Only the request spec and ordinary Rust regression tests are added to the
 repository. Local native captures, copied executables and inventory artifacts
 remain under `target/`; they are not promoted to committed acceptance evidence.
 
-## What remains
+## Remaining after the initial review
+
+This records the state before the follow-up corrections and full inventory below.
 
 1. **Large-flow timeout margin.** Before this review the debug case was reported
    at 149 seconds. After the shortcut, one normal inventory invocation completed
@@ -171,3 +173,48 @@ source snapshot are retained. They must not be combined with a new binary and
 called a complete current-source capture. The next full capture uses a fresh
 build/source snapshot; the 60-second timeout and both acceptance tiers are
 unchanged. The large-flow performance follow-up remains open.
+
+## Full inventory and CI repair — 2026-09-13
+
+The owner subsequently authorized fixing the producer failures and updating
+PR #22. `target/s08/p4-inventory-12` captures the checker source at `b48bc1d`:
+all 10,728 completion records replay successfully, and the captured source
+fingerprint still matches the workspace. Both acceptance (9,369/9,369) and
+informational (1,359/1,359) variants complete every requested diagnostic phase.
+There are no timeouts in this run. The remaining named boundary is P5's
+unimplemented type/symbol baseline walker: 9,171 acceptance and 1,248
+informational requests. Diagnostic execution is not native diagnostic parity
+or completion of E2; this run also does not establish a new performance margin.
+
+The failures in CI run
+[34756147448](https://github.com/iantocristian/ts-rust/actions/runs/34756147448)
+have three concrete corrections:
+
+- Add the existing synthetic-factory retention test to the exact S07 ownership
+  roster, raising the binding-publication suite from 17 to 18 tests and the
+  complete S07 ownership inventory from 83 to 84. Keep rejection of missing,
+  failed and unexpected tests; extend the missing/failed-case checks to this
+  retention test. Revalidating the archived macOS arm64 and both Linux outputs
+  against the corrected roster accepts all 40 suite/mode outputs per runner,
+  including Miri and ASan. This checks the correction against already-executed
+  instrumentation; it is not a new current-source E3 capture.
+- Regenerate `data/s07/operations.json`. The reviewed diff changes only 45 Rust
+  mapping records, including added port markers and moved line locations.
+  Source functions, call edges, operation boundaries and generator inputs are
+  identical. Record the new digest as a mapping-only amendment to the existing
+  subset review. The selected subset and checker-obligation files are unchanged;
+  the complete freeze validator succeeds using the authenticated existing Go
+  syntax and loader observations for all 10,728 variants.
+- Run the memory-accounting test's heavy/light pair from a fresh interpreter.
+  Linux's pre-exec RSS accounting can give both children the large unittest
+  process's memory floor, invalidating the old fixed 80 MiB/40 MiB assumption.
+  A Linux Python 3.12 container reproduces the old failure with a 160 MiB parent:
+  both children report 187,682,816 bytes. The revised test passes under the same
+  condition and rejects a deliberately substituted cumulative-child RSS result.
+  The production benchmark collector and its measurement semantics are unchanged.
+
+Local validation: all 395 script tests pass (one platform skip), the two focused
+child-accounting tests pass on Linux, and the complete frozen-subset validator
+returns `frozen_subset: true`. No Rust production source or workflow configuration
+changes are needed for these repairs. The refreshed remote CI run must establish
+the current four-target result before merge.
