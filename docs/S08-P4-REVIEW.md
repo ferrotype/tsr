@@ -217,4 +217,8 @@ Local validation: all 395 script tests pass (one platform skip), the two focused
 child-accounting tests pass on Linux, and the complete frozen-subset validator
 returns `frozen_subset: true`. No Rust production source or workflow configuration
 changes are needed for these repairs. The refreshed remote CI run must establish
-the current four-target result before merge.
+the current result before merge. The owner subsequently requested a temporary
+pause of macOS Intel and Ubuntu ARM64 in both producer and MSRV matrices because
+of CI load. macOS ARM64 and Ubuntu x86-64 remain enabled. This is a temporary
+validation-coverage reduction; ADR 0002's supported targets are unchanged, and
+both paused runners must be restored when the pause ends.
