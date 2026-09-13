@@ -21,6 +21,10 @@ use ts_arena::{ArenaId, NodeId, SymbolId};
 use ts_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
 use ts_jsnum::{Number, PseudoBigInt};
 
+#[path = "handles_display.rs"]
+mod display;
+pub use display::TypeNodeBuilder;
+
 /// A type of one checker, usable inside an operation on that checker.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypeRef {
@@ -329,7 +333,8 @@ impl Operation<'_> {
     /// Context-free `TypeToStringEx`: flags are explicit and there is no
     /// enclosing declaration. Go's `TypeToString` defaults are
     /// `ALLOW_UNIQUE_ES_SYMBOL_TYPE | USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE`.
-    /// Context-sensitive qualification/annotation reuse is not implemented yet.
+    /// Use `type_to_string_at` for qualification and annotation reuse in an
+    /// enclosing declaration.
     pub fn type_to_string(
         &mut self,
         ty: TypeRef,

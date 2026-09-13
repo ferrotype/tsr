@@ -60,6 +60,37 @@ pub(crate) struct NodeBuilder<'a> {
 }
 
 impl<'a> NodeBuilder<'a> {
+    /// Begin an independent public request on this builder. Generated syntax
+    /// and emit metadata survive; resolution and formatting state do not.
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.enterContext
+    pub(crate) fn prepare_context(
+        &mut self,
+        enclosing: Option<NodeId>,
+        flags: ts_nodebuilder::Flags,
+        internal_flags: ts_nodebuilder::InternalFlags,
+    ) -> Result<(), Error> {
+        if let Some(node) = enclosing {
+            self.retain_source_node(node)?;
+        }
+        self.enclosing = enclosing;
+        self.flags = flags;
+        self.internal_flags = internal_flags;
+        self.mapper = None;
+        self.suppress_inference_fallback = false;
+        self.encountered_error = false;
+        self.enclosing_symbol_types.clear();
+        self.type_parameter_names = scopes::TypeParameterNames::default();
+        self.reuse_boundaries.clear();
+        self.approximate_length = 0;
+        self.truncating = false;
+        self.visited.clear();
+        self.symbol_depth.clear();
+        self.infer_parameters = [].into();
+        self.reverse_mapped_stack.clear();
+        self.name_access = names::NameAccess::default();
+        Ok(())
+    }
+
     pub(crate) fn new(checker: &'a mut CheckerState, flags: ts_nodebuilder::Flags) -> Self {
         let emit = EmitContext::new();
         let ast = AstBuilder::with_hooks(
@@ -1003,7 +1034,7 @@ impl<'a> NodeBuilder<'a> {
             if reverse {
                 self.reverse_mapped_stack.push(symbol);
             }
-            let result = self.type_node(ty);
+            let result = self.serialize_declaration_type(None, Some(ty), Some(symbol), true);
             if reverse {
                 self.reverse_mapped_stack.pop();
             }
@@ -1052,9 +1083,34 @@ impl<'a> NodeBuilder<'a> {
                 .symbol_declarations(symbol)?
                 .iter()
                 .flatten()
-                .next(),
+                .next()
+                .or(self.enclosing),
         };
         if let Some(ty) = name_type {
+            if self.checker.types.flags(ty)? & tf::ENUM_LITERAL != 0 {
+                if let Some(context) = self.enclosing {
+                    let member = self
+                        .checker
+                        .types
+                        .get(ty)?
+                        .symbol
+                        .ok_or(Error::MissingLink("enum name symbol"))?;
+                    let enum_symbol = self.checker.symbol(member)?.parent().unwrap_or(member);
+                    let accessible = self.checker.emit_symbol_accessible(
+                        Some(enum_symbol),
+                        Some(context),
+                        sf::VALUE,
+                        false,
+                        false,
+                    )?;
+                    if accessible.accessibility
+                        == ts_printer::emit_resolver::SymbolAccessibility::Accessible
+                    {
+                        let expression = self.symbol_expression(member, Some(context))?;
+                        return Ok(self.ast.new_computed_property_name(Some(expression)));
+                    }
+                }
+            }
             if self.checker.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0 {
                 let symbol = self
                     .checker
@@ -1067,14 +1123,10 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         let name = match name_type {
-            Some(ty) => {
-                // TypeToString currently has no enclosing declaration/file;
-                // the enum accessibility branch therefore falls through to
-                // the ordinary string/number literal name, exactly as Go.
-                self.checker
-                    .index_property_name(ty)?
-                    .unwrap_or(raw_name.clone())
-            }
+            Some(ty) => self
+                .checker
+                .index_property_name(ty)?
+                .unwrap_or(raw_name.clone()),
             None => raw_name,
         };
         let (string_named, single_quote) = self.property_name_style(symbol)?;

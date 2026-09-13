@@ -52,6 +52,79 @@ fn left_meaning(meaning: u32) -> u32 {
 }
 
 impl NodeBuilder<'_> {
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToNode
+    pub(crate) fn symbol_display_node(
+        &mut self,
+        symbol: SymbolId,
+        meaning: u32,
+        allow_any_node: bool,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        if !allow_any_node {
+            let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
+            return self.entity_name_from_symbol_chain(&chain);
+        }
+        if self.internal_flags & ts_nodebuilder::internal_flags::WRITE_COMPUTED_PROPS != 0 {
+            if let Some(declaration) = self.checker.symbol(symbol)?.value_declaration() {
+                let view = self.checker.ast(declaration)?;
+                if let Some(name) = view.node(declaration)?.name() {
+                    if view.node(name)?.kind() == K::ComputedPropertyName {
+                        self.retain_source_node(name)?;
+                        return Ok(name);
+                    }
+                }
+            }
+            if let Some(ty) = self
+                .checker
+                .value_symbol_links
+                .try_get(symbol)
+                .and_then(|l| l.name_type)
+            {
+                if self.checker.types.flags(ty)?
+                    & (crate::type_flags::ENUM_LITERAL | crate::type_flags::UNIQUE_ES_SYMBOL)
+                    != 0
+                {
+                    let target = self
+                        .checker
+                        .types
+                        .get(ty)?
+                        .symbol
+                        .ok_or(Error::MissingLink("computed name symbol"))?;
+                    let old = self.enclosing;
+                    self.enclosing = self.checker.symbol(target)?.value_declaration();
+                    let expression =
+                        self.symbol_expression_with_meaning(target, self.enclosing, meaning);
+                    self.enclosing = old;
+                    return Ok(self.ast.new_computed_property_name(Some(expression?)));
+                }
+            }
+        }
+        self.symbol_expression_with_meaning(symbol, self.enclosing, meaning)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createEntityNameFromSymbolChain
+    fn entity_name_from_symbol_chain(&mut self, chain: &[SymbolId]) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        let (&symbol, prefix) = chain
+            .split_last()
+            .ok_or(Error::MissingLink("entity name chain"))?;
+        if prefix.is_empty() {
+            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let name = self.symbol_name(symbol);
+        if prefix.is_empty() {
+            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let identifier = self.ast.new_identifier(name?);
+        self.emit
+            .add_emit_flags(identifier, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+        if prefix.is_empty() {
+            return Ok(identifier);
+        }
+        let left = self.entity_name_from_symbol_chain(prefix)?;
+        Ok(self.ast.new_qualified_name(Some(left), Some(identifier)))
+    }
+
     pub(super) fn accessibility_chain(
         &mut self,
         symbol: SymbolId,
@@ -642,6 +715,8 @@ impl NodeBuilder<'_> {
         meaning: u32,
     ) -> Result<Vec<SymbolId>, Error> {
         if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
+            || self.internal_flags & ts_nodebuilder::internal_flags::DO_NOT_INCLUDE_SYMBOL_CHAIN
+                != 0
             || enclosing.is_none()
                 && self.flags & ts_nodebuilder::flags::USE_FULLY_QUALIFIED_TYPE == 0
         {
@@ -814,16 +889,23 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        let mut name = self.symbol_name(symbol)?;
+        if index == 0 {
+            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let name = self.symbol_name(symbol);
+        if index == 0 {
+            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let mut name = name?;
         if name
             .as_bytes()
             .first()
             .is_some_and(|b| matches!(b, b'\'' | b'"'))
             && self.name_external_module(symbol)?
         {
-            return Err(Error::Unsupported(
-                "symbolToExpression: external module specifier",
-            ));
+            let specifier = self.module_specifier_with_context(symbol, self.enclosing)?;
+            self.approximate_length += specifier.len() + 2;
+            return Ok(self.string_literal(specifier));
         }
         let can_access = if name.as_bytes().starts_with(b"#") {
             name.len() > 1

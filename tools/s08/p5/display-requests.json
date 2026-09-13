@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "scope": "P5 context-sensitive type display and explicit node-builder requests",
+  "programs": [
+    {
+      "id": "annotations-and-symbols",
+      "files": {
+        "/main.ts": "type Hex = { a: 0x10; b: 0b11; text: 'é' };\nconst unique: unique symbol = Symbol();\nnamespace N { export interface Inner { n: number } }\nlet value: N.Inner;\ntype Literal = 'hello';\nlet café = 1;\nnamespace N { export const inside = 0; }\nenum Keys { Named = \"x\" }\ntype EnumKeys = { [Keys.Named]: number };\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "hex-context-free",
+          "declaration": "Hex",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "hex-enclosing",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "hex-node",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "unique-enclosing",
+          "declaration": "unique",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 1048576
+        },
+        {
+          "id": "qualified-type",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 1048576
+        },
+        {
+          "id": "qualified-node",
+          "declaration": "value",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "literal-node",
+          "declaration": "Literal",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "symbol-qualified",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 4,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-no-chain",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 36,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-entity",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 0,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-unicode",
+          "declaration": "café",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 4,
+          "meaning": 0
+        },
+        {
+          "id": "enum-context-free",
+          "declaration": "EnumKeys",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "enum-enclosing",
+          "declaration": "EnumKeys",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        }
+      ]
+    }
+  ]
+}

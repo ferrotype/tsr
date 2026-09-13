@@ -12,10 +12,92 @@ pub(crate) const DEFAULT_FLAGS: TypeFormatFlags = type_format_flags::ALLOW_UNIQU
     | type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE;
 
 impl CheckerState {
-    // port: tsc/internal/checker/printer.go:Checker.typeToStringEx
+    // port: tsc/internal/checker/printer.go:Checker.symbolToStringEx
+    pub(crate) fn symbol_to_string_at(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<ts_arena::NodeId>,
+        meaning: ts_ast::SymbolFlags,
+        flags: crate::SymbolFormatFlags,
+    ) -> Result<JsString, Error> {
+        use crate::symbol_format_flags as sf;
+        use ts_nodebuilder::{flags as nf, internal_flags as inf};
+        let mut node_flags = nf::IGNORE_ERRORS;
+        for (source, target) in [
+            (
+                sf::USE_ONLY_EXTERNAL_ALIASING,
+                nf::USE_ONLY_EXTERNAL_ALIASING,
+            ),
+            (
+                sf::WRITE_TYPE_PARAMETERS_OR_ARGUMENTS,
+                nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME,
+            ),
+            (
+                sf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+                nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+            ),
+        ] {
+            if flags & source != 0 {
+                node_flags |= target;
+            }
+        }
+        let mut internal = inf::NONE;
+        if flags & sf::DO_NOT_INCLUDE_SYMBOL_CHAIN != 0 {
+            internal |= inf::DO_NOT_INCLUDE_SYMBOL_CHAIN;
+        }
+        if flags & sf::WRITE_COMPUTED_PROPS != 0 {
+            internal |= inf::WRITE_COMPUTED_PROPS;
+        }
+        let source = enclosing
+            .map(|node| {
+                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .flatten();
+        let never_ascii_escape = enclosing
+            .map(|node| {
+                self.ast(node)?
+                    .node(node)
+                    .map(|n| n.kind() == ts_ast::SyntaxKind::SourceFile)
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .unwrap_or(false);
+        let mut builder = crate::node_builder::NodeBuilder::new(self, node_flags);
+        builder.prepare_context(enclosing, node_flags, internal)?;
+        let node =
+            builder.symbol_display_node(symbol, meaning, flags & sf::ALLOW_ANY_NODE_KIND != 0)?;
+        if builder.encountered_error {
+            return Ok(JsString::from_bytes(b"".as_slice()));
+        }
+        let printer = Printer::new(
+            PrinterOptions {
+                remove_comments: true,
+                omit_trailing_semicolon: true,
+                never_ascii_escape,
+                ..Default::default()
+            },
+            &builder.emit,
+        );
+        let mut writer = SingleLineStringWriter::new();
+        printer.write(builder.ast.view(), node, source, &mut writer)?;
+        Ok(JsString::from_bytes(writer.text().to_vec()))
+    }
+
     pub(crate) fn type_to_string(
         &mut self,
         ty: TypeId,
+        flags: TypeFormatFlags,
+    ) -> Result<JsString, Error> {
+        self.type_to_string_at(ty, None, flags)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.typeToStringEx
+    pub(crate) fn type_to_string_at(
+        &mut self,
+        ty: TypeId,
+        enclosing: Option<ts_arena::NodeId>,
         flags: TypeFormatFlags,
     ) -> Result<JsString, Error> {
         if self.serialization_level >= MAX_SERIALIZATION_LEVEL as u32 {
@@ -30,8 +112,16 @@ impl CheckerState {
         if no_truncation {
             combined |= ts_nodebuilder::flags::NO_TRUNCATION;
         }
-        self.serialization_level += 1;
+        let source = enclosing
+            .map(|node| {
+                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .flatten();
         let mut builder = crate::node_builder::NodeBuilder::new(self, combined);
+        builder.prepare_context(enclosing, combined, ts_nodebuilder::internal_flags::NONE)?;
+        builder.checker.serialization_level += 1;
         let node = builder.type_node(ty);
         builder.checker.serialization_level -= 1;
         let node = node?;
@@ -48,7 +138,7 @@ impl CheckerState {
             b"".as_slice()
         };
         let mut writer = TextWriter::new(newline, 0);
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
+        printer.write(builder.ast.view(), node, source, &mut writer)?;
         let maximum = if no_truncation {
             NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH
         } else {

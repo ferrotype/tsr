@@ -252,7 +252,7 @@ pub mod storage_pilot;
 pub use flags::*;
 pub use handles::{
     MemberSpec, NodeRef, RetainedNode, RetainedSignature, RetainedSymbol, RetainedType,
-    RetainedTypeList, SignatureRef, SymbolRef, TypeRef,
+    RetainedTypeList, SignatureRef, SymbolRef, TypeNodeBuilder, TypeRef,
 };
 pub use host::{CheckerHost, ModuleSpecifierPath};
 pub(crate) use ids::{
