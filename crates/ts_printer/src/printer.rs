@@ -2320,7 +2320,7 @@ impl<'a> Session<'a, '_> {
                 | K::Identifier
                 | K::PrivateIdentifier,
             ) => Some(op::PRIMARY),
-            Some(K::PropertyAccessExpression) => {
+            Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
                 Some(if ts_ast::utilities::is_optional_chain(&read) {
                     op::OPTIONAL_CHAIN
                 } else {
@@ -2359,6 +2359,7 @@ impl<'a> Session<'a, '_> {
             K::Identifier => self.emit_identifier_reference(node)?,
             K::PrivateIdentifier => self.emit_private_identifier(node)?,
             K::PropertyAccessExpression => self.emit_property_access_expression(node)?,
+            K::ElementAccessExpression => self.emit_element_access_expression(node)?,
             K::PrefixUnaryExpression => self.emit_prefix_unary_expression(node)?,
             K::ExpressionWithTypeArguments => self.emit_expression_with_type_arguments(node)?,
             kind => {
@@ -2499,6 +2500,49 @@ impl<'a> Session<'a, '_> {
         self.emit_member_name(Some(name))?;
         self.decrease_indent_if(lines_after_dot > 0);
         self.decrease_indent_if(lines_before_dot > 0);
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitElementAccessExpression
+    fn emit_element_access_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let access = read
+            .data_source()
+            .as_element_access_expression()
+            .ok_or(Error::MissingNode("element access payload"))?;
+        let expression = access
+            .expression()
+            .ok_or(Error::MissingNode("element access expression"))?;
+        let argument = access
+            .argument_expression()
+            .ok_or(Error::MissingNode("element access argument"))?;
+        let question_dot = access.question_dot_token();
+        let precedence = if ts_ast::utilities::is_optional_chain(&read) {
+            op::OPTIONAL_CHAIN
+        } else {
+            op::MEMBER
+        };
+        self.emit_expression(expression, precedence)?;
+        self.emit_token_node(question_dot)?;
+        let question_end = question_dot
+            .map(|id| self.node(id).map(|read| i64::from(read.end())))
+            .transpose()?;
+        self.emit_token(
+            K::OpenBracketToken,
+            greatest_end(
+                -1,
+                &[Some(i64::from(self.node(expression)?.end())), question_end],
+            ),
+            WriteKind::Punctuation,
+            node,
+        );
+        self.emit_expression(argument, op::COMMA)?;
+        self.emit_token(
+            K::CloseBracketToken,
+            i64::from(self.node(argument)?.end()),
+            WriteKind::Punctuation,
+            node,
+        );
         Ok(())
     }
 

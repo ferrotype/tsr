@@ -460,6 +460,26 @@ impl<'a> NodeBuilder<'a> {
         self.list(nodes)
     }
 
+    /// Raw symbol parents, without the accessibility/alias selection of symbolToName.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToEntityNameNode
+    fn raw_symbol_entity_name(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
+        let mut identifiers = Vec::new();
+        let mut current = Some(symbol);
+        while let Some(symbol) = current {
+            let record = self.checker.symbol(symbol)?;
+            let name = record.name_to_owned();
+            current = record.parent();
+            let identifier = self.ast.new_identifier(name);
+            self.id_to_symbol.insert(identifier, Some(symbol));
+            identifiers.push(identifier);
+        }
+        let mut name = identifiers.pop().expect("initial symbol was present");
+        while let Some(right) = identifiers.pop() {
+            name = self.ast.new_qualified_name(Some(name), Some(right));
+        }
+        Ok(name)
+    }
+
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode
     pub(crate) fn type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let in_alias = self.flags & nf::IN_TYPE_ALIAS != 0;
@@ -474,13 +494,7 @@ impl<'a> NodeBuilder<'a> {
             if let Some(alias) = self.checker.types.alias_of(ty)?.cloned() {
                 // TypeAlias.ToTypeReferenceNode uses raw entity-name symbols,
                 // separately from the ordinary alias accessibility path below.
-                let symbol = self.checker.symbol(alias.symbol)?;
-                if symbol.parent().is_some() {
-                    return Err(Error::Unsupported(
-                        "TypeAlias.ToTypeReferenceNode: parent chain",
-                    ));
-                }
-                let name = self.ast.new_identifier(symbol.name_to_owned());
+                let name = self.raw_symbol_entity_name(alias.symbol)?;
                 let arguments = if alias.type_arguments.is_empty() {
                     None
                 } else {

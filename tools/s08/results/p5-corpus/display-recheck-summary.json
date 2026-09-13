@@ -1,0 +1,115 @@
+{
+  "scope": "All type/symbol failures from the complete 5e93fce capture; supplemental comparison, no new full-corpus count",
+  "complete": true,
+  "source_stable": true,
+  "requests": 637,
+  "capture_sha256": "7a3ad89e12e38c8ffd5c5286ff25522213255d92b7d82fe6cefe6c772469515b",
+  "control_capture_sha256": "2079e9a0a81aa00a5df7bfc916d1b68e5a4cc255c34afc85aec1ce909903e20d",
+  "binary_sha256": "b352cfc209d98d37e5c679dd475c0d373bcb105bb5ce84ec682f5c7b8f4fc650",
+  "counts_by_tier": {
+    "acceptance": {
+      "different": 88,
+      "failed": 5,
+      "match": 462
+    },
+    "informational": {
+      "different": 7,
+      "match": 75
+    }
+  },
+  "remaining_explicit_failures": [
+    {
+      "id": "compiler/computedPropertiesInDestructuring1.ts#configuration=0",
+      "class": "walker_error",
+      "reason": "printer does not support expressions outside literal types and entity names yet",
+      "active_query": {
+        "end": 408,
+        "file": "/.src/computedPropertiesInDestructuring1.ts",
+        "flags": 71270405,
+        "internal_flags": 8,
+        "kind": 263,
+        "operation": "TypeToTypeNode",
+        "pos": 361,
+        "type_id": 544
+      }
+    },
+    {
+      "id": "compiler/computedPropertiesInDestructuring1_ES6.ts#configuration=0",
+      "class": "walker_error",
+      "reason": "printer does not support expressions outside literal types and entity names yet",
+      "active_query": {
+        "end": 442,
+        "file": "/.src/computedPropertiesInDestructuring1_ES6.ts",
+        "flags": 71270405,
+        "internal_flags": 8,
+        "kind": 263,
+        "operation": "TypeToTypeNode",
+        "pos": 395,
+        "type_id": 563
+      }
+    },
+    {
+      "id": "compiler/promiseAllOnAny01.ts#configuration=0",
+      "class": "walker_error",
+      "reason": "unsupported checker operation: mapped display: modifier preserving wrapper",
+      "active_query": {
+        "end": 63,
+        "file": "/.src/promiseAllOnAny01.ts",
+        "flags": 71270405,
+        "internal_flags": 8,
+        "kind": 214,
+        "operation": "TypeToTypeNode",
+        "pos": 48,
+        "type_id": 88
+      }
+    },
+    {
+      "id": "compiler/unknownLikeUnionObjectFlagsNotPropagated.ts#configuration=0",
+      "class": "walker_error",
+      "reason": "unsupported checker operation: mapped display: modifier preserving wrapper",
+      "active_query": {
+        "end": 293,
+        "file": "/.src/unknownLikeUnionObjectFlagsNotPropagated.ts",
+        "flags": 71270405,
+        "internal_flags": 8,
+        "kind": 214,
+        "operation": "TypeToTypeNode",
+        "pos": 271,
+        "type_id": 164
+      }
+    },
+    {
+      "id": "conformance/controlFlow/controlFlowParameter.ts#configuration=0",
+      "class": "walker_error",
+      "reason": "printer does not support expressions outside literal types and entity names yet",
+      "active_query": {
+        "end": 562,
+        "file": "/.src/controlFlowParameter.ts",
+        "flags": 71270405,
+        "internal_flags": 8,
+        "kind": 263,
+        "operation": "TypeToTypeNode",
+        "pos": 447,
+        "type_id": 111
+      }
+    }
+  ],
+  "diagnostic_prerequisite_regression": {
+    "acceptance_tier": "acceptance",
+    "errors": {
+      "differences": [],
+      "emit": "not_executed",
+      "native_diagnostics": 3,
+      "rust_diagnostics": 3,
+      "state": "match"
+    },
+    "id": "compiler/undeclaredModuleError.ts#configuration=0",
+    "state": "match",
+    "type_symbols": {
+      "differences": [],
+      "native_queries": 165,
+      "rust_queries": 165,
+      "state": "match"
+    }
+  }
+}

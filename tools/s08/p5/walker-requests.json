@@ -317,6 +317,38 @@
       "enabled": true,
       "allow_js": false,
       "skip_lib_check": true
+    },
+    {
+      "id": "numeric-and-string-members",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "class C { 0() {} \"bar\"() {} \"not-an-identifier\"() {} }\nconst c = new C(); c[0](); c[\"bar\"](); c[\"not-an-identifier\"]();"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "numeric-and-string-members.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "unresolved-alias-parent-chain",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "// @target: es2015\n// @module: commonjs\n\nnamespace foo {    \n    export class Provide {\n    }\n\n    export namespace bar { export namespace baz {export class boo {}}}\n}\n\nimport provide = foo;\nimport booz = foo.bar.baz;\n\nvar p = new provide.Provide();\n\nfunction use() {\n  var p1: provide.Provide; // error here, but should be okay\n  var p2: foo.Provide;\n  var p3:booz.bar;\n  var p22 = new provide.Provide();\n}\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "unresolved-alias-parent-chain.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
     }
   ]
 }
