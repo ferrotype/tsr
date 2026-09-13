@@ -7,7 +7,6 @@ use ts_ast::{check_flags as cf, node_flags as nf, symbol_flags as sf, SyntaxKind
 #[derive(Default)]
 pub(crate) struct FlowEffects {
     pub(crate) signatures: Map<NodeId, Result<Option<SignatureId>, Error>>,
-    pub(crate) resolving: hashbrown::HashSet<NodeId, std::hash::RandomState>,
     pub(crate) explicit_symbols: hashbrown::HashSet<SymbolId, std::hash::RandomState>,
 }
 
@@ -65,13 +64,10 @@ impl CheckerState {
         if let Some(&cached) = self.flow.effects.signatures.get(&node) {
             return cached;
         }
-        if !self.flow.effects.resolving.insert(node) {
-            return Err(Error::Unsupported(
-                "getEffectsSignature: reentrant effects resolution",
-            ));
-        }
+        // Upstream leaves `links.effectsSignature` nil while resolving, so a
+        // reentrant request recomputes; `getExplicitTypeOfSymbol`'s resolving
+        // set is what terminates the recursion.
         let result = self.effects_signature_worker(node);
-        self.flow.effects.resolving.remove(&node);
         self.flow.effects.signatures.insert(node, result);
         result
     }

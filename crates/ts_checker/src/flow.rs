@@ -1182,12 +1182,6 @@ impl FlowAnalysis {
             0,
         );
         charge(
-            "flowEffectsResolving",
-            self.effects.resolving.len(),
-            self.effects.resolving.allocation_size(),
-            0,
-        );
-        charge(
             "explicitSymbolResolving",
             self.effects.explicit_symbols.len(),
             self.effects.explicit_symbols.allocation_size(),

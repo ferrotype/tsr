@@ -2269,3 +2269,43 @@ class B4 implements I {}
         ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
     );
 }
+
+#[test]
+fn reentrant_effects_signature_resolution_terminates_like_upstream() {
+    // Pinned Go: controlFlowFunctionLikeCircular1.errors.txt, file 8. The
+    // assertion call's effects signature re-enters itself through the type
+    // predicate's `typeof arg`; upstream recomputes and the explicit-type
+    // resolving set ends the recursion.
+    let text = b"function test(arg: string | number, whatever: any) {
+  if (typeof arg === \"string\") {
+    b();
+    type First = typeof arg;
+    type Test = (arg: unknown) => arg is First;
+    const b: Test = whatever;
+    return b;
+  }
+  return undefined;
+}
+";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            strict: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::Block_scoped_variable_0_used_before_its_declaration.code,
+            ts_diagnostics::Variable_0_is_used_before_being_assigned.code,
+            ts_diagnostics::Expected_0_arguments_but_got_1.code,
+            ts_diagnostics::Type_alias_0_circularly_references_itself.code,
+        ]
+    );
+}

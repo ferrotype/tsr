@@ -495,7 +495,7 @@ Remaining inventory-05 acceptance buckets, largest first:
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
 | `getContainersOfSymbol: class-expression CommonJS assignment` | 4 (declaration) | closed in the tenth pass |
 | `largeControlFlowGraph` / `circularOptionalityRemoval` over 60 s | 2 | flow-analysis performance (P7) |
-| `getEffectsSignature: reentrant effects resolution` | 1 | upstream recurses without a guard; needs the terminating path |
+| `getEffectsSignature: reentrant effects resolution` | 1 | closed in the eleventh pass |
 | `combineValueAndTypeSymbols: split external export` | 1 | closed in the tenth pass |
 | `getDeclarationSpaces: export assignment alias` | 2 | alias declaration spaces |
 | `onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict` | 2 | the isolatedModules conflict report |
@@ -525,9 +525,18 @@ while checking their baselines.
   chained, as in `jsdocImplements_class.errors.txt`.
 
 Rerunning the same 244 inventory-05 failure variants: 243 complete every phase;
-the one left is `getEffectsSignature: reentrant effects resolution`. The two
-slow runs finish under the recheck's 120-second limit but stay above the
-inventory's 60 seconds in the debug build.
+the one left was `getEffectsSignature: reentrant effects resolution`. The two
+slow cases are not in that set; timed separately with the same debug binary,
+`largeControlFlowGraph` completes in 129 s and `circularOptionalityRemoval` is
+killed (signal 9) after 166 s, both past the inventory's 60-second limit.
+
+Eleventh pass (2026-09-13): `getEffectsSignature` no longer treats re-entry as
+a boundary. Upstream leaves the signature link nil while resolving and simply
+recomputes on re-entry; the recursion ends in `getExplicitTypeOfSymbol`'s
+resolving set, which the port already had. `controlFlowFunctionLikeCircular_8`
+(an assertion call whose type predicate narrows through `typeof arg`) now
+reports Go's TS2448/TS2454/TS2554/TS2456, and all 244 rechecked variants
+complete every phase.
 
 Eight pre-existing tests in `checker_semantics.rs` still assert `Unsupported`
 for operations that are now implemented and need re-pointing with per-case
