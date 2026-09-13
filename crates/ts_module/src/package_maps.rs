@@ -278,7 +278,7 @@ impl Resolver {
                             .iter()
                             .any(|c| c.as_bytes() == condition.as_bytes())
                         || context.conditions.iter().any(|c| c.as_bytes() == b"types")
-                            && applicable_types_key(condition.as_bytes());
+                            && is_applicable_versioned_types_key(condition.as_bytes());
                     if matches {
                         trace!(
                             self,
@@ -704,7 +704,7 @@ fn compiler_version() -> &'static ts_semver::Version {
     VERSION.get_or_init(|| ts_semver::Version::must_parse(b"7.1.0-dev"))
 }
 /// port: tsc/internal/module/util.go:IsApplicableVersionedTypesKey
-fn applicable_types_key(key: &[u8]) -> bool {
+pub fn is_applicable_versioned_types_key(key: &[u8]) -> bool {
     key.strip_prefix(b"types@")
         .and_then(ts_semver::VersionRange::parse)
         .is_some_and(|range| range.test(Some(compiler_version())))
@@ -716,12 +716,15 @@ pub(super) struct VersionPaths {
     traces: Vec<crate::DiagAndArgs>,
     paths: std::sync::OnceLock<ts_core::PathMappings>,
 }
-impl Resolver {
-    /// port: tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths
-    pub(super) fn version_paths<'a>(
-        &mut self,
-        package: &'a PackageJson,
-    ) -> Option<(&'a JsString, &'a ts_core::PathMappings)> {
+impl PackageJson {
+    /// The package and module-specifier consumers share the source first-use cache.
+    /// Reading the mappings here does not emit resolution trace messages.
+    pub fn version_paths(&self) -> Option<&ts_core::PathMappings> {
+        self.selected_version_paths().map(|(_, paths)| paths)
+    }
+    // port: tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths
+    fn selected_version_paths(&self) -> Option<(&JsString, &ts_core::PathMappings)> {
+        let package = self;
         let selected=package.version_paths.get_or_init(|| {
             let mut result=VersionPaths::default();
             let mut emit=|message,args|result.traces.push(crate::DiagAndArgs{message,args});
@@ -745,11 +748,6 @@ impl Resolver {
             emit(diagnostics::X_package_json_does_not_have_a_typesVersions_entry_that_matches_version_0,vec!["7.1".into()]);
             result
         });
-        if self.tracer.active {
-            for message in &selected.traces {
-                self.tracer.write(message.message, message.args.clone());
-            }
-        }
         if selected.version.is_empty() {
             return None;
         }
@@ -785,6 +783,25 @@ impl Resolver {
                 .collect()
         });
         Some((&selected.version, paths))
+    }
+}
+impl Resolver {
+    pub(super) fn version_paths<'a>(
+        &mut self,
+        package: &'a PackageJson,
+    ) -> Option<(&'a JsString, &'a ts_core::PathMappings)> {
+        let result = package.selected_version_paths();
+        if self.tracer.active {
+            for message in &package
+                .version_paths
+                .get()
+                .expect("version selection initialized")
+                .traces
+            {
+                self.tracer.write(message.message, message.args.clone());
+            }
+        }
+        result
     }
 }
 fn json_type(value: &Value) -> &'static str {

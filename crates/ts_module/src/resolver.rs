@@ -136,7 +136,10 @@ impl Resolver {
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
-    pub fn package_json(&mut self, directory: &[u8]) -> Result<Option<Arc<PackageJson>>, Error> {
+    pub fn package_json(
+        &mut self,
+        directory: &[u8],
+    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
         let file = path::combine(directory, &[b"package.json"]);
         let key = path::to_path(
             &file,
@@ -196,13 +199,28 @@ impl Resolver {
         Ok(result)
     }
 
-    pub fn package_scope(&mut self, directory: &[u8]) -> Result<Option<Arc<PackageJson>>, Error> {
+    pub fn package_scope(
+        &mut self,
+        directory: &[u8],
+    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
         for dir in path::ancestors(directory) {
             if let Some(info) = self.package_json(&dir)? {
                 return Ok(Some(info));
             }
         }
         Ok(None)
+    }
+    /// Native direct package-scope callers have no resolution tracer.
+    /// Keep the shared cache while preserving any enclosing resolver trace mode.
+    pub fn package_scope_untraced(
+        &mut self,
+        directory: &[u8],
+    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
+        let previous = self.tracer.active;
+        self.tracer.active = false;
+        let result = self.package_scope(directory);
+        self.tracer.active = previous;
+        result
     }
     pub fn resolve(
         &mut self,
@@ -750,26 +768,48 @@ pub fn resolve_package_directory(
         module_resolution: ModuleResolutionKind::BUNDLER,
         ..Default::default()
     });
-    let context = crate::package_maps::Context::new(&options, ModuleKind::NONE);
     let mut resolver = Resolver::new(host, options, cwd)?;
-    resolver.package_directory_only = true;
-    let Some(mut result) = resolver.nearest_node_modules(
-        name,
-        &path::directory(containing_file),
-        context.extensions,
-        &context,
-    )?
-    else {
-        return Ok(None);
-    };
-    if is_relative(name) {
-        result.is_external_library_import =
-            contains(result.resolved_file_name.as_bytes(), b"/node_modules/");
-    } else {
-        result = resolver.finish_external(result)?;
-    }
-    Ok(Some(result))
+    resolver.resolve_package_directory(name, containing_file, ModuleKind::NONE)
 }
+impl Resolver {
+    /// Additional dependency discovery uses the already-retained package cache.
+    /// Ordinary module resolutions are not recomputed by this operation.
+    // port: tsc/internal/module/resolver.go:Resolver.ResolvePackageDirectory
+    pub fn resolve_package_directory(
+        &mut self,
+        name: &[u8],
+        containing_file: &[u8],
+        mode: ModuleKind,
+    ) -> Result<Option<ResolvedModule>, Error> {
+        let context = crate::package_maps::Context::new(&self.options, mode);
+        let previous = self.package_directory_only;
+        let previous_trace = self.tracer.active;
+        self.package_directory_only = true;
+        self.tracer.active = false;
+        let result = (|| {
+            let Some(mut result) = self.nearest_node_modules(
+                name,
+                &path::directory(containing_file),
+                context.extensions,
+                &context,
+            )?
+            else {
+                return Ok(None);
+            };
+            if is_relative(name) {
+                result.is_external_library_import =
+                    contains(result.resolved_file_name.as_bytes(), b"/node_modules/");
+            } else {
+                result = self.finish_external(result)?;
+            }
+            Ok(Some(result))
+        })();
+        self.package_directory_only = previous;
+        self.tracer.active = previous_trace;
+        result
+    }
+}
+
 pub(super) const TS: u8 = 1;
 pub(super) const JS: u8 = 2;
 pub(super) const DTS: u8 = 4;
@@ -810,7 +850,15 @@ pub(super) fn parse_package_name(name: &[u8]) -> (&[u8], &[u8]) {
     }
     slash.map_or((name, b"".as_slice()), |n| (&name[..n], &name[n + 1..]))
 }
-pub(super) fn mangle_scoped(name: &[u8]) -> Vec<u8> {
+/// port: tsc/internal/module/util.go:GetTypesPackageName
+pub fn get_types_package_name(name: &[u8]) -> Vec<u8> {
+    [b"@types/".as_slice(), &mangle_scoped(name)].concat()
+}
+// port: tsc/internal/module/util.go:MangleScopedPackageName
+pub fn mangle_scoped_package_name(name: &[u8]) -> Vec<u8> {
+    mangle_scoped(name)
+}
+pub fn mangle_scoped(name: &[u8]) -> Vec<u8> {
     if let Some(name) = name.strip_prefix(b"@") {
         if let Some(index) = name.iter().position(|&b| b == b'/') {
             let mut result = name[..index].to_vec();

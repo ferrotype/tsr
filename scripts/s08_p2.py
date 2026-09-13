@@ -12,6 +12,7 @@ from s08_oracle import ROOT, canonical, digest
 
 SPEC = 'tools/s08/p2/requests.json'
 DRIVER = 'tools/s08/p2/oracle_test.go'
+IDENTITY_BRIDGE = 'tools/s08/p2/identity_bridge_test.go'
 MODES = ['single-checker', 'repeated', 'separate-checker', 'concurrent']
 PHASES = ['config', 'program', 'syntactic', 'bind', 'semantic', 'global', 'combined']
 DIAGNOSTIC_FIELDS = {'file', 'pos', 'end', 'code', 'category', 'key_hex', 'text_hex', 'source_hex',
@@ -24,10 +25,23 @@ def fields(value, expected):
 
 
 def specification(spec):
-    fields(spec, 'version scope options programs merge')
+    shape=dict(spec)
+    mode=shape.pop('diagnostic_mode', 'checker')
+    if mode not in ('checker', 'program'):raise ValueError('invalid diagnostic mode')
+    fields(shape, 'version scope options programs merge')
     options = ({'target':'ESNext','module':'ESNext','strict':True,'noLib':True},
                {'target':'ESNext','module':'ESNext','strict':True,'noLib':False,'skipLibCheck':True})
-    if type(spec['version']) is not int or spec['version'] != 1 or not any(same_json_value(spec['options'], value) for value in options):
+    selected_options = dict(spec['options'])
+    for name in ('noUncheckedIndexedAccess', 'isolatedModules', 'verbatimModuleSyntax', 'allowUnreachableCode', 'allowJs', 'checkJs', 'noImplicitOverride', 'allowSyntheticDefaultImports', 'esModuleInterop', 'resolveJsonModule', 'declaration', 'isolatedDeclarations', 'stripInternal', 'useDefineForClassFields', 'importHelpers', 'noEmit'):
+        if name in selected_options and type(selected_options.pop(name)) is not bool:
+            raise ValueError(f'{name} must be boolean')
+    if selected_options.get('target') not in ('ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', 'ES2022', 'ES2023', 'ES2024', 'ES2025', 'ESNext'):
+        raise ValueError('unknown target')
+    if selected_options.get('module') not in ('None', 'CommonJS', 'AMD', 'UMD', 'System', 'ES2015', 'ES2020', 'ES2022', 'ESNext', 'Node16', 'Node18', 'Node20', 'NodeNext', 'Preserve'):
+        raise ValueError('unknown module format')
+    selected_options['target'] = 'ESNext'
+    selected_options['module'] = 'ESNext'
+    if type(spec['version']) is not int or spec['version'] != 1 or not any(same_json_value(selected_options, value) for value in options):
         raise ValueError('capability capture requires explicit strict options and declared library checking policy')
     if not spec['programs'] or len({p['id'] for p in spec['programs']}) != len(spec['programs']):
         raise ValueError('empty or duplicate P2 programs')
@@ -100,12 +114,12 @@ def validate(spec, observed, *, allow_unsupported=False, require_rust_ownership=
     if [p['id'] for p in observed['programs']] != [p['id'] for p in spec['programs']]:
         raise ValueError('P2 program inventory differs')
     missing = []
-    def diagnostics(value, path):
+    def diagnostics(value, path, declaration=False):
         if not operation_state(value,path,missing,allow_unsupported):
             return
-        fields(value, 'state config program syntactic bind semantic global combined baseline')
+        fields(value, 'state config program syntactic bind semantic global combined baseline' + (' declaration' if declaration else ''))
         incomplete = False
-        for phase in PHASES:
+        for phase in (PHASES[:-1] + (['declaration'] if declaration else []) + ['combined']):
             payload = value[phase]
             if isinstance(payload, list):
                 diagnostic_payload(payload)
@@ -138,7 +152,7 @@ def validate(spec, observed, *, allow_unsupported=False, require_rust_ownership=
                 if requested['operation'] != 'declared_type_summary': type_fields += ' properties'
                 fields(query['type'], type_fields)
                 for key in ('display_hex','in_alias_display_hex'):bytes.fromhex(query['type'][key])
-        diagnostics(program['diagnostics'],path+'/diagnostics')
+        diagnostics(program['diagnostics'],path+'/diagnostics',spec['options'].get('declaration',False))
     if [m['mode'] for m in observed['merges']] != MODES:
         raise ValueError('P2 merge execution modes differ')
     for merge in observed['merges']:
@@ -185,8 +199,11 @@ def capture(directory, spec_path=SPEC):
     spec=specification(strict_json_loads((ROOT/spec_path).read_bytes()));raw=canonical(spec)+b'\n'
     (directory/'requests.json').write_bytes(raw)
     driver=directory/'s08_p2_test.go';driver.write_bytes((ROOT/DRIVER).read_bytes())
-    (directory/'overlay.json').write_bytes(canonical({'Replace':{str(upstream/'tsc/internal/checker/s08_p2_test.go'):str(driver)}})+b'\n')
-    source_names=(spec_path,DRIVER,'scripts/s08_p2.py','scripts/s04.py','scripts/s04_common.py','scripts/s04_runtime.py','scripts/s08_oracle.py','data/s04/toolchains.toml','data/upstream.json')
+    bridge=directory/'s08_p2_identity_bridge_test.go';bridge.write_bytes((ROOT/IDENTITY_BRIDGE).read_bytes())
+    replacements={str(upstream/'tsc/internal/checker/s08_p2_test.go'):str(driver),
+                  str(upstream/'tsc/internal/checker/s08_p2_identity_bridge_test.go'):str(bridge)}
+    (directory/'overlay.json').write_bytes(canonical({'Replace':replacements})+b'\n')
+    source_names=(spec_path,DRIVER,IDENTITY_BRIDGE,'scripts/s08_p2.py','scripts/s04.py','scripts/s04_common.py','scripts/s04_runtime.py','scripts/s08_oracle.py','data/s04/toolchains.toml','data/upstream.json')
     sources={name:digest((ROOT/name).read_bytes()) for name in source_names}
     for name in sources:
         snapshot=directory/'source-snapshot'/name;snapshot.parent.mkdir(parents=True,exist_ok=True);snapshot.write_bytes((ROOT/name).read_bytes())

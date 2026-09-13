@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "scope": "S08 P4 correlated destructuring and contextual-rest flow",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "parameter",
+      "files": {
+        "/case.ts": "type Action={kind:\"A\",payload:number}|{kind:\"B\",payload:string};\nfunction f({kind,payload}:Action){if(kind===\"A\"){const selected=payload; return selected;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "constant",
+      "files": {
+        "/case.ts": "type Action={kind:\"A\",payload:number}|{kind:\"B\",payload:string};\nfunction f(action:Action){const {kind,payload}=action;if(kind===\"B\"){const selected=payload;return selected;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "mutable",
+      "files": {
+        "/case.ts": "type Action={kind:\"A\",payload:number}|{kind:\"B\",payload:string};\nfunction f(action:Action){let {kind,payload}=action;if(kind===\"A\"){const selected=payload;return selected;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "parameter-assigned",
+      "files": {
+        "/case.ts": "type Action={kind:\"A\",payload:number}|{kind:\"B\",payload:string};\nfunction f({kind,payload}:Action){payload=0;if(kind===\"B\"){const selected=payload;return selected;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "nested",
+      "files": {
+        "/case.ts": "type Action={kind:\"A\",payload:number}|{kind:\"B\",payload:string};\nfunction f({inner:{kind,payload}}:{inner:Action}){if(kind===\"A\"){const selected=payload;return selected;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "contextual-rest",
+      "files": {
+        "/case.ts": "type Action=[kind:\"A\",payload:number]|[kind:\"B\",payload:string]; const f:(...args:Action)=>unknown=(kind,payload)=>{if(kind===\"A\"){const selected=payload;return selected;}};"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selected",
+          "file": "/case.ts",
+          "declaration": "selected",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

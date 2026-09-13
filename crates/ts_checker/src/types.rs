@@ -158,6 +158,14 @@ pub struct InstantiationExpressionData {
     pub node: Option<NodeId>,
 }
 
+/// `EvolvingArrayType`: never escapes a completed flow query before finalization.
+#[derive(Debug)]
+pub struct EvolvingArrayData {
+    pub object: ObjectData,
+    pub element_type: TypeId,
+    pub final_array_type: Option<TypeId>,
+}
+
 /// Source mapped type with independent lazy links for each instantiation.
 #[derive(Debug, Default)]
 pub struct MappedData {
@@ -376,6 +384,7 @@ pub(crate) enum Payload {
     )]
     UniqueEsSymbol(UniqueEsSymbolData),
     Anonymous(ObjectData),
+    EvolvingArray(EvolvingArrayData),
     Mapped(MappedData),
     ReverseMapped(ReverseMappedData),
     InstantiationExpression(InstantiationExpressionData),
@@ -453,6 +462,7 @@ pub struct TypeStore {
     anonymous: Vec<ObjectData>,
     mapped: Vec<MappedData>,
     reverse_mapped: Vec<ReverseMappedData>,
+    evolving_arrays: Vec<EvolvingArrayData>,
     instantiation_expressions: Vec<InstantiationExpressionData>,
     references: Vec<ReferenceData>,
     interfaces: Vec<InterfaceData>,
@@ -610,6 +620,10 @@ impl TypeStore {
                 TypeKind::InstantiationExpression,
                 push(&mut self.instantiation_expressions, data)?,
             ),
+            Payload::EvolvingArray(data) => (
+                TypeKind::EvolvingArray,
+                push(&mut self.evolving_arrays, data)?,
+            ),
             Payload::Anonymous(data) => (TypeKind::Anonymous, push(&mut self.anonymous, data)?),
             Payload::Reference(data) => (TypeKind::Reference, push(&mut self.references, data)?),
             Payload::Interface(data) => (TypeKind::Interface, push(&mut self.interfaces, data)?),
@@ -719,8 +733,9 @@ impl TypeStore {
     payload_accessors!(read mapped, mapped, Mapped, MappedData);
     payload_accessors!(write mapped_mut, mapped, Mapped, MappedData);
     payload_accessors!(read instantiation_expression, instantiation_expressions, InstantiationExpression, InstantiationExpressionData);
-    #[cfg(feature = "relation-probe")]
     payload_accessors!(write instantiation_expression_mut, instantiation_expressions, InstantiationExpression, InstantiationExpressionData);
+    payload_accessors!(read evolving_array, evolving_arrays, EvolvingArray, EvolvingArrayData);
+    payload_accessors!(write evolving_array_mut, evolving_arrays, EvolvingArray, EvolvingArrayData);
     payload_accessors!(read reverse_mapped, reverse_mapped, ReverseMapped, ReverseMappedData);
     payload_accessors!(write reverse_mapped_mut, reverse_mapped, ReverseMapped, ReverseMappedData);
     payload_accessors!(read string_mapping, string_mappings, StringMapping, StringMappingData);
@@ -738,6 +753,7 @@ impl TypeStore {
                 .get(index)
                 .map(|data| &data.object),
             TypeKind::Anonymous => self.anonymous.get(index),
+            TypeKind::EvolvingArray => self.evolving_arrays.get(index).map(|data| &data.object),
             TypeKind::Mapped => self.mapped.get(index).map(|data| &data.object),
             TypeKind::ReverseMapped => self.reverse_mapped.get(index).map(|data| &data.object),
             TypeKind::Reference => self.references.get(index).map(|data| &data.object),
@@ -768,6 +784,10 @@ impl TypeStore {
                 .get_mut(index)
                 .map(|data| &mut data.object),
             TypeKind::Anonymous => self.anonymous.get_mut(index),
+            TypeKind::EvolvingArray => self
+                .evolving_arrays
+                .get_mut(index)
+                .map(|data| &mut data.object),
             TypeKind::Mapped => self.mapped.get_mut(index).map(|data| &mut data.object),
             TypeKind::ReverseMapped => self
                 .reverse_mapped
@@ -935,6 +955,7 @@ impl TypeStore {
             records: &self.records,
             mapped: &self.mapped,
             reverse_mapped: &self.reverse_mapped,
+            evolving_arrays: &self.evolving_arrays,
             instantiation_expressions: &self.instantiation_expressions,
             indexes: &self.indexes,
             indexed_accesses: &self.indexed_accesses,
@@ -964,6 +985,7 @@ pub(crate) struct TableView<'a> {
     pub records: &'a Vec<TypeRecord>,
     pub mapped: &'a Vec<MappedData>,
     pub reverse_mapped: &'a Vec<ReverseMappedData>,
+    pub evolving_arrays: &'a Vec<EvolvingArrayData>,
     pub instantiation_expressions: &'a Vec<InstantiationExpressionData>,
     pub indexes: &'a Vec<IndexData>,
     pub indexed_accesses: &'a Vec<IndexedAccessData>,

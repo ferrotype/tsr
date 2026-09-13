@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "scope": "S08 P4 contextual signatures, intersection and union return inference",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "signature-union",
+      "files": {
+        "/case.ts": "const f:((n:number)=>number)|((n:number)=>string)=n=>n;const g:((n:number)=>number)|((n:string)=>string)=n=>n;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "f",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "g",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "signature-overload",
+      "files": {
+        "/case.ts": "const f:{(n:number):number;(n:string):string}=n=>n;const g:{(n:number):number;(n:number,x:string):number}=(n)=>n;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "f",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "g",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "signature-generic",
+      "files": {
+        "/case.ts": "const f:<T>(n:T)=>T=n=>n;const g:{f<T>(n:T):T}={f(n){return n;}};"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "f",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "g",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "signature-discriminant-context",
+      "files": {
+        "/case.ts": "const x:{kind:\"a\",f:(n:number)=>string}|{kind:\"b\",f:(n:string)=>number}={kind:\"a\",f:n=>\"s\"};const y:{kind?:\"a\",f:(n:number)=>number}|{kind:\"b\",f:(n:string)=>string}={f:n=>n};"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "x",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "y",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "signature-return-union",
+      "files": {
+        "/case.ts": "declare function use(f:((n:number)=>\"a\")|((n:number)=>\"b\")):void;use(n=>\"a\");type Use=typeof use;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "use",
+          "file": "/case.ts",
+          "declaration": "Use",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native anonymous class naming helper checks",
+  "options": {
+    "target": "ES2021",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "importHelpers": true
+  },
+  "programs": [
+    {
+      "id": "helper-anonymous-class",
+      "files": {
+        "/main.ts": "export {};const C=class{static #x=1;static f(){return this.#x;}};type Query=number;",
+        "/tslib.d.ts": "declare module \"tslib\"{export const x:number;}"
+      },
+      "roots": [
+        "/main.ts",
+        "/tslib.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "helper-computed-anonymous-class",
+      "files": {
+        "/main.ts": "export {};const key=\"C\";const value={ [key]:class{static #x=1;} };type Query=number;",
+        "/tslib.d.ts": "declare module \"tslib\"{export const x:number;}"
+      },
+      "roots": [
+        "/main.ts",
+        "/tslib.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

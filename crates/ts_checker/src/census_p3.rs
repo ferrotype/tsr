@@ -128,7 +128,10 @@ impl CheckerState {
         let query = &self.query;
         census.links("query_links", &query.declared_types);
         census.links("query_links", &query.type_nodes);
+        census.links("query_links", &query.resolved_symbols);
         census.map("query_links", &query.global_types);
+        census.map("query_links", &query.global_type_aliases);
+        census.map("query_links", &query.this_assignments);
         census.links("query_links", &query.references);
         census.links("query_links", &query.scope_changes);
         census.links("query_links", &query.deferred_property_types);
@@ -156,6 +159,29 @@ impl CheckerState {
         census.map("query_links", &query.apparent_types);
         census.set("query_links", &query.type_parameters_checked);
         census.set("query_links", &query.index_constraints_checked);
+        census.set("query_links", &query.accessor_pairs_checked);
+        census.map("query_links", &query.context_free_types);
+        census.map("type_caches", &query.array_literal_types);
+        census.map("type_caches", &query.widened_types);
+        census.map("query_links", &query.assertion_types);
+        census.map("query_links", &query.unresolved_symbols);
+        for name in query.unresolved_symbols.keys() {
+            census.text("query_links", name);
+        }
+        census.map("query_links", &query.undefined_properties);
+        for name in query.undefined_properties.keys() {
+            census.text("query_links", name);
+        }
+        census.map("query_links", &self.bindings.pattern_for_type);
+        census.map("query_links", &self.bindings.spread_links);
+        census.map("query_links", &self.bindings.discriminated_contexts);
+        census.vec_capacity(
+            "query_links",
+            &self.bindings.contextual_patterns,
+            self.bindings.contextual_patterns.capacity(),
+        );
+        census.set("query_links", &query.function_symbols_checked);
+        census.set("query_links", &query.reported_unreachable);
         census.map("query_links", &self.merged_symbols);
         census.map("query_links", &self.source_checks);
         census.links("mapped_symbol_links", &self.mapped_symbol_links);
@@ -194,6 +220,16 @@ impl CheckerState {
             self.inference.contexts.capacity(),
         );
         for context in &self.inference.contexts {
+            census.vec_capacity(
+                "inference",
+                &context.inferred_type_parameters,
+                context.inferred_type_parameters.capacity(),
+            );
+            census.vec_capacity(
+                "inference",
+                &context.intra_expression_sites,
+                context.intra_expression_sites.capacity(),
+            );
             census.vec_capacity(
                 "inference",
                 &context.inferences,

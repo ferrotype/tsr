@@ -30,6 +30,8 @@ ts_ast = { version = "0.1.0", path = "../ts_ast" }
 ts_parser = { version = "0.1.0", path = "../ts_parser" }
 ts_scanner = { version = "0.1.0", path = "../ts_scanner" }
 ts_binder = { version = "0.1.0", path = "../ts_binder" }
+ts_transformers = { version = "0.1.0", path = "../ts_transformers" }
+ts_printer = { version = "0.1.0", path = "../ts_printer" }
 ts_checker = { version = "0.1.0", path = "../ts_checker" }
 ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
 ts_diagnostics = { version = "0.1.0", path = "../ts_diagnostics" }

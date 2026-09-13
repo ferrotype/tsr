@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "scope": "S08 P4 namespace module wrappers and synthetic defaults",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "programs": [
+    {
+      "id": "namespace-callable",
+      "files": {
+        "/mod.ts": "declare function f(x:number):string; export = f;",
+        "/case.ts": "import * as NS from \"./mod\"; NS(1); type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-constructable",
+      "files": {
+        "/mod.ts": "declare class C { value:number; } export = C;",
+        "/case.ts": "import * as NS from \"./mod\"; new NS(); type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "callable-default",
+      "files": {
+        "/mod.ts": "declare function f(x:number):string; export = f;",
+        "/case.ts": "import * as NS from \"./mod\"; const value=NS.default(1); type Query=typeof value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "callable-properties",
+      "files": {
+        "/mod.ts": "declare function f(x:number):string; declare namespace f { const label:string; } export = f;",
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-default",
+      "files": {
+        "/mod.ts": "declare const object:{a:number;default:string}; export=object;",
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS.default;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "primitive-default",
+      "files": {
+        "/mod.ts": "declare const value:number; export=value;",
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "real-default",
+      "files": {
+        "/mod.ts": "export default class C { value:number; } export const a=1;",
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-property",
+      "files": {
+        "/mod.ts": "export const a=1; export const b=\"two\";",
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-alias",
+      "files": {
+        "/mod.ts": "declare function f(x:number):string; export = f;",
+        "/case.ts": "import F from \"./mod\"; type Query=typeof F;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

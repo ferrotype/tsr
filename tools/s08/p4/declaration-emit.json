@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "scope": "P4 declaration diagnostics through native Program.GetDeclarationDiagnostics; actual transform/resolver callbacks, output syntax discarded",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "programs": [
+    {
+      "id": "annotated-function",
+      "files": {
+        "/case.ts": "export function f(x: string): number { return x.length; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "annotated-interface",
+      "files": {
+        "/case.ts": "export interface I { x: string; f(y:number): boolean; [key:number]: string }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "annotated-alias",
+      "files": {
+        "/case.ts": "export type A = { x: number } | string;\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "inferred-literals",
+      "files": {
+        "/case.ts": "export const answer = 42; export let name = \"name\"; export function f() { return true; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "class-members",
+      "files": {
+        "/case.ts": "export class C { private x: number = 1; readonly y = 2; z!: string; constructor(public p: string) {} f(q: number): string { return this.p; } }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "private-nominality",
+      "files": {
+        "/case.ts": "export class C { #x = 1; f(): number { return this.#x; } }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "namespace-visibility",
+      "files": {
+        "/case.ts": "export namespace N { interface Private { x:string } export const value: Private = {x:\"\"}; } export const result = N.value;\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "late-alias",
+      "files": {
+        "/case.ts": "namespace A { export namespace Q { export interface I {a:string} } import B=Q; import C=B; export import D=C; } export type X=A.D.I;\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "enum-constants",
+      "files": {
+        "/case.ts": "export enum E { A, B=4, C=-2, S=\"s\" }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "overload-elision",
+      "files": {
+        "/case.ts": "export function f(x:string):string; export function f(x:number):number; export function f(x:any):any {return x;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-expression",
+      "files": {
+        "/case.ts": "export default {value: 1};\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "inaccessible-anonymous-class",
+      "files": {
+        "/case.ts": "export const C = class { private value: number = 1; };\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "external-return",
+      "files": {
+        "/dep.ts": "export function factory() { class Private { private x=1; } return new Private; }",
+        "/case.ts": "import {factory} from \"./dep\"; export const value=factory(); type Probe=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

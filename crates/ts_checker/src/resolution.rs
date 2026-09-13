@@ -17,10 +17,6 @@ pub enum TypeSystemEntity {
     Symbol(SymbolId),
     Type(TypeId),
     Signature(SignatureId),
-    #[allow(
-        dead_code,
-        reason = "P4 initializer/flow resolution uses node entities; the cycle-guard schema includes them"
-    )]
     Node(NodeId),
 }
 

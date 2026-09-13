@@ -58,22 +58,16 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameter
     pub(crate) fn check_type_parameter(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_grammar_modifiers(node)?;
         let read = self.ast(node)?.node(node)?;
-        if read.modifiers().is_some() {
-            return Err(Error::Unsupported(
-                "checkTypeParameter: variance/const modifiers",
-            ));
-        }
         let data = read
             .data_source()
             .as_type_parameter_declaration()
             .ok_or(Error::MissingLink("type parameter declaration"))?;
         let constraint = data.constraint();
         let default = data.default_type();
-        if data.expression().is_some() {
-            return Err(Error::Unsupported(
-                "checkTypeParameter: recovered expression",
-            ));
+        if let Some(expression) = data.expression() {
+            self.grammar_error_first_token(expression, ts_diagnostics::Type_expected, vec![])?;
         }
         if let Some(constraint) = constraint {
             self.check_source_element(constraint)?;
@@ -132,6 +126,72 @@ impl CheckerState {
                 vec![text],
             )?;
         }
+        self.defer_checker_node(node)?;
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkTypeParameterDeferred
+    pub(crate) fn check_type_parameter_deferred(&mut self, node: NodeId) -> Result<(), Error> {
+        use ts_ast::modifier_flags as mf;
+        let parent = self
+            .ast(node)?
+            .node(node)?
+            .parent()
+            .ok_or(Error::MissingLink("type parameter parent"))?;
+        let kind = self.ast(parent)?.node(parent)?.kind();
+        if !matches!(
+            kind.known(),
+            Some(
+                K::InterfaceDeclaration
+                    | K::ClassDeclaration
+                    | K::ClassExpression
+                    | K::TypeAliasDeclaration
+            )
+        ) {
+            return Ok(());
+        }
+        let symbol = self
+            .get_symbol_of_declaration(node)?
+            .ok_or(Error::MissingLink("type parameter symbol"))?;
+        let parameter = self.get_declared_type_of_type_parameter(symbol)?;
+        let modifiers = self.type_parameter_modifiers(parameter)? & (mf::IN | mf::OUT);
+        if modifiers == 0 {
+            return Ok(());
+        }
+        let parent_symbol = self
+            .get_symbol_of_declaration(parent)?
+            .ok_or(Error::MissingLink("variance container symbol"))?;
+        if kind == K::TypeAliasDeclaration {
+            let declared = self.get_declared_type_of_symbol(parent_symbol)?;
+            if self.types.object_flags(declared)?
+                & (crate::object_flags::ANONYMOUS | crate::object_flags::MAPPED)
+                == 0
+            {
+                self.error_at(Some(node), ts_diagnostics::Variance_annotations_are_only_supported_in_type_aliases_for_object_function_constructor_and_mapped_types, vec![])?;
+                return Ok(());
+            }
+        }
+        if modifiers == mf::IN || modifiers == mf::OUT {
+            let (sub, super_) = (
+                self.builtins.marker_sub_type_for_check,
+                self.builtins.marker_super_type_for_check,
+            );
+            let (source, target) = if modifiers == mf::OUT {
+                (sub, super_)
+            } else {
+                (super_, sub)
+            };
+            let source = self.create_marker_type(parent_symbol, parameter, source)?;
+            let target = self.create_marker_type(parent_symbol, parameter, target)?;
+            self.variance.checked_parameter = Some(parameter);
+            let result = self.check_type_related_ex(source, target, crate::RelationKind::Assignable, Some(node), Some(ts_diagnostics::Type_0_is_not_assignable_to_type_1_as_implied_by_variance_annotation));
+            // The pin retains this parameter after the check (its saved value is
+            // the current parameter), which also controls later marker display.
+            self.variance.checked_parameter = Some(parameter);
+            if let (_, Some(diagnostic)) = result? {
+                self.add_diagnostic(diagnostic)?;
+            }
+        }
         Ok(())
     }
 
@@ -157,6 +217,29 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeReferenceNode
     // port: tsc/internal/checker/checker.go:Checker.checkTypeArgumentConstraints
     pub(crate) fn check_type_reference_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_grammar_type_arguments(node)?;
+        let read = self.ast(node)?.node(node)?;
+        if read.kind() == ts_ast::SyntaxKind::TypeReference
+            && read.flags() & ts_ast::node_flags::JS_DOC == 0
+        {
+            if let (Some(name), Some(arguments)) = (read.name(), read.type_argument_list()) {
+                let end = self.ast(name)?.node(name)?.end();
+                let list = self.ast(node)?.list(arguments)?;
+                if i64::from(end) != list.loc().pos() {
+                    let view = self.ast(node)?;
+                    let source_id = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+                        .ok_or(Error::MissingLink("type reference source"))?;
+                    let source = view.source_file(source_id)?;
+                    if ts_scanner::scan_token_at_position(view, source_id, i64::from(end))?
+                        == ts_ast::SyntaxKind::DotToken
+                    {
+                        let start =
+                            ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(end));
+                        self.grammar_error_range(node, start, start + 1, ts_diagnostics::JSDoc_types_can_only_be_used_inside_documentation_comments)?;
+                    }
+                }
+            }
+        }
         let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
         for &node in &nodes {
             self.check_source_element(node)?;
@@ -169,14 +252,25 @@ impl CheckerState {
             return Ok(());
         };
         let parameters = self.get_local_type_parameters(symbol)?;
+        self.check_type_argument_constraints(node, &parameters)?;
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkTypeArgumentConstraints
+    pub(crate) fn check_type_argument_constraints(
+        &mut self,
+        node: NodeId,
+        parameters: &[TypeId],
+    ) -> Result<bool, Error> {
+        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
         let mut arguments = None;
         let mut mapper = None;
         let mut valid = true;
         for (index, &parameter) in parameters.iter().enumerate() {
             if let Some(constraint) = self.constraint_of_type_parameter(parameter)? {
                 if arguments.is_none() {
-                    let effective = self.effective_type_arguments(node, &parameters)?;
-                    mapper = Some(self.new_type_mapper(&parameters, &effective)?);
+                    let effective = self.effective_type_arguments(node, parameters)?;
+                    mapper = Some(self.new_type_mapper(parameters, &effective)?);
                     arguments = Some(effective);
                 }
                 if valid {
@@ -192,6 +286,6 @@ impl CheckerState {
                 }
             }
         }
-        Ok(())
+        Ok(valid)
     }
 }

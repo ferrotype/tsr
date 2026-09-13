@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "scope": "S08 P4 optional call signature markers and global Symbol call identity",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "call-inner",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "declare const f:(()=>{p:number})|undefined;const x=f?.().p;const y=f?.()?.p;\ntype Query_x=typeof x;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "call-outer",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "declare const f:(()=>{p:number})|null;const x=f?.();const y=(f?.()).p;\ntype Query_x=typeof x;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "call-generic",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "declare const f:(<T>(a:T)=>T)|undefined;const x=f?.(1);const y=f?.<string>(\"a\");\ntype Query_x=typeof x;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "call-overloads",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "declare const f:({(a:number):number;(a:string):string})|undefined;const x=f?.(1);const y=f?.(\"a\");\ntype Query_x=typeof x;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "call-this",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "interface X{n:number;f(this:X):number;}declare const a:X|undefined;const x=a?.f();const y=a?.f?.();\ntype Query_x=typeof x;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "symbol-global",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "const x=Symbol();let y=Symbol();const z=Symbol.for(\"x\");const p=(Symbol());\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_z=typeof z;\ntype Query_p=typeof p;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "p",
+          "file": "/case.ts",
+          "declaration": "Query_p",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "symbol-shadow",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "function f(Symbol:(x?:string)=>symbol){const x=Symbol();return x;}const y=f(()=>Symbol());\ntype Query_f=typeof f;\ntype Query_y=typeof y;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "symbol-return",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}interface Symbol{} interface SymbolConstructor{(description?:string|number):symbol;for(key:string):symbol;}declare var Symbol:SymbolConstructor;",
+        "/case.ts": "declare function make():symbol;const x=make();class C{static readonly y=Symbol();readonly z=Symbol();}const y=C.y;const z=new C().z;\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_z=typeof z;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -125,7 +125,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getObjectLiteralIndexInfo
-    fn object_literal_index_info(
+    pub(crate) fn object_literal_index_info(
         &mut self,
         readonly: bool,
         properties: &[SymbolId],

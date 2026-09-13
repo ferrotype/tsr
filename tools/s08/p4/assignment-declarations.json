@@ -1,0 +1,460 @@
+{
+  "version": 1,
+  "scope": "S08 P4 JavaScript assignment declarations and circular variable resolution; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "circular-initializer",
+      "files": {
+        "/main.ts": "const a = a;\nconst probe = 1;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "probe",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "circular-annotation",
+      "files": {
+        "/main.ts": "let a: typeof a;\nconst probe = 1;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "probe",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "circular-mutual",
+      "files": {
+        "/main.ts": "const a = b; const b = a;\nconst probe = 1;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "probe",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "shorthand-symbol",
+      "files": {
+        "/main.ts": "const a = 1; const object = {a}; let n: number = object.a;\nconst probe = 1;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "probe",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-function-expando",
+      "files": {
+        "/main.js": "function f() {} f.x = 1; const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-function-expando-mixed",
+      "files": {
+        "/main.js": "function f() {} f.x = 1; f.x = \"text\"; const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-expando-array",
+      "files": {
+        "/main.js": "function f() {} f.x = []; const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-constructor-property",
+      "files": {
+        "/main.js": "class A { constructor() { this.x = 1; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-constructor-conditional",
+      "files": {
+        "/main.js": "class A { constructor() { if (Math.random()) this.x = 1; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-method-property",
+      "files": {
+        "/main.js": "class A { m() { this.x = 1; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-this-self-assignment",
+      "files": {
+        "/main.js": "class A { constructor() { this.x = this.x || 1; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-annotated-this",
+      "files": {
+        "/main.js": "class A { constructor() { /** @type {number} */ this.x = \"bad\"; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-inherited-this",
+      "files": {
+        "/main.js": "class A { constructor() { this.x = 1; } } class B extends A { m() { this.x = 2; } } const result = new B().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-element-this",
+      "files": {
+        "/main.js": "class A { constructor() { this[\"x\"] = 1; } } const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-prototype-property",
+      "files": {
+        "/main.js": "function A() {} A.prototype.x = 1; const result = new A().x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-descriptor-value",
+      "files": {
+        "/main.js": "function f() {} Object.defineProperty(f, \"x\", {value: 1}); const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-descriptor-getter",
+      "files": {
+        "/main.js": "function f() {} Object.defineProperty(f, \"x\", {get() { return 1; }}); const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-descriptor-setter",
+      "files": {
+        "/main.js": "function f() {} Object.defineProperty(f, \"x\", {set(value) {}}); const result = f.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-exports",
+      "files": {
+        "/main.js": "exports.x = 1; const result = exports.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-exports-initial-undefined",
+      "files": {
+        "/main.js": "exports.x = void 0; exports.x = 1; const result = exports.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-module-exports",
+      "files": {
+        "/main.js": "module.exports = {x: 1}; const result = module.exports.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-nested-assignment",
+      "files": {
+        "/main.js": "exports.x = exports.y = 1; const result = exports.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-annotated-export",
+      "files": {
+        "/main.js": "/** @type {number} */ exports.x = \"bad\"; const result = exports.x;"
+      },
+      "roots": [
+        "/main.js"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/main.js",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

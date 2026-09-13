@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["xtask", "crates/ts_jsstring", "crates/ts_arena", "crates/ts_ast", "crates/ts_diagnostics", "crates/ts_encoder", "crates/ts_core", "crates/ts_jsnum", "crates/ts_scanner", "crates/ts_parser", "crates/ts_binder", "crates/ts_bench", "crates/ts_tspath", "crates/ts_vfs", "crates/ts_bundled", "crates/ts_tsoptions", "crates/ts_module", "crates/ts_compiler", "crates/ts_semver", "crates/ts_nodebuilder", "crates/ts_printer", "crates/ts_checker", "tools/s08/relater-prototype"]
+members = ["xtask", "crates/ts_jsstring", "crates/ts_arena", "crates/ts_ast", "crates/ts_diagnostics", "crates/ts_encoder", "crates/ts_core", "crates/ts_jsnum", "crates/ts_scanner", "crates/ts_parser", "crates/ts_binder", "crates/ts_bench", "crates/ts_tspath", "crates/ts_vfs", "crates/ts_bundled", "crates/ts_tsoptions", "crates/ts_module", "crates/ts_compiler", "crates/ts_semver", "crates/ts_nodebuilder", "crates/ts_pseudochecker", "crates/ts_printer", "crates/ts_checker", "crates/ts_transformers", "tools/s08/relater-prototype"]
 # Compiler crates are added under crates/ as they are created; see PLAN.md, section 8,
 # and sprints/README.md for the Phase 0 order.
 

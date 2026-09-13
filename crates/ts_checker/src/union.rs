@@ -129,7 +129,12 @@ impl CheckerState {
                 type_set = self.remove_constrained_variables(type_set)?;
             }
             if union_reduction == UnionReduction::Subtype {
-                type_set = self.remove_subtypes(type_set, includes & type_flags::OBJECT != 0)?;
+                let Some(reduced) =
+                    self.remove_subtypes(type_set, includes & type_flags::OBJECT != 0)?
+                else {
+                    return Ok(self.builtins.error_type);
+                };
+                type_set = reduced;
             }
             if type_set.is_empty() {
                 if includes & type_flags::NULL != 0 {
@@ -488,7 +493,7 @@ impl CheckerState {
     pub(crate) fn filter_type(
         &mut self,
         ty: TypeId,
-        predicate: &mut dyn FnMut(&Self, TypeId) -> Result<bool, Error>,
+        predicate: &mut dyn FnMut(&mut Self, TypeId) -> Result<bool, Error>,
     ) -> Result<TypeId, Error> {
         let record = *self.types.get(ty)?;
         if record.flags & type_flags::UNION != 0 {

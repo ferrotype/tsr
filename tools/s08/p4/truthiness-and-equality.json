@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "scope": "S08 P4 known-truthy condition use scans and equality diagnostics; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "function-condition",
+      "files": {
+        "/case.ts": "declare function f():number; if(f){} const v=f?1:2; type V=typeof v;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "V",
+          "file": "/case.ts",
+          "declaration": "V",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "function-used",
+      "files": {
+        "/case.ts": "declare function f():number; if(f){f();} const v=f?f():0; const x=f&&f(); type V=typeof v;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "V",
+          "file": "/case.ts",
+          "declaration": "V",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "property-used",
+      "files": {
+        "/case.ts": "declare const obj:{f():number}; declare const other:{f():number}; if(obj.f){obj.f();} if(obj.f){other.f();} type T=typeof obj;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/case.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "cast-property",
+      "files": {
+        "/case.ts": "declare const obj:any; if((obj as {f():void}).f){} type T=typeof obj;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/case.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "enum-condition",
+      "files": {
+        "/case.ts": "enum E{Zero=0,One=1,Empty=\"\",Text=\"x\"} if(E.Zero){} if(E.One){} const a=E.Empty?1:2; const b=E.Text&&3; type A=typeof a; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "logical-condition",
+      "files": {
+        "/case.ts": "declare function f():number; declare const opt:(()=>number)|undefined; if(opt||f){} if(f&&f()){} const x=opt??f; type X=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/case.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-equality",
+      "files": {
+        "/case.ts": "const a={}=={}; const b=[]!==[]; const c=(function(){})===(function(){}); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nan-equality",
+      "files": {
+        "/case.ts": "declare var NaN:number; declare let n:number; const a=n===NaN; const b=NaN!=n; const c=NaN==NaN; type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nan-shadow",
+      "files": {
+        "/case.ts": "declare var NaN:number; function f(NaN:number){return NaN===1;} type F=typeof f;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

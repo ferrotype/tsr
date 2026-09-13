@@ -1,0 +1,22 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources": {
+    "tools/s08/p4/declaration-selectors/source.ts": "c73caaa0a3b05ff5ebe65176613451d0f20b337c4f9b9af74efda487a99c904b",
+    "tools/s08/p4/declaration-selectors/oracle_test.go": "1eca04cc9401d2c5f21e011977266290a7d460bfca2a3d3db4d65ebc35da4f6e"
+  },
+  "observation_sha256": "efa751618ed5b95fcdb776be52230aa5c3e63476352c13db15d8e2318c533ed7",
+  "rows": 504,
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-trimpath",
+    "-overlay",
+    "/Users/cristian/git/ts-rust/target/s08/p4-declaration-selectors-native-01/overlay.json",
+    "./internal/transformers/declarations",
+    "-run",
+    "^TestS08DeclarationSelectors$",
+    "-count=1",
+    "-timeout=2m"
+  ]
+}

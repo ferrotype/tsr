@@ -25,7 +25,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.isDiscriminantProperty
-    fn discriminant_property(&mut self, ty: TypeId, name: &[u8]) -> Result<bool, Error> {
+    pub(crate) fn discriminant_property(&mut self, ty: TypeId, name: &[u8]) -> Result<bool, Error> {
         if self.types.flags(ty)? & tf::UNION == 0 {
             return Ok(false);
         }

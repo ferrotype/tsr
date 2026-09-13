@@ -103,6 +103,7 @@ pub(crate) const ALL_FAMILIES: &[&str] = &[
     "literal",
     "unique_es_symbol",
     "anonymous",
+    "evolving_arrays",
     "reference",
     "interface",
     "tuple",
@@ -142,6 +143,14 @@ pub(crate) const ALL_FAMILIES: &[&str] = &[
     "program_indices",
     "resolution",
     "diagnostics",
+    "flow_analysis",
+    "enum_links",
+    "enum_relations",
+    "body_check_state",
+    "call_resolution",
+    "deferred_checks",
+    "iteration_cache",
+    "module_aliases",
 ];
 
 /// Type families whose bytes sum to the footprint statistic's numerator.
@@ -151,6 +160,7 @@ pub(crate) const TYPE_FAMILIES: &[&str] = &[
     "literal",
     "unique_es_symbol",
     "anonymous",
+    "evolving_arrays",
     "reference",
     "interface",
     "tuple",
@@ -216,6 +226,14 @@ impl CheckerState {
         census.vec_capacity("anonymous", tables.anonymous, tables.anonymous.capacity());
         for data in tables.anonymous {
             Self::census_object(&mut census, "anonymous", data);
+        }
+        census.vec_capacity(
+            "evolving_arrays",
+            tables.evolving_arrays,
+            tables.evolving_arrays.capacity(),
+        );
+        for data in tables.evolving_arrays {
+            Self::census_object(&mut census, "evolving_arrays", &data.object);
         }
         census.vec_capacity("reference", tables.references, tables.references.capacity());
         for data in tables.references {
@@ -289,6 +307,38 @@ impl CheckerState {
         }
         self.census_caches(&mut census);
         self.census_p3(&mut census);
+        self.flow.census(&mut |_, count, allocation, keys| {
+            census.add("flow_analysis", count, allocation + keys);
+        });
+        self.census_enums(&mut census);
+        self.body_checks.census(&mut census);
+        self.calls.census(&mut census);
+        self.iteration.census(&mut census);
+        self.module_aliases.census(&mut census);
+        self.synthetic_scopes.census(&mut census);
+        census.links("query_links", &self.emit.visible);
+        census.links("query_links", &self.emit.aliases_marked);
+        census.links("query_links", &self.emit_checks.node_flags);
+        census.links("query_links", &self.emit_checks.requested_helpers);
+        census.links("query_links", &self.emit_checks.helpers_module);
+        census.links("query_links", &self.emit_checks.computed_names);
+        for name in self.emit_checks.computed_names.values().flatten() {
+            census.text("query_links", name);
+        }
+
+        census.map("type_caches", &self.promises.promised);
+        census.map("type_caches", &self.promises.awaited);
+        census.vec_capacity(
+            "query_links",
+            &self.promises.stack,
+            self.promises.stack.capacity(),
+        );
+        census.vec_capacity(
+            "deferred_checks",
+            &self.deferred_checks.pending,
+            self.deferred_checks.pending.capacity(),
+        );
+        census.set("deferred_checks", &self.deferred_checks.reported_properties);
 
         // Storage beside the type families.
         census.add(

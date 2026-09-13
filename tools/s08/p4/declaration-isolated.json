@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "scope": "P4 isolated declaration diagnostics, native transformer inference fallback and related annotation records",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "isolatedDeclarations": true
+  },
+  "programs": [
+    {
+      "id": "variable",
+      "files": {
+        "/case.ts": "export const value={a:1};\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "return",
+      "files": {
+        "/case.ts": "export function f() { return 1; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "parameter",
+      "files": {
+        "/case.ts": "export function f(x=1):number { return x; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "class-property",
+      "files": {
+        "/case.ts": "export class C { value = {a:1}; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "accessor",
+      "files": {
+        "/case.ts": "export class C { get value() { return 1; } set value(v) {} }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "enum",
+      "files": {
+        "/case.ts": "const N=1; export enum E { A=N }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "annotated-control",
+      "files": {
+        "/case.ts": "export const value: number=1; export function f(x:number):number{return x;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

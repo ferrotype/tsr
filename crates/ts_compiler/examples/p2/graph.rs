@@ -79,6 +79,105 @@ fn symbol<'a>(
         None => source_symbol(program, id),
     }
 }
+// Match the oracle's lexical class identity, not either binder's runtime ID.
+fn portable_name(
+    program: &Program,
+    op: Option<&Operation<'_>>,
+    name: &[u8],
+    id: Option<SymbolId>,
+) -> Result<Vec<u8>> {
+    if name.starts_with(b"\xfe@") {
+        let suffix = name
+            .iter()
+            .rposition(|b| *b == b'@')
+            .expect("prefix contains @");
+        // Well-known names without a numeric suffix are already portable.
+        if suffix > 1 {
+            if suffix + 1 == name.len() || !name[suffix + 1..].iter().all(u8::is_ascii_digit) {
+                return Err(Error::Protocol(
+                    "unique name has invalid runtime identity".into(),
+                ));
+            }
+            let op = op.ok_or_else(|| Error::Protocol("unique name has no checker".into()))?;
+            let id = id.ok_or_else(|| Error::Protocol("unique name has no symbol".into()))?;
+            let ty = op.symbol_name_type(op.symbol_ref(id)?)?.ok_or_else(|| {
+                Error::Protocol("unique name has no existing nameType identity".into())
+            })?;
+            if op.type_flags(ty)? & ts_checker::type_flags::UNIQUE_ES_SYMBOL == 0 {
+                return Err(Error::Protocol(
+                    "unique nameType is not unique symbol".into(),
+                ));
+            }
+            let key = op
+                .type_symbol(ty)?
+                .ok_or_else(|| Error::Protocol("unique nameType has no symbol".into()))?;
+            let symbol = symbol(program, Some(op), key)?;
+            let declaration = symbol
+                .value_declaration()
+                .or(declarations(program, Some(op), key)?
+                    .into_iter()
+                    .flatten()
+                    .next())
+                .ok_or_else(|| {
+                    Error::Protocol("unique symbol has no defining declaration".into())
+                })?;
+            let read = view(program, declaration)?.node(declaration)?;
+            let mut result = name[..suffix].to_vec();
+            result.extend_from_slice(
+                format!(
+                    "@symbol:{}:{}:{}:{}",
+                    hex(file_name(program, declaration)?),
+                    read.kind().raw(),
+                    read.pos(),
+                    read.end()
+                )
+                .as_bytes(),
+            );
+            return Ok(result);
+        }
+    }
+    if !name.starts_with(b"\xfe#") {
+        return Ok(name.to_vec());
+    }
+    let digits = name[2..].iter().take_while(|b| b.is_ascii_digit()).count();
+    let suffix = 2 + digits;
+    let id = id.ok_or_else(|| Error::Protocol("private name has no symbol".into()))?;
+    if digits == 0 || name.get(suffix) != Some(&b'@') {
+        return Err(Error::Protocol(
+            "private name has no runtime class identity".into(),
+        ));
+    }
+    let s = symbol(program, op, id)?;
+    let mut declaration = s.value_declaration();
+    if declaration.is_none() {
+        declaration = declarations(program, op, id)?.into_iter().flatten().next();
+    }
+    while let Some(node) = declaration {
+        let read = view(program, node)?.node(node)?;
+        if matches!(
+            read.kind().known(),
+            Some(ts_ast::SyntaxKind::ClassDeclaration | ts_ast::SyntaxKind::ClassExpression)
+        ) {
+            let mut result = vec![0xfe];
+            result.extend_from_slice(
+                format!(
+                    "#class:{}:{}:{}:{}",
+                    hex(file_name(program, node)?),
+                    read.kind().raw(),
+                    read.pos(),
+                    read.end()
+                )
+                .as_bytes(),
+            );
+            result.extend_from_slice(&name[suffix..]);
+            return Ok(result);
+        }
+        declaration = read.parent();
+    }
+    Err(Error::Protocol(
+        "private name has no declaring class".into(),
+    ))
+}
 fn table(
     program: &Program,
     op: Option<&Operation<'_>>,
@@ -98,7 +197,10 @@ fn table(
             .tables()
             .get(id)?
     };
-    let mut entries: Vec<_> = read.iter().map(|(name, id)| (name.to_vec(), id)).collect();
+    let mut entries = read
+        .iter()
+        .map(|(name, id)| Ok((portable_name(program, op, name, id)?, id)))
+        .collect::<Result<Vec<_>>>()?;
     entries.sort_by(|a, b| a.0.cmp(&b.0));
     Ok(entries)
 }
@@ -241,7 +343,7 @@ impl Graph {
             if let Some(id) = s.export_symbol() {
                 queue.push_back(id);
             }
-            records.push(json!({"id":self.id(Some(id)),"name_hex":hex(s.name_bytes()),"flags":s.flags(),"check_flags":s.check_flags(),"declarations":ds,"value_declaration":node_json(program,s.value_declaration())?,"members":members,"exports":exports,"parent":parent,"export_symbol":export_symbol}));
+            records.push(json!({"id":self.id(Some(id)),"name_hex":hex(&portable_name(program,op,s.name_bytes(),Some(id))?),"flags":s.flags(),"check_flags":s.check_flags(),"declarations":ds,"value_declaration":node_json(program,s.value_declaration())?,"members":members,"exports":exports,"parent":parent,"export_symbol":export_symbol}));
         }
         Ok(json!({"root":root_id,"records":records}))
     }

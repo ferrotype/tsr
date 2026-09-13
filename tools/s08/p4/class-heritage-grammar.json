@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "scope": "S08 P4 class heritage grammar and computed accessor semantics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "class-unnamed",
+      "files": {
+        "/class-unnamed.ts": "class {}const Query=0;\n"
+      },
+      "roots": [
+        "/class-unnamed.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-unnamed.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-extends-multiple",
+      "files": {
+        "/class-extends-multiple.ts": "class A{}class B{}class C extends A,B{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-extends-multiple.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-extends-multiple.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-extends-repeat",
+      "files": {
+        "/class-extends-repeat.ts": "class A{}class B{}class C extends A extends B{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-extends-repeat.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-extends-repeat.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-implements-repeat",
+      "files": {
+        "/class-implements-repeat.ts": "interface I{}interface J{}class C implements I implements J{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-implements-repeat.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-implements-repeat.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-extends-after-implements",
+      "files": {
+        "/class-extends-after-implements.ts": "class A{}interface I{}class C implements I extends A{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-extends-after-implements.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-extends-after-implements.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-extends-empty",
+      "files": {
+        "/class-extends-empty.ts": "class C extends {}const Query=C;\n"
+      },
+      "roots": [
+        "/class-extends-empty.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-extends-empty.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-implements-empty",
+      "files": {
+        "/class-implements-empty.ts": "class C implements {}const Query=C;\n"
+      },
+      "roots": [
+        "/class-implements-empty.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-implements-empty.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-extends-trailing",
+      "files": {
+        "/class-extends-trailing.ts": "class A{}class C extends A,{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-extends-trailing.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-extends-trailing.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-typeargs-empty",
+      "files": {
+        "/class-typeargs-empty.ts": "class A<T>{}class C extends A<>{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-typeargs-empty.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-typeargs-empty.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-typeargs-trailing",
+      "files": {
+        "/class-typeargs-trailing.ts": "class A<T>{}class C extends A<number,>{}const Query=C;\n"
+      },
+      "roots": [
+        "/class-typeargs-trailing.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/class-typeargs-trailing.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "accessor-computed-literal",
+      "files": {
+        "/accessor-computed-literal.ts": "class C{get [\"x\"](){return 1;}set [\"x\"](x:number){}}const Query=C;\n"
+      },
+      "roots": [
+        "/accessor-computed-literal.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/accessor-computed-literal.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "accessor-computed-unique",
+      "files": {
+        "/accessor-computed-unique.ts": "declare const key:unique symbol;class C{get [key](){return 1;}set [key](x:number){}}const Query=C;\n"
+      },
+      "roots": [
+        "/accessor-computed-unique.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/accessor-computed-unique.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "accessor-computed-dynamic",
+      "files": {
+        "/accessor-computed-dynamic.ts": "declare const key:string;class C{get [key](){return 1;}set [key](x:number){}}const Query=C;\n"
+      },
+      "roots": [
+        "/accessor-computed-dynamic.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/accessor-computed-dynamic.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "accessor-computed-comma",
+      "files": {
+        "/accessor-computed-comma.ts": "class C{get [1,2](){return 1;}}const Query=C;\n"
+      },
+      "roots": [
+        "/accessor-computed-comma.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/accessor-computed-comma.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

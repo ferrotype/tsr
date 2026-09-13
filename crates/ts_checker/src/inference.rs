@@ -42,6 +42,10 @@ pub(crate) struct InferenceContext {
     pub flags: u32,
     pub mapper: MapperId,
     pub non_fixing_mapper: MapperId,
+    pub return_mapper: Option<MapperId>,
+    pub outer_return_mapper: Option<MapperId>,
+    pub intra_expression_sites: Vec<(ts_arena::NodeId, TypeId)>,
+    pub inferred_type_parameters: Vec<TypeId>,
     pub comparer: Option<crate::RelationFrameId>,
 }
 #[derive(Default)]
@@ -99,9 +103,67 @@ impl CheckerState {
             flags,
             mapper,
             non_fixing_mapper,
+            return_mapper: None,
+            outer_return_mapper: None,
+            intra_expression_sites: Vec::new(),
+            inferred_type_parameters: Vec::new(),
             comparer: None,
         });
         Ok(id)
+    }
+
+    // port: tsc/internal/checker/inference.go:Checker.cloneInferenceContext
+    // port: tsc/internal/checker/inference.go:Checker.cloneInferredPartOfContext
+    pub(crate) fn clone_call_inference_context(
+        &mut self,
+        source: InferenceId,
+        flags: u32,
+        inferred_only: bool,
+    ) -> Result<Option<InferenceId>, Error> {
+        let source = self.inference_context(source)?;
+        let inferences: Vec<_> = source
+            .inferences
+            .iter()
+            .filter(|info| {
+                !inferred_only || !info.candidates.is_empty() || !info.contra_candidates.is_empty()
+            })
+            .cloned()
+            .collect();
+        if inferred_only && inferences.is_empty() {
+            return Ok(None);
+        }
+        let parameters: Vec<_> = inferences.iter().map(|info| info.parameter).collect();
+        let signature = source.signature;
+        let flags = source.flags | flags;
+        let comparer = source.comparer;
+        let result = self.new_inference_context(&parameters, signature, flags)?;
+        self.inference_context_mut(result)?.inferences = inferences;
+        if let Some(comparer) = comparer {
+            self.set_inference_comparer(result, comparer)?;
+        }
+        Ok(Some(result))
+    }
+
+    // port: tsc/internal/checker/inference.go:Checker.createOuterReturnMapper
+    pub(crate) fn call_outer_return_mapper(
+        &mut self,
+        context: InferenceId,
+    ) -> Result<MapperId, Error> {
+        if let Some(mapper) = self.inference_context(context)?.outer_return_mapper {
+            return Ok(mapper);
+        }
+        let cloned = self
+            .clone_call_inference_context(context, 0, false)?
+            .ok_or(Error::MissingLink("outer inference clone"))?;
+        let mut mapper = self.inference_context(cloned)?.mapper;
+        if let Some(first) = self.inference_context(context)?.return_mapper {
+            mapper = self.alloc_mapper(crate::mapper::Mapper::Merged {
+                first,
+                second: mapper,
+            })?;
+        }
+        self.inference_context_mut(context)?.outer_return_mapper = Some(mapper);
+        Ok(mapper)
     }
 
     pub(crate) fn set_inference_comparer(
@@ -135,6 +197,40 @@ impl CheckerState {
         }
         Ok(())
     }
+    // port: tsc/internal/checker/inference.go:Checker.addIntraExpressionInferenceSite
+    pub(crate) fn add_intra_expression_inference_site(
+        &mut self,
+        context: InferenceId,
+        node: ts_arena::NodeId,
+        ty: TypeId,
+    ) -> Result<(), Error> {
+        self.inference_context_mut(context)?
+            .intra_expression_sites
+            .push((node, ty));
+        Ok(())
+    }
+    // port: tsc/internal/checker/inference.go:Checker.inferFromIntraExpressionSites
+    fn infer_from_intra_expression_sites(&mut self, context: InferenceId) -> Result<(), Error> {
+        let sites = self
+            .inference_context(context)?
+            .intra_expression_sites
+            .clone();
+        for (node, ty) in sites {
+            let contextual =
+                if self.ast(node)?.node(node)?.kind() == ts_ast::SyntaxKind::MethodDeclaration {
+                    self.contextual_property_type_with_flags(node, 2)?
+                } else {
+                    self.contextual_expression_type_ex(node, 2)?
+                };
+            if let Some(contextual) = contextual {
+                self.infer_types(context, ty, contextual, priority::NONE, false)?;
+            }
+        }
+        self.inference_context_mut(context)?
+            .intra_expression_sites
+            .clear();
+        Ok(())
+    }
     // port: tsc/internal/checker/mapper.go:InferenceTypeMapper.Map
     pub(crate) fn map_inference_type(
         &mut self,
@@ -151,8 +247,7 @@ impl CheckerState {
             return Ok(ty);
         };
         if fixing && !self.inference_context(id)?.inferences[index].fixed {
-            // P4 expression sites must run here before fixing; type-only
-            // conditional/signature inference has no expression sites.
+            self.infer_from_intra_expression_sites(id)?;
             self.clear_cached_inferences(id)?;
             self.inference_context_mut(id)?.inferences[index].fixed = true;
         }

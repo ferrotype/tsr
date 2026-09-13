@@ -1,0 +1,26 @@
+[package]
+name = "ts_transformers"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ts_arena = { version = "0.1.0", path = "../ts_arena" }
+ts_ast = { version = "0.1.0", path = "../ts_ast" }
+ts_core = { version = "0.1.0", path = "../ts_core" }
+ts_diagnostics = { version = "0.1.0", path = "../ts_diagnostics" }
+ts_jsnum = { version = "0.1.0", path = "../ts_jsnum" }
+ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
+ts_printer = { version = "0.1.0", path = "../ts_printer" }
+ts_scanner = { version = "0.1.0", path = "../ts_scanner" }
+ts_tspath = { version = "0.1.0", path = "../ts_tspath" }
+
+[dev-dependencies]
+ts_parser = { version = "0.1.0", path = "../ts_parser" }
+ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+serde_json = "1"
+
+[lints]
+workspace = true

@@ -261,7 +261,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.compareTypeParametersIdentical
-    fn signature_type_parameters_identical(
+    pub(crate) fn signature_type_parameters_identical(
         &mut self,
         source: &[TypeId],
         target: &[TypeId],
@@ -289,7 +289,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionMemberSignatures
-    fn combine_member_signatures(
+    pub(crate) fn combine_member_signatures(
         &mut self,
         left: SignatureId,
         right: SignatureId,

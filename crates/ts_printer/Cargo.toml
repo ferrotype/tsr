@@ -11,6 +11,8 @@ ts_arena = { version = "0.1.0", path = "../ts_arena" }
 ts_ast = { version = "0.1.0", path = "../ts_ast" }
 ts_core = { version = "0.1.0", path = "../ts_core" }
 ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+ts_jsnum = { version = "0.1.0", path = "../ts_jsnum" }
+ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
 ts_scanner = { version = "0.1.0", path = "../ts_scanner" }
 
 [dev-dependencies]

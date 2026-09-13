@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "scope": "S08 P4 computed unique-symbol names through lexical and container symbol chains",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "computed-global",
+      "files": {
+        "/main.ts": "declare const key:unique symbol;type T={[key]:number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-interface-container",
+      "files": {
+        "/main.ts": "interface Keys{readonly key:unique symbol;}declare const Keys:Keys;type T={[Keys.key]:number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-symbol-constructor",
+      "files": {
+        "/main.ts": "interface SymbolConstructor{readonly iterator:unique symbol;}declare var Symbol:SymbolConstructor;type T={[Symbol.iterator]():number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-namespace",
+      "files": {
+        "/main.ts": "declare namespace N{const key:unique symbol;}type T={[N.key]:number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-two-namespaces",
+      "files": {
+        "/main.ts": "declare namespace A{const key:unique symbol;}declare namespace B{const key:unique symbol;}type T={[A.key]:number;[B.key]:string};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-object-value",
+      "files": {
+        "/main.ts": "declare const Key:{readonly key:unique symbol;};type T={[Key.key]:number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

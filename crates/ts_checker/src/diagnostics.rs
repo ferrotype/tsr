@@ -112,6 +112,26 @@ fn file_name<'a>(
 }
 
 impl CheckerState {
+    pub(crate) fn add_related_diagnostic(
+        &mut self,
+        index: usize,
+        diagnostic: Diagnostic,
+    ) -> Result<(), Error> {
+        validate_files(&diagnostic, &|file| {
+            file_name(self.factory.view(), self.program.as_ref(), file)
+        })?;
+        self.diagnostics
+            .entries
+            .get_mut(index)
+            .ok_or(Error::MissingLink("related diagnostic index"))?
+            .related_information
+            .push(std::sync::Arc::new(diagnostic));
+        self.diagnostics.globals.sorted = false;
+        for bucket in self.diagnostics.files.values_mut() {
+            bucket.sorted = false;
+        }
+        Ok(())
+    }
     // port: tsc/internal/checker/utilities.go:NewDiagnosticForNode
     pub(crate) fn diagnostic_for_node(
         &self,

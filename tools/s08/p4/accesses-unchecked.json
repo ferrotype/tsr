@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "scope": "S08 P4 unchecked indexed reads, tuple unions and readonly rest indexes",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "programs": [
+    {
+      "id": "index-signatures",
+      "files": {
+        "/main.ts": "declare const a:{[key:string]:number}; const x=a[\"x\"];type X=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "enum-reverse",
+      "files": {
+        "/main.ts": "enum E{A,B}const x=E[E.A];const y=E[2];type X=typeof x;type Y=typeof y;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Y",
+          "file": "/main.ts",
+          "declaration": "Y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-union",
+      "files": {
+        "/main.ts": "declare const a:[string]|[number,boolean];const x=a[3];const y=a[-1];type X=typeof x;type Y=typeof y;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Y",
+          "file": "/main.ts",
+          "declaration": "Y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-readonly-rest",
+      "files": {
+        "/main.ts": "declare const a:readonly [string,...number[]];const x=a[5];a[5]=1;type X=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "negative-rest",
+      "files": {
+        "/main.ts": "declare const a:[string,...number[]];const x=a[-1];type X=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "bigint-index",
+      "files": {
+        "/main.ts": "declare const a:{x:number};const x=a[1n];type X=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "dynamic-index",
+      "files": {
+        "/main.ts": "declare const a:{x:number};declare const key:string;const x=a[key];type X=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/main.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

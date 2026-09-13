@@ -23,7 +23,8 @@ pub fn declaration(program: &Program, path: &str, name: &str) -> Result<NodeId> 
             )
         ) {
             if let Some(node_name) = node.name() {
-                if ast.node_text(node_name)?.as_bytes() == name.as_bytes()
+                if ast.node(node_name)?.kind() == SyntaxKind::Identifier
+                    && ast.node_text(node_name)?.as_bytes() == name.as_bytes()
                     && found.replace(id).is_some()
                 {
                     return Err(Error::Protocol("ambiguous declaration selector".into()));
@@ -112,6 +113,8 @@ pub fn program(
     generation: &Generation,
     counters: &Counters,
     libraries: bool,
+    overrides: super::FixtureOptions,
+    program_diagnostics: bool,
 ) -> Result<(Value, Value)> {
     let program = super::load_with_libraries(
         &request["files"],
@@ -119,6 +122,7 @@ pub fn program(
         &mut FileCache::new(),
         counters,
         libraries,
+        overrides,
     )?;
     let weak = Arc::downgrade(&program);
     let owner = owner(program.clone(), generation, counters)?;
@@ -138,7 +142,7 @@ pub fn program(
         value["id"] = request["id"].clone();
         queries.push(value);
     }
-    let diagnostics = diagnostics::all(&program, &mut op)?;
+    let diagnostics = diagnostics::all_mode(&program, &mut op, program_diagnostics)?;
     drop(op);
     drop(owner);
     drop(program);

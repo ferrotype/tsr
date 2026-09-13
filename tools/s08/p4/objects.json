@@ -1,0 +1,364 @@
+{
+  "version": 1,
+  "scope": "S08 P4 object literals, contextual properties, spreads, methods and source diagnostics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "object-properties",
+      "files": {
+        "/case.ts": "const a=1;const b=\"s\";const x={a,b,c:true,n:{v:1},f:(n:number)=>n};\ntype Query_x=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-spread",
+      "files": {
+        "/case.ts": "const base={a:1,b:\"s\"};const x={...base,c:true};const y={a:\"s\",...base};const z={...base,a:\"s\"};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_z=typeof z;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-spread-union",
+      "files": {
+        "/case.ts": "declare const u:{a:number}|undefined;const x={...u,b:1};declare const v:{a:number}|{b:string};const y={...v,c:1};declare const w:unknown;const bad={...w};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_bad=typeof bad;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-spread-optional",
+      "files": {
+        "/case.ts": "declare const a:{a:number,b?:string};declare const b:{a?:string,c:boolean};const x={...a,...b};const y={...b,...a};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-context",
+      "files": {
+        "/case.ts": "const x:{kind:\"a\",cb:(n:number)=>string}={kind:\"a\",cb:n=>\"s\"};const y:{[name:string]:number}={a:1,b:2};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-methods",
+      "files": {
+        "/case.ts": "const x={f(n:number){return n;},g(){return \"s\";}};const y:{f(n:number):string}={f(n){return \"s\";}};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-accessors",
+      "files": {
+        "/case.ts": "const x={get a(){return 1;},set a(value:number){},get b():string{return \"s\";}};const y={set a(value:number){}};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-const",
+      "files": {
+        "/case.ts": "const x={a:1,b:\"s\",nested:{v:true},f(){return 1;}} as const;const y={...x,c:2} as const;\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-computed",
+      "files": {
+        "/case.ts": "declare const key:string;declare const numberKey:number;const x={[key]:1,a:2};const y={[numberKey]:\"s\",n:1};const z={[\"a\"]:1,[1]:\"s\"};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_z=typeof z;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-errors",
+      "files": {
+        "/case.ts": "const x={a:1,a:2};const y={f(){return 1;},f(){return 2;}};let q=1;const z={q=2};const bad={...1};\ntype Query_x=typeof x;\ntype Query_y=typeof y;\ntype Query_z=typeof z;\ntype Query_bad=typeof bad;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-generic-spread",
+      "files": {
+        "/case.ts": "function f<T>(x:T){return {...x,a:1};}function g<T,U>(x:T,y:U){return {...x,...y};}\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-inference-sites",
+      "files": {
+        "/case.ts": "declare function f<T>(obj:{make:(n:number)=>T,use:(v:T)=>void}):T;const value=f({make:n=>\"s\",use:v=>{const x:string=v;}});\ntype Query_value=typeof value;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "Query_value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

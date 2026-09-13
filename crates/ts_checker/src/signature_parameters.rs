@@ -58,11 +58,7 @@ impl CheckerState {
         &mut self,
         ty: TypeId,
     ) -> Result<Option<SignatureId>, Error> {
-        let ty = if self.options.strict_null_checks {
-            self.get_intersection_type(&[ty, self.builtins.empty_object_type])?
-        } else {
-            ty
-        };
+        let ty = self.non_nullable_type(ty)?;
         if self.types.flags(ty)? & tf::OBJECT == 0 {
             return Ok(None);
         }
@@ -160,10 +156,24 @@ impl CheckerState {
         Ok(count)
     }
 
-    // port: tsc/internal/checker/relater.go:Checker.getMinArgumentCountEx
+    // port: tsc/internal/checker/relater.go:Checker.getMinArgumentCount
     pub(crate) fn min_argument_count(&mut self, signature: SignatureId) -> Result<usize, Error> {
+        self.min_argument_count_ex(signature, 0)
+    }
+
+    // port: tsc/internal/checker/relater.go:Checker.getMinArgumentCountEx
+    /// Native flags: StrongArityForUntypedJS = 1, VoidIsNonOptional = 2.
+    /// The latter bypasses the resolved cache and never evaluates parameter
+    /// types merely to decide whether a trailing `void` makes them optional.
+    pub(crate) fn min_argument_count_ex(
+        &mut self,
+        signature: SignatureId,
+        flags: u32,
+    ) -> Result<usize, Error> {
+        let strong_arity = flags & 1 != 0;
+        let void_non_optional = flags & 2 != 0;
         let sig = self.signatures.get(signature)?;
-        if sig.resolved_min_argument_count >= 0 {
+        if !void_non_optional && sig.resolved_min_argument_count >= 0 {
             return Ok(sig.resolved_min_argument_count as usize);
         }
         let count = sig.parameters.as_deref().unwrap_or_default().len();
@@ -185,11 +195,14 @@ impl CheckerState {
             minimum
         } else {
             let sig = self.signatures.get(signature)?;
-            if sig.flags & sg::IS_UNTYPED_SIGNATURE_IN_JS_FILE != 0 {
+            if !strong_arity && sig.flags & sg::IS_UNTYPED_SIGNATURE_IN_JS_FILE != 0 {
                 return Ok(0);
             }
             sig.min_argument_count as usize
         };
+        if void_non_optional {
+            return Ok(minimum);
+        }
         while minimum > 0 {
             let ty = self
                 .parameter_type_at(signature, minimum - 1)?
@@ -576,7 +589,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.isResolvingReturnTypeOfSignature
-    fn resolving_signature_return(&self, signature: SignatureId) -> Result<bool, Error> {
+    pub(crate) fn resolving_signature_return(&self, signature: SignatureId) -> Result<bool, Error> {
         let sig = self.signatures.get(signature)?;
         if let Some(composite) = &sig.composite {
             for &part in composite.signatures.iter() {

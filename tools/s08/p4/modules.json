@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "scope": "S08 P4 namespace and internal alias source semantics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "namespace-values",
+      "files": {
+        "/case.ts": "namespace N { export const value = 1; export function f(x:string) { return x; } }\ntype Query = typeof N.value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nested-namespace",
+      "files": {
+        "/case.ts": "namespace N.Inner { export type T = { value:number }; export const value=1; }\ntype Query = N.Inner.T;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-alias",
+      "files": {
+        "/case.ts": "namespace N { export type T = { value:number }; export const value=1; }\nimport A = N;\ntype Query = A.T;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "alias-qualified",
+      "files": {
+        "/case.ts": "namespace N { export class C { value:number=1; } }\nimport C=N.C;\ntype Query = C;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "alias-chain",
+      "files": {
+        "/case.ts": "namespace N { export const value=1; }\nimport A=N; import B=A;\ntype Query=typeof B.value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "alias-cycle",
+      "files": {
+        "/case.ts": "import A=B; import B=A;\ntype Query=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "module-keyword",
+      "files": {
+        "/case.ts": "module N { export const value=1; }\ntype Query=typeof N.value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-context",
+      "files": {
+        "/case.ts": "function f(){ namespace N { export const value=1; } }\ntype Query=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-before-function",
+      "files": {
+        "/case.ts": "namespace f { export const value=1; } function f() {}\ntype Query=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-local-export",
+      "files": {
+        "/case.ts": "namespace N { const value=1; export {value}; }\ntype Query=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ambient-local-export",
+      "files": {
+        "/case.ts": "declare namespace N { const value:1; export {value}; }\ntype Query=typeof N.value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "export-duplicate-type",
+      "files": {
+        "/case.ts": "type T=number; export type {type T};\ntype Query=T;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "export-local",
+      "files": {
+        "/case.ts": "const value=1; export {value};\ntype Query=typeof value;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "export-global",
+      "files": {
+        "/case.ts": "export {undefined};\ntype Query=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

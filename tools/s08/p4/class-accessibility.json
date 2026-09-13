@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native private/protected constructor accessibility; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "private-external",
+      "files": {
+        "/private-external.ts": "class C {private constructor(){}} const x=new C(); type T=typeof x;\n"
+      },
+      "roots": [
+        "/private-external.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/private-external.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-internal",
+      "files": {
+        "/private-internal.ts": "class C {private constructor(){} static make(){return new C();}} type T=typeof C;\n"
+      },
+      "roots": [
+        "/private-internal.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/private-internal.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-nested",
+      "files": {
+        "/private-nested.ts": "class C {private constructor(){} static make(){const D=class {m(){return new C();}};return D;}} type T=typeof C;\n"
+      },
+      "roots": [
+        "/private-nested.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/private-nested.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "protected-external",
+      "files": {
+        "/protected-external.ts": "class C {protected constructor(){}} const x=new C(); type T=typeof x;\n"
+      },
+      "roots": [
+        "/protected-external.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/protected-external.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "protected-internal",
+      "files": {
+        "/protected-internal.ts": "class C {protected constructor(){} static make(){return new C();}} type T=typeof C;\n"
+      },
+      "roots": [
+        "/protected-internal.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/protected-internal.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "protected-derived",
+      "files": {
+        "/protected-derived.ts": "class C {protected constructor(){}} class D extends C { static make(){return new C();}} type T=typeof D;\n"
+      },
+      "roots": [
+        "/protected-derived.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/protected-derived.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "protected-unrelated",
+      "files": {
+        "/protected-unrelated.ts": "class C {protected constructor(){}} class D { static make(){return new C();}} type T=typeof D;\n"
+      },
+      "roots": [
+        "/protected-unrelated.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/protected-unrelated.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "public-ordinary",
+      "files": {
+        "/public-ordinary.ts": "class C {constructor(){}} const x=new C(); type T=typeof x;\n"
+      },
+      "roots": [
+        "/public-ordinary.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/public-ordinary.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

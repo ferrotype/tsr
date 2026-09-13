@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "scope": "P4 declaration generated-name paths: dynamic class bases, default values and promoted function/class expressions",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "programs": [
+    {
+      "id": "dynamic-base",
+      "files": {
+        "/case.ts": "function base(){ return class { x=1; }; } export class C extends base() { y=2; }\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "dynamic-base-private",
+      "files": {
+        "/case.ts": "function base(){ return class { private secret=1; }; } export class C extends base() {}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-arrow",
+      "files": {
+        "/case.ts": "export default (x: number): number => x;\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-function",
+      "files": {
+        "/case.ts": "export default (function named(x: number): string { return String(x); });\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-class",
+      "files": {
+        "/case.ts": "export default (class Named { x: number=1; constructor(public y: string) {} });\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-class-private",
+      "files": {
+        "/case.ts": "export default (class { private value=1; get(){ return this.value; } });\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "default-collision",
+      "files": {
+        "/case.ts": "const _default=1; export default { value: _default };\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-equals-expression",
+      "files": {
+        "/case.ts": "const input={x:1}; export = (input, {value:input.x});\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

@@ -92,54 +92,52 @@ impl NodeBuilder<'_> {
             .unwrap_or(self.checker.builtins.never_type))
     }
 
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclarationWithConstraint
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclaration
     pub(super) fn type_parameter_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
-        let constraint = self
-            .checker
-            .constraint_of_type_parameter(ty)?
-            .map(|ty| self.type_node(ty))
-            .transpose()?;
+        let constraint = if let Some(constraint) = self.checker.constraint_of_type_parameter(ty)? {
+            let annotation = self.checker.constraint_declaration(ty)?;
+            Some(self.type_node_with_reusable_annotation(constraint, annotation)?)
+        } else {
+            None
+        };
         self.type_parameter_node_with_constraint(ty, constraint)
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclarationWithConstraint
     pub(super) fn type_parameter_node_with_constraint(
         &mut self,
         ty: TypeId,
         constraint: Option<NodeId>,
     ) -> Result<NodeId, Error> {
-        let symbol = self.checker.types.get(ty)?.symbol;
-        let name = if let Some(symbol) = symbol {
-            self.symbol_node(symbol)?
-        } else {
-            self.ast
-                .new_identifier(JsString::from_bytes(b"?".as_slice()))
-        };
-        let default = self.checker.resolved_type_parameter_default(ty)?;
-        let default = if default == self.checker.builtins.no_constraint_type
-            || default == self.checker.builtins.circular_constraint_type
-        {
-            None
-        } else {
-            Some(self.type_node(default)?)
-        };
-        if let Some(symbol) = symbol {
-            for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-                if self
-                    .checker
-                    .ast(declaration)?
-                    .node(declaration)?
-                    .modifiers()
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "typeParameterToDeclaration: variance/const modifiers",
-                    ));
-                }
-            }
-        }
-        Ok(self
-            .ast
-            .new_type_parameter_declaration(None, Some(name), constraint, None, default))
+        let flags = self.flags;
+        self.flags &= !nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME;
+        let result = (|| {
+            let modifier_flags = self.checker.type_parameter_modifiers(ty)?;
+            let modifiers = ts_ast::utilities_middle::create_modifiers_from_modifier_flags(
+                modifier_flags,
+                |kind| Some(self.ast.new_modifier(kind)),
+            )
+            .map(|nodes| self.list(nodes.into_iter().flatten().collect()))
+            .transpose()?;
+            let name = self.type_parameter_name(ty)?;
+            let default = self.checker.resolved_type_parameter_default(ty)?;
+            let default = if default == self.checker.builtins.no_constraint_type
+                || default == self.checker.builtins.circular_constraint_type
+            {
+                None
+            } else {
+                Some(self.type_node(default)?)
+            };
+            Ok(self.ast.new_type_parameter_declaration(
+                modifiers,
+                Some(name),
+                constraint,
+                None,
+                default,
+            ))
+        })();
+        self.flags = flags;
+        result
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToParameterDeclaration
@@ -149,6 +147,7 @@ impl NodeBuilder<'_> {
         let mut source_name = None;
         let mut rest = value.check_flags() & check_flags::REST_PARAMETER != 0;
         let mut optional = value.check_flags() & check_flags::OPTIONAL_PARAMETER != 0;
+        let declaration = value.value_declaration();
         if let Some(node) = value.value_declaration() {
             let read = self.checker.ast(node)?.node(node)?;
             if let Some(name) = read.name() {
@@ -157,10 +156,19 @@ impl NodeBuilder<'_> {
             if let Some(parameter) = read.data_source().as_parameter_declaration() {
                 rest |= parameter.dot_dot_dot_token().is_some();
             }
-            optional |= read.question_token(self.checker.ast(node)?)?.is_some()
-                || read.initializer().is_some();
+            optional |= self.checker.is_optional_source_parameter(node)?;
         }
-        let ty = self.checker.get_type_of_symbol(symbol)?;
+        let mut ty = self.checker.get_type_of_symbol(symbol)?;
+        if let Some(node) = declaration {
+            if self
+                .checker
+                .parameter_requires_implicit_undefined(node, None)?
+            {
+                ty = self
+                    .checker
+                    .get_union_type(&[ty, self.checker.builtins.undefined_type])?;
+            }
+        }
         let annotation = self.type_node(ty)?;
         let name = match source_name {
             Some(name) => self.clone_binding_name(name)?,
@@ -181,87 +189,7 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.cloneBindingName
     fn clone_binding_name(&mut self, source: NodeId) -> Result<NodeId, Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.clone_binding_name_worker(source)
-        })
-    }
-
-    fn clone_binding_name_worker(&mut self, source: NodeId) -> Result<NodeId, Error> {
-        let read = self.checker.ast(source)?.node(source)?;
-        let kind = read.kind();
-        let result = match kind.known() {
-            Some(K::Identifier) => self.ast.new_identifier(
-                self.checker
-                    .ast(source)?
-                    .node_text(source)?
-                    .into_js_string(),
-            ),
-            Some(K::QualifiedName) => {
-                let right = read
-                    .data_source()
-                    .as_qualified_name()
-                    .and_then(|data| data.right())
-                    .ok_or(Error::MissingLink("qualified parameter name"))?;
-                return self.clone_binding_name(right);
-            }
-            Some(K::StringLiteral) => {
-                let flags = read
-                    .data_source()
-                    .as_string_literal()
-                    .ok_or(Error::MissingLink("binding string name"))?
-                    .token_flags();
-                self.ast.new_string_literal(
-                    self.checker
-                        .ast(source)?
-                        .node_text(source)?
-                        .into_js_string(),
-                    flags,
-                )
-            }
-            Some(K::NumericLiteral) => self.ast.new_numeric_literal(
-                self.checker
-                    .ast(source)?
-                    .node_text(source)?
-                    .into_js_string(),
-                0,
-            ),
-            Some(K::ArrayBindingPattern | K::ObjectBindingPattern) => {
-                let source_elements = self.checker.source_list(source, read.element_list())?;
-                let mut elements = Vec::with_capacity(source_elements.len());
-                for element in source_elements {
-                    elements.push(self.clone_binding_name(element)?);
-                }
-                let elements = self.list(elements)?;
-                self.ast.new_binding_pattern(kind, Some(elements))
-            }
-            Some(K::BindingElement) => {
-                let data = read
-                    .data_source()
-                    .as_binding_element()
-                    .ok_or(Error::MissingLink("binding element"))?;
-                let (rest, property, name) = (
-                    data.dot_dot_dot_token().is_some(),
-                    data.property_name(),
-                    data.name(),
-                );
-                let rest = rest.then(|| self.ast.new_token(K::DotDotDotToken.into()));
-                let property = property
-                    .map(|node| self.clone_binding_name(node))
-                    .transpose()?;
-                let name = name.map(|node| self.clone_binding_name(node)).transpose()?;
-                self.ast.new_binding_element(rest, property, name, None)
-            }
-            _ => {
-                return Err(Error::Unsupported(
-                    "cloneBindingName: computed name tracking/expression",
-                ))
-            }
-        };
-        self.emit.set_emit_flags(
-            result,
-            emit_flags::SINGLE_LINE | emit_flags::NO_ASCII_ESCAPING,
-        );
-        Ok(result)
+        self.clone_binding_name_native(source)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.signatureToSignatureDeclarationHelper
@@ -272,8 +200,20 @@ impl NodeBuilder<'_> {
         name: Option<NodeId>,
         question: Option<NodeId>,
     ) -> Result<NodeId, Error> {
+        self.with_expanded_signature_scope(signature, |b, expanded| {
+            b.signature_node_worker(signature, kind, name, question, expanded)
+        })
+    }
+
+    fn signature_node_worker(
+        &mut self,
+        signature: SignatureId,
+        kind: K,
+        name: Option<NodeId>,
+        question: Option<NodeId>,
+        expanded: &[SymbolId],
+    ) -> Result<NodeId, Error> {
         let sig = self.checker.signatures.get(signature)?.clone();
-        let expanded = self.checker.expanded_signature_parameters(signature)?;
         self.approximate_length += 3;
         let mut type_parameters = Vec::new();
         for &ty in sig.type_parameters.as_deref().unwrap_or_default() {
@@ -290,11 +230,19 @@ impl NodeBuilder<'_> {
                 parameters.push(self.parameter_node(this)?);
             }
         }
-        for parameter in expanded {
+        for &parameter in expanded {
             parameters.push(self.parameter_node(parameter)?);
         }
         let parameters = self.list(parameters)?;
-        let return_type = self.checker.return_type_of_signature(signature)?;
+        let mut return_type = self.checker.return_type_of_signature(signature)?;
+        if let Some(declaration) = sig.declaration {
+            if self.checker.ast(declaration)?.node(declaration)?.flags()
+                & ts_ast::node_flags::SYNTHESIZED
+                == 0
+            {
+                return_type = self.checker.instantiate_type(return_type, self.mapper)?;
+            }
+        }
         let return_type = match self.checker.type_predicate_of_signature(signature)? {
             Some(predicate) => self.predicate_node(predicate)?,
             None => self.type_node(return_type)?,
@@ -326,6 +274,24 @@ impl NodeBuilder<'_> {
                 type_parameters,
                 Some(parameters),
                 Some(return_type),
+            ),
+            K::GetAccessor => self.ast.new_get_accessor_declaration(
+                None,
+                name,
+                None,
+                Some(parameters),
+                Some(return_type),
+                None,
+                None,
+            ),
+            K::SetAccessor => self.ast.new_set_accessor_declaration(
+                None,
+                name,
+                None,
+                Some(parameters),
+                None,
+                None,
+                None,
             ),
             K::MethodSignature => self.ast.new_method_signature_declaration(
                 None,
@@ -392,8 +358,15 @@ impl NodeBuilder<'_> {
         &mut self,
         predicate: crate::TypePredicateId,
     ) -> Result<NodeId, Error> {
-        use crate::TypePredicateKind as Kind;
         let data = self.checker.signatures.predicate(predicate)?.clone();
+        self.predicate_data_node(data)
+    }
+
+    pub(super) fn predicate_data_node(
+        &mut self,
+        data: crate::TypePredicate,
+    ) -> Result<NodeId, Error> {
+        use crate::TypePredicateKind as Kind;
         let asserts = matches!(data.kind, Kind::AssertsThis | Kind::AssertsIdentifier)
             .then(|| self.ast.new_token(K::AssertsKeyword.into()));
         let name = if matches!(data.kind, Kind::Identifier | Kind::AssertsIdentifier) {
@@ -412,26 +385,150 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.addPropertyToElementList
     pub(super) fn property_elements(&mut self, symbol: SymbolId) -> Result<Vec<NodeId>, Error> {
-        let value = self.checker.symbol(symbol)?;
-        if value.flags() & (sf::METHOD | sf::FUNCTION) == 0 {
-            return self.property(symbol).map(|node| vec![node]);
+        let flags = self.checker.symbol(symbol)?.flags();
+        let placeholder = self.reverse_property_placeholder(symbol)?;
+        let ty = if placeholder {
+            self.checker.builtins.any_type
+        } else {
+            self.checker.get_type_of_symbol(symbol)?
+        };
+        let ty = self.without_missing(ty, flags & sf::OPTIONAL != 0)?;
+        self.approximate_length += self.checker.symbol(symbol)?.name_bytes().len() + 1;
+        if flags & sf::ACCESSOR != 0 {
+            let write = self.checker.write_type_of_symbol(symbol)?;
+            if ty != self.checker.builtins.error_type && write != self.checker.builtins.error_type {
+                let declarations: Vec<_> = self
+                    .checker
+                    .symbol_declarations(symbol)?
+                    .iter()
+                    .flatten()
+                    .collect();
+                let mut property = None;
+                for &node in &declarations {
+                    if self.checker.ast(node)?.node(node)?.kind() == K::PropertyDeclaration {
+                        property = Some(node);
+                        break;
+                    }
+                }
+                let class = self
+                    .checker
+                    .parent_of_symbol(symbol)?
+                    .map(|parent| {
+                        self.checker
+                            .symbol(parent)
+                            .map(|read| read.flags() & sf::CLASS != 0)
+                    })
+                    .transpose()?
+                    .unwrap_or(false);
+                if ty != write || class && property.is_none() {
+                    let mapper = self
+                        .checker
+                        .value_symbol_links
+                        .try_get(symbol)
+                        .and_then(|links| links.mapper);
+                    let mut nodes = Vec::new();
+                    for kind in [K::GetAccessor, K::SetAccessor] {
+                        let mut declaration = None;
+                        for &node in &declarations {
+                            if self.checker.ast(node)?.node(node)?.kind() == kind {
+                                declaration = Some(node);
+                                break;
+                            }
+                        }
+                        if let Some(declaration) = declaration {
+                            let mut signature =
+                                self.checker.signature_from_declaration(declaration)?;
+                            if let Some(mapper) = mapper {
+                                signature =
+                                    self.checker.instantiate_signature(signature, mapper)?;
+                            }
+                            let name = self.property_name_node(symbol)?;
+                            nodes.push(self.signature_node(signature, kind, Some(name), None)?);
+                        }
+                    }
+                    return Ok(nodes);
+                }
+                if class
+                    && property
+                        .map(|node| {
+                            self.checker
+                                .ast(node)?
+                                .node(node)?
+                                .modifier_flags(self.checker.ast(node)?)
+                                .map(|flags| flags & ts_ast::modifier_flags::ACCESSOR != 0)
+                                .map_err(Error::from)
+                        })
+                        .transpose()?
+                        .unwrap_or(false)
+                {
+                    let getter = self.checker.signatures.new_signature(
+                        0,
+                        None,
+                        None,
+                        None,
+                        None,
+                        Some(ty),
+                        None,
+                        0,
+                    )?;
+                    let parameter = self.checker.new_symbol(
+                        sf::FUNCTION_SCOPED_VARIABLE,
+                        JsString::from_bytes(b"arg".to_vec()),
+                    )?;
+                    self.checker
+                        .value_symbol_links
+                        .get_or_default(parameter)
+                        .resolved_type = Some(write);
+                    let setter = self.checker.signatures.new_signature(
+                        0,
+                        None,
+                        None,
+                        None,
+                        Some(vec![parameter].into()),
+                        Some(self.checker.builtins.void_type),
+                        None,
+                        0,
+                    )?;
+                    let name = self.property_name_node(symbol)?;
+                    let getter = self.signature_node(getter, K::GetAccessor, Some(name), None)?;
+                    let name = self.property_name_node(symbol)?;
+                    let setter = self.signature_node(setter, K::SetAccessor, Some(name), None)?;
+                    return Ok(vec![getter, setter]);
+                }
+            }
         }
-        let text = self.symbol_name(symbol)?;
-        let optional = value.flags() & sf::OPTIONAL != 0;
-        let ty = self.checker.get_type_of_symbol(symbol)?;
-        let signatures = self.checker.signatures_of_type(ty, false)?;
-        let mut result = Vec::new();
-        for signature in signatures {
-            let name = self.ast.new_identifier(text.clone());
-            let question = optional.then(|| self.ast.new_token(K::QuestionToken.into()));
-            result.push(self.signature_node(
-                signature,
-                K::MethodSignature,
-                Some(name),
-                question,
-            )?);
+        if flags & (sf::METHOD | sf::FUNCTION) != 0
+            && (self.checker.types.flags(ty)? & crate::type_flags::OBJECT == 0
+                || self.checker.get_properties_of_type(ty)?.is_empty())
+            && !self.checker.is_readonly_symbol(symbol)?
+        {
+            let ty = self
+                .checker
+                .map_type(ty, &mut |checker, part| {
+                    Ok(
+                        (checker.types.flags(part)? & crate::type_flags::UNDEFINED == 0)
+                            .then_some(part),
+                    )
+                })?
+                .unwrap_or(self.checker.builtins.never_type);
+            let signatures = self.checker.signatures_of_type(ty, false)?;
+            let mut nodes = Vec::new();
+            for signature in signatures {
+                let name = self.property_name_node(symbol)?;
+                let question = (flags & sf::OPTIONAL != 0)
+                    .then(|| self.ast.new_token(K::QuestionToken.into()));
+                nodes.push(self.signature_node(
+                    signature,
+                    K::MethodSignature,
+                    Some(name),
+                    question,
+                )?);
+            }
+            if !nodes.is_empty() || flags & sf::OPTIONAL == 0 {
+                return Ok(nodes);
+            }
         }
-        Ok(result)
+        self.property(symbol).map(|node| vec![node])
     }
 }
 

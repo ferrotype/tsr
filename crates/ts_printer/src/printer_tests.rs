@@ -466,12 +466,12 @@ fn printer_matches_the_pinned_go_printer_on_every_case() {
         let name = case["name"].as_str().expect("case name");
         assert_eq!(Some(name), row["name"].as_str());
         let counters = Counters::new();
+        let mut context = EmitContext::new();
         let mut ast = AstBuilder::with_hooks(
             SourceText::from_bytes(&b""[..]),
             &counters,
-            EmitContext::factory_hooks(),
+            context.factory_hooks(),
         );
-        let mut context = EmitContext::new();
         let node = Builder {
             ast: &mut ast,
             context: &mut context,

@@ -200,7 +200,7 @@ impl CheckerState {
                 self.value_symbol_links.get_or_default(symbol).write_type = Some(ty);
                 return Ok(ty);
             }
-            return Err(Error::Unsupported("getWriteTypeOfAccessors"));
+            return self.write_type_of_accessors(symbol);
         }
         self.get_type_of_symbol(symbol)
     }

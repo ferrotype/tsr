@@ -266,3 +266,42 @@ pub(crate) fn build_info_file(
     };
     [base.as_slice(), b".tsbuildinfo"].concat()
 }
+
+/// Unconditional workers used by import-map inversion, regardless of emit flags.
+// port: tsc/internal/outputpaths/outputpaths.go:GetOutputJSFileNameWorker
+// port: tsc/internal/outputpaths/outputpaths.go:GetOutputDeclarationFileNameWorker
+pub(crate) fn module_specifier_output_name(
+    file: &[u8],
+    program: &Program,
+    common: &[u8],
+    declaration: bool,
+) -> Vec<u8> {
+    let options = program.options();
+    let directory = if declaration && !options.declaration_dir.is_empty() {
+        &options.declaration_dir
+    } else {
+        &options.out_dir
+    };
+    let output = if directory.is_empty() {
+        file.to_vec()
+    } else {
+        path::resolve(
+            directory.as_bytes(),
+            &[&path::relative_from_directory(
+                common,
+                file,
+                program.current_directory(),
+                program.host().use_case_sensitive_file_names(),
+            )],
+        )
+    };
+    if declaration {
+        declaration_extension(&output)
+    } else {
+        [
+            path::remove_file_extension(&output),
+            output_extension(file, options.jsx),
+        ]
+        .concat()
+    }
+}

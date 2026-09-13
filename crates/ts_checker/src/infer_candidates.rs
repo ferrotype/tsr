@@ -271,9 +271,7 @@ impl CheckerState {
     pub(crate) fn base_literal_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
         let flags = self.types.flags(ty)?;
         if flags & tf::ENUM_LIKE != 0 {
-            return Err(Error::Unsupported(
-                "getBaseTypeOfLiteralType: enum declaration",
-            ));
+            return self.base_type_of_enum_like(ty);
         }
         if flags & (tf::STRING_LITERAL | tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0 {
             return Ok(self.builtins.string_type);
@@ -304,14 +302,6 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getWidenedTypeWithContext
     pub(crate) fn widened_inference_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
-        if self.types.object_flags(ty)? & of::REQUIRES_WIDENING == 0 {
-            return Ok(ty);
-        }
-        if self.types.flags(ty)? & (tf::ANY | tf::NULLABLE) != 0 {
-            return Ok(self.builtins.any_type);
-        }
-        Err(Error::Unsupported(
-            "getWidenedType: object literal widening context",
-        ))
+        self.widened_type(ty)
     }
 }

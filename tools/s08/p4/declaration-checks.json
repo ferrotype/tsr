@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "scope": "S08 P4 duplicate declarations, unreachable spans, shadowing and lazy TypeScript comments; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowUnreachableCode": false
+  },
+  "programs": [
+    {
+      "id": "union-duplicate",
+      "files": {
+        "/case.ts": "type U = { a: string; a: number } | string;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "union-missing",
+      "files": {
+        "/case.ts": "type U = { a: Missing } | string;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "interface-conflict",
+      "files": {
+        "/case.ts": "interface I { a: string } interface I { a: number }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "optional-conflict",
+      "files": {
+        "/case.ts": "interface I { a?: string } interface I { a: string }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "var-conflict",
+      "files": {
+        "/case.ts": "var a: string; var a: number;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "var-initializer",
+      "files": {
+        "/case.ts": "var a: number = 1; var a: number = \"bad\";\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "parameter-redeclare",
+      "files": {
+        "/case.ts": "function f(a: number) { var a: number; return a; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "var-block-shadow",
+      "files": {
+        "/case.ts": "function f() { var a = 1; { let a = 2; var a = 3; } return a; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "var-top-level-shadow",
+      "files": {
+        "/case.ts": "let a=1; var a=2;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "unreachable-span",
+      "files": {
+        "/case.ts": "function f() { return 1; const a = 2; a; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "unreachable-if",
+      "files": {
+        "/case.ts": "function f() { if (true) return 1; else { const a=2; a; } return 3; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "unreachable-declarations",
+      "files": {
+        "/case.ts": "function f(){return; const enum E { A } interface I{} function g(){} var x; var y=1;}\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "comments-lazy",
+      "files": {
+        "/case.ts": "/** Documentation: {@link Missing} */\nfunction f(a:number){return a;}\n/** @type {Missing} ignored in TS */\nconst x=1; type X=typeof x;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-accessors",
+      "files": {
+        "/case.ts": "class C { get a(){return 1;} set a(v:number){} a=2; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "private-static-collision",
+      "files": {
+        "/case.ts": "class C { #x=1; static #x=2; }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Probe",
+          "declaration": "Probe",
+          "file": "/case.ts",
+          "operation": "declared_type",
+          "target": "name"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

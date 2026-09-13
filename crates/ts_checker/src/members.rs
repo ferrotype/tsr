@@ -65,6 +65,16 @@ impl CheckerState {
         name: &[u8],
         skip_augment: bool,
     ) -> Result<Option<SymbolId>, Error> {
+        self.constituent_property_ex(ty, name, skip_augment, false)
+    }
+
+    pub(crate) fn constituent_property_ex(
+        &mut self,
+        ty: TypeId,
+        name: &[u8],
+        skip_augment: bool,
+        include_type_only: bool,
+    ) -> Result<Option<SymbolId>, Error> {
         let ty = self.reduced_apparent_type(ty)?;
         let flags = self.types.flags(ty)?;
         if flags & tf::INTERSECTION != 0 {
@@ -85,7 +95,7 @@ impl CheckerState {
             self.apparent_primitive_type(ty)?
         };
         if let Some(ty) = object {
-            if let Some(prop) = self.object_property(ty, name)? {
+            if let Some(prop) = self.object_property(ty, name, include_type_only)? {
                 return Ok(Some(prop));
             }
             if skip_augment {
@@ -104,13 +114,13 @@ impl CheckerState {
             if let Some(function) =
                 function.and_then(|name| self.query.global_types.get(name).copied())
             {
-                if let Some(property) = self.object_property(function, name)? {
+                if let Some(property) = self.object_property(function, name, false)? {
                     return Ok(Some(property));
                 }
             }
             if let Some(&object) = self.query.global_types.get("Object") {
                 if object != ty {
-                    return self.object_property(object, name);
+                    return self.object_property(object, name, false);
                 }
             }
         }
@@ -118,7 +128,12 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getPropertyOfObjectType
-    fn object_property(&mut self, ty: TypeId, name: &[u8]) -> Result<Option<SymbolId>, Error> {
+    fn object_property(
+        &mut self,
+        ty: TypeId,
+        name: &[u8],
+        include_type_only: bool,
+    ) -> Result<Option<SymbolId>, Error> {
         self.resolve_type_members(ty)?;
         let Some(table) = self.types.structured(ty)?.members else {
             return Ok(None);
@@ -126,7 +141,22 @@ impl CheckerState {
         let Some(prop) = self.table(table)?.get(name).flatten() else {
             return Ok(None);
         };
-        Ok((self.symbol(prop)?.flags() & sf::VALUE != 0).then_some(prop))
+        if !include_type_only {
+            if let Some(symbol) = self.types.get(ty)?.symbol {
+                if self.symbol(symbol)?.flags() & sf::VALUE_MODULE != 0
+                    && self
+                        .module_aliases
+                        .type_only_exports
+                        .get(&symbol)
+                        .is_some_and(|table| table.contains_key(name))
+                {
+                    return Ok(None);
+                }
+            }
+        }
+        Ok(self
+            .symbol_is_value_ex(prop, include_type_only)?
+            .then_some(prop))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getPropertyOfUnionOrIntersectionType

@@ -95,10 +95,16 @@ impl CheckerState {
     ) -> Result<TypeList, Error> {
         let read = self.ast(node)?.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE != 0 {
-            return Err(Error::Unsupported(
-                "getTypeParametersFromDeclaration: JSDoc",
-            ));
+            if let Some(signature) = self.signature_of_full_signature(node)? {
+                return Ok(self
+                    .signatures
+                    .get(signature)?
+                    .type_parameters
+                    .clone()
+                    .unwrap_or_default());
+            }
         }
+        let read = self.ast(node)?.node(node)?;
         let nodes = self.source_list(node, read.type_parameter_list())?;
         let mut result = Vec::with_capacity(nodes.len());
         for node in nodes {

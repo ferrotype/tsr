@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "request_sha256": "4e33c50c0935ddbbb47327d3b5347453a10057ac60f248ae9b2b2b225f7d731b",
+  "native_sha256": "911abdc8ee268be27deebcd294e2d0d403e5ce21886c8651b8b8d5ec357f9536",
+  "pending_cases": {},
+  "pending_protocol": [
+    "post_action_display",
+    "post_action_union_ordering",
+    "final_state",
+    "source_and_global_diagnostics"
+  ]
+}

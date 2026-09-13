@@ -1,8 +1,9 @@
-//! Numeric text conversions used by the scanner. Arithmetic is a later slice.
+//! Numeric text conversions and JavaScript arithmetic used by the scanner and checker.
 //!
 //! Inputs retain Go string bytes. Float and bigint libraries are called only
 //! after the pinned Go grammar has accepted their input; see `SLICE.md`.
 
+mod arithmetic;
 mod bigint;
 mod pseudobigint;
 mod string;

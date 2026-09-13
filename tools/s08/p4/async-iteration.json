@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "scope": "S08 P4 asynchronous iterator protocol and async-from-sync conversion",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "async-iterator-structural",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor;interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface Iterator<T,R=any,N=any>{next(value?:N):{done?:false,value:T}|{done:true,value:R};}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<{done?:false,value:T}|{done:true,value:R}>;} async function f(input:{[Symbol.asyncIterator]():{next():Promise<{done:false,value:number}>}}){for await(const value of input)return value;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-from-sync",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor;interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface Iterator<T,R=any,N=any>{next(value?:N):{done?:false,value:T}|{done:true,value:R};}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<{done?:false,value:T}|{done:true,value:R}>;} async function f(input:{[Symbol.iterator]():{next():{done:false,value:Promise<string>}}}){for await(const value of input)return value;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-iterator-missing",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor;interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface Iterator<T,R=any,N=any>{next(value?:N):{done?:false,value:T}|{done:true,value:R};}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<{done?:false,value:T}|{done:true,value:R}>;} async function f(input:{[Symbol.asyncIterator]():{return():Promise<{value:number}>}}){for await(const value of input)return value;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-iterator-bad-result",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor;interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface Iterator<T,R=any,N=any>{next(value?:N):{done?:false,value:T}|{done:true,value:R};}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<{done?:false,value:T}|{done:true,value:R}>;} async function f(input:{[Symbol.asyncIterator]():{next():Promise<number>}}){for await(const value of input)return value;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-iterator-return",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor;interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface Iterator<T,R=any,N=any>{next(value?:N):{done?:false,value:T}|{done:true,value:R};}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<{done?:false,value:T}|{done:true,value:R}>;} async function f(input:AsyncIterable<Promise<string>,number,undefined>){for await(const value of input)return value;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

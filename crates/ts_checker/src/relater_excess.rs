@@ -3,6 +3,9 @@ use crate::{
     relater::{Relater, RelationKind},
     type_flags as tf, CheckerState, Error, TypeId,
 };
+use ts_arena::{NodeId, SymbolId};
+use ts_ast::{symbol_flags as sf, JsString, SymbolFlags, SyntaxKind as K};
+use ts_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:isExcessPropertyCheckTarget
@@ -111,6 +114,7 @@ impl Relater<'_> {
         &mut self,
         source: TypeId,
         target: TypeId,
+        report: bool,
     ) -> Result<bool, Error> {
         let record = *self.checker.types.get(source)?;
         if record.object_flags & (of::OBJECT_LITERAL | of::FRESH_LITERAL)
@@ -178,6 +182,9 @@ impl Relater<'_> {
                 continue;
             }
             if !self.checker.known_property(reduced, name.as_bytes(), jsx)? {
+                if report {
+                    self.report_excess_property(property, declaration, container, reduced, jsx)?;
+                }
                 return Ok(true);
             }
             if union {
@@ -206,11 +213,165 @@ impl Relater<'_> {
                 }
                 let target = self.checker.get_union_type(&types)?;
                 let source = self.checker.get_type_of_symbol(property)?;
-                if self.related(source, target, crate::relater::BOTH, 0)? == crate::ternary::FALSE {
+                if self.related_with_errors(source, target, crate::relater::BOTH, 0, report)?
+                    == crate::ternary::FALSE
+                {
+                    if report {
+                        let text = self.checker.symbol_to_string(property)?;
+                        self.report_error(d::Types_of_property_0_are_incompatible, vec![text]);
+                    }
                     return Ok(true);
                 }
             }
         }
         Ok(false)
+    }
+
+    /// The error branch of `hasExcessProperties`: the diagnostic is reported in
+    /// terms of the object constituents of the target, at the offending property
+    /// when it is written inside the literal itself.
+    fn report_excess_property(
+        &mut self,
+        property: SymbolId,
+        declaration: NodeId,
+        container: SymbolId,
+        reduced: TypeId,
+        jsx: bool,
+    ) -> Result<(), Error> {
+        // Report error in terms of object types in the target as those are the only ones
+        // we check in isKnownProperty.
+        let error_target = self.checker.filter_type(reduced, &mut |checker, part| {
+            checker.excess_check_target(part)
+        })?;
+        let error_node = self
+            .errors
+            .error_node
+            .ok_or(Error::MissingLink("No errorNode in hasExcessProperties"))?;
+        let error_read = self.checker.ast(error_node)?.node(error_node)?;
+        let jsx_error = jsx
+            || ts_ast::is_jsx_attributes(&error_read)
+            || ts_ast::utilities_middle::is_jsx_opening_like_element(&error_read)
+            || error_read
+                .parent()
+                .map(|parent| {
+                    Ok::<_, Error>(ts_ast::utilities_middle::is_jsx_opening_like_element(
+                        &self.checker.ast(parent)?.node(parent)?,
+                    ))
+                })
+                .transpose()?
+                .unwrap_or(false);
+        if jsx_error {
+            return Err(Error::Unsupported("hasExcessProperties: JSX attributes"));
+        }
+        // use the property's value declaration if the property is assigned inside the literal itself
+        let object_literal_declaration = self
+            .checker
+            .symbol_declarations(container)?
+            .get(0)
+            .flatten();
+        let view = self.checker.ast(declaration)?;
+        let declaration_read = view.node(declaration)?;
+        let mut suggestion = None;
+        if let Some(literal) = object_literal_declaration {
+            if ts_ast::utilities::is_object_literal_element(&declaration_read)
+                && ts_ast::utilities::find_ancestor(view, Some(declaration), |node| {
+                    node.id() == literal
+                })?
+                .is_some()
+                && ts_ast::utilities::get_source_file_of_node(view, Some(literal))?
+                    == ts_ast::utilities::get_source_file_of_node(
+                        self.checker.ast(error_node)?,
+                        Some(error_node),
+                    )?
+            {
+                let name = declaration_read
+                    .name()
+                    .ok_or(Error::MissingLink("object literal element name"))?;
+                self.errors.error_node = Some(name);
+                if view.node(name)?.kind() == K::Identifier {
+                    let text = view.node_text(name)?.into_js_string();
+                    suggestion = self
+                        .checker
+                        .suggestion_for_nonexistent_property(text.as_bytes(), error_target)?;
+                }
+            }
+        }
+        let property_name = self.checker.symbol_to_string(property)?;
+        let target_name = self
+            .checker
+            .type_to_string(error_target, crate::type_display::DEFAULT_FLAGS)?;
+        if let Some(suggestion) = suggestion {
+            self.report_error(
+                d::Object_literal_may_only_specify_known_properties_but_0_does_not_exist_in_type_1_Did_you_mean_to_write_2,
+                vec![property_name, target_name, suggestion],
+            );
+        } else {
+            self.report_error(
+                d::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1,
+                vec![property_name, target_name],
+            );
+        }
+        Ok(())
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.getSuggestionForNonexistentProperty
+    pub(crate) fn suggestion_for_nonexistent_property(
+        &mut self,
+        name: &[u8],
+        containing: TypeId,
+    ) -> Result<Option<JsString>, Error> {
+        let properties = self.get_properties_of_type(containing)?;
+        match self.spelling_suggestion_for_name(name, &properties, sf::VALUE)? {
+            Some(symbol) => Ok(Some(self.symbol(symbol)?.name_to_owned())),
+            None => Ok(None),
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getSpellingSuggestionForName
+    pub(crate) fn spelling_suggestion_for_name(
+        &mut self,
+        name: &[u8],
+        symbols: &[SymbolId],
+        meaning: SymbolFlags,
+    ) -> Result<Option<SymbolId>, Error> {
+        let mut candidates: Vec<(JsString, SymbolId)> = Vec::with_capacity(symbols.len());
+        for &candidate in symbols {
+            let candidate_name = self.ast_symbol_name(candidate)?;
+            let bytes = candidate_name.as_bytes();
+            if bytes.is_empty() || bytes[0] == b'"' || bytes[0] == 0xFE {
+                continue;
+            }
+            let flags = self.symbol(candidate)?.flags();
+            let matches_meaning = flags & meaning != 0
+                || flags & sf::ALIAS != 0 && {
+                    let alias = self.resolve_alias(candidate)?;
+                    alias != self.builtins.unknown_symbol
+                        && self.symbol(alias)?.flags() & meaning != 0
+                };
+            if matches_meaning {
+                candidates.push((candidate_name, candidate));
+            }
+        }
+        let failure = std::cell::Cell::new(None);
+        let result = ts_scanner::get_spelling_suggestion(
+            name,
+            candidates.iter(),
+            |entry| entry.0.as_bytes(),
+            |a, b| match self.compare_symbols(Some(a.1), Some(b.1)) {
+                Ok(order) => order,
+                Err(error) => {
+                    failure.set(Some(error));
+                    std::cmp::Ordering::Equal
+                }
+            },
+            0,
+        )
+        .map(|entry| entry.1);
+        if let Some(error) = failure.into_inner() {
+            return Err(error);
+        }
+        Ok(result)
     }
 }

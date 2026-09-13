@@ -294,14 +294,18 @@ impl CheckerState {
     /// ones; each group is sorted with the ported symbol comparator.
     // port: tsc/internal/checker/checker.go:Checker.getNamedMembers
     pub(crate) fn get_named_members(
-        &self,
+        &mut self,
         members: Option<SymbolTableId>,
         container: Option<SymbolId>,
     ) -> Result<Option<SymbolList>, Error> {
         let Some(members) = members else {
             return Ok(None);
         };
-        let table = self.table(members)?;
+        let table: Vec<_> = self
+            .table(members)?
+            .into_iter()
+            .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
+            .collect();
         if table.is_empty() {
             return Ok(None);
         }
@@ -315,9 +319,10 @@ impl CheckerState {
         let mut result = Vec::with_capacity(table.len());
         let mut contained_count = 0;
         if container_is_class_like {
-            for (id, symbol) in table {
+            for (id, symbol) in &table {
+                let symbol = *symbol;
                 let Some(symbol) = symbol else { continue };
-                if self.is_named_member(symbol, id)?
+                if self.is_named_member(symbol, id.as_bytes())?
                     && self.is_declaration_contained_by(
                         symbol,
                         container.expect("class-like container"),
@@ -328,9 +333,10 @@ impl CheckerState {
             }
             contained_count = result.len();
         }
-        for (id, symbol) in table {
+        for (id, symbol) in &table {
+            let symbol = *symbol;
             let Some(symbol) = symbol else { continue };
-            if self.is_named_member(symbol, id)?
+            if self.is_named_member(symbol, id.as_bytes())?
                 && (!container_is_class_like
                     || !self.is_declaration_contained_by(
                         symbol,
@@ -346,30 +352,27 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isNamedMember
-    pub(crate) fn is_named_member(&self, symbol: SymbolId, id: &[u8]) -> Result<bool, Error> {
+    pub(crate) fn is_named_member(&mut self, symbol: SymbolId, id: &[u8]) -> Result<bool, Error> {
         Ok(!is_reserved_member_name(id) && self.symbol_is_value(symbol)?)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.symbolIsValue
-    pub(crate) fn symbol_is_value(&self, symbol: SymbolId) -> Result<bool, Error> {
+    pub(crate) fn symbol_is_value(&mut self, symbol: SymbolId) -> Result<bool, Error> {
         self.symbol_is_value_ex(symbol, false)
     }
 
-    /// Alias symbols need `getSymbolFlagsEx`, which resolves aliases (P2).
     // port: tsc/internal/checker/checker.go:Checker.symbolIsValueEx
     pub(crate) fn symbol_is_value_ex(
-        &self,
+        &mut self,
         symbol: SymbolId,
-        _include_type_only_members: bool,
+        include_type_only_members: bool,
     ) -> Result<bool, Error> {
         let flags = self.symbol(symbol)?.flags();
-        if flags & symbol_flags::VALUE != 0 {
-            return Ok(true);
-        }
-        if flags & symbol_flags::ALIAS != 0 {
-            return Err(Error::Unsupported("getSymbolFlagsEx"));
-        }
-        Ok(false)
+        Ok(flags & symbol_flags::VALUE != 0
+            || flags & symbol_flags::ALIAS != 0
+                && self.module_symbol_flags(symbol, !include_type_only_members, false)?
+                    & symbol_flags::VALUE
+                    != 0)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isDeclarationContainedBy

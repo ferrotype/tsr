@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "scope": "S08 P4 JSDoc signature argument-reference and deprecation edges",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "jsdoc-arguments-scalar",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @param {string} tail */ export function f(){return arguments[0];}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-arguments-array",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @param {number[]} tail */ export function f(){return arguments[0];}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-arguments-shadow",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @param {string} missing */ export function f(arguments){return arguments[0];}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-arguments-nested",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @param {string} missing */ export function f(){const nested=()=>arguments[0];return nested;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-deprecated-call",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @deprecated replace this function @param {number} n */ export function f(n){return n;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-qualified-param",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface IArguments{length:number;[n:number]:any;}interface String{length:number;}",
+        "/jsdoc.js": "/** @param {number} foo.x */ export function f(value){return value;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f; const x=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

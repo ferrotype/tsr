@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "scope": "S08 P4 contextual this for object methods, nested ThisType markers and assigned functions",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "context-this-method",
+      "files": {
+        "/context-this-method.ts": "const obj={x:1,f(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-method.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-method.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-function",
+      "files": {
+        "/context-this-function.ts": "const obj={x:\"x\",f:function(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-function.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-function.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-getter",
+      "files": {
+        "/context-this-getter.ts": "const obj={x:1,get value(){return this.x;}};const Query=obj.value;\n"
+      },
+      "roots": [
+        "/context-this-getter.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-getter.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-setter",
+      "files": {
+        "/context-this-setter.ts": "const obj={x:1,set value(v:number){this.x=v;}};const Query=obj;\n"
+      },
+      "roots": [
+        "/context-this-setter.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-setter.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-annotated",
+      "files": {
+        "/context-this-annotated.ts": "const obj:{x:number,f():number}={x:1,f(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-annotated.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-annotated.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-explicit",
+      "files": {
+        "/context-this-explicit.ts": "const obj:{f(this:{x:string}):string}={f(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-explicit.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-explicit.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-marker",
+      "files": {
+        "/context-this-marker.ts": "interface ThisType<T>{} const obj:{f():number}&ThisType<{x:number}>={f(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-marker.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-marker.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-marker-error",
+      "files": {
+        "/context-this-marker-error.ts": "interface ThisType<T>{} const obj:{f():number}&ThisType<{x:string}>={f(){return this.x;}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-marker-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-marker-error.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-nested-marker",
+      "files": {
+        "/context-this-nested-marker.ts": "interface ThisType<T>{} const obj:{nested:{f():number}}&ThisType<{x:number}>={nested:{f(){return this.x;}}};const Query=obj;\n"
+      },
+      "roots": [
+        "/context-this-nested-marker.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-nested-marker.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-union-marker",
+      "files": {
+        "/context-this-union-marker.ts": "interface ThisType<T>{} declare function use(x:({tag:\"a\",f():number}&ThisType<{a:number}>)|({tag:\"b\",f():number}&ThisType<{b:number}>)):void;use({tag:\"a\",f(){return this.a;}});const Query=use;\n"
+      },
+      "roots": [
+        "/context-this-union-marker.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-union-marker.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-arrow",
+      "files": {
+        "/context-this-arrow.ts": "const obj={x:1,f(){const inner=()=>this.x;return inner();}};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-arrow.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-arrow.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-assignment",
+      "files": {
+        "/context-this-assignment.ts": "declare const obj:{x:number,f:()=>number};obj.f=function(){return this.x;};const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-assignment.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-assignment.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-element-assignment",
+      "files": {
+        "/context-this-element-assignment.ts": "declare const obj:{x:string,f:()=>string};obj[\"f\"]=(function(){return this.x;});const Query=obj.f;\n"
+      },
+      "roots": [
+        "/context-this-element-assignment.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-element-assignment.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "context-this-generic-marker",
+      "files": {
+        "/context-this-generic-marker.ts": "interface ThisType<T>{} declare function use<T>(v:T&ThisType<{x:number}>):T;const obj=use({f(){return this.x;}});const Query=obj;\n"
+      },
+      "roots": [
+        "/context-this-generic-marker.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/context-this-generic-marker.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

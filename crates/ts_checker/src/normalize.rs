@@ -92,9 +92,22 @@ impl CheckerState {
         self.types.get_mut(ty)?.object_flags |= of::IDENTICAL_BASE_TYPE_CALCULATED;
         let result = (|| {
             if self.types.get(target)?.object_flags & of::CLASS != 0 {
-                return Err(Error::Unsupported(
-                    "getSingleBaseForNonAugmentingSubtype: class heritage expression",
-                ));
+                if let Some(base) = self.class_base_type_node(target)? {
+                    let expression = self
+                        .ast(base)?
+                        .node(base)?
+                        .expression()
+                        .ok_or(Error::MissingLink("class heritage expression"))?;
+                    if !matches!(
+                        self.ast(expression)?.node(expression)?.kind().known(),
+                        Some(
+                            ts_ast::SyntaxKind::Identifier
+                                | ts_ast::SyntaxKind::PropertyAccessExpression
+                        )
+                    ) {
+                        return Ok(None);
+                    }
+                }
             }
             let bases = self.interface_base_types(target)?;
             if bases.len() != 1 {
@@ -316,6 +329,17 @@ impl CheckerState {
         end_skip: usize,
         writing: bool,
     ) -> Result<Option<TypeId>, Error> {
+        self.tuple_slice_element_type_ex(ty, start, end_skip, writing, false)
+    }
+
+    pub(crate) fn tuple_slice_element_type_ex(
+        &mut self,
+        ty: TypeId,
+        start: usize,
+        end_skip: usize,
+        writing: bool,
+        no_reductions: bool,
+    ) -> Result<Option<TypeId>, Error> {
         let elements = self.element_types(ty)?;
         let infos = self
             .types
@@ -337,7 +361,17 @@ impl CheckerState {
         if writing {
             self.get_intersection_type(&types).map(Some)
         } else {
-            self.get_union_type(&types).map(Some)
+            self.get_union_type_ex(
+                &types,
+                if no_reductions {
+                    crate::UnionReduction::None
+                } else {
+                    crate::UnionReduction::Literal
+                },
+                None,
+                None,
+            )
+            .map(Some)
         }
     }
 }

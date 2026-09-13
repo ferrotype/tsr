@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "scope": "S08 P4 failed overload signature selection and native diagnostic elaboration",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "overload-failure-union",
+      "files": {
+        "/case.ts": "declare function f(x:string):string;declare function f(x:number):number;const a=f(true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-implementation",
+      "files": {
+        "/case.ts": "function f(x:string):string;function f(x:number):number;function f(x:any):any{return x;}const a=f(true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-arity",
+      "files": {
+        "/case.ts": "declare function f(x:string):string;declare function f(x:number,y:number,z:number):number;const a=f();const b=f(1,2);const c=f(1,2,3,4);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "c",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-type-arity",
+      "files": {
+        "/case.ts": "declare function f<T>(x:T):T;declare function f<T,U,V>(x:T):V;const a=f<string,number>(1);const b=f<string,number,boolean,number>(1);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-constraints",
+      "files": {
+        "/case.ts": "declare function f<T extends string>(x:T):T;declare function f<T extends number>(x:T):T;const a=f<boolean>(true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-generic",
+      "files": {
+        "/case.ts": "declare function f<T>(x:T,y:string):T;declare function f<T,U>(x:T,y:U,z:number):U;const a=f(1,2);const b=f(true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-context",
+      "files": {
+        "/case.ts": "declare function f(cb:(x:string)=>string):string;declare function f(cb:(x:number)=>number):number;const a=f(x=>true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-this",
+      "files": {
+        "/case.ts": "declare const f:{(this:{x:number},n:number):number;(this:{x:string},n:string):string};const a=f(1);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "overload-failure-rest",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}declare function f(x:string,...rest:number[]):string;declare function f(x:number,...rest:string[]):number;const a=f(true);"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

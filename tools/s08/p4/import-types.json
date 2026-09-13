@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "scope": "S08 P4 literal import type resolution and qualifier identities",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "named-interface",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Shape;",
+        "/mod.ts": "export interface Shape{value:string;}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-interface",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Box<number>;",
+        "/mod.ts": "export interface Box<T>{value:T;}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-alias",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Box<string>;",
+        "/mod.ts": "export type Box<T>={value:T};"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nested-namespace",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").N.Shape;",
+        "/mod.ts": "export namespace N{export interface Shape{value:string;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "typeof-value",
+      "files": {
+        "/case.ts": "type Query=typeof import(\"./mod\").value;",
+        "/mod.ts": "export const value=42;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "typeof-namespace",
+      "files": {
+        "/case.ts": "type Query=typeof import(\"./mod\");",
+        "/mod.ts": "export const value=42;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "module-as-type",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\");",
+        "/mod.ts": "export const value=42;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-qualifier",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Missing;",
+        "/mod.ts": "export interface Shape{}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nonliteral-argument",
+      "files": {
+        "/case.ts": "type Query=import(number);",
+        "/mod.ts": "export interface Shape{}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "type-arity",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Shape<number>;",
+        "/mod.ts": "export interface Shape{}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-constraint",
+      "files": {
+        "/case.ts": "type Query=import(\"./mod\").Box<number>;",
+        "/mod.ts": "export interface Box<T extends string>{value:T;}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

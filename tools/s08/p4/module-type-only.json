@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "scope": "S08 P4 internal alias type-only provenance and ambient local exports",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "ambient-export-type",
+      "files": {
+        "/case.ts": "declare namespace N { const value:number; export type {value as t}; } type Query=typeof N.t; const bad=N.t;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ambient-specifier-type",
+      "files": {
+        "/case.ts": "declare namespace N { const value:number; export {type value as t}; } type Query=typeof N.t; const bad=N.t;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "internal-import-type",
+      "files": {
+        "/case.ts": "namespace N {export class C {}} import type C=N.C; const bad=C; type Query=C;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "redundant-export-type",
+      "files": {
+        "/case.ts": "declare namespace N { const value:number; export type {type value as t}; } type Query=typeof N.t;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "import-export-type",
+      "files": {
+        "/case.ts": "declare namespace N { const value:number; export type {value as t}; } import A=N.t; const bad=A; type Query=typeof A;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "import-intermediate-type",
+      "files": {
+        "/case.ts": "declare namespace N { namespace Inner {export const value:number;} export type {Inner}; } import A=N.Inner.value; const bad=A; type Query=typeof A;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

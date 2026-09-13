@@ -1,0 +1,421 @@
+{
+  "version": 1,
+  "scope": "P4 import attribute grammar, source types, resolution modes and pattern ambient module selection",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true
+  },
+  "programs": [
+    {
+      "id": "ordinary-values",
+      "files": {
+        "/case.ts": "import {value} from \"./dep\" with { type:\"custom\", flag:\"yes\" }; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "nonstring-value",
+      "files": {
+        "/case.ts": "import {value} from \"./dep\" with { type:1 }; type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "value-resolution-mode",
+      "files": {
+        "/case.ts": "import {value} from \"./dep\" with { \"resolution-mode\":\"require\" }; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "value-invalid-mode",
+      "files": {
+        "/case.ts": "import {value} from \"./dep\" with { \"resolution-mode\":\"other\" }; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "type-resolution-mode",
+      "files": {
+        "/case.ts": "import type {T} from \"./dep\" with { \"resolution-mode\":\"require\" }; type Probe=T;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "type-invalid-mode",
+      "files": {
+        "/case.ts": "import type {T} from \"./dep\" with { \"resolution-mode\":\"other\" }; type Probe=T;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "import-type-mode",
+      "files": {
+        "/case.ts": "type Probe=import(\"./dep\", {with:{\"resolution-mode\":\"import\"}}).T;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "import-type-invalid-mode",
+      "files": {
+        "/case.ts": "type Probe=import(\"./dep\", {with:{\"resolution-mode\":\"other\"}}).T;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-attributes",
+      "files": {
+        "/case.ts": "export {value} from \"./dep\" with {type:\"custom\"}; type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-attributes",
+      "files": {
+        "/case.ts": "import {value} from \"./dep\" with {type:\"a\",type:\"b\"}; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "pattern-selection",
+      "files": {
+        "/case.ts": "import value from \"a.asset\" with {type:\"text\"}; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type:\"css\"} {const value:1;export default value;} declare module \"*.asset\" with {type:\"text\"} {const value:2;export default value;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "pattern-specificity",
+      "files": {
+        "/case.ts": "import value from \"a.asset\" with {type:\"text\", extra:\"x\"}; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type:\"text\"} {const value:1;export default value;} declare module \"*.asset\" with {type:\"text\",extra:\"x\"} {const value:2;export default value;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "pattern-identical-merge",
+      "files": {
+        "/case.ts": "import {a,b} from \"a.asset\" with {type:\"text\"}; type Probe=typeof a | typeof b;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type:\"text\"} {export const a:1;} declare module \"*.asset\" with {type:\"text\"} {export const b:2;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "pattern-missing-attributes",
+      "files": {
+        "/case.ts": "import value from \"a.asset\"; type Probe=typeof value;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type:\"text\"} {const value:1;export default value;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "module-attribute-invalid-key",
+      "files": {
+        "/case.ts": "type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {\"resolution-mode\":\"require\"} {export const x:1;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "module-attribute-optional",
+      "files": {
+        "/case.ts": "type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type?:\"text\"} {export const x:1;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "module-attribute-not-literal",
+      "files": {
+        "/case.ts": "type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {type:string} {export const x:1;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "module-attribute-method",
+      "files": {
+        "/case.ts": "type Probe=number;\n",
+        "/dep.ts": "export const value=1; export type T=string;\n",
+        "/ambient.ts": "declare module \"*.asset\" with {f():string} {export const x:1;}\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/dep.ts",
+        "/ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

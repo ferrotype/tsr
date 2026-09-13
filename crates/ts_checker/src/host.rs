@@ -10,20 +10,33 @@
 //! | Upstream member | Status |
 //! | --- | --- |
 //! | `Options`, `SourceFiles`, `FileExists`, `GetSourceFile`, `IsSourceFileDefaultLibrary`, `CommonSourceDirectory`, `GetCurrentDirectory`, `UseCaseSensitiveFileNames` | In the trait; the loader already has the data |
-//! | `GetSourceFileForResolvedModule`, `GetResolvedModule`, `GetEmitModuleFormatOfFile`, `GetImpliedNodeFormatForEmit`, `GetEmitSyntaxForUsageLocation`, `SourceFileMayBeEmitted` | Implemented by the compiler's retained program adapter |
+//! | `GetSourceFileForResolvedModule`, `GetResolvedModule`, `GetEmitModuleFormatOfFile`, `GetImpliedNodeFormatForEmit`, `GetEmitSyntaxForUsageLocation`, `GetModeForUsageLocation`, `GetDefaultResolutionModeForFile`, `SourceFileMayBeEmitted` | Implemented by the compiler's retained program adapter |
 //! | `BindSourceFiles` | Satisfied by construction: program files are `CompletedFile`s |
 //! | `GetSourceFileMetaData` | In the trait; metadata lives in `ts_ast`, as upstream |
 //! | `GetResolvedModules`, `GetPackagesMap` | P2: whole-map views; add when a caller in the closure needs them |
-//! | `GetJSXRuntimeImportSpecifier`, `GetImportHelpersImportSpecifier` | P2: synthesize nodes through the checker AST factory; JSX is outside the frozen denominator, `importHelpers` is not |
-//! | `GetRedirectForResolution`, `GetProjectReferenceFromOutputDts`, `GetProjectReferenceFromSource`, `GetRedirectTargets`, `GetSourceOfProjectReferenceIfOutputIncluded` | Explicitly unsupported: project references are excluded from the denominator; the implementation must say so, not return `None` |
-//! | `GetSymlinkCache`, `GetPackageJsonInfo`, `GetNearestAncestorDirectoryWithPackageJson`, `GetGlobalTypingsCacheLocation`, `ContentMapperExtensions`, `GetDefaultResolutionModeForFile`, `GetResolvedModuleFromModuleSpecifier`, `GetModeForUsageLocation` | P2, with the node builder's import-type specifier generation |
+//! | `GetJSXRuntimeImportSpecifier` | JSX remains outside the frozen denominator |
+//! | `GetImportHelpersImportSpecifier` | P4: checker consumes the synthetic import as its retained `tslib` reference and host-computed import resolution mode; no synthetic syntax escapes the compiler |
+//! | `GetRedirectTargets`, `GetSourceOfProjectReferenceIfOutputIncluded` | P4: package-identity redirects feed the module paths; project references remain rejected by loading |
+//! | `GetRedirectForResolution`, `GetProjectReferenceFromSource`, `GetProjectReferenceFromOutputDts` | P4: the compiler adapter proves the project-reference map is empty because loading rejects nonempty references; the lookup therefore returns `None` without supporting reference loading |
+//! | `GetSymlinkCache`, `GetPackageJsonInfo`, `GetNearestAncestorDirectoryWithPackageJson`, `GetGlobalTypingsCacheLocation` | P4: module paths use retained resolutions plus native runtime-dependency discovery; direct package queries share the retained resolver cache; global typings cache has no configured input |
+//! | `ContentMapperExtensions`, `GetResolvedModuleFromModuleSpecifier` | Content mapper execution remains outside the loaded-program closure; module references use retained resolutions |
 
 use crate::Error;
+use std::sync::Arc;
 use ts_arena::NodeId;
 use ts_ast::{CompletedFile, SourceFileMetaData};
 use ts_core::{CompilerOptions, ModuleKind, ResolutionMode};
+use ts_jsstring::JsString;
 use ts_module::ResolvedModule;
 use ts_tsoptions::ParsedCommandLine;
+
+/// One spelling supplied by GetEachFileNameOfModule, before proximity sorting.
+#[derive(Clone, Debug)]
+pub struct ModuleSpecifierPath {
+    pub file_name: JsString,
+    pub is_in_node_modules: bool,
+    pub is_redirect: bool,
+}
 
 /// File names and directories are bytes, as everywhere in this port.
 pub trait CheckerHost: Send + Sync {
@@ -40,6 +53,18 @@ pub trait CheckerHost: Send + Sync {
         file_name: &[u8],
         usage_location: NodeId,
     ) -> Result<ResolutionMode, Error>;
+    fn get_mode_for_usage_location(
+        &self,
+        file_name: &[u8],
+        usage_location: NodeId,
+    ) -> Result<ResolutionMode, Error>;
+    /// Mode of the compiler's synthetic, attribute-free import of `tslib`.
+    fn get_import_helpers_resolution_mode(&self, file_name: &[u8])
+        -> Result<ResolutionMode, Error>;
+    fn get_default_resolution_mode_for_file(
+        &self,
+        file_name: &[u8],
+    ) -> Result<ResolutionMode, Error>;
     fn get_implied_node_format_for_emit(&self, file_name: &[u8]) -> Result<ModuleKind, Error>;
     fn get_resolved_module(
         &self,
@@ -48,18 +73,53 @@ pub trait CheckerHost: Send + Sync {
         mode: ResolutionMode,
     ) -> Result<Option<&ResolvedModule>, Error>;
     fn get_source_file_meta_data(&self, file_name: &[u8]) -> Result<&SourceFileMetaData, Error>;
+    /// `GetPackagesMap()[packageName]`: `None` when no resolution named the
+    /// package, otherwise whether any resolution of it was a `.d.ts`.
+    fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error>;
+    /// `Node.JSDoc(file)`: the JSDoc roots of `parent`, parsing them on first
+    /// use when the file carries lazy JSDoc.
+    fn jsdoc(
+        &self,
+        view: ts_ast::AstView<'_>,
+        source: NodeId,
+        parent: NodeId,
+    ) -> Result<ts_ast::JSDocRoots, Error>;
     fn source_file_may_be_emitted(
         &self,
         file: &CompletedFile,
         force_dts_emit: bool,
     ) -> Result<bool, Error>;
     fn is_source_file_default_library(&self, path: &[u8]) -> bool;
-    /// Project-reference resolution is an explicit unsupported boundary until
-    /// reference loading and redirects enter the executable operation closure.
+    /// The retained compiler adapter proves these reference lookups are empty
+    /// because loading rejects nonempty project-reference configurations.
     fn get_redirect_for_resolution(
         &self,
         file_name: &[u8],
     ) -> Result<Option<&ParsedCommandLine>, Error>;
+    fn get_project_reference_from_output_dts(
+        &self,
+        path: &[u8],
+    ) -> Result<Option<&ParsedCommandLine>, Error>;
+    fn get_project_reference_from_source(
+        &self,
+        path: &[u8],
+    ) -> Result<Option<&ParsedCommandLine>, Error>;
+    fn get_module_specifier_paths(
+        &self,
+        importer: &[u8],
+        target: &[u8],
+    ) -> Result<Vec<ModuleSpecifierPath>, Error>;
+    fn get_package_json_info(
+        &self,
+        file: &[u8],
+    ) -> Result<Option<Arc<ts_module::PackageJson>>, Error>;
+    fn get_nearest_ancestor_directory_with_package_json(
+        &self,
+        dir: &[u8],
+    ) -> Result<Option<JsString>, Error>;
+    fn get_global_typings_cache_location(&self) -> Result<JsString, Error>;
+    fn get_output_js_file_name(&self, file: &[u8]) -> Result<JsString, Error>;
+    fn get_output_declaration_file_name(&self, file: &[u8]) -> Result<JsString, Error>;
     fn common_source_directory(&self) -> Result<&[u8], Error>;
     fn get_current_directory(&self) -> &[u8];
     fn use_case_sensitive_file_names(&self) -> bool;

@@ -1,0 +1,381 @@
+{
+  "version": 1,
+  "scope": "S08 P4 lexical private fields, shadowing, accessors and private in checks",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "private-read",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:C){return c.#x;}}const x=new C().f(new C());type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-static",
+      "files": {
+        "/main.ts": "class C{static #x=1;static f(){return C.#x;}}const x=C.f();type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-outside",
+      "files": {
+        "/main.ts": "class C{#x=1;}declare const c:C;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-outside",
+      "files": {
+        "/main.ts": "declare const c:any;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-inside",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:any){return c.#x;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-missing",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:C){return c.#missing;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-method-write",
+      "files": {
+        "/main.ts": "class C{#f(){return 1;}m(){this.#f=()=>2;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-setter-read",
+      "files": {
+        "/main.ts": "class C{set #x(v:number){}f(){return this.#x;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-shadow",
+      "files": {
+        "/main.ts": "class C{#x=1;f(){return class D{#x=2;m(c:C){return c.#x;}};}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in",
+      "files": {
+        "/main.ts": "class C{#x=1;f(v:object){return #x in v;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in-missing",
+      "files": {
+        "/main.ts": "class C{#x=1;f(v:object){return #missing in v;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in-outside",
+      "files": {
+        "/main.ts": "declare const c:object;const x=#x in c;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-ambient",
+      "files": {
+        "/main.ts": "declare class C{#x;f():number;}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in-primitive",
+      "files": {
+        "/main.ts": "class C{#x=1;f(){return #x in 2;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-constructor-inference",
+      "files": {
+        "/main.ts": "class C{#x;constructor(){this.#x=1;}f(){return this.#x;}}const x=new C().f();type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-static-inference",
+      "files": {
+        "/main.ts": "class C{static #x;static{this.#x=\"x\";}static f(){return this.#x;}}const x=C.f();type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-spread",
+      "files": {
+        "/main.ts": "class C{#x=1;y=\"y\";}const x={...new C()};type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-distinct-classes",
+      "files": {
+        "/main.ts": "class A{#x=1;}class B{#x=\"b\";}type T=A|B;type TA=A;type TB=B;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "TA",
+          "file": "/main.ts",
+          "declaration": "TA",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "TB",
+          "file": "/main.ts",
+          "declaration": "TB",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -21,6 +21,7 @@
 
 mod emit_context;
 pub mod emit_flags;
+pub mod emit_resolver;
 mod emit_text_writer;
 pub mod list_format;
 mod literal_text;
@@ -30,7 +31,10 @@ mod single_line_string_writer;
 mod text_writer;
 mod type_precedence;
 
-pub use emit_context::EmitContext;
+pub use emit_context::{
+    generated_identifier_flags, AutoGenerateId, AutoGenerateInfo, AutoGenerateOptions, EmitContext,
+    SynthesizedComment,
+};
 pub use emit_flags::EmitFlags;
 pub use emit_text_writer::EmitTextWriter;
 pub use list_format::ListFormat;

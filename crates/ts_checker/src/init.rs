@@ -30,6 +30,10 @@ pub(crate) struct Builtins {
     pub arguments_symbol: SymbolId,
     pub require_symbol: SymbolId,
     pub unknown_symbol: SymbolId,
+    /// `primitiveTypeAliasSuggestions`: transient type aliases named after the
+    /// primitives, suggested when a global builtin object name is misspelled.
+    /// Created on first use, outside `SymbolCount`, as upstream's heap symbols are.
+    pub primitive_alias_suggestions: Vec<(&'static [u8], SymbolId)>,
     pub global_this_symbol: SymbolId,
     pub globals: Option<SymbolTableId>,
     pub any_type: TypeId,
@@ -125,6 +129,7 @@ impl Builtins {
             arguments_symbol: sym,
             require_symbol: sym,
             unknown_symbol: sym,
+            primitive_alias_suggestions: Vec::new(),
             global_this_symbol: sym,
             globals: None,
             any_type: t,
@@ -536,3 +541,13 @@ impl CheckerState {
         Ok(())
     }
 }
+
+/// Builtin object names paired with the primitive alias suggested in their place.
+pub(crate) const PRIMITIVE_ALIAS_SUGGESTIONS: [(&[u8], &[u8]); 6] = [
+    (b"String", b"string"),
+    (b"Number", b"number"),
+    (b"Boolean", b"boolean"),
+    (b"Object", b"object"),
+    (b"BigInt", b"bigint"),
+    (b"Symbol", b"symbol"),
+];

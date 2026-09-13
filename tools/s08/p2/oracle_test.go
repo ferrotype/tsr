@@ -11,6 +11,7 @@ import (
 	"os"
 	"runtime"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 
@@ -53,12 +54,29 @@ type p2Merge struct {
 type p2Spec struct {
 	Version int    `json:"version"`
 	Scope   string `json:"scope"`
+    DiagnosticMode string `json:"diagnostic_mode"`
 	Options struct {
 		Target string `json:"target"`
 		Module string `json:"module"`
 		Strict bool   `json:"strict"`
 		NoLib  bool   `json:"noLib"`
 		SkipLibCheck bool `json:"skipLibCheck"`
+        NoUncheckedIndexedAccess bool `json:"noUncheckedIndexedAccess"`
+        IsolatedModules bool `json:"isolatedModules"`
+        VerbatimModuleSyntax bool `json:"verbatimModuleSyntax"`
+        AllowUnreachableCode *bool `json:"allowUnreachableCode"`
+        NoImplicitOverride bool `json:"noImplicitOverride"`
+        AllowSyntheticDefaultImports *bool `json:"allowSyntheticDefaultImports"`
+        EsModuleInterop *bool `json:"esModuleInterop"`
+        ResolveJsonModule *bool `json:"resolveJsonModule"`
+        Declaration bool `json:"declaration"`
+        IsolatedDeclarations bool `json:"isolatedDeclarations"`
+        StripInternal bool `json:"stripInternal"`
+        UseDefineForClassFields *bool `json:"useDefineForClassFields"`
+        ImportHelpers *bool `json:"importHelpers"`
+        NoEmit *bool `json:"noEmit"`
+        AllowJs bool `json:"allowJs"`
+        CheckJs bool `json:"checkJs"`
 	} `json:"options"`
 	Programs []p2Program `json:"programs"`
 	Merge    p2Merge     `json:"merge"`
@@ -114,23 +132,71 @@ func p2Diagnostics(values []*ast.Diagnostic) []map[string]any {
 	}
 	return result
 }
-func p2SortedNames(table ast.SymbolTable) []string {
+// Private symbol names embed a process-local class ID. Freeze their lexical
+// class identity instead; retaining the class location distinguishes shadowed #x.
+func (g *p2Symbols) portableName(name string, symbol *ast.Symbol) string {
+	if strings.HasPrefix(name, "\xfe@") {
+		last := strings.LastIndexByte(name, '@')
+		if last > 1 {
+			if last == len(name)-1 { panic("P2 unique symbol name lacks runtime identity") }
+			for _, b := range []byte(name[last+1:]) {
+				if b < '0' || b > '9' { panic("P2 unique symbol name has invalid runtime identity") }
+			}
+			typ := checker.S08ExistingNameType(g.checker, symbol)
+			if typ == nil || typ.Flags()&checker.TypeFlagsUniqueESSymbol == 0 || typ.Symbol() == nil {
+				panic("P2 unique symbol name has no existing nameType identity")
+			}
+			key := typ.Symbol()
+			decl := key.ValueDeclaration
+			if decl == nil && len(key.Declarations) > 0 { decl = key.Declarations[0] }
+			if decl == nil { panic("P2 unique symbol name has no defining declaration") }
+			file := ast.GetSourceFileOfNode(decl)
+			return fmt.Sprintf("%s@symbol:%s:%d:%d:%d", name[:last], p2Hex(file.FileName()), decl.Kind, decl.Pos(), decl.End())
+		}
+	}
+	if !strings.HasPrefix(name, "\xfe#") {
+		return name
+	}
+	i := 2
+	for i < len(name) && name[i] >= '0' && name[i] <= '9' {
+		i++
+	}
+	if i == 2 || i >= len(name) || name[i] != '@' || symbol == nil {
+		panic("P2 private symbol name has no runtime class identity")
+	}
+	decl := symbol.ValueDeclaration
+	if decl == nil && len(symbol.Declarations) > 0 {
+		decl = symbol.Declarations[0]
+	}
+	for decl != nil && !ast.IsClassLike(decl) {
+		decl = decl.Parent
+	}
+	if decl == nil {
+		panic("P2 private symbol name has no declaring class")
+	}
+	file := ast.GetSourceFileOfNode(decl)
+	return fmt.Sprintf("\xfe#class:%s:%d:%d:%d%s", p2Hex(file.FileName()), decl.Kind, decl.Pos(), decl.End(), name[i:])
+}
+func (g *p2Symbols) sortedNames(table ast.SymbolTable) []string {
 	keys := make([]string, 0, len(table))
 	for k := range table {
 		keys = append(keys, k)
 	}
-	slices.Sort(keys)
+	slices.SortFunc(keys, func(a, b string) int {
+		return strings.Compare(g.portableName(a, table[a]), g.portableName(b, table[b]))
+	})
 	return keys
 }
 
 type p2Symbols struct {
+	checker *checker.Checker
 	ids   map[*ast.Symbol]string
 	owner string
 	next  int
 }
 
-func p2SymbolIDs(files []*ast.SourceFile, owner string) *p2Symbols {
-	g := &p2Symbols{ids: map[*ast.Symbol]string{}, owner: owner}
+func p2SymbolIDs(files []*ast.SourceFile, owner string, c *checker.Checker) *p2Symbols {
+	g := &p2Symbols{ids: map[*ast.Symbol]string{}, owner: owner, checker: c}
 	files = slices.Clone(files)
 	slices.SortFunc(files, func(a, b *ast.SourceFile) int { return bytes.Compare([]byte(a.FileName()), []byte(b.FileName())) })
 	for _, f := range files {
@@ -143,7 +209,7 @@ func p2SymbolIDs(files []*ast.SourceFile, owner string) *p2Symbols {
 			g.ids[s] = fmt.Sprintf("source:%s:%d", f.FileName(), next)
 			next++
 			for _, table := range []ast.SymbolTable{s.Members, s.Exports} {
-				for _, name := range p2SortedNames(table) {
+				for _, name := range g.sortedNames(table) {
 					seed(table[name])
 				}
 			}
@@ -154,7 +220,7 @@ func p2SymbolIDs(files []*ast.SourceFile, owner string) *p2Symbols {
 		visit = func(n *ast.Node) bool {
 			seed(n.Symbol())
 			seed(n.LocalSymbol())
-			for _, name := range p2SortedNames(n.Locals()) {
+			for _, name := range g.sortedNames(n.Locals()) {
 				seed(n.Locals()[name])
 			}
 			n.ForEachChild(visit)
@@ -200,8 +266,8 @@ func (g *p2Symbols) snapshot(root *ast.Symbol) any {
 				return nil
 			}
 			entries := []map[string]any{}
-			for _, name := range p2SortedNames(t) {
-				entries = append(entries, map[string]any{"name_hex": p2Hex(name), "symbol": ref(t[name])})
+			for _, name := range g.sortedNames(t) {
+				entries = append(entries, map[string]any{"name_hex": p2Hex(g.portableName(name, t[name])), "symbol": ref(t[name])})
 			}
 			return entries
 		}
@@ -213,13 +279,13 @@ func (g *p2Symbols) snapshot(root *ast.Symbol) any {
 			}
 			declarations = ds
 		}
-		records = append(records, map[string]any{"id": g.id(s), "name_hex": p2Hex(s.Name), "flags": uint32(s.Flags), "check_flags": uint32(s.CheckFlags), "declarations": declarations,
+		records = append(records, map[string]any{"id": g.id(s), "name_hex": p2Hex(g.portableName(s.Name, s)), "flags": uint32(s.Flags), "check_flags": uint32(s.CheckFlags), "declarations": declarations,
 			"value_declaration": p2Node(s.ValueDeclaration), "members": table(s.Members), "exports": table(s.Exports), "parent": ref(s.Parent), "export_symbol": ref(s.ExportSymbol)})
 	}
 	return map[string]any{"root": rootID, "records": records}
 }
 func p2BoundSnapshot(file *ast.SourceFile) map[string]any {
-	g := p2SymbolIDs([]*ast.SourceFile{file}, "bound")
+	g := p2SymbolIDs([]*ast.SourceFile{file}, "bound", nil)
 	nodes := []map[string]any{}
 	var visit func(*ast.Node) bool
 	visit = func(n *ast.Node) bool {
@@ -231,8 +297,8 @@ func p2BoundSnapshot(file *ast.SourceFile) map[string]any {
 	}
 	visit(file.AsNode())
 	locals := []map[string]any{}
-	for _, name := range p2SortedNames(file.AsNode().Locals()) {
-		locals = append(locals, map[string]any{"name_hex": p2Hex(name), "symbol": g.snapshot(file.AsNode().Locals()[name])})
+	for _, name := range g.sortedNames(file.AsNode().Locals()) {
+		locals = append(locals, map[string]any{"name_hex": p2Hex(g.portableName(name, file.AsNode().Locals()[name])), "symbol": g.snapshot(file.AsNode().Locals()[name])})
 	}
 	return map[string]any{"file": file.FileName(), "text_hex": p2Hex(file.Text()), "nodes": nodes, "locals": locals}
 }
@@ -240,7 +306,7 @@ func p2Declaration(file *ast.SourceFile, name string) *ast.Node {
 	var found *ast.Node
 	var visit func(*ast.Node) bool
 	visit = func(n *ast.Node) bool {
-		if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindInterfaceDeclaration || n.Kind == ast.KindVariableDeclaration) && n.Name() != nil && n.Name().Text() == name {
+		if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindInterfaceDeclaration || n.Kind == ast.KindVariableDeclaration) && n.Name() != nil && ast.IsIdentifier(n.Name()) && n.Name().Text() == name {
 			if found != nil {
 				panic("ambiguous declaration: " + name)
 			}
@@ -307,26 +373,30 @@ func p2QueryResult(c *checker.Checker, p *compiler.Program, q p2Query) map[strin
 	if typ == nil {
 		panic("native query returned no type")
 	}
-	g := p2SymbolIDs(p.SourceFiles(), "query")
+	g := p2SymbolIDs(p.SourceFiles(), "query", c)
 	if q.Operation == "declared_type_summary" {
 		return map[string]any{"id": q.ID, "state": "executed", "node": p2Node(node), "symbol": g.snapshot(symbol), "type": p2BasicType(c, typ)}
 	}
 	return map[string]any{"id": q.ID, "state": "executed", "node": p2Node(node), "symbol": g.snapshot(symbol), "type": p2Type(c, typ, g)}
 }
-func p2AllDiagnostics(t *testing.T, p *compiler.Program, c *checker.Checker) map[string]any {
+func p2AllDiagnostics(t *testing.T, p *compiler.Program, c *checker.Checker) map[string]any {return p2AllDiagnosticsMode(t,p,c,false)}
+func p2AllDiagnosticsMode(t *testing.T, p *compiler.Program, c *checker.Checker, programMode bool) map[string]any {
 	ctx := context.Background()
 	phases := map[string][]*ast.Diagnostic{"config": p.GetConfigFileParsingDiagnostics(), "program": p.GetProgramDiagnostics(), "syntactic": p.GetSyntacticDiagnostics(ctx, nil), "bind": p.GetBindDiagnostics(ctx, nil), "semantic": {}, "global": {}}
 	for _, file := range p.SourceFiles() {
 		if p.SkipTypeChecking(file, false) { continue }
 		phases["semantic"] = append(phases["semantic"], c.GetDiagnostics(ctx, file)...)
 	}
+    if programMode {phases["semantic"]=p.GetSemanticDiagnostics(ctx,nil)}
 	phases["global"] = c.GetGlobalDiagnostics()
 	observed := map[string]any{"state": "executed"}
 	all := []*ast.Diagnostic{}
-	for _, phase := range []string{"config", "program", "syntactic", "bind", "semantic", "global"} {
+	phaseOrder := []string{"config", "program", "syntactic", "bind", "semantic", "global"}
+    if p.Options().Declaration.IsTrue() || p.Options().Composite.IsTrue() { phases["declaration"] = p.GetDeclarationDiagnostics(ctx, nil); phaseOrder = append(phaseOrder,"declaration") }
+	for _, phase := range phaseOrder {
 		ds := compiler.SortAndDeduplicateDiagnostics(phases[phase])
 		observed[phase] = p2Diagnostics(ds)
-		all = append(all, ds...)
+        if !programMode || phase != "bind" {all = append(all,ds...)}
 	}
 	all = compiler.SortAndDeduplicateDiagnostics(all)
 	observed["combined"] = p2Diagnostics(all)
@@ -345,24 +415,34 @@ func p2AllDiagnostics(t *testing.T, p *compiler.Program, c *checker.Checker) map
 	}
 	return observed
 }
-func p2ObserveProgram(t *testing.T, request p2Program, libraries bool) map[string]any {
+func p2OptionalBool(value *bool) core.Tristate {
+    if value == nil { return core.TSUnknown }
+    return core.IfElse(*value, core.TSTrue, core.TSFalse)
+}
+func p2ObserveProgram(t *testing.T, request p2Program, libraries bool, unchecked bool, isolated bool, verbatim bool, unreachable *bool, allowJs bool, checkJs bool, implicitOverride bool, syntheticDefaults *bool, moduleInterop *bool, resolveJson *bool, programMode bool, declaration bool, isolatedDeclarations bool, stripInternal bool, target core.ScriptTarget, module core.ModuleKind, useDefine *bool, importHelpers *bool, noEmit *bool) map[string]any {
+    allowUnreachable := core.TSUnknown
+    if unreachable != nil { allowUnreachable = core.IfElse(*unreachable, core.TSTrue, core.TSFalse) }
 	var p *compiler.Program
 	if libraries {
 		fs := bundled.WrapFS(vfstest.FromMap(request.Files, true))
 		host := compiler.NewCompilerHost("/", fs, bundled.LibPath(), nil, nil, nil)
-		options := &core.CompilerOptions{Target: core.ScriptTargetESNext, Module: core.ModuleKindESNext, Strict: core.TSTrue, SkipLibCheck: core.TSTrue}
+		options := &core.CompilerOptions{Declaration: core.IfElse(declaration,core.TSTrue,core.TSUnknown), IsolatedDeclarations: core.IfElse(isolatedDeclarations,core.TSTrue,core.TSUnknown), StripInternal: core.IfElse(stripInternal,core.TSTrue,core.TSUnknown), AllowSyntheticDefaultImports: p2OptionalBool(syntheticDefaults), ESModuleInterop: p2OptionalBool(moduleInterop), ResolveJsonModule: p2OptionalBool(resolveJson), Target: target, Module: module, UseDefineForClassFields: p2OptionalBool(useDefine), ImportHelpers: p2OptionalBool(importHelpers), NoEmit: p2OptionalBool(noEmit), Strict: core.TSTrue, SkipLibCheck: core.TSTrue, AllowUnreachableCode: allowUnreachable, NoImplicitOverride: core.IfElse(implicitOverride,core.TSTrue,core.TSUnknown), AllowJs: core.IfElse(allowJs,core.TSTrue,core.TSUnknown), CheckJs: core.IfElse(checkJs,core.TSTrue,core.TSUnknown), NoUncheckedIndexedAccess: core.IfElse(unchecked, core.TSTrue, core.TSUnknown), IsolatedModules: core.IfElse(isolated, core.TSTrue, core.TSUnknown), VerbatimModuleSyntax: core.IfElse(verbatim, core.TSTrue, core.TSUnknown)}
 		config := tsoptions.NewParsedCommandLine(options, request.Roots, nil, tspath.ComparePathsOptions{})
 		p = compiler.NewProgram(compiler.ProgramOptions{Config: config, Host: host})
 		p.BindSourceFiles()
 	} else {
-		p = p2NewProgram(p2Host(request.Files), request.Roots)
+		host := p2Host(request.Files)
+        options := &core.CompilerOptions{Declaration: core.IfElse(declaration,core.TSTrue,core.TSUnknown), IsolatedDeclarations: core.IfElse(isolatedDeclarations,core.TSTrue,core.TSUnknown), StripInternal: core.IfElse(stripInternal,core.TSTrue,core.TSUnknown), AllowSyntheticDefaultImports: p2OptionalBool(syntheticDefaults), ESModuleInterop: p2OptionalBool(moduleInterop), ResolveJsonModule: p2OptionalBool(resolveJson), Target: target, Module: module, UseDefineForClassFields: p2OptionalBool(useDefine), ImportHelpers: p2OptionalBool(importHelpers), NoEmit: p2OptionalBool(noEmit), Strict: core.TSTrue, NoLib: core.TSTrue, AllowUnreachableCode: allowUnreachable, NoImplicitOverride: core.IfElse(implicitOverride,core.TSTrue,core.TSUnknown), AllowJs: core.IfElse(allowJs,core.TSTrue,core.TSUnknown), CheckJs: core.IfElse(checkJs,core.TSTrue,core.TSUnknown), NoUncheckedIndexedAccess: core.IfElse(unchecked, core.TSTrue, core.TSUnknown), IsolatedModules: core.IfElse(isolated, core.TSTrue, core.TSUnknown), VerbatimModuleSyntax: core.IfElse(verbatim, core.TSTrue, core.TSUnknown)}
+        config := tsoptions.NewParsedCommandLine(options, request.Roots, nil, tspath.ComparePathsOptions{})
+        p = compiler.NewProgram(compiler.ProgramOptions{Config: config, Host: host})
+        p.BindSourceFiles()
 	}
 	c, _ := checker.NewChecker(p, nil)
 	queries := []map[string]any{}
 	for _, q := range request.Queries {
 		queries = append(queries, p2QueryResult(c, p, q))
 	}
-	return map[string]any{"id": request.ID, "state": "executed", "queries": queries, "diagnostics": p2AllDiagnostics(t, p, c)}
+	return map[string]any{"id": request.ID, "state": "executed", "queries": queries, "diagnostics": p2AllDiagnosticsMode(t, p, c, programMode)}
 }
 
 type p2Merged struct {
@@ -378,7 +458,7 @@ func p2ObserveMerged(c *checker.Checker, p *compiler.Program, request p2Merge, l
 		panic("merged symbol absent")
 	}
 	typ := c.GetDeclaredTypeOfSymbol(symbol)
-	g := p2SymbolIDs(p.SourceFiles(), label)
+	g := p2SymbolIDs(p.SourceFiles(), label, c)
 	base := p.GetSourceFile(request.Shared).AsNode().Locals()[request.Symbol]
 	return p2Merged{row: map[string]any{"checker": label, "via": path, "symbol": g.snapshot(symbol), "type": p2Type(c, typ, g), "merged_is_bound_base": symbol == base}, symbol: symbol, typ: typ}
 }
@@ -490,12 +570,43 @@ func TestS08P2(t *testing.T) {
 	if decoder.Decode(new(any)) != io.EOF {
 		t.Fatal("trailing request")
 	}
-	if spec.Version != 1 || spec.Options.Target != "ESNext" || spec.Options.Module != "ESNext" || !spec.Options.Strict || spec.Options.NoLib == spec.Options.SkipLibCheck {
+    target, targetOK := map[string]core.ScriptTarget{
+        "ES5":core.ScriptTargetES5,
+        "ES2015":core.ScriptTargetES2015,
+        "ES2016":core.ScriptTargetES2016,
+        "ES2017":core.ScriptTargetES2017,
+        "ES2018":core.ScriptTargetES2018,
+        "ES2019":core.ScriptTargetES2019,
+        "ES2020":core.ScriptTargetES2020,
+        "ES2021":core.ScriptTargetES2021,
+        "ES2022":core.ScriptTargetES2022,
+        "ES2023":core.ScriptTargetES2023,
+        "ES2024":core.ScriptTargetES2024,
+        "ES2025":core.ScriptTargetES2025,
+        "ESNext":core.ScriptTargetESNext,
+    }[spec.Options.Target]
+    module, moduleOK := map[string]core.ModuleKind{
+        "None":core.ModuleKindNone,
+        "CommonJS":core.ModuleKindCommonJS,
+        "AMD":core.ModuleKindAMD,
+        "UMD":core.ModuleKindUMD,
+        "System":core.ModuleKindSystem,
+        "ES2015":core.ModuleKindES2015,
+        "ES2020":core.ModuleKindES2020,
+        "ES2022":core.ModuleKindES2022,
+        "ESNext":core.ModuleKindESNext,
+        "Node16":core.ModuleKindNode16,
+        "Node18":core.ModuleKindNode18,
+        "Node20":core.ModuleKindNode20,
+        "NodeNext":core.ModuleKindNodeNext,
+        "Preserve":core.ModuleKindPreserve,
+    }[spec.Options.Module]
+	if spec.Version != 1 || !targetOK || !moduleOK || !spec.Options.Strict || spec.Options.NoLib == spec.Options.SkipLibCheck {
 		t.Fatal("unsupported explicit P2 options")
 	}
 	programs := []map[string]any{}
 	for _, request := range spec.Programs {
-		programs = append(programs, p2ObserveProgram(t, request, !spec.Options.NoLib))
+		programs = append(programs, p2ObserveProgram(t, request, !spec.Options.NoLib, spec.Options.NoUncheckedIndexedAccess, spec.Options.IsolatedModules, spec.Options.VerbatimModuleSyntax, spec.Options.AllowUnreachableCode, spec.Options.AllowJs, spec.Options.CheckJs, spec.Options.NoImplicitOverride, spec.Options.AllowSyntheticDefaultImports, spec.Options.EsModuleInterop, spec.Options.ResolveJsonModule, spec.DiagnosticMode=="program", spec.Options.Declaration, spec.Options.IsolatedDeclarations, spec.Options.StripInternal, target, module, spec.Options.UseDefineForClassFields, spec.Options.ImportHelpers, spec.Options.NoEmit))
 	}
 	merges := []map[string]any{}
 	for _, mode := range spec.Merge.Modes {

@@ -25,16 +25,34 @@ fn checker(text: &[u8], options: CompilerOptions) -> (Arc<CheckerOwner>, NodeId)
 }
 
 fn fixture(text: &[u8], options: CompilerOptions) -> (Arc<CheckerOwner>, Arc<Program>, Counters) {
+    fixture_files(b"/main.ts", &[(b"/main.ts", text)], options)
+}
+
+fn fixture_files(
+    root: &[u8],
+    files: &[(&[u8], &[u8])],
+    options: CompilerOptions,
+) -> (Arc<CheckerOwner>, Arc<Program>, Counters) {
     let counters = Counters::new();
     let generation = Generation::new(&counters);
     let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
-    fs.insert_loaded(b"/main.ts", text);
+    for &(path, text) in files {
+        fs.insert_loaded(path, text);
+    }
     let program = Arc::new(
         Program::load(
             ProgramOptions {
                 config: ts_tsoptions::ParsedCommandLine::new(
                     options,
-                    vec![JsString::from_bytes(b"/main.ts".as_slice())],
+                    std::iter::once(root)
+                        .chain(
+                            files
+                                .iter()
+                                .map(|&(path, _)| path)
+                                .filter(|&path| path != root),
+                        )
+                        .map(JsString::from_bytes)
+                        .collect(),
                 ),
                 host: Arc::new(fs.finish()),
                 current_directory: JsString::from_bytes(b"/".as_slice()),
@@ -111,55 +129,120 @@ fn source_assignment_diagnostics_match_pinned_native_ranges_and_payload_on_repea
 }
 
 #[test]
-fn source_check_failure_after_a_diagnostic_stays_failed_across_operations() {
+fn source_check_repeats_its_result_across_operations_for_diagnostics_and_unported_input() {
+    // `typeof before` resolves now, so the program that once stopped at an
+    // unported boundary reports its assignment diagnostic instead. JSX input is
+    // still unported, and a failure must repeat across operations just as a
+    // diagnostic does.
     let (checker, source) = checker(
         b"let before: number = \"wrong\"; type Later = typeof before;",
         options(),
     );
     for _ in 0..3 {
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert_eq!(diagnostics[0].code, 2322);
         assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(
-                "checkSourceElementWorker: statement/type family"
-            ))
+            (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+            (4, 10)
+        );
+    }
+    let (owner, program, _) = fixture_files(
+        b"/main.tsx",
+        &[(b"/main.tsx", b"export const a = <div/>;")],
+        options(),
+    );
+    let source = program.file(b"/main.tsx").unwrap().source();
+    for _ in 0..3 {
+        assert_eq!(
+            owner.operation().unwrap().semantic_diagnostics(source),
+            Err(Error::Unsupported("checkExpressionWorker"))
         );
     }
 }
 
 #[test]
-fn source_check_rejects_unported_grammar_relations_and_options() {
+fn grammar_relations_and_options_report_their_native_diagnostics() {
+    // Each of these once stopped at an unported boundary. They are checked now,
+    // so the pinned diagnostics themselves are the expectation; `let value!`
+    // and the `@ts-ignore` directive are both no-ops at this layer.
     for (text, expected) in [
         (
             b"interface A { value: number; value: string }".as_slice(),
-            "checkObjectTypeForDuplicateDeclarations/subsequent property declarations",
+            vec![
+                (2300, 14, 19, vec!["value"]),
+                (2300, 29, 34, vec!["value"]),
+                (2717, 29, 34, vec!["value", "number", "string"]),
+            ],
         ),
         (
             b"let value: { field: number } = { field: 1, extra: 2 };",
-            "report excess properties: source object expression",
+            vec![(2353, 43, 48, vec!["extra", "{ field: number; }"])],
         ),
-        (
-            b"let value!: number;",
-            "checkGrammarVariableDeclaration: definite assignment assertion",
-        ),
+        (b"let value!: number;", vec![]),
         (
             b"// @ts-ignore\nlet value: number = \"wrong\";",
-            "checkSourceFile: diagnostic directives",
+            vec![(2322, 18, 23, vec!["string", "number"])],
         ),
     ] {
         let (checker, source) = checker(text, options());
-        assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(expected)),
-            "source {text:?}"
-        );
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        let actual = diagnostics
+            .iter()
+            .map(|diagnostic| {
+                (
+                    diagnostic.code,
+                    diagnostic.loc.pos(),
+                    diagnostic.loc.end(),
+                    diagnostic
+                        .message_args
+                        .iter()
+                        .map(|argument| String::from_utf8_lossy(argument.as_bytes()).into_owned())
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect::<Vec<_>>();
+        let expected = expected
+            .into_iter()
+            .map(|(code, pos, end, args)| {
+                (
+                    code,
+                    pos,
+                    end,
+                    args.into_iter().map(str::to_string).collect::<Vec<_>>(),
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(actual, expected, "source {text:?}");
+        // The later duplicate member points back at the first declaration.
+        if let Some(duplicate) = diagnostics
+            .iter()
+            .find(|diagnostic| diagnostic.code == 2717)
+        {
+            assert_eq!(duplicate.related_information.len(), 1);
+            assert_eq!(duplicate.related_information[0].code, 6203);
+            assert_eq!(
+                (
+                    duplicate.related_information[0].loc.pos(),
+                    duplicate.related_information[0].loc.end()
+                ),
+                (14, 19)
+            );
+        }
     }
+    // These options are accepted by the raw checker. Program-level noCheck
+    // suppression and declaration diagnostics have separate entry points.
     for options in [
         CompilerOptions {
             no_check: Tristate::TRUE,
-            ..options()
-        },
-        CompilerOptions {
-            no_unused_locals: Tristate::TRUE,
             ..options()
         },
         CompilerOptions {
@@ -168,26 +251,167 @@ fn source_check_rejects_unported_grammar_relations_and_options() {
         },
     ] {
         let (checker, source) = checker(b"let value: number = 1;", options);
+        assert!(checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap()
+            .is_empty());
+    }
+}
+
+#[test]
+fn review_tsx_files_check_ordinary_declarations() {
+    let (owner, program, _) = fixture_files(
+        b"/main.tsx",
+        &[(b"/main.tsx", b"export const value: number = \"wrong\";")],
+        options(),
+    );
+    let source = program.file(b"/main.tsx").unwrap().source();
+    for _ in 0..2 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert_eq!(diagnostics[0].code, 2322);
+    }
+}
+
+#[test]
+fn review_circular_parameter_initializers_preserve_native_diagnostics_on_repeat() {
+    // Pinned Go observation: tools/s08/p4/review-regressions.json, circular-default.
+    let (owner, source) = checker(
+        b"function fn1(x: number | undefined = x > 0 ? x : 0) {}\nfunction fn2(x?: string = someCondition ? \"value1\" : x) {}\ntype Query = number;",
+        options(),
+    );
+    let expected = [
+        (2502, 13, 50),
+        (2372, 37, 38),
+        (18048, 37, 38),
+        (2372, 45, 46),
+        (1015, 68, 69),
+        (2502, 68, 109),
+        (2304, 81, 94),
+        (2372, 108, 109),
+    ];
+    for _ in 0..3 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
         assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(
-                "checkSourceFile: noCheck/unused/isolated declaration options"
-            ))
+            diagnostics
+                .iter()
+                .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+                .collect::<Vec<_>>(),
+            expected
         );
     }
 }
 
 #[test]
+fn review_nested_alias_resolution_keeps_each_circularity_target() {
+    let files: &[(&[u8], &[u8])] = &[
+        (
+            b"/a.ts",
+            b"import second = require(\"./b\"); var first = second; export = first;",
+        ),
+        (
+            b"/b.ts",
+            b"import third = require(\"./c\"); export = third;",
+        ),
+        (
+            b"/c.ts",
+            b"import first = require(\"./a\"); export = first;",
+        ),
+        (
+            b"/case.ts",
+            b"import first = require(\"./a\"); let value = first; type Query = typeof value;",
+        ),
+    ];
+    let (owner, program, _) = fixture_files(b"/a.ts", files, options());
+    for _ in 0..2 {
+        let mut op = owner.operation().unwrap();
+        for &(path, _) in files {
+            op.semantic_diagnostics(program.file(path).unwrap().source())
+                .unwrap();
+        }
+        let mut targets = Vec::new();
+        for &(path, _) in files {
+            for diagnostic in op
+                .semantic_diagnostics(program.file(path).unwrap().source())
+                .unwrap()
+            {
+                if diagnostic.code == 7022 {
+                    targets.push((
+                        path,
+                        diagnostic.loc.pos(),
+                        diagnostic.loc.end(),
+                        diagnostic.message_args[0].as_bytes().to_vec(),
+                    ));
+                }
+            }
+        }
+        // Go reports the local first and the export third, never the imported second.
+        assert_eq!(
+            targets,
+            vec![
+                (b"/a.ts".as_slice(), 36, 41, b"first".to_vec()),
+                (b"/b.ts".as_slice(), 31, 46, b"third".to_vec())
+            ]
+        );
+    }
+}
+
+#[test]
+fn review_date_property_uses_the_pinned_lib_suggestion() {
+    let (owner, source) = checker(
+        b"interface Date {} declare const date: Date; date.toTemporalInstant();",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(diagnostics[0].code, 2550);
+    assert_eq!(
+        diagnostics[0]
+            .message_args
+            .iter()
+            .map(JsString::as_bytes)
+            .collect::<Vec<_>>(),
+        [b"toTemporalInstant".as_slice(), b"Date", b"esnext"]
+    );
+}
+
+#[test]
 fn source_check_reports_structural_assignment_failures() {
-    for (source, code, child) in [
+    // Pinned Go emits no chain for either shape: the elaborated property
+    // mismatch carries a TS6500 note, and the missing property carries TS2728.
+    for (text, code, range, note_code, note_range, note_args) in [
         (
             b"let value: { field: number } = { field: \"wrong\" };".as_slice(),
             2322,
-            Some(2326),
+            (33, 38),
+            6500,
+            (13, 18),
+            vec!["field".to_string(), "{ field: number; }".to_string()],
         ),
-        (b"let value: { field: number } = {};".as_slice(), 2741, None),
+        (
+            b"let value: { field: number } = {};".as_slice(),
+            2741,
+            (4, 9),
+            2728,
+            (13, 18),
+            vec!["field".to_string()],
+        ),
     ] {
-        let (owner, source) = checker(source, options());
+        let (owner, source) = checker(text, options());
         for _ in 0..2 {
             let diagnostics = owner
                 .operation()
@@ -196,7 +420,23 @@ fn source_check_reports_structural_assignment_failures() {
                 .unwrap();
             assert_eq!(diagnostics.len(), 1);
             assert_eq!(diagnostics[0].code, code);
-            assert_eq!(diagnostics[0].message_chain.first().map(|d| d.code), child);
+            assert_eq!(
+                (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+                range,
+                "diagnostic range for {text:?}"
+            );
+            assert!(diagnostics[0].message_chain.is_empty());
+            assert_eq!(diagnostics[0].related_information.len(), 1);
+            let note = &diagnostics[0].related_information[0];
+            assert_eq!(note.code, note_code);
+            assert_eq!((note.loc.pos(), note.loc.end()), note_range);
+            assert_eq!(
+                note.message_args
+                    .iter()
+                    .map(|argument| String::from_utf8_lossy(argument.as_bytes()).into_owned())
+                    .collect::<Vec<_>>(),
+                note_args
+            );
         }
     }
 }
@@ -282,7 +522,7 @@ fn source_symbol_references_are_bound_to_the_exact_checker_even_when_source_is_s
 }
 
 #[test]
-fn failed_query_caches_and_resolution_stack_cannot_convert_failure_to_success() {
+fn declared_type_queries_repeat_without_drift_and_unresolved_names_are_any() {
     let (owner, program, _) = fixture(b"interface Callable { (value: string): number } interface Generic<T> {} type Failed = typeof value; type Good = number;", options());
     let declarations = declarations(&program);
     for _ in 0..3 {
@@ -302,15 +542,14 @@ fn failed_query_caches_and_resolution_stack_cannot_convert_failure_to_success() 
             op.type_object_flags(generic).unwrap() & ts_checker::object_flags::REFERENCE,
             0
         );
+        // `typeof value` on a name that resolves to nothing is `any`, not a failure.
         for &declaration in &declarations[2..3] {
             let symbol = op
                 .get_symbol_at_location(declaration_name(&program, declaration))
                 .unwrap()
                 .unwrap();
-            assert!(matches!(
-                op.get_declared_type_of_symbol(symbol),
-                Err(Error::Unsupported(_))
-            ));
+            let failed = op.get_declared_type_of_symbol(symbol).unwrap();
+            assert_eq!(op.type_to_string(failed, 0).unwrap().as_bytes(), b"any");
         }
         let symbol = op
             .get_symbol_at_location(declaration_name(&program, declarations[3]))
@@ -422,11 +661,19 @@ fn lazy_jsdoc_type_names_do_not_resolve_as_ordinary_wrapper_interfaces() {
         file.source().arena(),
         "exercises retained lazy owner routing"
     );
+    // The tag names the primitive; the `interface String` declared above is a
+    // different type, so the lazy JSDoc name must not resolve to that wrapper.
     for _ in 0..2 {
-        assert_eq!(
-            owner.operation().unwrap().get_type_at_location(reference),
-            Err(Error::Unsupported("getIntendedTypeFromJSDocTypeReference"))
-        );
+        let mut op = owner.operation().unwrap();
+        let ty = op.get_type_at_location(reference).unwrap();
+        assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"string");
+        let wrapper = op
+            .get_symbol_at_location(declaration_name(&program, declarations(&program)[0]))
+            .unwrap()
+            .unwrap();
+        let wrapper = op.get_declared_type_of_symbol(wrapper).unwrap();
+        assert_eq!(op.type_to_string(wrapper, 0).unwrap().as_bytes(), b"String");
+        assert_ne!(ty, wrapper);
     }
 }
 
@@ -498,7 +745,7 @@ fn reference_identifier_and_whole_reference_preserve_distinct_native_queries() {
 }
 
 #[test]
-fn unsupported_variable_widening_does_not_rebuild_a_successful_cached_initializer() {
+fn variable_widening_does_not_rebuild_a_successful_cached_initializer() {
     let (owner, program, _) = fixture(b"let value = { field: 1 };", options());
     let file = program.file(b"/main.ts").unwrap();
     let view = file.bound().view().ast();
@@ -527,23 +774,21 @@ fn unsupported_variable_widening_does_not_rebuild_a_successful_cached_initialize
     let name = view.node(declaration).unwrap().name().unwrap();
     let mut op = owner.operation().unwrap();
     let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
-    let unsupported = Err(Error::Unsupported(
-        "widenTypeForVariableLikeDeclaration: auto/null/object widening",
-    ));
-    assert_eq!(op.get_type_of_symbol(symbol), unsupported);
+    let widened = op.get_type_of_symbol(symbol).unwrap();
+    assert_eq!(
+        op.type_to_string(widened, 0).unwrap().as_bytes(),
+        b"{ field: number; }"
+    );
     let before = (op.type_count(), op.symbol_count());
     for _ in 0..2 {
-        assert_eq!(op.get_type_of_symbol(symbol), unsupported);
+        assert_eq!(op.get_type_of_symbol(symbol).unwrap(), widened);
         assert_eq!(
             (op.type_count(), op.symbol_count()),
             before,
             "retrying widening must reuse the checked initializer's type and property symbols"
         );
     }
-    assert!(matches!(
-        op.semantic_diagnostics(file.source()),
-        Err(Error::Unsupported(_))
-    ));
+    assert!(op.semantic_diagnostics(file.source()).unwrap().is_empty());
     assert_eq!((op.type_count(), op.symbol_count()), before);
 }
 
@@ -595,7 +840,7 @@ fn union_property_normalization_is_deferred_and_repeated_identity_is_stable() {
 }
 
 #[test]
-fn union_property_failure_does_not_publish_a_partial_property_list() {
+fn union_properties_publish_a_complete_list_and_repeat_without_drift() {
     let (owner, program, _) = fixture(b"type A = { good: string; bad: typeof missingA }; type B = { good: number; bad: typeof missingB }; type U = A | B;", options());
     let name = declaration_name(&program, declarations(&program)[2]);
     let mut op = owner.operation().unwrap();
@@ -603,10 +848,17 @@ fn union_property_failure_does_not_publish_a_partial_property_list() {
     let ty = op.get_declared_type_of_symbol(symbol).unwrap();
     let mut previous_counts = None;
     for _ in 0..3 {
-        assert!(matches!(
-            op.properties_of_type(ty),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
+        // `bad` names an unresolvable value on both sides, which is `any` rather
+        // than a failure, so the whole list is published.
+        let properties = op.properties_of_type(ty).unwrap();
+        assert_eq!(properties.len(), 2);
+        let good = op.get_type_of_symbol(properties[0]).unwrap();
+        assert_eq!(
+            op.type_to_string(good, 0).unwrap().as_bytes(),
+            b"string | number"
+        );
+        let bad = op.get_type_of_symbol(properties[1]).unwrap();
+        assert_eq!(op.type_to_string(bad, 0).unwrap().as_bytes(), b"any");
         let counts = (op.type_count(), op.symbol_count());
         if let Some(previous) = previous_counts {
             assert_eq!(counts, previous);
@@ -673,44 +925,55 @@ fn primitive_union_diagnostics_preserve_literal_target_spelling() {
 
 #[test]
 fn compound_constituents_are_checked_even_after_reduction_and_on_retry() {
-    for text in [
-        "type U = { a: string; a: number } | string;",
-        "type U = string | { a: string; a: number };",
-        "type U = unknown | ({ a: string; a: number } | string);",
-        "type U = { a: Missing } | string;",
-        "type U = unknown | { a: Missing };",
-        "type U = unknown & { a: string; a: number };",
-        "type U = never & { a: Missing };",
-    ] {
-        let (owner, source) = checker(text.as_bytes(), options());
-        let first = owner.operation().unwrap().semantic_diagnostics(source);
-        assert!(
-            matches!(first, Err(Error::Unsupported(_))),
-            "{text}: {first:?}"
-        );
-        for _ in 0..2 {
-            assert_eq!(
-                owner.operation().unwrap().semantic_diagnostics(source),
-                first
-            );
-        }
-    }
-    // Checking follows source order, before construction sorts/reduces types.
-    for (text, expected) in [
+    // The duplicate member trio is TS2300 twice then TS2717; an unresolvable
+    // type name is a single TS2304. Both survive reduction and repeat exactly.
+    for (text, codes) in [
+        (
+            "type U = { a: string; a: number } | string;",
+            vec![2300, 2300, 2717],
+        ),
+        (
+            "type U = string | { a: string; a: number };",
+            vec![2300, 2300, 2717],
+        ),
+        (
+            "type U = unknown | ({ a: string; a: number } | string);",
+            vec![2300, 2300, 2717],
+        ),
+        ("type U = { a: Missing } | string;", vec![2304]),
+        ("type U = unknown | { a: Missing };", vec![2304]),
+        (
+            "type U = unknown & { a: string; a: number };",
+            vec![2300, 2300, 2717],
+        ),
+        ("type U = never & { a: Missing };", vec![2304]),
+        // Checking follows source order, before construction sorts/reduces
+        // types: the same pair of constituents reports in the order written.
         (
             "type U = { a: string; a: number } | typeof missing;",
-            "checkObjectTypeForDuplicateDeclarations/subsequent property declarations",
+            vec![2300, 2300, 2717, 2304],
         ),
         (
             "type U = typeof missing | { a: string; a: number };",
-            "checkSourceElementWorker: statement/type family",
+            vec![2304, 2300, 2300, 2717],
         ),
     ] {
         let (owner, source) = checker(text.as_bytes(), options());
-        assert_eq!(
-            owner.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(expected))
-        );
+        for _ in 0..3 {
+            let diagnostics = owner
+                .operation()
+                .unwrap()
+                .semantic_diagnostics(source)
+                .unwrap();
+            assert_eq!(
+                diagnostics
+                    .iter()
+                    .map(|diagnostic| diagnostic.code)
+                    .collect::<Vec<_>>(),
+                codes,
+                "{text}"
+            );
+        }
     }
     let (owner, source) = checker(b"type U = { a: string } | number;", options());
     assert!(owner
@@ -719,6 +982,59 @@ fn compound_constituents_are_checked_even_after_reduction_and_on_retry() {
         .semantic_diagnostics(source)
         .unwrap()
         .is_empty());
+}
+
+#[test]
+fn a_unique_symbol_widens_in_a_mutable_object_literal_location() {
+    // Upstream widens a unique symbol outside its const-like declaration, so a
+    // later declaration serialization never reaches an inaccessible one.
+    let (owner, program, _) = fixture(
+        b"declare function Symbol(): symbol; const key = Symbol(); const inner = { key }; type Probe = typeof inner;",
+        options(),
+    );
+    let mut op = owner.operation().unwrap();
+    let symbol = op
+        .get_symbol_at_location(declaration_name(&program, declarations(&program)[3]))
+        .unwrap()
+        .unwrap();
+    let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+    assert_eq!(
+        op.type_to_string(ty, 0).unwrap().as_bytes(),
+        b"{ key: symbol; }"
+    );
+}
+
+#[test]
+fn an_incompatible_property_reports_the_index_signature_wrapper_chain() {
+    // A fresh object literal elaborates to the offending property instead, so
+    // the wrapper is only observable through an already-typed source.
+    let (owner, source) = checker(
+        b"interface Target { [key: string]: string }\ndeclare const source: { type: number };\nconst check: Target = source;",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(diagnostics[0].code, 2322);
+    let wrapper = diagnostics[0]
+        .message_chain
+        .first()
+        .expect("index signature wrapper");
+    assert_eq!(wrapper.code, 2530);
+    assert_eq!(
+        wrapper
+            .message_args
+            .first()
+            .map(|argument| argument.as_bytes().to_vec()),
+        Some(b"type".to_vec())
+    );
+    assert_eq!(
+        wrapper.message_chain.first().map(|inner| inner.code),
+        Some(2322)
+    );
 }
 
 #[test]
@@ -768,7 +1084,7 @@ fn intersection_discriminant_reduction_is_lazy_and_raw_display_is_available() {
 }
 
 #[test]
-fn failed_intersection_reduction_clears_its_computed_flag_on_every_retry() {
+fn intersection_reduction_computes_its_never_flag_once_and_repeats_without_drift() {
     let (owner, program, _) = fixture(b"type A = { good: string; bad: typeof missingA }; type B = { good: number; bad: typeof missingB }; type I = A & B;", options());
     let mut op = owner.operation().unwrap();
     let symbol = op
@@ -776,19 +1092,29 @@ fn failed_intersection_reduction_clears_its_computed_flag_on_every_retry() {
         .unwrap()
         .unwrap();
     let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+    // Discovering the alias must not reduce it.
+    assert_eq!(
+        op.type_object_flags(ty).unwrap()
+            & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+        0
+    );
     let mut counts = None;
     for _ in 0..3 {
-        assert!(matches!(
-            op.properties_of_type(ty),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
-        assert!(matches!(
-            op.type_to_string(ty, 0),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
-        assert_eq!(
+        // `good` reduces to never, but `I` itself is not a never intersection.
+        let properties = op.properties_of_type(ty).unwrap();
+        assert_eq!(properties.len(), 2);
+        let good = op.get_type_of_symbol(properties[0]).unwrap();
+        assert_eq!(op.type_to_string(good, 0).unwrap().as_bytes(), b"never");
+        let bad = op.get_type_of_symbol(properties[1]).unwrap();
+        assert_eq!(op.type_to_string(bad, 0).unwrap().as_bytes(), b"any");
+        assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"I");
+        assert_ne!(
             op.type_object_flags(ty).unwrap()
                 & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+            0
+        );
+        assert_eq!(
+            op.type_object_flags(ty).unwrap() & ts_checker::object_flags::IS_NEVER_INTERSECTION,
             0
         );
         let current = (op.type_count(), op.symbol_count());
@@ -867,4 +1193,1411 @@ fn recursive_intersection_properties_preserve_order_and_identity_on_a_small_stac
         assert_eq!(op.properties_of_type(ty).unwrap(), properties);
         assert!(op.semantic_diagnostics(program.file(b"/main.ts").unwrap().source()).unwrap().is_empty());
     }).unwrap().join().unwrap();
+}
+
+#[test]
+fn delete_operands_must_be_optional_writable_property_references() {
+    let (owner, source) = checker(
+        b"declare const o: { a?: number; b: number; readonly c?: number };\ndelete o.a;\ndelete o.b;\ndelete o.c;\ndelete 1;\n",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+    assert_eq!(
+        codes,
+        vec![
+            ts_diagnostics::The_operand_of_a_delete_operator_must_be_optional.code,
+            ts_diagnostics::The_operand_of_a_delete_operator_cannot_be_a_read_only_property.code,
+            ts_diagnostics::The_operand_of_a_delete_operator_must_be_a_property_reference.code,
+        ]
+    );
+}
+
+#[test]
+fn meta_properties_need_their_containers_and_module_targets() {
+    let (owner, source) = checker(
+        b"const outer = new.target;\nfunction f() { return new.target; }\n",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(
+        diagnostics[0].code,
+        ts_diagnostics::Meta_property_0_is_only_allowed_in_the_body_of_a_function_declaration_function_expression_or_constructor.code
+    );
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (14, 24),
+        "the diagnostic spans `new.target` without its leading trivia"
+    );
+    let mut es2015 = options();
+    es2015.module = ModuleKind::ES2015;
+    let (owner, source) = checker(b"const m = import.meta;\n", es2015);
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+    assert_eq!(
+        codes,
+        vec![ts_diagnostics::The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_es2022_esnext_system_node16_node18_node20_or_nodenext.code]
+    );
+}
+
+#[test]
+fn regular_expression_literals_report_grammar_errors_once() {
+    let (owner, source) = checker(b"const a = /x/gg;\nconst b = /y/i;\n", options());
+    for _ in 0..2 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+        assert_eq!(
+            codes,
+            vec![ts_diagnostics::Duplicate_regular_expression_flag.code],
+            "one flag error for the duplicated `g`, none for `/y/i`"
+        );
+    }
+}
+
+#[test]
+fn debugger_statements_in_ambient_blocks_report_once_per_block() {
+    let (owner, source) = checker(
+        b"declare namespace N { debugger; debugger; }\ndeclare namespace M { debugger; }\n",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+    assert_eq!(
+        codes,
+        vec![
+            ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
+            ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
+        ]
+    );
+}
+
+fn codes_and_args(diagnostics: &[ts_ast::Diagnostic]) -> Vec<(i32, Vec<String>)> {
+    diagnostics
+        .iter()
+        .map(|d| {
+            (
+                d.code,
+                d.message_args
+                    .iter()
+                    .map(|argument| String::from_utf8_lossy(argument.as_bytes()).into_owned())
+                    .collect(),
+            )
+        })
+        .collect()
+}
+
+const UNUSED_FIXTURE: &[u8] = b"export {};
+let unused = 1;
+let used = 2;
+export const value = used;
+let p = 1, q = 2;
+function helper<T, U>(a: number, _b: string): void { let x = 1; }
+helper(1, \"\");
+class C {
+    private secret = 1;
+    private read = 2;
+    method() { return this.read; }
+    constructor(private param: number) {}
+}
+new C(1);
+";
+
+#[test]
+fn no_unused_locals_reports_locals_and_private_members_as_errors() {
+    let (owner, source) = checker(
+        UNUSED_FIXTURE,
+        CompilerOptions {
+            no_unused_locals: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let mut op = owner.operation().unwrap();
+    let diagnostics = op.semantic_diagnostics(source).unwrap();
+    let never_read = ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (never_read, vec!["unused".to_string()]),
+            (ts_diagnostics::All_variables_are_unused.code, vec![]),
+            (never_read, vec!["x".to_string()]),
+            (never_read, vec!["secret".to_string()]),
+            (
+                ts_diagnostics::Property_0_is_declared_but_its_value_is_never_read.code,
+                vec!["param".to_string()]
+            ),
+        ]
+    );
+    // Parameters and type parameters are suggestions while noUnusedParameters is off.
+    let suggestions = op.recorded_suggestions(source).unwrap();
+    assert_eq!(
+        codes_and_args(&suggestions),
+        vec![
+            (ts_diagnostics::All_type_parameters_are_unused.code, vec![]),
+            (never_read, vec!["a".to_string()]),
+        ]
+    );
+    assert!(suggestions
+        .iter()
+        .all(|d| d.category == ts_diagnostics::Category::Suggestion as i32));
+}
+
+#[test]
+fn no_unused_parameters_reports_parameters_and_type_parameter_lists() {
+    let (owner, source) = checker(
+        UNUSED_FIXTURE,
+        CompilerOptions {
+            no_unused_parameters: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (ts_diagnostics::All_type_parameters_are_unused.code, vec![]),
+            (
+                ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
+                vec!["a".to_string()]
+            ),
+        ]
+    );
+    let text = std::str::from_utf8(UNUSED_FIXTURE).unwrap();
+    let start = text.find("<T, U>").unwrap() as i64;
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (start, start + "<T, U>".len() as i64),
+        "the list range spans both angle brackets"
+    );
+}
+
+#[test]
+fn unused_reports_are_suggestions_without_the_options() {
+    let (owner, source) = checker(b"export {};\nlet unused = 1;\n", options());
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(source).unwrap().is_empty());
+    let suggestions = op.recorded_suggestions(source).unwrap();
+    assert_eq!(
+        codes_and_args(&suggestions),
+        vec![(
+            ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
+            vec!["unused".to_string()]
+        )]
+    );
+    assert_eq!(
+        suggestions[0].category,
+        ts_diagnostics::Category::Suggestion as i32
+    );
+}
+
+#[test]
+fn renamed_binding_elements_in_function_types_are_errors_regardless_of_options() {
+    let typed = b"type F = ({ a: renamed }: { a: string }) => void;\n";
+    let (owner, source) = checker(typed, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let code = ts_diagnostics::X_0_is_an_unused_renaming_of_1_Did_you_intend_to_use_it_as_a_type_annotation.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(code, vec!["renamed".to_string(), "a".to_string()])]
+    );
+    assert!(diagnostics[0].related_information.is_empty());
+
+    let untyped = b"type F = ({ a: renamed }) => void;\n";
+    let (owner, source) = checker(
+        untyped,
+        CompilerOptions {
+            no_implicit_any: Tristate::FALSE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(code, vec!["renamed".to_string(), "a".to_string()])]
+    );
+    let related = &diagnostics[0].related_information;
+    assert_eq!(related.len(), 1);
+    assert_eq!(
+        related[0].code,
+        ts_diagnostics::We_can_only_write_a_type_for_0_by_adding_a_type_for_the_entire_parameter_here
+            .code
+    );
+    let end = untyped.iter().position(|&b| b == b')').unwrap() as i64;
+    assert_eq!((related[0].loc.pos(), related[0].loc.end()), (end, end));
+}
+
+#[test]
+fn excess_properties_report_the_offending_property_with_spelling_suggestions() {
+    let plain = b"let value: { field: number } = { field: 1, extra: 2 };";
+    let (owner, source) = checker(plain, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
+            vec!["extra".to_string(), "{ field: number; }".to_string()]
+        )]
+    );
+    let start = plain.windows(5).position(|w| w == b"extra").unwrap() as i64;
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (start, start + 5),
+        "the property name is the error node"
+    );
+    assert!(diagnostics[0].message_chain.is_empty());
+
+    let misspelled = b"let value: { field: number } = { feild: 1 };";
+    let (owner, source) = checker(misspelled, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Object_literal_may_only_specify_known_properties_but_0_does_not_exist_in_type_1_Did_you_mean_to_write_2.code,
+            vec![
+                "feild".to_string(),
+                "{ field: number; }".to_string(),
+                "field".to_string()
+            ]
+        )]
+    );
+
+    let discriminated = b"let value: { kind: \"a\"; x: number } | { kind: \"b\"; y: number } = { kind: \"a\", y: 1 };";
+    let (owner, source) = checker(discriminated, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
+            vec!["y".to_string(), "{ kind: \"a\"; x: number; }".to_string()]
+        )],
+        "the matching discriminant narrows the reported target"
+    );
+}
+
+#[test]
+fn commonjs_files_cannot_import_ecmascript_modules_synchronously_under_node16() {
+    let node16 = CompilerOptions {
+        module: ModuleKind::NODE16,
+        module_resolution: ts_core::ModuleResolutionKind::NODE16,
+        ..options()
+    };
+    let main = b"import { x } from \"./esm.mjs\";\nx;\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[(b"/main.ts", main), (b"/esm.mts", b"export const x = 1;\n")],
+        node16.clone(),
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::The_current_file_is_a_CommonJS_module_whose_imports_will_produce_require_calls_however_the_referenced_file_is_an_ECMAScript_module_and_cannot_be_imported_with_require_Consider_writing_a_dynamic_import_0_call_instead.code,
+            vec!["./esm.mjs".to_string()]
+        )]
+    );
+    let start = main.iter().position(|&b| b == b'"').unwrap() as i64;
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (start, start + "\"./esm.mjs\"".len() as i64),
+        "the specifier is the error node"
+    );
+    assert_eq!(diagnostics[0].message_chain.len(), 1);
+    let details = &diagnostics[0].message_chain[0];
+    assert_eq!(
+        details.code,
+        ts_diagnostics::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module.code
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(details))[0].1,
+        vec![".mts".to_string()]
+    );
+
+    let type_only = b"import type { x } from \"./esm.mjs\";\nlet value: typeof x = 1;\nvalue;\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", type_only),
+            (b"/esm.mts", b"export const x = 1;\n"),
+        ],
+        node16,
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Type_only_import_of_an_ECMAScript_module_from_a_CommonJS_module_must_have_a_resolution_mode_attribute.code,
+            vec!["./esm.mjs".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn classes_extending_an_any_base_check_without_resolving_members_on_any() {
+    let text = b"declare var Err: any;\nclass A extends Err {\n    payload: string;\n    constructor() {\n        super(1, 2);\n        super.unknown;\n        super[\"unknown\"];\n    }\n    process() { return this.payload + \"!\"; }\n}\nvar o = { m() { super.unknown; } };\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner.operation().unwrap().semantic_diagnostics(source);
+    assert!(diagnostics.is_ok(), "{diagnostics:?}");
+}
+
+#[test]
+fn using_declarations_report_grammar_and_disposable_initializer_errors() {
+    const GLOBALS: &[u8] = b"interface Disposable { dispose(): void }
+interface AsyncDisposable { asyncDispose(): void }
+";
+    let script = b"interface Disposable { dispose(): void }
+interface AsyncDisposable { asyncDispose(): void }
+using bad = 1;
+using good = { dispose() {} };
+switch (1) { case 1: using inClause = null; }
+";
+    let (owner, source) = checker(script, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    // The relation error carries the generalized source and the nullable-stripped
+    // target as arguments even though the head message has no placeholders.
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (
+                ts_diagnostics::The_initializer_of_a_using_declaration_must_be_either_an_object_with_a_Symbol_dispose_method_or_be_null_or_undefined.code,
+                vec!["number".to_string(), "Disposable".to_string()]
+            ),
+            (
+                ts_diagnostics::X_using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block.code,
+                vec![]
+            ),
+        ]
+    );
+    let start = script.windows(7).position(|w| w == b"bad = 1").unwrap() as i64 + 6;
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (start, start + 1),
+        "the initializer is the error node"
+    );
+
+    // `await using` at the top level of a module checks against AsyncDisposable | Disposable.
+    let module = b"export {};\nawait using x = { asyncDispose() {} };\nawait using y = 2;\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[(b"/main.ts", module), (b"/globals.ts", GLOBALS)],
+        options(),
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+    assert_eq!(
+        codes,
+        vec![
+            ts_diagnostics::The_initializer_of_an_await_using_declaration_must_be_either_an_object_with_a_Symbol_asyncDispose_or_Symbol_dispose_method_or_be_null_or_undefined.code
+        ]
+    );
+
+    let top_level = b"await using x = null;\n";
+    let (owner, source) = checker(top_level, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_await_using_statements_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module.code,
+            vec![]
+        )]
+    );
+}
+
+#[test]
+fn import_helpers_report_a_missing_tslib_once_per_file() {
+    let text = b"export const { a, ...rest } = { a: 1, b: 2 };\n";
+    for (target, expected) in [
+        (ScriptTarget::ES2018, 0),
+        (ScriptTarget::ES2017, 1),
+        (ScriptTarget::ES2015, 1),
+    ] {
+        let (owner, source) = checker(
+            text,
+            CompilerOptions {
+                target,
+                import_helpers: Tristate::TRUE,
+                ..options()
+            },
+        );
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+        assert_eq!(
+            codes,
+            vec![
+                ts_diagnostics::This_syntax_requires_an_imported_helper_but_module_0_cannot_be_found.code;
+                expected
+            ],
+            "target {target:?}"
+        );
+        if expected == 1 {
+            let start = text.windows(7).position(|w| w == b"...rest").unwrap() as i64 + 3;
+            assert_eq!(
+                (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+                (start, start + 4),
+                "the rest binding element is the error node, spanning its name"
+            );
+        }
+    }
+}
+
+#[test]
+fn import_attribute_values_are_contextually_typed_and_inline_attributes_are_const_contexts() {
+    let globals: &[u8] = b"interface ImportAttributes { [name: string]: string }
+interface Array<T> { length: number }
+interface RegExp {}
+interface Number { toString(): string }
+";
+    let module = b"import * as thing1 from \"./mod.mjs\" with { field: 0 };
+import * as thing2 from \"./mod.mjs\" with { field: `a` };
+import * as thing3 from \"./mod.mjs\" with { field: /a/g };
+import * as thing4 from \"./mod.mjs\" with { field: [\"a\"] };
+import * as thing5 from \"./mod.mjs\" with { field: { a: 0 } };
+import * as thing6 from \"./mod.mjs\" with { type: \"json\", field: 0..toString() };
+";
+    let nodenext = CompilerOptions {
+        target: ScriptTarget::ES2022,
+        module: ModuleKind::NODE_NEXT,
+        module_resolution: ts_core::ModuleResolutionKind::NODE_NEXT,
+        ..options()
+    };
+    let (owner, program, _) = fixture_files(
+        b"/mod.mts",
+        &[(b"/mod.mts", module), (b"/globals.d.ts", globals)],
+        nodenext.clone(),
+    );
+    let source = program.file(b"/mod.mts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
+    let not_assignable = ts_diagnostics::Type_0_is_not_assignable_to_type_1.code;
+    let not_string =
+        ts_diagnostics::Import_attribute_values_must_be_string_literal_expressions.code;
+    // Pinned Go: importAttributes6(module=nodenext).errors.txt, ten errors in source order.
+    assert_eq!(
+        codes,
+        vec![
+            not_assignable,
+            not_string,
+            not_string,
+            not_assignable,
+            not_string,
+            not_assignable,
+            not_string,
+            not_assignable,
+            not_string,
+            not_string
+        ]
+    );
+    assert_eq!(
+        codes_and_args(&diagnostics[..1])[0].1,
+        vec!["{ field: 0; }".to_string(), "ImportAttributes".to_string()],
+        "the attribute value keeps its literal type under the ImportAttributes contextual type"
+    );
+
+    let inline = b"export const loaded = import(\"./mod.mjs\", { with: { type: \"json\" } });\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.mts",
+        &[
+            (b"/main.mts", inline),
+            (b"/mod.mjs", b"export const x = 1;\n"),
+            (b"/globals.ts", globals),
+        ],
+        nodenext,
+    );
+    let source = program.file(b"/main.mts").unwrap().source();
+    let diagnostics = owner.operation().unwrap().semantic_diagnostics(source);
+    assert!(diagnostics.is_ok(), "{diagnostics:?}");
+}
+
+#[test]
+fn inferred_qualified_type_names_emit_as_entity_names_in_declarations() {
+    // Inferred types are written by the node builder; upstream builds
+    // `NS.I` as a qualified name and `typeof C` over an entity name.
+    let text = b"export namespace NS { export interface I { x: number } }
+declare const make: () => NS.I;
+export const v = make();
+export class C {}
+export const cls = C;
+export const mixin = (Base: new (...args: any[]) => any) => class extends Base { get(node: NS.I) {} };
+";
+    let (owner, program, _) = fixture(text, options());
+    let file = program.file(b"/main.ts").unwrap();
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(file.source()).unwrap().is_empty());
+    let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
+    assert!(declarations.is_ok(), "{declarations:?}");
+    assert!(declarations.unwrap().is_empty());
+}
+
+#[test]
+fn abstract_properties_destructured_from_this_in_constructors_are_reported() {
+    // Pinned Go: abstractPropertyInConstructor.errors.txt, class C1.
+    let text = b"abstract class C1 {
+    abstract x: string;
+    abstract y: string;
+    constructor() {
+        let self = this;
+        let { x, y: y1 } = this;
+        ({ x, y: y1, \"y\": y1 } = this);
+    }
+}
+";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let code =
+        ts_diagnostics::Abstract_property_0_in_class_1_cannot_be_accessed_in_the_constructor.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        ["x", "y", "x", "y", "y"]
+            .iter()
+            .map(|name| (code, vec![(*name).to_string(), "C1".to_string()]))
+            .collect::<Vec<_>>()
+    );
+
+    // Destructuring a private member checks accessibility at the binding element.
+    let private = b"class A { private p = 1; q = 2; }\nconst { p, q } = new A();\np; q;\n";
+    let (owner, source) = checker(private, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Property_0_is_private_and_only_accessible_within_class_1.code,
+            vec!["p".to_string(), "A".to_string()]
+        )]
+    );
+    let start = private.windows(8).position(|w| w == b"{ p, q }").unwrap() as i64 + 2;
+    assert_eq!(
+        (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+        (start, start + 1)
+    );
+}
+
+#[test]
+fn missing_properties_from_later_libs_suggest_the_lib() {
+    let text =
+        b"interface String { length: number }\ndeclare const s: string;\ns.padStart(2);\ns.nope;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (
+                ts_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later.code,
+                vec!["padStart".to_string(), "string".to_string(), "es2017".to_string()]
+            ),
+            (
+                ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+                vec!["nope".to_string(), "string".to_string()]
+            ),
+        ]
+    );
+}
+
+#[test]
+fn declaration_emit_names_types_from_other_modules_through_ranked_specifiers() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (
+                b"/main.ts",
+                b"import { make } from \"./lib\";\nexport const v = make();\n",
+            ),
+            (
+                b"/lib.ts",
+                b"export interface I { x: number }\nexport declare function make(): I;\n",
+            ),
+        ],
+        options(),
+    );
+    let file = program.file(b"/main.ts").unwrap();
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(file.source()).unwrap().is_empty());
+    let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
+    assert!(declarations.is_ok(), "{declarations:?}");
+    assert!(declarations.unwrap().is_empty());
+}
+
+#[test]
+fn untyped_packages_report_the_types_install_chain() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import * as foo from \"foo\";\nfoo;\n"),
+            (b"/node_modules/foo/index.js", b"module.exports = {};\n"),
+            (
+                b"/node_modules/foo/package.json",
+                b"{ \"name\": \"foo\", \"version\": \"1.0.0\", \"main\": \"index.js\" }\n",
+            ),
+        ],
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            module_resolution: ts_core::ModuleResolutionKind::NODE10,
+            ..options()
+        },
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type.code,
+            vec!["foo".to_string(), "/node_modules/foo/index.js".to_string()]
+        )]
+    );
+    assert_eq!(diagnostics[0].message_chain.len(), 1);
+    let chain = &diagnostics[0].message_chain[0];
+    assert_eq!(
+        chain.code,
+        ts_diagnostics::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0.code
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(chain))[0].1,
+        vec!["foo".to_string(), "foo".to_string()]
+    );
+}
+
+#[test]
+fn global_augmentations_merging_into_aliases_resolve_the_alias() {
+    // Pinned Go: checkMergedGlobalUMDSymbol.errors.txt, two TS2451 in global.d.ts.
+    let (owner, program, _) = fixture_files(
+        b"/test.ts",
+        &[
+            (b"/test.ts", b"const m = THREE;\nm;\n"),
+            (b"/three.d.ts", b"export namespace THREE {\n  export class Vector2 {}\n}\n"),
+            (
+                b"/global.d.ts",
+                b"import * as _three from './three';\n\nexport as namespace THREE;\n\ndeclare global {\n  export const THREE: typeof _three;\n}\n",
+            ),
+        ],
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            ..options()
+        },
+    );
+    let mut op = owner.operation().unwrap();
+    let test = program.file(b"/test.ts").unwrap().source();
+    let test_diagnostics = op.semantic_diagnostics(test);
+    assert!(test_diagnostics.is_ok(), "{test_diagnostics:?}");
+    assert!(test_diagnostics.unwrap().is_empty());
+    let global = program.file(b"/global.d.ts").unwrap().source();
+    let diagnostics = op.semantic_diagnostics(global).unwrap();
+    let redeclare = ts_diagnostics::Cannot_redeclare_block_scoped_variable_0.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (redeclare, vec!["THREE".to_string()]),
+            (redeclare, vec!["THREE".to_string()]),
+        ]
+    );
+}
+
+#[test]
+fn unique_symbol_index_errors_name_the_symbol_fully_qualified() {
+    let text = b"declare const s: unique symbol;\ndeclare const o: { a: number };\no[s];\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Element_implicitly_has_an_any_type_because_expression_of_type_0_can_t_be_used_to_index_type_1.code,
+            vec!["unique symbol".to_string(), "{ a: number; }".to_string()]
+        )]
+    );
+    let chain = &diagnostics[0].message_chain;
+    assert_eq!(chain.len(), 1);
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&chain[0])),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["[s]".to_string(), "{ a: number; }".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn deprecated_contextual_properties_are_suggested_with_their_tag() {
+    let text = b"interface Opts {\n    /** @deprecated use fresh */\n    old?: number;\n    fresh?: number;\n}\nexport const o: Opts = { old: 1 };\n";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(source).unwrap().is_empty());
+    let suggestions = op.recorded_suggestions(source).unwrap();
+    assert_eq!(
+        codes_and_args(&suggestions),
+        vec![(
+            ts_diagnostics::X_0_is_deprecated.code,
+            vec!["old".to_string()]
+        )]
+    );
+    assert_eq!(suggestions[0].related_information.len(), 1);
+    assert_eq!(
+        suggestions[0].related_information[0].code,
+        ts_diagnostics::The_declaration_was_marked_as_deprecated_here.code
+    );
+}
+
+#[test]
+fn typeof_this_in_a_method_signature_checks_without_a_boundary() {
+    // Pinned Go: typeofThisInMethodSignature has no errors.
+    let text = b"export class A {\n\tx = 1\n\ta(x: typeof this.x): void {}\n}\n\nconst a = new A().a(1);\n";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            ..options()
+        },
+    );
+    let diagnostics = owner.operation().unwrap().semantic_diagnostics(source);
+    assert!(diagnostics.is_ok(), "{diagnostics:?}");
+    assert_eq!(codes_and_args(&diagnostics.unwrap()), vec![]);
+}
+
+#[test]
+fn rewritten_relative_imports_that_resolve_to_directories_are_reported() {
+    // Pinned Go: rewriteRelativeImportExtensions/cjsErrors(module=node18).errors.txt.
+    let (owner, program, _) = fixture_files(
+        b"/index.ts",
+        &[
+            (
+                b"/index.ts",
+                b"import foo = require(\"./foo.ts\"); // Error\nimport type _foo = require(\"./foo.ts\"); // Ok\nfoo;\n",
+            ),
+            (b"/foo.ts/index.ts", b"export = {};\n"),
+        ],
+        CompilerOptions {
+            target: ScriptTarget::ES2022,
+            module: ModuleKind::NODE18,
+            module_resolution: ts_core::ModuleResolutionKind::NODE16,
+            rewrite_relative_import_extensions: Tristate::TRUE,
+            verbatim_module_syntax: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let source = program.file(b"/index.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::This_relative_import_path_is_unsafe_to_rewrite_because_it_looks_like_a_file_name_but_actually_resolves_to_0.code,
+            vec!["./foo.ts/index.ts".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn never_intersections_explain_the_conflicting_property() {
+    let text = b"type A = { kind: \"a\" } & { kind: \"b\" };\ndeclare const a: A;\na.kind;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    // The head message displays the reduced type; the chain keeps the alias
+    // through NoTypeReduction.
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["kind".to_string(), "never".to_string()]
+        )]
+    );
+    let chain = &diagnostics[0].message_chain;
+    assert_eq!(chain.len(), 1);
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&chain[0])),
+        vec![(
+            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents.code,
+            vec!["A".to_string(), "kind".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn nominal_classes_are_not_subtype_reduced_unless_derived() {
+    let text = b"class A { x = 1 }\nclass B extends A {}\nclass C { x = 1 }\ndeclare const a: A;\ndeclare const b: B;\ndeclare const c: C;\nexport const arr = [a, b, c];\n";
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", text),
+            (b"/globals.d.ts", b"interface Array<T> { length: number }\n"),
+        ],
+        options(),
+    );
+    let export = *declarations(&program).last().unwrap();
+    let view = program.file(b"/main.ts").unwrap().bound().view().ast();
+    let list = view
+        .node(export)
+        .unwrap()
+        .data_source()
+        .as_variable_statement()
+        .unwrap()
+        .declaration_list()
+        .unwrap();
+    let declarations_list = view
+        .node(list)
+        .unwrap()
+        .data_source()
+        .as_variable_declaration_list()
+        .unwrap()
+        .declarations()
+        .unwrap();
+    let declaration = view
+        .node_slice(view.list(declarations_list).unwrap().nodes())
+        .unwrap()
+        .get(0)
+        .unwrap()
+        .unwrap();
+    let name = declaration_name(&program, declaration);
+    let mut op = owner.operation().unwrap();
+    let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+    let ty = op.get_type_of_symbol(symbol).unwrap();
+    // B derives from A and is removed; C is structurally identical to A but nominal.
+    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"(A | C)[]");
+}
+
+#[test]
+fn too_many_arguments_through_a_spread_report_the_extra_argument_span() {
+    // Pinned Go: functionParameterArityMismatch.errors.txt, the last two calls.
+    let text = b"interface Array<T> { length: number }\ndeclare function f2();\ndeclare function f2(a: number, b: number, c: number, d: number, e: number, f: number);\nf2(1, 2, 3, 4, 5, 6, 7);\nf2(1, 2, 3, 4, 5, ...[6, 7]);\n";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            strict: Tristate::FALSE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let expected = ts_diagnostics::Expected_0_arguments_but_got_1.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (expected, vec!["0-6".to_string(), "7".to_string()]),
+            (expected, vec!["0-6".to_string(), "7".to_string()]),
+        ]
+    );
+    // The second span starts at the spread element that carries the extra argument.
+    let spread = text.windows(8).position(|w| w == b"...[6, 7").unwrap() as i64;
+    assert_eq!(diagnostics[1].loc.pos(), spread);
+}
+
+#[test]
+fn readonly_type_operators_are_limited_to_array_and_tuple_literals() {
+    let (owner, source) = checker(b"type T = readonly string;\n", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types.code,
+            vec!["symbol".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn conflicting_private_members_reduce_intersections_to_never_with_an_explanation() {
+    let text =
+        b"class A { private p = 1 }\nclass B { private p = 1 }\ndeclare const x: A & B;\nx.p;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            vec!["p".to_string(), "never".to_string()]
+        )]
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
+        vec![(
+            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some.code,
+            vec!["A & B".to_string(), "p".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn circular_import_aliases_report_the_circularity() {
+    let (owner, source) = checker(b"import a = a;\na;\n", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert!(
+        diagnostics
+            .iter()
+            .any(|d| d.code == ts_diagnostics::Circular_definition_of_import_alias_0.code),
+        "{:?}",
+        codes_and_args(&diagnostics)
+    );
+}
+
+#[test]
+fn misspelled_mapped_types_suggest_the_in_keyword() {
+    let text = b"type Keys = \"a\" | \"b\";\ntype M = { [Keys]: number };\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Did_you_mean_to_use_1_in_0.code,
+            vec!["Keys".to_string(), "K".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn misspelled_builtin_names_suggest_the_primitive_alias() {
+    // A case difference costs 0.1 in the spelling distance, so `strng` prefers the
+    // primitive alias while `Strng` would pick the `String` interface.
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"let value: strng = \"\";\nvalue;\n"),
+            (b"/globals.d.ts", b"interface String {}\n"),
+        ],
+        options(),
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Cannot_find_name_0_Did_you_mean_1.code,
+            vec!["strng".to_string(), "string".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn exported_namespaces_in_commonjs_files_are_rejected_under_verbatim_module_syntax() {
+    let (owner, source) = checker(
+        b"export namespace N { export const x = 1; }\n",
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            verbatim_module_syntax: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled.code,
+            vec![]
+        )]
+    );
+    assert_eq!(diagnostics[0].loc.pos(), 0);
+}
+
+#[test]
+fn constructor_visibility_mismatches_report_the_visibilities() {
+    let text = b"class A { private constructor() {} }\nclass B { protected constructor() {} }\nlet x: typeof B = A;\nx;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(
+        diagnostics[0].code,
+        ts_diagnostics::Type_0_is_not_assignable_to_type_1.code
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
+        vec![(
+            ts_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type.code,
+            vec!["private".to_string(), "protected".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn imports_conflicting_with_global_values_need_type_only_imports_under_isolated_modules() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import { Foo } from \"./a\";\nFoo;\n"),
+            (b"/a.ts", b"export interface Foo { x: number }\n"),
+            (b"/globals.d.ts", b"declare var Foo: number;\n"),
+        ],
+        CompilerOptions {
+            isolated_modules: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert!(
+        diagnostics.iter().any(|d| d.code
+            == ts_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled.code),
+        "{:?}",
+        codes_and_args(&diagnostics)
+    );
+}
+
+#[test]
+fn uncalled_function_checks_resolve_this_property_symbols() {
+    let text = b"class C {\n    f = () => 1;\n    m() { return this.f ? 1 : 2; }\n}\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![ts_diagnostics::This_condition_will_always_return_true_since_this_function_is_always_defined_Did_you_mean_to_call_it_instead.code]
+    );
+}
+
+#[test]
+fn split_value_and_type_exports_combine_into_one_symbol() {
+    // Pinned Go: mergedDeclarations7.errors.txt. `Passport` resolves to the
+    // interface from the namespace merged with the `export =` value.
+    let (owner, program, _) = fixture_files(
+        b"/test.ts",
+        &[
+            (
+                b"/passport.d.ts",
+                b"declare module 'passport' {
+    namespace passport {
+        interface Passport {
+            use(): this;
+        }
+        interface PassportStatic extends Passport {
+            Passport: {new(): Passport};
+        }
+    }
+    const passport: passport.PassportStatic;
+    export = passport;
+}
+",
+            ),
+            (
+                b"/test.ts",
+                b"import * as passport from \"passport\";
+import { Passport } from \"passport\";
+let p: Passport = passport.use();
+",
+            ),
+        ],
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            ..options()
+        },
+    );
+    let source = program.file(b"/test.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Type_0_is_not_assignable_to_type_1.code,
+            vec!["PassportStatic".to_string(), "Passport".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn commonjs_class_expression_containers_resolve_for_declaration_emit() {
+    // Pinned Go: jsDeclarationsExportAssignedClassExpressionAnonymousWithSub.
+    // getContainersOfSymbol reaches the class expressions through their
+    // `module.exports` assignments instead of failing the declaration phase.
+    let (owner, program, _) = fixture_files(
+        b"/index.js",
+        &[(
+            b"/index.js",
+            b"module.exports = class {
+    /** @param {number} p */
+    constructor(p) {
+        this.t = 12 + p;
+    }
+}
+module.exports.Sub = class {
+    constructor() {
+        this.instance = new module.exports(10);
+    }
+}
+",
+        )],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            declaration: Tristate::TRUE,
+            module: ModuleKind::COMMON_JS,
+            ..options()
+        },
+    );
+    let file = program.file(b"/index.js").unwrap();
+    let mut op = owner.operation().unwrap();
+    let semantic = op.semantic_diagnostics(file.source()).unwrap();
+    assert_eq!(
+        semantic.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::An_export_assignment_cannot_be_used_in_a_module_with_other_exported_elements.code,
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+        ]
+    );
+    let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
+    assert!(declarations.is_ok(), "{declarations:?}");
+}
+
+#[test]
+fn implements_errors_keep_their_head_message_over_missing_properties() {
+    // Pinned Go: jsdocImplements_class.errors.txt (B3) and relater.go's
+    // isConversionOrInterfaceImplementationMessage.
+    let text = b"class A { method(): number { throw 1 } }
+class B3 implements A {}
+interface I { method(): number }
+class B4 implements I {}
+";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass.code,
+            ts_diagnostics::Class_0_incorrectly_implements_interface_1.code,
+        ]
+    );
+    assert_eq!(
+        diagnostics[0].message_chain[0].code,
+        ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
+    );
+}
+
+#[test]
+fn reentrant_effects_signature_resolution_terminates_like_upstream() {
+    // Pinned Go: controlFlowFunctionLikeCircular1.errors.txt, file 8. The
+    // assertion call's effects signature re-enters itself through the type
+    // predicate's `typeof arg`; upstream recomputes and the explicit-type
+    // resolving set ends the recursion.
+    let text = b"function test(arg: string | number, whatever: any) {
+  if (typeof arg === \"string\") {
+    b();
+    type First = typeof arg;
+    type Test = (arg: unknown) => arg is First;
+    const b: Test = whatever;
+    return b;
+  }
+  return undefined;
+}
+";
+    let (owner, source) = checker(
+        text,
+        CompilerOptions {
+            strict: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::Block_scoped_variable_0_used_before_its_declaration.code,
+            ts_diagnostics::Variable_0_is_used_before_being_assigned.code,
+            ts_diagnostics::Expected_0_arguments_but_got_1.code,
+            ts_diagnostics::Type_alias_0_circularly_references_itself.code,
+        ]
+    );
+}
+
+#[test]
+fn iife_rest_parameters_past_the_argument_list_check_without_panicking() {
+    // `getSpreadArgumentType`'s `for i := index; i < argCount; i++` simply does
+    // not run when a rest parameter sits past the argument list, so the window is
+    // empty. Both shapes are lines 9 and 10 of the pinned fixture
+    // emitDefaultParametersFunctionExpression.ts, which Go checks without error.
+    for text in [
+        b"var y = (function (num = 10, boo = false, ...rest) { })();".as_slice(),
+        b"var z = (function (num: number, boo = false, ...rest) { })(10);",
+    ] {
+        let (checker, source) = checker(
+            text,
+            CompilerOptions {
+                strict: Tristate::FALSE,
+                ..options()
+            },
+        );
+        let first = checker.operation().unwrap().semantic_diagnostics(source);
+        assert!(first.is_ok(), "source {text:?}: {first:?}");
+        assert!(
+            first.as_ref().unwrap().is_empty(),
+            "source {text:?}: {first:?}"
+        );
+        for _ in 0..2 {
+            assert_eq!(
+                checker.operation().unwrap().semantic_diagnostics(source),
+                first,
+                "source {text:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn missing_dom_intersections_use_the_native_lib_diagnostic() {
+    // The six accesses and expected diagnostics are from the pinned
+    // compiler/missingDomElements.ts fixture, including its negative controls.
+    let text =
+        include_bytes!("../../../upstream/tsc/testdata/tests/cases/compiler/missingDomElements.ts");
+    let (checker, source) = checker(text, options());
+    for _ in 0..2 {
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(
+            diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+            [2812, 2812, 2812, 2812, 2339, 2339]
+        );
+        assert_eq!(
+            diagnostics[3]
+                .message_args
+                .iter()
+                .map(JsString::as_bytes)
+                .collect::<Vec<_>>(),
+            [b"textContent".as_slice(), b"EventTarget & HTMLInputElement"]
+        );
+    }
 }

@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "scope": "S08 P4 optional property, element, call and non-null chains with marker propagation",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "optional-property",
+      "files": {
+        "/optional-property.ts": "declare const a:{b:number}|undefined;const Query=a?.b;\n"
+      },
+      "roots": [
+        "/optional-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-property.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-null",
+      "files": {
+        "/optional-null.ts": "declare const a:{b:number}|null;const Query=a?.b;\n"
+      },
+      "roots": [
+        "/optional-null.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-null.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-known",
+      "files": {
+        "/optional-known.ts": "declare const a:{b:number};const Query=a?.b;\n"
+      },
+      "roots": [
+        "/optional-known.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-known.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-tail",
+      "files": {
+        "/optional-tail.ts": "declare const a:{b:{n:number}}|undefined;const Query=a?.b.n;\n"
+      },
+      "roots": [
+        "/optional-tail.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-tail.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-repeated",
+      "files": {
+        "/optional-repeated.ts": "declare const a:{b:{n:number}|undefined}|undefined;const Query=a?.b?.n;\n"
+      },
+      "roots": [
+        "/optional-repeated.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-repeated.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-inner-null",
+      "files": {
+        "/optional-inner-null.ts": "declare const a:{b:{n:number}|undefined}|undefined;const Query=a?.b.n;\n"
+      },
+      "roots": [
+        "/optional-inner-null.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-inner-null.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-parenthesized",
+      "files": {
+        "/optional-parenthesized.ts": "declare const a:{b:{n:number}}|undefined;const Query=(a?.b).n;\n"
+      },
+      "roots": [
+        "/optional-parenthesized.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-parenthesized.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-element",
+      "files": {
+        "/optional-element.ts": "declare const a:{b:number}|undefined;const Query=a?.[\"b\"];\n"
+      },
+      "roots": [
+        "/optional-element.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-element.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-element-tail",
+      "files": {
+        "/optional-element-tail.ts": "declare const a:{b:{n:number}}|null;const Query=a?.[\"b\"].n;\n"
+      },
+      "roots": [
+        "/optional-element-tail.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-element-tail.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-index",
+      "files": {
+        "/optional-index.ts": "declare const a:{[key:string]:number}|undefined;const Query=a?.[\"x\"];\n"
+      },
+      "roots": [
+        "/optional-index.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-index.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-missing",
+      "files": {
+        "/optional-missing.ts": "declare const a:{b:number}|undefined;const Query=a?.missing;\n"
+      },
+      "roots": [
+        "/optional-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-missing.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-assign",
+      "files": {
+        "/optional-assign.ts": "declare let a:{b:number}|undefined;a?.b=1;const Query=a;\n"
+      },
+      "roots": [
+        "/optional-assign.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-assign.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-generic",
+      "files": {
+        "/optional-generic.ts": "function f<T extends {b:number}|undefined>(a:T){return a?.b;}const Query=f;\n"
+      },
+      "roots": [
+        "/optional-generic.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-generic.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-assertion",
+      "files": {
+        "/optional-assertion.ts": "declare const a:{b:{n:number}|undefined}|undefined;const Query=a?.b!.n;\n"
+      },
+      "roots": [
+        "/optional-assertion.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-assertion.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-call",
+      "files": {
+        "/optional-call.ts": "declare const f:((a:number)=>string)|undefined;const Query=f?.(1);\n"
+      },
+      "roots": [
+        "/optional-call.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-call.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-method-call",
+      "files": {
+        "/optional-method-call.ts": "declare const a:{f:(n:number)=>{s:string}}|undefined;const Query=a?.f(1).s;\n"
+      },
+      "roots": [
+        "/optional-method-call.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-method-call.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "optional-method-root",
+      "files": {
+        "/optional-method-root.ts": "declare const a:{f:((n:number)=>{s:string})|undefined};const Query=a.f?.(1).s;\n"
+      },
+      "roots": [
+        "/optional-method-root.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/optional-method-root.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

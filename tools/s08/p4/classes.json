@@ -1,0 +1,496 @@
+{
+  "version": 1,
+  "scope": "S08 P4 class instance, constructor, prototype, generic heritage and member identities capability capture; not full class body/grammar acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "ambient-class",
+      "files": {
+        "/ambient-class.ts": "declare class C { x: number; readonly y: string; method(n:number): boolean; } type Instance=C; type Value=typeof C; type Prototype=typeof C.prototype;\n"
+      },
+      "roots": [
+        "/ambient-class.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/ambient-class.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/ambient-class.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Prototype",
+          "file": "/ambient-class.ts",
+          "declaration": "Prototype",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-class",
+      "files": {
+        "/generic-class.ts": "declare class Box<T=string> { value:T; constructor(value:T); get():T; } type Text=Box<string>; type Default=Box; type Value=typeof Box; type Prototype=typeof Box.prototype;\n"
+      },
+      "roots": [
+        "/generic-class.ts"
+      ],
+      "queries": [
+        {
+          "id": "Text",
+          "file": "/generic-class.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Default",
+          "file": "/generic-class.ts",
+          "declaration": "Default",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/generic-class.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Prototype",
+          "file": "/generic-class.ts",
+          "declaration": "Prototype",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-constructor",
+      "files": {
+        "/default-constructor.ts": "declare class C { x:number; } type Value=typeof C;\n"
+      },
+      "roots": [
+        "/default-constructor.ts"
+      ],
+      "queries": [
+        {
+          "id": "Value",
+          "file": "/default-constructor.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "derived-generic",
+      "files": {
+        "/derived-generic.ts": "declare class Base<T> { value:T; constructor(value:T); static count:number; } declare class Derived extends Base<string> { own:boolean; } type Instance=Derived; type Value=typeof Derived; type Inherited=Derived[\"value\"]; type Static=typeof Derived.count;\n"
+      },
+      "roots": [
+        "/derived-generic.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/derived-generic.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/derived-generic.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Inherited",
+          "file": "/derived-generic.ts",
+          "declaration": "Inherited",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Static",
+          "file": "/derived-generic.ts",
+          "declaration": "Static",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "explicit-constructor",
+      "files": {
+        "/explicit-constructor.ts": "declare class C<T> { constructor(value:T); constructor(value:T, count:number); value:T; } type Value=typeof C; type Instance=C<number>;\n"
+      },
+      "roots": [
+        "/explicit-constructor.ts"
+      ],
+      "queries": [
+        {
+          "id": "Value",
+          "file": "/explicit-constructor.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Instance",
+          "file": "/explicit-constructor.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "abstract-constructor",
+      "files": {
+        "/abstract-constructor.ts": "declare abstract class A<T> { constructor(value:T); abstract get():T; } declare abstract class B extends A<string> {} type ValueA=typeof A; type ValueB=typeof B; type Instance=B;\n"
+      },
+      "roots": [
+        "/abstract-constructor.ts"
+      ],
+      "queries": [
+        {
+          "id": "ValueA",
+          "file": "/abstract-constructor.ts",
+          "declaration": "ValueA",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "ValueB",
+          "file": "/abstract-constructor.ts",
+          "declaration": "ValueB",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Instance",
+          "file": "/abstract-constructor.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-interface-merge",
+      "files": {
+        "/class-interface-merge.ts": "declare class C<T> { x:T; } interface C<T> { y:T; } type Instance=C<string>; type Value=typeof C;\n"
+      },
+      "roots": [
+        "/class-interface-merge.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-interface-merge.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/class-interface-merge.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "null-base",
+      "files": {
+        "/null-base.ts": "declare class C extends null { x:number; } type Instance=C; type Value=typeof C;\n"
+      },
+      "roots": [
+        "/null-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/null-base.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/null-base.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-variable-base",
+      "files": {
+        "/constructor-variable-base.ts": "declare const Base: new (value:number) => { value:number }; declare class Derived extends Base { own:string; } type Instance=Derived; type Value=typeof Derived;\n"
+      },
+      "roots": [
+        "/constructor-variable-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/constructor-variable-base.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/constructor-variable-base.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "bad-base",
+      "files": {
+        "/bad-base.ts": "declare class C extends 1 { x:number; } type Instance=C; type Value=typeof C;\n"
+      },
+      "roots": [
+        "/bad-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/bad-base.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/bad-base.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "recursive-base",
+      "files": {
+        "/recursive-base.ts": "declare class C extends C { x:number; } type Instance=C; type Value=typeof C;\n"
+      },
+      "roots": [
+        "/recursive-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/recursive-base.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/recursive-base.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-property-inference",
+      "files": {
+        "/class-property-inference.ts": "class C { x=1; readonly literal=1; y: string=\"s\"; maybe?:number; static z=true; } type Instance=C; type Value=typeof C;\n"
+      },
+      "roots": [
+        "/class-property-inference.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-property-inference.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/class-property-inference.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-property-errors",
+      "files": {
+        "/class-property-errors.ts": "class C { x:number=\"wrong\"; missing:number; untyped; } type Instance=C;\n"
+      },
+      "roots": [
+        "/class-property-errors.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-property-errors.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-accessors",
+      "files": {
+        "/class-accessors.ts": "declare class C { get x(): string; set x(value: string | number); get y():number; set z(value:boolean); } type Instance=C; type X=C[\"x\"]; type Y=C[\"y\"]; type Z=C[\"z\"];\n"
+      },
+      "roots": [
+        "/class-accessors.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-accessors.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/class-accessors.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Y",
+          "file": "/class-accessors.ts",
+          "declaration": "Y",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Z",
+          "file": "/class-accessors.ts",
+          "declaration": "Z",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-accessor-inference",
+      "files": {
+        "/class-accessor-inference.ts": "class C { get value() { return 1; } set value(value) {} } type Instance=C; type Value=C[\"value\"];\n"
+      },
+      "roots": [
+        "/class-accessor-inference.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-accessor-inference.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/class-accessor-inference.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-accessor-errors",
+      "files": {
+        "/class-accessor-errors.ts": "class C { get value():number { return \"wrong\"; } set only(value) {} } type Instance=C;\n"
+      },
+      "roots": [
+        "/class-accessor-errors.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-accessor-errors.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-accessor-visibility",
+      "files": {
+        "/class-accessor-visibility.ts": "declare class C { protected get x():number; set x(v:number); abstract get y():number; set y(v:number); } type Instance=C;\n"
+      },
+      "roots": [
+        "/class-accessor-visibility.ts"
+      ],
+      "queries": [
+        {
+          "id": "Instance",
+          "file": "/class-accessor-visibility.ts",
+          "declaration": "Instance",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -66,6 +66,36 @@ pub(crate) struct RelationFrame {
 }
 
 impl CheckerState {
+    // port: tsc/internal/checker/relater.go:Checker.isSignatureAssignableTo
+    pub(crate) fn signature_is_assignable(
+        &mut self,
+        source: crate::SignatureId,
+        target: crate::SignatureId,
+        ignore_returns: bool,
+    ) -> Result<bool, Error> {
+        let kind = RelationKind::Assignable;
+        let frame = self.new_relation_frame(kind)?;
+        let mut relater = Relater {
+            checker: self,
+            kind,
+            frame,
+            report_errors: false,
+            errors: crate::relation_errors::RelationErrors::default(),
+        };
+        let mode = if ignore_returns {
+            crate::relater_signatures::IGNORE_RETURN_TYPES
+        } else {
+            0
+        };
+        let result = relater.compare_signatures(source, target, mode, 0);
+        if !relater.frame().retained {
+            relater.checker.relations.frames[frame.index(0).expect("allocated relation frame")] =
+                None;
+            relater.checker.relations.free_frames.push(frame);
+        }
+        result.map(|result| result != tr::FALSE)
+    }
+
     fn new_relation_frame(&mut self, kind: RelationKind) -> Result<crate::RelationFrameId, Error> {
         let frame = RelationFrame {
             kind,
@@ -189,6 +219,29 @@ impl CheckerState {
         Ok(result)
     }
 
+    pub(crate) fn best_assignable_error_target(
+        &mut self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<Option<TypeId>, Error> {
+        let kind = RelationKind::Assignable;
+        let frame = self.new_relation_frame(kind)?;
+        let mut relater = Relater {
+            checker: self,
+            frame,
+            kind,
+            report_errors: false,
+            errors: crate::relation_errors::RelationErrors::default(),
+        };
+        let result = relater.best_error_target(source, target);
+        if !relater.frame().retained {
+            relater.checker.relations.frames[frame.index(0).expect("allocated relation frame")] =
+                None;
+            relater.checker.relations.free_frames.push(frame);
+        }
+        result
+    }
+
     pub(crate) fn check_type_related_ex(
         &mut self,
         source: TypeId,
@@ -203,7 +256,10 @@ impl CheckerState {
             frame,
             kind,
             report_errors: false,
-            errors: crate::relation_errors::RelationErrors::default(),
+            errors: crate::relation_errors::RelationErrors {
+                error_node,
+                ..Default::default()
+            },
         };
         relater.report_errors = error_node.is_some() && kind != RelationKind::Identity;
         let result = relater.related_with_head(source, target, BOTH, 0, head);
@@ -243,6 +299,7 @@ impl CheckerState {
                 vec![source, target],
             )?)
         } else {
+            let error_node = relater.errors.error_node;
             relater.error_diagnostic(error_node)?
         };
         Ok((result != tr::FALSE, diagnostic))
@@ -277,8 +334,18 @@ impl CheckerState {
                 return Ok(true);
             }
         }
-        if (s | t) & tf::ENUM_LIKE != 0 {
-            return Err(Error::Unsupported("isSimpleTypeRelatedTo: enum relation"));
+        if s & tf::ENUM_LITERAL != 0
+            && t & tf::ENUM_LITERAL == 0
+            && ((s & tf::STRING_LITERAL != 0 && t & tf::STRING_LITERAL != 0)
+                || (s & tf::NUMBER_LITERAL != 0 && t & tf::NUMBER_LITERAL != 0))
+            && self.types.literal(source)?.value == self.types.literal(target)?.value
+        {
+            return Ok(true);
+        }
+        if let Some((source, target)) = self.simple_enum_relation_pair(source, target)? {
+            if self.enum_types_related(source, target)? {
+                return Ok(true);
+            }
         }
         if s & tf::UNDEFINED != 0
             && (!self.options.strict_null_checks && t & tf::UNION_OR_INTERSECTION == 0
@@ -300,12 +367,56 @@ impl CheckerState {
         {
             return Ok(true);
         }
-        if matches!(kind, RelationKind::Assignable | RelationKind::Comparable)
-            && (s & tf::ANY != 0 || self.is_unknown_like_union(target)?)
-        {
-            return Ok(true);
+        if matches!(kind, RelationKind::Assignable | RelationKind::Comparable) {
+            if s & tf::ANY != 0 {
+                return Ok(true);
+            }
+            if s & tf::NUMBER != 0
+                && (t & tf::ENUM != 0 || t & tf::NUMBER_LITERAL != 0 && t & tf::ENUM_LITERAL != 0)
+            {
+                return Ok(true);
+            }
+            if s & tf::NUMBER_LITERAL != 0
+                && s & tf::ENUM_LITERAL == 0
+                && (t & tf::ENUM != 0
+                    || t & tf::NUMBER_LITERAL != 0
+                        && t & tf::ENUM_LITERAL != 0
+                        && self.types.literal(source)?.value == self.types.literal(target)?.value)
+            {
+                return Ok(true);
+            }
+            if self.is_unknown_like_union(target)? {
+                return Ok(true);
+            }
         }
         Ok(false)
+    }
+
+    fn simple_enum_relation_pair(
+        &self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<Option<(ts_arena::SymbolId, ts_arena::SymbolId)>, Error> {
+        let s = self.types.get(source)?;
+        let t = self.types.get(target)?;
+        let eligible = s.flags & tf::ENUM != 0 && t.flags & tf::ENUM != 0
+            || s.flags & tf::ENUM_LITERAL != 0
+                && t.flags & tf::ENUM_LITERAL != 0
+                && (s.flags & tf::UNION != 0 && t.flags & tf::UNION != 0
+                    || s.flags & tf::LITERAL != 0
+                        && t.flags & tf::LITERAL != 0
+                        && self.types.literal(source)?.value == self.types.literal(target)?.value);
+        if !eligible {
+            return Ok(None);
+        }
+        let source = s.symbol.ok_or(Error::MissingLink("source enum symbol"))?;
+        let target = t.symbol.ok_or(Error::MissingLink("target enum symbol"))?;
+        if s.flags & tf::ENUM != 0
+            && self.symbol(source)?.name_bytes() != self.symbol(target)?.name_bytes()
+        {
+            return Ok(None);
+        }
+        Ok(Some((source, target)))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isUnknownLikeUnionType
@@ -603,12 +714,7 @@ impl Relater<'_> {
                 return Ok(tr::FALSE);
             }
             if intersection & TARGET == 0 {
-                if self.excess_properties(source, target)? {
-                    if self.report_errors {
-                        return Err(Error::Unsupported(
-                            "report excess properties: source object expression",
-                        ));
-                    }
+                if self.excess_properties(source, target, self.report_errors)? {
                     return Ok(tr::FALSE);
                 }
                 if self.no_common_properties(source, target)? {
@@ -643,17 +749,57 @@ impl Relater<'_> {
             && self
                 .checker
                 .simple_type_related(target, source, self.kind)?;
-        Ok(
-            if reverse
-                || self
-                    .checker
-                    .simple_type_related(source, target, self.kind)?
+        if reverse
+            || self
+                .checker
+                .simple_type_related(source, target, self.kind)?
+        {
+            return Ok(tr::TRUE);
+        }
+        if self.report_errors {
+            if let Some((source, target)) =
+                self.checker.simple_enum_relation_pair(source, target)?
             {
-                tr::TRUE
-            } else {
-                tr::FALSE
-            },
-        )
+                let source = self.checker.enum_owner_symbol(source)?;
+                let target = self.checker.enum_owner_symbol(target)?;
+                if self.checker.symbol(source)?.name_bytes()
+                    == self.checker.symbol(target)?.name_bytes()
+                    && self.checker.symbol(source)?.flags() & ts_ast::symbol_flags::REGULAR_ENUM
+                        != 0
+                    && self.checker.symbol(target)?.flags() & ts_ast::symbol_flags::REGULAR_ENUM
+                        != 0
+                {
+                    if let Some(mismatch) = self.checker.enum_relation_mismatch(source, target)? {
+                        self.report_enum_mismatch(mismatch)?;
+                    }
+                }
+            }
+        }
+        Ok(tr::FALSE)
+    }
+
+    fn report_enum_mismatch(
+        &mut self,
+        mismatch: crate::enums::EnumRelationMismatch,
+    ) -> Result<(), Error> {
+        use crate::enums::EnumRelationMismatch as M;
+        use ts_diagnostics as d;
+        let (message, args) = match mismatch {
+            M::Missing { property, target } => {
+                let name = self.checker.symbol_to_string(property)?;
+                let ty = self.checker.declared_enum_type(target)?;
+                let target = self.checker.type_to_string(ty, crate::type_format_flags::USE_FULLY_QUALIFIED_TYPE)?;
+                (d::Property_0_is_missing_in_type_1, vec![name, target])
+            }
+            M::Different { target, property, expected, actual } => (
+                d::Each_declaration_of_0_1_differs_in_its_value_where_2_was_expected_but_3_was_given,
+                vec![self.checker.symbol_to_string(target)?, self.checker.symbol_to_string(property)?, expected.diagnostic_text(), actual.diagnostic_text()]),
+            M::StringAndUnknown { target, property, value } => (
+                d::One_value_of_0_1_is_the_string_2_and_the_other_is_assumed_to_be_an_unknown_numeric_value,
+                vec![self.checker.symbol_to_string(target)?, self.checker.symbol_to_string(property)?, crate::enums::EnumValue::String(value).diagnostic_text()]),
+        };
+        self.report_error(message, args);
+        Ok(())
     }
 
     // port: tsc/internal/checker/relater.go:Relater.recursiveTypeRelatedTo

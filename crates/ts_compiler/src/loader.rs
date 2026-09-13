@@ -15,11 +15,17 @@ use ts_tspath as path;
 use ts_vfs::FileSystem;
 #[derive(Debug)]
 pub enum Error {
+    Checker(ts_checker::Error),
     Host(ts_vfs::Error),
     Resolution(ts_module::Error),
     Ast(ts_arena::Error),
     Bind(ts_ast::BindError),
     Unsupported(&'static str),
+}
+impl From<ts_checker::Error> for Error {
+    fn from(error: ts_checker::Error) -> Self {
+        Self::Checker(error)
+    }
 }
 impl From<ts_vfs::Error> for Error {
     fn from(e: ts_vfs::Error) -> Self {
@@ -75,7 +81,11 @@ pub struct Program {
     pub(crate) owners: crate::resolver_host::OwnerIndex,
     pub(crate) include_reasons: BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
     pub(crate) redirect_paths: BTreeMap<JsString, JsString>,
+    pub(crate) redirect_file_names: BTreeMap<JsString, JsString>,
+    pub(crate) package_resolver: std::sync::Mutex<Resolver>,
     pub(crate) include_explanations: IncludeExplanations,
+    pub(crate) declaration_diagnostics:
+        std::sync::Mutex<std::collections::HashMap<NodeId, Vec<Diagnostic>>>,
     pub(crate) diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics,
     option_verification: crate::OptionVerification,
     config: ts_tsoptions::ParsedCommandLine,
@@ -85,7 +95,7 @@ pub struct Program {
     host: Arc<dyn FileSystem>,
     files: Vec<Arc<ProgramFile>>,
     by_path: BTreeMap<JsString, usize>,
-    metadata: BTreeMap<JsString, SourceFileMetaData>,
+    pub(crate) metadata: BTreeMap<JsString, SourceFileMetaData>,
     libs: BTreeSet<JsString>,
     missing: Vec<JsString>,
     resolutions: Vec<Resolution>,
@@ -280,7 +290,22 @@ impl<'a> Loader<'a> {
             }
             self.load_worker(&task.name, task.is_lib, task.is_root, task.depth)?;
         }
+        let loaded_names: BTreeMap<_, _> = self
+            .files
+            .iter()
+            .map(|file| {
+                let source = file.bound().view().source_file().expect("retained source");
+                (
+                    source.parse_options().path.clone(),
+                    source.parse_options().file_name.clone(),
+                )
+            })
+            .collect();
         let redirects = self.collect_files();
+        let redirect_file_names = redirects
+            .keys()
+            .map(|key| (key.clone(), loaded_names[key].clone()))
+            .collect();
         for traces in self.library_traces.into_values() {
             self.trace.extend(traces);
         }
@@ -380,8 +405,11 @@ impl<'a> Loader<'a> {
         let mut program = Program {
             include_reasons: self.include_reasons,
             redirect_paths: redirects,
+            redirect_file_names,
+            package_resolver: std::sync::Mutex::new(self.resolver),
             include_explanations: IncludeExplanations::default(),
             diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics::default(),
+            declaration_diagnostics: std::sync::Mutex::default(),
             option_verification: crate::OptionVerification {
                 diagnostics: Vec::new(),
                 include_diagnostics: Vec::new(),

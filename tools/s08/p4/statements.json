@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "scope": "S08 P4 source statement grammar, checking order and diagnostic details",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "iterations",
+      "files": {
+        "/case.ts": "function iterations(flag:boolean) { let total = 0; do { total = total + 1; } while(flag); for(let i = 0; flag; i = i + 1) { if(flag) continue; break; } return total; }\ntype Query_iterations = typeof iterations;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "iterations",
+          "file": "/case.ts",
+          "declaration": "Query_iterations",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "switch-errors",
+      "files": {
+        "/case.ts": "function switchErrors(x:string) { switch(x) { case 1: break; default: break; default: break; } }\ntype Query_switchErrors = typeof switchErrors;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "switchErrors",
+          "file": "/case.ts",
+          "declaration": "Query_switchErrors",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "jump-labels",
+      "files": {
+        "/case.ts": "function jumps() { outer: { continue outer; } break missing; continue; }\ntype Query_jumps = typeof jumps;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "jumps",
+          "file": "/case.ts",
+          "declaration": "Query_jumps",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-label",
+      "files": {
+        "/case.ts": "function duplicates(flag:boolean) { outer: while(flag) { outer: while(flag) { break outer; } } }\ntype Query_duplicates = typeof duplicates;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "duplicates",
+          "file": "/case.ts",
+          "declaration": "Query_duplicates",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "catch-types",
+      "files": {
+        "/case.ts": "function catches() { try { throw 1; } catch(error: number) { const error = 2; } finally { 0; } }\ntype Query_catches = typeof catches;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "catches",
+          "file": "/case.ts",
+          "declaration": "Query_catches",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "catch-redeclaration",
+      "files": {
+        "/case.ts": "function catchRedeclare() { try { throw 1; } catch(error) { let error = 2; } }\ntype Query_catchRedeclare = typeof catchRedeclare;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "catchRedeclare",
+          "file": "/case.ts",
+          "declaration": "Query_catchRedeclare",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "for-in",
+      "files": {
+        "/case.ts": "function forIn(obj: {a:string}) { for(const key in obj) { key; } for(let key = 1 in obj) {} for(let first, second in obj) {} }\ntype Query_forIn = typeof forIn;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "forIn",
+          "file": "/case.ts",
+          "declaration": "Query_forIn",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "with",
+      "files": {
+        "/case.ts": "function withBody(obj:object) { with(obj) { unresolved; } }\ntype Query_withBody = typeof withBody;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "withBody",
+          "file": "/case.ts",
+          "declaration": "Query_withBody",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

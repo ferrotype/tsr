@@ -31,6 +31,121 @@ fn owner() -> (
 }
 
 #[test]
+fn unused_pass_failure_is_sticky_without_poisoning_completed_type_checks() {
+    use ts_ast::FactoryMethods;
+    let (_counters, _generation, _identity, owner) = owner();
+    let (source, other) = {
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let mut sources = Vec::new();
+        for file in [b"/failed.ts".as_slice(), b"/other.ts"] {
+            let source = state.factory.new_source_file(
+                ts_ast::SourceFileParseOptions {
+                    file_name: JsString::from_bytes(file),
+                    path: JsString::from_bytes(file),
+                    ..Default::default()
+                },
+                ts_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
+                None,
+                None,
+            );
+            // Model the already-completed prerequisite. Inject an unsupported
+            // node into the late pass so the production failure path executes.
+            state
+                .source_checks
+                .insert(source, crate::check::SourceCheckStatus::Complete);
+            sources.push(source);
+        }
+        let invalid_unused_node = state
+            .factory
+            .new_identifier(JsString::from_bytes(b"x".as_slice()));
+        state
+            .query
+            .identifier_check_nodes
+            .insert(sources[0], vec![invalid_unused_node]);
+        (sources[0], sources[1])
+    };
+    let expected = Err(Error::Unsupported(
+        "checkUnusedIdentifiers: unhandled registered node kind",
+    ));
+    for _ in 0..3 {
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        assert_eq!(state.check_source_file_ex(source, true), expected);
+        assert!(!state.query.identifier_check_nodes.contains_key(&source));
+        assert_eq!(state.check_source_file_ex(source, false), Ok(()));
+        assert_eq!(state.check_source_file_ex(other, true), Ok(()));
+        assert!(matches!(
+            state.source_checks.get(&source),
+            Some(crate::check::SourceCheckStatus::Complete)
+        ));
+    }
+}
+
+#[test]
+fn alias_circularity_without_a_declaration_returns_any() {
+    let (_counters, _generation, _identity, owner) = owner();
+    let symbol = owner
+        .operation()
+        .unwrap()
+        .state_mut()
+        .new_symbol(
+            symbol_flags::ALIAS,
+            JsString::from_bytes(b"alias".as_slice()),
+        )
+        .unwrap();
+    for _ in 0..2 {
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        assert_eq!(
+            state.report_symbol_circularity(symbol),
+            Ok(state.builtins.any_type)
+        );
+        // ResolveAlias/markAliasSymbolAsReferenced still require a declaration.
+        assert_eq!(
+            state.alias_declaration(symbol),
+            Err(Error::MissingLink("alias declaration"))
+        );
+        assert!(state.diagnostics_for_file(None).unwrap().is_empty());
+    }
+}
+
+#[test]
+fn module_resolution_follows_assignment_backed_aliases_but_keeps_local_merges() {
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let target = state
+        .new_symbol(
+            symbol_flags::FUNCTION,
+            JsString::from_bytes(b"target".as_slice()),
+        )
+        .unwrap();
+    for (flags, resolves) in [
+        (symbol_flags::ALIAS, true),
+        (symbol_flags::ALIAS | symbol_flags::PROPERTY, false),
+        (
+            symbol_flags::ALIAS | symbol_flags::PROPERTY | symbol_flags::ASSIGNMENT,
+            true,
+        ),
+    ] {
+        let alias = state
+            .new_symbol(flags, JsString::from_bytes(b"alias".as_slice()))
+            .unwrap();
+        // A cached target isolates the caller's decision from alias traversal.
+        state.module_aliases.targets.insert(alias, Ok(target));
+        assert_eq!(
+            state.resolve_module_symbol(Some(alias), false),
+            Ok(Some(if resolves { target } else { alias }))
+        );
+        assert_eq!(
+            state.resolve_module_symbol(Some(alias), true),
+            Ok(Some(alias))
+        );
+    }
+}
+
+#[test]
 fn census_follows_mapper_links_without_resolving_or_rooting_the_arena() {
     let (_counters, _generation, _identity, owner) = owner();
     let mut operation = owner.operation().unwrap();

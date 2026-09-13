@@ -31671,6 +31671,10 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
+          "file": "crates/ts_checker/src/diagnostics.rs",
+          "line": 26
+        },
+        {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
           "line": 76
         }
@@ -32356,8 +32360,13 @@
       "end_line": 934,
       "file": "tsc/internal/compiler/fileloader.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 165
+        }
+      ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
       "start_line": 926
     },
@@ -32378,7 +32387,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/loader.rs",
-          "line": 551
+          "line": 579
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32428,7 +32437,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/loader.rs",
-          "line": 640
+          "line": 668
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32442,7 +32451,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/loader.rs",
-          "line": 475
+          "line": 503
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32506,8 +32515,13 @@
       "end_line": 1016,
       "file": "tsc/internal/compiler/fileloader.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 180
+        }
+      ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
       "start_line": 1010
     },
@@ -32515,8 +32529,13 @@
       "end_line": 1083,
       "file": "tsc/internal/compiler/fileloader.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/metadata.rs",
+          "line": 89
+        }
+      ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
       "start_line": 1056
     },
@@ -32546,7 +32565,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/metadata.rs",
-          "line": 301
+          "line": 356
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32556,8 +32575,13 @@
       "end_line": 1048,
       "file": "tsc/internal/compiler/fileloader.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 166
+        }
+      ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
       "start_line": 1018
     },
@@ -32811,8 +32835,13 @@
       "end_line": 1747,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 386
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 1731
     },
@@ -32820,8 +32849,13 @@
       "end_line": 135,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 399
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 133
     },
@@ -32829,8 +32863,13 @@
       "end_line": 1702,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 129
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 1700
     },
@@ -32838,8 +32877,13 @@
       "end_line": 1706,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 140
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 1704
     },
@@ -32861,8 +32905,13 @@
       "end_line": 613,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 204
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 606
     },
@@ -32888,8 +32937,13 @@
       "end_line": 1690,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 228
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 1688
     },
@@ -32915,8 +32969,13 @@
       "end_line": 496,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 68
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 496
     },
@@ -32933,8 +32992,13 @@
       "end_line": 232,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/src/checker_host.rs",
+          "line": 404
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 230
     },
@@ -33010,8 +33074,13 @@
       "end_line": 1604,
       "file": "tsc/internal/compiler/program.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_compiler/examples/p2/diagnostics.rs",
+          "line": 24
+        }
+      ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
       "start_line": 1600
     },
@@ -33546,7 +33615,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_scanner/src/spelling.rs",
-          "line": 68
+          "line": 85
         }
       ],
       "source_sha256": "e94ac393477052b119bdd175c3cd5d20d7ce01cefd7b06f0334c80b2e915f814",
@@ -33902,7 +33971,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 824
+          "line": 872
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -33934,7 +34003,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 721
+          "line": 739
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -33966,7 +34035,11 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 742
+          "line": 760
+        },
+        {
+          "file": "crates/ts_module/src/resolver.rs",
+          "line": 777
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34007,7 +34080,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 722
+          "line": 740
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34270,7 +34343,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 545
+          "line": 563
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34466,7 +34539,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 581
+          "line": 599
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34480,7 +34553,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 644
+          "line": 662
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34494,7 +34567,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 660
+          "line": 678
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34508,7 +34581,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 700
+          "line": 718
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34742,8 +34815,13 @@
       "end_line": 67,
       "file": "tsc/internal/module/util.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_module/src/resolver.rs",
+          "line": 857
+        }
+      ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
       "start_line": 58
     },
@@ -34818,7 +34896,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/package_maps.rs",
-          "line": 720
+          "line": 725
         }
       ],
       "source_sha256": "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172",
@@ -36339,8 +36417,13 @@
       "end_line": 73,
       "file": "tsc/internal/tspath/extension.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_checker/src/external_resolution.rs",
+          "line": 946
+        }
+      ],
       "source_sha256": "c0d3ffdac4587ce7c12d5fc3d4ccfe562563ddfa5056c7e086b8c0e9c4940fed",
       "start_line": 66
     },
@@ -36352,7 +36435,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 25
+          "line": 26
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36366,7 +36449,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/comparison.rs",
-          "line": 121
+          "line": 141
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36398,7 +36481,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/comparison.rs",
-          "line": 173
+          "line": 193
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36462,8 +36545,13 @@
       "end_line": 915,
       "file": "tsc/internal/tspath/path.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_checker/src/external_resolution.rs",
+          "line": 1070
+        }
+      ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
       "start_line": 902
     },
@@ -36475,7 +36563,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 114
+          "line": 115
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36489,7 +36577,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 102
+          "line": 103
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36503,7 +36591,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 44
+          "line": 45
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36540,7 +36628,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 62
+          "line": 63
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36623,7 +36711,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/comparison.rs",
-          "line": 111
+          "line": 131
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36633,8 +36721,13 @@
       "end_line": 848,
       "file": "tsc/internal/tspath/path.go",
       "kind": "source",
-      "mapping_status": "no_source_marker",
-      "rust_mappings": [],
+      "mapping_status": "source_marker_present",
+      "rust_mappings": [
+        {
+          "file": "crates/ts_tspath/src/comparison.rs",
+          "line": 93
+        }
+      ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
       "start_line": 829
     },
@@ -36719,7 +36812,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 13
+          "line": 14
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36740,6 +36833,14 @@
       "kind": "source",
       "mapping_status": "source_marker_present",
       "rust_mappings": [
+        {
+          "file": "crates/ts_checker/src/external_resolution.rs",
+          "line": 1055
+        },
+        {
+          "file": "crates/ts_checker/src/node_builder_names.rs",
+          "line": 1174
+        },
         {
           "file": "crates/ts_tspath/src/comparison.rs",
           "line": 6
@@ -36774,7 +36875,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 77
+          "line": 78
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36788,7 +36889,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_tspath/src/lib.rs",
-          "line": 110
+          "line": 111
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",

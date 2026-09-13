@@ -7,7 +7,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
 use serde::de::{Deserialize, Deserializer, MapAccess, Visitor};
-use serde_json::{value::RawValue, Map, Value};
+pub use serde_json::Value;
+use serde_json::{value::RawValue, Map};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExpectedState {

@@ -23,10 +23,11 @@ class OwnershipScope(unittest.TestCase):
 
     def test_inventory_keeps_existing_cases_and_explicitly_includes_local_scope_suites(self):
         self.assertEqual(self.manifest["version"], 3)
-        self.assertEqual(len(self.manifest["common"]["binding_publication"]["cases"]), 17)
+        self.assertEqual(len(self.manifest["common"]["binding_publication"]["cases"]), 18)
         self.assertTrue({
             "bind_tests::exclusive_node_reads_observe_mutations_and_reject_unretained_owners",
             "bind_tests::exclusive_node_reads_route_new_lazy_records_and_reject_failed_slots",
+            "bind_tests::synthetic_factory_retains_completed_edges_after_caller_drops",
         }.issubset(self.manifest["common"]["binding_publication"]["cases"]))
         self.assertEqual(len(self.manifest["common"]["exclusive_binding"]["cases"]), 10)
         self.assertEqual(len(self.manifest["common"]["core_validation_proof"]["cases"]), 9)
@@ -35,7 +36,7 @@ class OwnershipScope(unittest.TestCase):
             self.assertEqual(len(self.manifest["common"][name]["cases"]), count)
         report = {"metrics": {}}
         publish_metrics(report, self.modes, self.manifest)
-        self.assertEqual(report["metrics"]["program_ownership_tests"], 83)
+        self.assertEqual(report["metrics"]["program_ownership_tests"], 84)
 
     def test_missing_or_retargeted_common_inventory_is_rejected(self):
         for name in COMMON:
@@ -138,7 +139,7 @@ class OwnershipScope(unittest.TestCase):
                 publish_metrics(report, modes, self.manifest)
                 self.assertFalse(report["metrics"]["shared_bound_file"])
                 self.assertFalse(report["metrics"]["retained_snapshot_edit"])
-                self.assertEqual(report["metrics"]["program_ownership_tests"], 62)
+                self.assertEqual(report["metrics"]["program_ownership_tests"], 63)
 
     def test_all_suites_execute_in_every_mode_with_unchanged_instrumentation_arguments(self):
         suites = {**self.manifest["common"], **self.manifest["groups"]}
@@ -193,7 +194,7 @@ class OwnershipScope(unittest.TestCase):
         self.assertFalse(report["metrics"]["shared_bound_file"])
         self.assertFalse(report["metrics"]["retained_snapshot_edit"])
         self.assertFalse(report["metrics"]["shared_bound_file_miri"])
-        self.assertEqual(report["metrics"]["program_ownership_tests"], 73)
+        self.assertEqual(report["metrics"]["program_ownership_tests"], 74)
 
     def test_each_common_suite_is_required_in_each_mode(self):
         for mode in MODES:
@@ -209,10 +210,11 @@ class OwnershipScope(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         publish_metrics({"metrics": {}}, modes, self.manifest)
 
-    def test_missing_or_failed_core_lookup_case_cannot_publish_ownership_success(self):
+    def test_missing_or_failed_lookup_or_retention_case_cannot_publish_ownership_success(self):
         suites = {**self.manifest["common"], **self.manifest["groups"]}
         cases = self.manifest["common"]["binding_publication"]["cases"]
         new_cases = [case for case in cases if case.startswith("bind_tests::exclusive_node_reads_")]
+        new_cases.append("bind_tests::synthetic_factory_retains_completed_edges_after_caller_drops")
         for affected in new_cases:
             for failed in (False, True):
                 def invoke(root, args, env):

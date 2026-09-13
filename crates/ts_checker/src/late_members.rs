@@ -25,9 +25,7 @@ pub(crate) struct LateMemberState {
 impl CheckerState {
     pub(crate) fn raw_declaration_symbol(&self, node: NodeId) -> Result<Option<SymbolId>, Error> {
         Ok(self
-            .program()?
-            .bound(node)?
-            .node_binding(node)?
+            .checker_node_binding(node)?
             .and_then(|binding| binding.symbol))
     }
 
@@ -43,7 +41,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getResolvedMembersOrExportsOfSymbol
-    fn resolved_members_or_exports(
+    pub(crate) fn resolved_members_or_exports(
         &mut self,
         symbol: SymbolId,
         is_static: bool,
@@ -55,13 +53,14 @@ impl CheckerState {
             }
         }
         let read = self.symbol(symbol)?;
-        if is_static && read.flags() & sf::MODULE != 0 {
-            return Err(Error::Unsupported("getExportsOfModuleWorker: late members"));
-        }
-        let early = if is_static {
-            read.exports()
-        } else {
+        let early = if !is_static {
             read.members()
+        } else if read.flags() & sf::MODULE != 0 {
+            // Resolve the early exports without publishing the ordinary module
+            // cache: this link must still combine the late static declarations.
+            Some(self.module_exports_worker(symbol)?)
+        } else {
+            read.exports()
         };
         let early_index_merge = self
             .member_symbol(early, names::INDEX)?
@@ -437,6 +436,43 @@ impl CheckerState {
             .get_or_insert(symbol))
     }
 
+    // port: tsc/internal/checker/checker.go:isInvalidComputedPropertyName
+    pub(crate) fn is_invalid_computed_property_name(&self, node: NodeId) -> Result<bool, Error> {
+        let read = self.ast(node)?.node(node)?;
+        let parent = read
+            .parent()
+            .ok_or(Error::MissingLink("computed property parent"))?;
+        let declaration = self.ast(parent)?.node(parent)?;
+        if matches!(
+            declaration.kind().known(),
+            Some(K::GetAccessor | K::SetAccessor)
+        ) {
+            return Ok(false);
+        }
+        let container = declaration
+            .parent()
+            .ok_or(Error::MissingLink("computed property container"))?;
+        if !matches!(
+            self.ast(container)?.node(container)?.kind().known(),
+            Some(
+                K::TypeLiteral | K::ClassDeclaration | K::ClassExpression | K::InterfaceDeclaration
+            )
+        ) {
+            return Ok(false);
+        }
+        let expression = read
+            .expression()
+            .ok_or(Error::MissingLink("computed property expression"))?;
+        let expression_read = self.ast(expression)?.node(expression)?;
+        let Some(binary) = expression_read.data_source().as_binary_expression() else {
+            return Ok(false);
+        };
+        let operator = binary
+            .operator_token()
+            .ok_or(Error::MissingLink("computed property operator"))?;
+        Ok(self.ast(operator)?.node(operator)?.kind() == K::InKeyword)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkComputedPropertyName
     pub(crate) fn check_computed_property_name(&mut self, node: NodeId) -> Result<TypeId, Error> {
         if let Some(Some(ty)) = self.query.type_nodes.try_get(node) {
@@ -449,16 +485,8 @@ impl CheckerState {
                 .node(node)?
                 .expression()
                 .ok_or(Error::MissingLink("computed name expression"))?;
-            let read = self.ast(expression)?.node(expression)?;
-            // Invalid `in` names need the grammar-specific diagnostics from P4.
-            if read
-                .data_source()
-                .as_binary_expression()
-                .is_some_and(|data| data.operator_token().is_some())
-            {
-                return Err(Error::Unsupported(
-                    "isInvalidComputedPropertyName: binary expression",
-                ));
+            if self.is_invalid_computed_property_name(node)? {
+                return Ok(self.builtins.error_type);
             }
             let ty = self.check_expression(expression)?;
             let assignable_kind = self.type_assignable_to_kind(
@@ -549,74 +577,5 @@ impl CheckerState {
         self.types.get_mut(ty)?.symbol = Some(symbol);
         self.late_members.unique_types.insert(symbol, ty);
         Ok(ty)
-    }
-
-    /// P3 needs ambient library value references for computed declarations.
-    /// Bodies and mutable source-variable reads still require P4 flow checking.
-    pub(crate) fn check_ambient_entity_expression(
-        &mut self,
-        node: NodeId,
-    ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
-        if read.kind() == K::Identifier {
-            let name = JsString::from_bytes(self.ast(node)?.node_text(node)?.as_bytes());
-            let symbol = self
-                .resolve_name(Some(node), name.as_bytes(), sf::VALUE, None, true)?
-                .ok_or(Error::Unsupported(
-                    "checkIdentifier: unresolved name diagnostic",
-                ))?;
-            let declaration =
-                self.symbol(symbol)?
-                    .value_declaration()
-                    .ok_or(Error::Unsupported(
-                        "checkIdentifier: alias/value resolution",
-                    ))?;
-            let declaration_read = self.ast(declaration)?.node(declaration)?;
-            if declaration_read.flags() & nf::AMBIENT == 0
-                || declaration_read.initializer().is_some()
-            {
-                return Err(Error::Unsupported("checkIdentifier: flow reference"));
-            }
-            return self.get_type_of_symbol(symbol);
-        }
-        if read.question_dot_token().is_some() {
-            return Err(Error::Unsupported(
-                "checkPropertyAccessExpression: optional chain",
-            ));
-        }
-        let expression = read
-            .expression()
-            .ok_or(Error::MissingLink("property access expression"))?;
-        let name = read
-            .name()
-            .ok_or(Error::MissingLink("property access name"))?;
-        if self.ast(name)?.node(name)?.kind() != K::Identifier {
-            return Err(Error::Unsupported(
-                "checkPropertyAccessExpression: private name",
-            ));
-        }
-        let name = JsString::from_bytes(self.ast(name)?.node_text(name)?.as_bytes());
-        let ty = self.check_ambient_entity_expression(expression)?;
-        let ty = self.reduced_apparent_type(ty)?;
-        if self.types.flags(ty)? & tf::ANY != 0 {
-            return Ok(ty);
-        }
-        let property = self
-            .constituent_property(ty, name.as_bytes(), false)?
-            .ok_or(Error::Unsupported(
-                "checkPropertyAccessExpression: missing property diagnostic",
-            ))?;
-        let read = self.symbol(property)?;
-        let declaration = read.value_declaration().ok_or(Error::Unsupported(
-            "checkPropertyAccessExpression: flow declaration",
-        ))?;
-        if self.ast(declaration)?.node(declaration)?.kind() != K::PropertySignature
-            || read.flags() & sf::OPTIONAL != 0
-        {
-            return Err(Error::Unsupported(
-                "checkPropertyAccessExpression: accessibility/flow",
-            ));
-        }
-        self.get_type_of_symbol(property)
     }
 }

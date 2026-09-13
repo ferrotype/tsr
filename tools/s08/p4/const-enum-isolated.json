@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "scope": "S08 P4 const enum use diagnostics with isolatedModules",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "isolatedModules": true
+  },
+  "programs": [
+    {
+      "id": "ambient-value",
+      "files": {
+        "/main.ts": "declare const enum E{A}const x=E.A;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ambient-query",
+      "files": {
+        "/main.ts": "declare const enum E{A}type T=typeof E;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ordinary-value",
+      "files": {
+        "/main.ts": "const enum E{A}const x=E.A;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ambient-initializer",
+      "files": {
+        "/main.ts": "declare const enum E{A}declare const x:E.A;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "interface-computed",
+      "files": {
+        "/main.ts": "declare const enum E{A}interface I{[E.A]:number}type T=I;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "type-computed",
+      "files": {
+        "/main.ts": "declare const enum E{A}type T={[E.A]:number};"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "scope": "S08 P4 flow: branches, stable aliases, predicates, assertion diagnostics, loops, switch exhaustiveness and evolving arrays",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "branch",
+      "files": {
+        "/case.ts": "function branch(x:string|number) { if(typeof x === \"string\") return x; return 0; }\ntype Query_branch = typeof branch;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "branch",
+          "file": "/case.ts",
+          "declaration": "Query_branch",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "discriminant",
+      "files": {
+        "/case.ts": "type Choice = {tag:\"left\"; left:string} | {tag:\"right\"; right:number}; function selection(x:Choice) { if(x.tag === \"left\") return x.left; return x.right; }\ntype Query_selection = typeof selection;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "selection",
+          "file": "/case.ts",
+          "declaration": "Query_selection",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "aliases",
+      "files": {
+        "/case.ts": "function aliases(x:string|number) { const isText = typeof x === \"string\"; if(isText) return x; return \"fallback\"; }\ntype Query_aliases = typeof aliases;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "aliases",
+          "file": "/case.ts",
+          "declaration": "Query_aliases",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "predicate",
+      "files": {
+        "/case.ts": "function isText(x:unknown): x is string { return typeof x === \"string\"; } function predicate(x:string|number) { if(isText(x)) return x; return \"fallback\"; }\ntype Query_predicate = typeof predicate;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "predicate",
+          "file": "/case.ts",
+          "declaration": "Query_predicate",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "assertion",
+      "files": {
+        "/case.ts": "function assertText(x:unknown): asserts x is string { if(typeof x !== \"string\") throw 0; } function assertion(x:unknown) { assertText(x); return x; }\ntype Query_assertion = typeof assertion;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "assertion",
+          "file": "/case.ts",
+          "declaration": "Query_assertion",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "assertion-condition",
+      "files": {
+        "/case.ts": "function assertTruthy(x:unknown): asserts x { if(!x) throw 0; } function assertionCondition(x:string|undefined) { assertTruthy(x); return x; }\ntype Query_assertionCondition = typeof assertionCondition;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "assertionCondition",
+          "file": "/case.ts",
+          "declaration": "Query_assertionCondition",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "assertion-target",
+      "files": {
+        "/case.ts": "const assertBad = (x:unknown): asserts x is string => {}; function assertionTarget(x:unknown) { assertBad(x); return x; }\ntype Query_assertionTarget = typeof assertionTarget;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "assertionTarget",
+          "file": "/case.ts",
+          "declaration": "Query_assertionTarget",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "loop",
+      "files": {
+        "/case.ts": "function loop(x:string|number, flag:boolean) { while(flag) { if(typeof x === \"string\") x = 1; else x = \"value\"; } return x; }\ntype Query_loop = typeof loop;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "loop",
+          "file": "/case.ts",
+          "declaration": "Query_loop",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "switch-exhaustive",
+      "files": {
+        "/case.ts": "function exhaustive(x:\"a\"|\"b\") { switch(x) { case \"a\": return 1; case \"b\": return 2; } }\ntype Query_exhaustive = typeof exhaustive;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "exhaustive",
+          "file": "/case.ts",
+          "declaration": "Query_exhaustive",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "switch-typeof",
+      "files": {
+        "/case.ts": "function typeSwitch(x:string|number|undefined) { switch(typeof x) { case \"string\": return x; case \"number\": return x; default: return false; } }\ntype Query_typeSwitch = typeof typeSwitch;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "typeSwitch",
+          "file": "/case.ts",
+          "declaration": "Query_typeSwitch",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "switch-true",
+      "files": {
+        "/case.ts": "function trueSwitch(x:string|number|undefined) { switch(true) { case typeof x === \"string\": return x; case typeof x === \"number\": return x; default: return false; } }\ntype Query_trueSwitch = typeof trueSwitch;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "trueSwitch",
+          "file": "/case.ts",
+          "declaration": "Query_trueSwitch",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "presence",
+      "files": {
+        "/case.ts": "type Presence = {left:string} | {right:number}; function presence(x:Presence) { if(\"left\" in x) return x.left; return x.right; }\ntype Query_presence = typeof presence;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "presence",
+          "file": "/case.ts",
+          "declaration": "Query_presence",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "evolving-array",
+      "files": {
+        "/case.ts": "interface Array<T> { [n:number]: T; length:number; push(...items:T[]): number; unshift(...items:T[]):number; } function evolving(flag:boolean) { const values = []; values.push(1); if(flag) values.push(\"text\"); return values; }\ntype Query_evolving = typeof evolving;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "evolving",
+          "file": "/case.ts",
+          "declaration": "Query_evolving",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "evolving-loop",
+      "files": {
+        "/case.ts": "interface Array<T> { [n:number]: T; length:number; push(...items:T[]): number; unshift(...items:T[]):number; } function evolvingLoop(flag:boolean) { const values = []; while(flag) { values.push(1); values[0] = \"text\"; } return values; }\ntype Query_evolvingLoop = typeof evolvingLoop;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "evolvingLoop",
+          "file": "/case.ts",
+          "declaration": "Query_evolvingLoop",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

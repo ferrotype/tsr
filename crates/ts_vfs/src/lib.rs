@@ -9,7 +9,7 @@ use std::{
 use ts_jsstring::{JsString, SourceText};
 use ts_tspath as path;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
     Unsupported(&'static str),
     OutsideScope,

@@ -18,6 +18,7 @@ pub(crate) struct VarianceState {
     pub stack: Vec<(SymbolId, TypeList)>,
     pub markers: crate::types::Set<TypeId>,
     pub reliability: u32,
+    pub checked_parameter: Option<TypeId>,
 }
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:Checker.getVariances
@@ -177,7 +178,7 @@ impl CheckerState {
         result
     }
     // port: tsc/internal/checker/relater.go:Checker.createMarkerType
-    fn create_marker_type(
+    pub(crate) fn create_marker_type(
         &mut self,
         symbol: SymbolId,
         source: TypeId,

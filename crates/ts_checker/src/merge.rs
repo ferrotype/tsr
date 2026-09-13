@@ -88,7 +88,7 @@ impl CheckerState {
         Ok(clone)
     }
 
-    fn clone_symbol_table(
+    pub(crate) fn clone_symbol_table(
         &mut self,
         source: Option<SymbolTableId>,
     ) -> Result<Option<SymbolTableId>, Error> {
@@ -188,13 +188,15 @@ impl CheckerState {
         }
         if target_flags & flags::TRANSIENT == 0 {
             let symbol = self.symbol(target)?;
-            if ts_ast::is_non_local_alias(
+            let resolved_target = if ts_ast::is_non_local_alias(
                 Some(&symbol),
                 flags::VALUE | flags::TYPE | flags::NAMESPACE,
             ) {
-                return Err(Error::Unsupported("resolveAlias during mergeSymbol"));
-            }
-            let resolved_target = target;
+                // port: tsc/internal/checker/checker.go:Checker.resolveSymbol
+                self.resolve_alias(target)?
+            } else {
+                target
+            };
             if resolved_target == self.builtins.unknown_symbol {
                 return Ok(source);
             }

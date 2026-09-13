@@ -920,3 +920,29 @@ fn factory_copies_select_each_retained_logical_sources_completed_binding() {
     }
     assert!(!copies.is_bound(sources[2].0).unwrap());
 }
+
+#[test]
+fn synthetic_factory_retains_completed_edges_after_caller_drops() {
+    let counters = Counters::new();
+    let (parsed, _, child) = make_parsed(&counters, b"/retained-completed.ts");
+    let completed = parsed
+        .bind_and_publish(|builder| {
+            declare(builder, child)?;
+            Ok(())
+        })
+        .unwrap();
+    let mut factory = AstBuilder::new(SourceText::default(), &counters);
+    factory.retain_completed(&completed);
+    let key = factory.new_string_literal(JsString::from_bytes(&b"property"[..]), 0);
+    let access = factory.new_element_access_expression(Some(child), None, Some(key), 0);
+    drop(completed);
+    assert_eq!(
+        factory.view().node(access).unwrap().expression(),
+        Some(child)
+    );
+    assert_ne!(
+        factory.view().node(child).unwrap().flags() & node_flags::UNREACHABLE,
+        0
+    );
+    assert_eq!(factory.view().node_text(child).unwrap().as_bytes(), b"x");
+}

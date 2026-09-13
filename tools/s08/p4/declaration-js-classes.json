@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "scope": "P4 JavaScript class declaration inference: this assignment collection, duplicate/static keys and inherited-member suppression",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "constructor-members",
+      "files": {
+        "/case.js": "export class A { constructor(){ this.x=1; this[\"space key\"]=\"a\"; } }\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "method-and-static-members",
+      "files": {
+        "/case.js": "export class A { m(){ this.y=true; } static { this.z=1; } }\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "explicit-duplicate-members",
+      "files": {
+        "/case.js": "export class A { x=1; constructor(){this.x=2;this.y=3;this.y=4;} }\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "inherited-members",
+      "files": {
+        "/case.js": "class A { constructor(){this.x=1;} } export class B extends A { constructor(){super();this.x=2;this.y=3;} }\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "nested-scope",
+      "files": {
+        "/case.js": "export class A { constructor(){ const nested=function(){this.wrong=1;}; const lexical=()=>{this.right=2;}; lexical(); } }\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

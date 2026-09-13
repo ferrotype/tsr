@@ -24,8 +24,10 @@ ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
 ts_module = { version = "0.1.0", path = "../ts_module" }
 ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
 ts_printer = { version = "0.1.0", path = "../ts_printer" }
+ts_pseudochecker = { version = "0.1.0", path = "../ts_pseudochecker" }
 ts_scanner = { version = "0.1.0", path = "../ts_scanner" }
 ts_tsoptions = { version = "0.1.0", path = "../ts_tsoptions" }
+ts_tspath = { version = "0.1.0", path = "../ts_tspath" }
 ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
 
 [dev-dependencies]

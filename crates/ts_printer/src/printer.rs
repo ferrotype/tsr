@@ -865,6 +865,9 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitIdentifierText
     fn emit_identifier_text(&mut self, node: NodeId) -> Result<(), Error> {
+        if self.printer.emit_context.has_auto_generate_info(node) {
+            return Err(Error::Unsupported("NameGenerator.generateName"));
+        }
         let text = self.get_text_of_node(node, false)?;
         let symbol = self
             .printer
@@ -1258,6 +1261,11 @@ impl<'a> Session<'a, '_> {
         let read = self.node(node)?;
         let data = read.data_source();
         let (type_parameters, parameters, type_node) = match read.kind().known() {
+            Some(K::GetAccessor | K::SetAccessor) => (
+                read.type_parameter_list(),
+                read.parameter_list(),
+                read.type_node(),
+            ),
             Some(K::MethodSignature) => {
                 let method = data
                     .as_method_signature_declaration()
@@ -1405,6 +1413,29 @@ impl<'a> Session<'a, '_> {
         Ok(())
     }
 
+    // port: tsc/internal/printer/printer.go:Printer.emitAccessorDeclaration
+    fn emit_accessor_declaration(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        if read.body().is_some() {
+            return Err(Error::Unsupported("accessor implementation body"));
+        }
+        let (modifiers, name, kind) = (read.modifiers(), read.name(), read.kind());
+        self.emit_modifier_list(node, modifiers, true)?;
+        self.write_keyword(if kind == K::GetAccessor {
+            b"get"
+        } else {
+            b"set"
+        });
+        self.write_space();
+        self.emit_property_name(name)?;
+        let indented = self.should_emit_indented(node);
+        self.increase_indent_if(indented);
+        self.emit_signature(node)?;
+        self.write_trailing_semicolon();
+        self.decrease_indent_if(indented);
+        Ok(())
+    }
+
     // port: tsc/internal/printer/printer.go:Printer.emitTypeElement
     fn emit_type_element(&mut self, node: NodeId) -> Result<(), Error> {
         match self.known_kind(node)? {
@@ -1413,7 +1444,7 @@ impl<'a> Session<'a, '_> {
             K::CallSignature => self.emit_call_signature(node),
             K::ConstructSignature => self.emit_construct_signature(node),
             K::IndexSignature => self.emit_index_signature(node),
-            K::GetAccessor | K::SetAccessor => Err(Error::Unsupported("accessor declarations")),
+            K::GetAccessor | K::SetAccessor => self.emit_accessor_declaration(node),
             K::NotEmittedTypeElement => Err(Error::Unsupported("NotEmittedTypeElement")),
             kind => Err(Error::UnexpectedKind {
                 context: "TypeElement",

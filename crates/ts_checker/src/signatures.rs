@@ -171,6 +171,12 @@ impl SignatureStore {
             .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
     }
 
+    pub(crate) fn index_info_mut(&mut self, id: IndexInfoId) -> Result<&mut IndexInfo, Error> {
+        id.index(0)
+            .and_then(|index| self.index_infos.get_mut(index))
+            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+    }
+
     pub fn predicate(&self, id: TypePredicateId) -> Result<&TypePredicate, Error> {
         id.index(0)
             .and_then(|index| self.predicates.get(index))

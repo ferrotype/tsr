@@ -15,16 +15,25 @@ impl CheckerState {
         if let Some(Some(ty)) = self.query.declared_types.try_get(symbol) {
             return Ok(*ty);
         }
-        let declarations = self.symbol_declarations(symbol)?.to_vec();
-        let mut declaration = None;
-        for node in declarations.into_iter().flatten() {
-            if self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration {
-                declaration = Some(node);
-                break;
+        let is_class = self.symbol(symbol)?.flags() & sf::CLASS != 0;
+        let declaration = if is_class {
+            self.symbol(symbol)?.value_declaration()
+        } else {
+            let declarations = self.symbol_declarations(symbol)?.to_vec();
+            let mut declaration = None;
+            for node in declarations.into_iter().flatten() {
+                if self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration {
+                    declaration = Some(node);
+                    break;
+                }
             }
-        }
-        let declaration = declaration.ok_or(Error::MissingLink("interface declaration"))?;
-        let ty = self.new_object_type(of::INTERFACE, Some(symbol))?;
+            declaration
+        };
+        let declaration = declaration.ok_or(Error::MissingLink("class/interface declaration"))?;
+        let ty = self.new_object_type(
+            if is_class { of::CLASS } else { of::INTERFACE },
+            Some(symbol),
+        )?;
         *self.query.declared_types.get_or_default(symbol) = Some(ty);
         let result = (|| {
             let outer = self.get_outer_type_parameters(declaration, false)?;
@@ -35,7 +44,7 @@ impl CheckerState {
                     parameters.push(parameter);
                 }
             }
-            if !parameters.is_empty() || !self.is_thisless_interface(symbol)? {
+            if !parameters.is_empty() || is_class || !self.is_thisless_interface(symbol)? {
                 self.types.get_mut(ty)?.object_flags |= of::REFERENCE;
                 let this = self.new_type_parameter(Some(symbol))?;
                 self.types.type_parameter_mut(this)?.is_this_type = true;
@@ -149,19 +158,58 @@ impl CheckerState {
         Ok(true)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.getSymbolFromTypeReference
     pub(crate) fn type_reference_symbol(
         &mut self,
         node: NodeId,
         ignore_errors: bool,
     ) -> Result<Option<SymbolId>, Error> {
         let read = self.ast(node)?.node(node)?;
-        let name = if let Some(reference) = read.data_source().as_type_reference_node() {
-            reference.type_name()
-        } else {
-            read.expression()
+        if read.kind() == K::ImportType {
+            self.type_from_import_node(node)?;
+            return Ok(self.query.resolved_symbols.try_get(node).copied().flatten());
         }
-        .ok_or(Error::MissingLink("reference name"))?;
-        self.resolve_entity_name(name, sf::TYPE, ignore_errors)
+        if !ignore_errors {
+            if let Some(Some(symbol)) = self.query.resolved_symbols.try_get(node) {
+                return Ok(Some(*symbol));
+            }
+        }
+        let symbol = self.resolve_type_reference_symbol(node, ignore_errors)?;
+        if !ignore_errors {
+            *self.query.resolved_symbols.get_or_default(node) = Some(symbol);
+        }
+        Ok(Some(symbol))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.resolveTypeReferenceName
+    fn resolve_type_reference_symbol(
+        &mut self,
+        node: NodeId,
+        ignore_errors: bool,
+    ) -> Result<SymbolId, Error> {
+        let read = self.ast(node)?.node(node)?;
+        let name = match read.kind().known() {
+            Some(K::TypeReference) => read
+                .data_source()
+                .as_type_reference_node()
+                .ok_or(Error::MissingLink("type reference payload"))?
+                .type_name(),
+            Some(K::ExpressionWithTypeArguments) => match read.expression() {
+                Some(name) if ts_ast::is_entity_name_expression(self.ast(name)?, name)? => {
+                    Some(name)
+                }
+                _ => None,
+            },
+            _ => None,
+        };
+        Ok(match name {
+            None => self.builtins.unknown_symbol,
+            Some(name) => match self.resolve_entity_name(name, sf::TYPE, ignore_errors)? {
+                Some(symbol) if symbol != self.builtins.unknown_symbol => symbol,
+                _ if ignore_errors => self.builtins.unknown_symbol,
+                _ => self.unresolved_symbol_for_name(name)?,
+            },
+        })
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromTypeReference
@@ -169,23 +217,36 @@ impl CheckerState {
         let Some(symbol) = self.type_reference_symbol(node, false)? else {
             return Ok(self.builtins.error_type);
         };
+        self.type_reference_from_symbol(node, symbol)
+    }
+    // port: tsc/internal/checker/checker.go:Checker.getTypeReferenceType
+    pub(crate) fn type_reference_from_symbol(
+        &mut self,
+        node: NodeId,
+        symbol: SymbolId,
+    ) -> Result<TypeId, Error> {
+        if symbol == self.builtins.unknown_symbol {
+            return Ok(self.builtins.error_type);
+        }
         let ty = self.get_declared_type_of_symbol(symbol)?;
         let flags = self.symbol(symbol)?.flags();
         let argument_nodes =
             self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
-        if flags & sf::INTERFACE != 0 {
+        if flags & (sf::CLASS | sf::INTERFACE) != 0 {
             let interface = self.types.interface(ty)?;
             let outer_count = interface.outer_type_parameter_count as usize;
             let outer = interface.type_parameters()[..outer_count].to_vec();
             let parameters = interface.type_parameters()[outer_count..].to_vec();
             if !parameters.is_empty() {
-                if !self.check_reference_arity(node, symbol, &argument_nodes, &parameters)? {
+                if !self.check_class_reference_arity(node, ty, &argument_nodes, &parameters)? {
                     return Ok(self.builtins.error_type);
                 }
-                if self.is_deferred_type_reference_node(
-                    node,
-                    argument_nodes.len() != parameters.len(),
-                )? {
+                if self.ast(node)?.node(node)?.kind() == K::TypeReference
+                    && self.is_deferred_type_reference_node(
+                        node,
+                        argument_nodes.len() != parameters.len(),
+                    )?
+                {
                     return self.create_deferred_type_reference(ty, node, None, None);
                 }
                 let local = self.effective_type_arguments(node, &parameters)?;
@@ -230,7 +291,56 @@ impl CheckerState {
             )?;
             return Ok(self.builtins.error_type);
         }
-        Ok(ty)
+        self.get_regular_type_of_literal_type(ty)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getTypeFromClassOrInterfaceReference
+    fn check_class_reference_arity(
+        &mut self,
+        node: NodeId,
+        ty: TypeId,
+        nodes: &[NodeId],
+        parameters: &[TypeId],
+    ) -> Result<bool, Error> {
+        let minimum = self.min_type_argument_count(parameters)?;
+        let read = self.ast(node)?.node(node)?;
+        let is_js = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
+        let options = self.program()?.host.options();
+        if is_js && !options.strict_option_value(options.no_implicit_any)
+            || nodes.len() >= minimum && nodes.len() <= parameters.len()
+        {
+            return Ok(true);
+        }
+        let parent = read.parent();
+        let missing_augments = is_js
+            && read.kind() == K::ExpressionWithTypeArguments
+            && match parent {
+                Some(parent) => self.ast(parent)?.node(parent)?.kind() != K::JSDocAugmentsTag,
+                None => true,
+            };
+        let message = if missing_augments {
+            if minimum < parameters.len() {
+                ts_diagnostics::Expected_0_1_type_arguments_provide_these_with_an_extends_tag
+            } else {
+                ts_diagnostics::Expected_0_type_arguments_provide_these_with_an_extends_tag
+            }
+        } else if minimum < parameters.len() {
+            ts_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments
+        } else {
+            ts_diagnostics::Generic_type_0_requires_1_type_argument_s
+        };
+        let text =
+            self.type_to_string(ty, crate::type_format_flags::WRITE_ARRAY_AS_GENERIC_TYPE)?;
+        self.error_at(
+            Some(node),
+            message,
+            vec![
+                text,
+                JsString::from_bytes(minimum.to_string().into_bytes()),
+                JsString::from_bytes(parameters.len().to_string().into_bytes()),
+            ],
+        )?;
+        Ok(is_js)
     }
 
     fn check_reference_arity(
@@ -343,10 +453,10 @@ impl CheckerState {
     fn may_resolve_type_alias(&mut self, node: NodeId) -> Result<bool, Error> {
         let read = self.ast(node)?.node(node)?;
         match read.kind().known() {
-            Some(K::TypeReference) => match self.type_reference_symbol(node, false)? {
-                Some(symbol) => Ok(self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0),
-                None => Ok(false),
-            },
+            Some(K::TypeReference) => {
+                let symbol = self.resolve_type_reference_symbol(node, false)?;
+                Ok(self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0)
+            }
             Some(K::TypeQuery) => Ok(true),
             Some(
                 K::ParenthesizedType

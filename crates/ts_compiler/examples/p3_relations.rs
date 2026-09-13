@@ -161,7 +161,7 @@ fn main() -> Result<()> {
     std::fs::write(
         &args[2],
         serde_json::to_vec(
-            &json!({"version":1,"request_sha256":request_sha256,"scope":"P3 relation actions; full P0 display and P4 body/JSDoc cases pending","rows":rows}),
+            &json!({"version":1,"request_sha256":request_sha256,"scope":"P4 relation actions including body/JSDoc; full P0 display/final-state contract pending","rows":rows}),
         )?,
     )?;
     Ok(())

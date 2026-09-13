@@ -42,11 +42,20 @@ impl CheckerState {
         if let Some(&cached) = self.signatures.instantiations.get(&key) {
             return Ok(cached);
         }
-        let parameters = self.signature_parameters_for_mapper(signature)?;
-        let mapper = self.new_type_mapper(&parameters, &arguments)?;
-        let result = self.instantiate_signature_ex(signature, mapper, true)?;
+        let result = self.create_signature_instantiation(signature, &arguments)?;
         self.signatures.instantiations.insert(key, result);
         Ok(result)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.createSignatureInstantiation
+    pub(crate) fn create_signature_instantiation(
+        &mut self,
+        signature: SignatureId,
+        arguments: &[TypeId],
+    ) -> Result<SignatureId, Error> {
+        let parameters = self.signature_parameters_for_mapper(signature)?;
+        let mapper = self.new_type_mapper(&parameters, arguments)?;
+        self.instantiate_signature_ex(signature, mapper, true)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateSignatureInContextOf

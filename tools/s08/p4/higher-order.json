@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "scope": "S08 P4 higher-order generic function instantiation and inferred return type parameters",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "higher-identity",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function wrap<A,B>(f:(x:A)=>B):(x:A)=>B;function identity<T>(x:T){return x;}const f=wrap(identity);const x=f(1);\ntype Query_f=typeof f;\ntype Query_x=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "higher-compose",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function compose<A,B,C>(f:(x:A)=>B,g:(y:B)=>C):(x:A)=>C;function array<T>(x:T){return [x];}function box<T>(x:T){return {value:x};}const f=compose(array,box);const x=f(\"s\");\ntype Query_f=typeof f;\ntype Query_x=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "higher-expression",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function wrap<A,B>(f:(x:A)=>B):(x:A)=>B;const f=wrap(<T>(x:T)=>x);const g=wrap(<U extends string>(x:U)=>x);\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "higher-no-return",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function consume<T>(f:(x:T)=>T,x:T):T;function identity<U>(x:U){return x;}const x=consume(identity,1);const y=consume(identity,\"s\");\ntype Query_x=typeof x;\ntype Query_y=typeof y;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "Query_y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "higher-member",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function wrap<A,B>(obj:{f:(x:A)=>B}):(x:A)=>B;const f=wrap({f<T>(x:T){return x;}});const x=f(true);\ntype Query_f=typeof f;\ntype Query_x=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "higher-rename",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;}\ndeclare function pair<A,B,C,D>(a:(x:A)=>B,b:(y:C)=>D):(x:A,y:C)=>[B,D];function identity<T>(x:T){return x;}const f=pair(identity,identity);const x=f(1,\"s\");\ntype Query_f=typeof f;\ntype Query_x=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "Query_x",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

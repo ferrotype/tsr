@@ -86,4 +86,21 @@ impl CheckerState {
     pub(crate) fn symbol_declarations(&self, id: SymbolId) -> Result<DeclarationRead<'_>, Error> {
         self.declaration_slice(self.symbol(id)?.declarations())
     }
+
+    /// `primitiveTypeAliasSuggestions()`: the six transient aliases, created on
+    /// first use without touching `SymbolCount`.
+    pub(crate) fn ensure_primitive_alias_suggestions(&mut self) {
+        if !self.builtins.primitive_alias_suggestions.is_empty() {
+            return;
+        }
+        for (builtin, primitive) in crate::init::PRIMITIVE_ALIAS_SUGGESTIONS {
+            let suggestion = self.symbols.push(Symbol::new(
+                symbol_flags::TYPE_ALIAS | symbol_flags::TRANSIENT,
+                JsString::from_bytes(primitive),
+            ));
+            self.builtins
+                .primitive_alias_suggestions
+                .push((builtin, suggestion));
+        }
+    }
 }

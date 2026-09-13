@@ -114,7 +114,7 @@ impl CheckerState {
             .symbol
             .ok_or(Error::MissingLink("interface symbol"))?;
         if self.symbol(symbol)?.flags() & sf::CLASS != 0 {
-            return Err(Error::Unsupported("resolveBaseTypesOfClass"));
+            return self.resolve_class_base_types(ty);
         }
         for node in self
             .symbol_declarations(symbol)?
@@ -152,7 +152,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.reportCircularBaseType
-    fn report_circular_base_type(
+    pub(crate) fn report_circular_base_type(
         &mut self,
         node: ts_arena::NodeId,
         ty: TypeId,
@@ -168,7 +168,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isValidBaseType
-    fn is_valid_base_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+    pub(crate) fn is_valid_base_type(&mut self, ty: TypeId) -> Result<bool, Error> {
         let flags = self.types.flags(ty)?;
         if flags & tf::TYPE_PARAMETER != 0 {
             if let Some(constraint) = self.base_constraint_of_type(ty)? {
@@ -190,7 +190,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.hasBaseType
-    fn has_base_type(&mut self, ty: TypeId, check: TypeId) -> Result<bool, Error> {
+    pub(crate) fn has_base_type(&mut self, ty: TypeId, check: TypeId) -> Result<bool, Error> {
         if self.types.get(ty)?.object_flags & (of::CLASS_OR_INTERFACE | of::REFERENCE) != 0 {
             // getTargetType returns the originating interface itself when it
             // has no type parameters or this type. Type.Target may be nil.

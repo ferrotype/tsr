@@ -7,8 +7,10 @@
 # Nothing is committed back; evidence in the repository is captured and reviewed locally.
 #
 # The workflow requires S01/S03/S04/S05/S06 and quality checks independently of unfinished sprints.
-# The matrices cover the four ADR 0002 targets: macos-15 (arm64), macos-15-intel (x86_64),
-# ubuntu-24.04 (x86_64) and ubuntu-24.04-arm (arm64).
+# Temporarily reduced at the owner's request (2026-09-13) to macos-15 (arm64)
+# and ubuntu-24.04 (x86_64) while CI is overloaded. ADR 0002's supported targets
+# are unchanged. Restore macos-15-intel and ubuntu-24.04-arm in both matrices
+# when the temporary runner pause ends.
 name: status
 
 on:
@@ -52,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-15-intel, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -75,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-15-intel, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5

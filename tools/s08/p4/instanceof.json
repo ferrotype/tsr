@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "scope": "S08 P4 instanceof expression and Symbol.hasInstance call resolution",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "instanceof-class",
+      "files": {
+        "/case.ts": "class C{} declare let x:unknown; const a=x instanceof C;const b=1 instanceof C;const c=x instanceof 1;const d=x instanceof {};"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "c",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "d",
+          "file": "/case.ts",
+          "declaration": "d",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-values",
+      "files": {
+        "/case.ts": "interface Function { ():void; } declare let a:any,u:unknown,f:Function,n:never; const x=a instanceof a;const y=u instanceof f;const z=n instanceof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "x",
+          "file": "/case.ts",
+          "declaration": "x",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "y",
+          "file": "/case.ts",
+          "declaration": "y",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "z",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-custom",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly hasInstance: unique symbol; } declare var Symbol: SymbolConstructor; declare const rhs:{[Symbol.hasInstance](x:{n:number}):boolean};declare const x:{n:number};const a=x instanceof rhs;declare const bad:{s:string};const b=bad instanceof rhs;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-return",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly hasInstance: unique symbol; } declare var Symbol: SymbolConstructor; declare const rhs:{[Symbol.hasInstance](x:unknown):number};declare const x:unknown;const a=x instanceof rhs;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-arity",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly hasInstance: unique symbol; } declare var Symbol: SymbolConstructor; declare const zero:{[Symbol.hasInstance]():boolean};declare const two:{[Symbol.hasInstance](x:unknown,y:string):boolean};declare const x:unknown;const a=x instanceof zero;const b=x instanceof two;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "b",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-generic",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly hasInstance: unique symbol; } declare var Symbol: SymbolConstructor; declare const rhs:{[Symbol.hasInstance]<T>(x:T):boolean};declare const x:{n:number};const a=x instanceof rhs;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-overload",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly hasInstance: unique symbol; } declare var Symbol: SymbolConstructor; declare const rhs:{[Symbol.hasInstance](x:{a:number}):boolean;[Symbol.hasInstance](x:{b:string}):boolean};declare const x:{b:string};const a=x instanceof rhs;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "a",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

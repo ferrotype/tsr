@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "scope": "S08 P4 retained NodeNext synthetic tslib import resolution",
+  "options": {
+    "target": "ES2021",
+    "module": "NodeNext",
+    "strict": true,
+    "noLib": true,
+    "importHelpers": true
+  },
+  "programs": [
+    {
+      "id": "retained-helper-current",
+      "files": {
+        "/main.mts": "export {};class C{#x=1;f(c:C){c.#x=2;c.#x+=3;return c.#x;}g(v:object){return #x in v;}}\ntype Query=number;",
+        "/node_modules/tslib/package.json": "{\"name\": \"tslib\", \"version\": \"1.0.0\", \"type\": \"module\", \"types\": \"index.d.ts\"}",
+        "/node_modules/tslib/index.d.ts": "export function __classPrivateFieldGet(a:any,b:any,c:any,d:any):any;\nexport function __classPrivateFieldSet(a:any,b:any,c:any,d:any,e:any):any;\nexport function __classPrivateFieldIn(a:any,b:any):boolean;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.mts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "retained-helper-old",
+      "files": {
+        "/main.mts": "export {};class C{#x=1;f(c:C){c.#x=2;c.#x+=3;return c.#x;}g(v:object){return #x in v;}}\ntype Query=number;",
+        "/node_modules/tslib/package.json": "{\"name\": \"tslib\", \"version\": \"1.0.0\", \"type\": \"module\", \"types\": \"index.d.ts\"}",
+        "/node_modules/tslib/index.d.ts": "export function __classPrivateFieldGet(a:any,b:any,c:any):any;\nexport function __classPrivateFieldSet(a:any,b:any,c:any,d:any):any;\nexport function __classPrivateFieldIn(a:any,b:any):boolean;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.mts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native operator results, write checks, nullish grammar and comma diagnostics; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "nullish-result",
+      "files": {
+        "/case.ts": "declare const a:string|undefined; const b=a??42; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nullish-syntax",
+      "files": {
+        "/case.ts": "const a=null??1; const b=42??2; const c=undefined??3; type A=typeof a; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nullish-mixed",
+      "files": {
+        "/case.ts": "declare let a:string|undefined; const b=a||\"x\"??\"y\"; const c=a??\"x\"&&\"y\"; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "logical-assignment",
+      "files": {
+        "/case.ts": "let a:string|undefined; a??=\"x\"; const b=a; let c:number|false=1; c&&=2; let d:string|undefined; d||=\"x\"; type B=typeof b; type D=typeof d;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "logical-invalid-write",
+      "files": {
+        "/case.ts": "const a:string|undefined=\"x\"; a??=\"y\"; let b:number|undefined; b??=\"x\"; let c:number|false=1; c&&=\"x\"; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "in-results",
+      "files": {
+        "/case.ts": "declare const obj:{a:number}|{b:string}; const yes=\"a\" in obj; if(\"a\" in obj){const a=obj.a;} type Y=typeof yes;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Y",
+          "file": "/case.ts",
+          "declaration": "Y",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "in-invalid",
+      "files": {
+        "/case.ts": "declare const maybe:{a:number}|null; const a=1 in 42; const b={} in maybe; type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "in-unknown",
+      "files": {
+        "/case.ts": "declare let x:unknown; if(x){const a=\"p\" in x;} type X=typeof x;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "X",
+          "file": "/case.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "comma-unused",
+      "files": {
+        "/case.ts": "let a=1; const b=(a,2); const c=(a++,3); type B=typeof b; type C=typeof c;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "comma-indirect",
+      "files": {
+        "/case.ts": "declare const x:{f():number}; const a=(0,x.f)(); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "comma-nested",
+      "files": {
+        "/case.ts": "declare let a:number; const b=(true?a:1,2); const c=(a=1,2); type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

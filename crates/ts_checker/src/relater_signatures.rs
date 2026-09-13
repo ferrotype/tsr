@@ -9,6 +9,7 @@ use crate::{
 const BIVARIANT_CALLBACK: u32 = 1;
 const STRICT_CALLBACK: u32 = 2;
 const CALLBACK: u32 = BIVARIANT_CALLBACK | STRICT_CALLBACK;
+pub(crate) const IGNORE_RETURN_TYPES: u32 = 4;
 const STRICT_ARITY: u32 = 8;
 const STRICT_TOP: u32 = 16;
 
@@ -50,19 +51,8 @@ impl Relater<'_> {
             {
                 return Ok(tr::FALSE);
             }
-            for &signature in &[sources[0], targets[0]] {
-                if let Some(node) = self.checker.signatures.get(signature)?.declaration {
-                    if self
-                        .checker
-                        .ast(node)?
-                        .node(node)?
-                        .modifier_flags(self.checker.ast(node)?)?
-                        & ts_ast::modifier_flags::NON_PUBLIC_ACCESSIBILITY_MODIFIER
-                        != 0
-                    {
-                        return Err(Error::Unsupported("constructorVisibilitiesAreCompatible"));
-                    }
-                }
+            if !self.constructor_visibilities_are_compatible(sources[0], targets[0])? {
+                return Ok(tr::FALSE);
             }
         }
         let sr = *self.checker.types.get(source)?;
@@ -144,7 +134,7 @@ impl Relater<'_> {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.compareSignaturesRelated
-    fn compare_signatures(
+    pub(crate) fn compare_signatures(
         &mut self,
         mut source: SignatureId,
         target: SignatureId,
@@ -355,6 +345,9 @@ impl Relater<'_> {
                 return Ok(result);
             }
         }
+        if mode & IGNORE_RETURN_TYPES != 0 {
+            return Ok(result);
+        }
         let target_return = self.checker.non_circular_return_type(target)?;
         if target_return == self.checker.builtins.void_type
             || target_return == self.checker.builtins.any_type
@@ -483,5 +476,62 @@ impl Relater<'_> {
             false,
             &mut |checker, source, target| checker.compare_in_relation_frame(frame, source, target),
         )
+    }
+
+    // port: tsc/internal/checker/relater.go:Relater.constructorVisibilitiesAreCompatible
+    fn constructor_visibilities_are_compatible(
+        &mut self,
+        source: crate::SignatureId,
+        target: crate::SignatureId,
+    ) -> Result<bool, Error> {
+        use ts_ast::modifier_flags as mf;
+        let (Some(source_declaration), Some(target_declaration)) = (
+            self.checker.signatures.get(source)?.declaration,
+            self.checker.signatures.get(target)?.declaration,
+        ) else {
+            return Ok(true);
+        };
+        let accessibility = |checker: &crate::CheckerState, node: ts_arena::NodeId| {
+            Ok::<_, Error>(
+                checker
+                    .ast(node)?
+                    .node(node)?
+                    .modifier_flags(checker.ast(node)?)?
+                    & mf::NON_PUBLIC_ACCESSIBILITY_MODIFIER,
+            )
+        };
+        let source_accessibility = accessibility(self.checker, source_declaration)?;
+        let target_accessibility = accessibility(self.checker, target_declaration)?;
+        // A public, protected and private signature is assignable to a private signature.
+        if target_accessibility == mf::PRIVATE {
+            return Ok(true);
+        }
+        // A public and protected signature is assignable to a protected signature.
+        if target_accessibility == mf::PROTECTED && source_accessibility != mf::PRIVATE {
+            return Ok(true);
+        }
+        // Only a public signature is assignable to public signature.
+        if target_accessibility != mf::PROTECTED && source_accessibility == 0 {
+            return Ok(true);
+        }
+        if self.report_errors {
+            let visibility = |flags: u32| -> ts_ast::JsString {
+                ts_ast::JsString::from_bytes(if flags == mf::PRIVATE {
+                    b"private".as_slice()
+                } else if flags == mf::PROTECTED {
+                    b"protected".as_slice()
+                } else {
+                    b"public".as_slice()
+                })
+            };
+            self.report_error(
+                ts_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type,
+                vec![
+                    visibility(source_accessibility),
+                    visibility(target_accessibility),
+                ],
+            );
+        }
+        Ok(false)
     }
 }

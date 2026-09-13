@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "scope": "S08 P4 function-body return and predicate inference, native diagnostics and context-free signature display",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "returns",
+      "files": {
+        "/case.ts": "function scalar() { return 1; } function mixed(flag:boolean) { if (flag) return 1; return \"x\"; } function optional(flag:boolean) { if(flag) return 1; } function explicitEmpty(flag:boolean) { if(flag) return; return 1; } function empty() {} function nested() { function inner() { return \"ignored\"; } return 1; }\ntype Query_scalar = typeof scalar;\ntype Query_mixed = typeof mixed;\ntype Query_optional = typeof optional;\ntype Query_explicitEmpty = typeof explicitEmpty;\ntype Query_empty = typeof empty;\ntype Query_nested = typeof nested;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "scalar",
+          "file": "/case.ts",
+          "declaration": "Query_scalar",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "mixed",
+          "file": "/case.ts",
+          "declaration": "Query_mixed",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "optional",
+          "file": "/case.ts",
+          "declaration": "Query_optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "explicitEmpty",
+          "file": "/case.ts",
+          "declaration": "Query_explicitEmpty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "empty",
+          "file": "/case.ts",
+          "declaration": "Query_empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "nested",
+          "file": "/case.ts",
+          "declaration": "Query_nested",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nonreturning",
+      "files": {
+        "/case.ts": "function declarationNever() { throw 0; } const expressionNever = function() { throw 0; }; const arrowNever = () => { throw 0; }; function recursion() { return recursion(); }\ntype Query_declarationNever = typeof declarationNever;\ntype Query_expressionNever = typeof expressionNever;\ntype Query_arrowNever = typeof arrowNever;\ntype Query_recursion = typeof recursion;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "declarationNever",
+          "file": "/case.ts",
+          "declaration": "Query_declarationNever",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "expressionNever",
+          "file": "/case.ts",
+          "declaration": "Query_expressionNever",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "arrowNever",
+          "file": "/case.ts",
+          "declaration": "Query_arrowNever",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "recursion",
+          "file": "/case.ts",
+          "declaration": "Query_recursion",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "arrows",
+      "files": {
+        "/case.ts": "const scalar = () => 1; const literal: () => 1 = () => 1; const undefinedReturn: () => undefined = () => {}; const body: () => 1 = () => { return 1; };\ntype Query_scalar = typeof scalar;\ntype Query_literal = typeof literal;\ntype Query_undefinedReturn = typeof undefinedReturn;\ntype Query_body = typeof body;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "scalar",
+          "file": "/case.ts",
+          "declaration": "Query_scalar",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "literal",
+          "file": "/case.ts",
+          "declaration": "Query_literal",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "undefinedReturn",
+          "file": "/case.ts",
+          "declaration": "Query_undefinedReturn",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "body",
+          "file": "/case.ts",
+          "declaration": "Query_body",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "predicates",
+      "files": {
+        "/case.ts": "function isString(x:string|number) { return typeof x === \"string\"; } function notString(x:string|number) { return typeof x !== \"string\"; } function twoReturns(x:string|number) { if(typeof x === \"string\") return true; return false; } function booleanIdentity(x:boolean) { return x; } function noRefinement(x:string|number) { return true; } function isDefined(x:string|undefined) { return x !== undefined; }\ntype Query_isString = typeof isString;\ntype Query_notString = typeof notString;\ntype Query_twoReturns = typeof twoReturns;\ntype Query_booleanIdentity = typeof booleanIdentity;\ntype Query_noRefinement = typeof noRefinement;\ntype Query_isDefined = typeof isDefined;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "isString",
+          "file": "/case.ts",
+          "declaration": "Query_isString",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "notString",
+          "file": "/case.ts",
+          "declaration": "Query_notString",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "twoReturns",
+          "file": "/case.ts",
+          "declaration": "Query_twoReturns",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "booleanIdentity",
+          "file": "/case.ts",
+          "declaration": "Query_booleanIdentity",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "noRefinement",
+          "file": "/case.ts",
+          "declaration": "Query_noRefinement",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "isDefined",
+          "file": "/case.ts",
+          "declaration": "Query_isDefined",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "predicate-side-effects",
+      "files": {
+        "/case.ts": "function reassigned(x:string|number) { x = 1; return typeof x === \"string\"; } function unrelated(x:string|number, y:string|number) { return typeof y === \"string\"; } function implication(x:string|number) { return typeof x === \"string\" && x.length > 0; }\ntype Query_reassigned = typeof reassigned;\ntype Query_unrelated = typeof unrelated;\ntype Query_implication = typeof implication;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "reassigned",
+          "file": "/case.ts",
+          "declaration": "Query_reassigned",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "unrelated",
+          "file": "/case.ts",
+          "declaration": "Query_unrelated",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "implication",
+          "file": "/case.ts",
+          "declaration": "Query_implication",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "flow-return",
+      "files": {
+        "/case.ts": "interface String { readonly length:number; } function narrow(x:string|undefined) { if(x === undefined) return 0; return x.length; }\ntype Query_narrow = typeof narrow;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "narrow",
+          "file": "/case.ts",
+          "declaration": "Query_narrow",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "return-errors",
+      "files": {
+        "/case.ts": "function mismatch(): number { return \"wrong\"; } function missing():number {} function path(flag:boolean):number { if(flag) return 1; } function never():never {} const arrow = (): number => \"wrong\";\ntype Query_mismatch=typeof mismatch; type Query_missing=typeof missing; type Query_path=typeof path; type Query_never=typeof never; type Query_arrow=typeof arrow;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "mismatch",
+          "file": "/case.ts",
+          "declaration": "Query_mismatch",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "missing",
+          "file": "/case.ts",
+          "declaration": "Query_missing",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "path",
+          "file": "/case.ts",
+          "declaration": "Query_path",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "never",
+          "file": "/case.ts",
+          "declaration": "Query_never",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "arrow",
+          "file": "/case.ts",
+          "declaration": "Query_arrow",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

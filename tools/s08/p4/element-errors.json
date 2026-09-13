@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "scope": "S08 P4 element-directed relation diagnostics and private/protected properties; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true
+  },
+  "programs": [
+    {
+      "id": "object-property",
+      "files": {
+        "/main.ts": "let x: { a: number } = { a: \"bad\" };\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "object-nested",
+      "files": {
+        "/main.ts": "let x: { a: { b: number } } = { a: { b: \"bad\" } };\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "object-computed",
+      "files": {
+        "/main.ts": "const key = \"a\"; let x: { a: number } = { [key]: \"bad\" };\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "array-elements",
+      "files": {
+        "/main.ts": "let x: number[] = [1, \"bad\", true];\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "array-tuple",
+      "files": {
+        "/main.ts": "let x: [number, boolean] = [\"bad\", 1];\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "array-tuple-extra",
+      "files": {
+        "/main.ts": "let x: [number] = [1, 2];\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "call-object",
+      "files": {
+        "/main.ts": "declare function f(x: {a: number}): void; f({a:\"bad\"});\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "call-array",
+      "files": {
+        "/main.ts": "declare function f(x: number[]): void; f([\"bad\"]);\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "const-assertion",
+      "files": {
+        "/main.ts": "let x: {a:number} = {a:\"bad\"} as const;\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "ordinary-assertion",
+      "files": {
+        "/main.ts": "let x: {a:number} = {a:\"bad\"} as {a:string};\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "assignment-rhs",
+      "files": {
+        "/main.ts": "let a: any; let x: {a:number} = (a = {a:\"bad\"});\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "comma-rhs",
+      "files": {
+        "/main.ts": "let x: {a:number} = (void 0, {a:\"bad\"});\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "index-signature",
+      "files": {
+        "/main.ts": "interface Target { [name: string]: number } let x: Target = {a:\"bad\"};\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "union-property",
+      "files": {
+        "/main.ts": "type Target = {kind:\"a\", value:number}|{kind:\"b\", value:boolean}; let x: Target = {kind:\"a\", value:\"bad\"};\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "private-separate",
+      "files": {
+        "/main.ts": "class A { private x=1; } class B { private x=1; } let a: A = new B();\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "private-public",
+      "files": {
+        "/main.ts": "class A { private x=1; } class B { x=1; } let a: A = new B();\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "protected-derived",
+      "files": {
+        "/main.ts": "class A { protected x=1; } class B extends A { protected x=2; } let a: A = new B();\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "protected-unrelated",
+      "files": {
+        "/main.ts": "class A { protected x=1; } class B { protected x=1; } let a: A = new B();\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "protected-public",
+      "files": {
+        "/main.ts": "class A { x=1; } class B { protected x=1; } let a: A = new B();\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "late-static-module",
+      "files": {
+        "/main.ts": "declare const key: unique symbol; class A { static [key]: number; } namespace A { export const other = 1; } let x: number = A[key]; let y: number = A.other;\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "late-static-collision",
+      "files": {
+        "/main.ts": "const key = \"a\"; class A { static [key]: number; } namespace A { export const a = \"bad\"; }\ntype Probe = number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

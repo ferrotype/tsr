@@ -342,16 +342,11 @@ impl CheckerState {
         &mut self,
         object: TypeId,
         mut index: TypeId,
-        flags: crate::AccessFlags,
+        mut flags: crate::AccessFlags,
         node: Option<ts_arena::NodeId>,
         alias: Option<crate::AliasId>,
     ) -> Result<Option<TypeId>, Error> {
         use crate::access_flags as af;
-        if flags & (af::EXPRESSION_POSITION | af::CONTEXTUAL) != 0 {
-            return Err(Error::Unsupported(
-                "indexed access: expression flow/context",
-            ));
-        }
         if object == self.builtins.wildcard_type || index == self.builtins.wildcard_type {
             return Ok(Some(self.builtins.wildcard_type));
         }
@@ -361,6 +356,14 @@ impl CheckerState {
             && self.type_assignable_to_kind(index, tf::STRING | tf::NUMBER)?
         {
             index = self.builtins.string_type;
+        }
+        if self
+            .program
+            .as_ref()
+            .is_some_and(|program| program.host.options().no_unchecked_indexed_access.is_true())
+            && flags & af::EXPRESSION_POSITION != 0
+        {
+            flags |= af::INCLUDE_UNDEFINED;
         }
         if self.should_defer_indexed_access(object, index, node)? {
             if self.types.flags(object)? & tf::ANY_OR_UNKNOWN != 0 {
@@ -398,8 +401,10 @@ impl CheckerState {
             let mut missing = false;
             for &part in indexes.iter() {
                 match self.property_for_index(
+                    object,
                     apparent,
                     part,
+                    index,
                     node,
                     flags
                         | if missing {
@@ -424,7 +429,9 @@ impl CheckerState {
             };
         }
         self.property_for_index(
+            object,
             apparent,
+            index,
             index,
             node,
             flags | af::CACHE_SYMBOL | af::REPORT_DEPRECATED,
@@ -456,7 +463,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:getTotalFixedElementCount
-    fn total_fixed_elements(&self, ty: TypeId) -> Result<usize, Error> {
+    pub(crate) fn total_fixed_elements(&self, ty: TypeId) -> Result<usize, Error> {
         let tuple = self.types.tuple(self.types.target(ty)?)?;
         Ok(tuple.fixed_length as usize
             + tuple
@@ -618,40 +625,126 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getPropertyTypeForIndexType
     fn property_for_index(
         &mut self,
+        original_object: TypeId,
         object: TypeId,
         index: TypeId,
+        full_index: TypeId,
         node: Option<ts_arena::NodeId>,
         flags: crate::AccessFlags,
     ) -> Result<Option<TypeId>, Error> {
         use crate::access_flags as af;
-        if let Some(node) = node {
-            if self.ast(node)?.node(node)?.kind() != K::IndexedAccessType {
-                return Err(Error::Unsupported(
-                    "getPropertyTypeForIndexType: expression",
+        let expression = match node {
+            Some(node) if self.ast(node)?.node(node)?.kind() == K::ElementAccessExpression => {
+                Some(node)
+            }
+            _ => None,
+        };
+        let name = if node
+            .map(|node| {
+                self.ast(node)?
+                    .node(node)
+                    .map(|read| read.kind() == K::PrivateIdentifier)
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .unwrap_or(false)
+        {
+            None
+        } else if let Some(name) = self.index_property_name(index)? {
+            Some(name)
+        } else if let Some(node) = node {
+            if ts_ast::utilities::is_property_name(&self.ast(node)?.node(node)?) {
+                let name = self.index_property_name_node(node)?;
+                (name.as_bytes() != ts_ast::internal_symbol_names::MISSING).then_some(name)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        if let Some(name) = &name {
+            if flags & af::CONTEXTUAL != 0 {
+                return Ok(Some(
+                    self.type_of_property_of_contextual_type(object, name.as_bytes())?
+                        .unwrap_or(self.builtins.any_type),
                 ));
             }
-        }
-        let name = self.index_property_name(index)?;
-        if let Some(name) = &name {
             if let Some(symbol) = self.constituent_property(object, name.as_bytes(), false)? {
-                let value = self.get_type_of_symbol(symbol)?;
-                if flags & af::WRITING != 0
-                    && self.symbol(symbol)?.flags() & ts_ast::symbol_flags::SET_ACCESSOR != 0
-                {
-                    return Err(Error::Unsupported("getWriteTypeOfSymbol: accessor"));
+                if let Some(expression) = expression {
+                    let left = self
+                        .ast(expression)?
+                        .node(expression)?
+                        .expression()
+                        .ok_or(Error::MissingLink("indexed receiver"))?;
+                    self.mark_access_property_referenced(symbol, expression, left)?;
+                    let assignment = self.assignment_target_kind(expression)?;
+                    if self.assignment_to_readonly_property(expression, symbol, assignment)? {
+                        let name = self.symbol_to_string(symbol)?;
+                        self.error_at(
+                            self.index_access_node(node)?,
+                            ts_diagnostics::Cannot_assign_to_0_because_it_is_a_read_only_property,
+                            vec![name],
+                        )?;
+                        return Ok(None);
+                    }
+                    if flags & af::CACHE_SYMBOL != 0 {
+                        *self.query.resolved_symbols.get_or_default(expression) = Some(symbol);
+                    }
+                    if self.this_property_access_in_constructor(expression, symbol)? {
+                        return Ok(Some(self.builtins.auto_type));
+                    }
                 }
-                if node.is_some() && self.type_contains_missing(value)? {
+                let value = if flags & af::WRITING != 0 {
+                    self.write_type_of_symbol(symbol)?
+                } else {
+                    self.get_type_of_symbol(symbol)?
+                };
+                if let Some(expression) = expression {
+                    if self.assignment_target_kind(expression)?
+                        != crate::flow_assignments::AssignmentKind::Definite
+                    {
+                        return self
+                            .flow_type_of_this_reference(expression, value)
+                            .map(Some);
+                    }
+                } else if node
+                    .map(|node| {
+                        self.ast(node)?
+                            .node(node)
+                            .map(|read| read.kind() == K::IndexedAccessType)
+                            .map_err(Error::from)
+                    })
+                    .transpose()?
+                    .unwrap_or(false)
+                    && self.type_contains_missing(value)?
+                {
                     return self
                         .get_union_type(&[value, self.builtins.undefined_type])
                         .map(Some);
                 }
                 return Ok(Some(value));
             }
-            if self.is_tuple_type(object)? {
-                if let Some(index) = numeric_name(name.as_bytes()) {
-                    return self
-                        .tuple_index_outside_start(object, index, name.clone(), node, flags)
-                        .map(Some);
+            if let Some(index) = numeric_name(name.as_bytes()) {
+                let parts = if self.types.flags(object)? & tf::UNION != 0 {
+                    self.types.types_of(object)?.to_vec()
+                } else {
+                    vec![object]
+                };
+                let mut tuples = true;
+                for &part in &parts {
+                    tuples &= self.is_tuple_type(part)?;
+                }
+                if tuples {
+                    if let Some(value) = self.tuple_index_outside_start(
+                        object,
+                        &parts,
+                        index,
+                        name.clone(),
+                        node,
+                        flags,
+                    )? {
+                        return Ok(Some(value));
+                    }
                 }
             }
         }
@@ -678,20 +771,52 @@ impl CheckerState {
                 if flags & af::NO_INDEX_SIGNATURES != 0
                     && info.key_type != self.builtins.number_type
                 {
+                    if let Some(expression) = expression {
+                        let display = self
+                            .type_to_string(original_object, crate::type_display::DEFAULT_FLAGS)?;
+                        if flags & af::WRITING != 0 {
+                            self.error_at(Some(expression),ts_diagnostics::Type_0_is_generic_and_can_only_be_indexed_for_reading,vec![display])?;
+                        } else {
+                            let index =
+                                self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
+                            self.error_at(
+                                Some(expression),
+                                ts_diagnostics::Type_0_cannot_be_used_to_index_type_1,
+                                vec![index, display],
+                            )?;
+                        }
+                    }
                     return Ok(None);
                 }
                 if node.is_some()
                     && info.key_type == self.builtins.string_type
                     && !self.type_assignable_to_kind(index, tf::STRING | tf::NUMBER)?
                 {
-                    let text = self.type_to_string(index, crate::type_format_flags::NONE)?;
+                    let text = self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
                     self.error_at(
                         self.index_access_node(node)?,
                         ts_diagnostics::Type_0_cannot_be_used_as_an_index_type,
                         vec![text],
                     )?;
+                    return if flags & af::INCLUDE_UNDEFINED != 0 {
+                        self.get_union_type(&[info.value_type, self.builtins.missing_type])
+                            .map(Some)
+                    } else {
+                        Ok(Some(info.value_type))
+                    };
                 }
-                return if flags & af::INCLUDE_UNDEFINED != 0 {
+                self.error_writing_readonly_index(Some(info.clone()), object, expression)?;
+                let enum_self_index = if let (Some(object_symbol), Some(index_symbol)) = (
+                    self.types.get(object)?.symbol,
+                    self.types.get(index)?.symbol,
+                ) {
+                    self.symbol(object_symbol)?.flags() & ts_ast::symbol_flags::ENUM != 0
+                        && self.types.flags(index)? & tf::ENUM_LITERAL != 0
+                        && self.parent_of_symbol(index_symbol)? == Some(object_symbol)
+                } else {
+                    false
+                };
+                return if flags & af::INCLUDE_UNDEFINED != 0 && !enum_self_index {
                     self.get_union_type(&[info.value_type, self.builtins.missing_type])
                         .map(Some)
                 } else {
@@ -702,19 +827,53 @@ impl CheckerState {
                 return Ok(Some(self.builtins.never_type));
             }
         }
+        if let Some(expression) = expression {
+            let constant_enum = self
+                .types
+                .get(object)?
+                .symbol
+                .map(|symbol| {
+                    self.symbol(symbol)
+                        .map(|read| read.flags() & ts_ast::symbol_flags::CONST_ENUM != 0)
+                })
+                .transpose()?
+                .unwrap_or(false);
+            if !constant_enum
+                && self.types.flags(index)? & tf::NULLABLE == 0
+                && self.type_assignable_to_kind(
+                    index,
+                    tf::STRING_LIKE | tf::NUMBER_LIKE | tf::ES_SYMBOL_LIKE,
+                )?
+            {
+                return self.missing_indexed_property(
+                    expression,
+                    object,
+                    index,
+                    full_index,
+                    name.as_ref(),
+                    flags,
+                );
+            }
+        }
         if flags & af::ALLOW_MISSING != 0
             && self.types.get(object)?.object_flags & of::OBJECT_LITERAL != 0
         {
             return Ok(Some(self.builtins.undefined_type));
         }
         if let Some(node) = self.index_access_node(node)? {
-            let object_text = self.type_to_string(object, crate::type_format_flags::NONE)?;
-            let index_text = self.type_to_string(index, crate::type_format_flags::NONE)?;
-            if let Some(name) = name {
+            let object_text = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;
+            let index_text = self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
+            if self.ast(node)?.node(node)?.kind() != K::BigIntLiteral
+                && self.types.flags(index)? & tf::STRING_OR_NUMBER_LITERAL != 0
+            {
                 self.error_at(
                     Some(node),
                     ts_diagnostics::Property_0_does_not_exist_on_type_1,
-                    vec![name, object_text],
+                    vec![
+                        self.index_property_name(index)?
+                            .ok_or(Error::MissingLink("literal index name"))?,
+                        object_text,
+                    ],
                 )?;
             } else if self.types.flags(index)? & (tf::STRING | tf::NUMBER) != 0 {
                 self.error_at(
@@ -723,6 +882,11 @@ impl CheckerState {
                     vec![object_text, index_text],
                 )?;
             } else {
+                let index_text = if self.ast(node)?.node(node)?.kind() == K::BigIntLiteral {
+                    JsString::from_bytes(b"bigint".to_vec())
+                } else {
+                    index_text
+                };
                 self.error_at(
                     Some(node),
                     ts_diagnostics::Type_0_cannot_be_used_as_an_index_type,
@@ -733,69 +897,126 @@ impl CheckerState {
         Ok((self.types.flags(index)? & tf::ANY != 0).then_some(index))
     }
 
-    fn index_access_node(
+    pub(crate) fn index_access_node(
         &self,
         node: Option<ts_arena::NodeId>,
     ) -> Result<Option<ts_arena::NodeId>, Error> {
         node.map(|node| {
             let read = self.ast(node)?.node(node)?;
-            Ok(read
-                .data_source()
-                .as_indexed_access_type_node()
-                .and_then(|data| data.index_type())
-                .unwrap_or(node))
+            match read.kind().known() {
+                Some(K::ElementAccessExpression) => read
+                    .data_source()
+                    .as_element_access_expression()
+                    .and_then(|data| data.argument_expression())
+                    .ok_or(Error::MissingLink("element access index")),
+                Some(K::IndexedAccessType) => read
+                    .data_source()
+                    .as_indexed_access_type_node()
+                    .and_then(|data| data.index_type())
+                    .ok_or(Error::MissingLink("indexed type index")),
+                Some(K::ComputedPropertyName) => read
+                    .expression()
+                    .ok_or(Error::MissingLink("computed index expression")),
+                _ => Ok(node),
+            }
         })
         .transpose()
     }
 
     // Upstream NewChecker's containsMissingType closure (checker.go:1259).
-    fn type_contains_missing(&self, ty: TypeId) -> Result<bool, Error> {
+    pub(crate) fn type_contains_missing(&self, ty: TypeId) -> Result<bool, Error> {
         Ok(ty == self.builtins.missing_type
             || self.types.flags(ty)? & tf::UNION != 0
                 && self.types.types_of(ty)?.first() == Some(&self.builtins.missing_type))
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.getTupleElementTypeOutOfStartCount
+    // port: tsc/internal/checker/checker.go:Checker.getPropertyTypeForIndexType
     fn tuple_index_outside_start(
         &mut self,
         ty: TypeId,
+        parts: &[TypeId],
         index: f64,
         name: JsString,
         node: Option<ts_arena::NodeId>,
         flags: crate::AccessFlags,
-    ) -> Result<TypeId, Error> {
-        use crate::element_flags as ef;
-        let target = self.types.target(ty)?;
-        let data = self.types.tuple(target)?;
-        let infos = data.element_infos.clone();
-        let start = data.fixed_length as usize;
-        if node.is_some()
-            && data.combined_flags & ef::VARIABLE == 0
-            && flags & crate::access_flags::ALLOW_MISSING == 0
-        {
-            let node = self.index_access_node(node)?;
-            if index < 0.0 {
+    ) -> Result<Option<TypeId>, Error> {
+        let mut fixed = true;
+        for &part in parts {
+            fixed &= self.types.tuple(self.types.target(part)?)?.combined_flags
+                & crate::element_flags::VARIABLE
+                == 0;
+        }
+        if node.is_some() && fixed && flags & crate::access_flags::ALLOW_MISSING == 0 {
+            let error_node = self.index_access_node(node)?;
+            if self.is_tuple_type(ty)? {
+                if index < 0.0 {
+                    self.error_at(
+                        error_node,
+                        ts_diagnostics::A_tuple_type_cannot_be_indexed_with_a_negative_value,
+                        vec![],
+                    )?;
+                    return Ok(Some(self.builtins.undefined_type));
+                }
+                let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
+                let count = self
+                    .types
+                    .tuple(self.types.target(ty)?)?
+                    .element_infos
+                    .len();
                 self.error_at(
-                    node,
-                    ts_diagnostics::A_tuple_type_cannot_be_indexed_with_a_negative_value,
-                    vec![],
+                    error_node,
+                    ts_diagnostics::Tuple_type_0_of_length_1_has_no_element_at_index_2,
+                    vec![
+                        display,
+                        JsString::from_bytes(count.to_string().into_bytes()),
+                        name,
+                    ],
                 )?;
-                return Ok(self.builtins.undefined_type);
+            } else {
+                let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
+                self.error_at(
+                    error_node,
+                    ts_diagnostics::Property_0_does_not_exist_on_type_1,
+                    vec![name, display],
+                )?;
             }
-            let text = self.type_to_string(ty, crate::type_format_flags::NONE)?;
-            self.error_at(
-                node,
-                ts_diagnostics::Tuple_type_0_of_length_1_has_no_element_at_index_2,
-                vec![
-                    text,
-                    JsString::from_bytes(infos.len().to_string().into_bytes()),
-                    name,
-                ],
-            )?;
         }
         if index < 0.0 {
-            return Ok(self.builtins.undefined_type);
+            return Ok(None);
         }
+        let mut numeric_info = None;
+        for id in self.index_infos_of_type(ty)? {
+            let info = self.signatures.index_info(id)?;
+            if info.key_type == self.builtins.number_type {
+                numeric_info = Some(info.clone());
+                break;
+            }
+        }
+        let expression = match node {
+            Some(node) if self.ast(node)?.node(node)?.kind() == K::ElementAccessExpression => {
+                Some(node)
+            }
+            _ => None,
+        };
+        self.error_writing_readonly_index(numeric_info, ty, expression)?;
+        let mut values = Vec::new();
+        for &part in parts {
+            values.push(self.tuple_element_outside_start(part, index, flags)?);
+        }
+        self.get_union_type(&values).map(Some)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getTupleElementTypeOutOfStartCount
+    fn tuple_element_outside_start(
+        &mut self,
+        ty: TypeId,
+        index: f64,
+        flags: crate::AccessFlags,
+    ) -> Result<TypeId, Error> {
+        use crate::element_flags as ef;
+        let data = self.types.tuple(self.types.target(ty)?)?;
+        let infos = data.element_infos.clone();
+        let start = data.fixed_length as usize;
         let elements = self.element_types(ty)?;
         if start == elements.len() {
             return Ok(self.builtins.undefined_type);
@@ -833,39 +1054,7 @@ impl CheckerState {
             self.check_source_element(child)?;
         }
         let ty = self.get_type_from_type_node(node)?;
-        if self.types.flags(ty)? & tf::INDEXED_ACCESS == 0 {
-            return Ok(());
-        }
-        let data = *self.types.indexed_access(ty)?;
-        let key = self.get_index_type(data.object_type, 0)?;
-        let number_index = self
-            .index_infos_of_type(data.object_type)?
-            .into_iter()
-            .any(|id| {
-                self.signatures
-                    .index_info(id)
-                    .is_ok_and(|info| info.key_type == self.builtins.number_type)
-            });
-        let indexes = if self.types.flags(data.index_type)? & tf::UNION != 0 {
-            self.types.types_of(data.index_type)?.to_vec()
-        } else {
-            vec![data.index_type]
-        };
-        for index in indexes {
-            if self.source_type_assignable(index, key, &mut Vec::new())?
-                || number_index && self.applicable_index_type(index, self.builtins.number_type)?
-            {
-                continue;
-            }
-            let index = self.type_to_string(data.index_type, crate::type_format_flags::NONE)?;
-            let object = self.type_to_string(data.object_type, crate::type_format_flags::NONE)?;
-            self.error_at(
-                Some(node),
-                ts_diagnostics::Type_0_cannot_be_used_to_index_type_1,
-                vec![index, object],
-            )?;
-            break;
-        }
+        self.check_indexed_value_type(ty, node)?;
         Ok(())
     }
 }

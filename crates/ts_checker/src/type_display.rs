@@ -125,9 +125,34 @@ impl CheckerState {
 
     // port: tsc/internal/checker/printer.go:Checker.symbolToString
     pub(crate) fn symbol_to_string(&mut self, symbol: SymbolId) -> Result<JsString, Error> {
+        self.symbol_to_string_without_chain(symbol, None)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getFullyQualifiedName
+    pub(crate) fn fully_qualified_name(
+        &mut self,
+        symbol: SymbolId,
+        location: Option<ts_arena::NodeId>,
+    ) -> Result<JsString, Error> {
+        if let Some(parent) = self.symbol(symbol)?.parent() {
+            let parent = self.fully_qualified_name(parent, location)?;
+            let name = self.symbol_to_string(symbol)?;
+            let mut text = parent.as_bytes().to_vec();
+            text.push(b'.');
+            text.extend_from_slice(name.as_bytes());
+            return Ok(JsString::from_bytes(text));
+        }
+        self.symbol_to_string_without_chain(symbol, location)
+    }
+
+    fn symbol_to_string_without_chain(
+        &mut self,
+        symbol: SymbolId,
+        location: Option<ts_arena::NodeId>,
+    ) -> Result<JsString, Error> {
         let mut builder =
             crate::node_builder::NodeBuilder::new(self, ts_nodebuilder::flags::IGNORE_ERRORS);
-        let node = builder.symbol_node(symbol)?;
+        let node = builder.symbol_expression_without_chain(symbol, location)?;
         let printer = Printer::new(
             PrinterOptions {
                 remove_comments: true,
@@ -305,12 +330,12 @@ mod tests {
             .unwrap();
         state.types.get_mut(other).unwrap().alias = Some(other_alias);
         let union = state.get_union_type(&[object, other]).unwrap();
-        assert!(matches!(
-            state.type_to_string(union, 0),
-            Err(Error::Unsupported(
-                "mapToTypeNodes: colliding names require qualified display"
-            ))
-        ));
+        // Distinct aliases spelled the same are regenerated fully qualified;
+        // these synthetic aliases have no containers, so the spelling repeats.
+        assert_eq!(
+            state.type_to_string(union, 0).unwrap().as_bytes(),
+            b"Shape | Shape"
+        );
         // The source permits duplicate spellings when both types share the
         // same alias record; only distinct references need qualification.
         state.types.get_mut(other).unwrap().alias = Some(alias);
@@ -355,10 +380,15 @@ mod tests {
         );
         assert_eq!(state.serialization_level, MAX_SERIALIZATION_LEVEL as u32);
         state.serialization_level = 0;
-        assert!(matches!(
-            state.type_to_string(state.builtins.unresolved_type, 0),
-            Err(Error::Unsupported("unresolved type synthetic comment"))
-        ));
+        // The `/*unresolved*/` synthetic comment is dropped by the comment-free
+        // display printer, leaving the `any` keyword.
+        assert_eq!(
+            state
+                .type_to_string(state.builtins.unresolved_type, 0)
+                .unwrap()
+                .as_bytes(),
+            b"any"
+        );
         assert_eq!(state.serialization_level, 0);
         assert_eq!(
             state

@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "scope": "S08 P4 async function-body inference, annotation validation and awaited return diagnostics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "async-inferred",
+      "files": {
+        "/case.ts": "interface Promise<T> { then<TResult>(fn:(value:T)=>TResult):Promise<TResult>; } declare var Promise: { new<T>(fn:()=>T):Promise<T>; }; async function scalar(){return 1;} async function empty(){} const never=async()=>{throw 0;}; async function optional(flag:boolean){if(flag)return 1;}\ntype Query_scalar = typeof scalar;\ntype Query_empty = typeof empty;\ntype Query_never = typeof never;\ntype Query_optional = typeof optional;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "scalar",
+          "file": "/case.ts",
+          "declaration": "Query_scalar",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "empty",
+          "file": "/case.ts",
+          "declaration": "Query_empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "never",
+          "file": "/case.ts",
+          "declaration": "Query_never",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "optional",
+          "file": "/case.ts",
+          "declaration": "Query_optional",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-await",
+      "files": {
+        "/case.ts": "interface Promise<T> { then<TResult>(fn:(value:T)=>TResult):Promise<TResult>; } declare var Promise: { new<T>(fn:()=>T):Promise<T>; }; declare let promised:Promise<string>; async function adopted(){return promised;} async function awaited(){return await promised;}\ntype Query_adopted = typeof adopted;\ntype Query_awaited = typeof awaited;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "adopted",
+          "file": "/case.ts",
+          "declaration": "Query_adopted",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "awaited",
+          "file": "/case.ts",
+          "declaration": "Query_awaited",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-context",
+      "files": {
+        "/case.ts": "interface Promise<T> { then<TResult>(fn:(value:T)=>TResult):Promise<TResult>; } declare var Promise: { new<T>(fn:()=>T):Promise<T>; }; const literal:()=>Promise<1>=async()=>1; const empty:()=>Promise<undefined>=async()=>{};\ntype Query_literal = typeof literal;\ntype Query_empty = typeof empty;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "literal",
+          "file": "/case.ts",
+          "declaration": "Query_literal",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "empty",
+          "file": "/case.ts",
+          "declaration": "Query_empty",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-errors",
+      "files": {
+        "/case.ts": "interface Promise<T> { then<TResult>(fn:(value:T)=>TResult):Promise<TResult>; } declare var Promise: { new<T>(fn:()=>T):Promise<T>; }; async function mismatch():Promise<number>{return \"wrong\";} async function annotation():number{return 1;} async function missing():Promise<number>{}\ntype Query_mismatch = typeof mismatch;\ntype Query_annotation = typeof annotation;\ntype Query_missing = typeof missing;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "mismatch",
+          "file": "/case.ts",
+          "declaration": "Query_mismatch",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "annotation",
+          "file": "/case.ts",
+          "declaration": "Query_annotation",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "missing",
+          "file": "/case.ts",
+          "declaration": "Query_missing",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "async-no-promise",
+      "files": {
+        "/case.ts": "async function scalar(){return 1;} const arrow=async()=>1;\ntype Query_scalar = typeof scalar;\ntype Query_arrow = typeof arrow;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "scalar",
+          "file": "/case.ts",
+          "declaration": "Query_scalar",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "arrow",
+          "file": "/case.ts",
+          "declaration": "Query_arrow",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -8,7 +8,14 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from s04_common import strict_json_loads
-from s08_families import OBSERVATIONS, REQUESTS, P3_UNPAIRED_FAMILIES, requests, validate
+from s08_families import (
+    OBSERVATIONS,
+    REQUESTS,
+    P3_UNPAIRED_FAMILIES,
+    P4_UNPAIRED_FAMILIES,
+    requests,
+    validate,
+)
 from s08_oracle import ROOT
 
 
@@ -17,7 +24,7 @@ def observation(trace, rust=False):
     census = {"families": {"union": {"count": 1, "bytes": 8}}, "types": {"created": 1, "reachable": 1, "unreachable_occupied": 0},
               "unavailable": ["checker_ast"]}
     if rust:
-        census["families"].update({name:{"count":0,"bytes":0} for name in P3_UNPAIRED_FAMILIES})
+        census["families"].update({name:{"count":0,"bytes":0} for name in P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES})
     return {"roots": trace["roots"], "named": trace["named"], "counts": trace["counts"], "prefix_counts": trace["prefix_counts"],
             "census": census, "real_counts": trace["real_counts"]}
 
@@ -46,7 +53,7 @@ class S08Families(unittest.TestCase):
     def test_unpaired_families_cannot_disappear_or_become_paired_silently(self):
         request, trace = self.spec["traces"][0], self.frozen["traces"][0]
         go, rust = observation(trace), observation(trace, rust=True)
-        for name in P3_UNPAIRED_FAMILIES:
+        for name in P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES:
             missing = copy.deepcopy(rust)
             del missing["census"]["families"][name]
             with self.subTest(name=name), self.assertRaises(ValueError):

@@ -14,9 +14,7 @@ impl CheckerState {
             let view = file.view();
             let source = view.source_file()?;
             augmentations.extend(source.module_augmentations()?.iter().flatten().copied());
-            if !view.result().pattern_ambient_modules().is_empty() {
-                return Err(Error::Unsupported("mergePatternAmbientModules"));
-            }
+            let source_id = file.source();
             let locals = view
                 .node_binding(file.source())?
                 .and_then(|binding| binding.locals);
@@ -64,6 +62,7 @@ impl CheckerState {
                     }
                 }
             }
+            self.collect_pattern_ambient_modules(source_id)?;
         }
         for &name in &augmentations {
             let declaration = self
@@ -139,6 +138,7 @@ impl CheckerState {
         for symbol in ambient_modules {
             self.merge_global_symbol(symbol)?;
         }
+        self.merge_pattern_ambient_modules()?;
         for name in augmentations {
             let declaration = self
                 .ast(name)?
@@ -146,9 +146,7 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("augmentation parent"))?;
             if !ast::is_global_scope_augmentation(&self.ast(declaration)?.node(declaration)?) {
-                return Err(Error::Unsupported(
-                    "mergeModuleAugmentation: external module resolution",
-                ));
+                self.merge_external_module_augmentation(declaration)?;
             }
         }
         Ok(())

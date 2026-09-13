@@ -105,17 +105,18 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.removeSubtypes
+    /// `None` when the union is too complex to represent (the diagnostic is reported here).
     pub(crate) fn remove_subtypes(
         &mut self,
         mut types: Vec<TypeId>,
         has_objects: bool,
-    ) -> Result<Vec<TypeId>, Error> {
+    ) -> Result<Option<Vec<TypeId>>, Error> {
         if types.len() < 2 {
-            return Ok(types);
+            return Ok(Some(types));
         }
         let key = crate::key::type_list_key(&types);
         if let Some(cached) = self.types.caches.subtype_reductions.get(&key) {
-            return Ok(cached.to_vec());
+            return Ok(Some(cached.to_vec()));
         }
         let mut has_empty = false;
         if has_objects {
@@ -180,7 +181,15 @@ impl CheckerState {
                 if count == 100_000
                     && (count / (original_length - index)) * original_length > 1_000_000
                 {
-                    return Err(Error::Unsupported("removeSubtypes: complexity diagnostic"));
+                    // After 100000 subtype checks we estimate the remaining amount of work by assuming the
+                    // same ratio of checks per element. If the estimated number of remaining type checks is
+                    // greater than 1M we deem the union type too complex to represent.
+                    self.error_at(
+                        self.current_node,
+                        ts_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,
+                        vec![],
+                    )?;
+                    return Ok(None);
                 }
                 count += 1;
                 if let Some((name, key_type)) = &key_property {
@@ -218,14 +227,14 @@ impl CheckerState {
                     } else {
                         target
                     };
+                    // Two classes are only subtype-reducible when one derives from the other.
                     if self.types.object_flags(source_target)?
                         & self.types.object_flags(target_target)?
                         & of::CLASS
                         != 0
+                        && !self.is_type_derived_from(source, target)?
                     {
-                        return Err(Error::Unsupported(
-                            "removeSubtypes: nominal class derivation",
-                        ));
+                        continue;
                     }
                     remove = true;
                     break;
@@ -239,6 +248,6 @@ impl CheckerState {
             .caches
             .subtype_reductions
             .insert(key, types.clone().into());
-        Ok(types)
+        Ok(Some(types))
     }
 }

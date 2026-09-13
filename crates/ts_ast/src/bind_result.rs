@@ -955,6 +955,13 @@ impl AstFile {
 pub struct CompletedFile {
     bound: BoundFile,
 }
+impl crate::AstBuilder {
+    /// Retain completed syntax before creating synthetic nodes that refer to it.
+    /// This capability does not expose or promise a pristine parsed snapshot.
+    pub fn retain_completed(&mut self, file: &CompletedFile) {
+        self.retain_file(file.bound.file.clone());
+    }
+}
 impl CompletedFile {
     pub fn view(&self) -> BoundView<'_> {
         self.bound.view()

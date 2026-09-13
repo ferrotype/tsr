@@ -202,7 +202,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.computeKeyPropertyNameAndMap
-    fn compute_key_property_name(&mut self, union: TypeId) -> Result<(), Error> {
+    pub(crate) fn compute_key_property_name(&mut self, union: TypeId) -> Result<(), Error> {
         let types = self.types.compound_types(union)?.clone();
         self.types.union_mut(union)?.key_property_name = Some(JsString::default());
         let result = (|| {

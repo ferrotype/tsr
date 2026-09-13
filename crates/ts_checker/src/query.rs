@@ -2,8 +2,8 @@
 //! Unsupported branches are failures of the port, not language diagnostics.
 
 use crate::{
-    object_flags as of, type_flags as tf, CheckerState, Error, LinkStore, TypeAlias, TypeId,
-    TypeSystemEntity, TypeSystemPropertyName,
+    node_check_flags as nc, object_flags as of, type_flags as tf, CheckerState, Error, LinkStore,
+    TypeAlias, TypeId, TypeSystemEntity, TypeSystemPropertyName,
 };
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{check_flags, node_flags as nf, symbol_flags as sf, SymbolFlags, SyntaxKind as K};
@@ -11,10 +11,21 @@ use ts_jsstring::JsString;
 
 #[derive(Default)]
 pub(crate) struct QueryState {
+    pub this_assignments:
+        crate::types::Map<SymbolId, crate::assignment_declarations::ThisAssignment>,
+    pub resolved_symbols: LinkStore<NodeId, Option<SymbolId>>,
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    pub global_type_aliases: crate::types::Map<(&'static str, usize, bool), Option<SymbolId>>,
     pub references: LinkStore<SymbolId, SymbolFlags>,
+    /// `sourceFileLinks.identifierCheckNodes`, keyed by source file.
+    pub identifier_check_nodes: crate::types::Map<NodeId, Vec<NodeId>>,
+    /// `sourceFileLinks.unusedChecked`, with sticky Rust errors scoped to that
+    /// phase rather than invalidating a completed type check.
+    pub unused_checks: crate::types::Map<NodeId, Result<(), Error>>,
+    /// `Checker.renamedBindingElementsInTypes`.
+    pub renamed_binding_elements_in_types: Vec<NodeId>,
     pub scope_changes: LinkStore<NodeId, ts_core::Tristate>,
     /// The union/intersection slice of deferredSymbolLinks.constituents. The containing
     /// type lives in valueSymbolLinks; no owning references back to the checker.
@@ -26,6 +37,15 @@ pub(crate) struct QueryState {
     pub apparent_types: crate::types::Map<TypeId, TypeId>,
     pub type_parameters_checked: crate::types::Set<SymbolId>,
     pub index_constraints_checked: crate::types::Set<TypeId>,
+    pub accessor_pairs_checked: crate::types::Set<NodeId>,
+    pub context_free_types: crate::types::Map<NodeId, TypeId>,
+    pub array_literal_types: crate::types::Map<TypeId, TypeId>,
+    pub widened_types: crate::types::Map<TypeId, TypeId>,
+    pub assertion_types: crate::types::Map<NodeId, TypeId>,
+    pub reported_unreachable: crate::types::Set<NodeId>,
+    pub unresolved_symbols: crate::types::Map<JsString, SymbolId>,
+    pub undefined_properties: crate::types::Map<JsString, SymbolId>,
+    pub function_symbols_checked: crate::types::Set<SymbolId>,
 }
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
@@ -105,38 +125,16 @@ impl CheckerState {
                 return self.get_symbol_of_declaration(parent);
             }
         }
-        if read.kind() == K::Identifier {
-            let name = JsString::from_bytes(self.ast(node)?.node_text(node)?.as_bytes());
-            let parent = required(read.parent(), "identifier parent")?;
-            let parent = self.ast(parent)?.node(parent)?;
-            let type_reference = parent.kind() == K::TypeReference;
-            if !type_reference
-                && !matches!(
-                    parent.kind().known(),
-                    Some(
-                        K::BinaryExpression
-                            | K::VariableDeclaration
-                            | K::PropertyAssignment
-                            | K::ParenthesizedExpression
-                            | K::ExpressionStatement
-                    )
-                )
-            {
-                return Err(Error::Unsupported(
-                    "getSymbolOfNameOrPropertyAccessExpression: identifier context",
-                ));
-            }
-            let result = self.resolve_name(
-                Some(node),
-                name.as_bytes(),
-                if type_reference { sf::TYPE } else { sf::VALUE },
-                None,
-                true,
-            )?;
-            if type_reference && result.is_none() {
-                return Err(Error::Unsupported("getUnresolvedSymbolForEntityName"));
-            }
-            return Ok(result);
+        if matches!(
+            read.kind().known(),
+            Some(
+                K::Identifier
+                    | K::PrivateIdentifier
+                    | K::PropertyAccessExpression
+                    | K::QualifiedName
+            )
+        ) {
+            return self.symbol_of_expression_name(node);
         }
         match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral) => {
@@ -172,26 +170,125 @@ impl CheckerState {
                 }
                 Ok(None)
             }
+            Some(K::ThisKeyword) => {
+                let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
+                if ts_ast::utilities::is_function_like(Some(&self.ast(container)?.node(container)?))
+                {
+                    let signature = self.signature_from_declaration(container)?;
+                    if let Some(this_parameter) = self.signatures.get(signature)?.this_parameter {
+                        return Ok(Some(this_parameter));
+                    }
+                }
+                if is_in_expression_context(self.ast(node)?, node)? {
+                    let ty = self.check_expression(node)?;
+                    return Ok(self.types.get(ty)?.symbol);
+                }
+                let ty = self.type_from_this_node(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ThisType) => {
+                let ty = self.type_from_this_node(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::SuperKeyword | K::MetaProperty) => {
+                let ty = self.check_expression(node)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ConstructorKeyword) => {
+                // constructor keyword for an overload, should take us to the definition if it exist
+                match read.parent() {
+                    Some(constructor)
+                        if self.ast(constructor)?.node(constructor)?.kind() == K::Constructor =>
+                    {
+                        match self.ast(constructor)?.node(constructor)?.parent() {
+                            Some(class) => self.raw_declaration_symbol(class),
+                            None => Ok(None),
+                        }
+                    }
+                    _ => Ok(None),
+                }
+            }
             Some(
-                K::PrivateIdentifier
-                | K::PropertyAccessExpression
-                | K::QualifiedName
-                | K::ThisKeyword
-                | K::ThisType
-                | K::SuperKeyword
-                | K::ConstructorKeyword
-                | K::DefaultKeyword
+                K::DefaultKeyword
                 | K::FunctionKeyword
                 | K::EqualsGreaterThanToken
-                | K::ClassKeyword
-                | K::ImportType
-                | K::ExportKeyword
-                | K::ImportKeyword
-                | K::NewKeyword
-                | K::InstanceOfKeyword
-                | K::MetaProperty
-                | K::JsxNamespacedName,
-            ) => Err(Error::Unsupported("getSymbolAtLocation: node context")),
+                | K::ClassKeyword,
+            ) => match read.parent() {
+                Some(parent) => self.get_symbol_of_declaration(parent),
+                None => Ok(None),
+            },
+            Some(K::ExportKeyword) => match read.parent() {
+                Some(parent) if self.ast(parent)?.node(parent)?.kind() == K::ExportAssignment => {
+                    self.raw_declaration_symbol(parent)
+                }
+                _ => Ok(None),
+            },
+            Some(K::ImportKeyword | K::NewKeyword) => {
+                let Some(parent) = read.parent() else {
+                    return Ok(None);
+                };
+                let parent_read = self.ast(parent)?.node(parent)?;
+                if parent_read.kind() != K::MetaProperty {
+                    return Ok(None);
+                }
+                if read.kind() == K::ImportKeyword {
+                    if let Some(name) = parent_read.name() {
+                        if self.ast(name)?.node_text(name)?.as_bytes() == b"defer" {
+                            return Ok(None);
+                        }
+                    }
+                }
+                let ty = self.check_meta_property(parent)?;
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::InstanceOfKeyword) => {
+                let Some(parent) = read.parent() else {
+                    return Ok(None);
+                };
+                let parent_read = self.ast(parent)?.node(parent)?;
+                let Some(right) = parent_read
+                    .data_source()
+                    .as_binary_expression()
+                    .and_then(|data| data.right())
+                else {
+                    return Ok(None);
+                };
+                let ty = self.check_expression_cached(right)?;
+                if let Some(has_instance) = self.symbol_has_instance_method_of_object_type(ty)? {
+                    if let Some(symbol) = self.types.get(has_instance)?.symbol {
+                        return Ok(Some(symbol));
+                    }
+                }
+                Ok(self.types.get(ty)?.symbol)
+            }
+            Some(K::ImportType) => {
+                let literal = read
+                    .data_source()
+                    .as_import_type_node()
+                    .and_then(|data| data.argument())
+                    .map(|argument| {
+                        Ok::<_, Error>(
+                            self.ast(argument)?
+                                .node(argument)?
+                                .data_source()
+                                .as_literal_type_node()
+                                .and_then(|data| data.literal()),
+                        )
+                    })
+                    .transpose()?
+                    .flatten();
+                match literal {
+                    Some(literal)
+                        if self.ast(literal)?.node(literal)?.kind() == K::StringLiteral =>
+                    {
+                        self.get_symbol_at_location(literal)
+                    }
+                    _ => Ok(None),
+                }
+            }
+            Some(K::JsxNamespacedName) => Err(Error::Unsupported(
+                "getSymbolAtLocation: JSX namespaced name",
+            )),
             _ => Ok(None),
         }
     }
@@ -277,6 +374,10 @@ impl CheckerState {
                     let ty = self.check_expression(node)?;
                     self.get_regular_type_of_literal_type(ty)
                 }
+                _ if ts_ast::utilities::is_expression_kind(kind) => {
+                    let ty = self.check_expression(node)?;
+                    self.get_regular_type_of_literal_type(ty)
+                }
                 _ => Err(Error::Unsupported("getTypeOfNode: expression/context")),
             }
         })
@@ -288,12 +389,7 @@ impl CheckerState {
         symbol: SymbolId,
     ) -> Result<TypeId, Error> {
         let flags = self.symbol(symbol)?.flags();
-        if flags & sf::CLASS != 0 {
-            return Err(Error::Unsupported(
-                "getDeclaredTypeOfClassOrInterface: class",
-            ));
-        }
-        if flags & sf::INTERFACE != 0 {
+        if flags & (sf::CLASS | sf::INTERFACE) != 0 {
             return self.declared_interface_type(symbol);
         }
         if flags & sf::TYPE_PARAMETER != 0 {
@@ -303,38 +399,75 @@ impl CheckerState {
             return self.get_declared_type_of_type_alias(symbol);
         }
         if flags & sf::ENUM != 0 {
-            return Err(Error::Unsupported("getDeclaredTypeOfEnum"));
+            return self.declared_enum_type(symbol);
         }
         if flags & sf::ENUM_MEMBER != 0 {
-            return Err(Error::Unsupported("getDeclaredTypeOfEnumMember"));
+            return self.declared_enum_member_type(symbol);
         }
         if flags & sf::ALIAS != 0 {
-            return Err(Error::Unsupported("getDeclaredTypeOfAlias"));
+            let target = self.resolve_alias(symbol)?;
+            return self.get_declared_type_of_symbol(target);
         }
         Ok(self.builtins.error_type)
     }
 
-    fn push_source_resolution(
+    pub(crate) fn push_source_resolution(
         &mut self,
         symbol: SymbolId,
         property: TypeSystemPropertyName,
     ) -> bool {
+        self.push_type_resolution(TypeSystemEntity::Symbol(symbol), property)
+    }
+
+    /// Upstream keys the "already produced" probe on the resolution's property
+    /// name alone and type-asserts the target, so one predicate serves every
+    /// entity kind; an entry whose target does not match its property's entity
+    /// cannot occur, and answers `false` here rather than panicking.
+    // port: tsc/internal/checker/checker.go:Checker.typeResolutionHasProperty
+    pub(crate) fn push_type_resolution(
+        &mut self,
+        target: TypeSystemEntity,
+        property: TypeSystemPropertyName,
+    ) -> bool {
+        let aliases = &self.module_aliases.targets;
         let declared = &self.query.declared_types;
         let values = &self.value_symbol_links;
+        let node_flags = &self.emit_checks.node_flags;
         self.resolution
-            .push(TypeSystemEntity::Symbol(symbol), property, |entry| {
-                let TypeSystemEntity::Symbol(symbol) = entry.target else {
-                    return false;
-                };
-                match entry.property_name {
-                    TypeSystemPropertyName::DeclaredType => {
+            .push(target, property, |entry| match entry.property_name {
+                TypeSystemPropertyName::AliasTarget => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => {
+                        aliases.get(&symbol).is_some_and(Result::is_ok)
+                    }
+                    _ => false,
+                },
+                TypeSystemPropertyName::DeclaredType => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => {
                         declared.try_get(symbol).is_some_and(Option::is_some)
                     }
-                    TypeSystemPropertyName::Type => values
+                    _ => false,
+                },
+                TypeSystemPropertyName::Type => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => values
                         .try_get(symbol)
                         .is_some_and(|links| links.resolved_type.is_some()),
                     _ => false,
-                }
+                },
+                TypeSystemPropertyName::WriteType => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => values
+                        .try_get(symbol)
+                        .is_some_and(|links| links.write_type.is_some()),
+                    _ => false,
+                },
+                TypeSystemPropertyName::InitializerIsUndefined => match entry.target {
+                    TypeSystemEntity::Node(node) => {
+                        node_flags.try_get(node).copied().unwrap_or_default()
+                            & nc::INITIALIZER_IS_UNDEFINED_COMPUTED
+                            != 0
+                    }
+                    _ => false,
+                },
+                _ => false,
             })
     }
 
@@ -345,8 +478,13 @@ impl CheckerState {
         }
         let declarations = self.symbol_declarations(symbol)?.to_vec();
         let mut declaration = None;
+        // Upstream's `IsTypeOrJSTypeAliasDeclaration`: a JSDoc `@typedef` or
+        // `@callback` declares a JS type alias.
         for node in declarations.into_iter().flatten() {
-            if self.ast(node)?.node(node)?.kind() == K::TypeAliasDeclaration {
+            if matches!(
+                self.ast(node)?.node(node)?.kind().known(),
+                Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
+            ) {
                 declaration = Some(node);
                 break;
             }
@@ -410,11 +548,8 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromTypeNodeWorker
     fn get_type_from_type_node_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let read = self.ast(node)?.node(node)?;
-        if read.kind() == K::TypeReference && read.flags() & nf::JS_DOC != 0 {
-            return Err(Error::Unsupported("getIntendedTypeFromJSDocTypeReference"));
-        }
         let builtin = match read.kind().known() {
-            Some(K::AnyKeyword) => Some(self.builtins.any_type),
+            Some(K::AnyKeyword | K::JSDocAllType) => Some(self.builtins.any_type),
             Some(K::UnknownKeyword) => Some(self.builtins.unknown_type),
             Some(K::StringKeyword) => Some(self.builtins.string_type),
             Some(K::NumberKeyword) => Some(self.builtins.number_type),
@@ -436,12 +571,35 @@ impl CheckerState {
             return Ok(*ty);
         }
         let ty = match read.kind().known() {
+            Some(K::TypeQuery) => self.source_type_query(node)?,
+            Some(K::ImportType) => self.type_from_import_node(node)?,
             Some(K::ConditionalType) => self.source_conditional_type(node)?,
             Some(K::InferType) => self.source_infer_type(node)?,
             Some(K::UnionType | K::IntersectionType) => {
                 self.get_type_from_union_or_intersection_type_node(node)?
             }
-            Some(K::ParenthesizedType) => {
+            Some(K::JSDocNullableType | K::JSDocOptionalType | K::JSDocVariadicType) => {
+                let kind = read.kind();
+                let annotation = if let Some(data) = read.data_source().as_js_doc_variadic_type() {
+                    data.r#type()
+                } else if let Some(data) = read.data_source().as_js_doc_optional_type() {
+                    data.r#type()
+                } else {
+                    read.type_node()
+                };
+                let annotation = required(annotation, "JSDoc type operand")?;
+                let ty = self.get_type_from_type_node(annotation)?;
+                if kind == K::JSDocVariadicType {
+                    self.create_array_type(ty, false)?
+                } else if kind == K::JSDocOptionalType {
+                    self.add_type_optionality(ty, false, true)?
+                } else if self.options.strict_null_checks {
+                    self.nullable_type(ty, tf::NULL)?
+                } else {
+                    ty
+                }
+            }
+            Some(K::ParenthesizedType | K::JSDocNonNullableType) => {
                 return self
                     .get_type_from_type_node(required(read.type_node(), "parenthesized type")?)
             }
@@ -481,7 +639,10 @@ impl CheckerState {
                 }
             }
             Some(K::TypeReference | K::ExpressionWithTypeArguments) => {
-                self.source_type_reference(node)?
+                match self.intended_jsdoc_type(node)? {
+                    Some(ty) => ty,
+                    None => self.source_type_reference(node)?,
+                }
             }
             Some(K::MappedType) => self.source_mapped_type(node)?,
             Some(K::TemplateLiteralType) => self.source_template_type(node)?,
@@ -649,22 +810,36 @@ impl CheckerState {
         if let Some(Some(ty)) = self.query.type_nodes.try_get(node) {
             return Ok(*ty);
         }
-        // P2 implements normal checking only and rejects flow-dependent
-        // expressions. When flow checking is added, a cache fill must save,
-        // clear and restore flowLoopStack/flowTypeCache as upstream does.
-        let ty = self.check_expression(node)?;
+        let saved_loops = std::mem::take(&mut self.flow.loop_stack);
+        let saved_cache = std::mem::take(&mut self.flow.expression_cache);
+        let result = self.check_expression(node);
+        self.flow.loop_stack = saved_loops;
+        self.flow.expression_cache = saved_cache;
+        let ty = result?;
         *self.query.type_nodes.get_or_default(node) = Some(ty);
         Ok(ty)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionWorker
     pub(crate) fn check_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
+        self.check_expression_ex(node, 0)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkExpressionEx
+    pub(crate) fn check_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        let previous_mode = std::mem::replace(&mut self.expression_mode, mode);
         let previous = self.current_node.replace(node);
         self.instantiation.count = 0;
         let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.check_expression_worker(node)
+            let ty = self.check_expression_worker(node)?;
+            let ty = self.instantiate_single_generic_function(node, ty, mode)?;
+            if self.const_enum_object_type(ty)? {
+                self.check_const_enum_access(node, ty)?;
+            }
+            Ok(ty)
         });
         self.current_node = previous;
+        self.expression_mode = previous_mode;
         result
     }
 
@@ -692,44 +867,74 @@ impl CheckerState {
             Some(K::FalseKeyword) => return Ok(self.builtins.false_type),
             Some(K::NullKeyword) => return Ok(self.builtins.null_widening_type),
             Some(K::ParenthesizedExpression) => {
-                return self
-                    .check_expression(required(read.expression(), "parenthesized expression")?)
+                return self.check_expression_ex(
+                    required(read.expression(), "parenthesized expression")?,
+                    self.expression_mode,
+                )
             }
-            Some(K::Identifier | K::PropertyAccessExpression) => {
-                return self.check_ambient_entity_expression(node)
+            Some(K::SyntheticExpression) => return self.check_synthetic_expression(node),
+            Some(K::SpreadElement) => {
+                return self.check_spread_expression(node, self.expression_mode)
+            }
+            Some(K::PrivateIdentifier) => self.check_private_identifier_expression(node)?,
+            Some(K::Identifier) => return self.check_identifier(node),
+            Some(K::ElementAccessExpression) => return self.check_element_access(node),
+            Some(K::PropertyAccessExpression | K::QualifiedName) => {
+                return self.check_property_expression(node)
+            }
+            Some(K::FunctionExpression | K::ArrowFunction) => {
+                return self.check_function_expression(node)
+            }
+            Some(K::CallExpression | K::NewExpression) => return self.check_call_expression(node),
+            Some(K::ExpressionWithTypeArguments) => {
+                return self.check_instantiation_expression(node)
+            }
+            Some(K::TaggedTemplateExpression) => {
+                return self.check_tagged_template_expression(node)
             }
             Some(K::ObjectLiteralExpression) => return self.check_object_literal(node),
-            Some(K::PrefixUnaryExpression) => {
-                let data = read
-                    .data_source()
-                    .as_prefix_unary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
-                let operand = required(data.operand(), "prefix operand")?;
-                let operator = data.operator();
-                if self.ast(operand)?.node(operand)?.kind() != K::NumericLiteral
-                    || !matches!(operator.known(), Some(K::PlusToken | K::MinusToken))
-                {
-                    return Err(Error::Unsupported("checkPrefixUnaryExpression"));
-                }
-                // Operand checking owns grammar diagnostics even when the
-                // literal fast path determines the unary expression's type.
-                self.check_expression(operand)?;
-                let number =
-                    ts_jsnum::from_string(self.ast(operand)?.node_text(operand)?.as_bytes())
-                        .value();
-                self.get_number_literal_type(ts_jsnum::Number::new(if operator == K::MinusToken {
-                    -number
-                } else {
-                    number
-                }))?
+            Some(K::ArrayLiteralExpression) => return self.check_array_literal(node),
+            Some(K::TemplateExpression) => return self.check_template_expression(node),
+            Some(K::YieldExpression) => return self.check_yield_expression(node),
+            Some(K::AwaitExpression) => return self.check_await_expression(node),
+            Some(K::AsExpression | K::TypeAssertionExpression) => {
+                return self.check_assertion_expression(node)
             }
+            Some(K::SatisfiesExpression) => return self.check_satisfies_expression(node),
+            Some(K::NonNullExpression) => return self.check_non_null_assertion(node),
+            Some(K::ThisKeyword) => return self.check_this_expression(node),
+            Some(K::SuperKeyword) => return self.check_super_expression(node),
+            Some(K::ClassExpression) => return self.check_class_expression(node),
+            Some(K::OmittedExpression) => return Ok(self.builtins.undefined_widening_type),
+            Some(K::BinaryExpression) => return self.check_binary_expression(node),
+            Some(K::ConditionalExpression) => return self.check_conditional_expression(node),
+            Some(K::TypeOfExpression) => {
+                let expression = required(read.expression(), "typeof operand")?;
+                self.check_expression(expression)?;
+                return Ok(self.typeof_result_type());
+            }
+            Some(K::VoidExpression) => {
+                let expression = required(read.expression(), "void operand")?;
+                self.check_expression(expression)?;
+                return Ok(self.builtins.undefined_widening_type);
+            }
+            Some(K::PrefixUnaryExpression | K::PostfixUnaryExpression) => {
+                return self.check_unary_expression(node)
+            }
+            Some(K::RegularExpressionLiteral) => {
+                return self.check_regular_expression_literal(node)
+            }
+            Some(K::DeleteExpression) => return self.check_delete_expression(node),
+            Some(K::MetaProperty) => return self.check_meta_property(node),
+            // JSX expressions are outside the frozen denominator; every other
+            // kind upstream accepts is ported above.
             _ => return Err(Error::Unsupported("checkExpressionWorker")),
         };
         self.get_fresh_type_of_literal_type(ty)
     }
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarNumericLiteral
-    fn check_grammar_numeric_literal(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn check_grammar_numeric_literal(&mut self, node: NodeId) -> Result<(), Error> {
         let view = self.ast(node)?;
         let read = view.node(node)?;
         let literal = read
@@ -784,155 +989,9 @@ impl CheckerState {
         Ok(())
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.checkObjectLiteral
-    fn check_object_literal(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let view = self.ast(node)?;
-        let read = view.node(node)?;
-        if read.flags() & (nf::JAVA_SCRIPT_FILE | nf::JSON_FILE) != 0 {
-            return Err(Error::Unsupported(
-                "checkObjectLiteral: JavaScript/JSON context",
-            ));
-        }
-        let parent = required(read.parent(), "object literal parent")?;
-        let parent_read = self.ast(parent)?.node(parent)?;
-        let contextual = if parent_read.kind() == K::VariableDeclaration
-            && parent_read.initializer() == Some(node)
-        {
-            parent_read
-                .type_node()
-                .map(|annotation| self.get_type_from_type_node(annotation))
-                .transpose()?
-        } else if parent_read.kind() == K::PropertyAssignment {
-            self.contextual_property_type(parent)?
-        } else {
-            return Err(Error::Unsupported(
-                "getContextualType: object literal context",
-            ));
-        };
-        let view = self.ast(node)?;
-        let properties = match view.node(node)?.property_list() {
-            Some(list) => view
-                .node_slice(view.list(list)?.nodes())?
-                .iter()
-                .collect::<Vec<_>>(),
-            None => Vec::new(),
-        };
-        let mut members = ts_ast::SymbolTable::new();
-        let mut flags = of::FRESH_LITERAL;
-        for property in properties.into_iter().flatten() {
-            let read = self.ast(property)?.node(property)?;
-            if read.kind() != K::PropertyAssignment {
-                return Err(Error::Unsupported(
-                    "checkObjectLiteral: spread, shorthand or method",
-                ));
-            }
-            let name = required(read.name(), "property assignment name")?;
-            if !ts_ast::utilities::is_property_name_literal(&self.ast(name)?.node(name)?) {
-                return Err(Error::Unsupported("checkComputedPropertyName"));
-            }
-            let original = required(self.get_symbol_of_declaration(property)?, "property symbol")?;
-            let text = self.symbol(original)?.name_to_owned();
-            if members.contains_key(text.as_bytes()) {
-                return Err(Error::Unsupported(
-                    "checkGrammarObjectLiteralExpression: duplicate property",
-                ));
-            }
-            let contextual_property = match contextual {
-                Some(contextual) => self.property_type(contextual, text.as_bytes())?,
-                None => None,
-            };
-            let ty = self.check_property_assignment(property, contextual_property)?;
-            flags |= self.types.get(ty)?.object_flags & of::PROPAGATING_FLAGS;
-            let original_read = self.symbol(original)?;
-            let symbol_flags = sf::PROPERTY | original_read.flags();
-            let declarations = original_read.declarations();
-            let parent = original_read.parent();
-            let value_declaration = original_read.value_declaration();
-            let prop = self.new_symbol_ex(symbol_flags, text.clone(), check_flags::NONE)?;
-            let stored = self.symbol_mut(prop)?;
-            stored.declarations = declarations;
-            stored.parent = parent;
-            stored.value_declaration = value_declaration;
-            let links = self.value_symbol_links.get_or_default(prop);
-            links.resolved_type = Some(ty);
-            links.target = Some(original);
-            members.insert(text, Some(prop));
-        }
-        let symbol = self.get_symbol_of_declaration(node)?;
-        let table = self.alloc_symbol_table(members);
-        let ty = self.new_anonymous_type(symbol, Some(table), &[], &[], &[])?;
-        self.types.get_mut(ty)?.object_flags |=
-            flags | of::OBJECT_LITERAL | of::CONTAINS_OBJECT_OR_ARRAY_LITERAL;
-        Ok(ty)
-    }
-
-    pub(crate) fn property_type(
-        &mut self,
-        ty: TypeId,
-        name: &[u8],
-    ) -> Result<Option<TypeId>, Error> {
-        if self.types.flags(ty)? & tf::ANY != 0 {
-            return Ok(Some(self.builtins.any_type));
-        }
-        self.resolve_type_members(ty)?;
-        let table = self.types.structured(ty)?.members;
-        let symbol = table
-            .map(|table| self.table(table).map(|table| table.get(name).flatten()))
-            .transpose()?
-            .flatten();
-        symbol
-            .map(|symbol| self.get_type_of_symbol(symbol))
-            .transpose()
-    }
-
-    fn contextual_property_type(&mut self, property: NodeId) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(property)?.node(property)?;
-        let object = required(read.parent(), "property parent")?;
-        let parent = required(self.ast(object)?.node(object)?.parent(), "object parent")?;
-        let parent_read = self.ast(parent)?.node(parent)?;
-        let contextual = if parent_read.kind() == K::VariableDeclaration {
-            parent_read
-                .type_node()
-                .map(|node| self.get_type_from_type_node(node))
-                .transpose()?
-        } else if parent_read.kind() == K::PropertyAssignment {
-            self.contextual_property_type(parent)?
-        } else {
-            return Err(Error::Unsupported(
-                "getContextualTypeForObjectLiteralElement",
-            ));
-        };
-        let Some(contextual) = contextual else {
-            return Ok(None);
-        };
-        let name = required(self.ast(property)?.node(property)?.name(), "property name")?;
-        let name = self.ast(name)?.node_text(name)?.into_js_string();
-        self.property_type(contextual, name.as_bytes())
-    }
-
-    // port: tsc/internal/checker/checker.go:Checker.checkPropertyAssignment
-    fn check_property_assignment(
-        &mut self,
-        node: NodeId,
-        contextual: Option<TypeId>,
-    ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
-        if read.type_node().is_some() {
-            return Err(Error::Unsupported(
-                "checkPropertyAssignment: annotation compatibility",
-            ));
-        }
-        let initializer = required(read.initializer(), "property initializer")?;
-        let mut ty = self.check_expression(initializer)?;
-        if !self.literal_of_context(ty, contextual)? {
-            ty = self.widen_literal_type(ty)?;
-        }
-        self.get_regular_type_of_literal_type(ty)
-    }
-
     // port: tsc/internal/checker/checker.go:Checker.isLiteralOfContextualType
-    fn literal_of_context(
-        &self,
+    pub(crate) fn literal_of_context(
+        &mut self,
         candidate: TypeId,
         contextual: Option<TypeId>,
     ) -> Result<bool, Error> {
@@ -940,31 +999,44 @@ impl CheckerState {
             return Ok(false);
         };
         let flags = self.types.flags(contextual)?;
-        if flags & tf::UNION != 0 {
-            for &ty in self.types.union(contextual)?.types.iter() {
+        if flags & tf::UNION_OR_INTERSECTION != 0 {
+            for &ty in self.types.compound_types(contextual)?.clone().iter() {
                 if self.literal_of_context(candidate, Some(ty))? {
                     return Ok(true);
                 }
             }
             return Ok(false);
         }
-        if flags & (tf::INTERSECTION | tf::INSTANTIABLE_NON_PRIMITIVE) != 0 {
-            return Err(Error::Unsupported(
-                "isLiteralOfContextualType: constraint/intersection",
-            ));
+        if flags & tf::INSTANTIABLE_NON_PRIMITIVE != 0 {
+            let constraint = self
+                .base_constraint_of_type(contextual)?
+                .unwrap_or(self.builtins.unknown_type);
+            for (primitive, literal) in [
+                (tf::STRING, tf::STRING_LITERAL),
+                (tf::NUMBER, tf::NUMBER_LITERAL),
+                (tf::BIG_INT, tf::BIG_INT_LITERAL),
+                (tf::ES_SYMBOL, tf::UNIQUE_ES_SYMBOL),
+            ] {
+                if self.maybe_type_of_kind(constraint, primitive)?
+                    && self.maybe_type_of_kind(candidate, literal)?
+                {
+                    return Ok(true);
+                }
+            }
+            return self.literal_of_context(candidate, Some(constraint));
         }
-        let candidate = self.types.flags(candidate)?;
         Ok(
             flags & (tf::STRING_LITERAL | tf::INDEX | tf::TEMPLATE_LITERAL | tf::STRING_MAPPING)
                 != 0
-                && candidate & tf::STRING_LITERAL != 0
-                || flags
-                    & candidate
-                    & (tf::NUMBER_LITERAL
-                        | tf::BIG_INT_LITERAL
-                        | tf::BOOLEAN_LITERAL
-                        | tf::UNIQUE_ES_SYMBOL)
-                    != 0,
+                && self.maybe_type_of_kind(candidate, tf::STRING_LITERAL)?
+                || flags & tf::NUMBER_LITERAL != 0
+                    && self.maybe_type_of_kind(candidate, tf::NUMBER_LITERAL)?
+                || flags & tf::BIG_INT_LITERAL != 0
+                    && self.maybe_type_of_kind(candidate, tf::BIG_INT_LITERAL)?
+                || flags & tf::BOOLEAN_LITERAL != 0
+                    && self.maybe_type_of_kind(candidate, tf::BOOLEAN_LITERAL)?
+                || flags & tf::UNIQUE_ES_SYMBOL != 0
+                    && self.maybe_type_of_kind(candidate, tf::UNIQUE_ES_SYMBOL)?,
         )
     }
 
@@ -990,129 +1062,129 @@ impl CheckerState {
         {
             return Ok(ty);
         }
-        if read.flags() & (sf::FUNCTION | sf::METHOD) != 0 {
+        if read.flags() & sf::CLASS != 0 {
+            return self.type_of_class(symbol);
+        }
+        if read.flags() & sf::PROTOTYPE != 0 {
+            return self.type_of_prototype(symbol);
+        }
+        if read.flags() & sf::ENUM != 0 {
+            return self.type_of_enum(symbol);
+        }
+        if read.flags() & sf::ENUM_MEMBER != 0 {
+            return self.type_of_enum_member(symbol);
+        }
+        if read.flags() & sf::ACCESSOR != 0 {
+            return self.type_of_accessors(symbol);
+        }
+        if read.flags() & sf::VALUE_MODULE != 0 && self.shorthand_ambient_module(symbol)? {
+            return Ok(self.builtins.any_type);
+        }
+        if read.flags() & (sf::FUNCTION | sf::METHOD | sf::VALUE_MODULE) != 0 {
             let ty = self.new_object_type(of::ANONYMOUS, Some(symbol))?;
             self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
             return Ok(ty);
         }
+        if read.flags() & sf::ALIAS != 0 && read.flags() & (sf::VARIABLE | sf::PROPERTY) == 0 {
+            return self.type_of_alias(symbol);
+        }
         if read.flags() & (sf::VARIABLE | sf::PROPERTY) == 0 {
-            return Err(Error::Unsupported("getTypeOfSymbol: value family"));
+            return Ok(self.builtins.error_type);
+        }
+        if symbol == self.builtins.require_symbol {
+            return Ok(self.builtins.any_type);
         }
         let declaration = required(read.value_declaration(), "value declaration")?;
+        if self.ast(declaration)?.node(declaration)?.kind() == K::SourceFile {
+            let source = self.ast(declaration)?.source_file(declaration)?;
+            if source.script_kind == ts_core::ScriptKind::JSON {
+                let statements = self.source_list(
+                    declaration,
+                    self.ast(declaration)?.node(declaration)?.statement_list(),
+                )?;
+                let ty = if let Some(&statement) = statements.first() {
+                    let expression = required(
+                        self.ast(statement)?.node(statement)?.expression(),
+                        "JSON root expression",
+                    )?;
+                    let ty = self.check_expression(expression)?;
+                    let ty = self.widen_literal_type(ty)?;
+                    self.widened_type(ty)?
+                } else {
+                    self.builtins.empty_object_type
+                };
+                self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
+                return Ok(ty);
+            }
+        }
         if !self.push_source_resolution(symbol, TypeSystemPropertyName::Type) {
-            return Err(Error::Unsupported("reportCircularityError"));
+            return self.report_symbol_circularity(symbol);
         }
         let result = (|| {
-            if self.ast(declaration)?.node(declaration)?.kind() == K::PropertyAssignment {
-                let context = self.contextual_property_type(declaration)?;
-                self.check_property_assignment(declaration, context)
+            if self.symbol(symbol)?.flags() & sf::MODULE_EXPORTS != 0 {
+                if self.symbol(symbol)?.name_to_owned().as_bytes() == b"exports" {
+                    let module = self
+                        .get_symbol_of_declaration(declaration)?
+                        .ok_or(Error::MissingLink("exports source symbol"))?;
+                    let export = self
+                        .resolve_external_module_symbol(Some(module), false)?
+                        .ok_or(Error::MissingLink("resolved exports symbol"))?;
+                    self.get_type_of_symbol(export)
+                } else {
+                    let members = self.symbol(symbol)?.members();
+                    self.new_anonymous_type(Some(symbol), members, &[], &[], &[])
+                }
+            } else if self.ast(declaration)?.node(declaration)?.kind() == K::PropertyAssignment {
+                self.check_object_property_assignment(declaration, 0)
+            } else if self.ast(declaration)?.node(declaration)?.kind()
+                == K::ShorthandPropertyAssignment
+            {
+                self.check_shorthand_property_assignment(declaration, true, 0)
+            } else if self.ast(declaration)?.node(declaration)?.kind() == K::MethodDeclaration {
+                self.check_object_literal_method(declaration)
+            } else if matches!(
+                self.ast(declaration)?.node(declaration)?.kind().known(),
+                Some(K::BinaryExpression | K::CallExpression)
+            ) {
+                self.widened_assignment_declaration_type(symbol)
+            } else if self.ast(declaration)?.node(declaration)?.kind() == K::ExportAssignment {
+                let read = self.ast(declaration)?.node(declaration)?;
+                if let Some(annotation) = read.type_node() {
+                    self.get_type_from_type_node(annotation)
+                } else {
+                    let expression = required(read.expression(), "export assignment expression")?;
+                    let ty = self.check_expression_cached(expression)?;
+                    self.widen_type_for_variable_like(declaration, Some(ty), false)
+                }
             } else {
                 self.type_of_variable_like(declaration)
             }
         })();
         let complete = self.resolution.pop();
         let ty = result?;
-        if !complete {
-            return Err(Error::Unsupported("reportCircularityError"));
+        let ty = if complete {
+            ty
+        } else {
+            self.report_symbol_circularity(symbol)?
+        };
+        if self
+            .value_symbol_links
+            .get_or_default(symbol)
+            .resolved_type
+            .is_none()
+            && !self.parameter_of_context_sensitive_signature(declaration)?
+        {
+            self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
         }
-        self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
         Ok(ty)
-    }
-
-    // port: tsc/internal/checker/checker.go:Checker.getTypeForVariableLikeDeclaration
-    fn type_of_variable_like(&mut self, declaration: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(declaration)?.node(declaration)?;
-        if !matches!(
-            read.kind().known(),
-            Some(K::VariableDeclaration | K::PropertySignature | K::Parameter)
-        ) {
-            return Err(Error::Unsupported(
-                "getTypeForVariableLikeDeclaration: declaration family",
-            ));
-        }
-        let property = read.kind() == K::PropertySignature;
-        if read.flags() & nf::JAVA_SCRIPT_FILE != 0 {
-            return Err(Error::Unsupported(
-                "getTypeForVariableLikeDeclaration: JavaScript inference",
-            ));
-        }
-        if !property {
-            let parent = required(read.parent(), "variable parent")?;
-            let parent = self.ast(parent)?.node(parent)?;
-            if parent.kind() == K::CatchClause {
-                return Err(Error::Unsupported(
-                    "getTypeForVariableLikeDeclaration: catch variable",
-                ));
-            }
-            let grandparent = required(parent.parent(), "variable grandparent")?;
-            if matches!(
-                self.ast(grandparent)?.node(grandparent)?.kind().known(),
-                Some(K::ForInStatement | K::ForOfStatement)
-            ) {
-                return Err(Error::Unsupported(
-                    "getTypeForVariableLikeDeclaration: iteration variable",
-                ));
-            }
-        }
-        let optional = read.question_token(self.ast(declaration)?)?.is_some();
-        let annotation = read.type_node();
-        let initializer = read.initializer();
-        if let Some(annotation) = annotation {
-            let ty = self.get_type_from_type_node(annotation)?;
-            if optional && self.options.strict_null_checks {
-                let optional = if property {
-                    self.builtins.undefined_or_missing_type
-                } else {
-                    self.builtins.undefined_type
-                };
-                return self.get_union_type(&[ty, optional]);
-            }
-            return Ok(ty);
-        }
-        if let Some(initializer) = initializer {
-            // checkDeclarationInitializer bypasses the cache for quick literal
-            // types. Other supported initializers use the normal-mode cache.
-            let kind = self.ast(initializer)?.node(initializer)?.kind();
-            let ty = if matches!(
-                kind.known(),
-                Some(
-                    K::StringLiteral
-                        | K::NoSubstitutionTemplateLiteral
-                        | K::NumericLiteral
-                        | K::BigIntLiteral
-                        | K::TrueKeyword
-                        | K::FalseKeyword
-                )
-            ) {
-                self.check_expression(initializer)?
-            } else {
-                self.check_expression_cached(initializer)?
-            };
-            if self.types.flags(ty)? & (tf::NULL | tf::UNDEFINED) != 0
-                || self.types.get(ty)?.object_flags & of::REQUIRES_WIDENING != 0
-            {
-                return Err(Error::Unsupported(
-                    "widenTypeForVariableLikeDeclaration: auto/null/object widening",
-                ));
-            }
-            let read = self.ast(declaration)?.node(declaration)?;
-            let constant = match read.parent() {
-                Some(parent) => self.ast(parent)?.node(parent)?.flags() & nf::CONSTANT != 0,
-                None => false,
-            };
-            if constant {
-                return Ok(ty);
-            }
-            return self.widen_literal_type(ty);
-        }
-        Err(Error::Unsupported(
-            "getTypeForVariableLikeDeclaration: implicit type",
-        ))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getWidenedLiteralType
     pub(crate) fn widen_literal_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
         if self.is_fresh_literal_type(ty)? {
+            if self.types.flags(ty)? & tf::ENUM_LIKE != 0 {
+                return self.base_type_of_enum_like(ty);
+            }
             return Ok(match self.types.flags(ty)? {
                 tf::STRING_LITERAL => self.builtins.string_type,
                 tf::NUMBER_LITERAL => self.builtins.number_type,
@@ -1190,4 +1262,223 @@ impl CheckerState {
             ))?;
         Ok(Some(apparent))
     }
+}
+
+// port: tsc/internal/ast/utilities.go:IsInExpressionContext
+pub(crate) fn is_in_expression_context(
+    view: ts_ast::AstView<'_>,
+    node: NodeId,
+) -> Result<bool, Error> {
+    let Some(parent) = view.node(node)?.parent() else {
+        return Ok(false);
+    };
+    let read = view.node(parent)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::VariableDeclaration
+            | K::Parameter
+            | K::PropertyDeclaration
+            | K::PropertySignature
+            | K::EnumMember
+            | K::PropertyAssignment
+            | K::BindingElement,
+        ) => read.initializer() == Some(node),
+        Some(
+            K::ExpressionStatement
+            | K::IfStatement
+            | K::DoStatement
+            | K::WhileStatement
+            | K::ReturnStatement
+            | K::WithStatement
+            | K::SwitchStatement
+            | K::CaseClause
+            | K::DefaultClause
+            | K::ThrowStatement
+            | K::TypeAssertionExpression
+            | K::AsExpression
+            | K::TemplateSpan
+            | K::ComputedPropertyName
+            | K::SatisfiesExpression,
+        ) => read.expression() == Some(node),
+        Some(K::ForStatement) => {
+            let data = read
+                .data_source()
+                .as_for_statement()
+                .ok_or(ts_arena::Error::InvalidGraph)?;
+            data.initializer() == Some(node)
+                && view.node(node)?.kind() != K::VariableDeclarationList
+                || data.condition() == Some(node)
+                || data.incrementor() == Some(node)
+        }
+        Some(K::ForInStatement | K::ForOfStatement) => {
+            let (initializer, expression) = match read.data_source().as_for_in_or_of_statement() {
+                Some(data) => (data.initializer(), data.expression()),
+                None => (None, None),
+            };
+            initializer == Some(node) && view.node(node)?.kind() != K::VariableDeclarationList
+                || expression == Some(node)
+        }
+        Some(K::Decorator | K::JsxExpression | K::JsxSpreadAttribute | K::SpreadAssignment) => true,
+        Some(K::ExpressionWithTypeArguments) => {
+            read.expression() == Some(node) && !part_of_type_node(view, parent)?
+        }
+        Some(K::ShorthandPropertyAssignment) => {
+            read.data_source()
+                .as_shorthand_property_assignment()
+                .and_then(|data| data.object_assignment_initializer())
+                == Some(node)
+        }
+        _ => is_expression_node(view, parent)?,
+    })
+}
+
+// port: tsc/internal/ast/utilities.go:IsExpressionNode
+pub(crate) fn is_expression_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::SuperKeyword
+            | K::NullKeyword
+            | K::TrueKeyword
+            | K::FalseKeyword
+            | K::RegularExpressionLiteral
+            | K::ArrayLiteralExpression
+            | K::ObjectLiteralExpression
+            | K::PropertyAccessExpression
+            | K::ElementAccessExpression
+            | K::CallExpression
+            | K::NewExpression
+            | K::TaggedTemplateExpression
+            | K::AsExpression
+            | K::TypeAssertionExpression
+            | K::SatisfiesExpression
+            | K::NonNullExpression
+            | K::ParenthesizedExpression
+            | K::FunctionExpression
+            | K::ClassExpression
+            | K::ArrowFunction
+            | K::VoidExpression
+            | K::DeleteExpression
+            | K::TypeOfExpression
+            | K::PrefixUnaryExpression
+            | K::PostfixUnaryExpression
+            | K::BinaryExpression
+            | K::ConditionalExpression
+            | K::SpreadElement
+            | K::TemplateExpression
+            | K::OmittedExpression
+            | K::JsxElement
+            | K::JsxSelfClosingElement
+            | K::JsxFragment
+            | K::YieldExpression
+            | K::AwaitExpression,
+        ) => true,
+        Some(K::MetaProperty) => {
+            // `import.defer` in `import.defer(...)` is not an expression
+            match read.parent() {
+                Some(parent) => {
+                    let parent_read = view.node(parent)?;
+                    !crate::external_resolution::is_import_call(view, &parent_read)?
+                        || parent_read.expression() != Some(node)
+                }
+                None => true,
+            }
+        }
+        Some(K::ExpressionWithTypeArguments) => match read.parent() {
+            Some(parent) => view.node(parent)?.kind() != K::HeritageClause,
+            None => true,
+        },
+        Some(K::QualifiedName) => {
+            let mut current = node;
+            while let Some(parent) = view.node(current)?.parent() {
+                if view.node(parent)?.kind() != K::QualifiedName {
+                    break;
+                }
+                current = parent;
+            }
+            match view.node(current)?.parent() {
+                Some(parent) => matches!(
+                    view.node(parent)?.kind().known(),
+                    Some(
+                        K::TypeQuery
+                            | K::JSDocLink
+                            | K::JSDocLinkCode
+                            | K::JSDocLinkPlain
+                            | K::JSDocNameReference
+                    )
+                ),
+                None => false,
+            }
+        }
+        Some(K::PrivateIdentifier) => match read.parent() {
+            Some(parent) => {
+                let parent_read = view.node(parent)?;
+                match parent_read.data_source().as_binary_expression() {
+                    Some(data) => {
+                        data.left() == Some(node)
+                            && data
+                                .operator_token()
+                                .map(|token| view.node(token).map(|read| read.kind()))
+                                .transpose()?
+                                == Some(K::InKeyword.into())
+                    }
+                    None => false,
+                }
+            }
+            None => false,
+        },
+        Some(K::Identifier) => {
+            let type_context = match read.parent() {
+                Some(parent) => matches!(
+                    view.node(parent)?.kind().known(),
+                    Some(
+                        K::TypeQuery
+                            | K::JSDocLink
+                            | K::JSDocLinkCode
+                            | K::JSDocLinkPlain
+                            | K::JSDocNameReference
+                    )
+                ),
+                None => false,
+            };
+            type_context || is_in_expression_context(view, node)?
+        }
+        Some(
+            K::NumericLiteral
+            | K::BigIntLiteral
+            | K::StringLiteral
+            | K::NoSubstitutionTemplateLiteral
+            | K::ThisKeyword,
+        ) => is_in_expression_context(view, node)?,
+        _ => false,
+    })
+}
+
+// port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
+fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    let kind = read.kind();
+    if ts_ast::utilities::is_type_node_kind(kind) {
+        return Ok(true);
+    }
+    Ok(match kind.known() {
+        Some(
+            K::AnyKeyword
+            | K::UnknownKeyword
+            | K::NumberKeyword
+            | K::BigIntKeyword
+            | K::StringKeyword
+            | K::BooleanKeyword
+            | K::SymbolKeyword
+            | K::ObjectKeyword
+            | K::UndefinedKeyword
+            | K::NullKeyword
+            | K::NeverKeyword,
+        ) => true,
+        Some(K::VoidKeyword) => match read.parent() {
+            Some(parent) => view.node(parent)?.kind() != K::VoidExpression,
+            None => true,
+        },
+        _ => false,
+    })
 }

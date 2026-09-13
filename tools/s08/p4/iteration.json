@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "scope": "S08 P4 synchronous iteration globals, structural methods, next constraints and legacy array/string fallback",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "array-fallback",
+      "files": {
+        "/case.ts": "interface Array<T> { [n:number]:T; length:number; } interface ReadonlyArray<T> { readonly [n:number]:T; readonly length:number; } function run(values:number[]) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "string-fallback",
+      "files": {
+        "/case.ts": "function run(values:string) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "union-fallback",
+      "files": {
+        "/case.ts": "interface Array<T> { [n:number]:T; length:number; } interface ReadonlyArray<T> { readonly [n:number]:T; readonly length:number; } function run(values:string|number[]) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "invalid-fallback",
+      "files": {
+        "/case.ts": "interface Array<T> { [n:number]:T; length:number; } interface ReadonlyArray<T> { readonly [n:number]:T; readonly length:number; } function run(values:number) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "global-fast",
+      "files": {
+        "/case.ts": "interface Iterable<T,TReturn,TNext> {} function run(values:Iterable<number,void,unknown>) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "global-next-error",
+      "files": {
+        "/case.ts": "interface Iterable<T,TReturn,TNext> {} function run(values:Iterable<number,void,string>) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "structural",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly iterator: unique symbol; } declare var Symbol: SymbolConstructor; interface Iterable<T,TReturn,TNext> { [Symbol.iterator](): Iterator<T,TReturn,TNext>; } interface Iterator<T,TReturn,TNext> { next(value?:TNext): {done?:false;value:T} | {done:true;value:TReturn}; } function run(values:{[Symbol.iterator](): {next():{done:false;value:string}}}) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-next",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly iterator: unique symbol; } declare var Symbol: SymbolConstructor; interface Iterable<T,TReturn,TNext> { [Symbol.iterator](): Iterator<T,TReturn,TNext>; } interface Iterator<T,TReturn,TNext> { next(value?:TNext): {done?:false;value:T} | {done:true;value:TReturn}; } function run(values:{[Symbol.iterator](): {return():{value:string}}}) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-iterator",
+      "files": {
+        "/case.ts": "interface SymbolConstructor { readonly iterator: unique symbol; } declare var Symbol: SymbolConstructor; interface Iterable<T,TReturn,TNext> { [Symbol.iterator](): Iterator<T,TReturn,TNext>; } interface Iterator<T,TReturn,TNext> { next(value?:TNext): {done?:false;value:T} | {done:true;value:TReturn}; } function run(values:number) { for(const value of values) return value; }\ntype Query_run = typeof run;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "run",
+          "file": "/case.ts",
+          "declaration": "Query_run",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

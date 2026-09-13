@@ -173,6 +173,13 @@ P3_UNPAIRED_FAMILIES = {
     "signature_caches", "declarations", "program_indices", "resolution", "diagnostics",
 }
 
+# P4 operation state is charged even when this P1 trace never exercises it.
+# Matching Go state will be added to the paired census at P7.
+P4_UNPAIRED_FAMILIES = {
+    "flow_analysis", "enum_links", "enum_relations", "body_check_state",
+    "call_resolution", "deferred_checks", "iteration_cache", "evolving_arrays", "module_aliases",
+}
+
 
 def validate(request, rust, go):
     for name in ("roots", "named", "counts", "prefix_counts"):
@@ -183,10 +190,11 @@ def validate(request, rust, go):
     for key in ("families", "types", "unavailable"):
         if key not in rust["census"] or key not in go["census"]:
             raise ValueError(f"census is missing {key}")
-    if set(rust["census"]["families"]) != set(go["census"]["families"]) | P3_UNPAIRED_FAMILIES:
-        raise ValueError("census families differ from the P1 inventory plus named P3 additions")
-    if P3_UNPAIRED_FAMILIES & set(go["census"]["families"]):
-        raise ValueError("Go now measures a P3 family; review the paired inventory")
+    unpaired = P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES
+    if set(rust["census"]["families"]) != set(go["census"]["families"]) | unpaired:
+        raise ValueError("census families differ from the P1 inventory plus named P3/P4 additions")
+    if unpaired & set(go["census"]["families"]):
+        raise ValueError("Go now measures a P3/P4 family; review the paired inventory")
 
 
 def run_go(directory, request):

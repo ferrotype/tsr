@@ -61,6 +61,31 @@ impl CheckerState {
             self.builtins.silent_never_signature,
         ]);
         work.types(roots.iter().copied());
+        work.types(self.flow.type_roots());
+        work.types(self.module_aliases.type_roots());
+        work.types(self.iteration.type_roots());
+        work.signatures(self.flow.signature_roots());
+        work.types(self.calls.census_types());
+        work.signatures(self.calls.census_signatures());
+        for context in &self.calls.contexts {
+            work.pending.extend(context.inference.map(Edge::Inference));
+        }
+        for (_, inference) in &self.calls.inference_contexts {
+            work.pending.extend(inference.map(Edge::Inference));
+        }
+        work.types(self.enums.string_literals.values().copied());
+        work.types(self.enums.number_literals.values().copied());
+        work.types(self.enums.nan_literals.values().copied());
+        for check in &self.deferred_checks.pending {
+            match check {
+                crate::deferred_checks::DeferredCheck::MissingProperty { containing, .. } => {
+                    work.types([*containing]);
+                }
+                crate::deferred_checks::DeferredCheck::Iteration { .. }
+                | crate::deferred_checks::DeferredCheck::WeakMapSetCollision { .. }
+                | crate::deferred_checks::DeferredCheck::ReflectCollision { .. } => {}
+            }
+        }
         let caches = &self.types.caches;
         for map in [
             &caches.union_types,
@@ -113,6 +138,23 @@ impl CheckerState {
                 .flatten(),
         );
         work.types(self.query.global_types.values().copied());
+        work.types(self.query.context_free_types.values().copied());
+        work.types(self.query.array_literal_types.keys().copied());
+        work.types(self.query.array_literal_types.values().copied());
+        work.types(self.query.widened_types.keys().copied());
+        work.types(self.query.widened_types.values().copied());
+        work.types(self.query.assertion_types.values().copied());
+        // Undefined-property value links are roots in the common symbol-link walk below.
+        work.types(self.bindings.pattern_for_type.keys().copied());
+        for (&(_, ty), &result) in &self.bindings.discriminated_contexts {
+            work.types([ty, result]);
+        }
+        for cache in [&self.promises.promised, &self.promises.awaited] {
+            for (&source, &result) in cache {
+                work.types([source, result]);
+            }
+        }
+        work.types(self.promises.stack.iter().copied());
         work.types(self.query.index_constraints_checked.iter().copied());
         for links in self.query.type_aliases.values() {
             work.types(
@@ -169,6 +211,7 @@ impl CheckerState {
             work.types(types.iter().copied());
         }
         work.types(self.variance.markers.iter().copied());
+        work.types(self.variance.checked_parameter);
         let mut active = Vec::new();
         self.inference.reverse.census_type_roots(&mut active);
         self.relations.census_type_roots(&mut active);
@@ -240,6 +283,10 @@ impl CheckerState {
                     let context = self.inference_context(id)?;
                     work.signatures(context.signature);
                     work.mappers([context.mapper, context.non_fixing_mapper]);
+                    work.mappers(context.return_mapper);
+                    work.mappers(context.outer_return_mapper);
+                    work.types(context.inferred_type_parameters.iter().copied());
+                    work.types(context.intra_expression_sites.iter().map(|(_, ty)| *ty));
                     for info in &context.inferences {
                         work.types([info.parameter]);
                         work.types(info.inferred);
@@ -268,6 +315,7 @@ impl CheckerState {
         }
         match record.kind {
             TypeKind::Anonymous
+            | TypeKind::EvolvingArray
             | TypeKind::Reference
             | TypeKind::Interface
             | TypeKind::Tuple
@@ -275,6 +323,11 @@ impl CheckerState {
             | TypeKind::ReverseMapped
             | TypeKind::InstantiationExpression => {
                 let object = self.types.object(ty)?;
+                if record.kind == TypeKind::EvolvingArray {
+                    let evolving = self.types.evolving_array(ty)?;
+                    work.types([evolving.element_type]);
+                    work.types(evolving.final_array_type);
+                }
                 work.structured(&object.structured, self)?;
                 work.types(object.target);
                 work.mappers(object.mapper);
@@ -421,9 +474,6 @@ impl CheckerState {
                 }
             }
             TypeKind::Intrinsic | TypeKind::UniqueEsSymbol => {}
-            TypeKind::EvolvingArray => {
-                return Err(Error::Unsupported("census: evolving-array payload"))
-            }
         }
         Ok(())
     }
