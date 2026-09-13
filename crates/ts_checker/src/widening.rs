@@ -44,16 +44,15 @@ impl CheckerState {
             Some(self.widened_object_literal(ty, context, contexts)?)
         } else if record.flags & tf::UNION != 0 {
             let parts = self.types.compound_types(ty)?.clone();
-            let context = match context {
-                Some(context) => context,
-                None => {
-                    let id = contexts.len();
-                    contexts.push(Context {
-                        siblings: Some(parts.to_vec()),
-                        ..Default::default()
-                    });
-                    id
-                }
+            let context = if let Some(context) = context {
+                context
+            } else {
+                let id = contexts.len();
+                contexts.push(Context {
+                    siblings: Some(parts.to_vec()),
+                    ..Default::default()
+                });
+                id
             };
             let mut types = Vec::with_capacity(parts.len());
             let mut empty = false;

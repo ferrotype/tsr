@@ -27,20 +27,20 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         }
         let dynamic = ts_ast::has_dynamic_name(self.output.view(), Some(node))?;
         if dynamic {
-            let name = self.required(self.node(node).name())?;
-            let expression = self.required(self.node(name).expression())?;
+            let name = Self::required(self.node(node).name())?;
+            let expression = Self::required(self.node(name).expression())?;
             let entity = ts_ast::is_entity_name_expression(self.output.view(), expression)?;
             if self.options.isolated_declarations {
                 if !self
                     .resolver
                     .definitely_reference_to_global_symbol_object(expression)?
                 {
-                    let parent = self.required(self.node(node).parent())?;
+                    let parent = Self::required(self.node(node).parent())?;
                     if matches!(
                         self.node(parent).kind().known(),
                         Some(K::ClassDeclaration | K::ObjectLiteralExpression)
                     ) {
-                        self.diagnostic(node, &ts_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations, vec![])?;
+                        self.diagnostic(node, ts_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations, vec![])?;
                         return Ok(None);
                     }
                     if matches!(
@@ -48,7 +48,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         Some(K::InterfaceDeclaration | K::TypeLiteral)
                     ) && !entity
                     {
-                        self.diagnostic(node, &ts_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations, vec![])?;
+                        self.diagnostic(node, ts_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations, vec![])?;
                         return Ok(None);
                     }
                 }
@@ -85,8 +85,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         self.select_context(node, true)?;
                     }
                     self.tracker.error_name = self.node(node).name();
-                    let name = self.required(self.node(node).name())?;
-                    let expression = self.required(self.node(name).expression())?;
+                    let name = Self::required(self.node(node).name())?;
+                    let expression = Self::required(self.node(name).expression())?;
                     self.entity_visible(expression)?;
                 }
                 Ok(result)
@@ -99,6 +99,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.suppress_context = old_suppress;
         result
     }
+    #[allow(
+        clippy::match_same_arms,
+        reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+    )]
     fn subtree_worker(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
         match self.node(node).kind().known() {
             Some(K::VariableDeclaration) => {
@@ -121,9 +125,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         self.node(n).kind().known(),
                         Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
                     )
-                }) && self.has_binding_initializer(self.required(name)?)?
+                }) && self.has_binding_initializer(Self::required(name)?)?
                 {
-                    return self.recreate_binding(self.required(name)?);
+                    return self.recreate_binding(Self::required(name)?);
                 }
                 let name = self.binding_name(name)?;
                 let ty = self.ensure_type(node, false)?;
@@ -170,7 +174,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 | K::ConstructorType,
             ) => self.signature(node),
             Some(K::TypeReference) => {
-                let name = self.required(
+                let name = Self::required(
                     self.node(node)
                         .as_type_reference_node()
                         .unwrap()
@@ -181,12 +185,12 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             }
             Some(K::TypeQuery) => {
                 let name =
-                    self.required(self.node(node).as_type_query_node().unwrap().expr_name())?;
+                    Self::required(self.node(node).as_type_query_node().unwrap().expr_name())?;
                 self.entity_visible(name)?;
                 self.children(node).map(Some)
             }
             Some(K::ExpressionWithTypeArguments) => {
-                let expression = self.required(self.node(node).expression())?;
+                let expression = Self::required(self.node(node).expression())?;
                 if ts_ast::is_entity_name_expression(self.output.view(), expression)? {
                     self.entity_visible(expression)?;
                 }
@@ -202,7 +206,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 let check = self.visit(data.check_type)?;
                 let extends = self.visit(data.extends_type)?;
                 let old = self.enclosing;
-                self.enclosing = self.required(data.true_type)?;
+                self.enclosing = Self::required(data.true_type)?;
                 let yes = self.visit(data.true_type);
                 self.enclosing = old;
                 let yes = yes?;
@@ -244,9 +248,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 let mut types = Vec::new();
                 for element in self.list_nodes(data.types) {
                     let name = if self.node(element).kind() == K::ExpressionWithTypeArguments {
-                        self.required(self.node(element).expression())?
+                        Self::required(self.node(element).expression())?
                     } else {
-                        self.required(
+                        Self::required(
                             self.node(element)
                                 .as_type_reference_node()
                                 .unwrap()
@@ -283,7 +287,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 let private_method = self.node(node).parent().is_some_and(|parent| {
                     matches!(self.node(parent).kind().known(), Some(K::MethodDeclaration))
                 }) && self.resolver.effective_declaration_flags(
-                    self.required(self.node(node).parent())?,
+                    Self::required(self.node(node).parent())?,
                     mf::PRIVATE,
                 )? != 0;
                 if private_method && (data.constraint.is_some() || data.default_type.is_some()) {
@@ -299,9 +303,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 self.children(node).map(Some)
             }
             Some(K::QualifiedName) => {
-                let right = self.required(self.node(node).as_qualified_name().unwrap().right())?;
+                let right = Self::required(self.node(node).as_qualified_name().unwrap().right())?;
                 if self.node(right).kind() == K::PrivateIdentifier {
-                    self.diagnostic(node, &ts_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here, vec![self.output.view().node_text(right)?.into_js_string()])?;
+                    self.diagnostic(node, ts_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here, vec![self.output.view().node_text(right)?.into_js_string()])?;
                 }
                 self.children(node).map(Some)
             }
@@ -479,7 +483,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 &mut self.tracker,
             )
         } else {
-            return self.unsupported("declaration emit: ensureType node kind");
+            return Self::unsupported("declaration emit: ensureType node kind");
         };
         let flushed = self.flush_reports();
         self.tracker.error_name = old_name;
@@ -503,7 +507,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if !self.should_initializer(node)? {
             return Ok(None);
         }
-        let initializer = self.required(self.node(node).initializer())?;
+        let initializer = Self::required(self.node(node).initializer())?;
         let unwrapped = util::unwrap_parenthesized_expression(self.output.view(), initializer)?;
         if !ts_ast::utilities_tail::is_primitive_literal_value(
             self.output.view(),
@@ -768,26 +772,25 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             }
         }
         if self.node(node).kind() == K::SetAccessor {
-            let value = if !private {
+            let value = if private {
+                None
+            } else {
                 parameters
                     .get(result.len())
                     .copied()
                     .map(|p| self.parameter(p))
                     .transpose()?
-            } else {
-                None
             };
-            let value = match value {
-                Some(value) => value,
-                None => {
-                    let ty =
-                        (!private).then(|| self.output.new_keyword_type_node(K::AnyKeyword.into()));
-                    let name = self
-                        .output
-                        .new_identifier(JsString::from_bytes(b"value".as_slice()));
-                    self.output
-                        .new_parameter_declaration(None, None, Some(name), None, ty, None)
-                }
+            let value = if let Some(value) = value {
+                value
+            } else {
+                let ty =
+                    (!private).then(|| self.output.new_keyword_type_node(K::AnyKeyword.into()));
+                let name = self
+                    .output
+                    .new_identifier(JsString::from_bytes(b"value".as_slice()));
+                self.output
+                    .new_parameter_declaration(None, None, Some(name), None, ty, None)
             };
             result.push(value);
         }
@@ -816,7 +819,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     .to_owned();
                 if let Some(property) = data.property_name {
                     if self.node(property).kind() == K::ComputedPropertyName {
-                        let expression = self.required(self.node(property).expression())?;
+                        let expression = Self::required(self.node(property).expression())?;
                         if ts_ast::is_entity_name_expression(self.output.view(), expression)? {
                             self.entity_visible(expression)?;
                         }

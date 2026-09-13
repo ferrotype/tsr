@@ -481,12 +481,11 @@ impl CheckerState {
                 return Ok(false);
             }
             let read = self.ast(node)?.node(node)?;
-            if ast::is_function_like(Some(&read)) {
-                if ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
+            if ast::is_function_like(Some(&read))
+                && ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
                     .is_none()
-                {
-                    return Ok(true);
-                }
+            {
+                return Ok(true);
             }
             if read.kind() == K::ClassStaticBlockDeclaration {
                 return Ok(self.ast(declaration)?.node(declaration)?.pos()

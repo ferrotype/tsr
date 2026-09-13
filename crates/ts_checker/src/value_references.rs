@@ -1,8 +1,8 @@
 //! Identifier flow starts with the exported value's declaration, retaining the
 //! local symbol for diagnostics and assignment tracking.
 use crate::{
-    flow_assignments::AssignmentKind, type_facts as f, type_flags as tf, CheckerState, Error,
-    TypeId,
+    flow_assignments::AssignmentKind, node_check_flags as nc, type_facts as f, type_flags as tf,
+    CheckerState, Error, TypeId, TypeSystemEntity, TypeSystemPropertyName,
 };
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
@@ -235,10 +235,10 @@ impl CheckerState {
             )?;
             return Ok(ty);
         }
-        if assignment != AssignmentKind::None {
-            self.base_literal_type(flow)
-        } else {
+        if assignment == AssignmentKind::None {
             Ok(flow)
+        } else {
+            self.base_literal_type(flow)
         }
     }
 
@@ -302,13 +302,69 @@ impl CheckerState {
             && read.kind() == K::Parameter
             && read.initializer().is_some()
             && self.type_facts(ty, f::IS_UNDEFINED)? != 0
+            && !self.parameter_initializer_contains_undefined(declaration)?
         {
-            let initializer = self.check_declaration_initializer(declaration, 0, None)?;
-            if self.type_facts(initializer, f::IS_UNDEFINED)? == 0 {
-                return self.type_with_facts(ty, f::NE_UNDEFINED);
-            }
+            return self.type_with_facts(ty, f::NE_UNDEFINED);
         }
         Ok(ty)
+    }
+
+    /// The answer is cached on the declaration's node links, and the initializer
+    /// is checked under a resolution entry: a parameter whose default refers back
+    /// to the parameter reports a circularity once instead of recurring forever.
+    // port: tsc/internal/checker/checker.go:Checker.parameterInitializerContainsUndefined
+    fn parameter_initializer_contains_undefined(
+        &mut self,
+        declaration: NodeId,
+    ) -> Result<bool, Error> {
+        if self.initializer_node_flags(declaration) & nc::INITIALIZER_IS_UNDEFINED_COMPUTED == 0 {
+            if !self.push_type_resolution(
+                TypeSystemEntity::Node(declaration),
+                TypeSystemPropertyName::InitializerIsUndefined,
+            ) {
+                self.report_declaration_circularity(declaration)?;
+                return Ok(true);
+            }
+            let contains = self
+                .check_declaration_initializer(declaration, 0, None)
+                .and_then(|initializer| self.type_facts(initializer, f::IS_UNDEFINED));
+            // Both initializer checking and fact computation can fail. Restore
+            // the stack before propagating either error to the next query.
+            let complete = self.resolution.pop();
+            let contains = contains? != 0;
+            if !complete {
+                self.report_declaration_circularity(declaration)?;
+                return Ok(true);
+            }
+            // Upstream re-tests the flag: checking the initializer can have set it.
+            let flags = self.emit_checks.node_flags.get_or_default(declaration);
+            if *flags & nc::INITIALIZER_IS_UNDEFINED_COMPUTED == 0 {
+                *flags |= nc::INITIALIZER_IS_UNDEFINED_COMPUTED
+                    | if contains {
+                        nc::INITIALIZER_IS_UNDEFINED
+                    } else {
+                        0
+                    };
+            }
+        }
+        Ok(self.initializer_node_flags(declaration) & nc::INITIALIZER_IS_UNDEFINED != 0)
+    }
+
+    fn initializer_node_flags(&self, declaration: NodeId) -> u32 {
+        self.emit_checks
+            .node_flags
+            .try_get(declaration)
+            .copied()
+            .unwrap_or_default()
+    }
+
+    /// `reportCircularityError` takes the declaration's symbol upstream; a
+    /// declaration without one has nothing to name, so it reports nothing.
+    fn report_declaration_circularity(&mut self, declaration: NodeId) -> Result<(), Error> {
+        if let Some(symbol) = self.get_symbol_of_declaration(declaration)? {
+            self.report_symbol_circularity(symbol)?;
+        }
+        Ok(())
     }
     // port: tsc/internal/checker/checker.go:Checker.isInPropertyInitializerOrClassStaticBlock
     pub(crate) fn in_property_initializer_or_static_block(

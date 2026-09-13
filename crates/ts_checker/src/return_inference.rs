@@ -28,17 +28,7 @@ impl CheckerState {
         if is_generator {
             return self.generator_return_type_from_body(function, body, mode, is_async);
         }
-        let mut return_type = if self.ast(body)?.node(body)?.kind() != K::Block {
-            let mut ty = self.return_expression_type(body, mode)?;
-            if self.is_const_context(body)? {
-                ty = self.get_regular_type_of_literal_type(ty)?;
-            }
-            if is_async {
-                self.awaited_body_return_type(ty, function)?
-            } else {
-                ty
-            }
-        } else {
+        let mut return_type = if self.ast(body)?.node(body)?.kind() == K::Block {
             let (types, never_returning) =
                 self.aggregate_return_expression_types(function, body, mode)?;
             if never_returning {
@@ -69,6 +59,16 @@ impl CheckerState {
                 };
             }
             self.get_union_type_ex(&types, UnionReduction::Subtype, None, None)?
+        } else {
+            let mut ty = self.return_expression_type(body, mode)?;
+            if self.is_const_context(body)? {
+                ty = self.get_regular_type_of_literal_type(ty)?;
+            }
+            if is_async {
+                self.awaited_body_return_type(ty, function)?
+            } else {
+                ty
+            }
         };
         self.report_function_widening(
             function,
@@ -690,9 +690,7 @@ impl CheckerState {
         if self.body_function_flags(function)? != (false, false) {
             return Ok(None);
         }
-        let expression = if self.ast(body)?.node(body)?.kind() != K::Block {
-            body
-        } else {
+        let expression = if self.ast(body)?.node(body)?.kind() == K::Block {
             let returns = self.return_statements(body)?;
             if returns.len() != 1 || self.function_has_implicit_return(function)? {
                 return Ok(None);
@@ -701,6 +699,8 @@ impl CheckerState {
                 return Ok(None);
             };
             expression
+        } else {
+            body
         };
         self.expression_refines_any_parameter(function, expression)
     }

@@ -43,7 +43,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         {
             return Ok(false);
         }
-        let left = self.required(self.node(node).as_binary_expression().unwrap().left())?;
+        let left = Self::required(self.node(node).as_binary_expression().unwrap().left())?;
         if self.node(left).kind() != K::PropertyAccessExpression {
             return Ok(false);
         }
@@ -76,7 +76,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     } else {
                         declaration
                     };
-                    self.diagnostic(target, &ts_diagnostics::Assigning_properties_to_functions_without_declaring_them_is_not_supported_with_isolatedDeclarations_Add_an_explicit_declaration_for_the_properties_assigned_to_this_function, vec![])?;
+                    self.diagnostic(target, ts_diagnostics::Assigning_properties_to_functions_without_declaring_them_is_not_supported_with_isolatedDeclarations_Add_an_explicit_declaration_for_the_properties_assigned_to_this_function, vec![])?;
                 }
             }
         }
@@ -101,8 +101,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 if self.source_of(declaration)? == containing {
                     continue;
                 }
-                let mut diagnostic = diagnostic_for_node(self.resolver.ast(declaration)?, Some(declaration), &ts_diagnostics::Declaration_augments_declaration_in_another_file_This_cannot_be_serialized, vec![])?;
-                let related = diagnostic_for_node(self.resolver.ast(primary)?, Some(primary), &ts_diagnostics::This_is_the_declaration_being_augmented_Consider_moving_the_augmenting_declaration_into_the_same_file, vec![])?;
+                let mut diagnostic = diagnostic_for_node(self.resolver.ast(declaration)?, Some(declaration), ts_diagnostics::Declaration_augments_declaration_in_another_file_This_cannot_be_serialized, vec![])?;
+                let related = diagnostic_for_node(self.resolver.ast(primary)?, Some(primary), ts_diagnostics::This_is_the_declaration_being_augmented_Consider_moving_the_augmenting_declaration_into_the_same_file, vec![])?;
                 diagnostic
                     .related_information
                     .push(std::sync::Arc::new(related));

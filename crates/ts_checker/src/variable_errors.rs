@@ -199,7 +199,10 @@ impl CheckerState {
         } else if record.object_flags & of::OBJECT_LITERAL != 0 {
             let owner = record
                 .symbol
-                .map(|symbol| self.symbol(symbol).map(|symbol| symbol.value_declaration()))
+                .map(|symbol| {
+                    self.symbol(symbol)
+                        .map(ts_ast::SymbolRef::value_declaration)
+                })
                 .transpose()?
                 .flatten();
             let mut reported = false;

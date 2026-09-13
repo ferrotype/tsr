@@ -491,6 +491,7 @@ const FEATURE_MAP: &[(&str, &[Entry])] = &[
     ),
     ("DisposableStack", &[("esnext", &[])]),
     ("AsyncDisposableStack", &[("esnext", &[])]),
+    ("Date", &[("esnext", &["toTemporalInstant"])]),
 ];
 
 /// The first lib whose entry for `container` lists `property`.

@@ -94,7 +94,7 @@ impl CheckerState {
                     return self.resolve_untyped_call(node);
                 }
                 if !calls.is_empty() {
-                    return self.resolve_typed_call(node, calls);
+                    return self.resolve_typed_call(node, &calls);
                 }
             } else {
                 let has_signatures = !self.signatures_of_type(ty, false)?.is_empty()

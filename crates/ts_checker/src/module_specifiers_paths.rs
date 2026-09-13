@@ -256,6 +256,10 @@ impl Generation<'_> {
     }
 
     // port: tsc/internal/modulespecifiers/specifiers.go:tryGetModuleNameFromRootDirs
+    #[allow(
+        clippy::naive_bytecount,
+        reason = "Count separators in module paths with the standard library; a byte-counting dependency is not justified here"
+    )]
     pub(super) fn root_dirs_path(
         &self,
         target: &[u8],
@@ -299,7 +303,7 @@ impl Generation<'_> {
     }
 
     // port: tsc/internal/modulespecifiers/specifiers.go:tryGetModuleNameFromPaths
-    pub(super) fn from_paths(
+    pub(super) fn module_name_from_paths(
         &self,
         relative: &[u8],
         mappings: &ts_core::PathMappings,

@@ -234,7 +234,7 @@ impl CheckerState {
                     | K::ForOfStatement,
                 ) => return Ok(false),
                 Some(K::LabeledStatement) => {
-                    node = read.parent().ok_or(Error::MissingLink("label parent"))?
+                    node = read.parent().ok_or(Error::MissingLink("label parent"))?;
                 }
                 _ => return Ok(true),
             }

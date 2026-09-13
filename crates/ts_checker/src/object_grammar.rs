@@ -198,7 +198,7 @@ impl CheckerState {
                     d::An_object_literal_cannot_have_multiple_properties_with_the_same_name,
                     vec![text],
                 )?;
-            } else if meaning & 12 != 0 && previous & 12 != 0 {
+            } else if meaning & 0b1100 != 0 && previous & 0b1100 != 0 {
                 if previous != 12 && previous != meaning {
                     seen.insert(effective, meaning | previous);
                 } else {
@@ -222,8 +222,8 @@ impl CheckerState {
             return Ok(());
         }
         let modifiers = self.source_list(node, self.ast(node)?.node(node)?.modifiers())?;
-        if !modifiers.is_empty()
-            && !(modifiers.len() == 1
+        if !(modifiers.is_empty()
+            || modifiers.len() == 1
                 && self.ast(modifiers[0])?.node(modifiers[0])?.kind() == K::AsyncKeyword)
         {
             self.grammar_error_first_token(node, d::Modifiers_cannot_appear_here, vec![])?;

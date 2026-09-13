@@ -181,6 +181,10 @@ fn parameter_message(
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:getRelatedSuggestionByDeclarationKind
+#[allow(
+    clippy::match_same_arms,
+    reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+)]
 pub(super) fn related_suggestion(kind: K) -> Option<&'static Message> {
     match kind {
         K::ArrowFunction => Some(d::Add_a_return_type_to_the_function_expression),
@@ -202,6 +206,10 @@ pub(super) fn related_suggestion(kind: K) -> Option<&'static Message> {
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:getErrorByDeclarationKind
+#[allow(
+    clippy::match_same_arms,
+    reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+)]
 pub(super) fn isolated_error_message(kind: K) -> Option<&'static Message> {
     match kind {
         K::FunctionExpression=>Some(d::Function_must_have_an_explicit_return_type_annotation_with_isolatedDeclarations),

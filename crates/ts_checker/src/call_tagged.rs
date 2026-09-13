@@ -72,7 +72,7 @@ impl CheckerState {
             self.resolve_untyped_call(node)?;
             return Ok(self.builtins.unknown_signature);
         }
-        self.resolve_typed_call(node, calls)
+        self.resolve_typed_call(node, &calls)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isUntypedFunctionCall
@@ -112,13 +112,12 @@ impl CheckerState {
             .ok_or(Error::MissingLink("tagged template"))?
             .template()
             .ok_or(Error::MissingLink("tagged template literal"))?;
-        let strings = match self.query.global_types.get("TemplateStringsArray") {
-            Some(&ty) => ty,
-            None => {
-                let ty = self.get_global_type("TemplateStringsArray", 0, true)?;
-                self.query.global_types.insert("TemplateStringsArray", ty);
-                ty
-            }
+        let strings = if let Some(&ty) = self.query.global_types.get("TemplateStringsArray") {
+            ty
+        } else {
+            let ty = self.get_global_type("TemplateStringsArray", 0, true)?;
+            self.query.global_types.insert("TemplateStringsArray", ty);
+            ty
         };
         let mut result = vec![self.synthetic_call_argument(template, strings, false, None)?];
         if self.ast(template)?.node(template)?.kind() == K::TemplateExpression {

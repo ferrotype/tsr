@@ -47,7 +47,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             if self.node(base).kind() != K::ExpressionWithTypeArguments {
                 continue;
             }
-            let expression = self.required(self.node(base).expression())?;
+            let expression = Self::required(self.node(base).expression())?;
             if ts_ast::is_entity_name_expression(self.output.view(), expression)?
                 || self.node(expression).kind() == K::NullKeyword
             {
@@ -65,7 +65,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             name.extend_from_slice(b"_base");
             let new_id = self.unique_name(JsString::from_bytes(name));
             self.tracker.selector = super::tracker::Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
-                diagnostic_message: &ts_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
+                diagnostic_message: ts_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
                 error_node: Some(base), type_name: data.name,
             });
             let ty = self.resolver.create_type_of_expression(
@@ -168,7 +168,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     continue;
                 }
                 self.select_context(parameter, false)?;
-                let name = self.required(self.node(parameter).name())?;
+                let name = Self::required(self.node(parameter).name())?;
                 if self.node(name).kind() == K::Identifier {
                     let modifiers = self.modifiers(parameter)?;
                     let question = self.node(parameter).question_token(self.output.view())?;

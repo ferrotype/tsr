@@ -474,16 +474,15 @@ impl CheckerState {
         if !complete {
             if let Some(node) = declaration {
                 let annotation = self.ast(node)?.node(node)?.type_node();
+                let options = self.program()?.host.options();
+                let no_implicit_any = options.strict_option_value(options.no_implicit_any);
                 if let Some(annotation) = annotation {
                     self.error_at(
                         Some(annotation),
                         ts_diagnostics::Return_type_annotation_circularly_references_itself,
                         vec![],
                     )?;
-                } else if {
-                    let options = self.program()?.host.options();
-                    options.strict_option_value(options.no_implicit_any)
-                } {
+                } else if no_implicit_any {
                     let name = self.ast(node)?.node(node)?.name();
                     if let Some(name) = name {
                         let text =

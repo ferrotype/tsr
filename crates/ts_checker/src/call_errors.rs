@@ -75,12 +75,7 @@ impl CheckerState {
         if self.types.flags(ty)? & tf::UNION != 0 {
             let mut has_signatures = false;
             for part in self.types.compound_types(ty)?.to_vec() {
-                if !self.signatures_of_type(part, construct)?.is_empty() {
-                    has_signatures = true;
-                    if diagnostic.is_some() {
-                        break;
-                    }
-                } else {
+                if self.signatures_of_type(part, construct)?.is_empty() {
                     if diagnostic.is_none() {
                         let part_text = self.type_to_string(
                             part,
@@ -100,6 +95,11 @@ impl CheckerState {
                         ));
                     }
                     if has_signatures {
+                        break;
+                    }
+                } else {
+                    has_signatures = true;
+                    if diagnostic.is_some() {
                         break;
                     }
                 }
@@ -227,6 +227,10 @@ impl CheckerState {
         Ok(result)
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Parameters preserve the upstream operation and its independently selected checking modes"
+    )]
     pub(crate) fn collect_expression_relation_errors(
         &mut self,
         source: TypeId,

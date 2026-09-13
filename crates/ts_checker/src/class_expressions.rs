@@ -404,7 +404,7 @@ impl CheckerState {
             node = parent;
             match self.ast(node)?.node(node)?.kind().known() {
                 Some(K::ComputedPropertyName) => {
-                    node = required(self.ast(node)?.node(node)?.parent(), "computed name parent")?
+                    node = required(self.ast(node)?.node(node)?.parent(), "computed name parent")?;
                 }
                 Some(K::FunctionDeclaration | K::FunctionExpression | K::ArrowFunction)
                     if stop_functions =>

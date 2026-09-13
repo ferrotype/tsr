@@ -148,7 +148,7 @@ impl PseudoTypeData {
                 pending.push(std::mem::replace(regular_type, any()));
             }
             Self::Union { types } | Self::Tuple { elements: types } => {
-                pending.extend(std::mem::take(types))
+                pending.extend(std::mem::take(types));
             }
             Self::SingleCallSignature(data) => signature(data, pending),
             Self::ObjectLiteral { elements } => {
@@ -158,7 +158,7 @@ impl PseudoTypeData {
                         PseudoObjectElementData::PropertyAssignment { ty, .. }
                         | PseudoObjectElementData::GetAccessor { ty, .. } => pending.push(ty),
                         PseudoObjectElementData::SetAccessor { parameter, .. } => {
-                            pending.push(parameter.ty)
+                            pending.push(parameter.ty);
                         }
                     }
                 }

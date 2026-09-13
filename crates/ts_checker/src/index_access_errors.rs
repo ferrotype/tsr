@@ -126,7 +126,7 @@ impl CheckerState {
             }
             if let Some(suggestion) = ts_scanner::get_spelling_suggestion_for_strings(
                 name.as_bytes(),
-                names.iter().map(|name| name.as_bytes()),
+                names.iter().map(ts_jsstring::JsString::as_bytes),
             ) {
                 let suggestion = JsString::from_bytes(suggestion);
                 let display = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;
@@ -240,11 +240,11 @@ impl CheckerState {
         index: TypeId,
     ) -> Result<Option<JsString>, Error> {
         let method = if self.assignment_target_kind(node)?
-            != crate::flow_assignments::AssignmentKind::None
+            == crate::flow_assignments::AssignmentKind::None
         {
-            b"set".as_slice()
-        } else {
             b"get".as_slice()
+        } else {
+            b"set".as_slice()
         };
         let Some(property) = self.constituent_property(object, method, false)? else {
             return Ok(None);

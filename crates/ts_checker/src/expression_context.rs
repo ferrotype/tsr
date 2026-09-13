@@ -176,13 +176,13 @@ impl CheckerState {
                         let Some(index) = args.iter().position(|&argument| argument == node) else {
                             return Ok(None);
                         };
-                        let signature = match self.cached_call_signature(parent) {
-                            Some(signature) => signature,
-                            None => {
-                                self.check_tagged_template_expression(parent)?;
-                                self.cached_call_signature(parent)
-                                    .ok_or(Error::MissingLink("contextual tagged signature"))?
-                            }
+                        let signature = if let Some(signature) = self.cached_call_signature(parent)
+                        {
+                            signature
+                        } else {
+                            self.check_tagged_template_expression(parent)?;
+                            self.cached_call_signature(parent)
+                                .ok_or(Error::MissingLink("contextual tagged signature"))?
                         };
                         return self.parameter_type_at(signature, index);
                     }
@@ -194,13 +194,12 @@ impl CheckerState {
                 let Some(index) = args.iter().position(|&arg| arg == node) else {
                     return Ok(None);
                 };
-                let signature = match self.cached_call_signature(parent) {
-                    Some(signature) => signature,
-                    None => {
-                        self.check_call_expression(parent)?;
-                        self.cached_call_signature(parent)
-                            .ok_or(Error::MissingLink("contextual call signature"))?
-                    }
+                let signature = if let Some(signature) = self.cached_call_signature(parent) {
+                    signature
+                } else {
+                    self.check_call_expression(parent)?;
+                    self.cached_call_signature(parent)
+                        .ok_or(Error::MissingLink("contextual call signature"))?
                 };
                 self.parameter_type_at(signature, index)
             }

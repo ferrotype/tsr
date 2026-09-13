@@ -16,6 +16,8 @@ pub(crate) struct FlowAnalysis {
     pub(crate) disabled: bool,
     pub(crate) invocation_count: u64,
     pub(crate) reachable: crate::types::Map<FlowId, bool>,
+    // Upstream's lastFlowNode cache also covers unshared straight-line flows.
+    last_reachable: Option<(FlowId, bool)>,
     post_super: crate::types::Map<FlowId, bool>,
     pub(crate) synthetic: crate::types::Map<NodeId, (NodeId, FlowId)>,
     pub(crate) loop_cache: crate::types::Map<FlowLoopKey, TypeId>,
@@ -126,7 +128,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNode
     pub(crate) fn reachable_flow(&mut self, owner: NodeId, flow: FlowId) -> Result<bool, Error> {
-        self.reachable_flow_worker(owner, flow, &mut Vec::new())
+        let result = self.reachable_flow_worker(owner, flow, &mut Vec::new())?;
+        self.flow.last_reachable = Some((flow, result));
+        Ok(result)
     }
 
     // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNodeWorker
@@ -139,6 +143,11 @@ impl CheckerState {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             let mut shared = Vec::new();
             let result = loop {
+                if let Some((last, result)) = self.flow.last_reachable {
+                    if last == flow {
+                        break result;
+                    }
+                }
                 let node = self.flow_node(owner, flow)?;
                 if node.flags & ff::SHARED != 0 && reduced.is_empty() {
                     if let Some(&result) = self.flow.reachable.get(&flow) {
@@ -172,6 +181,9 @@ impl CheckerState {
                     let Some(FlowData::ReduceLabel(data)) = node.node else {
                         return Err(ts_arena::Error::InvalidGraph.into());
                     };
+                    // Temporary antecedents invalidate the last-flow shortcut,
+                    // just as they do in isReachableFlowNodeWorker upstream.
+                    self.flow.last_reachable = None;
                     reduced.push(data);
                     let result = self.reachable_flow_worker(
                         owner,
@@ -1165,7 +1177,7 @@ impl FlowAnalysis {
                 .flatten()
                 .map(|values| {
                     size_of_val(values.as_ref())
-                        + values.iter().map(|value| value.len()).sum::<usize>()
+                        + values.iter().map(ts_jsstring::JsString::len).sum::<usize>()
                 })
                 .sum(),
         );

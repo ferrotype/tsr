@@ -40,6 +40,10 @@ pub(crate) struct TypedCall {
 pub(crate) struct CallState {
     resolved: Map<NodeId, Resolution>,
     optional_signatures: Map<(SignatureId, u32), SignatureId>,
+    #[allow(
+        clippy::option_option,
+        reason = "Distinguish an unqueried symbol from a cached absent symbol"
+    )]
     symbol_constructor: Option<Option<SymbolId>>,
     pub contexts: Vec<ArgumentContext>,
     pub instantiation_expressions: Map<(NodeId, TypeId), TypeId>,
@@ -294,13 +298,12 @@ impl CheckerState {
         {
             return Ok(false);
         }
-        let global = match self.calls.symbol_constructor {
-            Some(symbol) => symbol,
-            None => {
-                let symbol = self.resolve_name(None, b"Symbol", sf::VALUE, None, false)?;
-                self.calls.symbol_constructor = Some(symbol);
-                symbol
-            }
+        let global = if let Some(symbol) = self.calls.symbol_constructor {
+            symbol
+        } else {
+            let symbol = self.resolve_name(None, b"Symbol", sf::VALUE, None, false)?;
+            self.calls.symbol_constructor = Some(symbol);
+            symbol
         };
         let Some(global) = global else {
             return Ok(false);
@@ -353,7 +356,7 @@ impl CheckerState {
                     .copied()
                 {
                     let constructors = self.instantiated_constructors_for_arguments(ty, base)?;
-                    return self.resolve_typed_call(node, constructors);
+                    return self.resolve_typed_call(node, &constructors);
                 }
             }
             return self.resolve_untyped_call(node);
@@ -439,7 +442,7 @@ impl CheckerState {
                 }
             }
         }
-        self.resolve_typed_call_chain(node, signatures, call_chain_flags)
+        self.resolve_typed_call_chain(node, &signatures, call_chain_flags)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveNewExpression
@@ -526,11 +529,11 @@ impl CheckerState {
                 self.resolve_untyped_call(node)?;
                 return Ok(self.builtins.unknown_signature);
             }
-            return self.resolve_typed_call(node, signatures);
+            return self.resolve_typed_call(node, &signatures);
         }
         let signatures = self.signatures_of_type(ty, false)?;
         if !signatures.is_empty() {
-            let signature = self.resolve_typed_call(node, signatures)?;
+            let signature = self.resolve_typed_call(node, &signatures)?;
             let options = self.program()?.host.options();
             if !options.strict_option_value(options.no_implicit_any) {
                 if self.signatures.get(signature)?.declaration.is_some()
@@ -593,7 +596,7 @@ impl CheckerState {
             };
             if last_symbol.is_none() || symbol == last_symbol {
                 if last_parent.is_some() && parent == last_parent {
-                    index += 1
+                    index += 1;
                 } else {
                     last_parent = parent;
                     index = cutoff;
@@ -646,7 +649,7 @@ impl CheckerState {
     pub(crate) fn resolve_typed_call(
         &mut self,
         node: NodeId,
-        signatures: Vec<SignatureId>,
+        signatures: &[SignatureId],
     ) -> Result<SignatureId, Error> {
         self.resolve_typed_call_chain(node, signatures, 0)
     }
@@ -654,7 +657,7 @@ impl CheckerState {
     fn resolve_typed_call_chain(
         &mut self,
         node: NodeId,
-        signatures: Vec<SignatureId>,
+        signatures: &[SignatureId],
         call_chain_flags: u32,
     ) -> Result<SignatureId, Error> {
         let type_arguments = if self.ast(node)?.node(node)?.kind() == K::BinaryExpression {
@@ -665,7 +668,7 @@ impl CheckerState {
         for &argument in &type_arguments {
             self.check_source_element(argument)?;
         }
-        let candidates = self.reorder_call_candidates(&signatures, call_chain_flags)?;
+        let candidates = self.reorder_call_candidates(signatures, call_chain_flags)?;
         let args = self.effective_call_arguments(node)?;
         let single_non_generic = candidates.len() == 1
             && self
@@ -706,7 +709,7 @@ impl CheckerState {
         self.calls
             .resolved
             .insert(node, Resolution::Signature(candidate));
-        self.report_typed_call_failure(&state, &signatures)?;
+        self.report_typed_call_failure(&state, signatures)?;
         Ok(candidate)
     }
 
@@ -746,7 +749,7 @@ impl CheckerState {
             {
                 continue;
             }
-            if !self.call_has_correct_arity(node, &args, *candidate)? {
+            if !self.call_has_correct_arity(node, args, *candidate)? {
                 continue;
             }
             let mut inference = None;
@@ -759,7 +762,7 @@ impl CheckerState {
                     let arguments = self.infer_call_type_arguments_ex(
                         node,
                         *candidate,
-                        &args,
+                        args,
                         state.argument_mode | 8,
                         context,
                     )?;
@@ -769,7 +772,7 @@ impl CheckerState {
                     arguments
                 } else {
                     let Some(arguments) =
-                        self.call_type_arguments(*candidate, &type_arguments, false)?
+                        self.call_type_arguments(*candidate, type_arguments, false)?
                     else {
                         state.constraint_error = Some(*candidate);
                         continue;
@@ -779,7 +782,7 @@ impl CheckerState {
                 self.call_signature_instantiation(*candidate, &type_arguments, false, inference)?
             };
             if self.non_array_rest_type(*candidate)?.is_some()
-                && !self.call_has_correct_arity(node, &args, checked)?
+                && !self.call_has_correct_arity(node, args, checked)?
             {
                 state.arity_error = Some(checked);
                 continue;
@@ -789,7 +792,7 @@ impl CheckerState {
             } else {
                 state.argument_mode
             };
-            if !self.call_signature_applicable_ex(node, &args, checked, relation, false, mode)? {
+            if !self.call_signature_applicable_ex(node, args, checked, relation, false, mode)? {
                 state.argument_errors.push(checked);
                 continue;
             }
@@ -797,7 +800,7 @@ impl CheckerState {
                 state.argument_mode = 0;
                 if let Some(context) = inference {
                     let arguments =
-                        self.infer_call_type_arguments_ex(node, *candidate, &args, 0, context)?;
+                        self.infer_call_type_arguments_ex(node, *candidate, args, 0, context)?;
                     checked = self.call_signature_instantiation(
                         *candidate,
                         &arguments,
@@ -805,13 +808,13 @@ impl CheckerState {
                         Some(context),
                     )?;
                     if self.non_array_rest_type(*candidate)?.is_some()
-                        && !self.call_has_correct_arity(node, &args, checked)?
+                        && !self.call_has_correct_arity(node, args, checked)?
                     {
                         state.arity_error = Some(checked);
                         continue;
                     }
                 }
-                if !self.call_signature_applicable_ex(node, &args, checked, relation, false, 0)? {
+                if !self.call_signature_applicable_ex(node, args, checked, relation, false, 0)? {
                     state.argument_errors.push(checked);
                     continue;
                 }

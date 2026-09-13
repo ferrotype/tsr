@@ -266,6 +266,10 @@ impl CheckerState {
         Ok(source)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkArrayLiteralDestructuringElementAssignment
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Parameters preserve the upstream operation and its independently selected checking modes"
+    )]
     fn check_array_assignment_element(
         &mut self,
         element: NodeId,

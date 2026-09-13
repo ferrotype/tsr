@@ -97,17 +97,16 @@ fn subpaths(value: &Value) -> bool {
         return false;
     };
     let mut dot = false;
-    let mut hash = false;
     let mut other = false;
     for key in object.keys() {
         match key.as_bytes().first() {
             Some(b'.') => dot = true,
-            Some(b'#') => hash = true,
+            Some(b'#') | None => {}
             Some(_) => other = true,
-            None => {}
         }
     }
-    dot && !(other && (dot || hash))
+    // Once a dot key exists, any condition key makes the object invalid.
+    dot && !other
 }
 fn ts_file(file: &[u8]) -> bool {
     has_extension(file, &[b".ts", b".tsx", b".cts", b".mts"])
@@ -270,7 +269,7 @@ impl Generation<'_> {
         let versions = package.version_paths();
         if let Some(paths) = versions {
             let submodule = &file[root.len() + 1..];
-            let from = self.from_paths(submodule, paths, endings, root)?;
+            let from = self.module_name_from_paths(submodule, paths, endings, root)?;
             if from.is_empty() {
                 maybe_blocked = true;
             } else {
@@ -282,17 +281,15 @@ impl Generation<'_> {
             .or_else(|| package.string("types"))
             .or_else(|| package.string("main"))
             .unwrap_or(b"index.js");
-        if !main.is_empty()
-            && !(maybe_blocked
-                && versions.is_some_and(|paths| self.package_matches_paths(main, paths)))
+        if !(main.is_empty()
+            || maybe_blocked
+                && versions.is_some_and(|paths| Self::package_matches_paths(main, paths)))
         {
             let main_path = path::to_path(main, root, self.case_sensitive());
             if self.package_paths_equal(
-                &path::remove_file_extension(main_path.as_bytes()),
-                &path::remove_file_extension(&result.file),
-            ) {
-                result.root = Some(root.to_vec());
-            } else if package.string("type") != Some(b"module")
+                path::remove_file_extension(main_path.as_bytes()),
+                path::remove_file_extension(&result.file),
+            ) || package.string("type") != Some(b"module")
                 && !has_extension(
                     &result.file,
                     &[b".mts", b".d.mts", b".mjs", b".cts", b".d.cts", b".cjs"],
@@ -314,7 +311,7 @@ impl Generation<'_> {
     }
 
     // MatchPatternOrExact's only observed output here is whether a key matched.
-    fn package_matches_paths(&self, value: &[u8], paths: &PathMappings) -> bool {
+    fn package_matches_paths(value: &[u8], paths: &PathMappings) -> bool {
         paths.iter().any(|(key, _)| {
             let key = key.as_bytes();
             if key == value {

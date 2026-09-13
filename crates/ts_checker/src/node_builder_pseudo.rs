@@ -278,12 +278,12 @@ impl NodeBuilder<'_> {
                                 false,
                             )? {
                                 if let P::Inferred { error_nodes, .. } = ty.as_ref() {
-                                    if !error_nodes.is_empty() {
+                                    if error_nodes.is_empty() {
+                                        self.pseudo_report(report, parent);
+                                    } else {
                                         for &node in error_nodes {
                                             self.pseudo_report(report, node);
                                         }
-                                    } else {
-                                        self.pseudo_report(report, parent);
                                     }
                                 } else if !is_structural(ty) {
                                     self.pseudo_report(report, parent);

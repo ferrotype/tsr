@@ -78,8 +78,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             if assignments {
                 if common_js && kind == ts_ast::JSDeclarationKind::ModuleExports {
                     let right =
-                        self.required(self.node(node).as_binary_expression().unwrap().right())?;
-                    let input = self.required(self.node(node).parent())?;
+                        Self::required(self.node(node).as_binary_expression().unwrap().right())?;
+                    let input = Self::required(self.node(node).parent())?;
                     let result = self.export_assignment_from(input, node, right, true)?;
                     self.cjs.assignment = Some(result);
                     self.has_scope_marker = true;
@@ -90,8 +90,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     ts_ast::JSDeclarationKind::Property => self.expando_assignment(node)?,
                     ts_ast::JSDeclarationKind::ExportsProperty if common_js => {
                         let left =
-                            self.required(self.node(node).as_binary_expression().unwrap().left())?;
-                        let name = self.required(ts_ast::get_element_or_property_access_name(
+                            Self::required(self.node(node).as_binary_expression().unwrap().left())?;
+                        let name = Self::required(ts_ast::get_element_or_property_access_name(
                             self.output.view(),
                             left,
                         )?)?;
@@ -165,7 +165,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformBinaryExpressionToExportDeclaration
     pub fn binary_export(&mut self, node: NodeId, name: NodeId) -> Result<NodeId, R::Error> {
-        let right = self.required(self.node(node).as_binary_expression().unwrap().right())?;
+        let right = Self::required(self.node(node).as_binary_expression().unwrap().right())?;
         self.entity_visible(right)?;
         let property = if self.node(name).kind() == K::Identifier
             && self.output.view().node_text(right)?.as_bytes()
@@ -222,7 +222,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.external_indicator = true;
         self.has_scope_marker = true;
         if self.node(node).kind() == K::BinaryExpression {
-            let right = self.required(self.node(node).as_binary_expression().unwrap().right())?;
+            let right = Self::required(self.node(node).as_binary_expression().unwrap().right())?;
             let parent = self.node(node).parent();
             let alias = self.node(right).kind() == K::Identifier
                 && if let Some(symbol) = self.resolver.bound_symbol_of_declaration(node)? {
@@ -286,7 +286,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.tracker.selector =
             Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
                 diagnostic_message:
-                    &ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+                    ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
                 error_node: Some(node),
                 type_name: None,
             });
@@ -319,7 +319,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 self.output
                     .view()
                     .node_text(name)
-                    .map(|text| text.into_js_string())
+                    .map(ts_ast::NodeText::into_js_string)
             })
             .transpose()?
             .filter(|name| !name.is_empty());

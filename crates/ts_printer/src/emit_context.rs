@@ -440,7 +440,7 @@ mod original_overwrite_tests {
     fn replacing_original_keeps_local_emit_metadata() {
         let mut emit = EmitContext::new();
         let mut ast = AstBuilder::with_hooks(
-            Default::default(),
+            ts_jsstring::SourceText::default(),
             &ts_arena::Counters::new(),
             emit.factory_hooks(),
         );

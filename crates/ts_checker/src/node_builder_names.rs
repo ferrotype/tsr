@@ -377,7 +377,7 @@ impl NodeBuilder<'_> {
         let mut result = vec![];
         self.some_name_scope(query.enclosing, |this, table, _| {
             let local = !matches!(table.id, NameTableId::Members(_));
-            result = this.name_chain_from_table(query, table, false, local)?;
+            result = this.name_chain_from_table(query, &table, false, local)?;
             Ok(!result.is_empty())
         })?;
         self.name_access.chains.insert(key, result.clone());
@@ -388,7 +388,7 @@ impl NodeBuilder<'_> {
     fn name_chain_from_table(
         &mut self,
         query: NameQuery,
-        table: NameTable,
+        table: &NameTable,
         ignore_qualification: bool,
         local: bool,
     ) -> Result<Vec<SymbolId>, Error> {
@@ -396,7 +396,7 @@ impl NodeBuilder<'_> {
         if !self.name_access.visited.insert(key) {
             return Ok(vec![]);
         }
-        let result = self.try_name_table(query, &table, ignore_qualification, local);
+        let result = self.try_name_table(query, table, ignore_qualification, local);
         self.name_access.visited.remove(&key);
         result
     }
@@ -575,7 +575,7 @@ impl NodeBuilder<'_> {
             table: Some(table),
             singleton: None,
         };
-        let result = self.name_chain_from_table(query, table, true, false)?;
+        let result = self.name_chain_from_table(query, &table, true, false)?;
         if result.is_empty()
             || !self.name_can_qualify(query, symbol, left_meaning(query.meaning))?
         {

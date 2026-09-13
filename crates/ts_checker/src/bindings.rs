@@ -12,6 +12,10 @@ use ts_ast::{node_flags as nf, symbol_flags as sf, SymbolTable, SyntaxKind as K}
 pub(crate) struct BindingState {
     pub pattern_for_type: Map<TypeId, NodeId>,
     pub contextual_patterns: Vec<NodeId>,
+    #[allow(
+        clippy::option_option,
+        reason = "Distinguish an unqueried symbol from a cached absent symbol"
+    )]
     pub omit_symbol: Option<Option<ts_arena::SymbolId>>,
     pub spread_links: Map<ts_arena::SymbolId, (ts_arena::SymbolId, ts_arena::SymbolId)>,
     pub discriminated_contexts: Map<(NodeId, TypeId), TypeId>,

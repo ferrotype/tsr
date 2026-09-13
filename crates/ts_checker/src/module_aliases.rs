@@ -8,8 +8,6 @@ use ts_ast::{symbol_flags as sf, SyntaxKind as K};
 #[derive(Default)]
 pub(crate) struct ModuleAliasState {
     pub(crate) global_import_attributes: Option<TypeId>,
-    /// The export symbol of the alias whose type is being resolved (`reportCircularityError` target).
-    pub(crate) circular_alias_export: Option<SymbolId>,
     pub(crate) attributes_types: crate::types::Map<SymbolId, TypeId>,
     pub(crate) referenced: crate::types::Set<SymbolId>,
     pub(crate) exports_checked: crate::types::Set<SymbolId>,
@@ -229,16 +227,15 @@ impl CheckerState {
             // Internal import-equals reports an illegal `import type` modifier
             // but does not mark that declaration as type-only. Native marking
             // belongs to the external import/export target resolvers.
-            if self.ast(declaration)?.node(declaration)?.kind() != K::ImportEqualsDeclaration {
-                if self
+            if self.ast(declaration)?.node(declaration)?.kind() != K::ImportEqualsDeclaration
+                && self
                     .local_type_only_alias_declaration(declaration)?
                     .is_some()
-                {
-                    self.module_aliases
-                        .type_only
-                        .entry(symbol)
-                        .or_insert(declaration);
-                }
+            {
+                self.module_aliases
+                    .type_only
+                    .entry(symbol)
+                    .or_insert(declaration);
             }
             let mut target = self
                 .target_of_alias_declaration(declaration)?
@@ -553,13 +550,15 @@ impl CheckerState {
         if !self.push_source_resolution(symbol, TypeSystemPropertyName::Type) {
             return Ok(self.builtins.error_type);
         }
+        // Recursive alias queries must not overwrite this invocation's target
+        // for reportCircularityError (exportSymbol is a local upstream).
+        let mut export = None;
         let result: Result<TypeId, Error> = (|| {
             let target = self.resolve_alias(symbol)?;
-            let export = match self.alias_declaration_or_none(symbol)? {
+            export = match self.alias_declaration_or_none(symbol)? {
                 Some(declaration) => self.target_of_alias_declaration(declaration)?,
                 None => None,
             };
-            self.module_aliases.circular_alias_export = export;
             if let Some(ty) = self
                 .value_symbol_links
                 .try_get(symbol)
@@ -578,7 +577,6 @@ impl CheckerState {
         let complete = self.resolution.pop();
         let ty = result?;
         if !complete {
-            let export = self.module_aliases.circular_alias_export.take();
             self.report_symbol_circularity(export.unwrap_or(symbol))?;
             let links = self.value_symbol_links.get_or_default(symbol);
             if links.resolved_type.is_none() {

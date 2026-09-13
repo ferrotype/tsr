@@ -251,7 +251,7 @@ impl NodeBuilder<'_> {
                     && self.checker.get_type_from_type_node(existing)? == ty
                 {
                     if self.visited.contains(&ty) {
-                        return self.elided_type();
+                        return Ok(self.elided_type());
                     }
                     self.visited.push(ty);
                     let result = self.try_reuse_existing_type_node(existing, ty, None, None);
@@ -262,7 +262,7 @@ impl NodeBuilder<'_> {
                 }
             }
             if self.visited.contains(&ty) {
-                return self.elided_type();
+                return Ok(self.elided_type());
             }
             return self.visit_object_type(ty);
         }
@@ -279,7 +279,7 @@ impl NodeBuilder<'_> {
             if let Some(alias) = self.alias_for_recursive_literal(symbol)? {
                 return self.type_reference(alias, &[]);
             }
-            return self.elided_type();
+            return Ok(self.elided_type());
         }
         self.visit_object_type(ty)
     }
@@ -315,7 +315,7 @@ impl NodeBuilder<'_> {
                 .count()
                 > 10
             {
-                return self.elided_type();
+                return Ok(self.elided_type());
             }
             self.symbol_depth.push(identity);
         }

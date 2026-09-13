@@ -325,10 +325,9 @@ impl CheckerState {
                     .options()
                     .strict_option_value(self.program()?.host.options().no_implicit_any)
                 && self.types.get(ty)?.object_flags & of::CONTAINS_WIDENING_TYPE != 0
+                && !self.report_widening_errors_in_type(ty)?
             {
-                if !self.report_widening_errors_in_type(ty)? {
-                    self.report_implicit_any(declaration, ty)?;
-                }
+                self.report_implicit_any(declaration, ty)?;
             }
             if self.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0
                 && (self.ast(declaration)?.node(declaration)?.kind() == K::BindingElement

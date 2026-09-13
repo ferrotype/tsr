@@ -126,13 +126,12 @@ impl CheckerState {
         let mut mapper = None;
         for (index, &node) in nodes.iter().enumerate() {
             if let Some(constraint) = self.constraint_of_type_parameter(parameters[index])? {
-                let mapper = match mapper {
-                    Some(mapper) => mapper,
-                    None => {
-                        let value = self.new_type_mapper(&parameters, &types)?;
-                        mapper = Some(value);
-                        value
-                    }
+                let mapper = if let Some(mapper) = mapper {
+                    mapper
+                } else {
+                    let value = self.new_type_mapper(&parameters, &types)?;
+                    mapper = Some(value);
+                    value
                 };
                 let constraint = self.instantiate_type(constraint, Some(mapper))?;
                 let constraint =
@@ -463,6 +462,10 @@ impl CheckerState {
         Ok(result)
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Parameters preserve the upstream operation and its independently selected checking modes"
+    )]
     pub(crate) fn collect_signature_applicability_errors(
         &mut self,
         node: NodeId,
@@ -543,9 +546,7 @@ impl CheckerState {
         if let Some(rest) = rest {
             let spread =
                 self.spread_argument_type(args, arg_count, args.len(), rest, None, mode)?;
-            let error_node = if !report {
-                None
-            } else {
+            let error_node = if report {
                 Some(match args.len() - arg_count {
                     0 => node,
                     1 => self.effective_expression_check_node(args[arg_count])?,
@@ -563,6 +564,8 @@ impl CheckerState {
                         synthetic
                     }
                 })
+            } else {
+                None
             };
             let (related, diagnostic) = self.check_type_related_ex(
                 spread,

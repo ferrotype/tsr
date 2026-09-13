@@ -7,7 +7,7 @@ use ts_arena::{NodeId, SymbolId};
 use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
-    fn name_table(&self, id: NameTableId, table: Option<SymbolTableId>) -> NameTable {
+    fn name_table(id: NameTableId, table: Option<SymbolTableId>) -> NameTable {
         NameTable {
             id,
             table,
@@ -35,7 +35,7 @@ impl NodeBuilder<'_> {
                 .checker_node_binding(node)?
                 .and_then(|binding| binding.locals);
             if locals.is_some() && !global_source {
-                let table = self.name_table(NameTableId::Locals(node), locals);
+                let table = Self::name_table(NameTableId::Locals(node), locals);
                 if callback(self, table, Some(node))? {
                     return Ok(true);
                 }
@@ -53,7 +53,7 @@ impl NodeBuilder<'_> {
                         .checker
                         .get_symbol_of_declaration(node)?
                         .ok_or(Error::MissingLink("name scope module symbol"))?;
-                    let table = self.name_table(
+                    let table = Self::name_table(
                         NameTableId::Exports(symbol),
                         self.checker.symbol(symbol)?.exports(),
                     );
@@ -66,7 +66,7 @@ impl NodeBuilder<'_> {
                         .checker
                         .get_symbol_of_declaration(node)?
                         .ok_or(Error::MissingLink("name scope class symbol"))?;
-                    let table = self.name_table(
+                    let table = Self::name_table(
                         NameTableId::Members(symbol),
                         self.checker.symbol(symbol)?.members(),
                     );
@@ -95,7 +95,7 @@ impl NodeBuilder<'_> {
             }
             location = parent;
         }
-        let table = self.name_table(NameTableId::Globals, self.checker.builtins.globals);
+        let table = Self::name_table(NameTableId::Globals, self.checker.builtins.globals);
         callback(self, table, None)
     }
 
@@ -138,7 +138,7 @@ impl NodeBuilder<'_> {
             return Ok(vec![]);
         };
         let mut result = Vec::new();
-        for (name, value) in self.checker.table(id)?.iter() {
+        for (name, value) in self.checker.table(id)? {
             if let Some(value) = value {
                 if matches!(table.id, NameTableId::Members(_))
                     && self.checker.symbol(value)?.flags() & (sf::TYPE & !sf::ASSIGNMENT) == 0

@@ -152,15 +152,10 @@ impl CheckerState {
         let mut include = Vec::with_capacity(types.len());
         for &ty in types.iter() {
             let reduced = self.get_reduced_type(ty)?;
-            include.push(
-                if self.types.flags(ty)? & tf::PRIMITIVE == 0
-                    && self.types.flags(reduced)? & tf::NEVER == 0
-                {
-                    1u8
-                } else {
-                    0
-                },
-            );
+            include.push(u8::from(
+                self.types.flags(ty)? & tf::PRIMITIVE == 0
+                    && self.types.flags(reduced)? & tf::NEVER == 0,
+            ));
         }
         for (name, expression) in items {
             let mut matched = false;
@@ -189,7 +184,7 @@ impl CheckerState {
             }
             for included in &mut include {
                 if *included == 2 {
-                    *included = if matched { 0 } else { 1 };
+                    *included = u8::from(!matched);
                 }
             }
         }

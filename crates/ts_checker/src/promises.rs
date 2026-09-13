@@ -13,19 +13,26 @@ pub(crate) struct PromiseState {
     pub promised: Map<TypeId, TypeId>,
     pub awaited: Map<TypeId, TypeId>,
     pub stack: Vec<TypeId>,
+    #[allow(
+        clippy::option_option,
+        reason = "Distinguish an unqueried symbol from a cached absent symbol"
+    )]
     awaited_symbols: [Option<Option<SymbolId>>; 2],
+    #[allow(
+        clippy::option_option,
+        reason = "Distinguish an unqueried symbol from a cached absent symbol"
+    )]
     constructor_symbols: [Option<Option<SymbolId>>; 2],
 }
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.createPromiseLikeType
     pub(crate) fn create_promise_like_type(&mut self, promised: TypeId) -> Result<TypeId, Error> {
-        let global = match self.query.global_types.get("PromiseLikeChecked") {
-            Some(&ty) => ty,
-            None => {
-                let ty = self.get_global_type("PromiseLike", 1, true)?;
-                self.query.global_types.insert("PromiseLikeChecked", ty);
-                ty
-            }
+        let global = if let Some(&ty) = self.query.global_types.get("PromiseLikeChecked") {
+            ty
+        } else {
+            let ty = self.get_global_type("PromiseLike", 1, true)?;
+            self.query.global_types.insert("PromiseLikeChecked", ty);
+            ty
         };
         if global == self.builtins.empty_generic_type {
             return Ok(self.builtins.unknown_type);

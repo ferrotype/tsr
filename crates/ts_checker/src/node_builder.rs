@@ -172,7 +172,7 @@ impl<'a> NodeBuilder<'a> {
         }
         for declaration in declarations.iter().flatten() {
             let view = self.checker.ast(declaration)?;
-            if let Some(name) = view.node(declaration)?.name() {
+            if let Some(name) = ts_ast::get_name_of_declaration(view, Some(declaration))? {
                 if view.node(name)?.kind() == K::ComputedPropertyName
                     && read.check_flags() & check_flags::LATE == 0
                 {
@@ -654,11 +654,11 @@ impl<'a> NodeBuilder<'a> {
             if let Some(symbol) = record.symbol {
                 return self.type_reference(symbol, &[]);
             }
-            let name = if (ty == self.checker.builtins.marker_sub_type_for_check
-                || ty == self.checker.builtins.marker_super_type_for_check)
-                && self.checker.variance.checked_parameter.is_some()
-            {
-                let parameter = self.checker.variance.checked_parameter.unwrap();
+            let marker_parameter = self.checker.variance.checked_parameter.filter(|_| {
+                ty == self.checker.builtins.marker_sub_type_for_check
+                    || ty == self.checker.builtins.marker_super_type_for_check
+            });
+            let name = if let Some(parameter) = marker_parameter {
                 if let Some(symbol) = self.checker.types.get(parameter)?.symbol {
                     let mut name = if ty == self.checker.builtins.marker_sub_type_for_check {
                         b"sub-".to_vec()
@@ -900,7 +900,7 @@ impl<'a> NodeBuilder<'a> {
             }
             for &index in indexes.iter() {
                 if self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0 {
-                    let placeholder = self.elided_type()?;
+                    let placeholder = self.elided_type();
                     nodes.push(self.index_signature_node_with_type(index, Some(placeholder))?);
                 } else {
                     nodes.push(self.index_signature_node(index)?);
@@ -933,21 +933,21 @@ impl<'a> NodeBuilder<'a> {
             .new_property_signature_declaration(None, Some(name), None, None, None))
     }
 
-    fn elided_type(&mut self) -> Result<NodeId, Error> {
+    fn elided_type(&mut self) -> NodeId {
         self.approximate_length += 3;
         if self.flags & nf::NO_TRUNCATION != 0 {
             let node = self.ast.new_keyword_type_node(K::AnyKeyword.into());
-            return Ok(self.emit.add_synthetic_leading_comment(
+            return self.emit.add_synthetic_leading_comment(
                 node,
                 K::MultiLineCommentTrivia,
                 JsString::from_bytes(b"elided".as_slice()),
                 false,
-            ));
+            );
         }
         let name = self
             .ast
             .new_identifier(JsString::from_bytes(b"...".as_slice()));
-        Ok(self.ast.new_type_reference_node(Some(name), None))
+        self.ast.new_type_reference_node(Some(name), None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createTypeNodesFromResolvedType
@@ -998,7 +998,7 @@ impl<'a> NodeBuilder<'a> {
                 .unwrap_or(self.checker.builtins.never_type);
         }
         let type_node = if placeholder {
-            self.elided_type()?
+            self.elided_type()
         } else {
             if reverse {
                 self.reverse_mapped_stack.push(symbol);

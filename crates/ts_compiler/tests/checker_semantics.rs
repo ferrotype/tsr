@@ -129,48 +129,117 @@ fn source_assignment_diagnostics_match_pinned_native_ranges_and_payload_on_repea
 }
 
 #[test]
-fn source_check_failure_after_a_diagnostic_stays_failed_across_operations() {
+fn source_check_repeats_its_result_across_operations_for_diagnostics_and_unported_input() {
+    // `typeof before` resolves now, so the program that once stopped at an
+    // unported boundary reports its assignment diagnostic instead. JSX input is
+    // still unported, and a failure must repeat across operations just as a
+    // diagnostic does.
     let (checker, source) = checker(
         b"let before: number = \"wrong\"; type Later = typeof before;",
         options(),
     );
     for _ in 0..3 {
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert_eq!(diagnostics[0].code, 2322);
         assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(
-                "checkSourceElementWorker: statement/type family"
-            ))
+            (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
+            (4, 10)
+        );
+    }
+    let (owner, program, _) = fixture_files(
+        b"/main.tsx",
+        &[(b"/main.tsx", b"export const a = <div/>;")],
+        options(),
+    );
+    let source = program.file(b"/main.tsx").unwrap().source();
+    for _ in 0..3 {
+        assert_eq!(
+            owner.operation().unwrap().semantic_diagnostics(source),
+            Err(Error::Unsupported("checkExpressionWorker"))
         );
     }
 }
 
 #[test]
-fn source_check_rejects_unported_grammar_relations_and_options() {
+fn grammar_relations_and_options_report_their_native_diagnostics() {
+    // Each of these once stopped at an unported boundary. They are checked now,
+    // so the pinned diagnostics themselves are the expectation; `let value!`
+    // and the `@ts-ignore` directive are both no-ops at this layer.
     for (text, expected) in [
         (
             b"interface A { value: number; value: string }".as_slice(),
-            "checkObjectTypeForDuplicateDeclarations/subsequent property declarations",
+            vec![
+                (2300, 14, 19, vec!["value"]),
+                (2300, 29, 34, vec!["value"]),
+                (2717, 29, 34, vec!["value", "number", "string"]),
+            ],
         ),
         (
             b"let value: { field: number } = { field: 1, extra: 2 };",
-            "report excess properties: source object expression",
+            vec![(2353, 43, 48, vec!["extra", "{ field: number; }"])],
         ),
-        (
-            b"let value!: number;",
-            "checkGrammarVariableDeclaration: definite assignment assertion",
-        ),
+        (b"let value!: number;", vec![]),
         (
             b"// @ts-ignore\nlet value: number = \"wrong\";",
-            "checkSourceFile: diagnostic directives",
+            vec![(2322, 18, 23, vec!["string", "number"])],
         ),
     ] {
         let (checker, source) = checker(text, options());
-        assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(expected)),
-            "source {text:?}"
-        );
+        let diagnostics = checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        let actual = diagnostics
+            .iter()
+            .map(|diagnostic| {
+                (
+                    diagnostic.code,
+                    diagnostic.loc.pos(),
+                    diagnostic.loc.end(),
+                    diagnostic
+                        .message_args
+                        .iter()
+                        .map(|argument| String::from_utf8_lossy(argument.as_bytes()).into_owned())
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect::<Vec<_>>();
+        let expected = expected
+            .into_iter()
+            .map(|(code, pos, end, args)| {
+                (
+                    code,
+                    pos,
+                    end,
+                    args.into_iter().map(str::to_string).collect::<Vec<_>>(),
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(actual, expected, "source {text:?}");
+        // The later duplicate member points back at the first declaration.
+        if let Some(duplicate) = diagnostics
+            .iter()
+            .find(|diagnostic| diagnostic.code == 2717)
+        {
+            assert_eq!(duplicate.related_information.len(), 1);
+            assert_eq!(duplicate.related_information[0].code, 6203);
+            assert_eq!(
+                (
+                    duplicate.related_information[0].loc.pos(),
+                    duplicate.related_information[0].loc.end()
+                ),
+                (14, 19)
+            );
+        }
     }
+    // These options are accepted by the raw checker. Program-level noCheck
+    // suppression and declaration diagnostics have separate entry points.
     for options in [
         CompilerOptions {
             no_check: Tristate::TRUE,
@@ -182,13 +251,142 @@ fn source_check_rejects_unported_grammar_relations_and_options() {
         },
     ] {
         let (checker, source) = checker(b"let value: number = 1;", options);
+        assert!(checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap()
+            .is_empty());
+    }
+}
+
+#[test]
+fn review_tsx_files_check_ordinary_declarations() {
+    let (owner, program, _) = fixture_files(
+        b"/main.tsx",
+        &[(b"/main.tsx", b"export const value: number = \"wrong\";")],
+        options(),
+    );
+    let source = program.file(b"/main.tsx").unwrap().source();
+    for _ in 0..2 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert_eq!(diagnostics[0].code, 2322);
+    }
+}
+
+#[test]
+fn review_circular_parameter_initializers_preserve_native_diagnostics_on_repeat() {
+    // Pinned Go observation: tools/s08/p4/review-regressions.json, circular-default.
+    let (owner, source) = checker(
+        b"function fn1(x: number | undefined = x > 0 ? x : 0) {}\nfunction fn2(x?: string = someCondition ? \"value1\" : x) {}\ntype Query = number;",
+        options(),
+    );
+    let expected = [
+        (2502, 13, 50),
+        (2372, 37, 38),
+        (18048, 37, 38),
+        (2372, 45, 46),
+        (1015, 68, 69),
+        (2502, 68, 109),
+        (2304, 81, 94),
+        (2372, 108, 109),
+    ];
+    for _ in 0..3 {
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(source)
+            .unwrap();
         assert_eq!(
-            checker.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(
-                "checkSourceFile: noCheck/unused/isolated declaration options"
-            ))
+            diagnostics
+                .iter()
+                .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+                .collect::<Vec<_>>(),
+            expected
         );
     }
+}
+
+#[test]
+fn review_nested_alias_resolution_keeps_each_circularity_target() {
+    let files: &[(&[u8], &[u8])] = &[
+        (
+            b"/a.ts",
+            b"import second = require(\"./b\"); var first = second; export = first;",
+        ),
+        (
+            b"/b.ts",
+            b"import third = require(\"./c\"); export = third;",
+        ),
+        (
+            b"/c.ts",
+            b"import first = require(\"./a\"); export = first;",
+        ),
+        (
+            b"/case.ts",
+            b"import first = require(\"./a\"); let value = first; type Query = typeof value;",
+        ),
+    ];
+    let (owner, program, _) = fixture_files(b"/a.ts", files, options());
+    for _ in 0..2 {
+        let mut op = owner.operation().unwrap();
+        for &(path, _) in files {
+            op.semantic_diagnostics(program.file(path).unwrap().source())
+                .unwrap();
+        }
+        let mut targets = Vec::new();
+        for &(path, _) in files {
+            for diagnostic in op
+                .semantic_diagnostics(program.file(path).unwrap().source())
+                .unwrap()
+            {
+                if diagnostic.code == 7022 {
+                    targets.push((
+                        path,
+                        diagnostic.loc.pos(),
+                        diagnostic.loc.end(),
+                        diagnostic.message_args[0].as_bytes().to_vec(),
+                    ));
+                }
+            }
+        }
+        // Go reports the local first and the export third, never the imported second.
+        assert_eq!(
+            targets,
+            vec![
+                (b"/a.ts".as_slice(), 36, 41, b"first".to_vec()),
+                (b"/b.ts".as_slice(), 31, 46, b"third".to_vec())
+            ]
+        );
+    }
+}
+
+#[test]
+fn review_date_property_uses_the_pinned_lib_suggestion() {
+    let (owner, source) = checker(
+        b"interface Date {} declare const date: Date; date.toTemporalInstant();",
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1);
+    assert_eq!(diagnostics[0].code, 2550);
+    assert_eq!(
+        diagnostics[0]
+            .message_args
+            .iter()
+            .map(JsString::as_bytes)
+            .collect::<Vec<_>>(),
+        [b"toTemporalInstant".as_slice(), b"Date", b"esnext"]
+    );
 }
 
 #[test]
@@ -324,7 +522,7 @@ fn source_symbol_references_are_bound_to_the_exact_checker_even_when_source_is_s
 }
 
 #[test]
-fn failed_query_caches_and_resolution_stack_cannot_convert_failure_to_success() {
+fn declared_type_queries_repeat_without_drift_and_unresolved_names_are_any() {
     let (owner, program, _) = fixture(b"interface Callable { (value: string): number } interface Generic<T> {} type Failed = typeof value; type Good = number;", options());
     let declarations = declarations(&program);
     for _ in 0..3 {
@@ -344,15 +542,14 @@ fn failed_query_caches_and_resolution_stack_cannot_convert_failure_to_success() 
             op.type_object_flags(generic).unwrap() & ts_checker::object_flags::REFERENCE,
             0
         );
+        // `typeof value` on a name that resolves to nothing is `any`, not a failure.
         for &declaration in &declarations[2..3] {
             let symbol = op
                 .get_symbol_at_location(declaration_name(&program, declaration))
                 .unwrap()
                 .unwrap();
-            assert!(matches!(
-                op.get_declared_type_of_symbol(symbol),
-                Err(Error::Unsupported(_))
-            ));
+            let failed = op.get_declared_type_of_symbol(symbol).unwrap();
+            assert_eq!(op.type_to_string(failed, 0).unwrap().as_bytes(), b"any");
         }
         let symbol = op
             .get_symbol_at_location(declaration_name(&program, declarations[3]))
@@ -464,11 +661,19 @@ fn lazy_jsdoc_type_names_do_not_resolve_as_ordinary_wrapper_interfaces() {
         file.source().arena(),
         "exercises retained lazy owner routing"
     );
+    // The tag names the primitive; the `interface String` declared above is a
+    // different type, so the lazy JSDoc name must not resolve to that wrapper.
     for _ in 0..2 {
-        assert_eq!(
-            owner.operation().unwrap().get_type_at_location(reference),
-            Err(Error::Unsupported("getIntendedTypeFromJSDocTypeReference"))
-        );
+        let mut op = owner.operation().unwrap();
+        let ty = op.get_type_at_location(reference).unwrap();
+        assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"string");
+        let wrapper = op
+            .get_symbol_at_location(declaration_name(&program, declarations(&program)[0]))
+            .unwrap()
+            .unwrap();
+        let wrapper = op.get_declared_type_of_symbol(wrapper).unwrap();
+        assert_eq!(op.type_to_string(wrapper, 0).unwrap().as_bytes(), b"String");
+        assert_ne!(ty, wrapper);
     }
 }
 
@@ -540,7 +745,7 @@ fn reference_identifier_and_whole_reference_preserve_distinct_native_queries() {
 }
 
 #[test]
-fn unsupported_variable_widening_does_not_rebuild_a_successful_cached_initializer() {
+fn variable_widening_does_not_rebuild_a_successful_cached_initializer() {
     let (owner, program, _) = fixture(b"let value = { field: 1 };", options());
     let file = program.file(b"/main.ts").unwrap();
     let view = file.bound().view().ast();
@@ -569,23 +774,21 @@ fn unsupported_variable_widening_does_not_rebuild_a_successful_cached_initialize
     let name = view.node(declaration).unwrap().name().unwrap();
     let mut op = owner.operation().unwrap();
     let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
-    let unsupported = Err(Error::Unsupported(
-        "widenTypeForVariableLikeDeclaration: auto/null/object widening",
-    ));
-    assert_eq!(op.get_type_of_symbol(symbol), unsupported);
+    let widened = op.get_type_of_symbol(symbol).unwrap();
+    assert_eq!(
+        op.type_to_string(widened, 0).unwrap().as_bytes(),
+        b"{ field: number; }"
+    );
     let before = (op.type_count(), op.symbol_count());
     for _ in 0..2 {
-        assert_eq!(op.get_type_of_symbol(symbol), unsupported);
+        assert_eq!(op.get_type_of_symbol(symbol).unwrap(), widened);
         assert_eq!(
             (op.type_count(), op.symbol_count()),
             before,
             "retrying widening must reuse the checked initializer's type and property symbols"
         );
     }
-    assert!(matches!(
-        op.semantic_diagnostics(file.source()),
-        Err(Error::Unsupported(_))
-    ));
+    assert!(op.semantic_diagnostics(file.source()).unwrap().is_empty());
     assert_eq!((op.type_count(), op.symbol_count()), before);
 }
 
@@ -637,7 +840,7 @@ fn union_property_normalization_is_deferred_and_repeated_identity_is_stable() {
 }
 
 #[test]
-fn union_property_failure_does_not_publish_a_partial_property_list() {
+fn union_properties_publish_a_complete_list_and_repeat_without_drift() {
     let (owner, program, _) = fixture(b"type A = { good: string; bad: typeof missingA }; type B = { good: number; bad: typeof missingB }; type U = A | B;", options());
     let name = declaration_name(&program, declarations(&program)[2]);
     let mut op = owner.operation().unwrap();
@@ -645,10 +848,17 @@ fn union_property_failure_does_not_publish_a_partial_property_list() {
     let ty = op.get_declared_type_of_symbol(symbol).unwrap();
     let mut previous_counts = None;
     for _ in 0..3 {
-        assert!(matches!(
-            op.properties_of_type(ty),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
+        // `bad` names an unresolvable value on both sides, which is `any` rather
+        // than a failure, so the whole list is published.
+        let properties = op.properties_of_type(ty).unwrap();
+        assert_eq!(properties.len(), 2);
+        let good = op.get_type_of_symbol(properties[0]).unwrap();
+        assert_eq!(
+            op.type_to_string(good, 0).unwrap().as_bytes(),
+            b"string | number"
+        );
+        let bad = op.get_type_of_symbol(properties[1]).unwrap();
+        assert_eq!(op.type_to_string(bad, 0).unwrap().as_bytes(), b"any");
         let counts = (op.type_count(), op.symbol_count());
         if let Some(previous) = previous_counts {
             assert_eq!(counts, previous);
@@ -715,44 +925,55 @@ fn primitive_union_diagnostics_preserve_literal_target_spelling() {
 
 #[test]
 fn compound_constituents_are_checked_even_after_reduction_and_on_retry() {
-    for text in [
-        "type U = { a: string; a: number } | string;",
-        "type U = string | { a: string; a: number };",
-        "type U = unknown | ({ a: string; a: number } | string);",
-        "type U = { a: Missing } | string;",
-        "type U = unknown | { a: Missing };",
-        "type U = unknown & { a: string; a: number };",
-        "type U = never & { a: Missing };",
-    ] {
-        let (owner, source) = checker(text.as_bytes(), options());
-        let first = owner.operation().unwrap().semantic_diagnostics(source);
-        assert!(
-            matches!(first, Err(Error::Unsupported(_))),
-            "{text}: {first:?}"
-        );
-        for _ in 0..2 {
-            assert_eq!(
-                owner.operation().unwrap().semantic_diagnostics(source),
-                first
-            );
-        }
-    }
-    // Checking follows source order, before construction sorts/reduces types.
-    for (text, expected) in [
+    // The duplicate member trio is TS2300 twice then TS2717; an unresolvable
+    // type name is a single TS2304. Both survive reduction and repeat exactly.
+    for (text, codes) in [
+        (
+            "type U = { a: string; a: number } | string;",
+            vec![2300, 2300, 2717],
+        ),
+        (
+            "type U = string | { a: string; a: number };",
+            vec![2300, 2300, 2717],
+        ),
+        (
+            "type U = unknown | ({ a: string; a: number } | string);",
+            vec![2300, 2300, 2717],
+        ),
+        ("type U = { a: Missing } | string;", vec![2304]),
+        ("type U = unknown | { a: Missing };", vec![2304]),
+        (
+            "type U = unknown & { a: string; a: number };",
+            vec![2300, 2300, 2717],
+        ),
+        ("type U = never & { a: Missing };", vec![2304]),
+        // Checking follows source order, before construction sorts/reduces
+        // types: the same pair of constituents reports in the order written.
         (
             "type U = { a: string; a: number } | typeof missing;",
-            "checkObjectTypeForDuplicateDeclarations/subsequent property declarations",
+            vec![2300, 2300, 2717, 2304],
         ),
         (
             "type U = typeof missing | { a: string; a: number };",
-            "checkSourceElementWorker: statement/type family",
+            vec![2304, 2300, 2300, 2717],
         ),
     ] {
         let (owner, source) = checker(text.as_bytes(), options());
-        assert_eq!(
-            owner.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported(expected))
-        );
+        for _ in 0..3 {
+            let diagnostics = owner
+                .operation()
+                .unwrap()
+                .semantic_diagnostics(source)
+                .unwrap();
+            assert_eq!(
+                diagnostics
+                    .iter()
+                    .map(|diagnostic| diagnostic.code)
+                    .collect::<Vec<_>>(),
+                codes,
+                "{text}"
+            );
+        }
     }
     let (owner, source) = checker(b"type U = { a: string } | number;", options());
     assert!(owner
@@ -863,7 +1084,7 @@ fn intersection_discriminant_reduction_is_lazy_and_raw_display_is_available() {
 }
 
 #[test]
-fn failed_intersection_reduction_clears_its_computed_flag_on_every_retry() {
+fn intersection_reduction_computes_its_never_flag_once_and_repeats_without_drift() {
     let (owner, program, _) = fixture(b"type A = { good: string; bad: typeof missingA }; type B = { good: number; bad: typeof missingB }; type I = A & B;", options());
     let mut op = owner.operation().unwrap();
     let symbol = op
@@ -871,19 +1092,29 @@ fn failed_intersection_reduction_clears_its_computed_flag_on_every_retry() {
         .unwrap()
         .unwrap();
     let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+    // Discovering the alias must not reduce it.
+    assert_eq!(
+        op.type_object_flags(ty).unwrap()
+            & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+        0
+    );
     let mut counts = None;
     for _ in 0..3 {
-        assert!(matches!(
-            op.properties_of_type(ty),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
-        assert!(matches!(
-            op.type_to_string(ty, 0),
-            Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family"))
-        ));
-        assert_eq!(
+        // `good` reduces to never, but `I` itself is not a never intersection.
+        let properties = op.properties_of_type(ty).unwrap();
+        assert_eq!(properties.len(), 2);
+        let good = op.get_type_of_symbol(properties[0]).unwrap();
+        assert_eq!(op.type_to_string(good, 0).unwrap().as_bytes(), b"never");
+        let bad = op.get_type_of_symbol(properties[1]).unwrap();
+        assert_eq!(op.type_to_string(bad, 0).unwrap().as_bytes(), b"any");
+        assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"I");
+        assert_ne!(
             op.type_object_flags(ty).unwrap()
                 & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+            0
+        );
+        assert_eq!(
+            op.type_object_flags(ty).unwrap() & ts_checker::object_flags::IS_NEVER_INTERSECTION,
             0
         );
         let current = (op.type_count(), op.symbol_count());

@@ -182,14 +182,14 @@ impl CheckerState {
                 )?;
             } else {
                 let index = self.for_in_index_type(right)?;
-                if !self.is_type_related_to(index, left, RelationKind::Assignable)? {
+                if self.is_type_related_to(index, left, RelationKind::Assignable)? {
+                    self.check_reference_expression(initializer,d::The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access,d::The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access)?;
+                } else {
                     self.error_at(
                         Some(initializer),
                         d::The_left_hand_side_of_a_for_in_statement_must_be_of_type_string_or_any,
                         vec![],
                     )?;
-                } else {
-                    self.check_reference_expression(initializer,d::The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access,d::The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access)?;
                 }
             }
         }
@@ -321,7 +321,7 @@ impl CheckerState {
             .map(|label| {
                 self.ast(label)?
                     .node_text(label)
-                    .map(|text| text.into_js_string())
+                    .map(ts_ast::NodeText::into_js_string)
                     .map_err(Error::from)
             })
             .transpose()?;

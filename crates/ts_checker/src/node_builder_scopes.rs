@@ -15,6 +15,10 @@ pub(super) struct TypeParameterNames {
 
 struct ScopeUndo {
     table: SymbolTableId,
+    #[allow(
+        clippy::option_option,
+        reason = "Scope rollback distinguishes a missing table key from a present key with a nil symbol"
+    )]
     values: Vec<(JsString, Option<Option<SymbolId>>)>,
 }
 

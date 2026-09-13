@@ -14,10 +14,11 @@ native source selection, bind/check diagnostic composition, plain-JS filtering,
 source directives and include diagnostics. The semantic phase records its API;
 earlier captures without that marker used raw checker diagnostics. Successful
 execution still does not establish baseline decoration, query schedule or
-semantic parity. Declaration
-transform/emit-resolver diagnostics, full suggestion checking, and the P5 native
-type/symbol baseline walker remain `not_implemented` until their production
-entry points are available. No missing phase passes through an empty baseline.
+semantic parity. Requested declaration diagnostics now run through the production
+declaration transformer and checker emit resolver, and requested suggestion
+diagnostics run through the production suggestion entry point. The P5 native
+type/symbol baseline walker remains `not_implemented`. No missing phase passes
+through an empty baseline.
 
 Use existing authenticated S07 loading requests; the runner checks the complete
 10,728-row inventory and every request hash against
@@ -64,3 +65,21 @@ Failures are grouped by operation, failure class and exact reason, retaining
 all affected variant IDs and occurrence counts. Informational outcomes do not
 enter acceptance counts. Completed diagnostics are not called passes; no E2
 metric is emitted by this tool.
+
+## Review regression fixtures
+
+`review-regressions.json` covers circular default initializers, nested alias
+resolution and exported-name display, try/finally reachability, 10,000 sequential
+assignments, the pinned Date lib suggestion, and ordinary declarations in TSX
+files. Its native comparison is separate from the full inventory and E2.
+
+```sh
+python3 scripts/s08_p2.py capture --spec tools/s08/p4/review-regressions.json --output target/s08/p4-review-native
+cargo run -p ts_compiler --example p2_checker -- target/s08/p4-review-native/requests.json target/s08/p4-review-rust.json
+python3 scripts/s08_p2.py compare --native target/s08/p4-review-native --actual target/s08/p4-review-rust.json --output target/s08/p4-review-comparison.json
+```
+
+Use fresh output paths. `cargo run` selects the current compiler artifact; the
+comparison checks the native requests and every recorded observation rather
+than accepting a successful process exit alone. The compiler tests separately
+keep a real JSX expression as an explicit repeated failure.

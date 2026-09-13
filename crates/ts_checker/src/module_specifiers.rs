@@ -96,6 +96,10 @@ impl Generation<'_> {
     }
 
     // port: tsc/internal/modulespecifiers/specifiers.go:getAllModulePathsWorker
+    #[allow(
+        clippy::naive_bytecount,
+        reason = "Count separators in module paths with the standard library; a byte-counting dependency is not justified here"
+    )]
     fn sorted_paths(&self, paths: Vec<ModulePath>) -> Vec<ModulePath> {
         // Source first collects by exact spelling. An overwrite keeps the last
         // ModulePath for that spelling; tie ordering is explicit at this pin.
@@ -239,6 +243,10 @@ impl Generation<'_> {
     }
 
     // port: tsc/internal/modulespecifiers/specifiers.go:getLocalModuleSpecifier
+    #[allow(
+        clippy::naive_bytecount,
+        reason = "Count separators in module paths with the standard library; a byte-counting dependency is not justified here"
+    )]
     fn local_specifier(&self, target: &[u8], paths_only: bool) -> Result<Vec<u8>, Error> {
         let options = self.options();
         if paths_only && options.paths.is_none() {
@@ -282,13 +290,13 @@ impl Generation<'_> {
         } else {
             self.package_imports(target, &directory, prefer_ts)?
         };
-        if (paths_only || non_relative.is_empty()) && options.paths.is_some() {
-            non_relative = self.from_paths(
-                &relative_to_base,
-                options.paths.as_ref().expect("paths present"),
-                &endings,
-                &base,
-            )?;
+        if let Some(paths) = options
+            .paths
+            .as_ref()
+            .filter(|_| paths_only || non_relative.is_empty())
+        {
+            non_relative =
+                self.module_name_from_paths(&relative_to_base, paths, &endings, &base)?;
         }
         if paths_only {
             return Ok(non_relative);

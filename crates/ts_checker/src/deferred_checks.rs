@@ -65,7 +65,7 @@ impl CheckerState {
                 } => self.report_missing_property(name, containing, unchecked_js)?,
                 DeferredCheck::Iteration { index } => self.report_iteration_diagnostic(index)?,
                 DeferredCheck::WeakMapSetCollision { node } => {
-                    self.check_weak_map_set_collision(node)?
+                    self.check_weak_map_set_collision(node)?;
                 }
                 DeferredCheck::ReflectCollision { node } => self.check_reflect_collision(node)?,
             }

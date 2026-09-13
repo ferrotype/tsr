@@ -91,12 +91,12 @@ impl CheckerState {
             let types = self.types.compound_types(base)?.clone();
             let mixins = self.constructor_mixin_flags(&types)?;
             for (&part, mixin) in types.iter().zip(mixins) {
-                if !mixin && self.types.object_flags(part)? & of::CLASS_OR_INTERFACE != 0 {
-                    if self.types.get(part)?.symbol == Some(target)
-                        || self.type_has_protected_accessible_base(target, part)?
-                    {
-                        return Ok(true);
-                    }
+                if !mixin
+                    && self.types.object_flags(part)? & of::CLASS_OR_INTERFACE != 0
+                    && (self.types.get(part)?.symbol == Some(target)
+                        || self.type_has_protected_accessible_base(target, part)?)
+                {
+                    return Ok(true);
                 }
             }
             return Ok(false);

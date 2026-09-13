@@ -86,8 +86,10 @@ pub fn panic_error(payload: &(dyn std::any::Any + Send)) -> Error {
 pub fn failure(error: &Error, operation: &str) -> Value {
     let unsupported = match error {
         Error::Checker(ts_checker::Error::Unsupported(name))
-        | Error::Compiler(ts_compiler::Error::Checker(ts_checker::Error::Unsupported(name)))
-        | Error::Compiler(ts_compiler::Error::Unsupported(name))
+        | Error::Compiler(
+            ts_compiler::Error::Checker(ts_checker::Error::Unsupported(name))
+            | ts_compiler::Error::Unsupported(name),
+        )
         | Error::Unsupported(name) => Some(*name),
         _ => None,
     };

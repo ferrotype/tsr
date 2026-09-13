@@ -617,7 +617,7 @@ impl NodeBuilder<'_> {
                             | K::NoSubstitutionTemplateLiteral
                     )
                 )
-                .then(|| view.node_text(e).map(|s| s.into_js_string()))
+                .then(|| view.node_text(e).map(ts_ast::NodeText::into_js_string))
                 .transpose()?)
             }
             Some(K::JsxNamespacedName) => {

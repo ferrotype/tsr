@@ -28,7 +28,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 | K::JsxNamespacedName,
             ) => Ok(Some(self.output.view().node_text(name)?.into_js_string())),
             Some(K::ComputedPropertyName) => {
-                let expression = self.required(self.node(name).expression())?;
+                let expression = Self::required(self.node(name).expression())?;
                 if matches!(
                     self.node(expression).kind().known(),
                     Some(
@@ -140,7 +140,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         {
             return Ok(true);
         }
-        let mut name = self.required(ts_ast::get_name_of_declaration(
+        let mut name = Self::required(ts_ast::get_name_of_declaration(
             self.output.view(),
             Some(node),
         )?)?;
@@ -176,8 +176,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 self.select_context(node, true)?;
             }
             self.tracker.error_name = self.node(node).name();
-            let expression = self.required(
-                self.node(self.required(self.node(node).name())?)
+            let expression = Self::required(
+                self.node(Self::required(self.node(node).name())?)
                     .expression(),
             )?;
             let result = self.entity_visible(expression);

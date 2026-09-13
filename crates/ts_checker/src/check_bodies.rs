@@ -643,7 +643,10 @@ impl CheckerState {
             {
                 return Ok(());
             }
-            self.signatures.get_mut(signature)?.type_parameters = source.type_parameters.clone();
+            self.signatures
+                .get_mut(signature)?
+                .type_parameters
+                .clone_from(&source.type_parameters);
         }
         if let Some(context_this) = source.this_parameter {
             let parameter = target.this_parameter;
@@ -659,13 +662,12 @@ impl CheckerState {
                 None => false,
             };
             if !has_annotation {
-                let parameter = match parameter {
-                    Some(parameter) => parameter,
-                    None => {
-                        let parameter = self.clone_symbol_with_type(context_this, None)?;
-                        self.signatures.get_mut(signature)?.this_parameter = Some(parameter);
-                        parameter
-                    }
+                let parameter = if let Some(parameter) = parameter {
+                    parameter
+                } else {
+                    let parameter = self.clone_symbol_with_type(context_this, None)?;
+                    self.signatures.get_mut(signature)?.this_parameter = Some(parameter);
+                    parameter
                 };
                 let ty = self.get_type_of_symbol(context_this)?;
                 self.assign_body_parameter_type(parameter, Some(ty))?;

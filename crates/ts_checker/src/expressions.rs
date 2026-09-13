@@ -292,8 +292,8 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeOfExpression
-    pub(crate) fn typeof_result_type(&mut self) -> Result<TypeId, Error> {
-        Ok(self.builtins.typeof_type)
+    pub(crate) fn typeof_result_type(&self) -> TypeId {
+        self.builtins.typeof_type
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkConditionalExpression

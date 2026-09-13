@@ -79,7 +79,7 @@ impl CheckerState {
         for check in &self.deferred_checks.pending {
             match check {
                 crate::deferred_checks::DeferredCheck::MissingProperty { containing, .. } => {
-                    work.types([*containing])
+                    work.types([*containing]);
                 }
                 crate::deferred_checks::DeferredCheck::Iteration { .. }
                 | crate::deferred_checks::DeferredCheck::WeakMapSetCollision { .. }

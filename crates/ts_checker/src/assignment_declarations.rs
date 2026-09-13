@@ -126,15 +126,16 @@ impl CheckerState {
                     }
                 }
                 if let Some(assigned) = self.assignment_declaration_initializer_type(declaration)? {
-                    if ts_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
-                        != J::ExportsProperty
+                    if (ts_ast::get_assignment_declaration_kind(
+                        self.ast(declaration)?,
+                        declaration,
+                    )? != J::ExportsProperty
                         || index != 0
                         || declarations.len() == 1
-                        || self.types.flags(assigned)? & tf::UNDEFINED == 0
+                        || self.types.flags(assigned)? & tf::UNDEFINED == 0)
+                        && !types.contains(&assigned)
                     {
-                        if !types.contains(&assigned) {
-                            types.push(assigned);
-                        }
+                        types.push(assigned);
                     }
                 }
             }

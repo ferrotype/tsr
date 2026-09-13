@@ -502,6 +502,10 @@ impl CheckerState {
         self.ensure_primitive_alias_suggestions();
         self.resolve_name_mode(location, name, meaning, None, false, false, true)
     }
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Parameters preserve the upstream operation and its independently selected checking modes"
+    )]
     fn resolve_name_mode(
         &mut self,
         location: Option<NodeId>,
@@ -566,7 +570,7 @@ impl CheckerState {
                     }
                     Effect::Resolved(resolution) => self.on_source_symbol_resolved(resolution)?,
                     Effect::Failed(location, name, meaning, message) => {
-                        self.on_failed_source_name(location, name.as_bytes(), meaning, message)?
+                        self.on_failed_source_name(location, name.as_bytes(), meaning, message)?;
                     }
                     Effect::InvalidInitializer(location, name, property, result) => self
                         .report_invalid_initializer(location, name.as_bytes(), property, result)?,

@@ -374,7 +374,7 @@ impl CheckerState {
                         .data_source()
                         .as_tagged_template_expression()
                         .and_then(|data| data.tag())
-                        .ok_or(Error::MissingLink("deprecated template tag"))?
+                        .ok_or(Error::MissingLink("deprecated template tag"))?;
                 }
                 Some(K::TypeReference) => {
                     let name = read

@@ -125,6 +125,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/flow.go:Checker.narrowTypeByInstanceof
+    #[allow(
+        clippy::nonminimal_bool,
+        reason = "Keep the native predicate grouping and short-circuit order of fallible type queries"
+    )]
     pub(crate) fn narrow_flow_instanceof(
         &mut self,
         reference: NodeId,

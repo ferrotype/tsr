@@ -118,7 +118,7 @@ impl CheckerState {
                 }
                 let signatures = self.signatures_of_type(method_type, false)?;
                 let mut returns = Vec::new();
-                for &signature in signatures.iter() {
+                for &signature in &signatures {
                     if self.min_argument_count(signature)? == 0 {
                         returns.push(self.return_type_of_signature(signature)?);
                     }
@@ -275,7 +275,7 @@ impl CheckerState {
         }
         let mut parameter_types = Vec::new();
         let mut method_return_types = Vec::new();
-        for &signature in signatures.iter() {
+        for &signature in &signatures {
             if name != b"throw"
                 && self
                     .signatures
@@ -317,7 +317,10 @@ impl CheckerState {
             .resolve_iteration_type(method_return_type, asynchronous, error_node)?
             .unwrap_or(self.builtins.any_type);
         let result = self.iteration_types_of_iterator_result(method_return_type)?;
-        let yield_type = if !result.has_types() {
+        let yield_type = if result.has_types() {
+            return_types.extend(result.return_type);
+            result.yield_type
+        } else {
             if let Some(node) = error_node {
                 diagnostics.push(self.diagnostic_for_node(
                     Some(node),
@@ -327,9 +330,6 @@ impl CheckerState {
             }
             return_types.push(self.builtins.any_type);
             Some(self.builtins.any_type)
-        } else {
-            return_types.extend(result.return_type);
-            result.yield_type
         };
         Ok(IterationTypes {
             yield_type,
@@ -362,18 +362,18 @@ impl CheckerState {
         let yield_result = self.filter_type(ty, &mut |checker, part| {
             checker.is_iteration_result(part, true)
         })?;
-        let yield_type = if yield_result != self.builtins.never_type {
-            self.property_type(yield_result, b"value")?
-        } else {
+        let yield_type = if yield_result == self.builtins.never_type {
             None
+        } else {
+            self.property_type(yield_result, b"value")?
         };
         let return_result = self.filter_type(ty, &mut |checker, part| {
             checker.is_iteration_result(part, false)
         })?;
-        let return_type = if return_result != self.builtins.never_type {
-            self.property_type(return_result, b"value")?
-        } else {
+        let return_type = if return_result == self.builtins.never_type {
             None
+        } else {
+            self.property_type(return_result, b"value")?
         };
         if yield_type.is_none() && return_type.is_none() {
             return Ok(IterationTypes::default());

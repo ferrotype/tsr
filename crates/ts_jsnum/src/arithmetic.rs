@@ -30,41 +30,49 @@ impl Number {
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.SignedRightShift
+    #[must_use]
     pub fn signed_right_shift(self, other: Self) -> Self {
         Self::new(f64::from(self.to_int32() >> other.shift_count()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.UnsignedRightShift
+    #[must_use]
     pub fn unsigned_right_shift(self, other: Self) -> Self {
         Self::new(f64::from(self.to_uint32() >> other.shift_count()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.LeftShift
+    #[must_use]
     pub fn left_shift(self, other: Self) -> Self {
         Self::new(f64::from(self.to_int32().wrapping_shl(other.shift_count())))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.BitwiseNOT
+    #[must_use]
     pub fn bitwise_not(self) -> Self {
         Self::new(f64::from(!self.to_int32()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.BitwiseOR
+    #[must_use]
     pub fn bitwise_or(self, other: Self) -> Self {
         Self::new(f64::from(self.to_int32() | other.to_int32()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.BitwiseAND
+    #[must_use]
     pub fn bitwise_and(self, other: Self) -> Self {
         Self::new(f64::from(self.to_int32() & other.to_int32()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.BitwiseXOR
+    #[must_use]
     pub fn bitwise_xor(self, other: Self) -> Self {
         Self::new(f64::from(self.to_int32() ^ other.to_int32()))
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.Remainder
+    #[must_use]
     pub fn remainder(self, divisor: Self) -> Self {
         let value = self.value();
         let divisor = divisor.value();
@@ -84,6 +92,7 @@ impl Number {
     }
 
     // port: tsc/internal/jsnum/jsnum.go:Number.Exponentiate
+    #[must_use]
     pub fn exponentiate(self, exponent: Self) -> Self {
         let base = self.value();
         let exponent = exponent.value();

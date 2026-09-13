@@ -712,10 +712,10 @@ impl CheckerState {
             .iter()
             .chain(self.symbol_declarations(type_symbol)?.iter())
         {
-            if !declarations.contains(&declaration) {
-                declarations.push(declaration);
-            }
+            declarations.push(declaration);
         }
+        // Go's slices.Compact removes adjacent duplicates only.
+        declarations.dedup();
         if declarations.is_empty() {
             return Err(Error::MissingLink("combined symbol declarations"));
         }

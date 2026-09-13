@@ -384,10 +384,10 @@ impl CheckerState {
         let mut remove = true;
         for &part in parts {
             let flags = self.types.flags(part)?;
-            remove &= if equal != assume {
-                flags & nullable != 0
-            } else {
+            remove &= if equal == assume {
                 flags & (tf::ANY_OR_UNKNOWN | nullable) == 0
+            } else {
+                flags & nullable != 0
             };
         }
         if remove {

@@ -8,6 +8,10 @@ struct Host {
     fs: Arc<dyn FileSystem>,
     cwd: JsString,
 }
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "This conversion consumes the error supplied by Result::map_err"
+)]
 fn module_error(error: ts_module::Error) -> ts_vfs::Error {
     match error {
         ts_module::Error::Host(error) => error,

@@ -477,7 +477,10 @@ impl CheckerState {
         }
         let ty = self.get_type_of_expression(expression)?;
         let name = self.index_property_name(ty)?;
-        *self.emit_checks.computed_names.get_or_default(node) = name.clone();
+        self.emit_checks
+            .computed_names
+            .get_or_default(node)
+            .clone_from(&name);
         Ok(name)
     }
 }

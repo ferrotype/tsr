@@ -210,7 +210,7 @@ impl CheckerState {
             }
             if let Some(star) = export_star {
                 if self.ast(star)?.node(star)?.is_type_only() {
-                    for (name, _) in &symbols {
+                    for name in symbols.keys() {
                         traversal.type_only.insert(name.clone(), star);
                     }
                 }

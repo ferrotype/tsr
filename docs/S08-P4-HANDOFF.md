@@ -1,5 +1,11 @@
 # S08 P4 handoff
 
+**Current continuation:** see [the 2026-09-13 takeover review](S08-P4-REVIEW.md)
+for the reviewed dirty increment, eight-commit audit, corrections and remaining
+work. The sections below retain the earlier handoff and Claude's implementation
+history. Inventory-07 is now the latest full execution run; the review adds
+focused reruns rather than claiming a new full capture.
+
 The owner requested a pause after active work. **P4 is incomplete; P5–P8 have
 not started.** This is an implementation checkpoint, not an acceptance result.
 The original request was P4 on PR #19, then one stacked PR per later checkpoint.

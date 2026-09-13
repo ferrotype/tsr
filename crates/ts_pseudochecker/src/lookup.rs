@@ -1,4 +1,13 @@
-use crate::{types::*, Error, Host, PseudoChecker};
+use crate::{
+    types::{
+        bigint, bigint_literal, boolean, direct, false_type, inferred, inferred_with_errors,
+        maybe_const_location, no_result, null, number, numeric_literal, object_literal,
+        single_call_signature, string, string_literal, true_type, tuple, undefined, union,
+        PseudoObjectElement, PseudoObjectElementData, PseudoParameter, PseudoSignature, PseudoType,
+        PseudoTypeData, PseudoTypeKind,
+    },
+    Error, Host, PseudoChecker,
+};
 use ts_arena::NodeId;
 use ts_ast::{
     modifier_flags as mf, node_flags as nf, AstView, NodeListId, NodeRead, SyntaxKind as K,
@@ -113,7 +122,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     fn node(&self, node: NodeId) -> R<NodeRead<'_>, H> {
         Ok(self.ast(node)?.node(node)?)
     }
-    fn required<T>(&self, value: Option<T>, context: &'static str) -> R<T, H> {
+    fn required<T>(value: Option<T>, context: &'static str) -> R<T, H> {
         value.ok_or_else(|| Error::MissingLink(context).into())
     }
     fn bad_kind(&self, node: NodeId, operation: &'static str) -> R<H::Error, H> {
@@ -142,10 +151,10 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         self.list(node, self.node(node)?.type_parameter_list())
     }
     fn name(&self, node: NodeId) -> R<NodeId, H> {
-        self.required(self.node(node)?.name(), "pseudo declaration name")
+        Self::required(self.node(node)?.name(), "pseudo declaration name")
     }
     fn expression(&self, node: NodeId) -> R<NodeId, H> {
-        self.required(self.node(node)?.expression(), "pseudo expression")
+        Self::required(self.node(node)?.expression(), "pseudo expression")
     }
     fn is_const_assertion(&self, node: NodeId) -> R<bool, H> {
         let read = self.node(node)?;
@@ -155,7 +164,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         ) {
             return Ok(false);
         }
-        let annotation = self.required(read.type_node(), "pseudo assertion type")?;
+        let annotation = Self::required(read.type_node(), "pseudo assertion type")?;
         self.is_const_type_reference(annotation)
     }
     fn is_const_type_reference(&self, node: NodeId) -> R<bool, H> {
@@ -335,7 +344,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         if !setter && read.kind() != K::GetAccessor {
             return Err(self.bad_kind(node, "accessor pairing")?);
         }
-        let declarations = self.required(
+        let declarations = Self::required(
             self.host.raw_symbol_declarations(node)?,
             "pseudo accessor symbol",
         )?;
@@ -502,7 +511,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 return self.type_from_function_expression(node)
             }
             Some(K::TypeAssertionExpression | K::AsExpression) => {
-                let annotation = self.required(read.type_node(), "pseudo assertion annotation")?;
+                let annotation = Self::required(read.type_node(), "pseudo assertion annotation")?;
                 return if self.is_const_type_reference(annotation)? {
                     self.type_from_expression(self.expression(node)?)
                 } else {
@@ -544,11 +553,11 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     }
     fn type_from_primitive_prefix(&self, node: NodeId) -> R<PseudoType, H> {
         let read = self.node(node)?;
-        let data = self.required(
+        let data = Self::required(
             read.data_source().as_prefix_unary_expression(),
             "pseudo prefix",
         )?;
-        let operand = self.required(data.operand(), "pseudo prefix operand")?;
+        let operand = Self::required(data.operand(), "pseudo prefix operand")?;
         let literal = if data.operator() == K::PlusToken {
             operand
         } else {
@@ -614,7 +623,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 }
                 Some(K::PropertyAssignment) => {
                     let initializer =
-                        self.required(read.initializer(), "pseudo property initializer")?;
+                        Self::required(read.initializer(), "pseudo property initializer")?;
                     elements.push(PseudoObjectElement::property(
                         false,
                         name,
@@ -772,7 +781,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     }
     fn type_node_could_refer_to_undefined_worker(&self, mut node: NodeId) -> R<bool, H> {
         while self.node(node)?.kind() == K::ParenthesizedType {
-            node = self.required(self.node(node)?.type_node(), "parenthesized pseudo type")?;
+            node = Self::required(self.node(node)?.type_node(), "parenthesized pseudo type")?;
         }
         let read = self.node(node)?;
         match read.kind().known() {
@@ -824,7 +833,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             }
             match ty.as_ref() {
                 PseudoTypeData::MaybeConstLocation { regular_type, .. } => {
-                    pending.push(regular_type)
+                    pending.push(regular_type);
                 }
                 PseudoTypeData::Direct { type_node } => {
                     if self.type_node_could_refer_to_undefined(*type_node)? {
@@ -845,13 +854,12 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         })
     }
     fn parameter_rest(&self, node: NodeId) -> R<bool, H> {
-        Ok(self
-            .required(
-                self.node(node)?.data_source().as_parameter_declaration(),
-                "pseudo parameter",
-            )?
-            .dot_dot_dot_token()
-            .is_some())
+        Ok(Self::required(
+            self.node(node)?.data_source().as_parameter_declaration(),
+            "pseudo parameter",
+        )?
+        .dot_dot_dot_token()
+        .is_some())
     }
     fn last_required_parameter(&self, parameters: &[NodeId]) -> R<usize, H> {
         for (index, &parameter) in parameters.iter().enumerate().rev() {
@@ -868,7 +876,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromParameter
     fn type_from_parameter(&self, node: NodeId) -> R<PseudoType, H> {
         let read = self.node(node)?;
-        let parent = self.required(read.parent(), "pseudo parameter parent")?;
+        let parent = Self::required(read.parent(), "pseudo parameter parent")?;
         if self.node(parent)?.kind() == K::SetAccessor {
             return self.type_from_accessor(parent);
         }
@@ -890,7 +898,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         last_required: usize,
     ) -> R<PseudoType, H> {
         let read = self.node(node)?;
-        let parent = self.required(read.parent(), "pseudo parameter parent")?;
+        let parent = Self::required(read.parent(), "pseudo parameter parent")?;
         if self.node(parent)?.kind() == K::SetAccessor {
             return self.type_from_accessor(parent);
         }

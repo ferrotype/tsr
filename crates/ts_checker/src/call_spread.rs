@@ -188,8 +188,8 @@ impl CheckerState {
         }
         let mut types = Vec::new();
         let mut infos = Vec::new();
-        for index in start..count {
-            let argument = args[index];
+        for (offset, &argument) in args[start..count].iter().enumerate() {
+            let index = start + offset;
             let synthetic = self.ast(argument)?.node(argument)?.kind() == K::SyntheticExpression;
             let (ty, flags) = if self.is_spread_argument(argument)? {
                 let operand = if synthetic {

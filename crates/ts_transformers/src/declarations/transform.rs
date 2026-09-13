@@ -59,7 +59,7 @@ pub fn transform_declarations<R: DeclarationEmitResolver>(
         external_indicator: false,
         replacements: HashMap::new(),
         visitor_error: None,
-        cjs: Default::default(),
+        cjs: super::common_js::CommonJsState::default(),
     };
     let root = tx.source_file(source)?;
     Ok(DeclarationTransform {
@@ -107,13 +107,13 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             BUILDER_FLAGS
         }
     }
-    pub fn unsupported<T>(&self, name: &'static str) -> Result<T, R::Error> {
+    pub fn unsupported<T>(name: &'static str) -> Result<T, R::Error> {
         Err(R::unsupported(name))
     }
     pub fn node(&self, node: NodeId) -> ts_ast::NodeRead<'_> {
         Factory::node(&*self.output, node)
     }
-    pub fn required(&self, node: Option<NodeId>) -> Result<NodeId, R::Error> {
+    pub fn required(node: Option<NodeId>) -> Result<NodeId, R::Error> {
         node.ok_or_else(|| ts_arena::Error::InvalidGraph.into())
     }
     pub fn list_nodes(&self, list: Option<NodeListId>) -> Vec<NodeId> {
@@ -276,7 +276,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             match pending {
                 Pending::SelectorError(error) => return Err(error.into()),
                 Pending::Accessibility(info, result) => {
-                    let node = self.required(result.error_node.or(info.error_node))?;
+                    let node = Self::required(result.error_node.or(info.error_node))?;
                     let mut args = Vec::new();
                     if let Some(name) = info.type_name {
                         args.push(self.name_text(name)?);
@@ -285,7 +285,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     self.diagnostic(node, info.diagnostic_message, args)?;
                 }
                 Pending::Report(Event::PushErrorFallbackNode(node)) => {
-                    self.tracker.fallback.push(node)
+                    self.tracker.fallback.push(node);
                 }
                 Pending::Report(Event::PopErrorFallbackNode) => {
                     if self.tracker.fallback.pop().is_none() {
@@ -298,7 +298,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     parent_symbol,
                     augmenting_symbol,
                 }) => {
-                    self.nonlocal_augmentation(containing_file, parent_symbol, augmenting_symbol)?
+                    self.nonlocal_augmentation(containing_file, parent_symbol, augmenting_symbol)?;
                 }
                 Pending::Report(event) => {
                     let location =
@@ -314,7 +314,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         Event::LikelyUnsafeImportRequired { specifier, symbol_name } => if symbol_name.is_empty() { (&d::The_inferred_type_of_0_cannot_be_named_without_a_reference_to_1_This_is_likely_not_portable_A_type_annotation_is_necessary, vec![name, specifier]) } else { (&d::The_inferred_type_of_0_cannot_be_named_without_a_reference_to_2_from_1_This_is_likely_not_portable_A_type_annotation_is_necessary, vec![name, specifier, symbol_name]) },
                         Event::Truncation => (&d::The_inferred_type_of_this_node_exceeds_the_maximum_length_the_compiler_will_serialize_An_explicit_type_annotation_is_needed, vec![]),
                         Event::NonSerializableProperty(property) => (&d::The_type_of_this_node_cannot_be_serialized_because_its_property_0_cannot_be_serialized, vec![property]),
-                        Event::PrivateInBaseOfClassExpression(property) => { self.diagnostic(location, &d::Property_0_of_exported_anonymous_class_type_may_not_be_private_or_protected, vec![property])?; if self.node(location).parent().is_some_and(|p| self.node(p).kind() == K::VariableDeclaration) { let related = super::diagnostics::diagnostic_for_node(self.resolver.ast(location)?, Some(location), &d::Add_a_type_annotation_to_the_variable_0, vec![name])?; self.diagnostics.last_mut().expect("just added diagnostic").related_information.push(std::sync::Arc::new(related)); } continue; }
+                        Event::PrivateInBaseOfClassExpression(property) => { self.diagnostic(location, d::Property_0_of_exported_anonymous_class_type_may_not_be_private_or_protected, vec![property])?; if self.node(location).parent().is_some_and(|p| self.node(p).kind() == K::VariableDeclaration) { let related = super::diagnostics::diagnostic_for_node(self.resolver.ast(location)?, Some(location), d::Add_a_type_annotation_to_the_variable_0, vec![name])?; self.diagnostics.last_mut().expect("just added diagnostic").related_information.push(std::sync::Arc::new(related)); } continue; }
                         _ => return Err(ts_arena::Error::InvalidGraph.into()),
                     };
                     self.diagnostic(location, message, args)?;

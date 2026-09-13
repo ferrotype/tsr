@@ -217,8 +217,8 @@ impl CheckerState {
         };
         let mut valid = true;
         for part in parts {
-            if !self.is_type_related_to(part, key, crate::RelationKind::Assignable)?
-                && !(number && self.applicable_index_type(part, self.builtins.number_type)?)
+            if !(self.is_type_related_to(part, key, crate::RelationKind::Assignable)?
+                || number && self.applicable_index_type(part, self.builtins.number_type)?)
             {
                 valid = false;
                 break;
@@ -593,10 +593,10 @@ impl CheckerState {
             )?;
             return Ok(ty);
         }
-        if assignment != AssignmentKind::None {
-            self.base_literal_type(flow)
-        } else {
+        if assignment == AssignmentKind::None {
             Ok(flow)
+        } else {
+            self.base_literal_type(flow)
         }
     }
 
@@ -648,11 +648,12 @@ impl CheckerState {
         node: NodeId,
         property: SymbolId,
     ) -> Result<bool, Error> {
-        let constructor = match self.constructor_this_assignment(property)? {
-            crate::assignment_declarations::ThisAssignment::Constructor(constructor) => {
+        let constructor =
+            if let crate::assignment_declarations::ThisAssignment::Constructor(constructor) =
+                self.constructor_this_assignment(property)?
+            {
                 Some(constructor)
-            }
-            _ => {
+            } else {
                 let is_this = match self.access_receiver(node)? {
                     Some(left) => self.ast(left)?.node(left)?.kind() == K::ThisKeyword,
                     None => false,
@@ -662,8 +663,7 @@ impl CheckerState {
                 } else {
                     None
                 }
-            }
-        };
+            };
         Ok(constructor
             == Some(ts_ast::get_this_container(
                 self.ast(node)?,

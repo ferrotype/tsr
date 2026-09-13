@@ -39,7 +39,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     let declarations = self.resolver.symbol_declarations(export)?;
                     if declarations.len() > 1 {
                         for declaration in declarations {
-                            self.diagnostic(declaration, &ts_diagnostics::Multiple_module_exports_assignments_cannot_be_serialized_for_declaration_emit, vec![])?;
+                            self.diagnostic(declaration, ts_diagnostics::Multiple_module_exports_assignments_cannot_be_serialized_for_declaration_emit, vec![])?;
                         }
                     }
                 }
@@ -242,7 +242,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             Some(K::EnumDeclaration) => self.enum_declaration(node).map(Some),
             Some(K::ModuleDeclaration) => self.module_declaration(node).map(Some),
             Some(K::ClassDeclaration) => self.class_declaration(node).map(Some),
-            _ => self.unsupported("declaration emit: top-level declaration kind"),
+            _ => Self::unsupported("declaration emit: top-level declaration kind"),
         }
     }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.isInternalDeclaration
@@ -264,7 +264,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 .any(|window| window == b"@internal"))
         };
         if self.node(node).kind() == K::Parameter {
-            let parent = self.required(self.node(node).parent())?;
+            let parent = Self::required(self.node(node).parent())?;
             let parameters = self.list_nodes(self.node(parent).parameter_list());
             let index = parameters.iter().position(|parameter| *parameter == node);
             let previous = index
@@ -343,10 +343,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         } else {
             0
         };
-        if !self
+        if self
             .node(node)
             .parent()
-            .is_some_and(|p| self.node(p).kind() == K::SourceFile)
+            .is_none_or(|p| self.node(p).kind() != K::SourceFile)
         {
             mask ^= mf::AMBIENT;
             additions = 0;
@@ -389,7 +389,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             .as_variable_statement()
             .unwrap()
             .to_owned();
-        let declaration_list = self.required(data.declaration_list)?;
+        let declaration_list = Self::required(data.declaration_list)?;
         let declarations = self
             .node(declaration_list)
             .as_variable_declaration_list()
@@ -465,12 +465,12 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         &mut self,
         node: NodeId,
     ) -> Result<Option<NodeId>, R::Error> {
-        let initializer = self.required(self.node(node).initializer())?;
+        let initializer = Self::required(self.node(node).initializer())?;
         let arguments = self.list_nodes(self.node(initializer).argument_list());
-        let specifier = self.required(arguments.first().copied())?;
+        let specifier = Self::required(arguments.first().copied())?;
         // Declaration diagnostics have no output relocation; the original
         // module literal is the native rewriteModuleSpecifier result here.
-        let name = self.required(self.node(node).name())?;
+        let name = Self::required(self.node(node).name())?;
         match self.node(name).kind().known() {
             Some(K::Identifier) => {
                 let reference = self.output.new_external_module_reference(Some(specifier));
@@ -536,7 +536,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 && value.has_external_references
                 && name.is_none_or(|n| self.node(n).kind() != K::ComputedPropertyName)
             {
-                self.diagnostic(member, &ts_diagnostics::Enum_member_initializers_must_be_computable_without_references_to_external_symbols_with_isolatedDeclarations, vec![])?;
+                self.diagnostic(member, ts_diagnostics::Enum_member_initializers_must_be_computable_without_references_to_external_symbols_with_isolatedDeclarations, vec![])?;
             }
             let initializer = match value.value {
                 None => None,
@@ -584,7 +584,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             .as_import_equals_declaration()
             .unwrap()
             .to_owned();
-        let reference = self.required(data.module_reference)?;
+        let reference = Self::required(data.module_reference)?;
         if self.node(reference).kind() == K::ExternalModuleReference {
             self.external_indicator = true;
             return Ok(Some(node));
@@ -665,7 +665,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             && self.resolver.import_required_by_augmentation(node)?
         {
             if self.options.isolated_declarations {
-                self.diagnostic(node, &ts_diagnostics::Declaration_emit_for_this_file_requires_preserving_this_import_for_augmentations_This_is_not_supported_with_isolatedDeclarations, vec![])?;
+                self.diagnostic(node, ts_diagnostics::Declaration_emit_for_this_file_requires_preserving_this_import_for_augmentations_This_is_not_supported_with_isolatedDeclarations, vec![])?;
             }
             self.external_indicator = true;
             return Ok(Some(self.output.update_import_declaration(

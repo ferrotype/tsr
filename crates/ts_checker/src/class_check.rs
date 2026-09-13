@@ -132,24 +132,22 @@ impl CheckerState {
                     }
                 }
                 let base_with_this = self.get_type_with_this_argument(base, this, false)?;
-                if !self.is_type_related_to(with_this, base_with_this, RelationKind::Assignable)? {
+                if self.is_type_related_to(with_this, base_with_this, RelationKind::Assignable)? {
+                    let without_signatures = self.type_without_signatures(static_base)?;
+                    let (_, diagnostic) = self.check_type_related_ex(static_type, without_signatures, RelationKind::Assignable, Some(name.unwrap_or(node)), Some(messages::Class_static_side_0_incorrectly_extends_base_class_static_side_1))?;
+                    if let Some(diagnostic) = diagnostic {
+                        self.add_diagnostic(diagnostic)?;
+                    }
+                } else {
                     self.issue_class_member_error(
                         node,
                         with_this,
                         base_with_this,
                         messages::Class_0_incorrectly_extends_base_class_1,
                     )?;
-                } else {
-                    let without_signatures = self.type_without_signatures(static_base)?;
-                    let (_, diagnostic) = self.check_type_related_ex(static_type, without_signatures, RelationKind::Assignable, Some(name.unwrap_or(node)), Some(messages::Class_static_side_0_incorrectly_extends_base_class_static_side_1))?;
-                    if let Some(diagnostic) = diagnostic {
-                        self.add_diagnostic(diagnostic)?;
-                    }
                 }
                 if self.types.flags(constructor)? & tf::TYPE_VARIABLE != 0 {
-                    if !self.is_mixin_constructor_type(static_type)? {
-                        self.error_at(Some(name.unwrap_or(node)),messages::A_mixin_class_must_have_a_constructor_with_a_single_rest_parameter_of_type_any,vec![])?;
-                    } else {
+                    if self.is_mixin_constructor_type(static_type)? {
                         let mut abstract_base = false;
                         for signature in self.signatures_of_type(constructor, true)? {
                             if self.signatures.get(signature)?.flags
@@ -163,6 +161,8 @@ impl CheckerState {
                         if abstract_base && modifiers & mf::ABSTRACT == 0 {
                             self.error_at(Some(name.unwrap_or(node)),messages::A_mixin_class_that_extends_from_a_type_variable_containing_an_abstract_construct_signature_must_also_be_declared_abstract,vec![])?;
                         }
+                    } else {
+                        self.error_at(Some(name.unwrap_or(node)),messages::A_mixin_class_must_have_a_constructor_with_a_single_rest_parameter_of_type_any,vec![])?;
                     }
                 }
                 let class_constructor = self

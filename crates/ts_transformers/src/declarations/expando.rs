@@ -8,8 +8,8 @@ use ts_printer::{emit_resolver::DeclarationEmitResolver, AutoGenerateOptions};
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     fn expando_host_root(&self, declaration: NodeId) -> Result<NodeId, R::Error> {
         let root = if self.node(declaration).kind() == K::VariableDeclaration {
-            let list = self.required(self.node(declaration).parent())?;
-            self.required(self.node(list).parent())?
+            let list = Self::required(self.node(declaration).parent())?;
+            Self::required(self.node(list).parent())?
         } else {
             declaration
         };
@@ -23,7 +23,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if self.resolver.symbol_flags(symbol)? & sf::ASSIGNMENT == 0 {
             return Ok(());
         }
-        let left = self.required(self.node(node).as_binary_expression().unwrap().left())?;
+        let left = Self::required(self.node(node).as_binary_expression().unwrap().left())?;
         let namespace = ts_ast::get_leftmost_access_expression(self.output.view(), left)?;
         if self.node(namespace).kind() != K::Identifier {
             return Ok(());
@@ -34,17 +34,16 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if self.strip_internal(declaration)? {
             return Ok(());
         }
-        if self.node(declaration).kind() == K::VariableDeclaration {
-            if self.node(declaration).type_node().is_some()
+        if self.node(declaration).kind() == K::VariableDeclaration
+            && (self.node(declaration).type_node().is_some()
                 || !self
                     .node(declaration)
                     .initializer()
                     .is_some_and(|initializer| {
                         ts_ast::utilities::is_function_like(Some(&self.node(initializer)))
-                    })
-            {
-                return Ok(());
-            }
+                    }))
+        {
+            return Ok(());
         }
         if self.node(declaration).kind() == K::FunctionDeclaration
             && self
@@ -68,7 +67,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             Some(K::PropertyAccessExpression) => self
                 .output
                 .view()
-                .node_text(self.required(self.node(left).name())?)?
+                .node_text(Self::required(self.node(left).name())?)?
                 .into_js_string(),
             _ => JsString::default(),
         };
@@ -126,7 +125,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         };
         let context = self.save_expression_context(node)?;
         let result = (|| {
-            let right = self.required(self.node(node).as_binary_expression().unwrap().right())?;
+            let right = Self::required(self.node(node).as_binary_expression().unwrap().right())?;
             if self.node(right).kind() == K::Identifier {
                 let export = self.binary_export(node, export_name)?;
                 self.cjs
@@ -219,7 +218,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             let function = if self.node(declaration).kind() == K::FunctionDeclaration {
                 declaration
             } else if self.node(declaration).kind() == K::VariableDeclaration {
-                self.required(self.node(declaration).initializer())?
+                Self::required(self.node(declaration).initializer())?
             } else {
                 let replacement = self.top_level(declaration)?;
                 self.cjs.expando_hosts.insert(root, replacement);
@@ -235,7 +234,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     data.as_function_expression().unwrap().asterisk_token()
                 }
                 Some(K::ArrowFunction) => None,
-                _ => return self.unsupported("declaration emit: expando host function kind"),
+                _ => return Self::unsupported("declaration emit: expando host function kind"),
             };
             drop(read);
             let type_parameters = self.type_parameters(function)?;
@@ -315,7 +314,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         else {
             return Ok(Some(host));
         };
-        let name = self.required(self.node(named).name())?;
+        let name = Self::required(self.node(named).name())?;
         let name = self
             .output
             .clone_node_generated(name)
@@ -347,7 +346,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             ts_ast::NodeData::ClassDeclaration(d) => d.modifiers = modifiers,
             ts_ast::NodeData::ModuleDeclaration(d) => d.modifiers = modifiers,
             ts_ast::NodeData::EnumDeclaration(d) => d.modifiers = modifiers,
-            _ => return self.unsupported("declaration emit: replace declaration modifiers"),
+            _ => return Self::unsupported("declaration emit: replace declaration modifiers"),
         }
         let result = self.output.new_node(self.node(node).kind(), data);
         Ok(self.output.finish_update(result, node))

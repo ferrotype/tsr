@@ -342,12 +342,12 @@ fn checker_host_retains_program_and_preserves_foreign_source_and_vfs_errors() {
         Err(Error::Arena(ts_arena::Error::WrongOwner))
     );
     assert_eq!(host.file_exists(b"loop"), Err(ts_vfs::Error::SymlinkCycle));
-    assert!(matches!(
-        host.get_redirect_for_resolution(b"main.ts"),
-        Err(Error::Unsupported(
-            "GetRedirectForResolution: project references"
-        ))
-    ));
+    // Project references are rejected before files load, so the native lookup
+    // is an empty one rather than an unported boundary.
+    assert!(host
+        .get_redirect_for_resolution(b"main.ts")
+        .unwrap()
+        .is_none());
     assert!(host
         .get_project_reference_from_output_dts(b"main.d.ts")
         .unwrap()

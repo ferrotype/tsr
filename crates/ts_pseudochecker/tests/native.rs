@@ -60,7 +60,7 @@ impl TestHost {
         r["node"] = self.node(s.signature);
         r["parameters"] = self.parameters(&s.parameters);
         r["type_parameters"] = self.nodes(&s.type_parameters);
-        r["return"] = self.tree(&s.return_type)
+        r["return"] = self.tree(&s.return_type);
     }
     fn tree(&self, t: &PseudoType) -> Value {
         let mut r = json!({"kind":t.kind() as i16});
@@ -78,10 +78,10 @@ impl TestHost {
      PseudoObjectElementData::PropertyAssignment{readonly,ty}=>{m["readonly"]=json!(readonly);m["type"]=self.tree(ty);}
      PseudoObjectElementData::SetAccessor{signature,parameter}=>{m["node"]=self.node(*signature);m["parameter"]=self.parameter(parameter);}
      PseudoObjectElementData::GetAccessor{signature,ty}=>{m["node"]=self.node(*signature);m["type"]=self.tree(ty);}
-    };m
+    }m
    }).collect()),
    PseudoTypeData::Undefined|PseudoTypeData::Null|PseudoTypeData::Any|PseudoTypeData::String|PseudoTypeData::Number|PseudoTypeData::BigInt|PseudoTypeData::Boolean|PseudoTypeData::True|PseudoTypeData::False=>{}
-  };
+  }
         r
     }
     fn children(&self, node: NodeId) -> Vec<NodeId> {
@@ -129,7 +129,7 @@ fn operations(k: K) -> Vec<&'static str> {
             | K::ShorthandPropertyAssignment
             | K::CallExpression
     ) {
-        ops.push("declaration")
+        ops.push("declaration");
     }
     if matches!(
         k,
@@ -154,7 +154,7 @@ fn operations(k: K) -> Vec<&'static str> {
             | K::FalseKeyword
             | K::CallExpression
     ) {
-        ops.push("expression")
+        ops.push("expression");
     }
     if matches!(
         k,
@@ -173,13 +173,17 @@ fn operations(k: K) -> Vec<&'static str> {
             | K::ArrowFunction
             | K::JSDocSignature
     ) {
-        ops.push("return")
+        ops.push("return");
     }
     if matches!(k, K::GetAccessor | K::SetAccessor) {
-        ops.push("accessor")
-    };
+        ops.push("accessor");
+    }
     ops
 }
+#[allow(
+    clippy::case_sensitive_file_extension_comparisons,
+    reason = "The pinned test filenames and upstream extension matching are case sensitive"
+)]
 fn parse(file: &str, source: &str) -> TestHost {
     let parsed = ts_parser::parse_source_file(
         ts_jsstring::SourceText::from_loaded_bytes(source.as_bytes()),

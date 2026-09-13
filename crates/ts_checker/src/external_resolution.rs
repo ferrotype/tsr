@@ -626,6 +626,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/ast/utilities.go:IsEmittableImport
+    #[allow(
+        clippy::match_same_arms,
+        reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+    )]
     fn module_import_emittable(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
             let read = self.ast(node)?.node(node)?;

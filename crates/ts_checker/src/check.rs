@@ -62,7 +62,14 @@ impl CheckerState {
                     .identifier_check_nodes
                     .remove(&source)
                     .unwrap_or_default();
-                self.check_unused_identifiers(nodes)?;
+                if let Err(error) = self.check_unused_identifiers(nodes) {
+                    // The queue has been consumed and may have emitted some
+                    // diagnostics. A retry must not turn an empty queue into
+                    // success after a failed suggestion/unused pass.
+                    self.source_checks
+                        .insert(source, SourceCheckStatus::Failed(error));
+                    return Err(error);
+                }
             }
             self.query.unused_checked.insert(source);
         }
@@ -74,12 +81,15 @@ impl CheckerState {
         let file = view.source_file(source)?;
         if !matches!(
             file.script_kind,
-            ts_core::ScriptKind::TS | ts_core::ScriptKind::JS
+            ts_core::ScriptKind::TS
+                | ts_core::ScriptKind::JS
+                | ts_core::ScriptKind::TSX
+                | ts_core::ScriptKind::JSX
         ) {
-            return Err(Error::Unsupported(
-                "checkSourceFile: JSX or non-script input",
-            ));
+            return Err(Error::Unsupported("checkSourceFile: non-script input"));
         }
+        // A TSX/JSX file can contain only ordinary declarations or imports.
+        // Reject unported JSX expressions at their operation, not by file kind.
         self.check_grammar_source(source)?;
         self.query.renamed_binding_elements_in_types.clear();
         let view = self.ast(source)?;
@@ -118,6 +128,10 @@ impl CheckerState {
         result
     }
 
+    #[allow(
+        clippy::match_same_arms,
+        reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+    )]
     fn check_source_element_worker(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_eager_jsdoc(node)?;
         if !self.within_unreachable_code
@@ -296,7 +310,10 @@ impl CheckerState {
                 .map(|_| ()),
             Some(K::EmptyStatement) => Ok(()),
             Some(K::DebuggerStatement) => self.check_statement_ambient_context(node).map(|_| ()),
-            Some(K::MissingDeclaration) => self.check_missing_declaration(node),
+            Some(K::MissingDeclaration) => {
+                Self::check_missing_declaration(node);
+                Ok(())
+            }
             // Upstream's switch has no case for these; `export as namespace` is
             // checked through its alias target and a stray `;` class member has
             // nothing to check.
@@ -313,9 +330,7 @@ impl CheckerState {
     /// A missing declaration can carry modifiers but never decorators upstream
     /// recognizes (`CanHaveDecorators`), so `checkDecorators` returns at once.
     // port: tsc/internal/checker/checker.go:Checker.checkMissingDeclaration
-    fn check_missing_declaration(&mut self, _node: NodeId) -> Result<(), Error> {
-        Ok(())
-    }
+    fn check_missing_declaration(_node: NodeId) {}
 
     // port: tsc/internal/checker/checker.go:Checker.checkUnionOrIntersectionType
     fn check_union_or_intersection_type(&mut self, node: NodeId) -> Result<(), Error> {

@@ -85,7 +85,7 @@ pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -
             Ok(values) => semantic.extend(values),
             Err(error) => {
                 if semantic_error.is_none() {
-                    semantic_error = Some(Error::from(error));
+                    semantic_error = Some(error);
                 }
             }
         }

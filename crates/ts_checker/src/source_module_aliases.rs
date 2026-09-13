@@ -55,7 +55,9 @@ impl CheckerState {
         }
         if specifier.is_none() || self.check_external_import_or_export(node)? {
             if let Some(clause) = clause {
-                if self.ast(clause)?.node(clause)?.kind() != K::NamespaceExport {
+                if self.ast(clause)?.node(clause)?.kind() == K::NamespaceExport {
+                    self.check_export_star(node, Some(clause), specifier)?;
+                } else {
                     for element in
                         self.source_list(clause, self.ast(clause)?.node(clause)?.element_list())?
                     {
@@ -81,8 +83,6 @@ impl CheckerState {
                             vec![],
                         )?;
                     }
-                } else {
-                    self.check_export_star(node, Some(clause), specifier)?;
                 }
             } else {
                 self.check_export_star(node, None, specifier)?;

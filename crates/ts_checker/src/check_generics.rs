@@ -269,8 +269,8 @@ impl CheckerState {
         for (index, &parameter) in parameters.iter().enumerate() {
             if let Some(constraint) = self.constraint_of_type_parameter(parameter)? {
                 if arguments.is_none() {
-                    let effective = self.effective_type_arguments(node, &parameters)?;
-                    mapper = Some(self.new_type_mapper(&parameters, &effective)?);
+                    let effective = self.effective_type_arguments(node, parameters)?;
+                    mapper = Some(self.new_type_mapper(parameters, &effective)?);
                     arguments = Some(effective);
                 }
                 if valid {

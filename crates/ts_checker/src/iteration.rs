@@ -26,6 +26,10 @@ pub(crate) enum IterationKind {
 }
 
 #[derive(Clone, Copy, Default)]
+#[allow(
+    clippy::struct_field_names,
+    reason = "Names distinguish the native yield, return and next type slots from values"
+)]
 pub(crate) struct IterationTypes {
     pub(crate) yield_type: Option<TypeId>,
     pub(crate) return_type: Option<TypeId>,

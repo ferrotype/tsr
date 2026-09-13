@@ -23,6 +23,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             .alloc_nodes(statements.into_iter().map(Some).collect());
         self.output.new_syntax_list(nodes)
     }
+    #[allow(
+        clippy::unnecessary_wraps,
+        reason = "Returns the optional modifier-list slot expected by all factory declaration constructors, including an allocated empty list"
+    )]
     pub fn declare_modifiers(&mut self) -> Option<ts_ast::NodeListId> {
         let modifiers = if self.needs_declare {
             vec![Some(self.output.new_token(K::DeclareKeyword.into()))]
@@ -98,18 +102,18 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     fn assigned_expression(&self, mut node: NodeId) -> Result<NodeId, R::Error> {
         loop {
             if self.node(node).kind() == K::ParenthesizedExpression {
-                node = self.required(self.node(node).expression())?;
+                node = Self::required(self.node(node).expression())?;
                 continue;
             }
             if self.node(node).kind() == K::BinaryExpression {
                 let read = self.node(node);
                 let data = read.as_binary_expression().unwrap();
-                let operator = self.required(data.operator_token())?;
+                let operator = Self::required(data.operator_token())?;
                 if matches!(
                     self.node(operator).kind().known(),
                     Some(K::EqualsToken | K::CommaToken)
                 ) {
-                    node = self.required(data.right())?;
+                    node = Self::required(data.right())?;
                     continue;
                 }
             }
@@ -127,7 +131,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.export_assignment_from(
             node,
             node,
-            self.required(data.expression)?,
+            Self::required(data.expression)?,
             data.is_export_equals,
         )
     }
@@ -145,7 +149,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.has_scope_marker = true;
         if self.node(expression).kind() == K::Identifier
             && matches!(
-                parent.and_then(|p| p.known()),
+                parent.and_then(ts_ast::NodeKind::known),
                 Some(K::SourceFile | K::ModuleBlock)
             )
         {
@@ -176,7 +180,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             self.tracker.selector = super::tracker::Selector::fixed(
                 super::diagnostics::SymbolAccessibilityDiagnostic {
                     diagnostic_message:
-                        &ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+                        ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
                     error_node: Some(input),
                     type_name: None,
                 },
@@ -241,7 +245,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 .as_function_expression()
                 .and_then(|d| d.full_signature()),
             Some(K::ArrowFunction) => data.as_arrow_function().and_then(|d| d.full_signature()),
-            _ => return self.unsupported("declaration emit: exported function expression kind"),
+            _ => return Self::unsupported("declaration emit: exported function expression kind"),
         }
         .or(full);
         drop(read);

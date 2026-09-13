@@ -237,7 +237,7 @@ impl CheckerState {
                     diagnostic,
                     vec![self.symbol(symbol)?.name_to_owned()],
                 )?;
-                diagnostic.related_information = related.clone();
+                diagnostic.related_information.clone_from(&related);
                 self.add_diagnostic(diagnostic)?;
             }
         }

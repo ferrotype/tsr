@@ -2,8 +2,8 @@
 //! Unsupported branches are failures of the port, not language diagnostics.
 
 use crate::{
-    object_flags as of, type_flags as tf, CheckerState, Error, LinkStore, TypeAlias, TypeId,
-    TypeSystemEntity, TypeSystemPropertyName,
+    node_check_flags as nc, object_flags as of, type_flags as tf, CheckerState, Error, LinkStore,
+    TypeAlias, TypeId, TypeSystemEntity, TypeSystemPropertyName,
 };
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{check_flags, node_flags as nf, symbol_flags as sf, SymbolFlags, SyntaxKind as K};
@@ -415,29 +415,58 @@ impl CheckerState {
         symbol: SymbolId,
         property: TypeSystemPropertyName,
     ) -> bool {
+        self.push_type_resolution(TypeSystemEntity::Symbol(symbol), property)
+    }
+
+    /// Upstream keys the "already produced" probe on the resolution's property
+    /// name alone and type-asserts the target, so one predicate serves every
+    /// entity kind; an entry whose target does not match its property's entity
+    /// cannot occur, and answers `false` here rather than panicking.
+    // port: tsc/internal/checker/checker.go:Checker.typeResolutionHasProperty
+    pub(crate) fn push_type_resolution(
+        &mut self,
+        target: TypeSystemEntity,
+        property: TypeSystemPropertyName,
+    ) -> bool {
         let aliases = &self.module_aliases.targets;
         let declared = &self.query.declared_types;
         let values = &self.value_symbol_links;
+        let node_flags = &self.emit_checks.node_flags;
         self.resolution
-            .push(TypeSystemEntity::Symbol(symbol), property, |entry| {
-                let TypeSystemEntity::Symbol(symbol) = entry.target else {
-                    return false;
-                };
-                match entry.property_name {
-                    TypeSystemPropertyName::AliasTarget => {
+            .push(target, property, |entry| match entry.property_name {
+                TypeSystemPropertyName::AliasTarget => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => {
                         aliases.get(&symbol).is_some_and(Result::is_ok)
                     }
-                    TypeSystemPropertyName::DeclaredType => {
+                    _ => false,
+                },
+                TypeSystemPropertyName::DeclaredType => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => {
                         declared.try_get(symbol).is_some_and(Option::is_some)
                     }
-                    TypeSystemPropertyName::Type => values
+                    _ => false,
+                },
+                TypeSystemPropertyName::Type => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => values
                         .try_get(symbol)
                         .is_some_and(|links| links.resolved_type.is_some()),
-                    TypeSystemPropertyName::WriteType => values
+                    _ => false,
+                },
+                TypeSystemPropertyName::WriteType => match entry.target {
+                    TypeSystemEntity::Symbol(symbol) => values
                         .try_get(symbol)
                         .is_some_and(|links| links.write_type.is_some()),
                     _ => false,
-                }
+                },
+                TypeSystemPropertyName::InitializerIsUndefined => match entry.target {
+                    TypeSystemEntity::Node(node) => {
+                        node_flags.try_get(node).copied().unwrap_or_default()
+                            & nc::INITIALIZER_IS_UNDEFINED_COMPUTED
+                            != 0
+                    }
+                    _ => false,
+                },
+                _ => false,
             })
     }
 
@@ -881,7 +910,7 @@ impl CheckerState {
             Some(K::TypeOfExpression) => {
                 let expression = required(read.expression(), "typeof operand")?;
                 self.check_expression(expression)?;
-                return self.typeof_result_type();
+                return Ok(self.typeof_result_type());
             }
             Some(K::VoidExpression) => {
                 let expression = required(read.expression(), "void operand")?;

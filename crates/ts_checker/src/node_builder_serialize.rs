@@ -400,7 +400,9 @@ impl NodeBuilder<'_> {
                 true
             }
             P::Direct { type_node } => {
-                if !self.can_reuse_existing_js_type_node(*type_node, ty)? {
+                if self.can_reuse_existing_js_type_node(*type_node, ty)? {
+                    false
+                } else {
                     if !self.suppress_inference_fallback {
                         self.report(
                             ts_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(
@@ -409,8 +411,6 @@ impl NodeBuilder<'_> {
                         );
                     }
                     true
-                } else {
-                    false
                 }
             }
             _ => false,

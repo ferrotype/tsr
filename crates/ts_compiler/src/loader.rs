@@ -409,7 +409,7 @@ impl<'a> Loader<'a> {
             package_resolver: std::sync::Mutex::new(self.resolver),
             include_explanations: IncludeExplanations::default(),
             diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics::default(),
-            declaration_diagnostics: Default::default(),
+            declaration_diagnostics: std::sync::Mutex::default(),
             option_verification: crate::OptionVerification {
                 diagnostics: Vec::new(),
                 include_diagnostics: Vec::new(),
