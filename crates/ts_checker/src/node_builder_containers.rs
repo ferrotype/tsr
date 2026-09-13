@@ -333,12 +333,51 @@ impl NodeBuilder<'_> {
                     }
                 }
             }
-            if kind == K::ClassExpression
-                && self.checker.ast(parent)?.node(parent)?.kind() == K::BinaryExpression
-            {
-                return Err(Error::Unsupported(
-                    "getContainersOfSymbol: class-expression CommonJS assignment",
-                ));
+            if kind == K::ClassExpression {
+                let view = self.checker.ast(parent)?;
+                let assignment = view.node(parent)?;
+                let Some(data) = assignment.data_source().as_binary_expression() else {
+                    continue;
+                };
+                let operator = data
+                    .operator_token()
+                    .ok_or(Error::MissingLink("class assignment operator"))?;
+                let left = data
+                    .left()
+                    .ok_or(Error::MissingLink("class assignment left"))?;
+                let left_node = view.node(left)?;
+                if view.node(operator)?.kind() != K::EqualsToken
+                    || !ts_ast::utilities::is_access_expression(&left_node)
+                {
+                    continue;
+                }
+                let target = left_node
+                    .expression()
+                    .ok_or(Error::MissingLink("class assignment target"))?;
+                if !ts_ast::is_entity_name_expression(view, target)? {
+                    continue;
+                }
+                if ts_ast::is_module_exports_access_expression(view, left)?
+                    || ts_ast::is_exports_identifier(view, target)?
+                {
+                    let source =
+                        ts_ast::utilities::get_source_file_of_node(view, Some(declaration))?;
+                    let Some(source) = source else {
+                        continue;
+                    };
+                    if let Some(symbol) = self.checker.get_symbol_of_declaration(source)? {
+                        if !candidates.contains(&symbol) {
+                            candidates.push(symbol);
+                        }
+                    }
+                    continue;
+                }
+                self.checker.check_expression_cached(target)?;
+                if let Some(symbol) = *self.checker.query.resolved_symbols.get_or_default(target) {
+                    if !candidates.contains(&symbol) {
+                        candidates.push(symbol);
+                    }
+                }
             }
         }
         let mut best = vec![];

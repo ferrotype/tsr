@@ -530,9 +530,7 @@ impl CheckerState {
         )?;
         let result = match (from_variable, from_module) {
             (Some(value), Some(ty)) if value != ty => {
-                return Err(Error::Unsupported(
-                    "combineValueAndTypeSymbols: split external export",
-                ))
+                Some(self.combine_value_and_type_symbols(value, ty)?)
             }
             (_, Some(value)) | (Some(value), _) => Some(value),
             _ => None,
@@ -681,5 +679,56 @@ impl CheckerState {
             .resolve_module_symbol(Some(self.get_merged_symbol(right)), false)?
             .ok_or(Error::MissingLink("right module reference"))?;
         Ok(self.get_merged_symbol(left) == self.get_merged_symbol(right))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.combineValueAndTypeSymbols
+    fn combine_value_and_type_symbols(
+        &mut self,
+        value_symbol: SymbolId,
+        type_symbol: SymbolId,
+    ) -> Result<SymbolId, Error> {
+        if value_symbol == self.builtins.unknown_symbol
+            && type_symbol == self.builtins.unknown_symbol
+        {
+            return Ok(self.builtins.unknown_symbol);
+        }
+        let value = self.symbol(value_symbol)?;
+        let ty = self.symbol(type_symbol)?;
+        if ty.flags() & sf::VALUE != 0 {
+            return Ok(type_symbol);
+        }
+        if value.flags() & (sf::TYPE | sf::NAMESPACE) != 0 {
+            return Ok(value_symbol);
+        }
+        let flags = value.flags() | ty.flags();
+        let name = value.name_to_owned();
+        let parent = value.parent().or(ty.parent());
+        let value_declaration = value.value_declaration();
+        let members = ty.members();
+        let exports = value.exports();
+        let mut declarations: Vec<Option<ts_arena::NodeId>> = Vec::new();
+        for declaration in self
+            .symbol_declarations(value_symbol)?
+            .iter()
+            .chain(self.symbol_declarations(type_symbol)?.iter())
+        {
+            if !declarations.contains(&declaration) {
+                declarations.push(declaration);
+            }
+        }
+        if declarations.is_empty() {
+            return Err(Error::MissingLink("combined symbol declarations"));
+        }
+        let result = self.new_symbol(flags, name)?;
+        let declarations = self.declarations.alloc(declarations)?;
+        let members = self.clone_symbol_table(members)?;
+        let exports = self.clone_symbol_table(exports)?;
+        let target = self.symbol_mut(result)?;
+        target.declarations = declarations;
+        target.parent = parent;
+        target.value_declaration = value_declaration;
+        target.members = members;
+        target.exports = exports;
+        Ok(result)
     }
 }

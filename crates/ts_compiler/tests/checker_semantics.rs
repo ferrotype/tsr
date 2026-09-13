@@ -2146,3 +2146,126 @@ fn uncalled_function_checks_resolve_this_property_symbols() {
         vec![ts_diagnostics::This_condition_will_always_return_true_since_this_function_is_always_defined_Did_you_mean_to_call_it_instead.code]
     );
 }
+
+#[test]
+fn split_value_and_type_exports_combine_into_one_symbol() {
+    // Pinned Go: mergedDeclarations7.errors.txt. `Passport` resolves to the
+    // interface from the namespace merged with the `export =` value.
+    let (owner, program, _) = fixture_files(
+        b"/test.ts",
+        &[
+            (
+                b"/passport.d.ts",
+                b"declare module 'passport' {
+    namespace passport {
+        interface Passport {
+            use(): this;
+        }
+        interface PassportStatic extends Passport {
+            Passport: {new(): Passport};
+        }
+    }
+    const passport: passport.PassportStatic;
+    export = passport;
+}
+",
+            ),
+            (
+                b"/test.ts",
+                b"import * as passport from \"passport\";
+import { Passport } from \"passport\";
+let p: Passport = passport.use();
+",
+            ),
+        ],
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            ..options()
+        },
+    );
+    let source = program.file(b"/test.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Type_0_is_not_assignable_to_type_1.code,
+            vec!["PassportStatic".to_string(), "Passport".to_string()]
+        )]
+    );
+}
+
+#[test]
+fn commonjs_class_expression_containers_resolve_for_declaration_emit() {
+    // Pinned Go: jsDeclarationsExportAssignedClassExpressionAnonymousWithSub.
+    // getContainersOfSymbol reaches the class expressions through their
+    // `module.exports` assignments instead of failing the declaration phase.
+    let (owner, program, _) = fixture_files(
+        b"/index.js",
+        &[(
+            b"/index.js",
+            b"module.exports = class {
+    /** @param {number} p */
+    constructor(p) {
+        this.t = 12 + p;
+    }
+}
+module.exports.Sub = class {
+    constructor() {
+        this.instance = new module.exports(10);
+    }
+}
+",
+        )],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            declaration: Tristate::TRUE,
+            module: ModuleKind::COMMON_JS,
+            ..options()
+        },
+    );
+    let file = program.file(b"/index.js").unwrap();
+    let mut op = owner.operation().unwrap();
+    let semantic = op.semantic_diagnostics(file.source()).unwrap();
+    assert_eq!(
+        semantic.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::An_export_assignment_cannot_be_used_in_a_module_with_other_exported_elements.code,
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+        ]
+    );
+    let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
+    assert!(declarations.is_ok(), "{declarations:?}");
+}
+
+#[test]
+fn implements_errors_keep_their_head_message_over_missing_properties() {
+    // Pinned Go: jsdocImplements_class.errors.txt (B3) and relater.go's
+    // isConversionOrInterfaceImplementationMessage.
+    let text = b"class A { method(): number { throw 1 } }
+class B3 implements A {}
+interface I { method(): number }
+class B4 implements I {}
+";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+        vec![
+            ts_diagnostics::Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass.code,
+            ts_diagnostics::Class_0_incorrectly_implements_interface_1.code,
+        ]
+    );
+    assert_eq!(
+        diagnostics[0].message_chain[0].code,
+        ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
+    );
+}

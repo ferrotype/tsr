@@ -493,10 +493,10 @@ Remaining inventory-05 acceptance buckets, largest first:
 | Bucket | Variants | Needs |
 | --- | ---: | --- |
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
-| `getContainersOfSymbol: class-expression CommonJS assignment` | 4 (declaration) | CommonJS class-expression containers in the node builder |
+| `getContainersOfSymbol: class-expression CommonJS assignment` | 4 (declaration) | closed in the tenth pass |
 | `largeControlFlowGraph` / `circularOptionalityRemoval` over 60 s | 2 | flow-analysis performance (P7) |
 | `getEffectsSignature: reentrant effects resolution` | 1 | upstream recurses without a guard; needs the terminating path |
-| `combineValueAndTypeSymbols: split external export` | 1 | the combined symbol construction |
+| `combineValueAndTypeSymbols: split external export` | 1 | closed in the tenth pass |
 | `getDeclarationSpaces: export assignment alias` | 2 | alias declaration spaces |
 | `onSuccessfullyResolvedSymbol: isolated imported-type/global-value conflict` | 2 | the isolatedModules conflict report |
 | `getPrimitiveTypeAliasSuggestions` | 2 | checker-owned primitive suggestion identity |
@@ -505,6 +505,29 @@ Remaining inventory-05 acceptance buckets, largest first:
 | `maybeMappedType: misspelled mapped type diagnostic` | 2 | the mapped-type spelling hint |
 | singletons | 5 | one each |
 | the single 60-second timeout | 1 | profiling |
+
+Tenth pass (2026-09-13, while inventory-06 ran): the last two named
+boundaries outside JSX and the slow runs are closed, plus one relater fix found
+while checking their baselines.
+
+- `combineValueAndTypeSymbols` builds the combined symbol for a split
+  value/type external export (flags union, deduplicated declarations, the
+  value's parent and value declaration, members from the type symbol, exports
+  from the value symbol); `mergedDeclarations7` now reports Go's single TS2322.
+- `getContainersOfSymbol` follows CommonJS class-expression assignments
+  (`module.exports = class {}` / `exports.X = class {}` to the source-file
+  symbol, `NS.K = class {}` to the resolved target of the access), which
+  completes the declaration phase for the four affected JS variants.
+- `reportRelationError` no longer suppresses the head message over a
+  missing-property chain when the head is a conversion or interface
+  implementation message (`isConversionOrInterfaceImplementationMessage`), so
+  `class B3 implements A {}` reports TS2720/TS2420 with the missing property
+  chained, as in `jsdocImplements_class.errors.txt`.
+
+Rerunning the same 244 inventory-05 failure variants: 243 complete every phase;
+the one left is `getEffectsSignature: reentrant effects resolution`. The two
+slow runs finish under the recheck's 120-second limit but stay above the
+inventory's 60 seconds in the debug build.
 
 Eight pre-existing tests in `checker_semantics.rs` still assert `Unsupported`
 for operations that are now implemented and need re-pointing with per-case

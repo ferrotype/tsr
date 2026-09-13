@@ -314,13 +314,15 @@ impl Relater<'_> {
                 2859 | 4104 if head.args == [generalized_name.clone(), target_name.clone()] => {
                     return Ok(())
                 }
-                2741 if head.args.get(1) == Some(&generalized_name)
+                2741 if !is_conversion_or_interface_implementation_message(message)
+                    && head.args.get(1) == Some(&generalized_name)
                     && head.args.get(2) == Some(&target_name) =>
                 {
                     return Ok(())
                 }
                 2739 | 2740
-                    if head.args.first() == Some(&generalized_name)
+                    if !is_conversion_or_interface_implementation_message(message)
+                        && head.args.first() == Some(&generalized_name)
                         && head.args.get(1) == Some(&target_name) =>
                 {
                     return Ok(())
@@ -331,6 +333,20 @@ impl Relater<'_> {
         self.report_error(message, vec![generalized_name, target_name]);
         Ok(())
     }
+}
+
+// port: tsc/internal/checker/relater.go:isConversionOrInterfaceImplementationMessage
+fn is_conversion_or_interface_implementation_message(message: &'static Message) -> bool {
+    [
+        messages::Class_0_incorrectly_implements_interface_1,
+        messages::Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass,
+        messages::Conversion_of_type_0_to_type_1_may_be_a_mistake_because_neither_type_sufficiently_overlaps_with_the_other_If_this_was_intentional_convert_the_expression_to_unknown_first,
+        messages::Its_instance_type_0_is_not_a_valid_JSX_element,
+        messages::Its_return_type_0_is_not_a_valid_JSX_element,
+        messages::Its_element_type_0_is_not_a_valid_JSX_element,
+    ]
+    .iter()
+    .any(|candidate| candidate.code == message.code)
 }
 
 fn property_name(name: &[u8]) -> Vec<u8> {

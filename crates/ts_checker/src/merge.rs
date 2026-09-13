@@ -88,7 +88,7 @@ impl CheckerState {
         Ok(clone)
     }
 
-    fn clone_symbol_table(
+    pub(crate) fn clone_symbol_table(
         &mut self,
         source: Option<SymbolTableId>,
     ) -> Result<Option<SymbolTableId>, Error> {
