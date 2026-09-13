@@ -365,15 +365,49 @@ ranking`, 1 was the shorthand panic and now completes. Regressions:
 declaration phase) and `abstract_properties_destructured_from_this_in_constructors_are_reported`
 (pinned `abstractPropertyInConstructor` class `C1`, plus a private destructuring).
 
+**Sixth pass.** The four largest remaining named buckets after the panics:
+
+- `getSymbolChain: external module specifier ranking` (30 declaration + 5
+  semantic): `sortByBestName` is ported. External containers are ranked by the
+  specifier `getSpecifierForModuleSymbol` produces for them (fewer path
+  components first, non-relative before relative, symbol order as the tie
+  break) instead of refusing; `PathIsRelative` and `CountPathComponents` are
+  local helpers in `node_builder_names.rs`.
+- `getSuggestedLibForNonExistentProperty` (20 + 4): the `getFeatureMap` table is
+  `lib_features.rs`; a missing property that a later `lib` provides reports
+  TS2550 with the lib name, ahead of the spelling suggestion as upstream does.
+- `errorOnImplicitAnyModule: package install diagnostic chain` (14):
+  `CreateModuleNotFoundChain` is ported over a new host query,
+  `package_bundles_types`, the per-package view of `GetPackagesMap`
+  (`checker_host.rs` computes it from the program's resolutions). The
+  repopulate marker has no Rust counterpart.
+- `resolveAlias during mergeSymbol` (13): `mergeSymbol` resolves a non-local
+  alias target through `resolveAlias` as `resolveSymbol` does, then clones the
+  resolved target.
+
+Rerunning the 93 inventory-05 variants from those buckets and the declaration
+phase with the rebuilt example binary: 86 complete every phase, 7 stop at other
+named boundaries (`getContainersOfSymbol: class-expression CommonJS assignment`
+4, `unresolved type synthetic comment` 2, `isTypeParameterPossiblyReferenced:
+type query scope` 1), none panic, no new reason. Regressions:
+`missing_properties_from_later_libs_suggest_the_lib`,
+`declaration_emit_names_types_from_other_modules_through_ranked_specifiers`,
+`untyped_packages_report_the_types_install_chain` (a `node_modules` fixture),
+`global_augmentations_merging_into_aliases_resolve_the_alias` (pinned
+`checkMergedGlobalUMDSymbol`).
+
 Remaining inventory-05 acceptance buckets, largest first, with what each needs:
 
 | Bucket | Variants | Needs |
 | --- | ---: | --- |
-| `getSymbolChain: external module specifier ranking` | 22 declaration + 5 former panics | node-builder specifier ranking |
 | `checkSourceFile: JSX or non-script input` | 24 | out of P4 scope |
-| `getSuggestedLibForNonExistentProperty` | 19 | the lib suggestion table |
-| `errorOnImplicitAnyModule: package install diagnostic chain` | 14 | the package-install chain |
-| `resolveAlias during mergeSymbol` | 13 | alias resolution inside symbol merging |
+| `getPropertyTypeForIndexType: unique symbol fully qualified diagnostic` | 11 | the fully qualified symbol display |
+| `resolveExternalModule: rewriteRelativeImportExtensions safety checks` | 9 | the rewrite safety checks |
+| `checkDeprecatedProperty: JSDoc deprecation suggestion` | 8 | JSDoc deprecation |
+| `removeSubtypes: nominal class derivation` | 8 | nominal class subtype reduction |
+| `elaborateNeverIntersection` | 6 | the never-intersection elaboration |
+| `getExportsOfModule: import attributes type` | 6 | attributes-typed export maps |
+| `isTypeParameterPossiblyReferenced: type query scope` | 6 (+1 declaration) | the type-query scope walk |
 | the single 60-second timeout | 1 | profiling |
 
 Eight pre-existing tests in `checker_semantics.rs` still assert `Unsupported`

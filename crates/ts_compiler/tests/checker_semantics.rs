@@ -1621,3 +1621,130 @@ fn abstract_properties_destructured_from_this_in_constructors_are_reported() {
         (start, start + 1)
     );
 }
+
+#[test]
+fn missing_properties_from_later_libs_suggest_the_lib() {
+    let text =
+        b"interface String { length: number }\ndeclare const s: string;\ns.padStart(2);\ns.nope;\n";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (
+                ts_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later.code,
+                vec!["padStart".to_string(), "string".to_string(), "es2017".to_string()]
+            ),
+            (
+                ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+                vec!["nope".to_string(), "string".to_string()]
+            ),
+        ]
+    );
+}
+
+#[test]
+fn declaration_emit_names_types_from_other_modules_through_ranked_specifiers() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (
+                b"/main.ts",
+                b"import { make } from \"./lib\";\nexport const v = make();\n",
+            ),
+            (
+                b"/lib.ts",
+                b"export interface I { x: number }\nexport declare function make(): I;\n",
+            ),
+        ],
+        options(),
+    );
+    let file = program.file(b"/main.ts").unwrap();
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(file.source()).unwrap().is_empty());
+    let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
+    assert!(declarations.is_ok(), "{declarations:?}");
+    assert!(declarations.unwrap().is_empty());
+}
+
+#[test]
+fn untyped_packages_report_the_types_install_chain() {
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import * as foo from \"foo\";\nfoo;\n"),
+            (b"/node_modules/foo/index.js", b"module.exports = {};\n"),
+            (
+                b"/node_modules/foo/package.json",
+                b"{ \"name\": \"foo\", \"version\": \"1.0.0\", \"main\": \"index.js\" }\n",
+            ),
+        ],
+        CompilerOptions {
+            module: ModuleKind::COMMON_JS,
+            module_resolution: ts_core::ModuleResolutionKind::NODE10,
+            ..options()
+        },
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type.code,
+            vec!["foo".to_string(), "/node_modules/foo/index.js".to_string()]
+        )]
+    );
+    assert_eq!(diagnostics[0].message_chain.len(), 1);
+    let chain = &diagnostics[0].message_chain[0];
+    assert_eq!(
+        chain.code,
+        ts_diagnostics::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0.code
+    );
+    assert_eq!(
+        codes_and_args(std::slice::from_ref(chain))[0].1,
+        vec!["foo".to_string(), "foo".to_string()]
+    );
+}
+
+#[test]
+fn global_augmentations_merging_into_aliases_resolve_the_alias() {
+    // Pinned Go: checkMergedGlobalUMDSymbol.errors.txt, two TS2451 in global.d.ts.
+    let (owner, program, _) = fixture_files(
+        b"/test.ts",
+        &[
+            (b"/test.ts", b"const m = THREE;\nm;\n"),
+            (b"/three.d.ts", b"export namespace THREE {\n  export class Vector2 {}\n}\n"),
+            (
+                b"/global.d.ts",
+                b"import * as _three from './three';\n\nexport as namespace THREE;\n\ndeclare global {\n  export const THREE: typeof _three;\n}\n",
+            ),
+        ],
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            ..options()
+        },
+    );
+    let mut op = owner.operation().unwrap();
+    let test = program.file(b"/test.ts").unwrap().source();
+    let test_diagnostics = op.semantic_diagnostics(test);
+    assert!(test_diagnostics.is_ok(), "{test_diagnostics:?}");
+    assert!(test_diagnostics.unwrap().is_empty());
+    let global = program.file(b"/global.d.ts").unwrap().source();
+    let diagnostics = op.semantic_diagnostics(global).unwrap();
+    let redeclare = ts_diagnostics::Cannot_redeclare_block_scoped_variable_0.code;
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![
+            (redeclare, vec!["THREE".to_string()]),
+            (redeclare, vec!["THREE".to_string()]),
+        ]
+    );
+}

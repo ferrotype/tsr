@@ -230,6 +230,19 @@ impl CheckerHost for ProgramCheckerHost {
         self.file_metadata(self.required_file(file_name)?)
     }
 
+    // port: tsc/internal/compiler/program.go:Program.GetPackagesMap
+    fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error> {
+        let mut found = None;
+        for resolution in self.program.resolutions() {
+            let module = &resolution.result;
+            if module.package_id.name.as_bytes() == package_name {
+                let bundles = found.unwrap_or(false) || module.extension.as_bytes() == b".d.ts";
+                found = Some(bundles);
+            }
+        }
+        Ok(found)
+    }
+
     // port: tsc/internal/compiler/program.go:Program.SourceFileMayBeEmitted
     fn source_file_may_be_emitted(
         &self,

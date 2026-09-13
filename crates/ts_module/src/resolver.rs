@@ -854,7 +854,11 @@ pub(super) fn parse_package_name(name: &[u8]) -> (&[u8], &[u8]) {
 pub fn get_types_package_name(name: &[u8]) -> Vec<u8> {
     [b"@types/".as_slice(), &mangle_scoped(name)].concat()
 }
-pub(super) fn mangle_scoped(name: &[u8]) -> Vec<u8> {
+// port: tsc/internal/module/util.go:MangleScopedPackageName
+pub fn mangle_scoped_package_name(name: &[u8]) -> Vec<u8> {
+    mangle_scoped(name)
+}
+pub fn mangle_scoped(name: &[u8]) -> Vec<u8> {
     if let Some(name) = name.strip_prefix(b"@") {
         if let Some(index) = name.iter().position(|&b| b == b'/') {
             let mut result = name[..index].to_vec();

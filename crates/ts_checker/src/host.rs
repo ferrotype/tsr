@@ -73,6 +73,9 @@ pub trait CheckerHost: Send + Sync {
         mode: ResolutionMode,
     ) -> Result<Option<&ResolvedModule>, Error>;
     fn get_source_file_meta_data(&self, file_name: &[u8]) -> Result<&SourceFileMetaData, Error>;
+    /// `GetPackagesMap()[packageName]`: `None` when no resolution named the
+    /// package, otherwise whether any resolution of it was a `.d.ts`.
+    fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error>;
     fn source_file_may_be_emitted(
         &self,
         file: &CompletedFile,

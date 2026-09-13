@@ -674,21 +674,52 @@ impl NodeBuilder<'_> {
             || self.name_needs_qualification(chain[0], query.enclosing, qualifier_meaning)?
         {
             let root = chain.first().copied().unwrap_or(query.symbol);
-            let mut parents = self.name_containers(NameQuery {
+            let parents = self.name_containers(NameQuery {
                 symbol: root,
                 ..query
             })?;
-            // External containers are ranked by their module specifiers, whose
-            // import-generation contract belongs to the emit resolver.
+            // External containers are ranked by their module specifiers: fewer
+            // path components first, non-relative before relative, then by
+            // symbol order (sortByBestName).
+            let mut ranked: Vec<(SymbolId, JsString)> = Vec::with_capacity(parents.len());
             for &parent in &parents {
-                if self.name_external_module(parent)? {
-                    return Err(Error::Unsupported(
-                        "getSymbolChain: external module specifier ranking",
-                    ));
-                }
+                let specifier = if self.name_external_module(parent)? {
+                    self.module_specifier_with_context(parent, query.enclosing)?
+                } else {
+                    JsString::default()
+                };
+                ranked.push((parent, specifier));
             }
-            self.checker.sort_symbols(&mut parents)?;
-            for parent in parents {
+            let failure = std::cell::Cell::new(None);
+            ranked.sort_by(|a, b| {
+                let (specifier_a, specifier_b) = (a.1.as_bytes(), b.1.as_bytes());
+                if !specifier_a.is_empty() && !specifier_b.is_empty() {
+                    let b_relative = path_is_relative(specifier_b);
+                    if path_is_relative(specifier_a) == b_relative {
+                        // Both relative or both non-relative, sort by number of parts
+                        return count_path_components(specifier_a)
+                            .cmp(&count_path_components(specifier_b));
+                    }
+                    // A non-relative specifier is preferred over a relative one
+                    return if b_relative {
+                        Ordering::Less
+                    } else {
+                        Ordering::Greater
+                    };
+                }
+                // must sort symbols for stable ordering
+                match self.checker.compare_symbols(Some(a.0), Some(b.0)) {
+                    Ok(order) => order,
+                    Err(error) => {
+                        failure.set(Some(error));
+                        Ordering::Equal
+                    }
+                }
+            });
+            if let Some(error) = failure.into_inner() {
+                return Err(error);
+            }
+            for (parent, _) in ranked {
                 let mut parent_chain = self.qualified_name_chain(
                     NameQuery {
                         symbol: parent,
@@ -1138,4 +1169,19 @@ impl NodeBuilder<'_> {
         }
         Ok(identifier)
     }
+}
+
+// port: tsc/internal/tspath/path.go:PathIsRelative
+fn path_is_relative(path: &[u8]) -> bool {
+    path == b"."
+        || path == b".."
+        || path.len() >= 2 && path[0] == b'.' && matches!(path[1], b'/' | b'\\')
+        || path.len() >= 3 && path[0] == b'.' && path[1] == b'.' && matches!(path[2], b'/' | b'\\')
+}
+
+// port: tsc/internal/modulespecifiers/compare.go:CountPathComponents
+fn count_path_components(path: &[u8]) -> usize {
+    let rest = path.strip_prefix(b"./").unwrap_or(path);
+    rest.iter()
+        .fold(0, |count, &byte| count + usize::from(byte == b'/'))
 }

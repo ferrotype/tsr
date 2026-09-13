@@ -408,16 +408,26 @@ impl CheckerState {
         if self.side_effect_import(node)? {
             return Ok(());
         }
-        if !ts_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
-            return Err(Error::Unsupported(
-                "errorOnImplicitAnyModule: package install diagnostic chain",
-            ));
-        }
-        let diagnostic = self.diagnostic_for_node(
-            Some(node),
-            d::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type,
-            vec![name.clone(), resolved.resolved_file_name.clone()],
-        )?;
+        let chain =
+            if !ts_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
+                Some(self.module_not_found_chain(node, resolved, name)?)
+            } else {
+                None
+            };
+        let args = vec![name.clone(), resolved.resolved_file_name.clone()];
+        let diagnostic = if let Some(chain) = chain {
+            ts_ast::Diagnostic::chain(
+                Some(std::sync::Arc::new(chain)),
+                d::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type,
+                args,
+            )
+        } else {
+            self.diagnostic_for_node(
+                Some(node),
+                d::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type,
+                args,
+            )?
+        };
         if is_error {
             self.add_diagnostic(diagnostic)?;
         } else {
@@ -854,4 +864,65 @@ fn try_get_extension_from_path(path: &[u8]) -> Option<&'static [u8]> {
     EXTENSIONS_TO_REMOVE
         .into_iter()
         .find(|extension| path.ends_with(extension))
+}
+
+impl CheckerState {
+    /// The repopulate marker Go attaches for incremental builds has no Rust
+    /// counterpart; the message and arguments are the observable payload.
+    // port: tsc/internal/checker/checker.go:Checker.createModuleNotFoundChain
+    // port: tsc/internal/checker/utilities.go:CreateModuleNotFoundChain
+    fn module_not_found_chain(
+        &mut self,
+        error_node: NodeId,
+        resolved: &ts_module::ResolvedModule,
+        module_reference: &JsString,
+    ) -> Result<ts_ast::Diagnostic, Error> {
+        let mut package_name = resolved.package_id.name.as_bytes().to_vec();
+        let (message, args): (&'static Message, Vec<JsString>) = if resolved
+            .alternate_result
+            .is_empty()
+        {
+            let host = self.program()?.host.clone();
+            let types_name = ts_module::get_types_package_name(&package_name);
+            let mangled = JsString::from_bytes(
+                ts_module::mangle_scoped_package_name(&package_name).as_slice(),
+            );
+            if host.package_bundles_types(&types_name)?.is_some() {
+                (
+                    d::If_the_0_package_actually_exposes_this_module_consider_sending_a_pull_request_to_amend_https_Colon_Slash_Slashgithub_com_SlashDefinitelyTyped_SlashDefinitelyTyped_Slashtree_Slashmaster_Slashtypes_Slash_1,
+                    vec![JsString::from_bytes(package_name.as_slice()), mangled],
+                )
+            } else if host.package_bundles_types(&package_name)? == Some(true) {
+                (
+                    d::If_the_0_package_actually_exposes_this_module_try_adding_a_new_declaration_d_ts_file_containing_declare_module_1,
+                    vec![
+                        JsString::from_bytes(package_name.as_slice()),
+                        module_reference.clone(),
+                    ],
+                )
+            } else {
+                (
+                    d::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0,
+                    vec![module_reference.clone(), mangled],
+                )
+            }
+        } else {
+            if resolved
+                .alternate_result
+                .as_bytes()
+                .windows(b"/node_modules/@types/".len())
+                .any(|window| window == b"/node_modules/@types/")
+            {
+                package_name = ts_module::get_types_package_name(&package_name);
+            }
+            (
+                d::There_are_types_at_0_but_this_result_could_not_be_resolved_when_respecting_package_json_exports_The_1_library_may_need_to_update_its_package_json_or_typings,
+                vec![
+                    resolved.alternate_result.clone(),
+                    JsString::from_bytes(package_name.as_slice()),
+                ],
+            )
+        };
+        self.diagnostic_for_node(Some(error_node), message, args)
+    }
 }

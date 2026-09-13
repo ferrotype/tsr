@@ -368,6 +368,7 @@ impl std::error::Error for Error {}
 mod families_tests;
 #[cfg(test)]
 mod flag_tests;
+mod lib_features;
 #[cfg(test)]
 mod tests;
 mod unused_identifiers;

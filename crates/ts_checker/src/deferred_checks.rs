@@ -108,20 +108,30 @@ impl CheckerState {
                 "reportNonexistentProperty: promised type",
             ));
         }
-        if let Some(symbol) = self.types.get(apparent)?.symbol {
-            let name = self.symbol(symbol)?.name_bytes();
-            if matches!(
-                name,
-                b"String"
-                    | b"Array"
-                    | b"ReadonlyArray"
-                    | b"Promise"
-                    | b"ObjectConstructor"
-                    | b"NumberConstructor"
-                    | b"SymbolConstructor"
-                    | b"Math"
+        // port: tsc/internal/checker/checker.go:Checker.getSuggestedLibForNonExistentProperty
+        let unreduced_apparent = self.apparent_type(containing)?;
+        if let Some(symbol) = self.types.get(unreduced_apparent)?.symbol {
+            let container_name = self.symbol(symbol)?.name_to_owned();
+            if let Some(lib) = crate::lib_features::suggested_lib_for_property(
+                container_name.as_bytes(),
+                spelling.as_bytes(),
             ) {
-                return Err(Error::Unsupported("getSuggestedLibForNonExistentProperty"));
+                let display =
+                    self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
+                let message = ts_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later;
+                let args = vec![
+                    spelling,
+                    display,
+                    ts_ast::JsString::from_bytes(lib.as_bytes()),
+                ];
+                let diagnostic = if child.is_some() {
+                    ts_ast::Diagnostic::chain(child, message, args)
+                } else {
+                    self.diagnostic_for_node(Some(name), message, args)?
+                };
+                self.add_diagnostic(diagnostic)?;
+                self.deferred_checks.reported_properties.insert(name);
+                return Ok(());
             }
         }
         let properties = self.get_properties_of_type(containing)?;
