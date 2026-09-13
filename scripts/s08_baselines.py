@@ -68,7 +68,7 @@ def replace_exact(source, before, after, count=1):
     return source.replace(before, after)
 
 
-def overlay_sources(upstream):
+def overlay_sources(upstream, *, walker_inputs=False):
     harness = (upstream / "tsc/internal/testutil/harnessutil/harnessutil.go").read_text()
     harness = replace_exact(harness, "\t// Parse harness and compiler options from the test configuration\n",
                             '\tif S08ObserveStage != nil { S08ObserveStage("native_options") }\n\t// Parse harness and compiler options from the test configuration\n')
@@ -97,11 +97,19 @@ def overlay_sources(upstream):
     symbol = '\tsymbolString.WriteString("Symbol(")\n'
     walker = replace_exact(walker,symbol,symbol+
         '\ts08RecordDisplay("SymbolToStringEx",walker,node.Parent,nil,uint32(checker.SymbolFormatFlagsAllowAnyNodeKind),0)\n')
+    driver = (BRIDGES/"baselines_test.go").read_text()
+    if walker_inputs:
+        anchor = '\t\t\t\ttsbaseline.S08Queries = []tsbaseline.S08Query{}\n'
+        driver = replace_exact(driver, anchor,
+            '\t\t\t\tinputs := []map[string]string{}\n'
+            '\t\t\t\tfor _, f := range allFiles { inputs = append(inputs, map[string]string{"name_hex":hex.EncodeToString([]byte(f.UnitName)), "content_hex":hex.EncodeToString([]byte(f.Content))}) }\n'
+            '\t\t\t\trow["baseline_inputs"] = inputs\n'
+            '\t\t\t\trow["baseline_header"] = header\n' + anchor)
     return {"testutil/harnessutil/harnessutil.go":harness,
             "testutil/harnessutil/s08_diagnostics_observer.go":(BRIDGES/"diagnostics_observer.go").read_text(),
             "testutil/tsbaseline/type_symbol_baseline.go":walker,
             "testutil/tsbaseline/s08_baselines_bridge.go":(BRIDGES/"baselines_bridge.go").read_text(),
-            "testrunner/s08_baselines_test.go":(BRIDGES/"baselines_test.go").read_text()}
+            "testrunner/s08_baselines_test.go":driver}
 
 
 def validate_observations(rows, requests, observed, file_observations, *, legacy_failures=None):
@@ -191,7 +199,7 @@ def validate_observations(rows, requests, observed, file_observations, *, legacy
     return mismatches
 
 
-def capture(directory, smoke=False, case_id=None, include_informational=False):
+def capture(directory, smoke=False, case_id=None, include_informational=False, *, walker_inputs=False):
     directory = Path(directory).resolve()
     directory.mkdir(parents=True,exist_ok=False)
     upstream = verified_upstream()
@@ -200,7 +208,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False):
     rows, requests = requests_from_subset(subset,smoke,case_id)
     raw = canonical(requests)+b"\n"
     (directory/"requests.json").write_bytes(raw)
-    sources = overlay_sources(upstream)
+    sources = overlay_sources(upstream, walker_inputs=walker_inputs)
     replacements = {}
     for name, source in sources.items():
         path = directory/"overlay"/name
@@ -242,7 +250,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False):
     if any(digest((ROOT/name).read_bytes())!=value for name,value in inputs.items()):
         raise ValueError("capture inputs changed")
     report = {"version":3,"pin":subset["pin"],"smoke":smoke,"case_id":case_id,"source_inputs":inputs,
-              "include_informational":include_informational,
+              "include_informational":include_informational, "walker_inputs":walker_inputs, "walker_input_encoding":"hex-v1" if walker_inputs else None,
               "request_sha256":digest(raw),"observation_sha256":digest((directory/"observations.ndjson").read_bytes()),
               "requests":len(requests),"states":dict(states),"test_exit":completed.returncode,
               "states_by_tier":{tier:dict(Counter(r["state"] for r in observed if r["acceptance_tier"]==tier)) for tier in ("acceptance","informational")},
@@ -362,6 +370,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--include-informational",action="store_true",help="collect available baselines beyond native option guards for informational cases only")
+    parser.add_argument("--walker-inputs",action="store_true",help="retain native ordered input files and header for the P5 walker")
     selection=parser.add_mutually_exclusive_group()
     selection.add_argument("--smoke",action="store_true")
     selection.add_argument("--case",dest="case_id",help="one exact frozen variant ID, for diagnosis only")
@@ -371,7 +380,7 @@ if __name__=="__main__":
         if args.review_capture:
             review_capture(args.review_capture,args.output)
         else:
-            capture(args.output,args.smoke,args.case_id,args.include_informational)
+            capture(args.output,args.smoke,args.case_id,args.include_informational,walker_inputs=args.walker_inputs)
     except (OSError,ValueError,RuntimeError,KeyError,TypeError,subprocess.TimeoutExpired) as error:
         print(f"S08 baseline capture failed: {error}",file=sys.stderr)
         raise SystemExit(1) from error

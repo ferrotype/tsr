@@ -289,6 +289,24 @@ impl Operation<'_> {
         Ok(self.type_ref(ty))
     }
 
+    /// Whether this source node participates in an expression query. The
+    /// contextual cases share the classifier used by checker name resolution.
+    pub fn is_expression_node(&self, node: NodeId) -> Result<bool, Error> {
+        crate::query::is_expression_node(self.state().ast(node)?, node)
+    }
+
+    /// Native `IsPartOfTypeNode`, including qualified names and heritage nodes.
+    pub fn is_part_of_type_node(&self, node: NodeId) -> Result<bool, Error> {
+        self.state().is_part_of_type_node(node)
+    }
+
+    /// The intrinsic spelling is distinct from printed type syntax. In
+    /// particular the native baseline walker bypasses the builder for `any`.
+    pub fn intrinsic_type_name(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        Ok(self.state().types.intrinsic(ty)?.name.clone())
+    }
+
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         let ty = self.state_mut().get_declared_type_of_symbol(symbol)?;

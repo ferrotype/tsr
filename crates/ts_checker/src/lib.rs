@@ -187,6 +187,7 @@ mod program_init;
 mod promises;
 mod property_symbols;
 mod query;
+mod query_location;
 mod query_names;
 mod reduction;
 mod references;

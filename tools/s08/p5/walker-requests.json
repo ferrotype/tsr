@@ -1,0 +1,322 @@
+{
+  "version": 1,
+  "scope": "native-walker-focused",
+  "cases": [
+    {
+      "id": "disabled",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "const value = 1;"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "disabled.ts",
+      "had_errors": true,
+      "enabled": false,
+      "allow_js": false
+    },
+    {
+      "id": "no-files",
+      "files": [],
+      "roots": [],
+      "header": "no-files.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "empty-file",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": ""
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "empty-file.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "alias-and-expression",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "type Shape = { text: '\u00e9'; n: 0x10 };\nconst value: Shape = { text: '\u00e9', n: 16 };\nvalue.text;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "alias-and-expression.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "plain-any",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "declare let value: any;\nvalue; value.field;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "plain-any.ts",
+      "had_errors": false,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "error-any",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "declare let value: any;\nvalue; value.field;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "error-any.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "line-decoration",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "// \ud83d\ude00 leading trivia\r\nlet caf\u00e9 = 1;\r\n{\r\n  caf\u00e9;\r\n}\u2028caf\u00e9;\u2029\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "line-decoration.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "ordered-files",
+      "files": [
+        {
+          "name": "/.src/z.ts",
+          "content": "const z = shared;\n"
+        },
+        {
+          "name": "/.lib/lib.custom.d.ts",
+          "content": "declare const shared: number;\n"
+        }
+      ],
+      "roots": [
+        "/.lib/lib.custom.d.ts",
+        "/.src/z.ts"
+      ],
+      "header": "ordered-files.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "heritage",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "namespace N { export class Base {} }\nclass Derived extends N.Base {}\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "heritage.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "imports",
+      "files": [
+        {
+          "name": "/.src/main.ts",
+          "content": "import { value as local } from \"./dep\";\nexport { local };\nlocal;\n"
+        },
+        {
+          "name": "/.src/dep.ts",
+          "content": "export const value = 1;\n"
+        }
+      ],
+      "roots": [
+        "/.src/main.ts"
+      ],
+      "header": "imports.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "overload-declarations",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "function f(x: 0): 0;\nfunction f(x: 1): 1;\nfunction f(x: 2): 2;\nfunction f(x: 3): 3;\nfunction f(x: 4): 4;\nfunction f(x: 5): 5;\nfunction f(x: number) { return x; }\nf(1);\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "overload-declarations.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "jsdoc-reparsed",
+      "files": [
+        {
+          "name": "/main.js",
+          "content": "/** @type {{ value: string }} */\nconst x = { value: \"yes\" };\nx.value;\n/** @type {number} */ (x);\n"
+        }
+      ],
+      "roots": [
+        "/main.js"
+      ],
+      "header": "jsdoc-reparsed.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": true
+    },
+    {
+      "id": "computed-and-indexed",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "const obj = { [\"key\"]: 1, [2]: \"yes\" };\nobj[\"key\"]; obj[2];\ntype Key = typeof obj[\"key\"];\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "computed-and-indexed.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "flow-expression",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "function f(value: string | number) {\n if (typeof value === \"string\") { return value; }\n return value;\n}\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "flow-expression.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "alias-chain",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "import { value as local } from \"./middle\";\nlocal;\n"
+        },
+        {
+          "name": "/middle.ts",
+          "content": "export { value } from \"./dep\";\n"
+        },
+        {
+          "name": "/dep.ts",
+          "content": "export const value = 1;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "alias-chain.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "implements-and-binding",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "interface I { x: number }\nclass C implements I { x = 1; }\nconst { x: renamed } = new C();\nrenamed;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "implements-and-binding.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "assertions",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "const x = 1 as number;\nconst y = { value: x } satisfies { value: number };\ny.value;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "assertions.ts",
+      "had_errors": true,
+      "enabled": true,
+      "allow_js": false
+    },
+    {
+      "id": "no-check",
+      "files": [
+        {
+          "name": "/main.ts",
+          "content": "const value = { field: 1 };\nvalue.field;\n"
+        }
+      ],
+      "roots": [
+        "/main.ts"
+      ],
+      "header": "no-check.ts",
+      "had_errors": false,
+      "enabled": true,
+      "allow_js": false,
+      "no_check": true
+    },
+    {
+      "id": "skip-lib-check",
+      "files": [
+        {
+          "name": "/types.d.ts",
+          "content": "interface I { field: Missing; field: number }\ndeclare const value: I;\n"
+        }
+      ],
+      "roots": [
+        "/types.d.ts"
+      ],
+      "header": "skip-lib-check.ts",
+      "had_errors": false,
+      "enabled": true,
+      "allow_js": false,
+      "skip_lib_check": true
+    }
+  ]
+}
