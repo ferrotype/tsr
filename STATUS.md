@@ -251,7 +251,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 |---|---|---|
 | binder | stale: source, pin, command or inputs changed | [result](status/evidence/39a1a6141f1f90f404def533292985e774370308d140eb4f30049181bf722b80.json) |
 | bindworkload | stale: source, pin, command or inputs changed | [result](status/evidence/6c8627273ab14f7592eca85e92afb6d7ffb55859a2497cf909c9a82d476361c6.json) |
-| checkertext | current | [result](status/evidence/2ccb9bb4372abe70ddf9d3481f2a7bd146ff3a06dea7219d06a7aac6be3985cc.json) |
+| checkertext | current | [result](status/evidence/6bf5a4701795074d2cb6c45bb7d851e1b6079e9c3e6c67a4a3b2367357b4567f.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/44f293c40525a7b8a95f3260513f2f642e4ad5b7e92a9c8453730daaaff7c404.json) |
 | deny | stale: source, pin, command or inputs changed | [result](status/evidence/15576dbef02793bf57c9fe6ea001049e7fb50445aee3c5c1a77efa734c3b4caa.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/8475c96bcb9a17161ade95d00164c73369b45b736c4b50a6ce7668b8c78fc027.json) |

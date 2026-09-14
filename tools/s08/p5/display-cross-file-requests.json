@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "escaped-property",
+      "files": {
+        "/queried.ts": "type Target = { \\u0061: number; };",
+        "/context.ts": "\n\n\n\n\n\n/* unrelated source */\ndeclare let Other: unknown;"
+      },
+      "roots": [
+        "/queried.ts",
+        "/context.ts"
+      ],
+      "queries": [
+        {
+          "id": "declaration-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "declaration-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "escaped-parameter",
+      "files": {
+        "/queried.ts": "type Target = { method: (\\u0061: number) => void; };",
+        "/context.ts": "\n\n\n\n\n\n/* unrelated source */\ndeclare let Other: unknown;"
+      },
+      "roots": [
+        "/queried.ts",
+        "/context.ts"
+      ],
+      "queries": [
+        {
+          "id": "declaration-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "declaration-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "escaped-annotation",
+      "files": {
+        "/queried.ts": "declare let Target: { text: \"\\u0061\"; num: 0x10; };",
+        "/context.ts": "\n\n\n\n\n\n/* unrelated source */\ndeclare let Other: unknown;"
+      },
+      "roots": [
+        "/queried.ts",
+        "/context.ts"
+      ],
+      "queries": [
+        {
+          "id": "declaration-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "declaration-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "multiline",
+      "files": {
+        "/queried.ts": "type Target = {\n first: number;\n second: string;\n};",
+        "/context.ts": "\n\n\n\n\n\n/* unrelated source */\ndeclare let Other: unknown;"
+      },
+      "roots": [
+        "/queried.ts",
+        "/context.ts"
+      ],
+      "queries": [
+        {
+          "id": "declaration-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "declaration-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Target",
+          "declaration": "Target",
+          "enclosing_declaration": "Target",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Other",
+          "declaration": "Target",
+          "enclosing_declaration": "Other",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    }
+  ]
+}

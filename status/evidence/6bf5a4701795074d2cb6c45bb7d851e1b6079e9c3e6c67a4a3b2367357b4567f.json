@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "run_id": "checkertext",
+  "recorded_at": 1789384400,
+  "context": {
+    "revision": "b2cfed09e0148b9e58d120bacf8712557bdf5f31",
+    "source_sha256": "81f8115a60f51c4d1f539a5b7a588eb1eb51486c4bf9ba0392f611460f1d13cb",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "d17fa6d517ebc611691fd3d859a5481522e62f3005b0857d92201bf4be21eecc",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s08/p5/text-cases.json": "1a01380f7d0c157d62af13fb768cb383ac4871d1f09b983f117efe1a62176fcb",
+    "data/s08/p5/text-coverage.json": "4ce07a6d5ce650afd571927c359efe5e3f6adab71e9d2a0a55e46f158139102f",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "tools/s08/p5/text-requests.json": "fd285a15e22aaa132d5f042f7563ebd1333a534853bc8b4b2d0cf6f71d943e12"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_checkertext.py"
+  ],
+  "target": "host",
+  "config": "S08 E4 production checker, node builder and printer; 64 frozen byte-encoded requests in four required groups; pinned local Go evaluated on this host and native Rust dev profile; original annotation reuse versus regenerated literal types, malformed UTF-8/WTF-8, BOM, surrogates, numeric/bigint spellings and byte truncation; exact content required, no absent-as-pass; raw request/results and mismatches retained; S04 leaf/S05 scanner/S06 encoder scopes unchanged",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"failed_probes\": 0, \"helper_printer_semantics\": true, \"helper_printer_semantics_probes\": 64, \"probes\": 64, \"token_literal_bytes\": true, \"token_literal_bytes_probes\": 52}, \"tests\": {\"byte-truncation-boundaries\": \"pass\", \"lossless-source-and-regenerated-literals\": \"pass\", \"numeric-and-bigint-literals\": \"pass\", \"source-annotation-and-regeneration\": \"pass\"}}\n",
+  "stderr": "+ go version\ngo version go1.27.1 darwin/arm64\n+ go test -trimpath -mod=readonly -overlay /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000/native/overlay.json ./internal/checker -run ^TestS08P5Display$ -count=1 -timeout=5m\n+ cargo run --locked --package ts_compiler --example p5_display -- /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000/native/requests.json /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000/rust.json\n   Compiling ts_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_checker)\n   Compiling ts_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_compiler)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.97s\n     Running `target/debug/examples/p5_display /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000/native/requests.json /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000/rust.json`\nchecker text: 64 probes, 0 mismatches; raw capture /Users/cristian/git/ts-rust/target/s08/checkertext-1789384384405655000\n",
+  "stdout_sha256": "823189f7992f6525b51d9ef728b23e4f6067bf9f07fa29b53c31d40c56715e91",
+  "stderr_sha256": "295c4e6d52bba2fda37cec9c6d58c9c09fff86b3edd1f094207c5ea829f0d794",
+  "valid_capture": true
+}

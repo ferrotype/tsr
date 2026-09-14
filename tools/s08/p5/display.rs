@@ -235,7 +235,7 @@ pub fn observe(request: &Value) -> Result<Value> {
                         .write(
                             builder.view(),
                             node,
-                            enclosing.map(|_| source),
+                            enclosing.map(|_| context_source),
                             &mut writer,
                         )?;
                         result["text_hex"] = json!(hex(writer.text()));
@@ -250,4 +250,21 @@ pub fn observe(request: &Value) -> Result<Value> {
         programs.push(json!({"id":r["id"],"queries":queries}));
     }
     Ok(json!({"version":1,"programs":programs}))
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn cross_file_enclosing_contexts_match_native_display() {
+        let request = serde_json::from_str(include_str!(
+            "../../../data/s08/p5/display-cross-file/requests.json"
+        ))
+        .unwrap();
+        let expected: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../data/s08/p5/display-cross-file/observations.json"
+        ))
+        .unwrap();
+        let actual = super::observe(&request).unwrap();
+        assert_eq!(actual["programs"], expected["programs"]);
+    }
 }
