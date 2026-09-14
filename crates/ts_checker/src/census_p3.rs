@@ -165,6 +165,7 @@ impl CheckerState {
         census.map("type_caches", &query.widened_types);
         census.map("query_links", &query.assertion_types);
         census.map("query_links", &query.unresolved_symbols);
+        census.key_map("type_caches", &query.error_types);
         for name in query.unresolved_symbols.keys() {
             census.text("query_links", name);
         }

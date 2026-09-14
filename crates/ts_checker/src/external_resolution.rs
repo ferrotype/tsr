@@ -7,6 +7,9 @@ use ts_core::{ModuleKind, ModuleResolutionKind};
 use ts_diagnostics::{self as d, Message};
 use ts_tspath as path;
 
+#[path = "external_resolution_context.rs"]
+mod context;
+
 struct ExternalModuleReference {
     location: NodeId,
     module_reference: JsString,

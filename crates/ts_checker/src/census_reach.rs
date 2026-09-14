@@ -61,6 +61,7 @@ impl CheckerState {
             self.builtins.silent_never_signature,
         ]);
         work.types(roots.iter().copied());
+        work.types(self.display_builder.type_roots());
         work.types(self.flow.type_roots());
         work.types(self.module_aliases.type_roots());
         work.types(self.iteration.type_roots());
@@ -144,6 +145,7 @@ impl CheckerState {
         work.types(self.query.widened_types.keys().copied());
         work.types(self.query.widened_types.values().copied());
         work.types(self.query.assertion_types.values().copied());
+        work.types(self.query.error_types.values().copied());
         // Undefined-property value links are roots in the common symbol-link walk below.
         work.types(self.bindings.pattern_for_type.keys().copied());
         for (&(_, ty), &result) in &self.bindings.discriminated_contexts {

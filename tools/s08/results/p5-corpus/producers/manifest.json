@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "capture": "target/s08/p5-corpus-default-recheck-01",
+      "producer": "p5-corpus-default-recheck-01.py",
+      "producer_sha256": "3b334db6d45772d98341606f35cf4849901de7f52e4a41332310aa2e6c6b57f1",
+      "capture_sha256": "572fdbf263fd41ac1b93cac851612266345006ea3e52490fef5bf66636d2496a",
+      "report_sha256": "770c5d2248a77ae52cdb280d1ef0b47f95682370598f64ec26f2f9df93628004",
+      "selection": "p5-corpus-default-recheck-01.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-differences-recheck-01",
+      "producer": "p5-corpus-differences-recheck-01.py",
+      "producer_sha256": "f756efdc7b88ef493c18a4aa148db084fd216ca8cff45fbd6c173a615534b8dd",
+      "capture_sha256": "4d49353d07754457802613519b767b4409c63042dac395bd24c7b16a574ecba1",
+      "report_sha256": "7c751e7769d12f4ac4df447ace9fc12ff72de7674d161220353d46256f97ad59",
+      "selection": "p5-corpus-differences-recheck-01.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-01",
+      "producer": "p5-corpus-display-recheck-01.py",
+      "producer_sha256": "434c582e9f918211da070ddbf1ad87131369a84030279fdb187512acb9083564",
+      "capture_sha256": "7a3ad89e12e38c8ffd5c5286ff25522213255d92b7d82fe6cefe6c772469515b",
+      "report_sha256": "52d517005399e027cccf1ddf7f6c2eee897ba8183913e48adb882a746344dff3",
+      "selection": "p5-corpus-display-recheck-01.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-02",
+      "producer": "p5-corpus-display-recheck-02.py",
+      "producer_sha256": "db783b8d73fae6a485d6b2e1c9b6d4a421d275fb2ce7268912a7f9a3850865a9",
+      "capture_sha256": "1089ba02daa8cbc4fb6e9e0ee19b634cbdd2cb71a9997b981bd800bb9e55be80",
+      "report_sha256": "3370562e87bcf019c2d4ffa4664df4e741c2b43968f0c4026fb886982a37e851",
+      "selection": "p5-corpus-display-recheck-02.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-03",
+      "producer": "p5-corpus-display-recheck-03.py",
+      "producer_sha256": "4a11c8065e090e420f262949df470c9dc4ee6e7a93fe681efb6fefedfa1f1df5",
+      "capture_sha256": "9a62fc8ad43fadc95703b063fab0f8595ae1cc33d92c118a7936a027fd65a998",
+      "report_sha256": "3cb3e481445ff881f221e1178008ee960139194c2d275096442370ea9f56b6ae",
+      "selection": "p5-corpus-display-recheck-03.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-04",
+      "producer": "p5-corpus-display-recheck-04.py",
+      "producer_sha256": "b4bc0743c9faa882de6decda1826e6ebfd6f682a0b0a462e5182abd74da8f887",
+      "capture_sha256": "659bc1edcb2c5939a804d3729560e82f8b11bbdeeaf93d9c2d409826dca4c380",
+      "report_sha256": "13c9b88e98f1a04ae1b5cf02ab41bab578b808fae0faf12c81b34d76db073e93",
+      "selection": "p5-corpus-display-recheck-04.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-module-alias-recheck-01",
+      "producer": "p5-corpus-module-alias-recheck-01.py",
+      "producer_sha256": "0c72245795a0be5d65ca89e3bb5a163c9715a8be9fd0cb193e4e8271b46c77b8",
+      "capture_sha256": "c157d788524975656e0058699583996258c1446684bfde79e6e1fd86c9c97123",
+      "report_sha256": "c48da0dfb254a0424236156198606b0228fc09a35ee9ae7e17c2b85cb6425702",
+      "selection": "p5-corpus-module-alias-recheck-01.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-module-root-recheck-01",
+      "producer": "p5-corpus-module-root-recheck-01.py",
+      "producer_sha256": "d5b18e79fca3fe0270458288ed6666cbae2f76a769ca8327eb1f0916bd02130d",
+      "capture_sha256": "2f17a456194e46aede18dc1aee10a71058c520b3526d9787078cf56d981573ba",
+      "report_sha256": "72f55659b2d25f9ae84ab9e4536f7301442bede0e68b7faf45f8693e068208e4",
+      "selection": "p5-corpus-module-root-recheck-01.selection.json"
+    },
+    {
+      "capture": "target/s08/p5-corpus-return-recheck-01",
+      "producer": "p5-corpus-return-recheck-01.py",
+      "producer_sha256": "aa26586f3b71a3240fd94432a0f2b73f636789a2a8128be2ac55736039094e8a",
+      "capture_sha256": "be56feb62bff0bdbc8472152f91830952cdc6f3bc2e7ed0dcddd6bdbbd60f216",
+      "report_sha256": "6d50466a951167c6c817134305c513a46be7378b77a0c2025d805f8a2f6e4f6f",
+      "selection": "p5-corpus-return-recheck-01.selection.json"
+    }
+  ]
+}

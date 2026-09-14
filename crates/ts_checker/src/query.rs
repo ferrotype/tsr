@@ -44,6 +44,7 @@ pub(crate) struct QueryState {
     pub assertion_types: crate::types::Map<NodeId, TypeId>,
     pub reported_unreachable: crate::types::Set<NodeId>,
     pub unresolved_symbols: crate::types::Map<JsString, SymbolId>,
+    pub error_types: crate::types::Map<crate::CacheKey, TypeId>,
     pub undefined_properties: crate::types::Map<JsString, SymbolId>,
     pub function_symbols_checked: crate::types::Set<SymbolId>,
 }
@@ -109,22 +110,51 @@ impl CheckerState {
         }
         if let Some(parent) = read.parent() {
             let parent_read = self.ast(parent)?.node(parent)?;
-            if parent_read.kind() == K::ComputedPropertyName {
-                return Err(Error::Unsupported(
-                    "getSymbolAtLocation: computed declaration name",
-                ));
-            }
-            if parent_read.name() == Some(node) && ts_ast::is_declaration(&parent_read) {
+            if crate::query_location::declaration_or_import_name(self.ast(node)?, node)? {
                 if matches!(
                     parent_read.kind().known(),
                     Some(K::ImportSpecifier | K::ExportSpecifier)
                 ) && parent_read.property_name() == Some(node)
                 {
-                    return Err(Error::Unsupported("getImmediateAliasedSymbol"));
+                    return match self.get_symbol_of_declaration(parent)? {
+                        Some(symbol) => self.immediate_aliased_symbol(symbol),
+                        None => Err(Error::MissingLink("import property symbol")),
+                    };
                 }
                 return self.get_symbol_of_declaration(parent);
             }
+            if parent_read.kind() == K::ComputedPropertyName
+                && matches!(
+                    read.kind().known(),
+                    Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral)
+                )
+            {
+                if let Some(declaration) = parent_read.parent() {
+                    if ts_ast::is_declaration(&self.ast(declaration)?.node(declaration)?) {
+                        return self.get_symbol_of_declaration(declaration);
+                    }
+                }
+            }
         }
+        if read.kind() == K::Identifier {
+            if let Some(parent) = read.parent() {
+                let binding = self.ast(parent)?.node(parent)?;
+                if binding.kind() == K::BindingElement && binding.property_name() == Some(node) {
+                    if let Some(pattern) = binding.parent() {
+                        if self.ast(pattern)?.node(pattern)?.kind() == K::ObjectBindingPattern {
+                            let ty = self.get_type_at_location(pattern)?;
+                            let name = self.ast(node)?.node_text(node)?.into_js_string();
+                            if let Some(property) =
+                                self.constituent_property(ty, name.as_bytes(), false)?
+                            {
+                                return Ok(Some(property));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let read = self.ast(node)?.node(node)?;
         if matches!(
             read.kind().known(),
             Some(
@@ -138,37 +168,7 @@ impl CheckerState {
         }
         match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral) => {
-                if let Some(parent) = read.parent() {
-                    let parent = self.ast(parent)?.node(parent)?;
-                    if matches!(
-                        parent.kind().known(),
-                        Some(
-                            K::CallExpression
-                                | K::ImportDeclaration
-                                | K::JSImportDeclaration
-                                | K::ExportDeclaration
-                                | K::ExternalModuleReference
-                                | K::ElementAccessExpression
-                        )
-                    ) {
-                        return Err(Error::Unsupported(
-                            "getSymbolAtLocation: module/property lookup",
-                        ));
-                    }
-                    if parent.kind() == K::LiteralType {
-                        if let Some(grandparent) = parent.parent() {
-                            if matches!(
-                                self.ast(grandparent)?.node(grandparent)?.kind().known(),
-                                Some(K::ImportType | K::IndexedAccessType)
-                            ) {
-                                return Err(Error::Unsupported(
-                                    "getSymbolAtLocation: import/indexed access type",
-                                ));
-                            }
-                        }
-                    }
-                }
-                Ok(None)
+                self.symbol_at_literal_location(node)
             }
             Some(K::ThisKeyword) => {
                 let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
@@ -224,6 +224,9 @@ impl CheckerState {
                 _ => Ok(None),
             },
             Some(K::ImportKeyword | K::NewKeyword) => {
+                // Parsed meta-properties store their keyword as a kind field,
+                // not a child node. Native checkMetaPropertyKeyword is a stub;
+                // this arm cannot be reached by the parsed baseline walker.
                 let Some(parent) = read.parent() else {
                     return Ok(None);
                 };
@@ -291,96 +294,6 @@ impl CheckerState {
             )),
             _ => Ok(None),
         }
-    }
-
-    // port: tsc/internal/checker/checker.go:Checker.GetTypeAtLocation
-    // port: tsc/internal/checker/checker.go:Checker.getTypeOfNode
-    pub(crate) fn get_type_at_location(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let read = self.ast(node)?.node(node)?;
-            if read.flags() & nf::IN_WITH_STATEMENT != 0 {
-                return Ok(self.builtins.error_type);
-            }
-            let kind = read.kind();
-            if let Some(parent) = read.parent() {
-                let parent_read = self.ast(parent)?.node(parent)?;
-                if parent_read.name() == Some(node) && ts_ast::is_declaration(&parent_read) {
-                    let symbol = required(
-                        self.get_symbol_of_declaration(parent)?,
-                        "declaration symbol",
-                    )?;
-                    return if self.is_type_declaration(parent)? {
-                        self.get_declared_type_of_symbol(symbol)
-                    } else {
-                        self.get_type_of_symbol(symbol)
-                    };
-                }
-                if kind == K::Identifier && parent_read.kind() == K::TypeReference {
-                    // At this pin, IsPartOfTypeNode selects the identifier
-                    // itself; getTypeFromTypeNodeWorker falls back to errorType.
-                    // Querying the complete reference is a different operation.
-                    return Ok(self.builtins.error_type);
-                }
-                if parent_read.kind() == K::QualifiedName {
-                    return Err(Error::Unsupported("getTypeOfNode: qualified name context"));
-                }
-            }
-            if ts_ast::utilities::is_type_node(&read) {
-                return self.get_type_from_type_node(node);
-            }
-            match kind.known() {
-                Some(
-                    K::TypeAliasDeclaration
-                    | K::InterfaceDeclaration
-                    | K::ClassDeclaration
-                    | K::TypeParameter
-                    | K::EnumDeclaration,
-                ) => {
-                    let symbol =
-                        required(self.get_symbol_of_declaration(node)?, "declaration symbol")?;
-                    self.get_declared_type_of_symbol(symbol)
-                }
-                Some(
-                    K::VariableDeclaration
-                    | K::PropertySignature
-                    | K::PropertyDeclaration
-                    | K::Parameter,
-                ) => {
-                    let symbol =
-                        required(self.get_symbol_of_declaration(node)?, "declaration symbol")?;
-                    self.get_type_of_symbol(symbol)
-                }
-                Some(K::SourceFile) => {
-                    if ts_ast::utilities::is_external_or_common_js_module(
-                        &self.ast(node)?.source_file(node)?,
-                    ) {
-                        Err(Error::Unsupported("getTypeOfNode: external module"))
-                    } else {
-                        Ok(self.builtins.error_type)
-                    }
-                }
-                Some(
-                    K::StringLiteral
-                    | K::NoSubstitutionTemplateLiteral
-                    | K::NumericLiteral
-                    | K::BigIntLiteral
-                    | K::TrueKeyword
-                    | K::FalseKeyword
-                    | K::NullKeyword
-                    | K::PrefixUnaryExpression
-                    | K::ParenthesizedExpression
-                    | K::ObjectLiteralExpression,
-                ) => {
-                    let ty = self.check_expression(node)?;
-                    self.get_regular_type_of_literal_type(ty)
-                }
-                _ if ts_ast::utilities::is_expression_kind(kind) => {
-                    let ty = self.check_expression(node)?;
-                    self.get_regular_type_of_literal_type(ty)
-                }
-                _ => Err(Error::Unsupported("getTypeOfNode: expression/context")),
-            }
-        })
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfSymbol
@@ -646,7 +559,7 @@ impl CheckerState {
             }
             Some(K::MappedType) => self.source_mapped_type(node)?,
             Some(K::TemplateLiteralType) => self.source_template_type(node)?,
-            Some(K::ThisType) => self.type_from_this_node(node)?,
+            Some(K::ThisType | K::ThisKeyword) => self.type_from_this_node(node)?,
             Some(K::IndexedAccessType) => self.source_indexed_access_type(node)?,
             Some(K::TypeOperator)
                 if read
@@ -711,7 +624,10 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("readonly type"))?,
                 )?
             }
-            _ => return Err(Error::Unsupported("getTypeFromTypeNodeWorker: type family")),
+            // Native default, reached by location queries on the identifier
+            // inside a TypeReference, among other non-type syntax. All native
+            // type-family arms are handled above; this is not an unported type.
+            _ => return Ok(self.builtins.error_type),
         };
         *self.query.type_nodes.get_or_default(node) = Some(ty);
         Ok(ty)

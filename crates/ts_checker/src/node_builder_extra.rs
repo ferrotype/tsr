@@ -8,6 +8,64 @@ use crate::{element_flags as ef, signature_flags as sg, IndexInfoId, SignatureId
 
 impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode
+    pub(super) fn reference_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        if self.checker.is_array_type(ty)? || self.checker.is_tuple_type(ty)? {
+            return self.array_or_tuple_node(ty);
+        }
+        if self.inaccessible_class_reference(ty)? {
+            return self.anonymous_type_node(ty);
+        }
+        let target = self.checker.types.target(ty)?;
+        let arguments = self.checker.get_type_arguments(ty)?;
+        let interface = self.checker.types.interface(target)?;
+        let outer = interface.outer_type_parameter_count as usize;
+        if arguments[..outer] != interface.type_parameters()[..outer] {
+            return Err(Error::Unsupported(
+                "typeReferenceToTypeNode: applied outer arguments",
+            ));
+        }
+        let arity = self.reference_display_arity(ty, &arguments)?;
+        self.type_reference(
+            self.checker
+                .types
+                .get(ty)?
+                .symbol
+                .ok_or(Error::MissingLink("reference symbol"))?,
+            &arguments[outer..arity],
+        )
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.conditionalTypeToTypeNode
+    pub(super) fn conditional_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        if self.check_truncation() {
+            return self.elision(b"...");
+        }
+        let data = *self.checker.types.conditional(ty)?;
+        let root = self.checker.conditional_root(data.root)?.clone();
+        if self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
+            && root.distributive
+            && self.checker.types.flags(data.check_type)? & crate::type_flags::TYPE_PARAMETER == 0
+        {
+            return Err(Error::Unsupported(
+                "conditionalTypeToTypeNode: shadowed distribution parameter",
+            ));
+        }
+        let check = self.type_node(data.check_type)?;
+        self.approximate_length += 15;
+        let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
+        let extends = self.type_node(data.extends_type);
+        self.infer_parameters = previous;
+        let extends = extends?;
+        let yes = self.checker.conditional_true_type(ty, false)?;
+        let no = self.checker.conditional_false_type(ty)?;
+        let yes = self.type_node_or_circularity_elision(yes)?;
+        let no = self.type_node_or_circularity_elision(no)?;
+        Ok(self
+            .ast
+            .new_conditional_type_node(Some(check), Some(extends), Some(yes), Some(no)))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode
     pub(super) fn array_or_tuple_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let target = self.checker.types.target(ty)?;
         let arguments = self.checker.element_types(ty)?;
@@ -79,6 +137,69 @@ impl NodeBuilder<'_> {
         } else {
             tuple
         })
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeReferenceToTypeNode
+    pub(super) fn reference_display_arity(
+        &mut self,
+        ty: TypeId,
+        arguments: &[TypeId],
+    ) -> Result<usize, Error> {
+        let target = self.checker.types.target(ty)?;
+        let parameters = self
+            .checker
+            .types
+            .interface(target)?
+            .type_parameters()
+            .to_vec();
+        let mut count = parameters.len().min(arguments.len());
+        // The pin elides trailing defaults only for these four global identities,
+        // not arbitrary interfaces or a same-spelled declaration in another scope.
+        let mut elide = false;
+        for name in [
+            "Iterable",
+            "IterableIterator",
+            "AsyncIterable",
+            "AsyncIterableIterator",
+        ] {
+            let global = self.checker.iteration_global(name, 3)?;
+            if self.checker.iteration_is_reference(ty, global)? {
+                elide = true;
+                break;
+            }
+        }
+        if elide {
+            let explicit = if let Some(node) = self.checker.types.type_reference(ty)?.node {
+                let read = self.checker.ast(node)?.node(node)?;
+                read.kind() == K::TypeReference
+                    && self
+                        .checker
+                        .source_list(node, read.type_argument_list())?
+                        .len()
+                        >= count
+            } else {
+                false
+            };
+            if !explicit {
+                while count > 0 {
+                    let default = self
+                        .checker
+                        .resolved_type_parameter_default(parameters[count - 1])?;
+                    if default == self.checker.builtins.no_constraint_type
+                        || default == self.checker.builtins.circular_constraint_type
+                        || !self.checker.is_type_related_to(
+                            arguments[count - 1],
+                            default,
+                            crate::RelationKind::Identity,
+                        )?
+                    {
+                        break;
+                    }
+                    count -= 1;
+                }
+            }
+        }
+        Ok(count)
     }
 
     fn without_missing(&mut self, ty: TypeId, optional: bool) -> Result<TypeId, Error> {
@@ -158,18 +279,9 @@ impl NodeBuilder<'_> {
             }
             optional |= self.checker.is_optional_source_parameter(node)?;
         }
-        let mut ty = self.checker.get_type_of_symbol(symbol)?;
-        if let Some(node) = declaration {
-            if self
-                .checker
-                .parameter_requires_implicit_undefined(node, None)?
-            {
-                ty = self
-                    .checker
-                    .get_union_type(&[ty, self.checker.builtins.undefined_type])?;
-            }
-        }
-        let annotation = self.type_node(ty)?;
+        let ty = self.checker.get_type_of_symbol(symbol)?;
+        let annotation =
+            self.serialize_declaration_type(declaration, Some(ty), Some(symbol), true)?;
         let name = match source_name {
             Some(name) => self.clone_binding_name(name)?,
             None => self.ast.new_identifier(text.clone()),
@@ -224,29 +336,29 @@ impl NodeBuilder<'_> {
         } else {
             Some(self.list(type_parameters)?)
         };
-        let mut parameters = Vec::new();
-        if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
-            if let Some(this) = sig.this_parameter {
-                parameters.push(self.parameter_node(this)?);
+        // Parameters do not inherit suppression of the enclosing signature's
+        // top-level `any` return type.
+        let flags = self.flags;
+        self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
+        let parameters = (|| {
+            let mut parameters = Vec::new();
+            if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
+                if let Some(this) = sig.this_parameter {
+                    parameters.push(self.parameter_node(this)?);
+                }
             }
-        }
-        for &parameter in expanded {
-            parameters.push(self.parameter_node(parameter)?);
-        }
-        let parameters = self.list(parameters)?;
-        let mut return_type = self.checker.return_type_of_signature(signature)?;
-        if let Some(declaration) = sig.declaration {
-            if self.checker.ast(declaration)?.node(declaration)?.flags()
-                & ts_ast::node_flags::SYNTHESIZED
-                == 0
-            {
-                return_type = self.checker.instantiate_type(return_type, self.mapper)?;
+            for &parameter in expanded {
+                parameters.push(self.parameter_node(parameter)?);
             }
+            self.list(parameters)
+        })();
+        self.flags = flags;
+        let parameters = parameters?;
+        let mut return_type = self.serialize_signature_return(signature, true)?;
+        if return_type.is_none() && matches!(kind, K::FunctionType | K::ConstructorType) {
+            let empty = self.ast.new_identifier(JsString::default());
+            return_type = Some(self.ast.new_type_reference_node(Some(empty), None));
         }
-        let return_type = match self.checker.type_predicate_of_signature(signature)? {
-            Some(predicate) => self.predicate_node(predicate)?,
-            None => self.type_node(return_type)?,
-        };
         let modifiers = if kind == K::ConstructorType && sig.flags & sg::ABSTRACT != 0 {
             let abstract_modifier = self.ast.new_modifier(K::AbstractKeyword.into());
             Some(self.list(vec![abstract_modifier])?)
@@ -254,33 +366,32 @@ impl NodeBuilder<'_> {
             None
         };
         Ok(match kind {
-            K::FunctionType => self.ast.new_function_type_node(
-                type_parameters,
-                Some(parameters),
-                Some(return_type),
-            ),
+            K::FunctionType => {
+                self.ast
+                    .new_function_type_node(type_parameters, Some(parameters), return_type)
+            }
             K::ConstructorType => self.ast.new_constructor_type_node(
                 modifiers,
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::CallSignature => self.ast.new_call_signature_declaration(
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::ConstructSignature => self.ast.new_construct_signature_declaration(
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             K::GetAccessor => self.ast.new_get_accessor_declaration(
                 None,
                 name,
                 None,
                 Some(parameters),
-                Some(return_type),
+                return_type,
                 None,
                 None,
             ),
@@ -299,7 +410,7 @@ impl NodeBuilder<'_> {
                 question,
                 type_parameters,
                 Some(parameters),
-                Some(return_type),
+                return_type,
             ),
             _ => {
                 return Err(Error::Unsupported(
@@ -307,6 +418,123 @@ impl NodeBuilder<'_> {
                 ))
             }
         })
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isTriviallySerializableComputedName
+    pub(super) fn serializable_computed_name(
+        &mut self,
+        declaration: NodeId,
+    ) -> Result<bool, Error> {
+        let Some(enclosing) = self.enclosing else {
+            return Ok(false);
+        };
+        let Some(name) = self.checker.ast(declaration)?.node(declaration)?.name() else {
+            return Ok(false);
+        };
+        let read = self.checker.ast(name)?.node(name)?;
+        if read.kind() != K::ComputedPropertyName {
+            return Ok(false);
+        }
+        let expression = read
+            .expression()
+            .ok_or(Error::MissingLink("computed index name"))?;
+        Ok(
+            ts_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)?
+                && self
+                    .checker
+                    .emit_entity_visible_ex(expression, enclosing, false)?
+                    .accessibility
+                    == ts_printer::emit_resolver::SymbolAccessibility::Accessible,
+        )
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToObjectComputedNamesOrSignatureDeclaration
+    pub(super) fn object_index_nodes(
+        &mut self,
+        index: IndexInfoId,
+        value_node: Option<NodeId>,
+    ) -> Result<Vec<NodeId>, Error> {
+        let info = self.checker.signatures.index_info(index)?.clone();
+        if let Some(components) = info.components.as_ref().filter(|items| !items.is_empty()) {
+            let mut serializable = self.enclosing.is_some();
+            for &component in components.iter() {
+                if !serializable {
+                    break;
+                }
+                serializable = self.serializable_computed_name(component)?;
+            }
+            if serializable {
+                // Native Filter precedes Map: finish all late-name queries before
+                // reusing names or serializing component value types.
+                let mut selected = Vec::new();
+                for &component in components.iter() {
+                    let late = if let Some(name) = self.checker.late_name(component)? {
+                        let ty = self.checker.late_name_type(name)?;
+                        self.checker.types.flags(ty)?
+                            & (crate::type_flags::STRING_OR_NUMBER_LITERAL
+                                | crate::type_flags::UNIQUE_ES_SYMBOL)
+                            != 0
+                    } else {
+                        false
+                    };
+                    if !late {
+                        selected.push(component);
+                    }
+                }
+                let mut results = Vec::new();
+                let mut bailed = false;
+                for component in selected {
+                    let read = self.checker.ast(component)?.node(component)?;
+                    let range = read.range();
+                    let name = read
+                        .name()
+                        .ok_or(Error::MissingLink("computed index name"))?;
+                    let postfix = read.postfix_token();
+                    if let Some(reused) = self.reuse_node(name)? {
+                        let expression = self
+                            .checker
+                            .ast(name)?
+                            .node(name)?
+                            .expression()
+                            .ok_or(Error::MissingLink("computed index expression"))?;
+                        self.reuse_track_computed_name(expression)?;
+                        let modifiers = if info.is_readonly {
+                            let token = self.ast.new_modifier(K::ReadonlyKeyword.into());
+                            Some(self.list(vec![token])?)
+                        } else {
+                            None
+                        };
+                        let postfix = postfix.map(|node| ts_ast::clone_node(&mut self.ast, node));
+                        let value = if let Some(node) = value_node {
+                            ts_ast::deep_clone_node(&mut self.ast, Some(node))
+                                .ok_or(Error::MissingLink("index value clone"))?
+                        } else {
+                            let symbol = self
+                                .checker
+                                .raw_declaration_symbol(component)?
+                                .ok_or(Error::MissingLink("computed index symbol"))?;
+                            let ty = self.checker.get_type_of_symbol(symbol)?;
+                            self.type_node(ty)?
+                        };
+                        let node = self.ast.new_property_signature_declaration(
+                            modifiers,
+                            Some(reused),
+                            postfix,
+                            Some(value),
+                            None,
+                        );
+                        self.ast.set_node_range(node, range);
+                        results.push(node);
+                    } else {
+                        bailed = true;
+                    }
+                }
+                if !bailed {
+                    return Ok(results);
+                }
+            }
+        }
+        Ok(vec![self.index_signature_node_with_type(index, value_node)?])
     }
 
     pub(super) fn index_signature_node(&mut self, index: IndexInfoId) -> Result<NodeId, Error> {
@@ -533,16 +761,58 @@ impl NodeBuilder<'_> {
 }
 
 impl NodeBuilder<'_> {
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isHomomorphicMappedTypeWithNonHomomorphicInstantiation
+    fn non_homomorphic_instantiation(&mut self, ty: TypeId) -> Result<bool, Error> {
+        let Some(target) = self.checker.types.object(ty)?.target else {
+            return Ok(false);
+        };
+        Ok(self.checker.homomorphic_type_variable(ty)?.is_none()
+            && self.checker.homomorphic_type_variable(target)?.is_some())
+    }
+
+    fn mapped_wrapper_variable(&mut self) -> Result<(TypeId, NodeId), Error> {
+        let symbol = self
+            .checker
+            .new_symbol(sf::TYPE_PARAMETER, JsString::from_bytes(b"T".as_slice()))?;
+        let parameter = self.checker.new_type_parameter(Some(symbol))?;
+        let name = self.type_parameter_name(parameter)?;
+        Ok((
+            parameter,
+            self.ast.new_type_reference_node(Some(name), None),
+        ))
+    }
+
+    fn mapped_wrapper_infer(
+        &mut self,
+        variable: NodeId,
+        constraint: Option<NodeId>,
+    ) -> Result<NodeId, Error> {
+        let name = self
+            .ast
+            .view()
+            .node(variable)?
+            .data_source()
+            .as_type_reference_node()
+            .and_then(|data| data.type_name())
+            .ok_or(Error::MissingLink("mapped wrapper variable"))?;
+        let name = ts_ast::clone_node(&mut self.ast, name);
+        let parameter =
+            self.ast
+                .new_type_parameter_declaration(None, Some(name), constraint, None, None);
+        Ok(self.ast.new_infer_type_node(Some(parameter)))
+    }
+
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createMappedTypeNodeFromType
     pub(super) fn mapped_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        use crate::type_flags as tf;
         let declaration = self.checker.mapped_declaration(ty)?;
         let read = self.checker.ast(declaration)?.node(declaration)?;
         let data = read
             .data_source()
             .as_mapped_type_node()
             .ok_or(Error::MissingLink("mapped display syntax"))?;
-        let readonly = data
-            .readonly_token()
+        let (readonly, question) = (data.readonly_token(), data.question_token());
+        let readonly = readonly
             .map(|node| {
                 self.checker
                     .ast(node)?
@@ -550,9 +820,9 @@ impl NodeBuilder<'_> {
                     .map(|read| read.kind())
                     .map_err(Error::from)
             })
-            .transpose()?;
-        let question = data
-            .question_token()
+            .transpose()?
+            .map(|kind| self.ast.new_token(kind));
+        let question = question
             .map(|node| {
                 self.checker
                     .ast(node)?
@@ -560,53 +830,146 @@ impl NodeBuilder<'_> {
                     .map(|read| read.kind())
                     .map_err(Error::from)
             })
-            .transpose()?;
-        if self.flags & ts_nodebuilder::flags::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0 {
-            return Err(Error::Unsupported(
-                "mapped display: modifier preserving wrapper",
-            ));
-        }
-        let template = self.checker.mapped_template(ty)?;
+            .transpose()?
+            .map(|kind| self.ast.new_token(kind));
+        let mut template = self.checker.mapped_template(ty)?;
         let parameter = self.checker.mapped_parameter(ty)?;
-        let constraint = if self.checker.mapped_keyof_constraint(ty)? {
-            let modifiers = self.checker.mapped_modifiers_type(ty)?;
-            let operand = self.type_node(modifiers)?;
+        let keyof = self.checker.mapped_keyof_constraint(ty)?;
+        let generate_names = self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0;
+        // Retain the native short-circuit order: computing a constraint may
+        // instantiate types and populate links used by the subsequent display.
+        let needs_wrapper = !keyof
+            && {
+                let modifiers = self.checker.mapped_modifiers_type(ty)?;
+                self.checker.types.flags(modifiers)? & tf::UNKNOWN == 0
+            }
+            && generate_names
+            && {
+                let constraint = self.checker.mapped_constraint(ty)?;
+                !(self.checker.types.flags(constraint)? & tf::TYPE_PARAMETER != 0
+                    && self
+                        .checker
+                        .constraint_of_type_parameter(constraint)?
+                        .map(|ty| self.checker.types.flags(ty))
+                        .transpose()?
+                        .is_some_and(|flags| flags & tf::INDEX != 0))
+            };
+        let mut variable = None;
+        let constraint = if keyof {
+            if generate_names && self.non_homomorphic_instantiation(ty)? {
+                let (new_parameter, new_variable) = self.mapped_wrapper_variable()?;
+                variable = Some(new_variable);
+                let target = self
+                    .checker
+                    .types
+                    .object(ty)?
+                    .target
+                    .ok_or(Error::MissingLink("mapped instantiation target"))?;
+                let target_template = self.checker.mapped_template(target)?;
+                let target_parameter = self.checker.mapped_parameter(target)?;
+                let target_modifiers = self.checker.mapped_modifiers_type(target)?;
+                let mapper = self.checker.new_type_mapper(
+                    &[target_parameter, target_modifiers],
+                    &[parameter, new_parameter],
+                )?;
+                template = self
+                    .checker
+                    .instantiate_type(target_template, Some(mapper))?;
+            }
+            let operand = if let Some(node) = variable {
+                node
+            } else {
+                let modifiers = self.checker.mapped_modifiers_type(ty)?;
+                self.type_node(modifiers)?
+            };
             self.ast
                 .new_type_operator_node(K::KeyOfKeyword.into(), Some(operand))
+        } else if needs_wrapper {
+            let (_, new_variable) = self.mapped_wrapper_variable()?;
+            variable = Some(new_variable);
+            new_variable
         } else {
             let constraint = self.checker.mapped_constraint(ty)?;
             self.type_node(constraint)?
         };
-        let name = self.symbol_node(
-            self.checker
-                .types
-                .get(parameter)?
-                .symbol
-                .ok_or(Error::MissingLink("mapped parameter display"))?,
+        let (parameter_node, name, template_node) = self.with_serialization_scope(
+            Some(declaration),
+            &[],
+            &[parameter],
+            &[],
+            None,
+            |builder| {
+                let parameter_node =
+                    builder.type_parameter_node_with_constraint(parameter, Some(constraint))?;
+                let name = builder
+                    .checker
+                    .mapped_name(ty)?
+                    .map(|ty| builder.type_node(ty))
+                    .transpose()?;
+                let optional =
+                    builder.checker.mapped_modifiers(ty)? & crate::mapped::INCLUDE_OPTIONAL != 0;
+                let template = builder.without_missing(template, optional)?;
+                Ok((parameter_node, name, builder.type_node(template)?))
+            },
         )?;
-        let parameter =
-            self.ast
-                .new_type_parameter_declaration(None, Some(name), Some(constraint), None, None);
-        let name_type = self
-            .checker
-            .mapped_name(ty)?
-            .map(|ty| self.type_node(ty))
-            .transpose()?;
-        let optional = self.checker.mapped_modifiers(ty)? & crate::mapped::INCLUDE_OPTIONAL != 0;
-        let template = self.without_missing(template, optional)?;
-        let template = self.type_node(template)?;
-        let readonly = readonly.map(|kind| self.ast.new_token(kind));
-        let question = question.map(|kind| self.ast.new_token(kind));
         let result = self.ast.new_mapped_type_node(
             readonly,
-            Some(parameter),
-            name_type,
+            Some(parameter_node),
+            name,
             question,
-            Some(template),
+            Some(template_node),
             None,
         );
         self.approximate_length += 10;
         self.emit.add_emit_flags(result, emit_flags::SINGLE_LINE);
+        if generate_names && self.non_homomorphic_instantiation(ty)? {
+            let raw = self.checker.mapped_constraint_node(ty)?;
+            let raw = match self.reuse_type_from_node(raw, false)? {
+                Some(ty) => self.checker.constraint_of_type_parameter(ty)?,
+                None => None,
+            }
+            .unwrap_or(self.checker.builtins.unknown_type);
+            let mapper = self.checker.types.object(ty)?.mapper;
+            let constraint = self.checker.instantiate_type(raw, mapper)?;
+            let constraint = if self.checker.types.flags(constraint)? & tf::UNKNOWN == 0 {
+                Some(self.type_node(constraint)?)
+            } else {
+                None
+            };
+            let modifiers = self.checker.mapped_modifiers_type(ty)?;
+            let check = self.type_node(modifiers)?;
+            let infer = self.mapped_wrapper_infer(
+                variable.ok_or(Error::MissingLink("homomorphic wrapper variable"))?,
+                constraint,
+            )?;
+            let never = self.ast.new_keyword_type_node(K::NeverKeyword.into());
+            return Ok(self.ast.new_conditional_type_node(
+                Some(check),
+                Some(infer),
+                Some(result),
+                Some(never),
+            ));
+        }
+        if needs_wrapper {
+            let constraint = self.checker.mapped_constraint(ty)?;
+            let check = self.type_node(constraint)?;
+            let modifiers = self.checker.mapped_modifiers_type(ty)?;
+            let modifiers = self.type_node(modifiers)?;
+            let constraint = self
+                .ast
+                .new_type_operator_node(K::KeyOfKeyword.into(), Some(modifiers));
+            let infer = self.mapped_wrapper_infer(
+                variable.ok_or(Error::MissingLink("modifier wrapper variable"))?,
+                Some(constraint),
+            )?;
+            let never = self.ast.new_keyword_type_node(K::NeverKeyword.into());
+            return Ok(self.ast.new_conditional_type_node(
+                Some(check),
+                Some(infer),
+                Some(result),
+                Some(never),
+            ));
+        }
         Ok(result)
     }
 }

@@ -148,7 +148,8 @@
       "prefix": "program_diagnostics::tests::",
       "target": "lib",
       "tests": [
-        "program_diagnostics::tests::independently_observed_go_related_merge_and_sort_ties"
+        "program_diagnostics::tests::independently_observed_go_related_merge_and_sort_ties",
+        "program_diagnostics::tests::public_aggregation_rejects_foreign_related_file_before_sorting"
       ]
     }
   ],

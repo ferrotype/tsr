@@ -74,6 +74,60 @@ fn fixture_files(
 }
 
 #[test]
+fn display_rejects_foreign_and_builder_generated_enclosing_nodes() {
+    let (owner, source) = checker(b"let local = 1;", options());
+    let (_foreign_owner, foreign_source) = checker(b"let foreign = 1;", options());
+    let mut op = owner.operation().unwrap();
+    let typ = op.builtin_type("stringType").unwrap();
+    let symbol = op
+        .new_symbol(ts_ast::symbol_flags::VARIABLE, b"local", 0)
+        .unwrap();
+    let symbol = op.symbol_ref(symbol).unwrap();
+    let generated = op
+        .node_builder()
+        .type_to_type_node(typ, Some(source), 0, 0)
+        .unwrap()
+        .unwrap();
+    for (case, enclosing) in [
+        ("foreign program", foreign_source),
+        ("dropped builder", generated),
+    ] {
+        assert_eq!(
+            op.type_to_string_at(typ, Some(enclosing), 0),
+            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            "type string: {case}"
+        );
+        assert_eq!(
+            op.symbol_to_string_at(symbol, Some(enclosing), 0, 0),
+            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            "symbol string: {case}"
+        );
+        let mut builder = op.node_builder();
+        assert_eq!(
+            builder.type_to_type_node(typ, Some(enclosing), 0, 0),
+            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            "type node: {case}"
+        );
+        assert!(builder
+            .type_to_type_node(typ, Some(source), 0, 0)
+            .unwrap()
+            .is_some());
+    }
+    assert_eq!(
+        op.type_to_string_at(typ, Some(source), 0)
+            .unwrap()
+            .as_bytes(),
+        b"string"
+    );
+    assert_eq!(
+        op.symbol_to_string_at(symbol, Some(source), 0, 0)
+            .unwrap()
+            .as_bytes(),
+        b"local"
+    );
+}
+
+#[test]
 fn source_assignment_diagnostics_match_pinned_native_ranges_and_payload_on_repeat() {
     let requests: serde_json::Value =
         serde_json::from_str(include_str!("../../../tools/s08/p2/requests.json")).unwrap();

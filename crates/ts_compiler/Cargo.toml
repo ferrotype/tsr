@@ -40,5 +40,7 @@ ts_diagnostics = { version = "0.1.0", path = "../ts_diagnostics" }
 workspace = true
 
 [dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
 serde_json = "1"
 sha2 = "0.10"

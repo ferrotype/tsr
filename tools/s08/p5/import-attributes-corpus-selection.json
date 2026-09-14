@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "selection": "Every native corpus type-baseline observation containing an import type with attributes or resolution-mode; includes the reviewed display group and an additional mode case. Selection reads displayed results after the observation separator, not source import expressions.",
+  "ids": [
+    "compiler/importAttributeArbitraryExtension.ts#configuration=0",
+    "compiler/importAttributeDynamicImports.ts#configuration=0",
+    "compiler/importAttributeModuleAugmentations.ts#configuration=0",
+    "compiler/importAttributeMostSpecificType.ts#configuration=0",
+    "compiler/importAttributePlainStringAmbientModule.ts#configuration=0",
+    "compiler/importAttributeType2.ts#configuration=0",
+    "conformance/importAssertion/importAssertion2.ts#configuration=0",
+    "conformance/importAssertion/importAssertion2.ts#configuration=1",
+    "conformance/importAssertion/importAssertion2.ts#configuration=2",
+    "conformance/importAssertion/importAssertion3.ts#configuration=0",
+    "conformance/importAssertion/importAssertion3.ts#configuration=1",
+    "conformance/importAttributes/importAttributes2.ts#configuration=0",
+    "conformance/importAttributes/importAttributes2.ts#configuration=1",
+    "conformance/importAttributes/importAttributes2.ts#configuration=2",
+    "conformance/importAttributes/importAttributes3.ts#configuration=0",
+    "conformance/importAttributes/importAttributes3.ts#configuration=1",
+    "conformance/node/esmModuleExports1.ts#configuration=0",
+    "conformance/node/esmModuleExports2.ts#configuration=0",
+    "conformance/node/esmModuleExports2.ts#configuration=1",
+    "conformance/node/esmModuleExports3.ts#configuration=0",
+    "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=0",
+    "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=1",
+    "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=2"
+  ]
+}

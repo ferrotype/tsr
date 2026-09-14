@@ -333,7 +333,7 @@ impl NodeBuilder<'_> {
             let previous = result;
             result = ts_ast::clone_node(&mut self.ast, result);
             self.ast.set_node_range(result, TextRange::new(-1, -1));
-            if let Some(&symbol) = self.id_to_symbol.get(&previous) {
+            if let Some(&symbol) = self.identifier_symbol(previous) {
                 self.id_to_symbol.insert(result, symbol);
             }
         }
@@ -668,7 +668,7 @@ impl NodeBuilder<'_> {
             && ts_ast::is_declaration(&view.node(parent)?)
             && view.node(parent)?.name() == Some(node))
     }
-    fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
         let first = ts_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let text = self.checker.ast(first)?.node_text(first)?.into_js_string();
         let symbol = self.checker.resolve_name(
@@ -695,6 +695,17 @@ impl NodeBuilder<'_> {
         Ok(())
     }
     fn reuse_attach_symbol(
+        &mut self,
+        leftmost: NodeId,
+        node: NodeId,
+        symbol: Option<SymbolId>,
+    ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.reuse_attach_symbol_worker(leftmost, node, symbol)
+        })
+    }
+
+    fn reuse_attach_symbol_worker(
         &mut self,
         leftmost: NodeId,
         node: NodeId,
@@ -912,12 +923,8 @@ impl NodeBuilder<'_> {
             return Ok(None);
         }
         self.track_symbol(resolved, meaning)?;
-        let name = self.symbol_expression_with_meaning(resolved, self.enclosing, meaning)?;
-        Ok(Some(if is_type_of {
-            self.ast.new_type_query_node(Some(name), args)
-        } else {
-            self.ast.new_type_reference_node(Some(name), args)
-        }))
+        self.symbol_type_node_from_chain(resolved, meaning, args)
+            .map(Some)
     }
     fn reuse_simple_type(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let mut inner = node;

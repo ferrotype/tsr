@@ -12,6 +12,7 @@ pub(crate) struct ModuleAliasState {
     pub(crate) referenced: crate::types::Set<SymbolId>,
     pub(crate) exports_checked: crate::types::Set<SymbolId>,
     pub(crate) targets: crate::types::Map<SymbolId, Result<SymbolId, Error>>,
+    pub(crate) immediate_targets: crate::types::Map<SymbolId, SymbolId>,
     pub(crate) type_only: crate::types::Map<SymbolId, NodeId>,
     pub(crate) resolved_exports: crate::types::Map<SymbolId, Result<ts_ast::SymbolTableId, Error>>,
     pub(crate) resolving_exports: crate::types::Set<SymbolId>,
@@ -51,6 +52,7 @@ impl ModuleAliasState {
         census.map("module_aliases", &self.synthetic_types);
         census.map("module_aliases", &self.export_types);
         census.map("module_aliases", &self.targets);
+        census.map("module_aliases", &self.immediate_targets);
         census.map("module_aliases", &self.type_only);
         census.map("module_aliases", &self.resolved_exports);
         census.add(
@@ -205,6 +207,25 @@ impl CheckerState {
         }
         Ok(None)
     }
+    // port: tsc/internal/checker/checker.go:Checker.getImmediateAliasedSymbol
+    pub(crate) fn immediate_aliased_symbol(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<Option<SymbolId>, Error> {
+        if self.symbol(symbol)?.flags() & sf::ALIAS == 0 {
+            return Err(ts_arena::Error::InvalidGraph.into());
+        }
+        if let Some(&target) = self.module_aliases.immediate_targets.get(&symbol) {
+            return Ok(Some(target));
+        }
+        let node = self.alias_declaration(symbol)?;
+        let target = self.target_of_alias_declaration(node)?;
+        if let Some(target) = target {
+            self.module_aliases.immediate_targets.insert(symbol, target);
+        }
+        Ok(target)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.resolveAlias
     pub(crate) fn resolve_alias(&mut self, symbol: SymbolId) -> Result<SymbolId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {

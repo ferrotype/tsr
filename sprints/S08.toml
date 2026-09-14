@@ -6,6 +6,7 @@
 #   run.e5.type_footprint_ratio    joins the e5 producer
 # E4 completes here with token_literal_bytes and helper_printer_semantics measured through
 # production literal-type construction and original-source/regenerated printer paths.
+# The checkertext producer supplies those two metrics; e4 keeps the S04 leaf scope.
 # Additional producers: checkerbench (frozen checker workload), relater (cases = the frozen
 # relater fixture manifest; the runner derives parity). Their inputs include the workload,
 # benchmark configuration and comparison methodology. They report actual measurements:

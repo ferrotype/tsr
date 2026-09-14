@@ -130,6 +130,9 @@ pub(crate) const ALL_FAMILIES: &[&str] = &[
     "value_symbol_links",
     "synthetic_expression_links",
     "checker_ast",
+    "display_cache",
+    "display_ast",
+    "display_emit",
     "mappers",
     "inference",
     "relations",
@@ -424,6 +427,9 @@ impl CheckerState {
             0,
         );
         census.unavailable.push("checker_ast");
+
+        self.display_builder.census(&mut census);
+        census.unavailable.extend(["display_ast", "display_emit"]);
 
         let created = self.types.len();
         let reachable = self.reachable_types(roots)?;

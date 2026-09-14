@@ -228,6 +228,32 @@ impl CheckerState {
         if symbol == self.builtins.unknown_symbol {
             return Ok(self.builtins.error_type);
         }
+        // getTypeFromTypeAliasReference keeps unresolved aliases on a cached
+        // intrinsic "error" type. The symbol's declared "unresolved" type is
+        // a distinct value, observable when the baseline bypasses the builder.
+        if self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0
+            && self.symbol(symbol)?.check_flags() & ts_ast::check_flags::UNRESOLVED != 0
+        {
+            let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+            let arguments = nodes
+                .into_iter()
+                .map(|node| self.get_type_from_type_node(node))
+                .collect::<Result<Vec<_>, _>>()?;
+            let mut key = crate::key::KeyBuilder::new();
+            key.write_alias(Some((self.symbol_runtime_id(symbol)?, &arguments)));
+            let key = key.finish();
+            if let Some(&cached) = self.query.error_types.get(&key) {
+                return Ok(cached);
+            }
+            let ty = self.new_intrinsic_type(crate::type_flags::ANY, b"error")?;
+            let alias = self.types.push_alias(crate::TypeAlias {
+                symbol,
+                type_arguments: arguments.into(),
+            })?;
+            self.types.get_mut(ty)?.alias = Some(alias);
+            self.query.error_types.insert(key, ty);
+            return Ok(ty);
+        }
         let ty = self.get_declared_type_of_symbol(symbol)?;
         let flags = self.symbol(symbol)?.flags();
         let argument_nodes =

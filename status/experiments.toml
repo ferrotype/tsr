@@ -259,14 +259,14 @@ unit = "scanner and scanned-literal diagnostic callbacks match Go on successful 
 
 [[E4.criteria]]
 id = "token_literal_bytes"
-metric = "run.e4.token_literal_bytes"
+metric = "run.checkertext.token_literal_bytes"
 op = "=="
 threshold = true
 unit = "token bytes, literal values and literal types match Go, including explicit upstream transformations without added lossy repair"
 
 [[E4.criteria]]
 id = "helper_printer_semantics"
-metric = "run.e4.helper_printer_semantics"
+metric = "run.checkertext.helper_printer_semantics"
 op = "=="
 threshold = true
 unit = "case mapping and truncation preserve Go's replacements/fragments; original-source and regenerated literal paths reproduce its distinct copy/escape behavior"

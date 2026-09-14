@@ -113,7 +113,7 @@
     "kind": "LiteralType",
     "literal": {
      "kind": "StringLiteral",
-     "text": "a\"b\\c\n\t\u0000é😀 "
+     "text": "a\"b\\c\n\t\u0000\u00e9\ud83d\ude00\u2028"
     }
    }
   },
@@ -129,7 +129,7 @@
     "kind": "LiteralType",
     "literal": {
      "kind": "StringLiteral",
-     "text": "héllo 😀"
+     "text": "h\u00e9llo \ud83d\ude00"
     }
    }
   },
@@ -2272,6 +2272,1301 @@
       "kind": "JSDocAllType"
      }
     ]
+   }
+  },
+  {
+   "name": "p5_EqualsToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "EqualsToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "EqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_EqualsToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "EqualsToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "EqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_CommaToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "CommaToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "CommaToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_CommaToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "CommaToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "CommaToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_QuestionQuestionToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "QuestionQuestionToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_QuestionQuestionToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "QuestionQuestionToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_BarBarToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "BarBarToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "BarBarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_BarBarToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "BarBarToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "BarBarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_AmpersandAmpersandToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AmpersandAmpersandToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "AmpersandAmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_AmpersandAmpersandToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AmpersandAmpersandToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "AmpersandAmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_BarToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "BarToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "BarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_BarToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "BarToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "BarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_CaretToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "CaretToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "CaretToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_CaretToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "CaretToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "CaretToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_AmpersandToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AmpersandToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "AmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_AmpersandToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AmpersandToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "AmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_EqualsEqualsToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "EqualsEqualsToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "EqualsEqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_EqualsEqualsToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "EqualsEqualsToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "EqualsEqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_LessThanToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "LessThanToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "LessThanToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_LessThanToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "LessThanToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "LessThanToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_LessThanLessThanToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "LessThanLessThanToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "LessThanLessThanToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_LessThanLessThanToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "LessThanLessThanToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "LessThanLessThanToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_AsteriskToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AsteriskToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "AsteriskToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_AsteriskToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AsteriskToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "AsteriskToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_SlashToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "SlashToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "SlashToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_SlashToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "SlashToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "SlashToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_AsteriskAsteriskToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AsteriskAsteriskToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "AsteriskAsteriskToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_AsteriskAsteriskToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AsteriskAsteriskToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "AsteriskAsteriskToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_PlusEqualsToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusEqualsToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "PlusEqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_PlusEqualsToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusEqualsToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "PlusEqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_PlusToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "PlusToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_PlusToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "PlusToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_MinusToken_left",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "MinusToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "MinusToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "c"
+    }
+   }
+  },
+  {
+   "name": "p5_MinusToken_right",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "MinusToken",
+    "left": {
+     "kind": "Identifier",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "MinusToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "b"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_coalesce_BarBarToken",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "QuestionQuestionToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "BarBarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "BarBarToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "c"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "d"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_BarBarToken_coalesce",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "BarBarToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "c"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "d"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_coalesce_AmpersandAmpersandToken",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "QuestionQuestionToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "AmpersandAmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "AmpersandAmpersandToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "c"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "d"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_AmpersandAmpersandToken_coalesce",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AmpersandAmpersandToken",
+    "left": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "b"
+     }
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "QuestionQuestionToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "c"
+     },
+     "right": {
+      "kind": "Identifier",
+      "text": "d"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_literal_plus",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusToken",
+    "left": {
+     "kind": "StringLiteral",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "PlusToken",
+     "left": {
+      "kind": "StringLiteral",
+      "text": "b"
+     },
+     "right": {
+      "kind": "StringLiteral",
+      "text": "c"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_mixed_plus",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "PlusToken",
+    "left": {
+     "kind": "StringLiteral",
+     "text": "a"
+    },
+    "right": {
+     "kind": "Binary",
+     "operator": "PlusToken",
+     "left": {
+      "kind": "NumericLiteral",
+      "text": "1"
+     },
+     "right": {
+      "kind": "NumericLiteral",
+      "text": "2"
+     }
+    }
+   }
+  },
+  {
+   "name": "p5_unary_exponent",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Binary",
+    "operator": "AsteriskAsteriskToken",
+    "left": {
+     "kind": "PrefixUnary",
+     "operator": "MinusToken",
+     "operand": {
+      "kind": "Identifier",
+      "text": "a"
+     }
+    },
+    "right": {
+     "kind": "Identifier",
+     "text": "b"
+    }
+   }
+  },
+  {
+   "name": "p5_call",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Call",
+    "expression": {
+     "kind": "Identifier",
+     "text": "f"
+    },
+    "arguments": [
+     {
+      "kind": "Binary",
+      "operator": "CommaToken",
+      "left": {
+       "kind": "Identifier",
+       "text": "a"
+      },
+      "right": {
+       "kind": "Identifier",
+       "text": "b"
+      }
+     },
+     {
+      "kind": "Identifier",
+      "text": "c"
+     }
+    ]
+   }
+  },
+  {
+   "name": "p5_generic_call",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Call",
+    "expression": {
+     "kind": "Identifier",
+     "text": "f"
+    },
+    "typeArguments": [
+     {
+      "kind": "KeywordType",
+      "keyword": "StringKeyword"
+     }
+    ],
+    "arguments": []
+   }
+  },
+  {
+   "name": "p5_optional_call",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "Call",
+    "expression": {
+     "kind": "Identifier",
+     "text": "f"
+    },
+    "optional": true,
+    "arguments": []
+   }
+  },
+  {
+   "name": "p5_optional_element",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "ElementAccess",
+    "expression": {
+     "kind": "PrefixUnary",
+     "operator": "MinusToken",
+     "operand": {
+      "kind": "Identifier",
+      "text": "a"
+     }
+    },
+    "argument": {
+     "kind": "NumericLiteral",
+     "text": "0"
+    },
+    "optional": true
+   }
+  },
+  {
+   "name": "p5_parenthesized_assignment",
+   "options": {
+    "remove_comments": true,
+    "new_line": "",
+    "writer": "text"
+   },
+   "tree": {
+    "kind": "ParenthesizedExpression",
+    "expression": {
+     "kind": "Binary",
+     "operator": "EqualsToken",
+     "left": {
+      "kind": "Identifier",
+      "text": "a"
+     },
+     "right": {
+      "kind": "StringLiteral",
+      "text": ""
+     }
+    }
    }
   }
  ]

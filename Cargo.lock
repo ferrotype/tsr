@@ -452,6 +452,7 @@ dependencies = [
 name = "ts_compiler"
 version = "0.1.0"
 dependencies = [
+ "serde",
  "serde_json",
  "sha2",
  "stacker",
@@ -464,6 +465,7 @@ dependencies = [
  "ts_diagnostics",
  "ts_jsstring",
  "ts_module",
+ "ts_nodebuilder",
  "ts_parser",
  "ts_printer",
  "ts_scanner",
@@ -561,6 +563,7 @@ name = "ts_printer"
 version = "0.1.0"
 dependencies = [
  "serde_json",
+ "stacker",
  "ts_arena",
  "ts_ast",
  "ts_core",

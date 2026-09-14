@@ -1,6 +1,7 @@
 //! Type and symbol display through synthetic AST nodes and `ts_printer`
-//! (`tsc/internal/checker/printer.go`). The builder and its emit context are
-//! operation scratch; the returned bytes keep no synthetic storage alive.
+//! (`tsc/internal/checker/printer.go`). The builder cache and emit context are
+//! reused across diagnostic calls. Completed cache entries retain their AST
+//! frames; uncached request output is released. Returned bytes own no AST.
 
 use crate::{type_format_flags, CheckerState, Error, TypeAlias, TypeFormatFlags, TypeId};
 use ts_arena::SymbolId;
@@ -12,10 +13,96 @@ pub(crate) const DEFAULT_FLAGS: TypeFormatFlags = type_format_flags::ALLOW_UNIQU
     | type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE;
 
 impl CheckerState {
-    // port: tsc/internal/checker/printer.go:Checker.typeToStringEx
+    // port: tsc/internal/checker/printer.go:Checker.symbolToStringEx
+    pub(crate) fn symbol_to_string_at(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<ts_arena::NodeId>,
+        meaning: ts_ast::SymbolFlags,
+        flags: crate::SymbolFormatFlags,
+    ) -> Result<JsString, Error> {
+        use crate::symbol_format_flags as sf;
+        use ts_nodebuilder::{flags as nf, internal_flags as inf};
+        let mut node_flags = nf::IGNORE_ERRORS;
+        for (source, target) in [
+            (
+                sf::USE_ONLY_EXTERNAL_ALIASING,
+                nf::USE_ONLY_EXTERNAL_ALIASING,
+            ),
+            (
+                sf::WRITE_TYPE_PARAMETERS_OR_ARGUMENTS,
+                nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME,
+            ),
+            (
+                sf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+                nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+            ),
+        ] {
+            if flags & source != 0 {
+                node_flags |= target;
+            }
+        }
+        let mut internal = inf::NONE;
+        if flags & sf::DO_NOT_INCLUDE_SYMBOL_CHAIN != 0 {
+            internal |= inf::DO_NOT_INCLUDE_SYMBOL_CHAIN;
+        }
+        if flags & sf::WRITE_COMPUTED_PROPS != 0 {
+            internal |= inf::WRITE_COMPUTED_PROPS;
+        }
+        let source = enclosing
+            .map(|node| {
+                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .flatten();
+        let never_ascii_escape = enclosing
+            .map(|node| {
+                self.ast(node)?
+                    .node(node)
+                    .map(|n| n.kind() == ts_ast::SyntaxKind::SourceFile)
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .unwrap_or(false);
+        crate::node_builder::NodeBuilder::with_cached(self, node_flags, |builder| {
+            builder.prepare_context(enclosing, node_flags, internal)?;
+            let node = builder.symbol_display_node(
+                symbol,
+                meaning,
+                flags & sf::ALLOW_ANY_NODE_KIND != 0,
+            )?;
+            if builder.encountered_error {
+                return Ok(JsString::from_bytes(b"".as_slice()));
+            }
+            let printer = Printer::new(
+                PrinterOptions {
+                    remove_comments: true,
+                    omit_trailing_semicolon: true,
+                    never_ascii_escape,
+                    ..Default::default()
+                },
+                &builder.emit,
+            );
+            let mut writer = SingleLineStringWriter::new();
+            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            Ok(JsString::from_bytes(writer.text().to_vec()))
+        })
+    }
+
     pub(crate) fn type_to_string(
         &mut self,
         ty: TypeId,
+        flags: TypeFormatFlags,
+    ) -> Result<JsString, Error> {
+        self.type_to_string_at(ty, None, flags)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.typeToStringEx
+    pub(crate) fn type_to_string_at(
+        &mut self,
+        ty: TypeId,
+        enclosing: Option<ts_arena::NodeId>,
         flags: TypeFormatFlags,
     ) -> Result<JsString, Error> {
         if self.serialization_level >= MAX_SERIALIZATION_LEVEL as u32 {
@@ -30,36 +117,45 @@ impl CheckerState {
         if no_truncation {
             combined |= ts_nodebuilder::flags::NO_TRUNCATION;
         }
-        self.serialization_level += 1;
-        let mut builder = crate::node_builder::NodeBuilder::new(self, combined);
-        let node = builder.type_node(ty);
-        builder.checker.serialization_level -= 1;
-        let node = node?;
-        let printer = Printer::new(
-            PrinterOptions {
-                remove_comments: true,
-                ..Default::default()
-            },
-            &builder.emit,
-        );
-        let newline = if flags & type_format_flags::MULTILINE_OBJECT_LITERALS != 0 {
-            b"\n".as_slice()
-        } else {
-            b"".as_slice()
-        };
-        let mut writer = TextWriter::new(newline, 0);
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
-        let maximum = if no_truncation {
-            NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH
-        } else {
-            DEFAULT_MAXIMUM_TRUNCATION_LENGTH
-        } * 2;
-        let mut text = writer.text().to_vec();
-        if !text.is_empty() && text.len() >= maximum {
-            text.truncate(maximum - 3);
-            text.extend_from_slice(b"...");
-        }
-        Ok(JsString::from_bytes(text))
+        let source = enclosing
+            .map(|node| {
+                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                    .map_err(Error::from)
+            })
+            .transpose()?
+            .flatten();
+        crate::node_builder::NodeBuilder::with_cached(self, combined, |builder| {
+            builder.prepare_context(enclosing, combined, ts_nodebuilder::internal_flags::NONE)?;
+            builder.checker.serialization_level += 1;
+            let node = builder.type_node(ty);
+            builder.checker.serialization_level -= 1;
+            let node = node?;
+            let printer = Printer::new(
+                PrinterOptions {
+                    remove_comments: true,
+                    ..Default::default()
+                },
+                &builder.emit,
+            );
+            let newline = if flags & type_format_flags::MULTILINE_OBJECT_LITERALS != 0 {
+                b"\n".as_slice()
+            } else {
+                b"".as_slice()
+            };
+            let mut writer = TextWriter::new(newline, 0);
+            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            let maximum = if no_truncation {
+                NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH
+            } else {
+                DEFAULT_MAXIMUM_TRUNCATION_LENGTH
+            } * 2;
+            let mut text = writer.text().to_vec();
+            if !text.is_empty() && text.len() >= maximum {
+                text.truncate(maximum - 3);
+                text.extend_from_slice(b"...");
+            }
+            Ok(JsString::from_bytes(text))
+        })
     }
 
     // port: tsc/internal/checker/printer.go:Checker.signatureToStringEx
@@ -69,33 +165,35 @@ impl CheckerState {
     ) -> Result<JsString, Error> {
         let construct =
             self.signatures.get(signature)?.flags & crate::signature_flags::CONSTRUCT != 0;
-        let mut builder = crate::node_builder::NodeBuilder::new(
+        crate::node_builder::NodeBuilder::with_cached(
             self,
             ts_nodebuilder::flags::IGNORE_ERRORS
                 | ts_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME,
-        );
-        let node = builder.signature_node(
-            signature,
-            if construct {
-                ts_ast::SyntaxKind::ConstructSignature
-            } else {
-                ts_ast::SyntaxKind::CallSignature
+            |builder| {
+                let node = builder.signature_node(
+                    signature,
+                    if construct {
+                        ts_ast::SyntaxKind::ConstructSignature
+                    } else {
+                        ts_ast::SyntaxKind::CallSignature
+                    },
+                    None,
+                    None,
+                )?;
+                let printer = Printer::new(
+                    PrinterOptions {
+                        remove_comments: true,
+                        omit_trailing_semicolon: true,
+                        never_ascii_escape: true,
+                        ..Default::default()
+                    },
+                    &builder.emit,
+                );
+                let mut writer = SingleLineStringWriter::new();
+                printer.write(builder.ast.view(), node, None, &mut writer)?;
+                Ok(JsString::from_bytes(writer.text().to_vec()))
             },
-            None,
-            None,
-        )?;
-        let printer = Printer::new(
-            PrinterOptions {
-                remove_comments: true,
-                omit_trailing_semicolon: true,
-                never_ascii_escape: true,
-                ..Default::default()
-            },
-            &builder.emit,
-        );
-        let mut writer = SingleLineStringWriter::new();
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
-        Ok(JsString::from_bytes(writer.text().to_vec()))
+        )
     }
 
     // port: tsc/internal/checker/printer.go:Checker.typePredicateToString
@@ -103,24 +201,26 @@ impl CheckerState {
         &mut self,
         predicate: crate::TypePredicateId,
     ) -> Result<JsString, Error> {
-        let mut builder = crate::node_builder::NodeBuilder::new(
+        crate::node_builder::NodeBuilder::with_cached(
             self,
             ts_nodebuilder::flags::IGNORE_ERRORS
                 | ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
-        );
-        let node = builder.predicate_node(predicate)?;
-        let printer = Printer::new(
-            PrinterOptions {
-                remove_comments: true,
-                omit_trailing_semicolon: true,
-                never_ascii_escape: true,
-                ..Default::default()
+            |builder| {
+                let node = builder.predicate_node(predicate)?;
+                let printer = Printer::new(
+                    PrinterOptions {
+                        remove_comments: true,
+                        omit_trailing_semicolon: true,
+                        never_ascii_escape: true,
+                        ..Default::default()
+                    },
+                    &builder.emit,
+                );
+                let mut writer = SingleLineStringWriter::new();
+                printer.write(builder.ast.view(), node, None, &mut writer)?;
+                Ok(JsString::from_bytes(writer.text().to_vec()))
             },
-            &builder.emit,
-        );
-        let mut writer = SingleLineStringWriter::new();
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
-        Ok(JsString::from_bytes(writer.text().to_vec()))
+        )
     }
 
     // port: tsc/internal/checker/printer.go:Checker.symbolToString
@@ -150,20 +250,24 @@ impl CheckerState {
         symbol: SymbolId,
         location: Option<ts_arena::NodeId>,
     ) -> Result<JsString, Error> {
-        let mut builder =
-            crate::node_builder::NodeBuilder::new(self, ts_nodebuilder::flags::IGNORE_ERRORS);
-        let node = builder.symbol_expression_without_chain(symbol, location)?;
-        let printer = Printer::new(
-            PrinterOptions {
-                remove_comments: true,
-                omit_trailing_semicolon: true,
-                ..Default::default()
+        crate::node_builder::NodeBuilder::with_cached(
+            self,
+            ts_nodebuilder::flags::IGNORE_ERRORS,
+            |builder| {
+                let node = builder.symbol_expression_without_chain(symbol, location)?;
+                let printer = Printer::new(
+                    PrinterOptions {
+                        remove_comments: true,
+                        omit_trailing_semicolon: true,
+                        ..Default::default()
+                    },
+                    &builder.emit,
+                );
+                let mut writer = SingleLineStringWriter::new();
+                printer.write(builder.ast.view(), node, None, &mut writer)?;
+                Ok(JsString::from_bytes(writer.text().to_vec()))
             },
-            &builder.emit,
-        );
-        let mut writer = SingleLineStringWriter::new();
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
-        Ok(JsString::from_bytes(writer.text().to_vec()))
+        )
     }
 }
 

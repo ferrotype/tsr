@@ -1,0 +1,1 @@
+{"metrics":{"failed_probes":0,"helper_printer_semantics":true,"helper_printer_semantics_probes":64,"probes":64,"token_literal_bytes":true,"token_literal_bytes_probes":52},"tests":{"byte-truncation-boundaries":"pass","lossless-source-and-regenerated-literals":"pass","numeric-and-bigint-literals":"pass","source-annotation-and-regeneration":"pass"}}

@@ -1,6 +1,8 @@
 //! The executable type-display slice of checker/nodebuilderimpl.go. Each builder
 //! owns its synthetic syntax and emit flags until printing finishes.
 
+#[path = "node_builder_cache.rs"]
+pub(crate) mod cache;
 #[path = "node_builder_class_emit.rs"]
 mod class_emit;
 #[path = "node_builder_enum.rs"]
@@ -57,11 +59,56 @@ pub(crate) struct NodeBuilder<'a> {
     infer_parameters: crate::TypeList,
     reverse_mapped_stack: Vec<SymbolId>,
     name_access: names::NameAccess,
+    specifiers: crate::types::Map<cache::SpecifierKey, JsString>,
+    serialized: crate::types::Map<cache::SerializedKey, cache::SerializedType>,
+    tracked_symbols: Vec<cache::TrackedSymbol>,
+    reported_diagnostic: bool,
+    cached: bool,
 }
 
 impl<'a> NodeBuilder<'a> {
+    /// Begin an independent public request on this builder. Generated syntax
+    /// and emit metadata survive; resolution and formatting state do not.
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.enterContext
+    pub(crate) fn prepare_context(
+        &mut self,
+        enclosing: Option<NodeId>,
+        flags: ts_nodebuilder::Flags,
+        internal_flags: ts_nodebuilder::InternalFlags,
+    ) -> Result<(), Error> {
+        if let Some(node) = enclosing {
+            self.retain_source_node(node)?;
+        }
+        self.enclosing = enclosing;
+        self.flags = flags;
+        self.internal_flags = internal_flags;
+        self.mapper = None;
+        self.suppress_inference_fallback = false;
+        self.encountered_error = false;
+        self.enclosing_symbol_types.clear();
+        self.type_parameter_names = scopes::TypeParameterNames::default();
+        self.reuse_boundaries.clear();
+        self.approximate_length = 0;
+        self.truncating = false;
+        self.visited.clear();
+        self.symbol_depth.clear();
+        self.infer_parameters = [].into();
+        self.reverse_mapped_stack.clear();
+        self.name_access = names::NameAccess::default();
+        self.tracked_symbols.clear();
+        self.reported_diagnostic = false;
+        Ok(())
+    }
+
     pub(crate) fn new(checker: &'a mut CheckerState, flags: ts_nodebuilder::Flags) -> Self {
-        let emit = EmitContext::new();
+        Self::with_emit(checker, flags, EmitContext::new())
+    }
+
+    fn with_emit(
+        checker: &'a mut CheckerState,
+        flags: ts_nodebuilder::Flags,
+        emit: EmitContext,
+    ) -> Self {
         let ast = AstBuilder::with_hooks(
             SourceText::from_bytes(b"".as_slice()),
             &checker.counters,
@@ -89,6 +136,11 @@ impl<'a> NodeBuilder<'a> {
             infer_parameters: [].into(),
             reverse_mapped_stack: Vec::new(),
             name_access: names::NameAccess::default(),
+            specifiers: crate::types::Map::default(),
+            serialized: crate::types::Map::default(),
+            tracked_symbols: Vec::new(),
+            reported_diagnostic: false,
+            cached: false,
         }
     }
 
@@ -128,6 +180,15 @@ impl<'a> NodeBuilder<'a> {
         if self.defer_reuse_report(&event) {
             return;
         }
+        use ts_printer::emit_resolver::DeclarationTrackerEvent as Event;
+        if !matches!(
+            event,
+            Event::InferenceFallback(_)
+                | Event::PushErrorFallbackNode(_)
+                | Event::PopErrorFallbackNode
+        ) {
+            self.reported_diagnostic = true;
+        }
         if let Some(tracker) = self.tracker.as_deref_mut() {
             tracker.report(event);
         }
@@ -137,38 +198,55 @@ impl<'a> NodeBuilder<'a> {
         if self.defer_reuse_symbol(symbol, self.enclosing, meaning) {
             return Ok(false);
         }
-        if self.tracker.is_none() || self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
-        {
-            return Ok(false);
+        let mut reported = false;
+        if let Some(tracker) = self.tracker.as_deref_mut() {
+            if tracker.track_symbol_without_accessibility(symbol) {
+                return Ok(false);
+            }
+            let accessibility = self.checker.emit_symbol_accessible(
+                Some(symbol),
+                self.enclosing,
+                meaning,
+                true,
+                true,
+            )?;
+            reported = self
+                .tracker
+                .as_deref_mut()
+                .expect("tracker was checked")
+                .track_symbol(symbol, self.enclosing, meaning, accessibility);
         }
-        if self
-            .tracker
-            .as_deref_mut()
-            .expect("tracker was checked")
-            .track_symbol_without_accessibility(symbol)
-        {
-            return Ok(false);
+        if reported {
+            self.reported_diagnostic = true;
+        } else if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER == 0 {
+            self.tracked_symbols.push(cache::TrackedSymbol {
+                symbol,
+                enclosing: self.enclosing,
+                meaning,
+            });
         }
-        let accessibility = self.checker.emit_symbol_accessible(
-            Some(symbol),
-            self.enclosing,
-            meaning,
-            true,
-            true,
-        )?;
-        Ok(self
-            .tracker
-            .as_deref_mut()
-            .expect("tracker was checked")
-            .track_symbol(symbol, self.enclosing, meaning, accessibility))
+        Ok(reported)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolAsWritten
     fn symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
         let read = self.checker.symbol(symbol)?;
         let declarations = self.checker.symbol_declarations(symbol)?;
-        if read.name_bytes() == ts_ast::internal_symbol_names::DEFAULT && declarations.is_empty() {
-            return Ok(JsString::from_bytes(b"default".as_slice()));
+        if read.name_bytes() == ts_ast::internal_symbol_names::DEFAULT
+            && self.flags & nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0
+        {
+            let external =
+                if self.flags & nf::IN_INITIAL_ENTITY_NAME == 0 || declarations.is_empty() {
+                    true
+                } else if let Some(enclosing) = self.enclosing {
+                    self.default_binding_context(declarations.first().flatten())?
+                        != self.default_binding_context(Some(enclosing))?
+                } else {
+                    false
+                };
+            if external {
+                return Ok(JsString::from_bytes(b"default".as_slice()));
+            }
         }
         for declaration in declarations.iter().flatten() {
             let view = self.checker.ast(declaration)?;
@@ -222,6 +300,19 @@ impl<'a> NodeBuilder<'a> {
         Ok(JsString::from_bytes(
             ts_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
         ))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:isDefaultBindingContext
+    fn default_binding_context(&self, mut node: Option<NodeId>) -> Result<Option<NodeId>, Error> {
+        while let Some(id) = node {
+            let view = self.checker.ast(id)?;
+            let read = view.node(id)?;
+            if read.kind() == K::SourceFile || ts_ast::is_ambient_module(view, id)? {
+                return Ok(node);
+            }
+            node = read.parent();
+        }
+        Ok(None)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolFromNameType
@@ -311,9 +402,6 @@ impl<'a> NodeBuilder<'a> {
     }
 
     fn type_reference(&mut self, symbol: SymbolId, arguments: &[TypeId]) -> Result<NodeId, Error> {
-        if self.name_external_module(symbol)? {
-            return self.module_type_node(symbol, false, arguments);
-        }
         let arguments = if arguments.is_empty() {
             None
         } else {
@@ -429,8 +517,32 @@ impl<'a> NodeBuilder<'a> {
         self.list(nodes)
     }
 
+    /// Raw symbol parents, without the accessibility/alias selection of symbolToName.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToEntityNameNode
+    fn raw_symbol_entity_name(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
+        let mut identifiers = Vec::new();
+        let mut current = Some(symbol);
+        while let Some(symbol) = current {
+            let record = self.checker.symbol(symbol)?;
+            let name = record.name_to_owned();
+            current = record.parent();
+            let identifier = self.ast.new_identifier(name);
+            self.id_to_symbol.insert(identifier, Some(symbol));
+            identifiers.push(identifier);
+        }
+        let mut name = identifiers.pop().expect("initial symbol was present");
+        while let Some(right) = identifiers.pop() {
+            name = self.ast.new_qualified_name(Some(name), Some(right));
+        }
+        Ok(name)
+    }
+
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode
     pub(crate) fn type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.type_node_worker(ty))
+    }
+
+    fn type_node_worker(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let in_alias = self.flags & nf::IN_TYPE_ALIAS != 0;
         self.flags &= !nf::IN_TYPE_ALIAS;
         let ty = if self.flags & nf::NO_TYPE_REDUCTION == 0 {
@@ -443,13 +555,7 @@ impl<'a> NodeBuilder<'a> {
             if let Some(alias) = self.checker.types.alias_of(ty)?.cloned() {
                 // TypeAlias.ToTypeReferenceNode uses raw entity-name symbols,
                 // separately from the ordinary alias accessibility path below.
-                let symbol = self.checker.symbol(alias.symbol)?;
-                if symbol.parent().is_some() {
-                    return Err(Error::Unsupported(
-                        "TypeAlias.ToTypeReferenceNode: parent chain",
-                    ));
-                }
-                let name = self.ast.new_identifier(symbol.name_to_owned());
+                let name = self.raw_symbol_entity_name(alias.symbol)?;
                 let arguments = if alias.type_arguments.is_empty() {
                     None
                 } else {
@@ -597,28 +703,11 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         if record.object_flags & of::REFERENCE != 0 {
-            if self.checker.is_array_type(ty)? || self.checker.is_tuple_type(ty)? {
-                return self.array_or_tuple_node(ty);
-            }
-            if self.inaccessible_class_reference(ty)? {
-                return self.anonymous_type_node(ty);
-            }
-            let target = self.checker.types.target(ty)?;
-            let arguments = self.checker.get_type_arguments(ty)?;
-            let interface = self.checker.types.interface(target)?;
-            let outer = interface.outer_type_parameter_count as usize;
-            if arguments[..outer] != interface.type_parameters()[..outer] {
-                return Err(Error::Unsupported(
-                    "typeReferenceToTypeNode: applied outer arguments",
-                ));
-            }
-            let arity = interface.type_parameters().len();
-            return self.type_reference(
-                record
-                    .symbol
-                    .ok_or(Error::MissingLink("reference symbol"))?,
-                &arguments[outer..arity],
-            );
+            return if self.checker.types.type_reference(ty)?.node.is_some() {
+                self.visit_transform_type(ty, Self::reference_type_node)
+            } else {
+                self.reference_type_node(ty)
+            };
         }
         if record.flags & tf::TYPE_PARAMETER != 0 && self.infer_parameters.contains(&ty) {
             let mut constraint_node = None;
@@ -724,35 +813,7 @@ impl<'a> NodeBuilder<'a> {
             return self.type_node(base);
         }
         if record.flags & tf::CONDITIONAL != 0 {
-            if self.check_truncation() {
-                return self.elision(b"...");
-            }
-            let data = *self.checker.types.conditional(ty)?;
-            let root = self.checker.conditional_root(data.root)?.clone();
-            if self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
-                && root.distributive
-                && self.checker.types.flags(data.check_type)? & tf::TYPE_PARAMETER == 0
-            {
-                return Err(Error::Unsupported(
-                    "conditionalTypeToTypeNode: shadowed distribution parameter",
-                ));
-            }
-            let check = self.type_node(data.check_type)?;
-            self.approximate_length += 15;
-            let previous = std::mem::replace(&mut self.infer_parameters, root.infer_parameters);
-            let extends = self.type_node(data.extends_type);
-            self.infer_parameters = previous;
-            let extends = extends?;
-            let yes = self.checker.conditional_true_type(ty, false)?;
-            let no = self.checker.conditional_false_type(ty)?;
-            let yes = self.type_node(yes)?;
-            let no = self.type_node(no)?;
-            return Ok(self.ast.new_conditional_type_node(
-                Some(check),
-                Some(extends),
-                Some(yes),
-                Some(no),
-            ));
+            return self.visit_transform_type(ty, Self::conditional_type_node);
         }
         if record.flags & tf::TEMPLATE_LITERAL != 0 {
             let data = self.checker.types.template_literal(ty)?;
@@ -901,9 +962,9 @@ impl<'a> NodeBuilder<'a> {
             for &index in indexes.iter() {
                 if self.checker.types.object_flags(ty)? & of::REVERSE_MAPPED != 0 {
                     let placeholder = self.elided_type();
-                    nodes.push(self.index_signature_node_with_type(index, Some(placeholder))?);
+                    nodes.extend(self.object_index_nodes(index, Some(placeholder))?);
                 } else {
-                    nodes.push(self.index_signature_node(index)?);
+                    nodes.extend(self.object_index_nodes(index, None)?);
                 }
             }
             nodes.extend(self.object_members(&properties)?);
@@ -1003,7 +1064,7 @@ impl<'a> NodeBuilder<'a> {
             if reverse {
                 self.reverse_mapped_stack.push(symbol);
             }
-            let result = self.type_node(ty);
+            let result = self.serialize_declaration_type(None, Some(ty), Some(symbol), true);
             if reverse {
                 self.reverse_mapped_stack.pop();
             }
@@ -1052,9 +1113,34 @@ impl<'a> NodeBuilder<'a> {
                 .symbol_declarations(symbol)?
                 .iter()
                 .flatten()
-                .next(),
+                .next()
+                .or(self.enclosing),
         };
         if let Some(ty) = name_type {
+            if self.checker.types.flags(ty)? & tf::ENUM_LITERAL != 0 {
+                if let Some(context) = self.enclosing {
+                    let member = self
+                        .checker
+                        .types
+                        .get(ty)?
+                        .symbol
+                        .ok_or(Error::MissingLink("enum name symbol"))?;
+                    let enum_symbol = self.checker.symbol(member)?.parent().unwrap_or(member);
+                    let accessible = self.checker.emit_symbol_accessible(
+                        Some(enum_symbol),
+                        Some(context),
+                        sf::VALUE,
+                        false,
+                        false,
+                    )?;
+                    if accessible.accessibility
+                        == ts_printer::emit_resolver::SymbolAccessibility::Accessible
+                    {
+                        let expression = self.symbol_expression(member, Some(context))?;
+                        return Ok(self.ast.new_computed_property_name(Some(expression)));
+                    }
+                }
+            }
             if self.checker.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0 {
                 let symbol = self
                     .checker
@@ -1067,14 +1153,10 @@ impl<'a> NodeBuilder<'a> {
             }
         }
         let name = match name_type {
-            Some(ty) => {
-                // TypeToString currently has no enclosing declaration/file;
-                // the enum accessibility branch therefore falls through to
-                // the ordinary string/number literal name, exactly as Go.
-                self.checker
-                    .index_property_name(ty)?
-                    .unwrap_or(raw_name.clone())
-            }
+            Some(ty) => self
+                .checker
+                .index_property_name(ty)?
+                .unwrap_or(raw_name.clone()),
             None => raw_name,
         };
         let (string_named, single_quote) = self.property_name_style(symbol)?;
@@ -1232,3 +1314,7 @@ impl<'a> NodeBuilder<'a> {
             || left.alias.is_some() && left.alias == right.alias)
     }
 }
+
+#[cfg(all(test, not(any(miri, target_family = "wasm"))))]
+#[path = "node_builder_stack_tests.rs"]
+mod stack_tests;

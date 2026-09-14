@@ -36,35 +36,7 @@ impl NodeBuilder<'_> {
                         if !serializable {
                             break;
                         }
-                        let Some(name) = self.checker.ast(component)?.node(component)?.name()
-                        else {
-                            serializable = false;
-                            break;
-                        };
-                        let read = self.checker.ast(name)?.node(name)?;
-                        if read.kind() != K::ComputedPropertyName {
-                            serializable = false;
-                            break;
-                        }
-                        let expression = read
-                            .expression()
-                            .ok_or(Error::MissingLink("computed index component"))?;
-                        if !ts_ast::is_entity_name_expression(
-                            self.checker.ast(expression)?,
-                            expression,
-                        )? || self
-                            .checker
-                            .emit_entity_visible_ex(
-                                expression,
-                                self.enclosing.expect("enclosing was checked"),
-                                false,
-                            )?
-                            .accessibility
-                            != ts_printer::emit_resolver::SymbolAccessibility::Accessible
-                        {
-                            serializable = false;
-                            break;
-                        }
+                        serializable = self.serializable_computed_name(component)?;
                     }
                     if serializable {
                         for &component in components.iter() {

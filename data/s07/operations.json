@@ -32895,7 +32895,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
-          "line": 207
+          "line": 222
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33079,6 +33079,10 @@
         {
           "file": "crates/ts_compiler/examples/p2/diagnostics.rs",
           "line": 24
+        },
+        {
+          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "line": 207
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -36421,7 +36425,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 946
+          "line": 949
         }
       ],
       "source_sha256": "c0d3ffdac4587ce7c12d5fc3d4ccfe562563ddfa5056c7e086b8c0e9c4940fed",
@@ -36549,7 +36553,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1070
+          "line": 1073
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36835,11 +36839,11 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1055
+          "line": 1058
         },
         {
           "file": "crates/ts_checker/src/node_builder_names.rs",
-          "line": 1174
+          "line": 1424
         },
         {
           "file": "crates/ts_tspath/src/comparison.rs",

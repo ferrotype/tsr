@@ -1,0 +1,645 @@
+{
+  "version": 1,
+  "scope": "diagnostic-writer-focused",
+  "cases": [
+    {
+      "id": "no-content",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "global",
+      "files": [],
+      "inputs": [],
+      "diagnostics": [
+        {
+          "file": null,
+          "pos": -1,
+          "end": -1,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "one",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "categories",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 0,
+          "text_hex": "6578616d706c65206d657373616765"
+        },
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        },
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 2,
+          "text_hex": "6578616d706c65206d657373616765"
+        },
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 3,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "empty-file",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f656d7074792e7473",
+          "content_hex": ""
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 0,
+          "end": 0,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "last-character",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 21,
+          "end": 22,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "newline-edge",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 9,
+          "end": 11,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "multiline",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 17,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "five-lines",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "61610a62620a63630a64640a65650a66660a6767"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 1,
+          "end": 19,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "unicode-tabs",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "09f09f9880c3a978793b20200d0a097a3b0d0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 5,
+          "end": 8,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "cr-only",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "610d620d63"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 2,
+          "end": 3,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "unicode-lines",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "61e280a862e280a963"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "invalid-source",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "61fffe623b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 1,
+          "end": 4,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "chain",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6f757465720a0a6c696e650d0a6c617374",
+          "chain": [
+            {
+              "file": null,
+              "pos": -1,
+              "end": -1,
+              "code": 9999,
+              "category": 1,
+              "text_hex": "6e6573746564",
+              "chain": [
+                {
+                  "file": null,
+                  "pos": -1,
+                  "end": -1,
+                  "code": 9999,
+                  "category": 1,
+                  "text_hex": "64656570"
+                }
+              ]
+            },
+            {
+              "file": null,
+              "pos": -1,
+              "end": -1,
+              "code": 9999,
+              "category": 1,
+              "text_hex": "7369626c696e67"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        },
+        {
+          "name_hex": "62756e646c65643a2f2f2f6c6962732f6c69622e6573352e642e7473",
+          "content_hex": "6c65742078203d20303b0a"
+        }
+      ],
+      "inputs": [
+        0,
+        1
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765",
+          "related": [
+            {
+              "file": 1,
+              "pos": 4,
+              "end": 5,
+              "code": 9999,
+              "category": 1,
+              "text_hex": "6465636c617265642068657265"
+            },
+            {
+              "file": null,
+              "pos": -1,
+              "end": -1,
+              "code": 9999,
+              "category": 1,
+              "text_hex": "676c6f62616c206e6f7465"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "input-order",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f622e7473",
+          "content_hex": "6c657420623b0a"
+        },
+        {
+          "name_hex": "2f2e7372632f612e7473",
+          "content_hex": "6c657420613b0a"
+        }
+      ],
+      "inputs": [
+        1,
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 1,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "666972737420616c7068616265746963616c6c79"
+        },
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "7365636f6e64"
+        }
+      ]
+    },
+    {
+      "id": "global-and-files",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        },
+        {
+          "name_hex": "2f2e7372632f612e7473",
+          "content_hex": "6c657420783b0a"
+        }
+      ],
+      "inputs": [
+        0,
+        1
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        },
+        {
+          "file": null,
+          "pos": -1,
+          "end": -1,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        },
+        {
+          "file": 1,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ]
+    },
+    {
+      "id": "binary",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 0,
+          "end": 22,
+          "code": 1490,
+          "category": 1,
+          "text_hex": "46696c65206170706561727320746f2062652062696e6172792e"
+        }
+      ]
+    },
+    {
+      "id": "external",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765",
+          "source_hex": "706c7567696e"
+        },
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765",
+          "source_hex": "706c7567696e"
+        }
+      ]
+    },
+    {
+      "id": "relative-directory",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6578616d706c65206d657373616765"
+        }
+      ],
+      "cwd": "/.src"
+    },
+    {
+      "id": "invalid-args",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6d61696e2e7473",
+          "content_hex": "6c65742061203d20313b0a6c65742062203d20323b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 2322,
+          "category": 1,
+          "key": "Type_0_is_not_assignable_to_type_1_2322",
+          "args_hex": [
+            "61fffe62eda080",
+            "6e756d626572"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "library-config-omitted",
+      "files": [
+        {
+          "name_hex": "62756e646c65643a2f2f2f6c6962732f6c69622e6573352e642e7473",
+          "content_hex": "6c657420613b0a"
+        },
+        {
+          "name_hex": "2f2e7372632f7473636f6e6669672e6a736f6e",
+          "content_hex": "7b2278223a20317d0a"
+        }
+      ],
+      "inputs": [],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "6c696220646961676e6f73746963"
+        },
+        {
+          "file": 1,
+          "pos": 1,
+          "end": 4,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "636f6e66696720646961676e6f73746963"
+        }
+      ]
+    },
+    {
+      "id": "no-args-keeps-placeholders",
+      "files": [],
+      "inputs": [],
+      "diagnostics": [
+        {
+          "file": null,
+          "pos": -1,
+          "end": -1,
+          "code": 2322,
+          "category": 1,
+          "key": "Type_0_is_not_assignable_to_type_1_2322"
+        }
+      ]
+    },
+    {
+      "id": "unicode-library-regexp",
+      "files": [
+        {
+          "name_hex": "2f2e7372632f6c69622e642e74c5bf",
+          "content_hex": "6c657420613b0a"
+        }
+      ],
+      "inputs": [
+        0
+      ],
+      "diagnostics": [
+        {
+          "file": 0,
+          "pos": 4,
+          "end": 5,
+          "code": 9999,
+          "category": 1,
+          "text_hex": "636173652d666f6c64656420737566666978"
+        }
+      ]
+    }
+  ]
+}

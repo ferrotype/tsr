@@ -65,6 +65,14 @@ sources = ["crates/ts_jsstring/**", "Cargo.*", ".cargo/**", "rust-toolchain*", "
 target = "host"
 config = "S04 text leaf slice; manifest-pinned local Go toolchain and clean source pin with access-only wrappers; deterministic byte/casing/position probes; release Rust; frozen request digest and scenario counts; classified panics and exact prescribed payloads; all probes required per scenario"
 
+[checkertext]
+command = ["python3", "scripts/s08_checkertext.py"]
+inputs = ["tools/s08/p5/text-requests.json", "data/s08/p5/text-coverage.json", "data/s04/toolchains.toml", "data/upstream.json", ".gitmodules"]
+cases = "data/s08/p5/text-cases.json"
+sources = ["crates/ts_arena/**", "crates/ts_ast/**", "crates/ts_binder/**", "crates/ts_bundled/**", "crates/ts_checker/**", "crates/ts_compiler/**", "crates/ts_core/**", "crates/ts_diagnostics/**", "crates/ts_jsnum/**", "crates/ts_jsstring/**", "crates/ts_module/**", "crates/ts_nodebuilder/**", "crates/ts_parser/**", "crates/ts_printer/**", "crates/ts_pseudochecker/**", "crates/ts_scanner/**", "crates/ts_semver/**", "crates/ts_transformers/**", "crates/ts_tsoptions/**", "crates/ts_tspath/**", "crates/ts_vfs/**", "crates/**/Cargo.toml", "Cargo.*", ".cargo/**", "rust-toolchain*", "xtask/**", "scripts/s08_checkertext.py", "scripts/s08_p5_display.py", "scripts/s08_oracle.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "tools/s08/p5/display.rs", "tools/s08/p5/display_oracle_test.go", "upstream"]
+target = "host"
+config = "S08 E4 production checker, node builder and printer; 64 frozen byte-encoded requests in four required groups; pinned local Go evaluated on this host and native Rust dev profile; original annotation reuse versus regenerated literal types, malformed UTF-8/WTF-8, BOM, surrogates, numeric/bigint spellings and byte truncation; exact content required, no absent-as-pass; raw request/results and mismatches retained; S04 leaf/S05 scanner/S06 encoder scopes unchanged"
+
 [gen]
 command = ["cargo", "xtask", "gen", "--verify"]
 inputs = ["data/s04/toolchains.toml", "data/s03/api-special-codecs.json", "data/s06/generated-ast-scope.json", "data/upstream.json", ".gitmodules", "rustfmt.toml"]

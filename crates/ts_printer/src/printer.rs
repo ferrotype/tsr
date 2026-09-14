@@ -8,6 +8,9 @@
 //! [`Session`] over one AST view and one writer; nothing about a node is cached
 //! across sessions.
 
+#[path = "printer_expressions.rs"]
+mod expressions;
+
 use crate::emit_flags as ef;
 use crate::list_format as lf;
 use crate::literal_text::{with_flag, LiteralTextFlags};
@@ -940,6 +943,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitEntityName
     fn emit_entity_name(&mut self, node: NodeId) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_entity_name_worker(node)
+        })
+    }
+
+    fn emit_entity_name_worker(&mut self, node: NodeId) -> Result<(), Error> {
         match self.known_kind(node)? {
             K::Identifier => self.emit_identifier_reference(node),
             K::QualifiedName => self.emit_qualified_name(node),
@@ -954,6 +963,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitBindingName
     fn emit_binding_name(&mut self, node: Option<NodeId>) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_binding_name_worker(node)
+        })
+    }
+
+    fn emit_binding_name_worker(&mut self, node: Option<NodeId>) -> Result<(), Error> {
         let Some(node) = node else {
             return Ok(());
         };
@@ -2122,8 +2137,10 @@ impl<'a> Session<'a, '_> {
         self.write_keyword(b"import");
         self.write_punctuation(b"(");
         self.emit_type_node_outside_extends(argument)?;
-        if attributes.is_some() {
-            return Err(Error::Unsupported("import type attributes"));
+        if let Some(attributes) = attributes {
+            self.write_punctuation(b",");
+            self.write_space();
+            self.emit_import_type_attributes(attributes)?;
         }
         self.write_punctuation(b")");
         if let Some(qualifier) = qualifier {
@@ -2131,6 +2148,60 @@ impl<'a> Session<'a, '_> {
             self.emit_entity_name(qualifier)?;
         }
         self.emit_type_arguments(node, type_arguments)
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitImportTypeNodeAttributes
+    fn emit_import_type_attributes(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let data = read
+            .data_source()
+            .as_import_attributes()
+            .ok_or(Error::MissingNode("import attributes payload"))?;
+        let (token, attributes) = (data.token(), data.attributes());
+        self.write_punctuation(b"{");
+        self.write_space();
+        self.write_keyword(if token == K::AssertKeyword {
+            b"assert"
+        } else {
+            b"with"
+        });
+        self.write_punctuation(b":");
+        self.write_space();
+        self.emit_list(
+            Self::emit_import_attribute,
+            node,
+            attributes,
+            lf::IMPORT_ATTRIBUTES,
+        )?;
+        self.write_space();
+        self.write_punctuation(b"}");
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitImportAttribute
+    fn emit_import_attribute(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let data = read
+            .data_source()
+            .as_import_attribute()
+            .ok_or(Error::MissingNode("import attribute payload"))?;
+        let (name, value) = (data.name(), data.value());
+        match name.ok_or(Error::MissingNode("import attribute name"))? {
+            name if self.known_kind(name)? == K::Identifier => self.emit_identifier_name(name)?,
+            name if self.known_kind(name)? == K::StringLiteral => self.emit_string_literal(name)?,
+            name => {
+                return Err(Error::UnexpectedKind {
+                    context: "ImportAttributeName",
+                    kind: self.node(name)?.kind(),
+                })
+            }
+        }
+        self.write_punctuation(b":");
+        self.write_space();
+        self.emit_expression(
+            value.ok_or(Error::MissingNode("import attribute value"))?,
+            op::DISALLOW_COMMA,
+        )
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeNodeInExtends
@@ -2162,6 +2233,16 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeNode
     fn emit_type_node(&mut self, node: NodeId, precedence: TypePrecedence) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_type_node_worker(node, precedence)
+        })
+    }
+
+    fn emit_type_node_worker(
+        &mut self,
+        node: NodeId,
+        precedence: TypePrecedence,
+    ) -> Result<(), Error> {
         let mut precedence = precedence;
         if self.in_extends && precedence <= TypePrecedence::Conditional {
             // In the `extends` clause of a conditional or infer type a conditional
@@ -2320,12 +2401,17 @@ impl<'a> Session<'a, '_> {
                 | K::Identifier
                 | K::PrivateIdentifier,
             ) => Some(op::PRIMARY),
-            Some(K::PropertyAccessExpression) => {
+            Some(K::PropertyAccessExpression | K::ElementAccessExpression | K::CallExpression) => {
                 Some(if ts_ast::utilities::is_optional_chain(&read) {
                     op::OPTIONAL_CHAIN
                 } else {
                     op::MEMBER
                 })
+            }
+            Some(K::ParenthesizedExpression) => Some(op::PARENTHESES),
+            Some(K::BinaryExpression) => {
+                let (_, operator, _) = self.binary_parts(node)?;
+                Some(self.binary_precedence(operator)?)
             }
             // Upstream ranks every prefix unary expression, `++` and `--` included, as unary.
             Some(K::PrefixUnaryExpression) => Some(op::UNARY),
@@ -2336,6 +2422,12 @@ impl<'a> Session<'a, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitExpression
     fn emit_expression(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.emit_expression_worker(node, precedence)
+        })
+    }
+
+    fn emit_expression_worker(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
         let kind = self.known_kind(node)?;
         let node_precedence = self.expression_precedence(node)?.ok_or(Error::Unsupported(
             "expressions outside literal types and entity names",
@@ -2359,6 +2451,10 @@ impl<'a> Session<'a, '_> {
             K::Identifier => self.emit_identifier_reference(node)?,
             K::PrivateIdentifier => self.emit_private_identifier(node)?,
             K::PropertyAccessExpression => self.emit_property_access_expression(node)?,
+            K::ElementAccessExpression => self.emit_element_access_expression(node)?,
+            K::CallExpression => self.emit_call_expression(node)?,
+            K::ParenthesizedExpression => self.emit_parenthesized_expression(node)?,
+            K::BinaryExpression => self.emit_binary_expression(node)?,
             K::PrefixUnaryExpression => self.emit_prefix_unary_expression(node)?,
             K::ExpressionWithTypeArguments => self.emit_expression_with_type_arguments(node)?,
             kind => {
@@ -2499,6 +2595,49 @@ impl<'a> Session<'a, '_> {
         self.emit_member_name(Some(name))?;
         self.decrease_indent_if(lines_after_dot > 0);
         self.decrease_indent_if(lines_before_dot > 0);
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitElementAccessExpression
+    fn emit_element_access_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let access = read
+            .data_source()
+            .as_element_access_expression()
+            .ok_or(Error::MissingNode("element access payload"))?;
+        let expression = access
+            .expression()
+            .ok_or(Error::MissingNode("element access expression"))?;
+        let argument = access
+            .argument_expression()
+            .ok_or(Error::MissingNode("element access argument"))?;
+        let question_dot = access.question_dot_token();
+        let precedence = if ts_ast::utilities::is_optional_chain(&read) {
+            op::OPTIONAL_CHAIN
+        } else {
+            op::MEMBER
+        };
+        self.emit_expression(expression, precedence)?;
+        self.emit_token_node(question_dot)?;
+        let question_end = question_dot
+            .map(|id| self.node(id).map(|read| i64::from(read.end())))
+            .transpose()?;
+        self.emit_token(
+            K::OpenBracketToken,
+            greatest_end(
+                -1,
+                &[Some(i64::from(self.node(expression)?.end())), question_end],
+            ),
+            WriteKind::Punctuation,
+            node,
+        );
+        self.emit_expression(argument, op::COMMA)?;
+        self.emit_token(
+            K::CloseBracketToken,
+            i64::from(self.node(argument)?.end()),
+            WriteKind::Punctuation,
+            node,
+        );
         Ok(())
     }
 

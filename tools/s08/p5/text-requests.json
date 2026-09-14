@@ -1,0 +1,530 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "lossless-source-and-regenerated-literals",
+      "files": {},
+      "file_bytes": {
+        "/main.ts": "efbbbf747970652048696768203d207b76616c75653a20225c7544383030227d3b0a74797065204c6f77203d207b76616c75653a20225c7544433030227d3b0a747970652050616972203d207b76616c75653a20225c75443833445c7544453030227d3b0a7479706520436f6e74726f6c203d207b76616c75653a20225c305c745c6e5c725c75323032385c7532303239227d3b0a7479706520526177537572726f67617465203d207b76616c75653a2022eda080227d3b0a74797065204d616c666f726d6564203d207b76616c75653a2022ffc280f09f227d3b0a7479706520556e69636f6465203d207b76616c75653a2022c3a92065cc8120f09f988020e280a8e280a9227d3b0a"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "High-None-type_string",
+          "declaration": "High",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "High-None-type_node",
+          "declaration": "High",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "High-declaration-type_string",
+          "declaration": "High",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "High-declaration-type_node",
+          "declaration": "High",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Low-None-type_string",
+          "declaration": "Low",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Low-None-type_node",
+          "declaration": "Low",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Low-declaration-type_string",
+          "declaration": "Low",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Low-declaration-type_node",
+          "declaration": "Low",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Pair-None-type_string",
+          "declaration": "Pair",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Pair-None-type_node",
+          "declaration": "Pair",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Pair-declaration-type_string",
+          "declaration": "Pair",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Pair-declaration-type_node",
+          "declaration": "Pair",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Control-None-type_string",
+          "declaration": "Control",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Control-None-type_node",
+          "declaration": "Control",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Control-declaration-type_string",
+          "declaration": "Control",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Control-declaration-type_node",
+          "declaration": "Control",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "RawSurrogate-None-type_string",
+          "declaration": "RawSurrogate",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "RawSurrogate-None-type_node",
+          "declaration": "RawSurrogate",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "RawSurrogate-declaration-type_string",
+          "declaration": "RawSurrogate",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "RawSurrogate-declaration-type_node",
+          "declaration": "RawSurrogate",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Malformed-None-type_string",
+          "declaration": "Malformed",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Malformed-None-type_node",
+          "declaration": "Malformed",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Malformed-declaration-type_string",
+          "declaration": "Malformed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Malformed-declaration-type_node",
+          "declaration": "Malformed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Unicode-None-type_string",
+          "declaration": "Unicode",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Unicode-None-type_node",
+          "declaration": "Unicode",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Unicode-declaration-type_string",
+          "declaration": "Unicode",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Unicode-declaration-type_node",
+          "declaration": "Unicode",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "numeric-and-bigint-literals",
+      "files": {
+        "/main.ts": "type NegativeZero = -0; type Small = 1e-7; type Large = 1e21; type Hex = 0x10; type Big = -0x10000000000000001n; type BigZero = -0n;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "NegativeZero-None-type_string",
+          "declaration": "NegativeZero",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "NegativeZero-None-type_node",
+          "declaration": "NegativeZero",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "NegativeZero-declaration-type_string",
+          "declaration": "NegativeZero",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "NegativeZero-declaration-type_node",
+          "declaration": "NegativeZero",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Small-None-type_string",
+          "declaration": "Small",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Small-None-type_node",
+          "declaration": "Small",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Small-declaration-type_string",
+          "declaration": "Small",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Small-declaration-type_node",
+          "declaration": "Small",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Large-None-type_string",
+          "declaration": "Large",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Large-None-type_node",
+          "declaration": "Large",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Large-declaration-type_string",
+          "declaration": "Large",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Large-declaration-type_node",
+          "declaration": "Large",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Hex-None-type_string",
+          "declaration": "Hex",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Hex-None-type_node",
+          "declaration": "Hex",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Hex-declaration-type_string",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Hex-declaration-type_node",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Big-None-type_string",
+          "declaration": "Big",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Big-None-type_node",
+          "declaration": "Big",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Big-declaration-type_string",
+          "declaration": "Big",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Big-declaration-type_node",
+          "declaration": "Big",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "BigZero-None-type_string",
+          "declaration": "BigZero",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "BigZero-None-type_node",
+          "declaration": "BigZero",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "BigZero-declaration-type_string",
+          "declaration": "BigZero",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "BigZero-declaration-type_node",
+          "declaration": "BigZero",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "source-annotation-and-regeneration",
+      "files": {
+        "/main.ts": "type Raw = { surrogate: \"\\uD800\"; escaped: \"\\x41\"; quote: 'a\"b'; hex: 0x10; big: 0x10n };"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Raw-None-type_string",
+          "declaration": "Raw",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Raw-None-type_node",
+          "declaration": "Raw",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Raw-declaration-type_string",
+          "declaration": "Raw",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Raw-declaration-type_node",
+          "declaration": "Raw",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "byte-truncation-boundaries",
+      "files": {
+        "/main.ts": "type Limit317 = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"; type Limit318 = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\";"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Limit317-None-type_string",
+          "declaration": "Limit317",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Limit317-None-type_node",
+          "declaration": "Limit317",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Limit317-declaration-type_string",
+          "declaration": "Limit317",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Limit317-declaration-type_node",
+          "declaration": "Limit317",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Limit318-None-type_string",
+          "declaration": "Limit318",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Limit318-None-type_node",
+          "declaration": "Limit318",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Limit318-declaration-type_string",
+          "declaration": "Limit318",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Limit318-declaration-type_node",
+          "declaration": "Limit318",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    }
+  ]
+}

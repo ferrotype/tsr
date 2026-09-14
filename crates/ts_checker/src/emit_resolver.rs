@@ -541,7 +541,9 @@ impl CheckerState {
                     mf::PARAMETER_PROPERTY_MODIFIER,
                 )?;
                 let enclosing_function = match enclosing {
-                    Some(n) => ts_ast::utilities::is_function_like(Some(&self.ast(n)?.node(n)?)),
+                    Some(n) => ts_ast::utilities::is_function_like_declaration(Some(
+                        &self.ast(n)?.node(n)?,
+                    )),
                     None => false,
                 };
                 let requires = (!optional && initialized && (!property || enclosing_function))

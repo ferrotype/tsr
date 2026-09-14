@@ -9,6 +9,9 @@ use std::cmp::Ordering;
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
 
+#[path = "node_builder_imports.rs"]
+mod imports;
+
 #[path = "node_builder_containers.rs"]
 mod containers;
 #[path = "node_builder_scope.rs"]
@@ -52,6 +55,88 @@ fn left_meaning(meaning: u32) -> u32 {
 }
 
 impl NodeBuilder<'_> {
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToNode
+    pub(crate) fn symbol_display_node(
+        &mut self,
+        symbol: SymbolId,
+        meaning: u32,
+        allow_any_node: bool,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        if !allow_any_node {
+            let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
+            return self.entity_name_from_symbol_chain(&chain);
+        }
+        if self.internal_flags & ts_nodebuilder::internal_flags::WRITE_COMPUTED_PROPS != 0 {
+            if let Some(declaration) = self.checker.symbol(symbol)?.value_declaration() {
+                let view = self.checker.ast(declaration)?;
+                if let Some(name) = view.node(declaration)?.name() {
+                    if view.node(name)?.kind() == K::ComputedPropertyName {
+                        self.retain_source_node(name)?;
+                        return Ok(name);
+                    }
+                }
+            }
+            if let Some(ty) = self
+                .checker
+                .value_symbol_links
+                .try_get(symbol)
+                .and_then(|l| l.name_type)
+            {
+                if self.checker.types.flags(ty)?
+                    & (crate::type_flags::ENUM_LITERAL | crate::type_flags::UNIQUE_ES_SYMBOL)
+                    != 0
+                {
+                    let target = self
+                        .checker
+                        .types
+                        .get(ty)?
+                        .symbol
+                        .ok_or(Error::MissingLink("computed name symbol"))?;
+                    let old = self.enclosing;
+                    self.enclosing = self.checker.symbol(target)?.value_declaration();
+                    let expression =
+                        self.symbol_expression_with_meaning(target, self.enclosing, meaning);
+                    self.enclosing = old;
+                    return Ok(self.ast.new_computed_property_name(Some(expression?)));
+                }
+            }
+        }
+        self.symbol_expression_with_meaning(symbol, self.enclosing, meaning)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createEntityNameFromSymbolChain
+    fn entity_name_from_symbol_chain(&mut self, chain: &[SymbolId]) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.entity_name_from_symbol_chain_worker(chain)
+        })
+    }
+
+    fn entity_name_from_symbol_chain_worker(
+        &mut self,
+        chain: &[SymbolId],
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        let (&symbol, prefix) = chain
+            .split_last()
+            .ok_or(Error::MissingLink("entity name chain"))?;
+        if prefix.is_empty() {
+            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let name = self.symbol_name(symbol);
+        if prefix.is_empty() {
+            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let identifier = self.ast.new_identifier(name?);
+        self.emit
+            .add_emit_flags(identifier, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+        if prefix.is_empty() {
+            return Ok(identifier);
+        }
+        let left = self.entity_name_from_symbol_chain(prefix)?;
+        Ok(self.ast.new_qualified_name(Some(left), Some(identifier)))
+    }
+
     pub(super) fn accessibility_chain(
         &mut self,
         symbol: SymbolId,
@@ -127,13 +212,8 @@ impl NodeBuilder<'_> {
         Ok(false)
     }
 
-    // The diagnostic symbolToString API has no enclosing declaration or file.
-    // Keep that native branch separate from declaration-emit specifier ranking.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
-    pub(super) fn context_free_module_specifier(
-        &mut self,
-        symbol: SymbolId,
-    ) -> Result<JsString, Error> {
+    fn module_file_declaration(&mut self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         let declarations: Vec<_> = self
             .checker
             .symbol_declarations(symbol)?
@@ -176,6 +256,23 @@ impl NodeBuilder<'_> {
                 }
             }
         }
+        Ok(file)
+    }
+
+    // The diagnostic symbolToString API has no enclosing declaration or file.
+    // Keep that native branch separate from declaration-emit specifier ranking.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
+    pub(super) fn context_free_module_specifier(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<JsString, Error> {
+        let declarations: Vec<_> = self
+            .checker
+            .symbol_declarations(symbol)?
+            .iter()
+            .flatten()
+            .collect();
+        let file = self.module_file_declaration(symbol)?;
         if file.is_none() {
             for &declaration in &declarations {
                 let view = self.checker.ast(declaration)?;
@@ -194,9 +291,19 @@ impl NodeBuilder<'_> {
         ) {
             return Ok(JsString::from_bytes(specifier));
         }
+        let source = self
+            .module_source_file(symbol)?
+            .ok_or(Error::MissingLink("module source file"))?;
+        Ok(JsString::from_bytes(
+            self.checker.ast(source)?.source_file(source)?.file_name(),
+        ))
+    }
+
+    // port: tsc/internal/ast/utilities.go:GetSourceFileOfModule
+    fn module_source_file(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         let mut declaration = self.checker.symbol(symbol)?.value_declaration();
         if declaration.is_none() {
-            for candidate in declarations {
+            for candidate in self.checker.symbol_declarations(symbol)?.iter().flatten() {
                 let view = self.checker.ast(candidate)?;
                 let read = view.node(candidate)?;
                 let external_augmentation = read.kind() == K::ModuleDeclaration
@@ -209,33 +316,13 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        let declaration = declaration.ok_or(Error::MissingLink("module source declaration"))?;
-        let view = self.checker.ast(declaration)?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(declaration))?
-            .ok_or(Error::MissingLink("module source file"))?;
-        Ok(JsString::from_bytes(view.source_file(source)?.file_name()))
-    }
-
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
-    pub(super) fn module_type_node(
-        &mut self,
-        symbol: SymbolId,
-        is_type_of: bool,
-        arguments: &[crate::TypeId],
-    ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
-        let specifier = self.context_free_module_specifier(symbol)?;
-        self.approximate_length += specifier.len() + 10;
-        let literal = self.string_literal(specifier);
-        let argument = self.ast.new_literal_type_node(Some(literal));
-        let arguments = if arguments.is_empty() {
-            None
-        } else {
-            Some(self.type_list(arguments, false)?)
-        };
-        Ok(self
-            .ast
-            .new_import_type_node(is_type_of, Some(argument), None, None, arguments))
+        match declaration {
+            Some(node) => Ok(ts_ast::utilities::get_source_file_of_node(
+                self.checker.ast(node)?,
+                Some(node),
+            )?),
+            None => Ok(None),
+        }
     }
 
     // Keep symbol/container selection here; generation uses the immutable
@@ -268,15 +355,7 @@ impl NodeBuilder<'_> {
             .iter()
             .flatten()
             .collect();
-        let mut source = None;
-        for &declaration in &declarations {
-            let view = self.checker.ast(declaration)?;
-            let read = view.node(declaration)?;
-            if read.kind() == K::SourceFile {
-                source = Some(declaration);
-                break;
-            }
-        }
+        let source = self.module_file_declaration(symbol)?;
         if source.is_none() {
             // Ambient declarations precede file-specifier generation.
             for &declaration in &declarations {
@@ -290,9 +369,11 @@ impl NodeBuilder<'_> {
                     }
                 }
             }
-            return Err(Error::Unsupported(
-                "getSpecifierForModuleSymbol: contextual export-equals container",
-            ));
+            if let Some(name) = ts_ast::try_get_ambient_module_name_from_symbol_name(
+                self.checker.symbol(symbol)?.name_bytes(),
+            ) {
+                return Ok(JsString::from_bytes(name));
+            }
         }
         let source = source.ok_or(Error::MissingLink("module source"))?;
         let target = self
@@ -304,18 +385,33 @@ impl NodeBuilder<'_> {
         let (importer, importer_name) = self.checker.module_source(enclosing)?;
         let host = self.checker.program()?.host.clone();
         let preferred_mode = if mode == ts_core::ResolutionMode::NONE {
-            host.get_default_resolution_mode_for_file(importer_name.as_bytes())?
+            match self.original_module_specifier(enclosing)? {
+                Some(original) => {
+                    host.get_mode_for_usage_location(importer_name.as_bytes(), original)?
+                }
+                None => host.get_default_resolution_mode_for_file(importer_name.as_bytes())?,
+            }
         } else {
             mode
         };
-        crate::module_specifiers::generate(
+        let key = super::cache::SpecifierKey {
+            symbol,
+            file: importer,
+            mode: preferred_mode,
+        };
+        if let Some(specifier) = self.cached_module_specifier(key) {
+            return Ok(specifier);
+        }
+        let specifier = crate::module_specifiers::generate(
             host.as_ref(),
             importer,
             importer_name.as_bytes(),
             &target,
             mode,
             preferred_mode == ts_core::ResolutionMode::ESNEXT,
-        )
+        )?;
+        self.cache_module_specifier(key, specifier.clone());
+        Ok(specifier)
     }
 
     pub(crate) fn symbol_expression_without_chain(
@@ -339,6 +435,12 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChainEx
     fn accessible_name_chain(&mut self, query: NameQuery) -> Result<Vec<SymbolId>, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.accessible_name_chain_worker(query)
+        })
+    }
+
+    fn accessible_name_chain_worker(&mut self, query: NameQuery) -> Result<Vec<SymbolId>, Error> {
         let declarations: Vec<_> = self
             .checker
             .symbol_declarations(query.symbol)?
@@ -641,7 +743,19 @@ impl NodeBuilder<'_> {
         enclosing: Option<NodeId>,
         meaning: u32,
     ) -> Result<Vec<SymbolId>, Error> {
+        self.display_name_chain_with_module(symbol, enclosing, meaning, false)
+    }
+
+    fn display_name_chain_with_module(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        yield_module: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
         if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
+            || self.internal_flags & ts_nodebuilder::internal_flags::DO_NOT_INCLUDE_SYMBOL_CHAIN
+                != 0
             || enclosing.is_none()
                 && self.flags & ts_nodebuilder::flags::USE_FULLY_QUALIFIED_TYPE == 0
         {
@@ -655,6 +769,7 @@ impl NodeBuilder<'_> {
                 external_only: self.flags & ts_nodebuilder::flags::USE_ONLY_EXTERNAL_ALIASING != 0,
             },
             true,
+            yield_module,
         )
     }
 
@@ -663,6 +778,18 @@ impl NodeBuilder<'_> {
         &mut self,
         query: NameQuery,
         end_of_chain: bool,
+        yield_module: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.qualified_name_chain_worker(query, end_of_chain, yield_module)
+        })
+    }
+
+    fn qualified_name_chain_worker(
+        &mut self,
+        query: NameQuery,
+        end_of_chain: bool,
+        yield_module: bool,
     ) -> Result<Vec<SymbolId>, Error> {
         let mut chain = self.accessible_name_chain(query)?;
         let qualifier_meaning = if chain.len() > 1 {
@@ -727,6 +854,7 @@ impl NodeBuilder<'_> {
                         ..query
                     },
                     false,
+                    yield_module,
                 )?;
                 if parent_chain.is_empty() {
                     continue;
@@ -765,7 +893,7 @@ impl NodeBuilder<'_> {
             || self.checker.symbol(query.symbol)?.flags() & (sf::TYPE_LITERAL | sf::OBJECT_LITERAL)
                 == 0
         {
-            if !end_of_chain && self.name_external_module(query.symbol)? {
+            if !end_of_chain && !yield_module && self.name_external_module(query.symbol)? {
                 return Ok(vec![]);
             }
             return Ok(vec![query.symbol]);
@@ -795,6 +923,16 @@ impl NodeBuilder<'_> {
         chain: &[SymbolId],
         index: usize,
     ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.expression_from_name_chain_worker(chain, index)
+        })
+    }
+
+    fn expression_from_name_chain_worker(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+    ) -> Result<NodeId, Error> {
         use ts_ast::FactoryMethods;
         let symbol = chain[index];
         if self.flags & ts_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
@@ -814,16 +952,23 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        let mut name = self.symbol_name(symbol)?;
+        if index == 0 {
+            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let name = self.symbol_name(symbol);
+        if index == 0 {
+            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+        }
+        let mut name = name?;
         if name
             .as_bytes()
             .first()
             .is_some_and(|b| matches!(b, b'\'' | b'"'))
             && self.name_external_module(symbol)?
         {
-            return Err(Error::Unsupported(
-                "symbolToExpression: external module specifier",
-            ));
+            let specifier = self.module_specifier_with_context(symbol, self.enclosing)?;
+            self.approximate_length += specifier.len() + 2;
+            return Ok(self.string_literal(specifier));
         }
         let can_access = if name.as_bytes().starts_with(b"#") {
             name.len() > 1
@@ -915,21 +1060,26 @@ fn is_late_bound_name(name: &[u8]) -> bool {
 }
 
 impl NodeBuilder<'_> {
-    /// `lookupSymbolChain` for type-node construction; the module-root case is
-    /// handled by the callers through `module_type_node`.
+    /// `lookupSymbolChain` for type-node construction, preserving a module root
+    /// when alias policy requires an import type.
     pub(super) fn type_symbol_chain(
         &mut self,
         symbol: SymbolId,
         meaning: u32,
     ) -> Result<Vec<SymbolId>, Error> {
-        let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
+        let chain = self.display_name_chain_with_module(
+            symbol,
+            self.enclosing,
+            meaning,
+            self.flags & ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0,
+        )?;
         if chain.is_empty() {
             return Err(Error::MissingLink("symbol type node chain"));
         }
         Ok(chain)
     }
 
-    /// The non-module-root tail of `symbolToTypeNode`.
+    /// Resolve aliases before deciding between an entity name and an import type.
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
     pub(super) fn symbol_type_node_from_chain(
         &mut self,
@@ -937,11 +1087,23 @@ impl NodeBuilder<'_> {
         meaning: u32,
         type_arguments: Option<ts_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
         let chain = self.type_symbol_chain(symbol, meaning)?;
+        self.symbol_type_node_from_resolved_chain(&chain, meaning, type_arguments)
+    }
+
+    fn symbol_type_node_from_resolved_chain(
+        &mut self,
+        chain: &[SymbolId],
+        meaning: u32,
+        type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
         let is_type_of = meaning == sf::VALUE;
+        if self.name_external_module(chain[0])? {
+            return self.import_type_from_symbol_chain(chain, is_type_of, type_arguments);
+        }
         let entity_name =
-            self.access_from_symbol_chain(&chain, chain.len() - 1, 0, type_arguments)?;
+            self.access_from_symbol_chain(chain, chain.len() - 1, 0, type_arguments)?;
         let kind = self.ast.view().node(entity_name)?.kind();
         if kind == K::IndexedAccessType {
             // Indexed accesses can never be `typeof`
@@ -957,6 +1119,82 @@ impl NodeBuilder<'_> {
         }
         Err(Error::Unsupported(
             "symbolToTypeNode: expression with type arguments",
+        ))
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
+    fn import_type_from_symbol_chain(
+        &mut self,
+        chain: &[SymbolId],
+        is_type_of: bool,
+        type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        use ts_ast::FactoryMethods;
+        let qualifier = if chain.len() > 1 {
+            Some(self.access_from_symbol_chain(chain, chain.len() - 1, 1, type_arguments)?)
+        } else {
+            None
+        };
+        let arguments = match type_arguments {
+            Some(arguments) => Some(arguments),
+            None => self.qualified_type_parameter_nodes(chain, 0)?,
+        };
+        let (specifier, attributes) =
+            self.import_type_specifier(chain[0], *chain.last().unwrap())?;
+        self.approximate_length += specifier.len() + 10;
+        let literal = self.string_literal(specifier);
+        let argument = self.ast.new_literal_type_node(Some(literal));
+        if let Some(mut node) = qualifier {
+            if self.ast.view().node(node)?.kind() == K::IndexedAccessType {
+                // getTopmostIndexedAccessType follows the object side to its
+                // first indexed access. Preserve that exact pinned extraction.
+                loop {
+                    let object = self
+                        .ast
+                        .view()
+                        .node(node)?
+                        .as_indexed_access_type_node()
+                        .unwrap()
+                        .object_type()
+                        .unwrap();
+                    if self.ast.view().node(object)?.kind() != K::IndexedAccessType {
+                        break;
+                    }
+                    node = object;
+                }
+                let indexed = self
+                    .ast
+                    .view()
+                    .node(node)?
+                    .data_source()
+                    .as_indexed_access_type_node()
+                    .unwrap()
+                    .to_owned();
+                let qualifier = self
+                    .ast
+                    .view()
+                    .node(indexed.object_type.unwrap())?
+                    .as_type_reference_node()
+                    .unwrap()
+                    .type_name();
+                let imported = self.ast.new_import_type_node(
+                    is_type_of,
+                    Some(argument),
+                    attributes,
+                    qualifier,
+                    arguments,
+                );
+                return Ok(self
+                    .ast
+                    .new_indexed_access_type_node(Some(imported), indexed.index_type));
+            }
+        }
+        Ok(self.ast.new_import_type_node(
+            is_type_of,
+            Some(argument),
+            attributes,
+            qualifier,
+            arguments,
         ))
     }
 
@@ -995,6 +1233,18 @@ impl NodeBuilder<'_> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessFromSymbolChain
     pub(super) fn access_from_symbol_chain(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+        stopper: usize,
+        override_type_arguments: Option<ts_ast::NodeListId>,
+    ) -> Result<NodeId, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.access_from_symbol_chain_worker(chain, index, stopper, override_type_arguments)
+        })
+    }
+
+    fn access_from_symbol_chain_worker(
         &mut self,
         chain: &[SymbolId],
         index: usize,

@@ -118,7 +118,7 @@ def e2():
 def program():
     from s07_subset_freeze import freeze
     from s07_program_compare import check_subset, input_fingerprints, digest
-    from s07_program_helpers import measure
+    from s07_program_helpers import measure, preflight
     from s07_verify_compare import capture as capture_verification
     def production_inputs():
         values = input_fingerprints()
@@ -128,10 +128,10 @@ def program():
             values.update((str(path.relative_to(ROOT)), digest(path)) for path in ROOT.glob(pattern) if path.is_file())
         return values
     before = production_inputs()
+    directory = ROOT / "target/s07-program-reports"
+    prepared_helpers = preflight(directory / "helpers")
     observations, loader, requests = prepare_subset(reuse=True)
     freeze(observations, loader, ROOT / "data/s07/subset-review.json", False)
-    directory = ROOT / "target/s07-program-reports"
-    directory.mkdir(parents=True, exist_ok=True)
     config = directory / "config-evidence.json"
     command([sys.executable, "scripts/s07_config.py", "--loading-requests", str(requests),
              "--output", str(config)], cwd=ROOT)
@@ -140,7 +140,7 @@ def program():
     command([sys.executable, "scripts/s07_verify_options.py", "--requests", str(requests),
              "--output", str(verify_oracle)], cwd=ROOT)
     verification = capture_verification(requests, verify_oracle, directory / "verification")
-    helpers = measure(directory / "helpers")
+    helpers = measure(directory / "helpers", prepared_helpers)
     metrics = {"loader_parity": loader_report["loader_graph_parity"],
                "config_parity": loader_report["config_parity"],
                "option_verification": verification["metrics"]["option_verification"],

@@ -7,6 +7,7 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+stacker = "=0.1.25"
 ts_arena = { version = "0.1.0", path = "../ts_arena" }
 ts_ast = { version = "0.1.0", path = "../ts_ast" }
 ts_core = { version = "0.1.0", path = "../ts_core" }

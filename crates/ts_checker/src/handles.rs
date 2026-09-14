@@ -21,6 +21,10 @@ use ts_arena::{ArenaId, NodeId, SymbolId};
 use ts_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
 use ts_jsnum::{Number, PseudoBigInt};
 
+#[path = "handles_display.rs"]
+mod display;
+pub use display::TypeNodeBuilder;
+
 /// A type of one checker, usable inside an operation on that checker.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypeRef {
@@ -285,6 +289,24 @@ impl Operation<'_> {
         Ok(self.type_ref(ty))
     }
 
+    /// Whether this source node participates in an expression query. The
+    /// contextual cases share the classifier used by checker name resolution.
+    pub fn is_expression_node(&self, node: NodeId) -> Result<bool, Error> {
+        crate::query::is_expression_node(self.state().ast(node)?, node)
+    }
+
+    /// Native `IsPartOfTypeNode`, including qualified names and heritage nodes.
+    pub fn is_part_of_type_node(&self, node: NodeId) -> Result<bool, Error> {
+        self.state().is_part_of_type_node(node)
+    }
+
+    /// The intrinsic spelling is distinct from printed type syntax. In
+    /// particular the native baseline walker bypasses the builder for `any`.
+    pub fn intrinsic_type_name(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        Ok(self.state().types.intrinsic(ty)?.name.clone())
+    }
+
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         let ty = self.state_mut().get_declared_type_of_symbol(symbol)?;
@@ -329,7 +351,8 @@ impl Operation<'_> {
     /// Context-free `TypeToStringEx`: flags are explicit and there is no
     /// enclosing declaration. Go's `TypeToString` defaults are
     /// `ALLOW_UNIQUE_ES_SYMBOL_TYPE | USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE`.
-    /// Context-sensitive qualification/annotation reuse is not implemented yet.
+    /// Use `type_to_string_at` for qualification and annotation reuse in an
+    /// enclosing declaration.
     pub fn type_to_string(
         &mut self,
         ty: TypeRef,
