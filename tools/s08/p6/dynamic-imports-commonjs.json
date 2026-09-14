@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "scope": "S08 P6 dynamic import checking through real programs, diagnostics and public queries; supplemental, not E2 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "programs": [
+    {
+      "id": "commonjs-argument-order",
+      "files": {
+        "/main.ts": "const trailing = import(\"./dep\",); const attributes = import(\"./dep\", { with: { type: \"json\" } }); const extra = import(\"./dep\", {}, missing);",
+        "/dep.ts": "export const value = 42;"
+      },
+      "roots": [
+        "/main.ts",
+        "/dep.ts"
+      ],
+      "queries": [
+        {
+          "id": "trailing.initializer",
+          "file": "/main.ts",
+          "declaration": "trailing",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "attributes.initializer",
+          "file": "/main.ts",
+          "declaration": "attributes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "extra.initializer",
+          "file": "/main.ts",
+          "declaration": "extra",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

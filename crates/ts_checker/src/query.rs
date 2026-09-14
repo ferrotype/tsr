@@ -801,6 +801,11 @@ impl CheckerState {
             Some(K::FunctionExpression | K::ArrowFunction) => {
                 return self.check_function_expression(node)
             }
+            Some(K::CallExpression)
+                if crate::external_resolution::is_import_call(self.ast(node)?, &read)? =>
+            {
+                return self.check_import_call_expression(node)
+            }
             Some(K::CallExpression | K::NewExpression) => return self.check_call_expression(node),
             Some(K::ExpressionWithTypeArguments) => {
                 return self.check_instantiation_expression(node)

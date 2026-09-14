@@ -149,12 +149,16 @@ impl CheckerState {
         ty: TypeId,
     ) -> Result<TypeId, Error> {
         let promise = self.create_promise_type(ty)?;
+        let import = crate::external_resolution::is_import_call(
+            self.ast(function)?,
+            &self.ast(function)?.node(function)?,
+        )?;
         if promise == self.builtins.unknown_type {
-            self.error_at(Some(function), ts_diagnostics::An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option, vec![])?;
+            self.error_at(Some(function), if import { ts_diagnostics::A_dynamic_import_call_returns_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option } else { ts_diagnostics::An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option }, vec![])?;
             return Ok(self.builtins.error_type);
         }
         if self.global_promise_constructor_symbol(true)?.is_none() {
-            self.error_at(Some(function), ts_diagnostics::An_async_function_or_method_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option, vec![])?;
+            self.error_at(Some(function), if import { ts_diagnostics::A_dynamic_import_call_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option } else { ts_diagnostics::An_async_function_or_method_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option }, vec![])?;
         }
         Ok(promise)
     }

@@ -92,12 +92,14 @@ impl CheckerState {
             if !construct
                 && (matches!(
                     self.ast(callee)?.node(callee)?.kind().known(),
-                    Some(K::SuperKeyword | K::ImportKeyword)
-                ) || ts_ast::utilities_middle::is_require_call(
-                    self.ast(expression)?,
-                    &self.ast(expression)?.node(expression)?,
-                    true,
-                )? || self.is_symbol_or_symbol_for_call(expression)?)
+                    Some(K::SuperKeyword)
+                ) || crate::external_resolution::is_import_call(self.ast(expression)?, &read)?
+                    || ts_ast::utilities_middle::is_require_call(
+                        self.ast(expression)?,
+                        &self.ast(expression)?.node(expression)?,
+                        true,
+                    )?
+                    || self.is_symbol_or_symbol_for_call(expression)?)
             {
                 return Ok(None);
             }

@@ -126,6 +126,7 @@ mod higher_order_inference;
 mod host;
 mod ids;
 mod import_attributes;
+mod import_calls;
 mod import_types;
 mod index_access_errors;
 mod indexes;

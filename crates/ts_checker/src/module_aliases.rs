@@ -8,6 +8,7 @@ use ts_ast::{symbol_flags as sf, SyntaxKind as K};
 #[derive(Default)]
 pub(crate) struct ModuleAliasState {
     pub(crate) global_import_attributes: Option<TypeId>,
+    pub(crate) global_import_call_options: [Option<TypeId>; 2],
     pub(crate) attributes_types: crate::types::Map<SymbolId, TypeId>,
     pub(crate) referenced: crate::types::Set<SymbolId>,
     pub(crate) exports_checked: crate::types::Set<SymbolId>,
@@ -34,6 +35,7 @@ impl ModuleAliasState {
             .flat_map(|(&key, &value)| [key, value])
             .chain(self.attributes_types.values().copied())
             .chain(self.global_import_attributes)
+            .chain(self.global_import_call_options.into_iter().flatten())
     }
     #[cfg(any(test, feature = "storage-pilot"))]
     pub(crate) fn census(&self, census: &mut crate::census::Census) {
