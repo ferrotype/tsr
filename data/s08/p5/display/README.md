@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These 190 source-selected requests exercise explicit builder calls and
+These 208 source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -71,3 +71,29 @@ then repeat the first, for file modules and attributed ambient modules. Both
 public display and explicit node-building preserve each export's own attributes.
 The driver now locates namespace-export declarations as well as its original
 variable, interface and type-alias declarations.
+
+The second review adds six cross-context attribute requests and twelve conditional
+package-export probes. `enclosing_declaration` names the independent enclosing
+argument of the public APIs; it does not change the declaration whose type or
+symbol is queried. Displaying the CSS module type in the text import's context
+must retain `type: "css"` because the original text attributes resolve to another
+merged module symbol. The sequence repeats the CSS context afterward.
+
+`branch-witnesses.json` records a 21-query diagnostic overlay, its source hashes,
+raw counters and the unsuccessful fixture attempts. Its outputs equal the
+uninstrumented native fixture exactly. The overlay inserts counters without
+changing branch decisions; `override_other_symbol` distinguishes a different
+resolved symbol from unresolved-module rejection. Reproduce with:
+
+```sh
+python3 scripts/s08_p5_display_branches.py \
+  --requests tools/s08/p5/display-branch-requests.json \
+  --output target/s08/p5-display-branches-new
+```
+
+The counters observe two different-symbol rejections and four accepted overrides.
+Conditional import/require exports, including private-path imports, choose a
+portable name without retry in both Node16 and NodeNext. The nonportable control
+attempts and fails the retry once. No successful swapped-mode retry is claimed;
+the bounded search stops here. The final ordinary capture is
+`target/s08/p5-display-review-native-final` (208/208 exact Rust matches).

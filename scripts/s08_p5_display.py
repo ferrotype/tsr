@@ -37,6 +37,10 @@ def validate(request, result):
             if q['id'] in query_ids:
                 raise ValueError('duplicate query identity')
             query_ids.add(q['id'])
+            if ('enclosing_declaration' in q
+                    and (not isinstance(q['enclosing_declaration'], str)
+                         or not q['enclosing_declaration'] or q.get('context') not in ('declaration', 'source'))):
+                raise ValueError('invalid enclosing declaration override')
             if row.get('state') == 'absent':
                 if q['operation'] == 'type_string' or set(row) != {'id', 'state'}:
                     raise ValueError('invalid absent display result')

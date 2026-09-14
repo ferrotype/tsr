@@ -34,7 +34,8 @@ def packagejson_source_report(output, pin):
     return observed
 
 
-def measure(directory):
+def preflight(directory):
+    """Build and validate every named obligation before any source capture."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     raw = (ROOT/'data/s07/program-helper-tests.json').read_bytes()
@@ -60,12 +61,6 @@ def measure(directory):
                 or group['tests'] != sorted(set(group['tests']))
                 or any(type(name) is not str or not name.startswith(group['prefix']) for name in group['tests'])):
             raise ValueError('invalid program helper test obligation')
-    source_reports = []
-    for index, check in enumerate(CHECKS):
-        output = setup([sys.executable, *check], ROOT, directory/f'source-{index}')
-        if check == ['scripts/s07_packagejson.py']:
-            observed = packagejson_source_report(output, document['upstream_pin'])
-            source_reports.append({'check': check, 'report': observed})
     packages = sorted({group['package'] for group in groups})
     args = ['cargo', 'test', '--locked', '--release', '--all-targets', '--no-run', '--message-format=json']
     for package in packages:
@@ -90,10 +85,26 @@ def measure(directory):
     if set(binaries) != wanted:
         raise ValueError('missing native program helper test binary')
     inventories = {key: setup([binary,'--list','--format=terse'], ROOT, directory/('-'.join(key)+'-inventory')) for key,binary in binaries.items()}
-    results = []
-    for index, group in enumerate(groups):
+    for group in groups:
         key = (group['package'], group['target'])
         test_inventory(inventories[key], {**group, 'name': '/'.join((*key, group['prefix']))})
+    return raw, document, binaries
+
+
+def measure(directory, prepared=None):
+    directory = Path(directory)
+    raw, document, binaries = preflight(directory) if prepared is None else prepared
+    if (ROOT/'data/s07/program-helper-tests.json').read_bytes() != raw:
+        raise ValueError('program helper inventory changed after preflight')
+    source_reports = []
+    for index, check in enumerate(CHECKS):
+        output = setup([sys.executable, *check], ROOT, directory/f'source-{index}')
+        if check == ['scripts/s07_packagejson.py']:
+            observed = packagejson_source_report(output, document['upstream_pin'])
+            source_reports.append({'check': check, 'report': observed})
+    results = []
+    for index, group in enumerate(document['groups']):
+        key = (group['package'], group['target'])
         for ordinal, name in enumerate(group['tests']):
             outcome = invoke([binaries[key],name,'--exact','--test-threads=1','--color=never'], ROOT, directory/f'test-{index}-{ordinal}')
             results.append({'package':key[0], 'target':key[1], 'test':name, 'passed':test_result(outcome,name)})

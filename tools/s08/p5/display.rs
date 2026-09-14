@@ -183,9 +183,13 @@ pub fn observe(request: &Value) -> Result<Value> {
         let mut queries = Vec::new();
         for q in array(&r["queries"])? {
             let (decl, name, source) = declaration(&program, text(&q["declaration"])?)?;
+            let (context_decl, _, context_source) = match q.get("enclosing_declaration") {
+                Some(value) => declaration(&program, text(value)?)?,
+                None => (decl, name, source),
+            };
             let enclosing = match q["context"].as_str() {
-                Some("declaration") => Some(decl),
-                Some("source") => Some(source),
+                Some("declaration") => Some(context_decl),
+                Some("source") => Some(context_source),
                 None if q["context"].is_null() => None,
                 _ => return Err("unknown context".into()),
             };

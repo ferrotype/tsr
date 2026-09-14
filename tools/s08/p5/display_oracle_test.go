@@ -37,6 +37,7 @@ func TestS08P5Display(t *testing.T) {
 				ID            string  `json:"id"`
 				Declaration   string  `json:"declaration"`
 				Context       *string `json:"context"`
+                EnclosingDeclaration string `json:"enclosing_declaration"`
 				Operation     string  `json:"operation"`
 				Flags         uint32  `json:"flags"`
 				InternalFlags int32   `json:"internal_flags"`
@@ -76,31 +77,31 @@ func TestS08P5Display(t *testing.T) {
 		c.GetGlobalDiagnostics()
 		queries := []any{}
 		for _, q := range r.Queries {
-			var declaration *ast.Node
-			var visit func(*ast.Node) bool
-			visit = func(n *ast.Node) bool {
-				if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindVariableDeclaration || n.Kind == ast.KindInterfaceDeclaration || n.Kind == ast.KindNamespaceExport) && n.Name() != nil && n.Name().Text() == q.Declaration {
-					if declaration != nil {
-						t.Fatal("ambiguous declaration", q.Declaration)
-					}
-					declaration = n
-				}
-				n.ForEachChild(visit)
-				return false
-			}
-			for _, f := range program.SourceFiles() {
-				visit(f.AsNode())
-			}
-			if declaration == nil {
-				t.Fatal("missing declaration", q.Declaration)
-			}
+            findDeclaration := func(name string) *ast.Node {
+                var found *ast.Node
+                var visit func(*ast.Node) bool
+                visit = func(n *ast.Node) bool {
+                    if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindVariableDeclaration || n.Kind == ast.KindInterfaceDeclaration || n.Kind == ast.KindNamespaceExport) && n.Name() != nil && n.Name().Text() == name {
+                        if found != nil { t.Fatal("ambiguous declaration", name) }
+                        found = n
+                    }
+                    n.ForEachChild(visit)
+                    return false
+                }
+                for _, f := range program.SourceFiles() { visit(f.AsNode()) }
+                if found == nil { t.Fatal("missing declaration", name) }
+                return found
+            }
+            declaration := findDeclaration(q.Declaration)
+            contextDeclaration := declaration
+            if q.EnclosingDeclaration != "" { contextDeclaration = findDeclaration(q.EnclosingDeclaration) }
 			var enclosing *ast.Node
 			if q.Context != nil {
 				switch *q.Context {
 				case "declaration":
-					enclosing = declaration
+					enclosing = contextDeclaration
 				case "source":
-					enclosing = ast.GetSourceFileOfNode(declaration).AsNode()
+					enclosing = ast.GetSourceFileOfNode(contextDeclaration).AsNode()
 				default:
 					t.Fatal("unknown context")
 				}

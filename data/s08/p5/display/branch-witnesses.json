@@ -1,0 +1,436 @@
+{
+  "capture": "target/s08/p5-display-branches-final",
+  "requests": "tools/s08/p5/display-branch-requests.json",
+  "uninstrumented_output_sha256": "39de54d1b5e197f97ff32cc2a73846240011d3fe29ed651172fc2a9385c30a1b",
+  "instrumented_observations": {
+    "go": "go1.27.1",
+    "goarch": "arm64",
+    "goos": "darwin",
+    "programs": [
+      {
+        "id": "attribute-override-rejection",
+        "queries": [
+          {
+            "id": "css-type_string-0",
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          },
+          {
+            "id": "css-type_node-1",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          },
+          {
+            "id": "text-type_string-2",
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          },
+          {
+            "id": "text-type_node-3",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          },
+          {
+            "id": "css-type_string-4",
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          },
+          {
+            "id": "css-type_node-5",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "747970656f6620696d706f727428222a2e7374796c65222c207b20776974683a207b20747970653a202263737322207d207d29"
+          }
+        ]
+      },
+      {
+        "id": "conditional-portability-nodenext",
+        "queries": [
+          {
+            "id": "type_string-8388608",
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-79659013",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-12550149",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          }
+        ]
+      },
+      {
+        "id": "conditional-portability-node16",
+        "queries": [
+          {
+            "id": "type_string-8388608",
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-79659013",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-12550149",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          }
+        ]
+      },
+      {
+        "id": "private-path-portability-nodenext",
+        "queries": [
+          {
+            "id": "type_string-8388608",
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-79659013",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-12550149",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          }
+        ]
+      },
+      {
+        "id": "private-path-portability-node16",
+        "queries": [
+          {
+            "id": "type_string-8388608",
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-79659013",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          },
+          {
+            "id": "type_node-12550149",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428227061636b61676522292e4974656d"
+          }
+        ]
+      },
+      {
+        "id": "module-portability-False",
+        "queries": [
+          {
+            "id": "type_string-8388608",
+            "state": "content",
+            "text_hex": "696d706f727428222e2f6e6f64655f6d6f64756c65732f7061636b6167652f696e6465782e636a7322292e4974656d"
+          },
+          {
+            "id": "type_node-79659013",
+            "kind": 206,
+            "state": "content",
+            "text_hex": "696d706f727428222e2f6e6f64655f6d6f64756c65732f7061636b6167652f696e6465782e636a7322292e4974656d"
+          },
+          {
+            "id": "type_node-12550149",
+            "state": "absent"
+          }
+        ]
+      }
+    ],
+    "request_sha256": "6fa8658e56725e0e396311dde9288e37286242da4db5accfe5ca0105a5d073d0",
+    "version": 1
+  },
+  "branches": [
+    {
+      "counts": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "attribute-override-rejection",
+      "query": "css-type_string-0"
+    },
+    {
+      "counts": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "attribute-override-rejection",
+      "query": "css-type_node-1"
+    },
+    {
+      "counts": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "program": "attribute-override-rejection",
+      "query": "text-type_string-2"
+    },
+    {
+      "counts": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "program": "attribute-override-rejection",
+      "query": "text-type_node-3"
+    },
+    {
+      "counts": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "attribute-override-rejection",
+      "query": "css-type_string-4"
+    },
+    {
+      "counts": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "attribute-override-rejection",
+      "query": "css-type_node-5"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-nodenext",
+      "query": "type_string-8388608"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-nodenext",
+      "query": "type_node-79659013"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-nodenext",
+      "query": "type_node-12550149"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-node16",
+      "query": "type_string-8388608"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-node16",
+      "query": "type_node-79659013"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "conditional-portability-node16",
+      "query": "type_node-12550149"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-nodenext",
+      "query": "type_string-8388608"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-nodenext",
+      "query": "type_node-79659013"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-nodenext",
+      "query": "type_node-12550149"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-node16",
+      "query": "type_string-8388608"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-node16",
+      "query": "type_node-79659013"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "private-path-portability-node16",
+      "query": "type_node-12550149"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "module-portability-False",
+      "query": "type_string-8388608"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "program": "module-portability-False",
+      "query": "type_node-79659013"
+    },
+    {
+      "counts": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "program": "module-portability-False",
+      "query": "type_node-12550149"
+    }
+  ],
+  "provenance": {
+    "branch_order": [
+      "override_accepted",
+      "override_rejected",
+      "retry_attempted",
+      "retry_succeeded",
+      "override_other_symbol"
+    ],
+    "go": "go1.27.1",
+    "goarch": "arm64",
+    "goos": "darwin",
+    "original_sha256": "49d0fd8924e98db8cef19ec31fe4a0c5029a66f0bd3d1d79335b79111daa8110",
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "sha256": {
+      "scripts/s08_p5_display_branches.py": "157aedd53a48d0d935fdf62b83a76992b336ca555eaf9e00812a0b0fd0f227b7",
+      "target/s08/p5-display-branches-final/branches.json": "85a73d77bb6de90d67421ddbb8b77a1ca3450c58c7486e075298803f0fabd144",
+      "target/s08/p5-display-branches-final/codex_s08_display_branches.go": "5a782e3b01a610b2c4ba1f6f8ecfee8e7d6277bda88a5c8167ed9ca9b5a5089a",
+      "target/s08/p5-display-branches-final/codex_s08_display_branches_test.go": "f1c4e246773bbfa7de068486f925b55ef8972b0795564adf307d4d9dbfa63015",
+      "target/s08/p5-display-branches-final/nodebuilderimpl.go": "93a9b95662562c5f98e6c07e2509bb9e3c64916d3ced08638b86a6f3df647930",
+      "target/s08/p5-display-branches-final/observations.json": "970af1dd146debc4e4d62b55d172ac6fa7ee3ffa9969e424d81b95b2b9d88bfd",
+      "target/s08/p5-display-branches-final/requests.json": "6fa8658e56725e0e396311dde9288e37286242da4db5accfe5ca0105a5d073d0",
+      "tools/s08/p5/display_oracle_test.go": "b8c8e3d25b6c79c4357f85b3ffa57ba40bfa09cf5b1f5439349e88cebcf3c7f0"
+    },
+    "toolchain_local": true
+  },
+  "attempts": [
+    {
+      "capture": "target/s08/p5-display-branches-01",
+      "outcome": "harness stopped before the probe: ambiguous declaration text; fixture renamed its ambient local"
+    },
+    {
+      "capture": "target/s08/p5-display-branches-02",
+      "outcome": "attribute override rejected; conditional package exports resolved without retry"
+    },
+    {
+      "capture": "target/s08/p5-display-branches-03",
+      "outcome": "private-path conditional package exports also resolved without retry; negative control attempted and failed retry"
+    },
+    {
+      "capture": "target/s08/p5-display-branches-final",
+      "outcome": "same final fixtures; separate non-null resolution counter confirmed rejection reaches a different merged symbol"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s08_p5_display import ROOT, canonical, compare, strict_json_loads, validate
+from s08_p5_display import ROOT, canonical, compare, digest, strict_json_loads, validate
 
 
 class DisplayProtocol(unittest.TestCase):
@@ -17,7 +17,27 @@ class DisplayProtocol(unittest.TestCase):
         self.observed = strict_json_loads((self.native / 'observations.json').read_bytes())
 
     def test_native_inventory_has_valid_states(self):
-        self.assertEqual(validate(self.request, self.observed), 190)
+        self.assertEqual(validate(self.request, self.observed), 208)
+
+    def test_branch_witnesses_match_uninstrumented_requests_and_results(self):
+        record = strict_json_loads((self.native / 'branch-witnesses.json').read_bytes())
+        requests = strict_json_loads((ROOT / record['requests']).read_bytes())
+        self.assertEqual(record['instrumented_observations']['request_sha256'], digest(canonical(requests) + b'\n'))
+        self.assertEqual(record['uninstrumented_output_sha256'], digest((self.native / 'observations.json').read_bytes()))
+        specs = {p['id']: p for p in self.request['programs']}
+        results = {p['id']: p for p in self.observed['programs']}
+        for spec, result in zip(requests['programs'], record['instrumented_observations']['programs'], strict=True):
+            self.assertEqual(specs[spec['id']], spec)
+            self.assertEqual(results[spec['id']], result)
+        order = record['provenance']['branch_order']
+        rows = {(r['program'], r['query']): dict(zip(order, r['counts'], strict=True)) for r in record['branches']}
+        for query in ('text-type_string-2', 'text-type_node-3'):
+            row = rows[('attribute-override-rejection', query)]
+            self.assertEqual(row['override_other_symbol'], 1)
+            self.assertEqual(row['override_rejected'], 1)
+            self.assertEqual(row['override_accepted'], 0)
+        self.assertEqual(sum(r['retry_attempted'] for r in rows.values()), 1)
+        self.assertEqual(sum(r['retry_succeeded'] for r in rows.values()), 0)
 
     def test_unknown_or_mistyped_module_options_fail(self):
         for bad in ('commonjs', '', 199, None, True):
@@ -67,3 +87,10 @@ class DisplayProtocol(unittest.TestCase):
         next(p for p in request['programs'] if p['id'] == 'lossless-source-and-regenerated-literals')['files']['/main.ts'] = 'different source'
         with self.assertRaises(ValueError):
             validate(request, self.observed)
+
+    def test_enclosing_override_requires_a_named_context(self):
+        for name, context in [(None, 'declaration'), ('', 'declaration'), ('T', None)]:
+            request = copy.deepcopy(self.request)
+            request['programs'][0]['queries'][0].update(enclosing_declaration=name, context=context)
+            with self.subTest(name=name, context=context), self.assertRaises(ValueError):
+                validate(request, self.observed)

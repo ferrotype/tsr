@@ -43,7 +43,17 @@ impl CheckerState {
         if matches!(
             node.kind().known(),
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
-        ) {
+        ) || node
+            .parent()
+            .map(|parent| {
+                let parent = view.node(parent)?;
+                Ok::<_, Error>(
+                    parent.kind() == K::ModuleDeclaration && parent.name() == Some(location),
+                )
+            })
+            .transpose()?
+            .unwrap_or(false)
+        {
             return Ok(Some(location));
         }
         if node.kind() == K::ModuleDeclaration {

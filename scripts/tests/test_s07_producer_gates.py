@@ -6,7 +6,19 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s07_producers import GRAPH_CONTRACT_TESTS, binder_contract_metrics
+from s07_producers import GRAPH_CONTRACT_TESTS, binder_contract_metrics, program
+
+
+class ProgramPreflightTests(unittest.TestCase):
+    def test_inventory_drift_stops_before_subset_or_source_capture(self):
+        with patch('s07_program_compare.input_fingerprints', return_value={}), \
+                patch('s07_program_helpers.preflight', side_effect=ValueError('inventory drift')), \
+                patch('s07_producers.prepare_subset') as subset, \
+                patch('s07_producers.command') as command:
+            with self.assertRaisesRegex(ValueError, 'inventory drift'):
+                program()
+            subset.assert_not_called()
+            command.assert_not_called()
 
 
 class BinderGateTests(unittest.TestCase):

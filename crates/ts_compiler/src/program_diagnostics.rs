@@ -333,7 +333,7 @@ mod tests {
             JsString::from_bytes(b"message".as_slice()),
         );
         assert!(first
-            .sort_and_deduplicate_diagnostics(&[diagnostic.clone()])
+            .sort_and_deduplicate_diagnostics(std::slice::from_ref(&diagnostic))
             .is_err());
         let mut parent = Diagnostic::external(
             None,

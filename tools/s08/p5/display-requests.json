@@ -1738,6 +1738,226 @@
           "internal_flags": 8
         }
       ]
+    },
+    {
+      "id": "attribute-override-rejection",
+      "files": {
+        "/modules.d.ts": "declare module \"*.style\" with { type: \"css\" } { const sheet: number; export default sheet; }\ndeclare module \"*.style\" with { type: \"text\" } { const contents: string; export default contents; }",
+        "/main.ts": "export * as css from \"a.style\" with { type: \"css\" };\nexport * as text from \"a.style\" with { type: \"text\" };"
+      },
+      "roots": [
+        "/main.ts",
+        "/modules.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "css-type_string-0",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "css-type_node-1",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "text-type_string-2",
+          "declaration": "css",
+          "enclosing_declaration": "text",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "text-type_node-3",
+          "declaration": "css",
+          "enclosing_declaration": "text",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "css-type_string-4",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "css-type_node-5",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "conditional-portability-nodenext",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "conditional-portability-node16",
+      "module": "node16",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "private-path-portability-nodenext",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "private-path-portability-node16",
+      "module": "node16",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
     }
   ]
 }
