@@ -207,8 +207,8 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 | E3: Ownership | release_boundaries | `run.e3.release_boundaries == true` release builds reject stale/wrong-owner cache, cross-arena and reentrant handles and suppress results from retired generations; debug assertions also pass | missing | pending |
 | E4: Strings | source_decoding | `run.e4.source_decoding == true` source bytes, BOM removal and UTF-16 decoding match Go | missing | pending |
 | E4: Strings | diagnostics | `run.scanner.diagnostics == true` scanner and scanned-literal diagnostic callbacks match Go on successful and malformed input; AST diagnostic integration remains separate | missing | pending |
-| E4: Strings | token_literal_bytes | `run.checkertext.token_literal_bytes == true` token bytes, literal values and literal types match Go, including explicit upstream transformations without added lossy repair | true | pass |
-| E4: Strings | helper_printer_semantics | `run.checkertext.helper_printer_semantics == true` case mapping and truncation preserve Go's replacements/fragments; original-source and regenerated literal paths reproduce its distinct copy/escape behavior | true | pass |
+| E4: Strings | token_literal_bytes | `run.checkertext.token_literal_bytes == true` token bytes, literal values and literal types match Go, including explicit upstream transformations without added lossy repair | missing | pending |
+| E4: Strings | helper_printer_semantics | `run.checkertext.helper_printer_semantics == true` case mapping and truncation preserve Go's replacements/fragments; original-source and regenerated literal paths reproduce its distinct copy/escape behavior | missing | pending |
 | E4: Strings | slice_validity | `run.e4.slice_validity == true` byte slices of UTF-8/WTF-8 strings remain representable and are reclassified when endpoints split a sequence; str views require valid slice boundaries | missing | pending |
 | E4: Strings | utf8_positions | `run.e4.utf8_positions == true` byte offsets, UTF-8 wire positions and distinct ECMAScript/LSP line maps match Go, including U+2028/U+2029 and range handling | missing | pending |
 | E4: Strings | utf16_positions | `run.e4.utf16_positions == true` API/LSP/scanner UTF-16 conversions match Go separately, including astral offset 1 to bytes 1/0/4, sentinel counting, partial byte prefixes and clamp/panic behavior | missing | pending |
@@ -251,7 +251,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 |---|---|---|
 | binder | stale: source, pin, command or inputs changed | [result](status/evidence/39a1a6141f1f90f404def533292985e774370308d140eb4f30049181bf722b80.json) |
 | bindworkload | stale: source, pin, command or inputs changed | [result](status/evidence/6c8627273ab14f7592eca85e92afb6d7ffb55859a2497cf909c9a82d476361c6.json) |
-| checkertext | current | [result](status/evidence/6bf5a4701795074d2cb6c45bb7d851e1b6079e9c3e6c67a4a3b2367357b4567f.json) |
+| checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/6bf5a4701795074d2cb6c45bb7d851e1b6079e9c3e6c67a4a3b2367357b4567f.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/44f293c40525a7b8a95f3260513f2f642e4ad5b7e92a9c8453730daaaff7c404.json) |
 | deny | stale: source, pin, command or inputs changed | [result](status/evidence/15576dbef02793bf57c9fe6ea001049e7fb50445aee3c5c1a77efa734c3b4caa.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/8475c96bcb9a17161ade95d00164c73369b45b736c4b50a6ce7668b8c78fc027.json) |
@@ -482,7 +482,7 @@ Items:
 - [ ] S08-5 Deep recursion (ADR 0011) and reentrancy fixtures: reserved stacks, growth guards and the pushTypeResolution guard
 - [ ] S08-6 Baseline divergence allow-list (ADR 0004, data/divergences.toml): every difference the comparison accepts has an owner-approved entry
 - [ ] S08-7 Per-type footprint on the subset, Rust against Go
-- [x] S08-8 E4 integration through production literal-type construction and original-source versus regenerated literal printing, including WTF-8 and malformed input
+- [ ] S08-8 E4 integration through production literal-type construction and original-source versus regenerated literal printing, including WTF-8 and malformed input
 - [ ] S08-9 Measure checker throughput, bytes allocated and retained bytes against the pinned Go checker on a fixed query workload; retain raw samples and configuration with the evidence, separate from parse-and-bind results
 - [ ] S08-10 Prototype the arena-reference/interior-mutability relater (ADR 0008), require parity on the frozen relater fixtures, and compare throughput, allocations and retained bytes with the id-and-&mut-self implementation on those same fixtures
 

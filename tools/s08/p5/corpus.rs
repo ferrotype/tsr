@@ -47,7 +47,10 @@ fn input_files(request: &Value, key: &str) -> Result<Vec<InputBytes>, &'static s
 }
 
 pub fn observe(request: &Value) -> Value {
-    let mut trace = baseline::Trace::default();
+    let mut trace = baseline::Trace {
+        collect_type_strings: request["public_type_strings"] == true,
+        ..Default::default()
+    };
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         executor::observe(request, |program, op, phases, diagnostic_values| {
             let complete = phases

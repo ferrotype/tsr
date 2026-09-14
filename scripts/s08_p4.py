@@ -146,7 +146,7 @@ def fatal(request, kind, reason):
             'fatal': {'state': 'failed', 'class': kind, 'reason': reason}}
 
 
-def build(directory, *, example='p4_inventory', source_fn=None, optimize=False):
+def build(directory, *, example='p4_inventory', source_fn=None, optimize=False, features=()):
     source_fn = source_fn or sources
     directory.mkdir(parents=True, exist_ok=False)
     before = source_fn()
@@ -159,6 +159,8 @@ def build(directory, *, example='p4_inventory', source_fn=None, optimize=False):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
     command = ['cargo', 'build', '--locked', '-p', 'ts_compiler', '--example', example, '--message-format=json']
+    if features:
+        command += ['--features', ','.join(features)]
     if optimize:
         command += ['--config', 'profile.dev.opt-level=1', '--config', 'profile.dev.debug-assertions=true',
                     '--config', 'profile.dev.overflow-checks=true']

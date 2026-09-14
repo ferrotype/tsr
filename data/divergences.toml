@@ -16,5 +16,12 @@
 # approved_by = "owner"
 # approved_on = "2026-09-05"
 # upstream_pin = "1f70213d4922b434345f639b441681e470c7cfc1"
+# observations = [{ variant_id = "exact frozen variant id", metric = "errors_parity", native_sha256 = "64 hex digits", rust_sha256 = "64 hex digits" }]
+#
+# E2 scopes match frozen variant IDs. Every accepted difference also needs an
+# exact observation witness copied from the E2 comparison report. A glob alone
+# never approves changed output. Failures, missing operations and native-unavailable
+# cases cannot be waived. Unused or changed acceptance witnesses prevent the
+# approval gate; informational witnesses are reported without affecting gates.
 
 divergence = []
