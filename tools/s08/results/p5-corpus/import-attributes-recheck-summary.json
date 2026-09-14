@@ -1,0 +1,481 @@
+{
+  "version": 1,
+  "capture": "target/s08/p5-corpus-import-attributes-recheck-01",
+  "capture_sha256": "ae6fefc7f2e172b1f67bd6f0b594ead654b6120931e8bab998ab5c73444ce49e",
+  "producer": "scripts/s08_p5_recheck.py",
+  "producer_sha256": "d022d361bce3e2d66a739fc2d6a2b0b01766eb46933e88c3755ce2c0f2b74eaf",
+  "binary_sha256": "f464cf5899ed37a460fcbe781530a76f5eb4af8d0f8378ca6ffb0b63d2a5d01c",
+  "selection": "tools/s08/p5/import-attributes-corpus-selection.json",
+  "selection_sha256": "1798883cf57e84d33ec7fd7fe9da6d6798ec30634a746b1d505cbf5016e469c9",
+  "control_capture_sha256": "2079e9a0a81aa00a5df7bfc916d1b68e5a4cc255c34afc85aec1ce909903e20d",
+  "report_sha256": "54a241f2254e2b797aae385c7585138c87b27b1a57257fff49a849eabe447a64",
+  "source_stable": true,
+  "scope": "Native corpus baseline comparison; emit not executed; no E2 metric",
+  "requested": 23,
+  "counts_by_tier": {
+    "acceptance": {
+      "different": 7,
+      "match": 15
+    },
+    "informational": {
+      "different": 1
+    }
+  },
+  "type_symbol_query_matches": 17,
+  "error_matches": 19,
+  "rows": [
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 2,
+        "rust_diagnostics": 2,
+        "state": "match"
+      },
+      "id": "compiler/importAttributeArbitraryExtension.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 117,
+        "rust_queries": 117,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "compiler/importAttributeDynamicImports.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "symbols",
+          "queries"
+        ],
+        "native_queries": 288,
+        "rust_queries": 252,
+        "state": "different"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 3,
+        "rust_diagnostics": 3,
+        "state": "match"
+      },
+      "id": "compiler/importAttributeModuleAugmentations.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 137,
+        "rust_queries": 137,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "compiler/importAttributeMostSpecificType.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 124,
+        "rust_queries": 124,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 1,
+        "rust_diagnostics": 1,
+        "state": "match"
+      },
+      "id": "compiler/importAttributePlainStringAmbientModule.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 47,
+        "rust_queries": 47,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 1,
+        "rust_diagnostics": 1,
+        "state": "match"
+      },
+      "id": "compiler/importAttributeType2.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 127,
+        "rust_queries": 127,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 6,
+        "rust_diagnostics": 6,
+        "state": "match"
+      },
+      "id": "conformance/importAssertion/importAssertion2.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 6,
+        "rust_diagnostics": 6,
+        "state": "match"
+      },
+      "id": "conformance/importAssertion/importAssertion2.ts#configuration=1",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAssertion/importAssertion2.ts#configuration=2",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 64,
+        "rust_queries": 64,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAssertion/importAssertion3.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 22,
+        "rust_queries": 22,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAssertion/importAssertion3.ts#configuration=1",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 22,
+        "rust_queries": 22,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 6,
+        "rust_diagnostics": 6,
+        "state": "match"
+      },
+      "id": "conformance/importAttributes/importAttributes2.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 6,
+        "rust_diagnostics": 6,
+        "state": "match"
+      },
+      "id": "conformance/importAttributes/importAttributes2.ts#configuration=1",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAttributes/importAttributes2.ts#configuration=2",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 64,
+        "rust_queries": 64,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAttributes/importAttributes3.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 22,
+        "rust_queries": 22,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/importAttributes/importAttributes3.ts#configuration=1",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 22,
+        "rust_queries": 22,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 1,
+        "rust_diagnostics": 2,
+        "state": "different"
+      },
+      "id": "conformance/node/esmModuleExports1.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "informational",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 6,
+        "rust_diagnostics": 6,
+        "state": "different"
+      },
+      "id": "conformance/node/esmModuleExports2.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "queries"
+        ],
+        "native_queries": 78,
+        "rust_queries": 78,
+        "state": "different"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 5,
+        "rust_diagnostics": 5,
+        "state": "different"
+      },
+      "id": "conformance/node/esmModuleExports2.ts#configuration=1",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "queries"
+        ],
+        "native_queries": 78,
+        "rust_queries": 78,
+        "state": "different"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 5,
+        "rust_diagnostics": 5,
+        "state": "different"
+      },
+      "id": "conformance/node/esmModuleExports3.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 71,
+        "rust_queries": 71,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "queries"
+        ],
+        "native_queries": 255,
+        "rust_queries": 207,
+        "state": "different"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=1",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "queries"
+        ],
+        "native_queries": 255,
+        "rust_queries": 207,
+        "state": "different"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/node/nodeModulesDeclarationEmitDynamicImportWithPackageExports.ts#configuration=2",
+      "state": "different",
+      "type_symbols": {
+        "differences": [
+          "types",
+          "queries"
+        ],
+        "native_queries": 255,
+        "rust_queries": 207,
+        "state": "different"
+      }
+    }
+  ]
+}

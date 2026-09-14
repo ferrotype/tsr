@@ -79,7 +79,7 @@ func TestS08P5Display(t *testing.T) {
 			var declaration *ast.Node
 			var visit func(*ast.Node) bool
 			visit = func(n *ast.Node) bool {
-				if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindVariableDeclaration || n.Kind == ast.KindInterfaceDeclaration) && n.Name() != nil && n.Name().Text() == q.Declaration {
+				if (n.Kind == ast.KindTypeAliasDeclaration || n.Kind == ast.KindVariableDeclaration || n.Kind == ast.KindInterfaceDeclaration || n.Kind == ast.KindNamespaceExport) && n.Name() != nil && n.Name().Text() == q.Declaration {
 					if declaration != nil {
 						t.Fatal("ambiguous declaration", q.Declaration)
 					}

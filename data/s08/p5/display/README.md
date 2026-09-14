@@ -1,6 +1,6 @@
 # P5 direct display observations
 
-These 178 source-selected requests exercise explicit builder calls and
+These 190 source-selected requests exercise explicit builder calls and
 context-sensitive type/symbol display, after semantic and global diagnostics.
 They are supplemental API evidence, not an E2 baseline capture. The native
 driver invokes the pinned checker and printer without expected-output hooks.
@@ -63,3 +63,11 @@ export-equals namespace. The positive package case selects its package name
 without a mode retry; it does not establish branch coverage of a successful
 swapped-mode portability retry. The direct adapter accepts only its three named
 module configurations, identically in Rust and Go.
+
+The review follow-up captures 190/190 exact requests in
+`target/s08/p5-display-original-imports-native-02`. Twelve added requests
+alternate two namespace exports with different original import attributes and
+then repeat the first, for file modules and attributed ambient modules. Both
+public display and explicit node-building preserve each export's own attributes.
+The driver now locates namespace-export declarations as well as its original
+variable, interface and type-alias declarations.

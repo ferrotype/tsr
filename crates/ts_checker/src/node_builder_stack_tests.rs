@@ -6,7 +6,7 @@ use std::sync::{
     Arc,
 };
 use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_ast::{AstBuilder, Factory, FactoryHooks, NodeId, SyntaxKind as K};
+use ts_ast::{AstBuilder, Factory, FactoryHooks, NodeId};
 use ts_jsstring::SourceText;
 use ts_nodebuilder::flags as nf;
 use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
@@ -14,16 +14,15 @@ use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 struct ObservedHooks {
     inner: Arc<dyn FactoryHooks>,
     largest_stack: Arc<AtomicUsize>,
-    panic_at_leaf: bool,
+    panic_above_stack: Option<usize>,
 }
 impl FactoryHooks for ObservedHooks {
     fn on_create(&self, factory: &mut dyn Factory, node: NodeId) {
-        self.largest_stack.fetch_max(
-            stacker::remaining_stack().expect("native stack bounds"),
-            Ordering::Relaxed,
-        );
+        let remaining = stacker::remaining_stack().expect("native stack bounds");
+        self.largest_stack.fetch_max(remaining, Ordering::Relaxed);
         assert!(
-            !self.panic_at_leaf || factory.node(node).kind() != K::StringKeyword,
+            self.panic_above_stack
+                .is_none_or(|limit| remaining <= limit),
             "factory panic inside grown builder stack"
         );
         self.inner.on_create(factory, node);
@@ -36,14 +35,18 @@ impl FactoryHooks for ObservedHooks {
     }
 }
 
-fn observe(builder: &mut NodeBuilder<'_>, largest_stack: &Arc<AtomicUsize>, panic_at_leaf: bool) {
+fn observe(
+    builder: &mut NodeBuilder<'_>,
+    largest_stack: &Arc<AtomicUsize>,
+    panic_above_stack: Option<usize>,
+) {
     builder.ast = AstBuilder::with_hooks(
         SourceText::from_bytes(b"".as_slice()),
         &builder.checker.counters,
         Arc::new(ObservedHooks {
             inner: builder.emit.factory_hooks(),
             largest_stack: Arc::clone(largest_stack),
-            panic_at_leaf,
+            panic_above_stack,
         }),
     );
 }
@@ -85,7 +88,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                 let storage_before = counters.snapshot();
                 {
                     let mut builder = NodeBuilder::new(checker, nf::NO_TRUNCATION);
-                    observe(&mut builder, &largest_stack, false);
+                    observe(&mut builder, &largest_stack, None);
                     let node = builder.type_node(ty).unwrap();
                     assert!(
                         largest_stack.load(Ordering::Relaxed) > STACK,
@@ -111,7 +114,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                         checker,
                         nf::NO_TRUNCATION | nf::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES,
                     );
-                    observe(&mut builder, &largest_stack, false);
+                    observe(&mut builder, &largest_stack, None);
                     let name = builder
                         .access_from_symbol_chain(&chain, chain.len() - 1, 0, None)
                         .unwrap();
@@ -135,7 +138,9 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
             let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let mut operation = owner.operation().unwrap();
                 NodeBuilder::with_cached(operation.state_mut(), nf::NO_TRUNCATION, |builder| {
-                    observe(builder, &largest_stack, true);
+                    // Release frame sizes can put the first leaf on the original
+                    // stack. Trigger only when a hook observes a grown segment.
+                    observe(builder, &largest_stack, Some(STACK));
                     builder.type_node(ty)?;
                     Ok(ts_ast::JsString::default())
                 })

@@ -58,3 +58,16 @@ and diagnostics affecting the native intrinsic-`any` fast path. The latter chang
 the query schedule even where emitted text agrees. The formatter must preserve
 that branch rather than fabricate queries to match Go. These are P6 investigation
 items; this attribution is not an accepted divergence or an E2 pass claim.
+
+`import-attributes-recheck-summary.json` records the source-stable 23-variant
+selection whose native displayed types contain import attributes or resolution
+modes: 22 acceptance variants and one informational variant. Fifteen match the
+whole contract; 17 match types/symbols/queries; 19 match errors; all execute.
+The six remaining type/query differences concern dynamic-import/require/export
+checker semantics. Two more rows differ only in diagnostics. This is a separate
+capture, not a new complete corpus result.
+
+The nine historical supplemental drivers and exact selections now live in
+`producers/`, with their original producer hashes. All nine reports replay
+exactly with the committed `scripts/s08_p5_recheck.py` command. See
+`producers/README.md` for the commands and raw-capture prerequisites.

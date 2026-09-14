@@ -224,6 +224,9 @@ impl CheckerState {
                 _ => Ok(None),
             },
             Some(K::ImportKeyword | K::NewKeyword) => {
+                // Parsed meta-properties store their keyword as a kind field,
+                // not a child node. Native checkMetaPropertyKeyword is a stub;
+                // this arm cannot be reached by the parsed baseline walker.
                 let Some(parent) = read.parent() else {
                     return Ok(None);
                 };

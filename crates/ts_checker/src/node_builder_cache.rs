@@ -33,9 +33,17 @@ struct CachedType {
     owner: AstFile,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub(super) struct SpecifierKey {
+    pub symbol: SymbolId,
+    pub file: NodeId,
+    pub mode: ts_core::ResolutionMode,
+}
+
 #[derive(Default)]
 pub(crate) struct CachedBuilder {
     emit: EmitContext,
+    specifiers: Map<SpecifierKey, ts_ast::JsString>,
     entries: Map<SerializedKey, CachedType>,
     identifiers: Map<NodeId, Option<SymbolId>>,
     /// Nested diagnostic display shares emit metadata. Sweep only after the
@@ -53,9 +61,14 @@ impl CachedBuilder {
     pub(crate) fn census(&self, census: &mut crate::census::Census) {
         census.add(
             "display_cache",
-            self.entries.len() + self.identifiers.len(),
-            self.entries.allocation_size() + self.identifiers.allocation_size(),
+            self.entries.len() + self.identifiers.len() + self.specifiers.len(),
+            self.entries.allocation_size()
+                + self.identifiers.allocation_size()
+                + self.specifiers.allocation_size(),
         );
+        for specifier in self.specifiers.values() {
+            census.text("display_cache", specifier);
+        }
         let mut frames = std::collections::HashSet::new();
         for entry in self.entries.values() {
             census.add(
@@ -78,6 +91,32 @@ impl CachedBuilder {
 }
 
 impl<'a> NodeBuilder<'a> {
+    pub(super) fn cached_module_specifier(&self, key: SpecifierKey) -> Option<ts_ast::JsString> {
+        if self.cached {
+            self.checker.display_builder.specifiers.get(&key)
+        } else {
+            self.specifiers.get(&key)
+        }
+        .cloned()
+    }
+
+    pub(super) fn cache_module_specifier(
+        &mut self,
+        key: SpecifierKey,
+        specifier: ts_ast::JsString,
+    ) {
+        // Keys refer only to the checker-retained program and symbol graph;
+        // values own bytes, never syntax from a transient display frame.
+        if self.cached {
+            self.checker
+                .display_builder
+                .specifiers
+                .insert(key, specifier);
+        } else {
+            self.specifiers.insert(key, specifier);
+        }
+    }
+
     // port: tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilder
     pub(crate) fn with_cached(
         checker: &'a mut CheckerState,
@@ -91,6 +130,9 @@ impl<'a> NodeBuilder<'a> {
         let result = action(&mut builder);
         // A panic unwinds the exclusive operation and retires its owner; the
         // partially built frame and its unpublished cache entries are dropped.
+        // Printing alone does not commit a successful request: publishing its
+        // reusable syntax and validating retained metadata must also succeed.
+        // Suppressing these errors would leave subsequent cache reads untrusted.
         builder.release_cached_frame(result.is_ok())?;
         result
     }

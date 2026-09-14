@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "selection": "All five remaining type/symbol failures from display-recheck-01; supplemental comparison, no new full-corpus count",
+  "ids": [
+    "compiler/computedPropertiesInDestructuring1.ts#configuration=0",
+    "compiler/computedPropertiesInDestructuring1_ES6.ts#configuration=0",
+    "compiler/promiseAllOnAny01.ts#configuration=0",
+    "compiler/unknownLikeUnionObjectFlagsNotPropagated.ts#configuration=0",
+    "conformance/controlFlow/controlFlowParameter.ts#configuration=0"
+  ]
+}

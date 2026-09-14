@@ -385,18 +385,33 @@ impl NodeBuilder<'_> {
         let (importer, importer_name) = self.checker.module_source(enclosing)?;
         let host = self.checker.program()?.host.clone();
         let preferred_mode = if mode == ts_core::ResolutionMode::NONE {
-            host.get_default_resolution_mode_for_file(importer_name.as_bytes())?
+            match self.original_module_specifier(enclosing)? {
+                Some(original) => {
+                    host.get_mode_for_usage_location(importer_name.as_bytes(), original)?
+                }
+                None => host.get_default_resolution_mode_for_file(importer_name.as_bytes())?,
+            }
         } else {
             mode
         };
-        crate::module_specifiers::generate(
+        let key = super::cache::SpecifierKey {
+            symbol,
+            file: importer,
+            mode: preferred_mode,
+        };
+        if let Some(specifier) = self.cached_module_specifier(key) {
+            return Ok(specifier);
+        }
+        let specifier = crate::module_specifiers::generate(
             host.as_ref(),
             importer,
             importer_name.as_bytes(),
             &target,
             mode,
             preferred_mode == ts_core::ResolutionMode::ESNEXT,
-        )
+        )?;
+        self.cache_module_specifier(key, specifier.clone());
+        Ok(specifier)
     }
 
     pub(crate) fn symbol_expression_without_chain(

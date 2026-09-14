@@ -17,7 +17,7 @@ class DisplayProtocol(unittest.TestCase):
         self.observed = strict_json_loads((self.native / 'observations.json').read_bytes())
 
     def test_native_inventory_has_valid_states(self):
-        self.assertEqual(validate(self.request, self.observed), 178)
+        self.assertEqual(validate(self.request, self.observed), 190)
 
     def test_unknown_or_mistyped_module_options_fail(self):
         for bad in ('commonjs', '', 199, None, True):

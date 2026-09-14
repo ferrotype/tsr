@@ -91,7 +91,12 @@ fn declaration(program: &Program, name: &str) -> Result<(NodeId, NodeId, NodeId)
             let read = view.node(id)?;
             if matches!(
                 read.kind().known(),
-                Some(K::TypeAliasDeclaration | K::InterfaceDeclaration | K::VariableDeclaration)
+                Some(
+                    K::TypeAliasDeclaration
+                        | K::InterfaceDeclaration
+                        | K::VariableDeclaration
+                        | K::NamespaceExport
+                )
             ) {
                 if let Some(n) = read.name() {
                     if view.node_text(n)?.as_bytes() == name.as_bytes()

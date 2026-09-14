@@ -1622,6 +1622,122 @@
           "internal_flags": 8
         }
       ]
+    },
+    {
+      "id": "original-import-attributes-file",
+      "files": {
+        "/lib.d.ts": "export interface Value { value: number }; export const value: Value;",
+        "/main.ts": "export * as one from \"./lib\" with {type: \"custom\", extra: \"one\"};\nexport * as two from \"./lib\" with {type: \"custom\", extra: \"two\"};"
+      },
+      "roots": [
+        "/lib.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "0-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "0-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "1-two-type_string",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "1-two-type_node",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "2-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "2-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "original-import-attributes-ambient",
+      "files": {
+        "/types.d.ts": "declare module \"virtual\" with {type: \"custom\"} { export interface Value { value: number }; export const value: Value; }",
+        "/main.ts": "export * as one from \"virtual\" with {type: \"custom\", extra: \"one\"};\nexport * as two from \"virtual\" with {type: \"custom\", extra: \"two\"};"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "0-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "0-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "1-two-type_string",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "1-two-type_node",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "2-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "2-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        }
+      ]
     }
   ]
 }

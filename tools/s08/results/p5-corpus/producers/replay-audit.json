@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "replay_command": "python3 scripts/s08_p5_recheck.py --output CAPTURE --replay",
+  "captures": [
+    {
+      "capture": "target/s08/p5-corpus-default-recheck-01",
+      "producer_sha256": "3b334db6d45772d98341606f35cf4849901de7f52e4a41332310aa2e6c6b57f1",
+      "report_sha256": "770c5d2248a77ae52cdb280d1ef0b47f95682370598f64ec26f2f9df93628004",
+      "counts_by_tier": {
+        "acceptance": {
+          "match": 1
+        },
+        "informational": {}
+      },
+      "requested": 1,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-differences-recheck-01",
+      "producer_sha256": "f756efdc7b88ef493c18a4aa148db084fd216ca8cff45fbd6c173a615534b8dd",
+      "report_sha256": "7c751e7769d12f4ac4df447ace9fc12ff72de7674d161220353d46256f97ad59",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 76,
+          "match": 12
+        },
+        "informational": {
+          "different": 7
+        }
+      },
+      "requested": 95,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-01",
+      "producer_sha256": "434c582e9f918211da070ddbf1ad87131369a84030279fdb187512acb9083564",
+      "report_sha256": "52d517005399e027cccf1ddf7f6c2eee897ba8183913e48adb882a746344dff3",
+      "counts_by_tier": {
+        "acceptance": {
+          "match": 462,
+          "different": 88,
+          "failed": 5
+        },
+        "informational": {
+          "match": 75,
+          "different": 7
+        }
+      },
+      "requested": 637,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-02",
+      "producer_sha256": "db783b8d73fae6a485d6b2e1c9b6d4a421d275fb2ce7268912a7f9a3850865a9",
+      "report_sha256": "3370562e87bcf019c2d4ffa4664df4e741c2b43968f0c4026fb886982a37e851",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 4,
+          "match": 1
+        },
+        "informational": {}
+      },
+      "requested": 5,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-03",
+      "producer_sha256": "4a11c8065e090e420f262949df470c9dc4ee6e7a93fe681efb6fefedfa1f1df5",
+      "report_sha256": "3cb3e481445ff881f221e1178008ee960139194c2d275096442370ea9f56b6ae",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 2,
+          "match": 3
+        },
+        "informational": {}
+      },
+      "requested": 5,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-display-recheck-04",
+      "producer_sha256": "b4bc0743c9faa882de6decda1826e6ebfd6f682a0b0a462e5182abd74da8f887",
+      "report_sha256": "13c9b88e98f1a04ae1b5cf02ab41bab578b808fae0faf12c81b34d76db073e93",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 2,
+          "match": 3
+        },
+        "informational": {}
+      },
+      "requested": 5,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-module-alias-recheck-01",
+      "producer_sha256": "0c72245795a0be5d65ca89e3bb5a163c9715a8be9fd0cb193e4e8271b46c77b8",
+      "report_sha256": "c48da0dfb254a0424236156198606b0228fc09a35ee9ae7e17c2b85cb6425702",
+      "counts_by_tier": {
+        "acceptance": {
+          "match": 10
+        },
+        "informational": {
+          "match": 2
+        }
+      },
+      "requested": 12,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-module-root-recheck-01",
+      "producer_sha256": "d5b18e79fca3fe0270458288ed6666cbae2f76a769ca8327eb1f0916bd02130d",
+      "report_sha256": "72f55659b2d25f9ae84ab9e4536f7301442bede0e68b7faf45f8693e068208e4",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 63,
+          "match": 25
+        },
+        "informational": {
+          "match": 2,
+          "different": 5
+        }
+      },
+      "requested": 95,
+      "matches_recorded_report": true
+    },
+    {
+      "capture": "target/s08/p5-corpus-return-recheck-01",
+      "producer_sha256": "aa26586f3b71a3240fd94432a0f2b73f636789a2a8128be2ac55736039094e8a",
+      "report_sha256": "6d50466a951167c6c817134305c513a46be7378b77a0c2025d805f8a2f6e4f6f",
+      "counts_by_tier": {
+        "acceptance": {
+          "different": 60,
+          "match": 28
+        },
+        "informational": {
+          "match": 2,
+          "different": 5
+        }
+      },
+      "requested": 95,
+      "matches_recorded_report": true
+    }
+  ]
+}
