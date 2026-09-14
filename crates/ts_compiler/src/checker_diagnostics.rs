@@ -7,6 +7,21 @@ use ts_core::{ScriptKind, Tristate};
 use ts_jsstring::scanner_positions::compute_line_of_position;
 
 impl Program {
+    /// Rejects a file handle that this program does not retain.
+    pub(crate) fn retained_source<'a>(
+        &self,
+        file: &'a ProgramFile,
+    ) -> Result<SourceFileRead<'a>, Error> {
+        let source = file.bound().view().source_file()?;
+        let retained = self
+            .file(source.parse_options().path.as_bytes())
+            .ok_or(ts_arena::Error::WrongOwner)?;
+        if retained.source() != file.source() {
+            return Err(ts_arena::Error::WrongOwner.into());
+        }
+        Ok(source)
+    }
+
     /// Source selection for semantic and suggestion diagnostics. Project references
     /// are absent because the loader rejects nonempty reference configurations.
     // port: tsc/internal/compiler/program.go:Program.SkipTypeChecking
@@ -16,13 +31,7 @@ impl Program {
         file: &ProgramFile,
         ignore_no_check: bool,
     ) -> Result<bool, Error> {
-        let source = file.bound().view().source_file()?;
-        let retained = self
-            .file(source.parse_options().path.as_bytes())
-            .ok_or(ts_arena::Error::WrongOwner)?;
-        if retained.source() != file.source() {
-            return Err(ts_arena::Error::WrongOwner.into());
-        }
+        let source = self.retained_source(file)?;
         let options = self.options();
         if !ignore_no_check && options.no_check.is_true()
             || options.skip_lib_check.is_true() && source.is_declaration_file

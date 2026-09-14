@@ -383,7 +383,12 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     .new_property_signature_declaration(None, name, None, ty, None)
             }
             Some(K::JSDocVariadicType) => {
-                let ty = self.visit(self.node(node).type_node())?;
+                let operand = self
+                    .node(node)
+                    .data_source()
+                    .as_js_doc_variadic_type()
+                    .and_then(|data| data.r#type());
+                let ty = self.visit(operand)?;
                 self.output.new_array_type_node(ty)
             }
             Some(K::JSDocNullableType | K::JSDocOptionalType) => {

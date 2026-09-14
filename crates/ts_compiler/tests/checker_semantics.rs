@@ -2655,3 +2655,166 @@ fn missing_dom_intersections_use_the_native_lib_diagnostic() {
         );
     }
 }
+
+#[test]
+fn jsdoc_rest_parameter_displays_reuse_the_variadic_operand() {
+    // Pinned Go nodecopy.go reuses JSDocVariadicType.Type. Sources and displays
+    // are the `f` rows of jsdocRestParameter, jsdocRestParameter_es6 and
+    // jsdocParseStarEquals .types, requested with the type baseline walker flags.
+    use ts_checker::type_format_flags as ff;
+    use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    let cases: [(&[u8], &[u8]); 3] = [
+        (
+            b"/** @param {...number} a */\nfunction f(a) {\n    a;\n}\n",
+            b"(a: number[]) => void",
+        ),
+        (
+            b"/** @param {...number} a */\nfunction f(...a) {\n    a;\n}\n",
+            b"(...a: number[]) => void",
+        ),
+        (
+            b"/** @param {...*=} args\n    @return {*=} */\nfunction f(...args) {\n    return null\n}\n",
+            b"(...args?: any[] | undefined) => any | undefined",
+        ),
+    ];
+    let flags = ((ff::NO_TRUNCATION
+        | ff::ALLOW_UNIQUE_ES_SYMBOL_TYPE
+        | ff::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS)
+        & ff::NODE_BUILDER_FLAGS_MASK)
+        | ts_nodebuilder::flags::IGNORE_ERRORS;
+    for (text, expected) in cases {
+        let (owner, program, _) = fixture_files(
+            b"/a.js",
+            &[(b"/a.js", text)],
+            CompilerOptions {
+                target: ScriptTarget::ES2015,
+                allow_js: Tristate::TRUE,
+                check_js: Tristate::TRUE,
+                ..options()
+            },
+        );
+        let file = program.file(b"/a.js").unwrap();
+        let view = file.bound().view().ast();
+        let function = view
+            .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+            .unwrap()
+            .iter()
+            .flatten()
+            .next()
+            .unwrap();
+        let name = view.node(function).unwrap().name().unwrap();
+        let mut op = owner.operation().unwrap();
+        let typ = op.get_type_at_location(name).unwrap();
+        let mut builder = op.node_builder();
+        let generated = builder
+            .type_to_type_node(
+                typ,
+                Some(function),
+                flags,
+                ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
+            )
+            .unwrap()
+            .unwrap();
+        let mut writer = TextWriter::new(b"", 0);
+        Printer::new(
+            PrinterOptions {
+                remove_comments: true,
+                ..Default::default()
+            },
+            builder.emit_context(),
+        )
+        .write(builder.view(), generated, Some(file.source()), &mut writer)
+        .unwrap();
+        assert_eq!(
+            String::from_utf8_lossy(writer.text()),
+            String::from_utf8_lossy(expected)
+        );
+    }
+}
+
+#[test]
+fn declaration_transform_reads_the_jsdoc_variadic_operand() {
+    // Pinned Go: parseJSDocType wraps a leading `...` in JSDocVariadicType, the
+    // typedef reparse keeps that node as the alias type, and
+    // transformJSDocVariadicType emits an array of JSDocVariadicType.Type.
+    use ts_ast::{AstBuilder, SyntaxKind as K};
+    use ts_printer::{EmitContext, EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    use ts_transformers::declarations::{transform_declarations, DeclarationOptions};
+    let (owner, program, _) = fixture_files(
+        b"/a.js",
+        &[(
+            b"/a.js",
+            b"/** @typedef {...number} Nums */\nvar value = 1;\n",
+        )],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            declaration: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let file = program.file(b"/a.js").unwrap();
+    let mut op = owner.operation().unwrap();
+    let counters = Counters::new();
+    let mut emit = EmitContext::new();
+    let mut output = AstBuilder::with_hooks(
+        ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+        &counters,
+        emit.factory_hooks(),
+    );
+    let transformed = transform_declarations(
+        &mut op,
+        &mut output,
+        &mut emit,
+        file.source(),
+        DeclarationOptions::default(),
+    )
+    .unwrap();
+    let view = output.view();
+    let statements: Vec<_> = view
+        .node_slice(
+            view.node(transformed.root)
+                .unwrap()
+                .statements(view)
+                .unwrap(),
+        )
+        .unwrap()
+        .iter()
+        .flatten()
+        .collect();
+    let alias = statements
+        .iter()
+        .copied()
+        .find(|&statement| {
+            matches!(
+                view.node(statement).unwrap().kind().known(),
+                Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
+            )
+        })
+        .expect("transformed typedef alias");
+    let array = view.node(alias).unwrap().type_node().unwrap();
+    assert_eq!(view.node(array).unwrap().kind(), K::ArrayType);
+    let element = view
+        .node(array)
+        .unwrap()
+        .data_source()
+        .as_array_type_node()
+        .unwrap()
+        .element_type();
+    assert_eq!(
+        element.map(|element| view.node(element).unwrap().kind().known()),
+        Some(Some(K::NumberKeyword))
+    );
+    let mut writer = TextWriter::new(b"", 0);
+    Printer::new(
+        PrinterOptions {
+            remove_comments: true,
+            ..Default::default()
+        },
+        &emit,
+    )
+    .write(view, array, Some(file.source()), &mut writer)
+    .unwrap();
+    assert_eq!(String::from_utf8_lossy(writer.text()), "number[]");
+    output.complete(transformed.root).unwrap();
+}

@@ -548,6 +548,17 @@ pub fn is_source_file_js(file: &SourceFileState) -> bool {
     file.is_js()
 }
 
+/// port: tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile
+pub fn is_check_js_enabled_for_file(
+    file: &SourceFileState,
+    options: &ts_core::CompilerOptions,
+) -> bool {
+    file.check_js_directive
+        .map_or(options.check_js == ts_core::Tristate::TRUE, |directive| {
+            directive.enabled
+        })
+}
+
 /// port: tsc/internal/ast/utilities.go:IsJsonSourceFile
 pub fn is_json_source_file(file: &SourceFileState) -> bool {
     file.script_kind == ts_core::ScriptKind::JSON

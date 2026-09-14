@@ -60,13 +60,12 @@ pub fn all(program: &Program, op: &mut Operation<'_>) -> Result<Value> {
     all_mode(program, op, false)
 }
 pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -> Result<Value> {
-    let mut syntactic = Vec::new();
+    let syntactic = program.syntactic_diagnostics(None)?;
     let mut bind = Vec::new();
     let mut semantic = Vec::new();
     let mut semantic_error = None;
     for file in program.files() {
         let source = file.bound().view().source_file()?;
-        syntactic.extend_from_slice(source.diagnostics());
         bind.extend_from_slice(source.bind_diagnostics());
         // The only library-enabled protocol uses skipLibCheck. Match the
         // compiler's selection before entering checker.GetDiagnostics; lazy

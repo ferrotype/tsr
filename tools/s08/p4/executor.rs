@@ -79,15 +79,15 @@ pub fn observe(
         Ok(values) => diagnostics::captured_phase(&program, values, &mut diagnostic_values),
         Err(error) => failure(format!("{error:?}"), "compiler_error"),
     };
-    let mut syntactic = Vec::new();
     let mut bind = Vec::new();
     for file in program.files() {
         let source = file.bound().view().source_file().expect("published source");
-        syntactic.extend_from_slice(source.diagnostics());
         bind.extend_from_slice(source.bind_diagnostics());
     }
-    row["phases"]["syntactic"] =
-        diagnostics::captured_phase(&program, &syntactic, &mut diagnostic_values);
+    row["phases"]["syntactic"] = match program.syntactic_diagnostics(None) {
+        Ok(values) => diagnostics::captured_phase(&program, &values, &mut diagnostic_values),
+        Err(error) => failure(format!("{error:?}"), "compiler_error"),
+    };
     // Keep raw bind diagnostics for attribution; the production semantic API
     // separately applies native selection, directives and plain-JS filtering.
     row["bind_diagnostics"] = diagnostics::phase(&program, &bind);
