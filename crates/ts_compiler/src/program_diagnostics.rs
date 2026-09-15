@@ -118,8 +118,9 @@ fn source_state(program: &Program, source: NodeId) -> Result<SourceFileRead<'_>,
     if let Some(config) = program
         .config()
         .config_file
-        .as_ref()
-        .filter(|config| config.root == source)
+        .iter()
+        .chain(&program.config().config_dependencies)
+        .find(|config| config.root == source)
     {
         config.file.view().source_file(source)
     } else {

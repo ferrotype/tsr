@@ -19,7 +19,7 @@ fn option_diagnostics_locations_paths_and_output_conflicts_match_go() {
     let mut cache = FileCache::new();
     let counters = ts_arena::Counters::new();
     for (request, expected) in requests.iter().zip(expected) {
-        let program = observation::try_load(request, &mut cache, &counters).unwrap();
+        let program = observation::try_load(request, &mut cache, &counters, None).unwrap();
         let actual = observation::verify_options(request["id"].as_str().unwrap(), &program);
         assert_eq!(actual, expected, "request {request}");
     }

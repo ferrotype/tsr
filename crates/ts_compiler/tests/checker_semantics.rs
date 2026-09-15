@@ -3257,6 +3257,14 @@ fn private_member_self_type_access_matches_native_program_diagnostics() {
 }
 
 #[test]
+fn static_index_constraints_exclude_only_synthetic_prototypes() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/static-index-prototype/requests.json"),
+        include_str!("../../../data/s08/p6/static-index-prototype/observations.json"),
+    );
+}
+
+#[test]
 fn interface_inheritance_matches_native_diagnostic_chains() {
     assert_native_semantic_fixture(
         include_str!("../../../data/s08/p6/interface-inheritance/requests.json"),

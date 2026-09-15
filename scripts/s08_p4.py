@@ -26,7 +26,7 @@ def canonical(value):
 
 PHASES = ('config', 'program', 'syntactic', 'semantic', 'global', 'declaration', 'suggestion')
 SOURCE_PATTERNS = ('crates/**/*.rs', 'crates/**/Cargo.toml', 'Cargo.toml', 'Cargo.lock',
-                   'tools/s08/p4/**', 'tools/s07/program/*.rs', 'scripts/s08_p4.py',
+                   'tools/s08/p4/**/*', 'tools/s07/program/*.rs', 'tools/s07/config/host.rs', 'scripts/s08_p4.py',
                    'scripts/s04_common.py', 'scripts/s07_program.py', 'scripts/s08_oracle.py',
                    'scripts/s07_subset.py', 'data/upstream.json')
 MANIFEST = ROOT / 'data/s08/baseline-requests.json'

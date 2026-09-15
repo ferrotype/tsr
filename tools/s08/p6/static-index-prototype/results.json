@@ -1,0 +1,1102 @@
+{
+  "version": 1,
+  "scope": "Bounded development comparison of all 128 config-bearing variants and 17 static/index controls against full E2 at 827c353. No full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "224d2fa6a25ef1ef1ded940828baa3f46da895a960ffe4e046124ddd652e5f91",
+  "candidate_capture_sha256": "4480a84877cc5820b8e1e7c4c1ae304610fa797be5f23303ba2b606cb5a00bd4",
+  "candidate_sources_sha256": "acffb8535adc5c5a933d5736bb3c0330390d642fe3f093f2618e7cb3de68a02d",
+  "selection_sha256": "5178229e01564873e39f676da383ddba720cd5976fe0f2b7a0c3427753399ce7",
+  "source_stable": true,
+  "counts_before": {
+    "acceptance": {
+      "types_parity": {
+        "match": 83,
+        "disabled": 9,
+        "different": 1
+      },
+      "errors_parity": {
+        "match": 72,
+        "different": 21
+      },
+      "type_to_string_parity": {
+        "match": 84,
+        "disabled": 9
+      }
+    },
+    "informational": {
+      "types_parity": {
+        "disabled": 9,
+        "match": 43
+      },
+      "errors_parity": {
+        "different": 52
+      },
+      "type_to_string_parity": {
+        "disabled": 9,
+        "match": 43
+      }
+    }
+  },
+  "counts_after": {
+    "acceptance": {
+      "types_parity": {
+        "match": 84,
+        "disabled": 9
+      },
+      "errors_parity": {
+        "match": 93
+      },
+      "type_to_string_parity": {
+        "match": 84,
+        "disabled": 9
+      }
+    },
+    "informational": {
+      "types_parity": {
+        "disabled": 9,
+        "match": 43
+      },
+      "errors_parity": {
+        "match": 52
+      },
+      "type_to_string_parity": {
+        "disabled": 9,
+        "match": 43
+      }
+    }
+  },
+  "regressions": [],
+  "changes": [
+    {
+      "id": "compiler/commonSourceDirectory_dts.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/declarationEmitMonorepoBaseUrl.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "compiler/declarationEmitPathMappingMonorepo.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/declarationEmitToDeclarationDirWithoutCompositeAndDeclarationOptions.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions4.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions5.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/deprecatedCompilerOptions6.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionPackageIdWithRelativeAndAbsolutePath.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithExtensions_withPaths.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_empty.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_notSpecified.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_oneBlank.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_oneNotFound.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_dirModuleWithIndex.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_externalModule.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_externalModulePath.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_externalModule_withPaths.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_externalTSModule.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_jsModule.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_one_jsonModule.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_threeLastIsBlank1.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_threeLastIsBlank2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_threeLastIsBlank3.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/moduleResolutionWithSuffixes_threeLastIsBlank4.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution1_node.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution2_node.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution4_classic.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution4_node.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution5_classic.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution5_node.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution7_classic.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution7_node.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution8_classic.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution8_node.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_aliasWithRoot.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_aliasWithRoot_differentRootTypes.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_aliasWithRoot_multipleAliases.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_aliasWithRoot_realRootFile.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_noAliasWithRoot.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_rootImport_noAliasWithRoot_realRootFile.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_withExtension.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_withExtensionInName.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_withExtension_MapedToNodeModules.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingBasedModuleResolution_withExtension_failedLookup.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathMappingInheritedBaseUrl.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "compiler/pathsValidation1.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathsValidation2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathsValidation3.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/pathsValidation4.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "compiler/pathsValidation5.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "compiler/requireOfJsonFileWithoutResolveJsonModuleAndPathMapping.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/requireOfJsonFile_PathMapping.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/staticIndexSignatureAndNormalIndexSignature.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/tsconfigRootdirInclude.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/classes/staticIndexSignature/staticIndexSignature1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/classes/staticIndexSignature/staticIndexSignature2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/classes/staticIndexSignature/staticIndexSignature3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/classes/staticIndexSignature/staticIndexSignature4.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/classes/staticIndexSignature/staticIndexSignature7.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/externalModules/verbatimModuleSyntaxCompat2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/externalModules/verbatimModuleSyntaxCompat3.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/externalModules/verbatimModuleSyntaxCompat4.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/moduleResolution/bundler/bundlerOptionsCompat.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/moduleResolution/packageJsonExportsOptionsCompat.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/moduleResolution/resolutionModeTripleSlash4.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/moduleResolution/resolutionModeTripleSlash5.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "before": {
+        "types_parity": "disabled",
+        "errors_parity": "different",
+        "type_to_string_parity": "disabled"
+      },
+      "after": {
+        "types_parity": "disabled",
+        "errors_parity": "match",
+        "type_to_string_parity": "disabled"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/IndexMemberDeclarations/parserIndexMemberDeclaration6.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/typings/typingsLookup1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "different",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/typings/typingsLookup3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "before": {
+        "types_parity": "match",
+        "errors_parity": "different",
+        "type_to_string_parity": "match"
+      },
+      "after": {
+        "types_parity": "match",
+        "errors_parity": "match",
+        "type_to_string_parity": "match"
+      }
+    }
+  ],
+  "prior_screens": [
+    {
+      "capture_sha256": "eed9045d49b52f835483bc20e6627bf7a15ad7419bb84430d6b7470ea4bb7d05",
+      "disposition": "Rejected: tsconfigRootdirInclude panicked because the adapter omitted config specs. A new regression exposed the missing config syntax-diagnostic aggregation and incorrect copied path-matching context; both were corrected before the final capture."
+    },
+    {
+      "capture_sha256": "e894983cd25d83db62f3af979d02207e52444ded74f4abf6d89120b8c58421a7",
+      "disposition": "All 145 comparisons matched. Final review replaced ReadFile of the root config with native direct test-unit parsing to preserve BOM bytes. The final -03 screen has identical E2 comparisons after this change."
+    }
+  ]
+}

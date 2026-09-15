@@ -244,7 +244,7 @@ impl CheckerState {
                 self.check_object_type_members(node)?;
                 let ty = self.get_type_from_type_node(node)?;
                 self.resolve_type_members(ty)?;
-                self.check_source_index_constraints(ty, node)
+                self.check_source_index_constraints(ty, node, false)
             }
             Some(K::ParenthesizedType) => {
                 self.check_source_element(required(read.type_node(), "parenthesized type")?)

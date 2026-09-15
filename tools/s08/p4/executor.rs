@@ -5,6 +5,7 @@ use std::sync::Arc;
 use ts_checker::{CheckerOwner, Error};
 use ts_compiler as ts_compiler_error;
 use ts_compiler::{FileCache, Program, ProgramOptions};
+mod config;
 pub mod diagnostics;
 #[path = "../../s07/program/rust_observation.rs"]
 mod observation;
@@ -61,20 +62,31 @@ pub fn observe(
     if capture_errors {
         row["error_baseline"] = absent("diagnostic aggregation not reached");
     }
-    let program = match observation::try_load(&request["loading"], &mut cache, &counters) {
-        Ok(program) => Arc::new(program),
-        Err(ts_compiler_error::Error::Unsupported(reason)) => {
-            row["load"] = failure(reason, "unsupported");
-            return row;
-        }
+    let parsed_config = match config::parse(request) {
+        Ok(config) => config,
         Err(error) => {
-            row["load"] = failure(format!("{error:?}"), "compiler_error");
+            row["load"] = failure(error, "config_parse");
             return row;
         }
     };
+    let program =
+        match observation::try_load(&request["loading"], &mut cache, &counters, parsed_config) {
+            Ok(program) => Arc::new(program),
+            Err(ts_compiler_error::Error::Unsupported(reason)) => {
+                row["load"] = failure(reason, "unsupported");
+                return row;
+            }
+            Err(error) => {
+                row["load"] = failure(format!("{error:?}"), "compiler_error");
+                return row;
+            }
+        };
     row["load"] = json!({"state":"executed","graph":observation::observe(request["id"].as_str().unwrap(), &program)});
-    row["phases"]["config"] =
-        diagnostics::captured_phase(&program, &program.config().errors, &mut diagnostic_values);
+    row["phases"]["config"] = diagnostics::captured_phase(
+        &program,
+        &program.config().config_file_parsing_diagnostics(),
+        &mut diagnostic_values,
+    );
     row["phases"]["program"] = match program.program_diagnostics() {
         Ok(values) => diagnostics::captured_phase(&program, values, &mut diagnostic_values),
         Err(error) => failure(format!("{error:?}"), "compiler_error"),

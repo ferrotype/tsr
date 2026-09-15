@@ -15,8 +15,9 @@ fn payload(program: &Program, d: &ts_ast::Diagnostic) -> Value {
         if let Some(config) = program
             .config()
             .config_file
-            .as_ref()
-            .filter(|c| c.root == id)
+            .iter()
+            .chain(&program.config().config_dependencies)
+            .find(|c| c.root == id)
         {
             return hex(config
                 .file

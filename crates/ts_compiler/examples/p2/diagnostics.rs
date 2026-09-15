@@ -91,7 +91,7 @@ pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -
     }
     let globals = op.global_diagnostics()?;
     let mut phases = vec![
-        ("config", program.config().errors.clone()),
+        ("config", program.config().config_file_parsing_diagnostics()),
         ("program", program.program_diagnostics()?.to_vec()),
         ("syntactic", syntactic),
         ("bind", bind),

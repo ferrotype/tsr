@@ -7695,7 +7695,6 @@
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNames",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.FileNamesByPath",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetBuildInfoFileName",
-      "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetConfigFileParsingDiagnostics",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetContentMapperForFileName",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetCurrentDirectory",
       "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",

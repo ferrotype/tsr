@@ -21,6 +21,7 @@ pub(super) fn try_load(
     request: &Value,
     cache: &mut FileCache,
     counters: &Counters,
+    parsed_config: Option<ts_tsoptions::ParsedCommandLine>,
 ) -> Result<Program, ts_compiler_error::Error> {
     let mut fs = MemoryBuilder::new(
         request["cwd"].as_str().unwrap().as_bytes(),
@@ -43,7 +44,21 @@ pub(super) fn try_load(
         .collect();
     let host = Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish())));
     let mut config = ts_tsoptions::ParsedCommandLine::new(options, roots);
-    if let Some(name) = request["config_name"].as_str() {
+    if let Some(parsed) = parsed_config {
+        // CompileFilesEx carries config diagnostics and their syntax owners
+        // beside the already finalized fixture options and source-file list.
+        config.config_file = parsed.config_file;
+        config.config_dependencies = parsed.config_dependencies;
+        config.errors = parsed.errors;
+        config.content_mappers = parsed.content_mappers;
+        // Go stores these include/exclude specifications on TsConfigSourceFile.
+        // Rust keeps them beside that source in ParsedCommandLine.
+        config.config_specs = parsed.config_specs;
+        // CompileFilesEx constructs a fresh ParsedCommandLine without copying
+        // comparePathsOptions. Preserve its zero-valued matching context even
+        // though the earlier config parse had an explicit directory and casing.
+        config.config_case_sensitive = false;
+    } else if let Some(name) = request["config_name"].as_str() {
         let text = bytes(request["config_text"].as_str().expect("config text hex"));
         config.config_file = Some(Arc::new(ts_tsoptions::TsConfigSourceFile::parse(
             JsString::from_bytes(name.as_bytes()),
@@ -81,8 +96,9 @@ pub(super) fn diagnostic(d: &ts_ast::Diagnostic, program: &Program) -> Value {
             if let Some(config) = program
                 .config()
                 .config_file
-                .as_ref()
-                .filter(|config| config.root == id)
+                .iter()
+                .chain(&program.config().config_dependencies)
+                .find(|config| config.root == id)
             {
                 return config
                     .file

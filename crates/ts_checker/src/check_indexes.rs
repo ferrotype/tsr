@@ -6,30 +6,38 @@ use crate::{
     IndexInfoId, TypeId,
 };
 use ts_arena::{NodeId, SymbolId};
-use ts_ast::{internal_symbol_names as names, SyntaxKind as K};
+use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn check_source_index_constraints(
         &mut self,
         ty: TypeId,
         declaration: NodeId,
+        is_static_index: bool,
     ) -> Result<(), Error> {
         if self.query.index_constraints_checked.contains(&ty) {
             return Ok(());
         }
-        self.check_index_constraints(ty)?;
+        self.check_index_constraints(ty, is_static_index)?;
         self.check_class_or_interface_duplicate_indexes(declaration)?;
         self.query.index_constraints_checked.insert(ty);
         Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkIndexConstraints
-    pub(crate) fn check_index_constraints(&mut self, ty: TypeId) -> Result<(), Error> {
+    pub(crate) fn check_index_constraints(
+        &mut self,
+        ty: TypeId,
+        is_static_index: bool,
+    ) -> Result<(), Error> {
         let indexes = self.index_infos_of_type(ty)?;
         if indexes.is_empty() {
             return Ok(());
         }
         for property in self.get_properties_of_type(ty)? {
+            if is_static_index && self.symbol(property)?.flags() & sf::PROTOTYPE != 0 {
+                continue;
+            }
             let key =
                 self.literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
             let value = self.non_missing_symbol_type(property)?;

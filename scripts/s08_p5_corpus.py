@@ -22,7 +22,7 @@ from s08_queries import action, expected_baseline
 
 def sources():
     result = p4_sources()
-    for pattern in ('tools/s08/p5/**', 'scripts/s08_p5*.py', 'scripts/s08_queries.py', 'scripts/s08_baselines.py'):
+    for pattern in ('tools/s08/p5/**/*', 'scripts/s08_p5*.py', 'scripts/s08_queries.py', 'scripts/s08_baselines.py'):
         for path in ROOT.glob(pattern):
             if path.is_file():
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())

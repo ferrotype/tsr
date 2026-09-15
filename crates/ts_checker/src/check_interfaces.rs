@@ -81,7 +81,7 @@ impl CheckerState {
                         self.add_diagnostic(diagnostic)?;
                     }
                 }
-                self.check_index_constraints(ty)?;
+                self.check_index_constraints(ty, false)?;
             }
             Ok(())
         })();
