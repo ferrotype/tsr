@@ -161,17 +161,22 @@ impl CheckerState {
         if let Some(Some(symbol)) = self.query.resolved_symbols.try_get(node) {
             return Ok(*symbol);
         }
-        let name = self.ast(node)?.node_text(node)?.into_js_string();
-        let message = self.cannot_find_name_diagnostic(node)?;
-        let symbol = self
-            .resolve_name(
+        let missing = ts_ast::node_is_missing(Some(&self.ast(node)?.node(node)?));
+        let symbol = if missing {
+            None
+        } else {
+            let name = self.ast(node)?.node_text(node)?.into_js_string();
+            let message = self.cannot_find_name_diagnostic(node)?;
+            let write_only = ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?;
+            self.resolve_name(
                 Some(node),
                 name.as_bytes(),
                 sf::VALUE | sf::EXPORT_VALUE,
                 Some(message),
-                true,
+                !write_only,
             )?
-            .unwrap_or(self.builtins.unknown_symbol);
+        }
+        .unwrap_or(self.builtins.unknown_symbol);
         *self.query.resolved_symbols.get_or_default(node) = Some(symbol);
         Ok(symbol)
     }

@@ -382,12 +382,11 @@ impl CheckerState {
         if !private {
             return Ok(());
         }
-        if node
-            .map(|node| self.assignment_target_kind(node))
-            .transpose()?
-            == Some(crate::flow_assignments::AssignmentKind::Definite)
-            && flags & sf::SET_ACCESSOR == 0
-        {
+        let write_only = match node {
+            Some(node) => ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?,
+            None => false,
+        };
+        if write_only && flags & sf::SET_ACCESSOR == 0 {
             return Ok(());
         }
         if self_access {

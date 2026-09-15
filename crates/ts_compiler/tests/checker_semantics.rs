@@ -2818,3 +2818,376 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
     assert_eq!(String::from_utf8_lossy(writer.text()), "number[]");
     output.complete(transformed.root).unwrap();
 }
+
+#[test]
+fn es_module_marker_grammar_error_is_skipped_only_by_program_no_emit_filtering() {
+    // Pinned Go: checkGrammarForEsModuleMarkerInBindingName reports through
+    // grammarErrorOnNodeSkippedOnNoEmit without reading noEmit, and
+    // Program.getSemanticDiagnosticsWithChecker drops it under noEmit. The source
+    // is compiler/es5-commonjs8.ts, whose noEmit es2015 baseline has no errors.
+    let text = b"export default \"test\";\nexport var __esModule = 1;\n";
+    for no_emit in [Tristate::UNKNOWN, Tristate::TRUE] {
+        let (owner, program, _) = fixture(
+            text,
+            CompilerOptions {
+                target: ScriptTarget::ES2015,
+                module: ModuleKind::COMMON_JS,
+                no_emit,
+                ..options()
+            },
+        );
+        let file = program.file(b"/main.ts").unwrap();
+        let mut op = owner.operation().unwrap();
+        let checked = op.semantic_diagnostics(file.source()).unwrap();
+        assert_eq!(
+            checked
+                .iter()
+                .map(|d| (d.code, d.loc.pos(), d.loc.end(), d.skipped_on_no_emit))
+                .collect::<Vec<_>>(),
+            [(1216, 34, 44, true)],
+            "checker diagnostics with noEmit {no_emit:?}"
+        );
+        let selected = program
+            .semantic_diagnostics_with_checker(&mut op, file)
+            .unwrap();
+        let expected: &[i32] = if no_emit.is_true() { &[] } else { &[1216] };
+        assert_eq!(
+            selected.iter().map(|d| d.code).collect::<Vec<_>>(),
+            expected,
+            "program diagnostics with noEmit {no_emit:?}"
+        );
+    }
+}
+
+#[test]
+fn qualified_enum_member_declaration_phase_completes_and_displays_like_native() {
+    // Pinned compiler/declarationEmitQualifiedName.ts. b.ts reaches E only through
+    // an import type, so appendReferenceToType extends that import's qualifier.
+    // Native reports no declaration diagnostics; displays are the `.types` rows.
+    use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    let files: [(&[u8], &[u8]); 3] = [
+        (b"/e.ts", b"export enum E {\n    A = 'a',\n    B = 'b',\n}\n"),
+        (
+            b"/a.ts",
+            b"import { E } from './e.js'\nexport const A = {\n    item: {\n        a: E.A,\n    },\n} as const\n",
+        ),
+        (
+            b"/b.ts",
+            b"import { A } from './a.js'\nexport const B = { ...A } as const\n",
+        ),
+    ];
+    let (owner, program, _) = fixture_files(
+        b"/e.ts",
+        &files,
+        CompilerOptions {
+            declaration: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let mut op = owner.operation().unwrap();
+    for (path, _) in files {
+        let file = program.file(path).unwrap();
+        let diagnostics = program.declaration_diagnostics_with_checker(&mut op, file);
+        assert!(
+            diagnostics.as_ref().is_ok_and(Vec::is_empty),
+            "{diagnostics:?}"
+        );
+    }
+    let flags = 79_659_013;
+    for (path, statement, expected) in [
+        (
+            b"/a.ts".as_slice(),
+            1,
+            "{ readonly item: { readonly a: E.A; }; }",
+        ),
+        (
+            b"/b.ts",
+            1,
+            "{ readonly item: { readonly a: import(\"./e.js\").E.A; }; }",
+        ),
+    ] {
+        let file = program.file(path).unwrap();
+        let view = file.bound().view().ast();
+        let statement = view
+            .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+            .unwrap()
+            .at(statement)
+            .unwrap();
+        let list = view
+            .node(statement)
+            .unwrap()
+            .data_source()
+            .as_variable_statement()
+            .unwrap()
+            .declaration_list()
+            .unwrap();
+        let declarations = view
+            .node(list)
+            .unwrap()
+            .data_source()
+            .as_variable_declaration_list()
+            .unwrap()
+            .declarations()
+            .unwrap();
+        let declaration = view
+            .node_slice(view.list(declarations).unwrap().nodes())
+            .unwrap()
+            .at(0)
+            .unwrap();
+        let name = view.node(declaration).unwrap().name().unwrap();
+        let typ = op.get_type_at_location(name).unwrap();
+        let mut builder = op.node_builder();
+        let generated = builder
+            .type_to_type_node(
+                typ,
+                Some(declaration),
+                flags,
+                ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
+            )
+            .unwrap()
+            .unwrap();
+        let mut writer = TextWriter::new(b"", 0);
+        Printer::new(
+            PrinterOptions {
+                remove_comments: true,
+                ..Default::default()
+            },
+            builder.emit_context(),
+        )
+        .write(builder.view(), generated, Some(file.source()), &mut writer)
+        .unwrap();
+        assert_eq!(String::from_utf8_lossy(writer.text()), expected);
+    }
+}
+
+#[test]
+fn missing_identifier_value_references_report_no_cannot_find_name_like_native() {
+    // Focused native witnesses (data/s08/p6/missing-identifier). Parser recovery
+    // matches: syntactic diagnostics are equal. Pinned Go getResolvedSymbol skips
+    // resolution for a missing node, so no TS2304 '(Missing)' is reported.
+    let request: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/missing-identifier/requests.json"
+    ))
+    .unwrap();
+    let native: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/missing-identifier/observations.json"
+    ))
+    .unwrap();
+    let observe = |values: &[ts_ast::Diagnostic]| -> Vec<serde_json::Value> {
+        values
+            .iter()
+            .map(|d| {
+                let args: Vec<_> = d
+                    .message_args
+                    .iter()
+                    .map(|arg| String::from_utf8(arg.as_bytes().to_vec()).unwrap())
+                    .collect();
+                serde_json::json!([d.code, d.loc.pos(), d.loc.end(), d.category, args])
+            })
+            .collect()
+    };
+    let expected = |values: &serde_json::Value| -> Vec<serde_json::Value> {
+        values
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| {
+                let args = d["args"].as_array().cloned().unwrap_or_default();
+                serde_json::json!([d["code"], d["pos"], d["end"], d["category"], args])
+            })
+            .collect()
+    };
+    let programs = request["programs"].as_array().unwrap();
+    let observed = native["programs"].as_array().unwrap();
+    assert_eq!(programs.len(), observed.len());
+    for (spec, native) in programs.iter().zip(observed) {
+        assert_eq!(spec["id"], native["id"]);
+        let text = spec["files"]["/main.ts"].as_str().unwrap();
+        let (owner, program, _) = fixture(text.as_bytes(), options());
+        let file = program.file(b"/main.ts").unwrap();
+        assert_eq!(
+            observe(&program.syntactic_diagnostics(Some(file)).unwrap()),
+            expected(&native["diagnostics"]["syntactic"]),
+            "{} syntactic",
+            spec["id"]
+        );
+        assert_eq!(
+            observe(
+                &owner
+                    .operation()
+                    .unwrap()
+                    .semantic_diagnostics(file.source())
+                    .unwrap()
+            ),
+            expected(&native["diagnostics"]["semantic"]),
+            "{} semantic",
+            spec["id"]
+        );
+    }
+}
+
+#[test]
+fn write_only_references_leave_locals_unused_like_native() {
+    // Pinned compiler/noUnusedLocals_writeOnly.ts: getResolvedSymbol passes
+    // !IsWriteOnlyAccess as isUse, so only `x` and `z` stay unreferenced, as in
+    // its errors.txt (1,12) and (16,9). `f2` needs the library and is omitted.
+    let fixture = include_str!(
+        "../../../upstream/tsc/testdata/tests/cases/compiler/noUnusedLocals_writeOnly.ts"
+    );
+    let text =
+        &fixture[fixture.find("function f(").unwrap()..fixture.find("function f2(").unwrap()];
+    let (checker, source) = checker(
+        text.as_bytes(),
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            no_unused_locals: Tristate::TRUE,
+            no_unused_parameters: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let diagnostics = checker
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        diagnostics
+            .iter()
+            .filter(|d| matches!(d.code, 6133 | 6138 | 6196 | 6198 | 6199))
+            .map(|d| {
+                let args: Vec<_> = d
+                    .message_args
+                    .iter()
+                    .map(|a| a.as_bytes().to_vec())
+                    .collect();
+                (d.code, d.loc.pos(), d.loc.end(), args)
+            })
+            .collect::<Vec<_>>(),
+        [
+            (6133, 11, 12, vec![b"x".to_vec()]),
+            (6133, 444, 445, vec![b"z".to_vec()])
+        ]
+    );
+}
+
+#[test]
+fn property_write_access_classification_matches_native_program_diagnostics() {
+    // Focused native witnesses (data/s08/p6/write-access): pinned Go passes
+    // IsWriteAccess and IsWriteOnlyAccess, not assignment-target kinds, at the
+    // property reference, accessibility and write-type call sites.
+    let request: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/write-access/requests.json"
+    ))
+    .unwrap();
+    let native: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/write-access/observations.json"
+    ))
+    .unwrap();
+    let observe = |values: &[ts_ast::Diagnostic]| -> Vec<serde_json::Value> {
+        values
+            .iter()
+            .map(|d| {
+                let args: Vec<_> = d
+                    .message_args
+                    .iter()
+                    .map(|arg| String::from_utf8(arg.as_bytes().to_vec()).unwrap())
+                    .collect();
+                serde_json::json!([d.code, d.loc.pos(), d.loc.end(), d.category, args])
+            })
+            .collect()
+    };
+    let expected = |values: &serde_json::Value| -> Vec<serde_json::Value> {
+        values
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| {
+                let args = d["args"].as_array().cloned().unwrap_or_default();
+                serde_json::json!([d["code"], d["pos"], d["end"], d["category"], args])
+            })
+            .collect()
+    };
+    let programs = request["programs"].as_array().unwrap();
+    let observed = native["programs"].as_array().unwrap();
+    assert_eq!(programs.len(), observed.len());
+    for (spec, native) in programs.iter().zip(observed) {
+        assert_eq!(spec["id"], native["id"]);
+        let text = spec["files"]["/main.ts"].as_str().unwrap();
+        let no_unused_locals = if spec["no_unused_locals"] == true {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        };
+        let (owner, program, _) = fixture(
+            text.as_bytes(),
+            CompilerOptions {
+                no_unused_locals,
+                ..options()
+            },
+        );
+        let file = program.file(b"/main.ts").unwrap();
+        assert_eq!(
+            observe(&program.syntactic_diagnostics(Some(file)).unwrap()),
+            expected(&native["syntactic"]),
+            "{} syntactic",
+            spec["id"]
+        );
+        let mut op = owner.operation().unwrap();
+        assert_eq!(
+            observe(
+                &program
+                    .semantic_diagnostics_with_checker(&mut op, file)
+                    .unwrap()
+            ),
+            expected(&native["semantic"]),
+            "{} semantic",
+            spec["id"]
+        );
+    }
+}
+
+#[test]
+fn destructuring_assignment_accessibility_errors_use_the_property_name_like_native() {
+    // Pinned compiler/destructuringAssignment_private.ts and its errors.txt:
+    // checkPropertyAccessibilityEx reports object-literal destructuring errors on
+    // the property name, including computed names, not on the whole property.
+    let fixture = include_str!(
+        "../../../upstream/tsc/testdata/tests/cases/compiler/destructuringAssignment_private.ts"
+    );
+    let text = &fixture[fixture.find("class C {").unwrap()..];
+    let (checker, source) = checker(
+        text.as_bytes(),
+        CompilerOptions {
+            target: ScriptTarget::ES2015,
+            strict: Tristate::UNKNOWN,
+            ..options()
+        },
+    );
+    let diagnostics = checker
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let observed: Vec<_> = diagnostics
+        .iter()
+        .filter(|d| d.code == 2341)
+        .map(|d| {
+            let args: Vec<_> = d
+                .message_args
+                .iter()
+                .map(|a| a.as_bytes().to_vec())
+                .collect();
+            (d.loc.pos(), d.loc.end(), args)
+        })
+        .collect();
+    let args = |name: &[u8]| vec![name.to_vec(), b"C".to_vec()];
+    assert_eq!(
+        observed,
+        [
+            (83, 84, args(b"x")),
+            (114, 115, args(b"o")),
+            (170, 177, args(b"x")),
+            (230, 237, args(b"o")),
+        ]
+    );
+}

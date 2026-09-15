@@ -368,7 +368,7 @@ impl CheckerState {
             self.check_access_property_accessibility(
                 node,
                 self.ast(left)?.node(left)?.kind() == K::SuperKeyword,
-                assignment != AssignmentKind::None,
+                ts_ast::utilities::is_write_access(self.ast(node)?, node)?,
                 apparent,
                 property,
                 Some(right),
@@ -383,7 +383,8 @@ impl CheckerState {
             }
             if self.this_property_access_in_constructor(node, property)? {
                 self.builtins.auto_type
-            } else if write_only || assignment == AssignmentKind::Definite {
+            } else if write_only || ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?
+            {
                 self.write_type_of_symbol(property)?
             } else {
                 self.get_type_of_symbol(property)?

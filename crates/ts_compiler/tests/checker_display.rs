@@ -55,3 +55,19 @@ fn deeply_qualified_symbol_display_runs_on_a_small_native_stack() {
         .join()
         .unwrap();
 }
+
+#[test]
+fn enum_member_display_through_import_type_parents_matches_native() {
+    // Supplemental native capture: identifier and quoted enum members displayed
+    // through an import type parent (b.ts) and a local reference parent (a.ts).
+    let request = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/enum-member-display/requests.json"
+    ))
+    .unwrap();
+    let expected: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/enum-member-display/observations.json"
+    ))
+    .unwrap();
+    let result = display::observe(&request).unwrap();
+    assert_eq!(result["programs"], expected["programs"]);
+}

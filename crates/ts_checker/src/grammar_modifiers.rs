@@ -32,6 +32,30 @@ impl CheckerState {
         Ok(true)
     }
 
+    /// Program semantic selection removes the diagnostic under noEmit; the checker keeps it.
+    // port: tsc/internal/checker/grammarchecks.go:Checker.grammarErrorOnNodeSkippedOnNoEmit
+    pub(crate) fn grammar_error_node_skipped_on_no_emit(
+        &mut self,
+        node: NodeId,
+        diagnostic: &'static d::Message,
+        args: Vec<JsString>,
+    ) -> Result<bool, Error> {
+        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            .ok_or(Error::MissingLink("grammar source"))?;
+        if !self
+            .ast(source)?
+            .source_file(source)?
+            .diagnostics()
+            .is_empty()
+        {
+            return Ok(false);
+        }
+        let mut diagnostic = self.diagnostic_for_node(Some(node), diagnostic, args)?;
+        diagnostic.skipped_on_no_emit = true;
+        self.add_diagnostic(diagnostic)?;
+        Ok(true)
+    }
+
     // port: tsc/internal/checker/grammarchecks.go:Checker.grammarErrorOnFirstToken
     pub(crate) fn grammar_error_first_token(
         &mut self,
