@@ -527,14 +527,13 @@ impl NodeBuilder<'_> {
                 return visited;
             }
             let result = visited?;
+            // NodeVisitor.VisitNodes keeps the input list's Loc even for nonlocal
+            // nodes; only the nodes themselves get synthetic positions.
             let result = if visited == list {
                 v.factory_mut().clone_list_header(result)
             } else {
                 result
             };
-            v.factory_mut()
-                .mutable_list(result)
-                .set_loc(TextRange::new(-1, -1));
             Some(result)
         };
         let mut visitor = NodeVisitor::new(

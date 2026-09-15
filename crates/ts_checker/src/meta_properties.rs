@@ -11,7 +11,7 @@ use ts_jsstring::JsString;
 
 impl CheckerState {
     /// The keyword and the name of a meta property.
-    fn meta_property_parts(&self, node: NodeId) -> Result<(NodeKind, NodeId), Error> {
+    pub(crate) fn meta_property_parts(&self, node: NodeId) -> Result<(NodeKind, NodeId), Error> {
         let read = self.ast(node)?.node(node)?;
         let data = read
             .data_source()
@@ -42,7 +42,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkNewTargetMetaProperty
-    fn check_new_target_meta_property(&mut self, node: NodeId) -> Result<TypeId, Error> {
+    pub(crate) fn check_new_target_meta_property(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let Some(container) = self.new_target_container(node)? else {
             self.error_at(
                 Some(node),
@@ -113,6 +113,31 @@ impl CheckerState {
             return self.global_import_meta_type();
         }
         Ok(self.builtins.error_type)
+    }
+
+    /// The synthetic `ImportMetaExpression { meta: ImportMeta }` type whose
+    /// `meta` member is the symbol of the `meta` name in `import.meta`.
+    // port: tsc/internal/checker/checker.go:Checker.getGlobalImportMetaExpressionType
+    pub(crate) fn global_import_meta_expression_type(&mut self) -> Result<TypeId, Error> {
+        if let Some(ty) = self.query.import_meta_expression_type {
+            return Ok(ty);
+        }
+        let symbol = self.new_symbol(0, JsString::from_bytes(&b"ImportMetaExpression"[..]))?;
+        let import_meta = self.global_import_meta_type()?;
+        let meta = self.new_symbol_ex(
+            ts_ast::symbol_flags::PROPERTY,
+            JsString::from_bytes(&b"meta"[..]),
+            ts_ast::check_flags::READONLY,
+        )?;
+        self.symbol_mut(meta)?.parent = Some(symbol);
+        self.value_symbol_links.get_or_default(meta).resolved_type = Some(import_meta);
+        let mut table = ts_ast::SymbolTable::new();
+        table.insert(JsString::from_bytes(&b"meta"[..]), Some(meta));
+        let members = self.alloc_symbol_table(table);
+        self.symbol_mut(symbol)?.members = Some(members);
+        let ty = self.new_anonymous_type(Some(symbol), Some(members), &[], &[], &[])?;
+        self.query.import_meta_expression_type = Some(ty);
+        Ok(ty)
     }
 
     /// `getGlobalImportMetaType`: the `ImportMeta` global, resolved once and

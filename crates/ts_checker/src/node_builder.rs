@@ -1181,18 +1181,26 @@ impl<'a> NodeBuilder<'a> {
                 "getPropertyNameNodeForSymbol: late/private name",
             ));
         }
+        let is_identifier =
+            ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
+        let is_numeric_name = ts_jsnum::from_string(name.as_bytes())
+            .to_string()
+            .as_bytes()
+            == name.as_bytes();
         let property_name =
-            if ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD)
-                && !(is_method && name.as_bytes() == b"new")
-            {
+            if name_type.is_some() && !is_identifier && (string_named || !is_numeric_name) {
+                // A string-named or non-numeric literal name type is always a string literal.
+                self.ast.new_string_literal(
+                    name.clone(),
+                    if single_quote {
+                        token_flags::SINGLE_QUOTE
+                    } else {
+                        0
+                    },
+                )
+            } else if is_identifier && !(is_method && name.as_bytes() == b"new") {
                 self.ast.new_identifier(name.clone())
-            } else if name_type.is_some()
-                && ts_jsnum::from_string(name.as_bytes())
-                    .to_string()
-                    .as_bytes()
-                    == name.as_bytes()
-                && name.as_bytes().starts_with(b"-")
-            {
+            } else if name_type.is_some() && is_numeric_name && name.as_bytes().starts_with(b"-") {
                 let number = self
                     .ast
                     .new_numeric_literal(JsString::from_bytes(&name.as_bytes()[1..]), 0);

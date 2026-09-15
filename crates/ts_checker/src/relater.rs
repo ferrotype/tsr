@@ -446,7 +446,7 @@ impl CheckerState {
         if self.types.object_flags(ty)? & of::IS_UNKNOWN_LIKE_UNION_COMPUTED != 0 {
             return Ok(self.types.object_flags(ty)? & of::IS_UNKNOWN_LIKE_UNION != 0);
         }
-        let types = self.types.types_of(ty)?;
+        let types = self.types.types_of(ty)?.to_vec();
         let mut result = false;
         if types.len() >= 3
             && self.types.flags(types[0])? & tf::UNDEFINED != 0

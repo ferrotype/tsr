@@ -114,16 +114,26 @@ impl CheckerState {
             } else {
                 self.check_non_null_type(ty, callee)?
             };
-            let signatures = self.signatures_of_type(ty, construct)?;
-            if signatures.len() == 1
-                && self
-                    .signatures
-                    .get(signatures[0])?
-                    .type_parameters
-                    .as_ref()
-                    .is_none_or(|p| p.is_empty())
-            {
-                let result = self.return_type_of_signature(signatures[0])?;
+            // getSingleSignature(t, kind, allowMembers=true): one object type
+            // with exactly one signature of the kind and none of the other kind.
+            let single = if self.types.flags(ty)? & tf::OBJECT != 0 {
+                let calls = self.signatures_of_type(ty, false)?;
+                let constructs = self.signatures_of_type(ty, true)?;
+                let (wanted, other) = if construct {
+                    (constructs, calls)
+                } else {
+                    (calls, constructs)
+                };
+                (wanted.len() == 1 && other.is_empty()).then(|| wanted[0])
+            } else {
+                None
+            };
+            if let Some(signature) = single.filter(|&signature| {
+                self.signatures
+                    .get(signature)
+                    .is_ok_and(|s| s.type_parameters.as_ref().is_none_or(|p| p.is_empty()))
+            }) {
+                let result = self.return_type_of_signature(signature)?;
                 return if optional_chain {
                     self.propagate_optional_type_marker(result, expression, non_optional != ty)
                         .map(Some)

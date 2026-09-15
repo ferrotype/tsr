@@ -76,11 +76,18 @@ impl CheckerState {
             crate::iteration::IterationKind::Return,
         )?;
         if self.types.flags(return_type)? & tf::UNIT != 0 {
-            let contextual = self.contextual_body_return_type(function)?;
-            let inference = self.call_inference_at_node(function)?;
-            let contextual = contextual
-                .map(|ty| self.instantiate_call_contextual_type(ty, inference, false))
-                .transpose()?;
+            // When the contextual signature is the function's own signature, the
+            // contextual type is the inferred return type itself.
+            let own = self.signature_from_declaration(function)?;
+            let contextual = if self.contextual_body_signature(function)? == Some(own) {
+                Some(return_type)
+            } else {
+                let contextual = self.contextual_body_return_type(function)?;
+                let inference = self.call_inference_at_node(function)?;
+                contextual
+                    .map(|ty| self.instantiate_call_contextual_type(ty, inference, false))
+                    .transpose()?
+            };
             let contextual = if is_async {
                 contextual
                     .map(|ty| self.get_promised_type_of_promise(ty))

@@ -17,6 +17,8 @@ pub(crate) struct QueryState {
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    /// `deferredGlobalImportMetaExpressionType`: the synthetic `ImportMetaExpression`.
+    pub import_meta_expression_type: Option<TypeId>,
     pub global_type_aliases: crate::types::Map<(&'static str, usize, bool), Option<SymbolId>>,
     pub references: LinkStore<SymbolId, SymbolFlags>,
     /// `sourceFileLinks.identifierCheckNodes`, keyed by source file.
@@ -158,22 +160,47 @@ impl CheckerState {
             }
         }
         let read = self.ast(node)?.node(node)?;
-        if matches!(
-            read.kind().known(),
-            Some(
-                K::Identifier
-                    | K::PrivateIdentifier
-                    | K::PropertyAccessExpression
-                    | K::QualifiedName
+        if read.kind() == K::Identifier {
+            if let Some(parent) = read.parent() {
+                let parent_read = self.ast(parent)?.node(parent)?;
+                if parent_read.kind() == K::MetaProperty && parent_read.name() == Some(node) {
+                    let (keyword, _) = self.meta_property_parts(parent)?;
+                    let text = self.ast(node)?.node_text(node)?;
+                    if keyword == K::NewKeyword && text.as_bytes() == b"target" {
+                        let ty = self.check_new_target_meta_property(parent)?;
+                        return Ok(self.types.get(ty)?.symbol);
+                    }
+                    if keyword == K::ImportKeyword && text.as_bytes() == b"meta" {
+                        let ty = self.global_import_meta_expression_type()?;
+                        let Some(symbol) = self.types.get(ty)?.symbol else {
+                            return Ok(None);
+                        };
+                        let members = self.symbol(symbol)?.members();
+                        return self.member_symbol(members, b"meta");
+                    }
+                    return Ok(None);
+                }
+            }
+        }
+        let this_in_type_query = is_this_in_type_query(self.ast(node)?, node)?;
+        if !this_in_type_query
+            && matches!(
+                read.kind().known(),
+                Some(
+                    K::Identifier
+                        | K::PrivateIdentifier
+                        | K::PropertyAccessExpression
+                        | K::QualifiedName
+                )
             )
-        ) {
+        {
             return self.symbol_of_expression_name(node);
         }
         match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral) => {
                 self.symbol_at_literal_location(node)
             }
-            Some(K::ThisKeyword) => {
+            Some(K::ThisKeyword | K::Identifier) => {
                 let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
                 if ts_ast::utilities::is_function_like(Some(&self.ast(container)?.node(container)?))
                 {
@@ -1412,7 +1439,8 @@ pub(crate) fn is_expression_node(view: ts_ast::AstView<'_>, node: NodeId) -> Res
 fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     let kind = read.kind();
-    if ts_ast::utilities::is_type_node_kind(kind) {
+    // The kind range only; `ExpressionWithTypeArguments` is decided by its parent below.
+    if kind.raw() >= K::TypePredicate as i16 && kind.raw() <= K::ImportType as i16 {
         return Ok(true);
     }
     Ok(match kind.known() {
@@ -1433,6 +1461,50 @@ fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Er
             Some(parent) => view.node(parent)?.kind() != K::VoidExpression,
             None => true,
         },
+        // port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
+        Some(K::ExpressionWithTypeArguments) => match read.parent() {
+            Some(parent) if view.node(parent)?.kind() == K::HeritageClause => {
+                let heritage = view.node(parent)?;
+                let class_extends = heritage.parent().is_some_and(|grand| {
+                    view.node(grand)
+                        .is_ok_and(|read| ts_ast::utilities::is_class_like(&read))
+                }) && heritage
+                    .data_source()
+                    .as_heritage_clause()
+                    .is_some_and(|data| data.token() != K::ImplementsKeyword);
+                !class_extends
+            }
+            _ => false,
+        },
         _ => false,
     })
+}
+
+// port: tsc/internal/ast/utilities.go:IsThisInTypeQuery
+pub(crate) fn is_this_in_type_query(
+    view: ts_ast::AstView<'_>,
+    node: NodeId,
+) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    if read.kind() != K::Identifier || view.node_text(node)?.as_bytes() != b"this" {
+        return Ok(false);
+    }
+    let mut current = node;
+    loop {
+        let Some(parent) = view.node(current)?.parent() else {
+            return Ok(false);
+        };
+        let parent_read = view.node(parent)?;
+        if parent_read.kind() == K::QualifiedName
+            && parent_read
+                .data_source()
+                .as_qualified_name()
+                .and_then(|data| data.left())
+                == Some(current)
+        {
+            current = parent;
+            continue;
+        }
+        return Ok(parent_read.kind() == K::TypeQuery);
+    }
 }

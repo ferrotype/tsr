@@ -4074,3 +4074,87 @@ fn reported_relation_failures_are_not_elaborated_twice() {
     );
     assert_eq!(missing.related_information.len(), 1);
 }
+
+/// The displayed type of the top-level `const`/`let` named `name` in `/main.ts`.
+fn variable_type_display(text: &[u8], options: CompilerOptions, name: &[u8]) -> String {
+    let (owner, program, _) = fixture(text, options);
+    let file = program.file(b"/main.ts").unwrap();
+    let source = file.source();
+    let mut op = owner.operation().unwrap();
+    op.semantic_diagnostics(source).unwrap();
+    let view = file.bound().view().ast();
+    let mut found = None;
+    for statement in declarations(&program) {
+        let Some(list) = view
+            .node(statement)
+            .unwrap()
+            .data_source()
+            .as_variable_statement()
+            .and_then(|data| data.declaration_list())
+        else {
+            continue;
+        };
+        let Some(items) = view
+            .node(list)
+            .unwrap()
+            .data_source()
+            .as_variable_declaration_list()
+            .and_then(|data| data.declarations())
+        else {
+            continue;
+        };
+        let items = view.list(items).unwrap().nodes();
+        for declaration in view.node_slice(items).unwrap().iter().flatten() {
+            let declaration_name = view.node(declaration).unwrap().name().unwrap();
+            if view.node_text(declaration_name).unwrap().as_bytes() == name {
+                found = Some(declaration_name);
+            }
+        }
+    }
+    let name = found.expect("declared variable");
+    let ty = op.get_type_at_location(name).unwrap();
+    String::from_utf8(op.type_to_string(ty, 0).unwrap().as_bytes().to_vec()).unwrap()
+}
+
+#[test]
+fn new_on_unions_with_abstract_construct_signatures_is_any() {
+    // Pinned Go: abstractClassUnionInstantiation.types prints `new cls2() : any`.
+    let text = b"abstract class AbstractA { a: string; }
+abstract class AbstractB { b: string; }
+declare const cls2: typeof AbstractA | typeof AbstractB;
+const v = new cls2();
+";
+    assert_eq!(variable_type_display(text, options(), b"v"), "any");
+}
+
+#[test]
+fn in_operator_narrows_unions_to_intersections_with_record() {
+    // Pinned Go: controlFlowInOperator.types prints `(A | B) & Record<"d", unknown>`.
+    let text = b"type Record<K extends keyof any, T> = { [P in K]: T; };
+const a = 'a';
+type A = { [a]: number; };
+type B = { b: string; };
+declare const c: A | B;
+function f() {
+    if ('d' in c) {
+        return c;
+    }
+    throw 0;
+}
+const w = f();
+";
+    assert_eq!(
+        variable_type_display(text, options(), b"w"),
+        "(A | B) & Record<\"d\", unknown>"
+    );
+}
+
+#[test]
+fn negative_numeric_string_property_names_display_as_string_literals() {
+    // Pinned Go: duplicateObjectLiteralProperty_computedName1.types prints `{ "-1": number; }`.
+    let text = b"const t7 = { \"-1\": 1 };\n";
+    assert_eq!(
+        variable_type_display(text, options(), b"t7"),
+        "{ \"-1\": number; }"
+    );
+}
