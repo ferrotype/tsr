@@ -1,0 +1,426 @@
+{
+  "version": 1,
+  "scope": "Development comparison of 503 alias/display and JS controls against full E2 at 827c353; no full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "224d2fa6a25ef1ef1ded940828baa3f46da895a960ffe4e046124ddd652e5f91",
+  "candidate_capture_sha256": "df49631ddc3f864f6fc92c77738443351334216d1a1f01821c2ea5fe7a688bc9",
+  "candidate_sources_sha256": "684d630969d9de109eb98a9043fea6941a8dac81339362acd3010090edd75fd4",
+  "selection_sha256": "96158abaeca05d0520e3d9b709424eade99105c5dfaa20cf071e9e972d20517c",
+  "source_stable": true,
+  "counts_before": {
+    "types_parity": {
+      "different": 39,
+      "match": 462,
+      "disabled": 2
+    },
+    "errors_parity": {
+      "different": 27,
+      "match": 476
+    },
+    "type_to_string_parity": {
+      "different": 39,
+      "match": 462,
+      "disabled": 2
+    }
+  },
+  "counts_after": {
+    "errors_parity": {
+      "different": 27,
+      "match": 476
+    },
+    "type_to_string_parity": {
+      "different": 39,
+      "disabled": 2,
+      "match": 462
+    },
+    "types_parity": {
+      "different": 38,
+      "disabled": 2,
+      "match": 463
+    }
+  },
+  "changes": [
+    {
+      "id": "conformance/jsdoc/typedefOnStatements.ts#configuration=0",
+      "before": {
+        "errors_parity": {
+          "accepted": true,
+          "differences": [],
+          "emit": "not_executed",
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "state": "match"
+        },
+        "type_to_string_parity": {
+          "accepted": true,
+          "native_queries": 96,
+          "rust_queries": 96,
+          "state": "match"
+        },
+        "types_parity": {
+          "accepted": false,
+          "differences": [
+            "types"
+          ],
+          "native_queries": 368,
+          "native_sha256": "7825ab15190f81696c9f1acc4366a72ef5a050cef3cf4de41bc368788e5abcc0",
+          "rust_queries": 368,
+          "rust_sha256": "c3c4592a0c1008d736e004fcb6fbc7ba79a25d99af2c94ebc289592b85ec1308",
+          "state": "different"
+        }
+      },
+      "after": {
+        "errors_parity": {
+          "accepted": true,
+          "differences": [],
+          "emit": "not_executed",
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "state": "match"
+        },
+        "type_to_string_parity": {
+          "accepted": true,
+          "native_queries": 96,
+          "rust_queries": 96,
+          "state": "match"
+        },
+        "types_parity": {
+          "accepted": true,
+          "differences": [],
+          "native_queries": 368,
+          "rust_queries": 368,
+          "state": "match"
+        }
+      }
+    }
+  ],
+  "remaining": [
+    {
+      "id": "compiler/abstractClassUnionInstantiation.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/arrayBindingPatternOmittedExpressions.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/arrayDestructuringInSwitch1.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/concatTuples.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/declarationEmitDestructuring5.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/dependentDestructuringBindingElementInitializer.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/discriminantOrderIndependence.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/discriminantsAndNullOrUndefined.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/dottedModuleName.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/duplicateObjectLiteralProperty_computedName1.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/namespaceDisambiguationInUnion.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "match"
+      }
+    },
+    {
+      "id": "compiler/narrowingUnionWithBang.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/noImplicitAnyDestructuringInPrivateMethod.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/objectFreeze.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/overloadConsecutiveness.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/parseErrorIncorrectReturnToken.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/reservedWords2.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/reservedWords3.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/switchExhaustiveNarrowing.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "compiler/symbolObserverMismatchingPolyfillsWorkTogether.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/classes/classDeclarations/classExtendingNonConstructor.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/classes/members/privateNames/privateNameStaticAccessorssDerivedClasses.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/classes/members/privateNames/privateNamesAndStaticFields.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/classes/members/privateNames/privateNamesConstructorChain-1.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/controlFlow/controlFlowInOperator.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/controlFlow/controlFlowOptionalChain2.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/es2020/modules/exportAsNamespace5.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/es6/destructuring/destructuringParameterDeclaration6.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/jsdoc/extendsTagEmit.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "match",
+        "types_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/jsdoc/jsdocAugmentsMissingType.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "match",
+        "types_parity": "match"
+      }
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=1",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.classMethods.es2018.ts#configuration=1",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=1",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction2.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/SkippedTokens/parserSkippedTokens16.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/types/literal/literalTypesWidenInParameterPosition.ts#configuration=0",
+      "states": {
+        "errors_parity": "different",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/types/objectTypeLiteral/callSignatures/callSignaturesWithParameterInitializers2.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    },
+    {
+      "id": "conformance/types/union/unionTypeConstructSignatures.ts#configuration=0",
+      "states": {
+        "errors_parity": "match",
+        "type_to_string_parity": "different",
+        "types_parity": "different"
+      }
+    }
+  ]
+}

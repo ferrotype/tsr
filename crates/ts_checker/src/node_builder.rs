@@ -696,10 +696,16 @@ impl<'a> NodeBuilder<'a> {
         if !in_alias {
             let alias = self.checker.types.alias_of(ty)?.cloned();
             if let Some(symbol) = crate::type_display::alias_symbol(alias.as_ref()) {
-                return self.type_reference(
-                    symbol,
-                    crate::type_display::alias_type_arguments(alias.as_ref()),
-                );
+                if self.flags & nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE != 0
+                    || self
+                        .checker
+                        .type_symbol_accessible(symbol, self.enclosing)?
+                {
+                    return self.type_reference(
+                        symbol,
+                        crate::type_display::alias_type_arguments(alias.as_ref()),
+                    );
+                }
             }
         }
         if record.object_flags & of::REFERENCE != 0 {

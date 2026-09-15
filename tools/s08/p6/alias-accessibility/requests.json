@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "ts-local-alias",
+      "files": {
+        "/main.ts": "function proof() { type Alpha = { alpha: string }; var alpha: Alpha = { alpha: \"aleph\" }; }"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_string-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_string-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 16384
+        },
+        {
+          "id": "type_string-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_node-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 16384,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        }
+      ]
+    },
+    {
+      "id": "ts-global-alias",
+      "files": {
+        "/main.ts": "type Alpha = { alpha: string }; var alpha: Alpha = { alpha: \"aleph\" };"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_string-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_string-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 16384
+        },
+        {
+          "id": "type_string-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_node-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 16384,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        }
+      ]
+    },
+    {
+      "id": "ts-shadowed-alias",
+      "files": {
+        "/main.ts": "type Alpha = { alpha: string }; var alpha: Alpha; function other() { type Alpha = number; var context: Alpha; }"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 0,
+          "enclosing_declaration": "context"
+        },
+        {
+          "id": "type_string-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_string-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 16384
+        },
+        {
+          "id": "type_string-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_string",
+          "flags": 0
+        },
+        {
+          "id": "type_node-declaration-0",
+          "declaration": "alpha",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 0,
+          "enclosing_declaration": "context",
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-0",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-source-16384",
+          "declaration": "alpha",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 16384,
+          "internal_flags": 0
+        },
+        {
+          "id": "type_node-None-0",
+          "declaration": "alpha",
+          "context": null,
+          "operation": "type_node",
+          "flags": 0,
+          "internal_flags": 0
+        }
+      ]
+    }
+  ]
+}

@@ -3395,6 +3395,77 @@ fn jsdoc_aliases_and_optional_methods_keep_native_display() {
 }
 
 #[test]
+fn jsdoc_return_typedef_expands_when_its_alias_is_inaccessible() {
+    // Pinned typedefOnStatements.types prints the local alpha declaration as
+    // `{ alpha: string; }`, although the trailing return declares alias Alpha.
+    let (owner, program, _) = fixture_files(
+        b"/main.js",
+        &[(b"/main.js", b"function proof() {\n/** @type {Alpha} */ var alpha = { alpha: \"aleph\" };\n/** @typedef {{ alpha: string }} Alpha */ return;\n}")],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let file = program.file(b"/main.js").unwrap();
+    let view = file.bound().view().ast();
+    let function = view
+        .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let body = view.node(function).unwrap().body().unwrap();
+    let statement = view
+        .node_slice(view.node(body).unwrap().statements(view).unwrap())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let list = view
+        .node(statement)
+        .unwrap()
+        .data_source()
+        .as_variable_statement()
+        .unwrap()
+        .declaration_list()
+        .unwrap();
+    let declarations = view
+        .node(list)
+        .unwrap()
+        .data_source()
+        .as_variable_declaration_list()
+        .unwrap()
+        .declarations()
+        .unwrap();
+    let declaration = view
+        .node_slice(view.list(declarations).unwrap().nodes())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let name = view.node(declaration).unwrap().name().unwrap();
+    for _ in 0..2 {
+        let mut op = owner.operation().unwrap();
+        op.semantic_diagnostics(file.source()).unwrap();
+        let typ = op.get_type_at_location(name).unwrap();
+        assert_eq!(
+            op.type_to_string_at(typ, Some(declaration), 0)
+                .unwrap()
+                .as_bytes(),
+            b"{ alpha: string; }"
+        );
+        assert_eq!(
+            op.type_to_string_at(
+                typ,
+                Some(declaration),
+                ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE
+            )
+            .unwrap()
+            .as_bytes(),
+            b"Alpha"
+        );
+    }
+}
+
+#[test]
 fn display_keeps_nontrailing_variadics_in_one_rest_parameter() {
     use ts_checker::type_format_flags as ff;
     let text = b"type Variadic = <A extends any[], B extends any[]>(...args: [...A, ...B]) => void;\ntype Fixed = (...args: [a: number, b: string]) => void;";

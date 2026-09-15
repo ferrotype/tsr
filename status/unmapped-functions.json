@@ -1711,7 +1711,6 @@
       "tsc/internal/checker/symbolaccessibility.go:Checker.GetAccessibleSymbolChain",
       "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessible",
       "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessibleByFlags",
-      "tsc/internal/checker/symbolaccessibility.go:Checker.IsTypeSymbolAccessible",
       "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChain",
       "tsc/internal/checker/symbolaccessibility.go:Checker.getClassExpressionNameTable",
       "tsc/internal/checker/symbolaccessibility.go:Checker.getExternalModuleContainer",
