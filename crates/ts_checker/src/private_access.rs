@@ -53,7 +53,13 @@ impl CheckerState {
         if self.types.flags(apparent)? & tf::ANY != 0 || apparent == self.builtins.silent_never_type
         {
             if lexical.is_some() {
-                return Ok(PrivateAccessResult::Type(apparent));
+                return Ok(PrivateAccessResult::Type(
+                    if self.is_error_type(apparent)? {
+                        self.builtins.error_type
+                    } else {
+                        apparent
+                    },
+                ));
             }
             if self.private_containing_class(right)?.is_none() {
                 self.grammar_error_node(

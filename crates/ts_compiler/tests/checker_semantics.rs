@@ -3288,6 +3288,135 @@ fn js_open_object_access_matches_native_diagnostics() {
     );
 }
 
+#[test]
+fn unresolved_jsdoc_property_access_drops_the_receiver_alias() {
+    // The typeFromPropertyAssignment* native baselines preserve an unresolved
+    // alias on the receiver, but display its property access as canonical any.
+    let text = b"/** @type {Missing} */ let value;\nvalue; value.field; value?.field;\n/** @type {any} */ let plain; plain.field;\nlet known = { field: 1 }; known.field;\nclass C { #hidden = 1; read() { return value.#hidden; } } new C().read;";
+    let (owner, program, _) = fixture_files(
+        b"/a.js",
+        &[(b"/a.js", text)],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let file = program.file(b"/a.js").unwrap();
+    let view = file.bound().view().ast();
+    let expressions: Vec<_> = view
+        .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+        .unwrap()
+        .iter()
+        .flatten()
+        .filter_map(|node| {
+            let read = view.node(node).unwrap();
+            (read.kind() == ts_ast::SyntaxKind::ExpressionStatement)
+                .then(|| read.expression().unwrap())
+        })
+        .collect();
+    for _ in 0..2 {
+        let mut op = owner.operation().unwrap();
+        op.semantic_diagnostics(file.source()).unwrap();
+        let actual: Vec<_> = expressions
+            .iter()
+            .map(|&node| {
+                let ty = op.get_type_at_location(node).unwrap();
+                op.type_to_string(ty, 0).unwrap()
+            })
+            .collect();
+        assert_eq!(
+            actual.iter().map(JsString::as_bytes).collect::<Vec<_>>(),
+            [
+                b"Missing".as_slice(),
+                b"any",
+                b"any",
+                b"any",
+                b"number",
+                b"() => any"
+            ]
+        );
+    }
+}
+
+#[test]
+fn js_property_followups_match_native_diagnostics() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/js-property-followups/requests.json"),
+        include_str!("../../../data/s08/p6/js-property-followups/observations.json"),
+    );
+}
+
+#[test]
+fn jsdoc_aliases_and_optional_methods_keep_native_display() {
+    // Native witnesses: topLevelBlockExpando, contextualTypedSpecialAssignment
+    // and typeFromContextualThisType. Check repeated reads across operations.
+    for (strict, expected_method) in [
+        (Tristate::TRUE, b"(() => number) | undefined".as_slice()),
+        (Tristate::FALSE, b"() => number".as_slice()),
+    ] {
+        let text = b"/** @typedef {{n: number}} Named */\n/** @type {Named} */ let value; value;\n/** @type {{m?(): number}} */ let receiver; receiver.m;";
+        let (owner, program, _) = fixture_files(
+            b"/a.js",
+            &[(b"/a.js", text)],
+            CompilerOptions {
+                allow_js: Tristate::TRUE,
+                check_js: Tristate::TRUE,
+                strict,
+                ..options()
+            },
+        );
+        let file = program.file(b"/a.js").unwrap();
+        let view = file.bound().view().ast();
+        let expressions: Vec<_> = view
+            .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+            .unwrap()
+            .iter()
+            .flatten()
+            .filter_map(|node| {
+                let read = view.node(node).unwrap();
+                (read.kind() == ts_ast::SyntaxKind::ExpressionStatement)
+                    .then(|| read.expression().unwrap())
+            })
+            .collect();
+        for _ in 0..2 {
+            let mut op = owner.operation().unwrap();
+            op.semantic_diagnostics(file.source()).unwrap();
+            for (&node, expected) in expressions
+                .iter()
+                .zip([b"Named".as_slice(), expected_method])
+            {
+                let ty = op.get_type_at_location(node).unwrap();
+                assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), expected);
+            }
+            assert_eq!(expressions.len(), 2);
+        }
+    }
+}
+
+#[test]
+fn display_keeps_nontrailing_variadics_in_one_rest_parameter() {
+    use ts_checker::type_format_flags as ff;
+    let text = b"type Variadic = <A extends any[], B extends any[]>(...args: [...A, ...B]) => void;\ntype Fixed = (...args: [a: number, b: string]) => void;";
+    let (owner, program, _) = fixture(text, options());
+    let declarations = declarations(&program);
+    let mut op = owner.operation().unwrap();
+    for (declaration, expected) in declarations.into_iter().zip([
+        b"<A extends any[], B extends any[]>(...args: [...A, ...B]) => void".as_slice(),
+        b"(a: number, b: string) => void".as_slice(),
+    ]) {
+        let name = declaration_name(&program, declaration);
+        let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+        let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+        for _ in 0..2 {
+            assert_eq!(
+                op.type_to_string(ty, ff::IN_TYPE_ALIAS).unwrap().as_bytes(),
+                expected
+            );
+        }
+    }
+}
+
 fn assert_native_semantic_fixture(requests: &str, native: &str) {
     fn option(value: &serde_json::Value, default: Tristate) -> Tristate {
         match value.as_bool() {

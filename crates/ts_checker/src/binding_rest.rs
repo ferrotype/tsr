@@ -148,6 +148,7 @@ impl CheckerState {
         if !setonly && readonly == self.is_readonly_symbol(source)? {
             return Ok(source);
         }
+        let read = self.symbol(source)?;
         let flags = sf::PROPERTY | (read.flags() & sf::OPTIONAL);
         let checks = read.check_flags() & cf::LATE | if readonly { cf::READONLY } else { 0 };
         let declarations = read.declarations();

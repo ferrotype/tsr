@@ -6,6 +6,15 @@ use crate::{
 };
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.getNonNullableTypeIfNeeded
+    pub(crate) fn non_nullable_type_if_needed(&mut self, ty: TypeId) -> Result<TypeId, Error> {
+        if self.type_facts(ty, f::IS_UNDEFINED_OR_NULL)? != 0 {
+            self.non_nullable_type(ty)
+        } else {
+            Ok(ty)
+        }
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.GetNonNullableType
     pub(crate) fn non_nullable_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
         if self.options.strict_null_checks {

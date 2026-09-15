@@ -352,6 +352,23 @@ impl CheckerState {
             let rest = data.dot_dot_dot_token();
             let question = data.question_token();
             let initializer = data.initializer();
+            if rest.is_some()
+                && index + 1 == parameters.len()
+                && read.flags() & ts_ast::node_flags::AMBIENT == 0
+            {
+                let owner = read
+                    .parent()
+                    .ok_or(Error::MissingLink("parameter parent"))?;
+                let list = self
+                    .ast(owner)?
+                    .node(owner)?
+                    .parameter_list()
+                    .ok_or(Error::MissingLink("parameter list"))?;
+                // Native reports the comma and still checks optionality and
+                // initializers on the same rest parameter.
+                self.check_grammar_trailing_comma(owner, list,
+                    ts_diagnostics::A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma)?;
+            }
             let diagnostic = if let Some(rest) = rest {
                 if index + 1 != parameters.len() {
                     Some((

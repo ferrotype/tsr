@@ -675,7 +675,10 @@ impl CheckerState {
                 parent = read.parent();
                 continue;
             }
-            if read.kind() != K::TypeAliasDeclaration {
+            if !matches!(
+                read.kind().known(),
+                Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
+            ) {
                 return Ok(None);
             }
             let Some(symbol) = self.get_symbol_of_declaration(current)? else {
@@ -1030,7 +1033,9 @@ impl CheckerState {
             return Ok(self.builtins.any_type);
         }
         if read.flags() & (sf::FUNCTION | sf::METHOD | sf::VALUE_MODULE) != 0 {
+            let optional = read.flags() & sf::OPTIONAL != 0;
             let ty = self.new_object_type(of::ANONYMOUS, Some(symbol))?;
+            let ty = self.add_type_optionality(ty, true, optional)?;
             self.value_symbol_links.get_or_default(symbol).resolved_type = Some(ty);
             return Ok(ty);
         }

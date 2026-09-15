@@ -279,7 +279,12 @@ impl CheckerState {
             .type_parameters
             .clone()
             .unwrap_or_else(|| [].into());
-        let context = self.new_inference_context(&parameters, Some(signature), 0)?;
+        let flags = if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
+            crate::inference::ANY_DEFAULT
+        } else {
+            0
+        };
+        let context = self.new_inference_context(&parameters, Some(signature), flags)?;
         self.infer_call_type_arguments_ex(node, signature, args, 4 | 8, context)
     }
 

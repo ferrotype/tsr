@@ -838,7 +838,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isReadonlySymbol
-    pub(crate) fn is_readonly_symbol(&self, symbol: SymbolId) -> Result<bool, Error> {
+    pub(crate) fn is_readonly_symbol(&mut self, symbol: SymbolId) -> Result<bool, Error> {
         let read = self.symbol(symbol)?;
         if read.check_flags() & cf::READONLY != 0 || read.flags() & sf::ENUM_MEMBER != 0 {
             return Ok(true);
@@ -861,6 +861,13 @@ impl CheckerState {
                     != 0
             {
                 return Ok(true);
+            }
+        }
+        for index in 0..self.symbol_declarations(symbol)?.len() {
+            if let Some(declaration) = self.symbol_declarations(symbol)?.at(index) {
+                if self.is_readonly_assignment_declaration(declaration)? {
+                    return Ok(true);
+                }
             }
         }
         Ok(false)

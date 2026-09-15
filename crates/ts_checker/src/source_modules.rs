@@ -458,8 +458,42 @@ impl CheckerState {
         ty: TypeId,
         symbol: SymbolId,
     ) -> Result<(), Error> {
-        let exports = Some(self.module_exports(symbol)?);
-        self.set_structured_type_members(ty, exports, &[], &[], &[])
+        let mut exports = self.module_exports(symbol)?;
+        if symbol == self.builtins.global_this_symbol {
+            // resolveAnonymousTypeMembers exposes runtime globals, excluding
+            // lexical declarations and modules declared only by ambient names.
+            let mut members = ts_ast::SymbolTable::new();
+            for (_, property) in self.table(exports)? {
+                let Some(property) = property else { continue };
+                let read = self.symbol(property)?;
+                if read.flags() & sf::BLOCK_SCOPED != 0 {
+                    continue;
+                }
+                let declarations = self.symbol_declarations(property)?;
+                let mut ambient_only =
+                    read.flags() & sf::VALUE_MODULE != 0 && !declarations.is_empty();
+                if ambient_only {
+                    for declaration in declarations.iter() {
+                        if !declaration
+                            .map(|node| {
+                                ts_ast::is_ambient_module(self.ast(node)?, node)
+                                    .map_err(Error::from)
+                            })
+                            .transpose()?
+                            .unwrap_or(false)
+                        {
+                            ambient_only = false;
+                            break;
+                        }
+                    }
+                }
+                if !ambient_only {
+                    members.insert(read.name_to_owned(), Some(property));
+                }
+            }
+            exports = self.alloc_symbol_table(members);
+        }
+        self.set_structured_type_members(ty, Some(exports), &[], &[], &[])
     }
 
     /// The alias half of `getDeclarationSpaces` for export assignments: an

@@ -347,7 +347,23 @@ impl NodeBuilder<'_> {
                     parameters.push(self.parameter_node(this)?);
                 }
             }
+            let mut non_trailing_rest = false;
             for &parameter in expanded {
+                if Some(&parameter) != expanded.last()
+                    && self.checker.symbol(parameter)?.check_flags()
+                        & ts_ast::check_flags::REST_PARAMETER
+                        != 0
+                {
+                    non_trailing_rest = true;
+                    break;
+                }
+            }
+            let displayed = if non_trailing_rest {
+                sig.parameters.as_deref().unwrap_or_default()
+            } else {
+                expanded
+            };
+            for &parameter in displayed {
                 parameters.push(self.parameter_node(parameter)?);
             }
             self.list(parameters)

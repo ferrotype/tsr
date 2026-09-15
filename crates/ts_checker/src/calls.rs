@@ -757,7 +757,14 @@ impl CheckerState {
                 *candidate
             } else {
                 let type_arguments = if type_arguments.is_empty() {
-                    let context = self.new_inference_context(&parameters, Some(*candidate), 0)?;
+                    let flags =
+                        if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
+                            crate::inference::ANY_DEFAULT
+                        } else {
+                            0
+                        };
+                    let context =
+                        self.new_inference_context(&parameters, Some(*candidate), flags)?;
                     inference = Some(context);
                     let arguments = self.infer_call_type_arguments_ex(
                         node,

@@ -86,7 +86,13 @@ impl CheckerState {
                         .expression()
                         .ok_or(Error::MissingLink("for-in expression"))?;
                     let ty = self.check_expression_ex(expression, mode)?;
-                    return self.for_in_index_type(ty).map(Some);
+                    let ty = self.non_nullable_type_if_needed(ty)?;
+                    let index = self.get_index_type(ty, 0)?;
+                    return if self.types.flags(index)? & (tf::TYPE_PARAMETER | tf::INDEX) != 0 {
+                        self.extract_string_type(index).map(Some)
+                    } else {
+                        Ok(Some(self.builtins.string_type))
+                    };
                 }
                 if read.kind() == K::ForOfStatement {
                     return self.check_right_hand_side_of_for_of(grandparent).map(Some);

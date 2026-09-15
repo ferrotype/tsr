@@ -355,7 +355,11 @@ impl CheckerState {
             }
         } else {
             if any {
-                return Ok(apparent);
+                return Ok(if self.is_error_type(apparent)? {
+                    self.builtins.error_type
+                } else {
+                    apparent
+                });
             }
             let skip_augment = self.const_enum_object_type(apparent)?;
             let qualified = self.ast(node)?.node(node)?.kind() == K::QualifiedName;
