@@ -1,0 +1,447 @@
+#!/usr/bin/env python3
+"""S08 checkerbench: the frozen checker workload (data/s08/checker-workload.json) on the
+pinned Go harness and the Rust port, one fresh process per sample, plus the per-type
+footprint census (data/s08/type-footprint.json) at the retained checkpoint.
+
+  build     compile the three Rust executables (normal, phase, alloc) and the Go test binary
+  capture   run warmups and the alternating seven-sample batches for every executable kind
+  report    aggregate the raw samples into ratios, stability flags and the footprint statistic
+  producer  emit the run.checkerbench.* metrics for the ledger when a current report exists
+"""
+import argparse
+import hashlib
+import json
+import math
+import os
+import platform
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+from statistics import median, mean, pstdev
+
+from s04 import go_environment, verified_upstream
+from s04_common import command, strict_json_loads
+from s07_benchmark import cargo_executable, native_environment
+from s07_benchmark_measure import host_info, reject_concurrent_builds
+from s07_benchmark_stats import ratio_summary
+from s08_oracle import ROOT, canonical, digest
+import s08_baselines
+
+DEFAULT = ROOT / "target/s08/checkerbench"
+CORPUS = ROOT / "target/s08/e2/corpus"
+METHOD = ROOT / "data/s08/checker-workload.json"
+FOOTPRINT = ROOT / "data/s08/type-footprint.json"
+BENCH = ROOT / "tools/s08/oracle/checkerbench"
+FAMILIES = ROOT / "tools/s08/oracle/families/bridge.go"
+MODES = {"normal": [], "phase": ["s08-phase-timer"], "alloc": ["s08-allocation"]}
+RUNTIMES = ("go", "rust")
+SAMPLE_TIMEOUT = 4 * 3600
+
+
+def method():
+    return strict_json_loads(METHOD.read_bytes())
+
+
+def sources():
+    """Every input the measurement depends on, so a report can be tied to exact source bytes."""
+    result = {}
+    patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**",
+                "tools/s08/p4/**", "tools/s08/p5/**", "tools/s08/p7/**", "tools/s08/oracle/**",
+                "tools/s07/program/*.rs", "tools/s07/config/host.rs",
+                "scripts/s08_checkerbench.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
+                "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
+                "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
+                "data/s08/checker-workload.json", "data/s08/type-footprint.json", "data/s08/baseline-requests.json",
+                "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml")
+    for pattern in patterns:
+        for path in ROOT.glob(pattern):
+            if path.is_file() and "__pycache__" not in path.parts:
+                result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
+    return result
+
+
+def fingerprint(files):
+    return digest(canonical(files))
+
+
+def frozen_ids():
+    manifest = strict_json_loads((ROOT / "data/s08/baseline-requests.json").read_bytes())
+    pin = strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
+    if manifest["pin"] != pin or method()["pin"] != pin:
+        raise ValueError("checkerbench pin drift")
+    return [r["id"] for r in manifest["requests"] if r["acceptance_tier"] == "acceptance"]
+
+
+def prepare_requests(directory, smoke=None):
+    """Rust requests come from the current E2 corpus capture (identical bound inputs to the
+    verified parity run); Go requests are the frozen harness identities of the same variants."""
+    if not (CORPUS / "requests.json").exists():
+        raise ValueError("no E2 corpus capture at target/s08/e2/corpus; capture E2 first (docs/S08-E2.md)")
+    rust = [r for r in strict_json_loads((CORPUS / "requests.json").read_bytes()) if r["acceptance_tier"] == "acceptance"]
+    ids = frozen_ids()
+    if [r["id"] for r in rust] != ids or len(ids) != method()["acceptance_variants"]:
+        raise ValueError("E2 corpus requests do not match the frozen acceptance inventory")
+    subset = strict_json_loads((ROOT / "data/s07/subset.json").read_bytes())
+    _, go_all = s08_baselines.requests_from_subset(subset)
+    by_id = {r["id"]: r for r in go_all}
+    go = [by_id[i] for i in ids]
+    if smoke:
+        rust, go = rust[:smoke], go[:smoke]
+    (directory / "rust-requests.json").write_bytes(canonical(rust) + b"\n")
+    (directory / "go-requests.json").write_bytes(canonical(go) + b"\n")
+    return {"variants": len(rust), "smoke": smoke, "ids_sha256": digest(canonical([r["id"] for r in rust])),
+            "rust_requests_sha256": digest((directory / "rust-requests.json").read_bytes()),
+            "go_requests_sha256": digest((directory / "go-requests.json").read_bytes())}
+
+
+def overlay_sources(upstream):
+    """The E2 baseline overlay plus the checkerbench clocks, compile hook and count-only walker."""
+    replace = s08_baselines.replace_exact
+    sources = s08_baselines.overlay_sources(upstream)
+    harness = sources["testutil/harnessutil/harnessutil.go"]
+    harness = replace(harness, "\tctx := context.Background()\n\n\tvar preErrors []*ast.Diagnostic\n",
+                      "\tif S08CheckerbenchCompile != nil {\n\t\treturn S08CheckerbenchCompile(host, config, harnessOptions)\n\t}\n"
+                      "\tctx := context.Background()\n\n\tvar preErrors []*ast.Diagnostic\n")
+    sources["testutil/harnessutil/harnessutil.go"] = harness
+    walker = sources["testutil/tsbaseline/type_symbol_baseline.go"]
+    walker = replace(walker, "\t\t\tbuilder := checker.NewNodeBuilder(fileChecker, ctx)\n",
+                     "\t\t\ts08DisplayBegin()\n\t\t\tbuilder := checker.NewNodeBuilder(fileChecker, ctx)\n")
+    walker = replace(walker, "\t\t\ttypeString = writer.String()\n", "\t\t\ttypeString = writer.String()\n\t\t\ts08DisplayEnd()\n")
+    symbol = "\tsymbolString.WriteString(ast.EscapeAllInternalSymbolNames(fileChecker.SymbolToStringEx(symbol, node.Parent, ast.SymbolFlagsNone, checker.SymbolFormatFlagsAllowAnyNodeKind)))\n"
+    walker = replace(walker, symbol,
+                     "\ts08DisplayBegin()\n\ts08SymbolText := fileChecker.SymbolToStringEx(symbol, node.Parent, ast.SymbolFlagsNone, checker.SymbolFormatFlagsAllowAnyNodeKind)\n"
+                     "\ts08DisplayEnd()\n\tsymbolString.WriteString(ast.EscapeAllInternalSymbolNames(s08SymbolText))\n")
+    sources["testutil/tsbaseline/type_symbol_baseline.go"] = walker
+    bridge = sources["testutil/tsbaseline/s08_baselines_bridge.go"]
+    bridge = replace(bridge, "\tS08Queries = append(S08Queries, q)\n", "\ts08Record(q)\n", 3)
+    bridge = replace(bridge, "\tresult := c.GetTypeAtLocation(node)\n",
+                     "\tresult := c.GetTypeAtLocation(node)\n\tif S08CollectRoots && result != nil {\n\t\tS08Roots = append(S08Roots, result)\n\t}\n")
+    bridge = replace(bridge, '\t\t\treturn map[string]any{"operation":stamp.Operation,',
+                     '\t\t\ts08DisplayBegin()\n\t\t\ts08Text := c.TypeToString(result)\n\t\t\ts08DisplayEnd()\n\t\t\treturn map[string]any{"operation":stamp.Operation,')
+    bridge = replace(bridge, 'hex.EncodeToString([]byte(c.TypeToString(result)))', 'hex.EncodeToString([]byte(s08Text))')
+    sources["testutil/tsbaseline/s08_baselines_bridge.go"] = bridge
+    pool = (upstream / "tsc/internal/compiler/checkerpool.go").read_text()
+    pool = replace(pool, "\t\t\t\tp.checkers[i], p.locks[i] = checker.NewChecker(p.program, tracer)\n",
+                   "\t\t\t\ts08CheckerInitBegin()\n\t\t\t\tp.checkers[i], p.locks[i] = checker.NewChecker(p.program, tracer)\n\t\t\t\ts08CheckerInitEnd()\n")
+    sources["compiler/checkerpool.go"] = pool
+    sources["core/s08_checkerbench_clock.go"] = (BENCH / "core_clock.go").read_text()
+    sources["compiler/s08_checkerbench_hooks.go"] = (BENCH / "compiler_hooks.go").read_text()
+    sources["testutil/harnessutil/s08_checkerbench.go"] = (BENCH / "harness_hooks.go").read_text()
+    sources["testutil/tsbaseline/s08_checkerbench_walker.go"] = (BENCH / "walker_hooks.go").read_text()
+    sources["testrunner/s08_checkerbench_test.go"] = (BENCH / "driver_test.go").read_text()
+    sources["checker/s08_families_bridge.go"] = FAMILIES.read_text()
+    return sources
+
+
+def write_overlay(directory, upstream):
+    replacements = {}
+    for name, source in overlay_sources(upstream).items():
+        path = directory / "overlay" / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source)
+        virtual = upstream / "tsc/internal" / name
+        if virtual.exists() and virtual.read_text() == source:
+            raise ValueError(f"overlay entry is not a modification: {name}")
+        replacements[str(virtual)] = str(path)
+    (directory / "overlay.json").write_bytes(canonical({"Replace": replacements}) + b"\n")
+    return directory / "overlay.json"
+
+
+def build(directory):
+    """Release Rust executables per mode and one Go test binary; exact artifact digests recorded."""
+    reject_concurrent_builds()
+    directory.mkdir(parents=True, exist_ok=True)
+    bin_dir = directory / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    env = native_environment()
+    manifest = ROOT / "crates/ts_compiler/Cargo.toml"
+    binaries = {}
+    for mode, features in MODES.items():
+        args = ["cargo", "build", "--release", "--locked", "--example", "p7_checkerbench", "--message-format=json",
+                "--manifest-path", str(manifest)]
+        if features:
+            args += ["--features", ",".join(features)]
+        messages = command(args, cwd=ROOT, env=env).decode()
+        executable = cargo_executable(messages, manifest, "p7_checkerbench", "example", features)
+        target = bin_dir / f"rust-{mode}"
+        shutil.copy2(executable, target)
+        binaries[f"rust-{mode}"] = {"path": str(target), "sha256": digest(target.read_bytes()), "features": features, "command": args}
+    upstream = verified_upstream()
+    overlay = write_overlay(directory, upstream)
+    go_env = go_environment()
+    repo_flag = "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=" + str(directory / "unmatched-prefix")
+    target = bin_dir / "go-checkerbench.test"
+    args = ["go", "test", "-c", "-o", str(target), "-trimpath", "-mod=readonly", repo_flag, "-overlay", str(overlay), "./internal/testrunner"]
+    command(args, cwd=upstream / "tsc", env=go_env)
+    binaries["go"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
+                      "go": command(["go", "version"], cwd=ROOT, env=go_env).decode().strip()}
+    verified_upstream()
+    report = {"version": 1, "binaries": binaries, "sources": sources(), "rust_toolchain": command(["rustc", "--version"], cwd=ROOT, env=env).decode().strip()}
+    report["sources_sha256"] = fingerprint(report["sources"])
+    (directory / "build.json").write_bytes(canonical(report) + b"\n")
+    return report
+
+
+def run_child(argv, env, cwd, stdout_path, timeout):
+    """One sample process with its own resource accounting; never a reused process."""
+    with open(stdout_path, "wb") as output, open(str(stdout_path) + ".stderr", "wb") as error:
+        started = time.monotonic_ns()
+        child = subprocess.Popen(argv, stdout=output, stderr=error, env=env, cwd=cwd)
+        deadline = time.monotonic() + timeout
+        try:
+            while True:
+                pid, status, usage = os.wait4(child.pid, os.WNOHANG)
+                if pid:
+                    child.returncode = os.waitstatus_to_exitcode(status)
+                    break
+                if time.monotonic() >= deadline:
+                    raise ValueError("checkerbench child exceeded the fixed process deadline")
+                time.sleep(0.05)
+        finally:
+            if child.returncode is None:
+                child.kill()
+                _, status, _ = os.wait4(child.pid, 0)
+                child.returncode = os.waitstatus_to_exitcode(status)
+        process_ns = time.monotonic_ns() - started
+    rss = usage.ru_maxrss * (1024 if sys.platform == "linux" else 1)
+    return {"returncode": child.returncode, "process_ns": process_ns, "peak_rss_bytes": rss,
+            "user_time_ns": round(usage.ru_utime * 1e9), "system_time_ns": round(usage.ru_stime * 1e9)}
+
+
+def sample(directory, build_report, runtime, mode, label):
+    samples = directory / "samples" / mode
+    samples.mkdir(parents=True, exist_ok=True)
+    rows = samples / f"{runtime}-{label}.rows.ndjson"
+    stdout = samples / f"{runtime}-{label}.stdout"
+    env = native_environment()
+    if runtime == "rust":
+        binary = build_report["binaries"][f"rust-{mode}"]["path"]
+        result = run_child([binary, str(directory / "rust-requests.json"), str(rows)], env, ROOT, stdout, SAMPLE_TIMEOUT)
+        if result["returncode"] != 0:
+            raise ValueError(f"rust {mode} sample failed: see {stdout}.stderr")
+        totals = strict_json_loads(stdout.read_bytes())
+    else:
+        summary = samples / f"{runtime}-{label}.summary.json"
+        env.update(go_environment())
+        env.update(S08_MODE=mode, S08_REQUESTS=str(directory / "go-requests.json"), S08_OUTPUT=str(rows),
+                   S08_SUMMARY=str(summary), TS_TEST_PROGRAM_SINGLE_THREADED="1")
+        for key in ("GOMEMLIMIT", "GODEBUG", "GOMAXPROCS"):
+            env.pop(key, None)
+        env["GOGC"] = "100"
+        binary = build_report["binaries"]["go"]["path"]
+        result = run_child([binary, "-test.run", "^TestS08Checkerbench$", "-test.count=1", "-test.timeout=0"],
+                           env, verified_upstream() / "tsc", stdout, SAMPLE_TIMEOUT)
+        if result["returncode"] != 0 or not summary.exists():
+            raise ValueError(f"go {mode} sample failed: see {stdout}")
+        totals = strict_json_loads(summary.read_bytes())
+    if totals["mode"] != mode:
+        raise ValueError("sample executable mode mismatch")
+    if totals["failed"] or totals["executed"] != totals["variants"]:
+        raise ValueError(f"{runtime} {mode} sample did not complete the fixed work: {totals['failures'][:5]}")
+    return {"runtime": runtime, "mode": mode, "label": label, "totals": totals, "process": result,
+            "rows_sha256": digest(rows.read_bytes()), "load_average": os.getloadavg()}
+
+
+def capture(directory, samples_per_runtime=7, smoke=None):
+    directory.mkdir(parents=True, exist_ok=True)
+    build_report = build(directory)
+    plan = method()
+    if samples_per_runtime != plan["sampling"]["measured_samples_per_runtime"] and not smoke:
+        raise ValueError("full captures use the frozen sample count")
+    requests = prepare_requests(directory, smoke)
+    host = host_info() if not smoke else {"os": sys.platform, "architecture": platform.machine(), "smoke": True}
+    runs = []
+    order = [[r.lower() for r in pair] for pair in plan["sampling"]["measured_order"]][:samples_per_runtime]
+    if len(order) != samples_per_runtime:
+        raise ValueError("measured order shorter than the sample count")
+    for mode in MODES:
+        for warmup in [r.lower() for r in plan["sampling"]["warmup_order"]]:
+            runs.append({**sample(directory, build_report, warmup, mode, "warmup"), "warmup": True})
+        for index, pair in enumerate(order):
+            for runtime in pair:
+                runs.append({**sample(directory, build_report, runtime, mode, f"sample-{index}"), "warmup": False})
+    capture_report = {"version": 1, "pin": plan["pin"], "host": host, "smoke": smoke, "requests": requests,
+                      "build_sha256": digest((directory / "build.json").read_bytes()), "sources_sha256": build_report["sources_sha256"],
+                      "method_sha256": digest(METHOD.read_bytes()), "footprint_sha256": digest(FOOTPRINT.read_bytes()),
+                      "samples_per_runtime": samples_per_runtime, "runs": runs, "finished": time.time()}
+    (directory / "capture.json").write_bytes(canonical(capture_report) + b"\n")
+    return capture_report
+
+
+def rows_of(directory, run):
+    path = directory / "samples" / run["mode"] / f"{run['runtime']}-{run['label']}.rows.ndjson"
+    return [strict_json_loads(line) for line in path.read_bytes().splitlines()]
+
+
+def stability(values):
+    return {"samples": values, "median": median(values), "max_over_min": max(values) / min(values),
+            "coefficient_of_variation": pstdev(values) / mean(values) if len(values) > 1 else 0.0,
+            "unstable": max(values) / min(values) > 1.10}
+
+
+def report(directory):
+    capture_report = strict_json_loads((directory / "capture.json").read_bytes())
+    build_report = strict_json_loads((directory / "build.json").read_bytes())
+    if digest((directory / "build.json").read_bytes()) != capture_report["build_sha256"]:
+        raise ValueError("build record changed after the capture")
+    measured = [r for r in capture_report["runs"] if not r["warmup"]]
+    result = {"version": 1, "pin": capture_report["pin"], "smoke": capture_report["smoke"], "variants": capture_report["requests"]["variants"],
+              "host": capture_report["host"], "sources_sha256": capture_report["sources_sha256"],
+              "source_stable": fingerprint(sources()) == capture_report["sources_sha256"],
+              "capture_sha256": digest((directory / "capture.json").read_bytes()), "modes": {}, "metrics": {}, "unavailable": {}}
+    # Work identity: every runtime repeats its own outputs and action schedule exactly; the two
+    # runtimes execute the same action counts per variant. Output digests are compared per variant.
+    identity = {}
+    for runtime in RUNTIMES:
+        runs = [r for r in measured if r["runtime"] == runtime]
+        identity[runtime] = {"outputs_sha256": sorted({r["totals"]["outputs_sha256"] for r in runs}),
+                             "actions_sha256": sorted({r["totals"]["actions_sha256"] for r in runs})}
+        if len(identity[runtime]["outputs_sha256"]) != 1 or len(identity[runtime]["actions_sha256"]) != 1:
+            raise ValueError(f"{runtime} samples did not repeat identical fixed work")
+    go_rows = {row["id"]: row for row in rows_of(directory, next(r for r in measured if r["runtime"] == "go" and r["mode"] == "normal"))}
+    rust_rows = {row["id"]: row for row in rows_of(directory, next(r for r in measured if r["runtime"] == "rust" and r["mode"] == "normal"))}
+    if list(go_rows) != list(rust_rows):
+        raise ValueError("runtimes observed different variant inventories")
+    action_mismatches = [i for i in go_rows if go_rows[i]["actions"] != rust_rows[i]["actions"]]
+    digest_mismatches = [i for i in go_rows if go_rows[i]["output_sha256"] != rust_rows[i]["output_sha256"]]
+    result["work"] = {"identity": identity, "action_mismatches": action_mismatches, "digest_mismatches": digest_mismatches,
+                      "digest_agreement": len(go_rows) - len(digest_mismatches)}
+    valid = not action_mismatches
+    if not valid:
+        result["unavailable"]["actions"] = f"{len(action_mismatches)} variants executed different action counts; samples invalid"
+    for mode in MODES:
+        runs = {runtime: [r for r in measured if r["runtime"] == runtime and r["mode"] == mode] for runtime in RUNTIMES}
+        summary = {"interval_ns": {runtime: stability([r["totals"]["interval_ns"] for r in runs[runtime]]) for runtime in RUNTIMES},
+                   "process_ns": {runtime: [r["process"]["process_ns"] for r in runs[runtime]] for runtime in RUNTIMES},
+                   "peak_rss_bytes": {runtime: [r["process"]["peak_rss_bytes"] for r in runs[runtime]] for runtime in RUNTIMES}}
+        go_ns = [r["totals"]["interval_ns"] for r in runs["go"]]
+        rust_ns = [r["totals"]["interval_ns"] for r in runs["rust"]]
+        try:
+            summary["elapsed"] = ratio_summary(go_ns, rust_ns, timing=True, threshold=1.0)
+            summary["throughput_ratio"] = summary["elapsed"]["go_median"] / summary["elapsed"]["rust_median"]
+        except ValueError as error:
+            summary["elapsed"] = {"unavailable": str(error)}
+        if mode == "phase":
+            phases = {}
+            for runtime in RUNTIMES:
+                totals = [r["totals"]["phases_ns"] for r in runs[runtime]]
+                phases[runtime] = {name: median([t[name] for t in totals]) for name in ("init", "check", "display")}
+                interval = median([r["totals"]["interval_ns"] for r in runs[runtime]])
+                phases[runtime]["sum_over_interval"] = sum(phases[runtime].values()) / interval if interval else None
+            summary["phases_ns"] = phases
+        if mode == "alloc":
+            allocation = {}
+            for runtime in RUNTIMES:
+                allocation[runtime] = {key: [r["totals"]["allocation"][key] for r in runs[runtime]] for key in ("requested_bytes", "retained_bytes")}
+                allocation[runtime]["allocation_calls"] = [r["totals"]["allocation"].get("allocation_calls") for r in runs[runtime]]
+            summary["allocation"] = allocation
+            for key, metric in (("requested_bytes", "allocated_bytes_ratio"), ("retained_bytes", "retained_bytes_ratio")):
+                go_values, rust_values = allocation["go"][key], allocation["rust"][key]
+                if min(go_values) <= 0 or min(rust_values) < 0:
+                    result["unavailable"][metric] = f"non-positive Go {key} denominator"
+                    continue
+                try:
+                    summary[metric] = ratio_summary(go_values, [max(v, 1) for v in rust_values])
+                    summary[metric]["ratio"] = median(rust_values) / median(go_values)
+                except ValueError as error:
+                    result["unavailable"][metric] = str(error)
+            # The census is a structural sum per sample; hash-table capacities can differ
+            # between processes, so the statistic is the median over samples with its spread.
+            census = {}
+            for runtime in RUNTIMES:
+                totals = [r["totals"]["census"] for r in runs[runtime]]
+                means = [t["type_storage_bytes"] / t["types_reachable"] for t in totals if t["types_reachable"]]
+                census[runtime] = {key: [t[key] for t in totals] for key in ("type_storage_bytes", "checker_bytes", "types_reachable", "types_created", "unavailable")}
+                census[runtime]["failed"] = sum(t.get("failed", 0) for t in totals)
+                census[runtime]["mean_bytes_per_reachable_type"] = median(means) if len(means) == len(totals) else None
+                census[runtime]["mean_bytes_max_over_min"] = (max(means) / min(means)) if means else None
+            summary["census"] = census
+            if census["go"]["failed"] or census["rust"]["failed"]:
+                result["unavailable"]["type_footprint_ratio"] = "a census failed on at least one variant"
+            elif not census["go"]["mean_bytes_per_reachable_type"] or census["rust"]["mean_bytes_per_reachable_type"] is None:
+                result["unavailable"]["type_footprint_ratio"] = "Go census denominator is not positive"
+            else:
+                summary["type_footprint_ratio"] = census["rust"]["mean_bytes_per_reachable_type"] / census["go"]["mean_bytes_per_reachable_type"]
+        result["modes"][mode] = summary
+    normal = result["modes"]["normal"]
+    if valid and "throughput_ratio" in normal:
+        result["metrics"]["throughput_ratio"] = normal["throughput_ratio"]
+        result["metrics"]["elapsed_ratio"] = normal["elapsed"]["ratio"]
+        result["metrics"]["stable"] = not any(normal["interval_ns"][r]["unstable"] for r in RUNTIMES)
+        for runtime in RUNTIMES:
+            result["metrics"][f"{runtime}_interval_ns_median"] = normal["interval_ns"][runtime]["median"]
+            result["metrics"][f"{runtime}_max_over_min"] = normal["interval_ns"][runtime]["max_over_min"]
+    alloc = result["modes"]["alloc"]
+    for metric in ("allocated_bytes_ratio", "retained_bytes_ratio"):
+        if valid and metric in alloc:
+            result["metrics"][metric] = alloc[metric]["ratio"]
+    if valid and "type_footprint_ratio" in alloc:
+        result["metrics"]["type_footprint_ratio"] = alloc["type_footprint_ratio"]
+    result["metrics"]["variants"] = result["variants"]
+    result["metrics"]["digest_agreement"] = result["work"]["digest_agreement"]
+    result["metrics"]["action_mismatches"] = len(action_mismatches)
+    (directory / "report.json").write_bytes(canonical(result) + b"\n")
+    return result
+
+
+def current_report(directory=DEFAULT):
+    path = directory / "report.json"
+    if not path.exists():
+        return None
+    result = strict_json_loads(path.read_bytes())
+    if result.get("smoke"):
+        print("checkerbench report is a smoke capture; no acceptance metrics", file=sys.stderr)
+        return None
+    if fingerprint(sources()) != result["sources_sha256"]:
+        print("checkerbench report is stale: sources changed since the capture", file=sys.stderr)
+        return None
+    return result
+
+
+def footprint_metric():
+    """The E5 per-type footprint statistic, when a current full capture measured it."""
+    result = current_report()
+    if result is None or "type_footprint_ratio" not in result["metrics"]:
+        return None
+    return result["metrics"]["type_footprint_ratio"]
+
+
+def producer():
+    result = current_report()
+    if result is None:
+        print("run.checkerbench metrics unavailable: no current full capture at target/s08/checkerbench (see docs/S08-P7.md)", file=sys.stderr)
+        return {"metrics": {}}
+    print(json.dumps({"report": result}, sort_keys=True), file=sys.stderr)
+    metrics = {k: v for k, v in result["metrics"].items() if k != "type_footprint_ratio"}
+    for name, reason in result["unavailable"].items():
+        print(f"run.checkerbench.{name} unavailable: {reason}", file=sys.stderr)
+    return {"metrics": metrics}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("command", choices=("build", "capture", "report", "producer"))
+    parser.add_argument("--output", type=Path, default=DEFAULT)
+    parser.add_argument("--samples", type=int, default=7)
+    parser.add_argument("--smoke", type=int, help="bounded variant count; never produces acceptance metrics")
+    args = parser.parse_args()
+    directory = args.output.resolve()
+    if args.command == "build":
+        print(json.dumps({k: v for k, v in build(directory).items() if k != "sources"}, sort_keys=True))
+    elif args.command == "capture":
+        capture(directory, args.samples, args.smoke)
+        print(json.dumps(report(directory)["metrics"], sort_keys=True))
+    elif args.command == "report":
+        print(json.dumps(report(directory)["metrics"], sort_keys=True))
+    else:
+        print(canonical(producer()).decode())
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        sys.exit(1)

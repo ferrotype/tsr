@@ -180,6 +180,16 @@ def performance(operation):
             value = report["summaries"][workers][field]
             for statistic in ("go_median", "rust_median", "ratio", "samples_per_runtime", "go_relative_mad", "rust_relative_mad"):
                 metrics[f"workers_{workers}_{field}_{statistic}"] = value[statistic]
+    if operation == "e5":
+        # The checker per-type footprint (data/s08/type-footprint.json) is measured by the
+        # S08 checkerbench allocation executable at the retained checkpoint of every
+        # acceptance variant; without a current full capture it stays unavailable.
+        from s08_checkerbench import footprint_metric
+        footprint = footprint_metric()
+        if footprint is None:
+            print("run.e5.type_footprint_ratio unavailable: no current full S08 checkerbench capture (docs/S08-P7.md)", file=sys.stderr)
+        else:
+            metrics["type_footprint_ratio"] = footprint
     return {"metrics": metrics}
 
 

@@ -13,7 +13,7 @@ fn original_config_diagnostics_reach_the_baseline_executor() {
     .unwrap();
     assert_eq!(requests.len(), expected.len());
     for (request, expected) in requests.iter().zip(expected) {
-        let actual = executor::observe(request, |_, _, _, _| {
+        let actual = executor::observe(request, &mut executor::NoHooks, |_, _, _, _, _| {
             panic!("diagnostic-only request must not run a baseline walker")
         });
         assert_eq!(
@@ -48,26 +48,30 @@ fn inherited_config_diagnostics_keep_their_source_during_formatting() {
         serde_json::json!(executor::diagnostics::hex(br#"{"extends":"./base.json"}"#));
     inputs.push(serde_json::json!({"name_hex":base_name,"content_hex":original["content_hex"]}));
     request["error_baseline_requested"] = true.into();
-    let result = executor::observe(&request, |program, _, _, diagnostics| {
-        let sorted = program
-            .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
-            .unwrap();
-        let mut writer = ts_compiler::diagnostic_writer::DiagnosticWriter::new(
-            program,
-            ts_compiler::diagnostic_writer::FormattingOptions::default(),
-        );
-        assert_eq!(sorted.len(), 8);
-        for diagnostic in &sorted {
-            assert_eq!(
-                writer.file(diagnostic).unwrap().unwrap().name(),
-                b"/foo/base.json"
+    let result = executor::observe(
+        &request,
+        &mut executor::NoHooks,
+        |program, _, _, diagnostics, _| {
+            let sorted = program
+                .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
+                .unwrap();
+            let mut writer = ts_compiler::diagnostic_writer::DiagnosticWriter::new(
+                program,
+                ts_compiler::diagnostic_writer::FormattingOptions::default(),
             );
-        }
-        executor::BaselineResults {
-            type_symbols: serde_json::json!({"state":"not_requested"}),
-            errors: serde_json::json!({"state":"not_requested"}),
-        }
-    });
+            assert_eq!(sorted.len(), 8);
+            for diagnostic in &sorted {
+                assert_eq!(
+                    writer.file(diagnostic).unwrap().unwrap().name(),
+                    b"/foo/base.json"
+                );
+            }
+            executor::BaselineResults {
+                type_symbols: serde_json::json!({"state":"not_requested"}),
+                errors: serde_json::json!({"state":"not_requested"}),
+            }
+        },
+    );
     let mut diagnostics = expected[0]["diagnostics"].clone();
     for diagnostic in diagnostics.as_array_mut().unwrap() {
         diagnostic["file_hex"] = base_name.clone().into();
@@ -85,15 +89,19 @@ fn config_include_specs_reach_program_diagnostics() {
         "../../../data/s08/p6/config-diagnostics/rootdir-observations.json"
     ))
     .unwrap();
-    let result = executor::observe(&request, |program, _, _, diagnostics| {
-        let sorted = program
-            .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
-            .unwrap();
-        executor::BaselineResults {
-            type_symbols: serde_json::json!({"state":"not_requested"}),
-            errors: executor::diagnostics::phase(program, &sorted),
-        }
-    });
+    let result = executor::observe(
+        &request,
+        &mut executor::NoHooks,
+        |program, _, _, diagnostics, _| {
+            let sorted = program
+                .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
+                .unwrap();
+            executor::BaselineResults {
+                type_symbols: serde_json::json!({"state":"not_requested"}),
+                errors: executor::diagnostics::phase(program, &sorted),
+            }
+        },
+    );
     assert_eq!(result["error_baseline"]["diagnostics"], expected);
 }
 
@@ -107,7 +115,7 @@ fn original_config_text_is_not_decoded_as_a_filesystem_read() {
     // ParseSourceFile. A BOM is part of this source, not a file-load prefix.
     let text = b"\xef\xbb\xbf{\"compilerOptions\":{}}";
     request["error_inputs"][0]["content_hex"] = executor::diagnostics::hex(text).into();
-    let result = executor::observe(&request, |program, _, _, _| {
+    let result = executor::observe(&request, &mut executor::NoHooks, |program, _, _, _, _| {
         let config = program.config().config_file.as_ref().unwrap();
         assert_eq!(
             config
@@ -135,7 +143,7 @@ fn missing_original_config_is_an_explicit_capture_failure() {
     .unwrap();
     let mut request = requests[0].clone();
     request["error_inputs"].as_array_mut().unwrap().remove(0);
-    let result = executor::observe(&request, |_, _, _, _| {
+    let result = executor::observe(&request, &mut executor::NoHooks, |_, _, _, _, _| {
         panic!("config failure must stop loading")
     });
     assert_eq!(result["load"]["state"], "failed");

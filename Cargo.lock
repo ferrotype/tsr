@@ -452,6 +452,9 @@ dependencies = [
 name = "ts_compiler"
 version = "0.1.0"
 dependencies = [
+ "cap",
+ "mimalloc",
+ "s08_relater_prototype",
  "serde",
  "serde_json",
  "sha2",

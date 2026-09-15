@@ -48,9 +48,22 @@ actions of every mode (`data/s08/supplemental-observations.json.xz`). A
   `Error::UndeclaredMember`; subsequent reads remain failed rather than publishing
   an empty default.
 
+## P7 extension
+
+P7 (`docs/S08-P7.md`) keeps this API and extends the algorithm to intrinsics,
+literals (fresh and regular), unions, intersections and object types with
+properties, index signatures and non-generic call/construct signatures, porting
+the pinned `relater.go` paths for those kinds. A `Description` (plain type
+snapshot) constructs the graph with lazy object resolvers; the measurement child
+`crates/ts_compiler/examples/p7_relater.rs` derives it from the production
+checker's resolved types at setup and relates in this crate. Paths that need
+generic instantiation, inference, conditional, mapped, template-literal or
+tuple machinery fail with `Error::Unsupported`; the four frozen fixtures that
+need them are reported as unsupported, never approximated.
+
 ## What it does not do
 
-No measurement, no diagnostics text parity, no unions, intersections, generics,
-signatures or index signatures, and no comparison with the production relater.
-The `relater-fixtures.json` experiment (21 cases, five modes, setup and relation
-intervals, seven samples) is P7 work over this API.
+No diagnostics text parity (one textual chain per failed reported relation,
+compared by count), no generics, tuples, mapped, conditional or template literal
+types, and no production path. The measurement over `relater-fixtures.json`
+lives in `scripts/s08_relater.py`.

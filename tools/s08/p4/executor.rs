@@ -1,5 +1,7 @@
 //! Shared diagnostic phase executor. An optional P5 callback uses the same
-//! checked owner after all requested diagnostic phases.
+//! checked owner after all requested diagnostic phases. Measurement hooks mark
+//! the checker interval of `data/s08/checker-workload.json`; the inventory
+//! executables pass `NoHooks`.
 use serde_json::{json, Value};
 use std::sync::Arc;
 use ts_checker::{CheckerOwner, Error};
@@ -9,6 +11,25 @@ mod config;
 pub mod diagnostics;
 #[path = "../../s07/program/rust_observation.rs"]
 mod observation;
+
+/// Checker-interval boundaries. Loading, parsing and binding precede
+/// `interval_start`; JSON transport inside the interval is bracketed by
+/// `pause`/`resume`; `checkpoint` runs after the complete schedule with the
+/// checker and every escaping result live.
+#[allow(dead_code)]
+pub trait Hooks {
+    fn interval_start(&mut self) {}
+    fn init_start(&mut self) {}
+    fn init_end(&mut self) {}
+    fn pause(&mut self) {}
+    fn resume(&mut self) {}
+    /// Query results the walker retains as roots of the retained checkpoint.
+    fn roots(&mut self, _types: &[ts_checker::TypeRef]) {}
+    fn checkpoint(&mut self, _op: &mut ts_checker::Operation<'_>) {}
+}
+#[allow(dead_code)]
+pub struct NoHooks;
+impl Hooks for NoHooks {}
 
 pub fn failure(reason: impl std::fmt::Display, class: &str) -> Value {
     json!({"state":"failed","class":class,"reason":reason.to_string()})
@@ -36,11 +57,13 @@ pub struct BaselineResults {
 
 pub fn observe(
     request: &Value,
+    hooks: &mut dyn Hooks,
     baseline: impl FnOnce(
         &Program,
         &mut ts_checker::Operation<'_>,
         &Value,
         Option<&[ts_ast::Diagnostic]>,
+        &mut dyn Hooks,
     ) -> BaselineResults,
 ) -> Value {
     let counters = ts_arena::Counters::new();
@@ -82,28 +105,38 @@ pub fn observe(
             }
         };
     row["load"] = json!({"state":"executed","graph":observation::observe(request["id"].as_str().unwrap(), &program)});
-    row["phases"]["config"] = diagnostics::captured_phase(
-        &program,
-        &program.config().config_file_parsing_diagnostics(),
-        &mut diagnostic_values,
-    );
-    row["phases"]["program"] = match program.program_diagnostics() {
+    // Bound inputs and the loader state are complete: the checker interval
+    // begins. Diagnostic JSON conversion is transport, bracketed out of it.
+    hooks.interval_start();
+    let config_values = program.config().config_file_parsing_diagnostics();
+    hooks.pause();
+    row["phases"]["config"] =
+        diagnostics::captured_phase(&program, &config_values, &mut diagnostic_values);
+    hooks.resume();
+    let program_values = program.program_diagnostics();
+    hooks.pause();
+    row["phases"]["program"] = match program_values {
         Ok(values) => diagnostics::captured_phase(&program, values, &mut diagnostic_values),
         Err(error) => failure(format!("{error:?}"), "compiler_error"),
     };
+    hooks.resume();
     let mut bind = Vec::new();
     for file in program.files() {
         let source = file.bound().view().source_file().expect("published source");
         bind.extend_from_slice(source.bind_diagnostics());
     }
-    row["phases"]["syntactic"] = match program.syntactic_diagnostics(None) {
+    let syntactic_values = program.syntactic_diagnostics(None);
+    hooks.pause();
+    row["phases"]["syntactic"] = match syntactic_values {
         Ok(values) => diagnostics::captured_phase(&program, &values, &mut diagnostic_values),
         Err(error) => failure(format!("{error:?}"), "compiler_error"),
     };
     // Keep raw bind diagnostics for attribution; the production semantic API
     // separately applies native selection, directives and plain-JS filtering.
     row["bind_diagnostics"] = diagnostics::phase(&program, &bind);
+    hooks.resume();
     let generation = ts_arena::Generation::new(&counters);
+    hooks.init_start();
     let owner = match CheckerOwner::for_program(
         ts_arena::CheckerIdentity::new(generation, &counters),
         &counters,
@@ -111,6 +144,7 @@ pub fn observe(
     ) {
         Ok(owner) => Arc::new(owner),
         Err(error) => {
+            hooks.init_end();
             row["phases"]["semantic"] = checker_failure(error);
             row["phases"]["global"] = absent("checker initialization failed");
             return row;
@@ -119,11 +153,13 @@ pub fn observe(
     let mut op = match owner.operation() {
         Ok(op) => op,
         Err(error) => {
+            hooks.init_end();
             row["phases"]["semantic"] = checker_failure(error);
             row["phases"]["global"] = absent("checker operation failed");
             return row;
         }
     };
+    hooks.init_end();
     let mut semantic = Vec::new();
     for file in program.files() {
         let source = file.bound().view().source_file().expect("published source");
@@ -131,9 +167,11 @@ pub fn observe(
         let result = match program.skip_type_checking(file, false) {
             Ok(skipped) => match program.semantic_diagnostics_with_checker(&mut op, file) {
                 Ok(values) => {
+                    hooks.pause();
                     let mut value =
                         diagnostics::captured_phase(&program, &values, &mut diagnostic_values);
                     value["selection"] = json!(if skipped { "native_skip" } else { "checked" });
+                    hooks.resume();
                     value
                 }
                 Err(error) => compiler_failure(error),
@@ -143,21 +181,27 @@ pub fn observe(
         semantic.push(json!({"file_hex":name,"result":result}));
     }
     row["phases"]["semantic"] = json!({"state":if semantic.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":semantic,"api":"Program.getSemanticDiagnosticsWithChecker"});
-    row["phases"]["global"] = match op.global_diagnostics() {
+    let global_values = op.global_diagnostics();
+    hooks.pause();
+    row["phases"]["global"] = match global_values {
         Ok(values) => diagnostics::captured_phase(&program, &values, &mut diagnostic_values),
         Err(error) => checker_failure(error),
     };
+    hooks.resume();
     if row["phases"].get("declaration").is_some() {
         let mut declarations = Vec::new();
         for file in program.files() {
             let source = file.bound().view().source_file().expect("published source");
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
-            let result = match program.declaration_diagnostics_with_checker(&mut op, file) {
+            let values = program.declaration_diagnostics_with_checker(&mut op, file);
+            hooks.pause();
+            let result = match values {
                 Ok(values) => {
                     diagnostics::captured_phase(&program, &values, &mut diagnostic_values)
                 }
                 Err(error) => compiler_failure(error),
             };
+            hooks.resume();
             declarations.push(json!({"file_hex":name,"result":result}));
         }
         row["phases"]["declaration"] = json!({"state":if declarations.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":declarations,"api":"Program.getDeclarationDiagnostics"});
@@ -167,12 +211,15 @@ pub fn observe(
         for file in program.files() {
             let source = file.bound().view().source_file().expect("published source");
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
-            let result = match op.recorded_suggestions(file.source()) {
+            let values = op.recorded_suggestions(file.source());
+            hooks.pause();
+            let result = match values {
                 Ok(values) => {
                     diagnostics::captured_phase(&program, &values, &mut diagnostic_values)
                 }
                 Err(error) => checker_failure(error),
             };
+            hooks.resume();
             suggestions.push(json!({"file_hex":name,"result":result}));
         }
         row["phases"]["suggestion"] = json!({"state":if suggestions.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":suggestions,"api":"Checker.GetSuggestionDiagnostics"});
@@ -183,11 +230,13 @@ pub fn observe(
             &mut op,
             &row["phases"],
             diagnostic_values.as_deref(),
+            hooks,
         );
         row["type_symbol_baselines"] = results.type_symbols;
         if capture_errors {
             row["error_baseline"] = results.errors;
         }
     }
+    hooks.checkpoint(&mut op);
     row
 }

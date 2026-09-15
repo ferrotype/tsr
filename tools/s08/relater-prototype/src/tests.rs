@@ -17,17 +17,21 @@ fn self_linked(checker: &Checker, name: &'static str, value: &Rc<TypeCell>) -> R
         Some(Box::new(move |graph, _| {
             let next = resolver_slot.borrow().clone();
             if next.upgrade().is_none() {
-                return Err(Error::UndeclaredMember("next"));
+                return Err(Error::UndeclaredMember(Rc::from("next")));
             }
             let members = vec![
                 Member {
-                    name: "value",
+                    name: Rc::from("value"),
                     optional: false,
+                    readonly: false,
+                    class_member: true,
                     r#type: value_link.clone(),
                 },
                 Member {
-                    name: "next",
+                    name: Rc::from("next"),
                     optional: false,
+                    readonly: false,
+                    class_member: true,
                     r#type: next,
                 },
             ];
@@ -37,7 +41,10 @@ fn self_linked(checker: &Checker, name: &'static str, value: &Rc<TypeCell>) -> R
                     .borrow_mut()
                     .push(Rc::new(member.clone()));
             }
-            Ok(members)
+            Ok(Structure {
+                members,
+                ..Default::default()
+            })
         })),
     );
     *slot.borrow_mut() = Rc::downgrade(&cell);
@@ -210,7 +217,11 @@ fn releasing_the_graph_frees_every_cell_and_fails_dangling_edges_explicitly() {
     );
     // The escaped handle keeps its own cell but not its dependencies.
     assert_eq!(escaped.resolutions(), 1);
-    let members = escaped.members.get().expect("resolved before release");
+    let members = &escaped
+        .structure
+        .get()
+        .expect("resolved before release")
+        .members;
     assert_eq!(members[0].r#type().err(), Some(Error::Released));
 }
 
@@ -228,7 +239,7 @@ fn a_panicking_resolver_leaves_the_graph_consistent() {
     }));
     assert!(result.is_err(), "the injected failure unwinds");
     assert!(
-        poisoned.members.get().is_none(),
+        poisoned.structure.get().is_none(),
         "no partial members were published"
     );
     assert_eq!(poisoned.resolutions(), 0);
@@ -246,7 +257,7 @@ fn a_panicking_resolver_leaves_the_graph_consistent() {
     // A second attempt on the poisoned type fails explicitly, not silently.
     let again = poisoned.members(&checker.graph);
     assert_eq!(again.err(), Some(Error::ResolutionFailed));
-    assert!(poisoned.members.get().is_none());
+    assert!(poisoned.structure.get().is_none());
     assert_eq!(
         checker.check_type_related_to(&healthy, &poisoned, Mode::Assignable, true),
         Err(Error::ResolutionFailed)
@@ -262,12 +273,151 @@ fn an_undeclared_member_type_is_an_error_not_a_default() {
     let other = checker.graph.object("Other", vec![]);
     assert_eq!(
         checker.check_type_related_to(&dangling, &other, Mode::Identity, false),
-        Err(Error::UndeclaredMember("x"))
+        Err(Error::UndeclaredMember(Rc::from("x")))
     );
     assert_eq!(
         checker.check_type_related_to(&dangling, &other, Mode::Identity, false),
         Err(Error::ResolutionFailed)
     );
-    assert!(dangling.members.get().is_none());
+    assert!(dangling.structure.get().is_none());
     assert_eq!(checker.relation(Mode::Identity).entries(), 0);
+}
+
+/// `type A = 'a' | 'b' | 0 | 1 | true; type B = string | number | boolean;`
+/// built from a description, as the P7 measurement child builds every fixture:
+/// unions link their constituents after construction, literals relate through
+/// the primitive-union shortcut, and the observed Go cache transitions of the
+/// `literal-union` fixture are reproduced (`data/s08/supplemental-observations.json.xz`).
+#[test]
+fn described_literal_union_matches_the_go_observations() {
+    fn literal(name: &str, flags: u32, value: LiteralValue) -> TypeDesc {
+        TypeDesc {
+            name: name.into(),
+            flags,
+            object_flags: 0,
+            symbol: None,
+            alias: None,
+            kind: KindDesc::Literal {
+                value,
+                fresh: false,
+                alternate: None,
+            },
+        }
+    }
+    fn intrinsic(name: &str, flags: u32) -> TypeDesc {
+        TypeDesc {
+            name: name.into(),
+            flags,
+            object_flags: 0,
+            symbol: None,
+            alias: None,
+            kind: KindDesc::Intrinsic,
+        }
+    }
+    // Production representation: `boolean` is the union `false | true`, and
+    // `string | number | boolean` flattens to four constituents.
+    let description = Description {
+        types: vec![
+            // 0..3: string, number, bigint, false, true
+            intrinsic("string", flags::STRING),
+            intrinsic("number", flags::NUMBER),
+            intrinsic("bigint", flags::BIG_INT),
+            literal(
+                "false",
+                flags::BOOLEAN_LITERAL,
+                LiteralValue::Boolean(false),
+            ),
+            literal("true", flags::BOOLEAN_LITERAL, LiteralValue::Boolean(true)),
+            // 5: boolean
+            TypeDesc {
+                name: "boolean".into(),
+                flags: flags::BOOLEAN | flags::UNION,
+                object_flags: object_flags::PRIMITIVE_UNION,
+                symbol: None,
+                alias: None,
+                kind: KindDesc::Union(vec![3, 4]),
+            },
+            // 6..9: 'a', 'b', 0, 1
+            literal(
+                "\"a\"",
+                flags::STRING_LITERAL,
+                LiteralValue::String(b"a".to_vec()),
+            ),
+            literal(
+                "\"b\"",
+                flags::STRING_LITERAL,
+                LiteralValue::String(b"b".to_vec()),
+            ),
+            literal("0", flags::NUMBER_LITERAL, LiteralValue::Number(0)),
+            literal(
+                "1",
+                flags::NUMBER_LITERAL,
+                LiteralValue::Number(1.0f64.to_bits()),
+            ),
+            // 10: A, 11: B
+            TypeDesc {
+                name: "A".into(),
+                flags: flags::UNION,
+                object_flags: object_flags::PRIMITIVE_UNION,
+                symbol: None,
+                alias: Some(1),
+                kind: KindDesc::Union(vec![6, 7, 8, 9, 4]),
+            },
+            TypeDesc {
+                name: "B".into(),
+                flags: flags::UNION,
+                object_flags: object_flags::PRIMITIVE_UNION,
+                symbol: None,
+                alias: Some(2),
+                kind: KindDesc::Union(vec![0, 1, 3, 4]),
+            },
+        ],
+    };
+    for mode in MODES {
+        let checker = Checker::new();
+        let constructed = checker.graph.construct(&description).unwrap();
+        checker.register_intrinsics(&constructed.cells);
+        let (a, b) = (&constructed.cells[10], &constructed.cells[11]);
+        let rows = sequence(&checker, a, b, mode);
+        let (succeeded, failed) = (relation_result::SUCCEEDED, relation_result::FAILED);
+        let expected = match mode {
+            Mode::Identity => vec![
+                (FALSE, false, 1, vec![failed], 0),
+                (FALSE, false, 1, vec![failed], 0),
+                (FALSE, false, 1, vec![failed], 0),
+                (TRUE, true, 1, vec![failed], 0),
+            ],
+            Mode::Comparable => vec![
+                (TRUE, true, 2, vec![succeeded; 2], 0),
+                (TRUE, true, 2, vec![succeeded; 2], 0),
+                (TRUE, true, 4, vec![succeeded; 4], 0),
+                (TRUE, true, 4, vec![succeeded; 4], 0),
+            ],
+            Mode::Assignable | Mode::Subtype | Mode::StrictSubtype => vec![
+                (TRUE, true, 6, vec![succeeded; 6], 0),
+                (TRUE, true, 6, vec![succeeded; 6], 0),
+                (
+                    FALSE,
+                    false,
+                    8,
+                    vec![
+                        succeeded, succeeded, succeeded, succeeded, succeeded, succeeded, failed,
+                        failed,
+                    ],
+                    1,
+                ),
+                (
+                    TRUE,
+                    true,
+                    8,
+                    vec![
+                        succeeded, succeeded, succeeded, succeeded, succeeded, succeeded, failed,
+                        failed,
+                    ],
+                    0,
+                ),
+            ],
+        };
+        assert_eq!(rows, expected, "{mode:?}");
+    }
 }
