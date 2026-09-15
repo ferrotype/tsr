@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "object-catch",
+      "files": {
+        "/main.ts": "try {} catch ({ message }) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "array-catch",
+      "files": {
+        "/main.ts": "try {} catch ([first, ...rest]) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "nested-defaults",
+      "files": {
+        "/main.ts": "try {} catch ({ nested: { value = 1 }, ...rest }: any) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "catch-redeclaration",
+      "files": {
+        "/main.ts": "try {} catch ({ x }: any) { let x; } try {} catch ({ y }) { const y = 1; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "catch-annotation",
+      "files": {
+        "/main.ts": "try {} catch ({ x }: string) {} try {} catch ({ y }: unknown) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "catch-initializer",
+      "files": {
+        "/main.ts": "try {} catch ({ x } = { x: 1 }) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "catch-name-and-omitted",
+      "files": {
+        "/main.ts": "try {} catch (e) {} try {} catch {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "ordinary-missing-initializer",
+      "files": {
+        "/main.ts": "let { x }; const [y];\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "ordinary-initialized",
+      "files": {
+        "/main.ts": "let { x } = { x: 1 };\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "for-in-binding",
+      "files": {
+        "/main.ts": "declare let object: any; for (let { x } in object) {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    }
+  ]
+}

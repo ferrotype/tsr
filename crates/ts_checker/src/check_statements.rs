@@ -576,7 +576,9 @@ impl CheckerState {
         let declaration = data.variable_declaration();
         let block = required(data.block(), "catch block")?;
         if let Some(declaration) = declaration {
-            self.check_source_element(declaration)?;
+            // Catch bindings have their own grammar below. In particular,
+            // destructuring here does not require a variable initializer.
+            self.check_variable_like(declaration)?;
             let read = self.ast(declaration)?.node(declaration)?;
             if let Some(annotation) = read.type_node() {
                 let ty = self.get_type_from_type_node(annotation)?;

@@ -3258,6 +3258,29 @@ fn private_member_self_type_access_matches_native_program_diagnostics() {
 
 #[test]
 fn interface_inheritance_matches_native_diagnostic_chains() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/interface-inheritance/requests.json"),
+        include_str!("../../../data/s08/p6/interface-inheritance/observations.json"),
+    );
+}
+
+#[test]
+fn catch_destructuring_matches_native_diagnostics() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/catch-destructuring/requests.json"),
+        include_str!("../../../data/s08/p6/catch-destructuring/observations.json"),
+    );
+}
+
+#[test]
+fn alias_circularity_matches_native_diagnostics() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/alias-circularity/requests.json"),
+        include_str!("../../../data/s08/p6/alias-circularity/observations.json"),
+    );
+}
+
+fn assert_native_semantic_fixture(requests: &str, native: &str) {
     fn payload(program: &Program, d: &ts_ast::Diagnostic) -> serde_json::Value {
         let file = d.file.map(|id| {
             let file = program
@@ -3293,26 +3316,34 @@ fn interface_inheritance_matches_native_diagnostic_chains() {
         })
     }
 
-    let requests: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../data/s08/p6/interface-inheritance/requests.json"
-    ))
-    .unwrap();
-    let native: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../data/s08/p6/interface-inheritance/observations.json"
-    ))
-    .unwrap();
+    let requests: serde_json::Value = serde_json::from_str(requests).unwrap();
+    let native: serde_json::Value = serde_json::from_str(native).unwrap();
     let requests = requests["programs"].as_array().unwrap();
     let observations = native["programs"].as_array().unwrap();
     assert_eq!(requests.len(), observations.len());
     let mut mismatches = Vec::new();
     for (spec, expected) in requests.iter().zip(observations) {
         assert_eq!(spec["id"], expected["id"]);
-        let (owner, program, _) = fixture(
-            spec["files"]["/main.ts"].as_str().unwrap().as_bytes(),
-            options(),
+        let files: Vec<_> = spec["files"]
+            .as_object()
+            .unwrap()
+            .iter()
+            .map(|(path, text)| (path.as_bytes(), text.as_str().unwrap().as_bytes()))
+            .collect();
+        let root = spec["roots"][0].as_str().unwrap().as_bytes();
+        let (owner, program, _) = fixture_files(
+            root,
+            &files,
+            CompilerOptions {
+                no_unused_locals: if spec["no_unused_locals"] == true {
+                    Tristate::TRUE
+                } else {
+                    Tristate::UNKNOWN
+                },
+                ..options()
+            },
         );
-        let file = program.file(b"/main.ts").unwrap();
-        let syntactic = program.syntactic_diagnostics(Some(file)).unwrap();
+        let syntactic = program.syntactic_diagnostics(None).unwrap();
         assert_eq!(
             serde_json::json!(syntactic
                 .iter()
@@ -3326,7 +3357,15 @@ fn interface_inheritance_matches_native_diagnostic_chains() {
         // The repeat exercises the once-per-merged-symbol check and cached file
         // diagnostics without discarding full chains, locations or related info.
         for attempt in 0..2 {
-            match program.semantic_diagnostics_with_checker(&mut op, file) {
+            let diagnostics = program
+                .files()
+                .iter()
+                .try_fold(Vec::new(), |mut diagnostics, file| {
+                    diagnostics.extend(program.semantic_diagnostics_with_checker(&mut op, file)?);
+                    Ok::<_, ts_compiler::Error>(diagnostics)
+                })
+                .and_then(|diagnostics| program.sort_and_deduplicate_diagnostics(&diagnostics));
+            match diagnostics {
                 Ok(diagnostics) => {
                     let actual = serde_json::json!(diagnostics
                         .iter()

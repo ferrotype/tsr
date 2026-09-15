@@ -335,56 +335,81 @@ impl CheckerState {
         self.push_type_resolution(TypeSystemEntity::Symbol(symbol), property)
     }
 
-    /// Upstream keys the "already produced" probe on the resolution's property
-    /// name alone and type-asserts the target, so one predicate serves every
-    /// entity kind; an entry whose target does not match its property's entity
-    /// cannot occur, and answers `false` here rather than panicking.
-    // port: tsc/internal/checker/checker.go:Checker.typeResolutionHasProperty
     pub(crate) fn push_type_resolution(
         &mut self,
         target: TypeSystemEntity,
         property: TypeSystemPropertyName,
     ) -> bool {
-        let aliases = &self.module_aliases.targets;
-        let declared = &self.query.declared_types;
-        let values = &self.value_symbol_links;
-        let node_flags = &self.emit_checks.node_flags;
+        let cycle_start =
+            self.resolution
+                .find_resolution_cycle_start_index(target, property, |entry| {
+                    self.type_resolution_has_property(entry)
+                });
         self.resolution
-            .push(target, property, |entry| match entry.property_name {
-                TypeSystemPropertyName::AliasTarget => match entry.target {
-                    TypeSystemEntity::Symbol(symbol) => {
-                        aliases.get(&symbol).is_some_and(Result::is_ok)
-                    }
-                    _ => false,
-                },
-                TypeSystemPropertyName::DeclaredType => match entry.target {
-                    TypeSystemEntity::Symbol(symbol) => {
-                        declared.try_get(symbol).is_some_and(Option::is_some)
-                    }
-                    _ => false,
-                },
-                TypeSystemPropertyName::Type => match entry.target {
-                    TypeSystemEntity::Symbol(symbol) => values
-                        .try_get(symbol)
-                        .is_some_and(|links| links.resolved_type.is_some()),
-                    _ => false,
-                },
-                TypeSystemPropertyName::WriteType => match entry.target {
-                    TypeSystemEntity::Symbol(symbol) => values
-                        .try_get(symbol)
-                        .is_some_and(|links| links.write_type.is_some()),
-                    _ => false,
-                },
-                TypeSystemPropertyName::InitializerIsUndefined => match entry.target {
-                    TypeSystemEntity::Node(node) => {
-                        node_flags.try_get(node).copied().unwrap_or_default()
-                            & nc::INITIALIZER_IS_UNDEFINED_COMPUTED
-                            != 0
-                    }
-                    _ => false,
-                },
-                _ => false,
-            })
+            .push_after_cycle_check(target, property, cycle_start)
+    }
+
+    /// The shared probe serves both resolution pushes and speculative alias
+    /// reads. Produced intermediate properties stop the cycle search.
+    // port: tsc/internal/checker/checker.go:Checker.typeResolutionHasProperty
+    pub(crate) fn type_resolution_has_property(
+        &self,
+        entry: &crate::resolution::TypeResolution,
+    ) -> bool {
+        use TypeSystemEntity::{Node, Signature, Symbol, Type};
+        use TypeSystemPropertyName as Property;
+        match (entry.property_name, entry.target) {
+            (Property::AliasTarget, Symbol(symbol)) => self
+                .module_aliases
+                .targets
+                .get(&symbol)
+                .is_some_and(Result::is_ok),
+            (Property::DeclaredType, Symbol(symbol)) => self
+                .query
+                .declared_types
+                .try_get(symbol)
+                .is_some_and(Option::is_some),
+            (Property::Type, Symbol(symbol)) => self
+                .value_symbol_links
+                .try_get(symbol)
+                .is_some_and(|links| links.resolved_type.is_some()),
+            (Property::WriteType, Symbol(symbol)) => self
+                .value_symbol_links
+                .try_get(symbol)
+                .is_some_and(|links| links.write_type.is_some()),
+            (Property::InitializerIsUndefined, Node(node)) => {
+                self.emit_checks
+                    .node_flags
+                    .try_get(node)
+                    .copied()
+                    .unwrap_or_default()
+                    & nc::INITIALIZER_IS_UNDEFINED_COMPUTED
+                    != 0
+            }
+            (Property::ResolvedTypeArguments, Type(ty)) => self
+                .types
+                .type_reference(ty)
+                .is_ok_and(|data| data.resolved_type_arguments.is_some()),
+            (Property::ResolvedBaseTypes, Type(ty)) => self
+                .types
+                .interface(ty)
+                .is_ok_and(|data| data.base_types_resolved),
+            (Property::ResolvedBaseConstructorType, Type(ty)) => self
+                .types
+                .interface(ty)
+                .is_ok_and(|data| data.resolved_base_constructor_type.is_some()),
+            (Property::ResolvedReturnType, Signature(signature)) => self
+                .signatures
+                .get(signature)
+                .is_ok_and(|data| data.resolved_return_type.is_some()),
+            (Property::ResolvedBaseConstraint, Type(ty)) => self
+                .types
+                .base_constraint_slot(ty)
+                .is_ok_and(|slot| slot.is_some_and(Option::is_some)),
+            // Entity/property mismatches are invalid internal entries. As in
+            // the other checked resolution probes, they cannot be cache hits.
+            _ => false,
+        }
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfTypeAlias

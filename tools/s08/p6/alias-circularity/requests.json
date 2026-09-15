@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "missing-export",
+      "files": {
+        "/main.ts": "export = Missing;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "missing-default",
+      "files": {
+        "/main.ts": "export default missing;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "missing-import-equals",
+      "files": {
+        "/main.ts": "import Alias = Missing;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "missing-qualified-alias",
+      "files": {
+        "/main.ts": "import Alias = Missing.Member;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "broken-alias-suggestion",
+      "files": {
+        "/main.ts": "import Broken = Missing; declare const other: number; Brokne;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "good-alias-suggestion",
+      "files": {
+        "/main.ts": "namespace Target { export const value = 1; } import Alias = Target; Alais.value;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "noncircular-alias-chain",
+      "files": {
+        "/main.ts": "namespace Target { export const value = 1; } import Middle = Target; import Alias = Middle; Alais.value;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "self-cycle",
+      "files": {
+        "/main.ts": "import A = A; A;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "mutual-cycle",
+      "files": {
+        "/main.ts": "import A = B; import B = A; A; B;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "namespace-alias-cycle",
+      "files": {
+        "/main.ts": "namespace A { export import B = C; } import C = A.B; C;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "cycle-with-missing-name",
+      "files": {
+        "/main.ts": "import A = B; import B = A; Missing;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "missing-export-specifier",
+      "files": {
+        "/main.ts": "export { Missing as alias };\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "cross-file-missing-reexport",
+      "files": {
+        "/main.ts": "import { alias } from \"./a\"; alias;\n",
+        "/a.ts": "export { Missing as alias };\n"
+      },
+      "roots": [
+        "/main.ts",
+        "/a.ts"
+      ]
+    },
+    {
+      "id": "cross-file-export-cycle",
+      "files": {
+        "/main.ts": "import first = require(\"./a\"); first;\n",
+        "/a.ts": "import second = require(\"./b\"); export = second;\n",
+        "/b.ts": "import first = require(\"./a\"); export = first;\n"
+      },
+      "roots": [
+        "/main.ts",
+        "/a.ts",
+        "/b.ts"
+      ]
+    }
+  ]
+}

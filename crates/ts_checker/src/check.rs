@@ -236,7 +236,7 @@ impl CheckerState {
                 Ok(())
             }
             Some(K::PropertySignature) => self.check_property_signature(node),
-            Some(K::VariableDeclaration) => self.check_variable_like(node),
+            Some(K::VariableDeclaration) => self.check_variable_declaration(node),
             Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration | K::InterfaceDeclaration) => {
                 self.check_type_declaration(node)
             }
@@ -436,8 +436,14 @@ impl CheckerState {
         Ok(())
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclaration
+    fn check_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_grammar_variable(node)?;
+        self.check_variable_like(node)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
-    fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.ast(node)?.node(node)?;
         let name = required(read.name(), "variable/property name")?;
         let name_kind = self.ast(name)?.node(name)?.kind();
@@ -464,9 +470,6 @@ impl CheckerState {
             return Err(Error::Unsupported(
                 "checkGrammarProperty: signature initializer",
             ));
-        }
-        if !property {
-            self.check_grammar_variable(node)?;
         }
         if binding {
             self.check_binding_variable(node)

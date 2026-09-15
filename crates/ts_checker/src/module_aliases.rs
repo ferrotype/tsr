@@ -228,6 +228,29 @@ impl CheckerState {
         Ok(target)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.tryResolveAlias
+    pub(crate) fn try_resolve_alias(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<Option<SymbolId>, Error> {
+        if self.module_aliases.targets.contains_key(&symbol)
+            || self
+                .resolution
+                .find_resolution_cycle_start_index(
+                    crate::TypeSystemEntity::Symbol(symbol),
+                    TypeSystemPropertyName::AliasTarget,
+                    |entry| self.type_resolution_has_property(entry),
+                )
+                .is_none()
+        {
+            self.resolve_alias(symbol).map(Some)
+        } else {
+            // Unlike pushTypeResolution, the speculative probe must not mark
+            // the active chain as circular merely to reject a suggestion.
+            Ok(None)
+        }
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.resolveAlias
     pub(crate) fn resolve_alias(&mut self, symbol: SymbolId) -> Result<SymbolId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {

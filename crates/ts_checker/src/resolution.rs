@@ -73,9 +73,21 @@ impl ResolutionStack {
         property_name: TypeSystemPropertyName,
         has_property: impl FnMut(&TypeResolution) -> bool,
     ) -> bool {
-        if let Some(start) =
-            self.find_resolution_cycle_start_index(target, property_name, has_property)
-        {
+        let cycle_start =
+            self.find_resolution_cycle_start_index(target, property_name, has_property);
+        self.push_after_cycle_check(target, property_name, cycle_start)
+    }
+
+    /// Splits the read-only probe from mutation so the checker can consult all
+    /// of its link stores without holding a mutable borrow of this stack.
+    /// `cycle_start` must come from an immediately preceding probe of this stack.
+    pub(crate) fn push_after_cycle_check(
+        &mut self,
+        target: TypeSystemEntity,
+        property_name: TypeSystemPropertyName,
+        cycle_start: Option<usize>,
+    ) -> bool {
+        if let Some(start) = cycle_start {
             for resolution in &mut self.resolutions[start..] {
                 resolution.result = false;
             }
