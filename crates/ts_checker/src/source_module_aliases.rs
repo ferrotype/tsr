@@ -9,6 +9,23 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
 impl CheckerState {
+    /// The CommonJS branch of checkVariableLikeDeclaration precedes ordinary
+    /// variable type/initializer checks, including for destructured aliases.
+    pub(crate) fn check_require_alias_declaration(
+        &mut self,
+        node: NodeId,
+        symbol: SymbolId,
+    ) -> Result<bool, Error> {
+        if self.symbol(symbol)?.flags() & sf::ALIAS != 0
+            && ts_ast::is_variable_declaration_initialized_to_require(self.ast(node)?, node)?
+        {
+            self.check_source_alias_symbol(node)?;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkExportDeclaration
     pub(crate) fn check_export_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.ast(node)?.node(node)?;

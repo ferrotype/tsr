@@ -3280,7 +3280,25 @@ fn alias_circularity_matches_native_diagnostics() {
     );
 }
 
+#[test]
+fn js_open_object_access_matches_native_diagnostics() {
+    assert_native_semantic_fixture(
+        include_str!("../../../data/s08/p6/js-object-expando/requests.json"),
+        include_str!("../../../data/s08/p6/js-object-expando/observations.json"),
+    );
+}
+
 fn assert_native_semantic_fixture(requests: &str, native: &str) {
+    fn option(value: &serde_json::Value, default: Tristate) -> Tristate {
+        match value.as_bool() {
+            Some(true) => Tristate::TRUE,
+            Some(false) => Tristate::FALSE,
+            None => {
+                assert!(value.is_null(), "fixture option must be a boolean");
+                default
+            }
+        }
+    }
     fn payload(program: &Program, d: &ts_ast::Diagnostic) -> serde_json::Value {
         let file = d.file.map(|id| {
             let file = program
@@ -3335,6 +3353,10 @@ fn assert_native_semantic_fixture(requests: &str, native: &str) {
             root,
             &files,
             CompilerOptions {
+                strict: option(&spec["strict"], Tristate::TRUE),
+                allow_js: option(&spec["allow_js"], Tristate::UNKNOWN),
+                check_js: option(&spec["check_js"], Tristate::UNKNOWN),
+                no_implicit_any: option(&spec["no_implicit_any"], Tristate::UNKNOWN),
                 no_unused_locals: if spec["no_unused_locals"] == true {
                     Tristate::TRUE
                 } else {

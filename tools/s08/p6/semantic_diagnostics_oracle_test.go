@@ -18,7 +18,8 @@ import (
 )
 
 // Focused native witnesses: program syntactic and semantic diagnostics for small
-// strict, no-lib programs with an optional noUnusedLocals setting.
+// no-lib programs. Strict checking defaults on; optional flags cover JS and
+// noImplicitAny without changing the earlier strict fixture requests.
 func s08P6Diagnostics(values []*ast.Diagnostic) []map[string]any {
 	result := make([]map[string]any, 0, len(values))
 	for _, d := range values {
@@ -43,6 +44,10 @@ func TestS08P6SemanticDiagnostics(t *testing.T) {
 		Programs []struct {
 			ID             string            `json:"id"`
 			NoUnusedLocals bool              `json:"no_unused_locals"`
+			Strict         *bool             `json:"strict"`
+			AllowJs        *bool             `json:"allow_js"`
+			CheckJs        *bool             `json:"check_js"`
+			NoImplicitAny  *bool             `json:"no_implicit_any"`
 			Files          map[string]string `json:"files"`
 			Roots          []string          `json:"roots"`
 		} `json:"programs"`
@@ -58,6 +63,16 @@ func TestS08P6SemanticDiagnostics(t *testing.T) {
 		host := compiler.NewCompilerHost("/", vfstest.FromMap(r.Files, true), "/no-default-lib", nil, nil, nil)
 		opts := &core.CompilerOptions{Target: core.ScriptTargetESNext, Module: core.ModuleKindESNext, Strict: core.TSTrue, NoLib: core.TSTrue,
 			NoUnusedLocals: core.IfElse(r.NoUnusedLocals, core.TSTrue, core.TSUnknown)}
+		for _, option := range []struct {
+			value  *bool
+			target *core.Tristate
+		}{
+			{r.Strict, &opts.Strict}, {r.AllowJs, &opts.AllowJs}, {r.CheckJs, &opts.CheckJs}, {r.NoImplicitAny, &opts.NoImplicitAny},
+		} {
+			if option.value != nil {
+				*option.target = core.IfElse(*option.value, core.TSTrue, core.TSFalse)
+			}
+		}
 		config := tsoptions.NewParsedCommandLine(opts, r.Roots, nil, tspath.ComparePathsOptions{})
 		program := compiler.NewProgram(compiler.ProgramOptions{Config: config, Host: host, SingleThreaded: core.TSTrue})
 		ctx := context.Background()

@@ -1888,7 +1888,6 @@
       "tsc/internal/checker/utilities.go:Checker.checkNotCanceled",
       "tsc/internal/checker/utilities.go:Checker.getPackagesMap",
       "tsc/internal/checker/utilities.go:Checker.isCanceled",
-      "tsc/internal/checker/utilities.go:Checker.isJSLiteralType",
       "tsc/internal/checker/utilities.go:Checker.packageBundlesTypes",
       "tsc/internal/checker/utilities.go:Checker.typesPackageExists",
       "tsc/internal/checker/utilities.go:GetSetAccessorValueParameter",

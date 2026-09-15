@@ -31,6 +31,21 @@ fn owner() -> (
 }
 
 #[test]
+fn missing_indexed_property_without_a_program_remains_unresolved() {
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let object = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+    let name = state
+        .get_string_literal_type(JsString::from_bytes(b"missing".as_slice()))
+        .unwrap();
+    assert_eq!(
+        state.indexed_access_or_undefined(object, name, 0, None, None),
+        Ok(None)
+    );
+}
+
+#[test]
 fn unused_pass_failure_is_sticky_without_poisoning_completed_type_checks() {
     use ts_ast::FactoryMethods;
     let (_counters, _generation, _identity, owner) = owner();

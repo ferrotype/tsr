@@ -1,0 +1,1332 @@
+{
+  "version": 1,
+  "scope": "Development comparison of the frozen 209-variant JS object/expando selection; no full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "f3d539156384f4a1a5cbf58063e36fdca98bd0ee4bf55dd66632ad318f57b18d",
+  "candidate_capture_sha256": "8153e3148736968e53e4d2fb4e6323ded3321560d4da5ba340272bc39fb06a1b",
+  "candidate_sources_sha256": "2afbd049f94903923ca756027baef78fbbbccf14d34e8e0057cdf819189d2c63",
+  "selection_sha256": "3a2b4c0a0053de0a1fb48e28d58854e92468e2453d270c73b38e7e94977db159",
+  "source_stable": true,
+  "counts_before": {
+    "types_parity": {
+      "match": 167,
+      "different": 42
+    },
+    "errors_parity": {
+      "match": 184,
+      "different": 25
+    },
+    "type_to_string_parity": {
+      "match": 175,
+      "different": 34
+    }
+  },
+  "counts_after": {
+    "types_parity": {
+      "match": 176,
+      "different": 33
+    },
+    "errors_parity": {
+      "match": 200,
+      "different": 9
+    },
+    "type_to_string_parity": {
+      "match": 175,
+      "different": 34
+    }
+  },
+  "changes": {
+    "types_parity": {
+      "improved": [
+        "conformance/salsa/jsObjectsMarkedAsOpenEnded.ts#configuration=0",
+        "conformance/salsa/privateIdentifierExpando.ts#configuration=0",
+        "conformance/salsa/propertyAssignmentOnImportedSymbol.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment11.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment13.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment18.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment34.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment37.ts#configuration=0",
+        "conformance/salsa/typeFromPrototypeAssignment4.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "errors_parity": {
+      "improved": [
+        "conformance/salsa/expandoOnAlias.ts#configuration=0",
+        "conformance/salsa/exportNestedNamespaces2.ts#configuration=0",
+        "conformance/salsa/jsObjectsMarkedAsOpenEnded.ts#configuration=0",
+        "conformance/salsa/moduleExportAliasUnknown.ts#configuration=0",
+        "conformance/salsa/privateIdentifierExpando.ts#configuration=0",
+        "conformance/salsa/propertyAssignmentOnImportedSymbol.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment11.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment13.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment14.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment18.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment34.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment35.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment37.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignment4.ts#configuration=0",
+        "conformance/salsa/typeFromPropertyAssignmentOutOfOrder.ts#configuration=0",
+        "conformance/salsa/typeFromPrototypeAssignment4.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "type_to_string_parity": {
+      "improved": [],
+      "regressed": []
+    }
+  },
+  "inherited_improvements": {
+    "errors_parity": [
+      "conformance/salsa/moduleExportAliasUnknown.ts#configuration=0"
+    ]
+  },
+  "remaining": [
+    {
+      "id": "compiler/expandoFunctionExpressionsWithDynamicNames.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 55,
+          "rust_queries": 55,
+          "accepted": false,
+          "native_sha256": "a220296c9fad38e3b2e81149f0ffbc2b7aef6ae7f3dc665093fafa2c2aadfaa9",
+          "rust_sha256": "29c567806e87cda9ad1d705dd913ca434bc628c73369a8bed71c3b3f577057c9"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "3c1233b7f2118485f6a8cf201971f5698bc1a91d6bca35f9d5cee1c91c6a521b",
+          "rust_sha256": "bf547412c10f12044f73d4762140b95cea28aadfbcfdaee128dbd35e25f0a0c0"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 16,
+          "rust_queries": 16,
+          "accepted": false,
+          "native_sha256": "64bfd8b387aa37a404f120bc6a13e569a6993b3175a232de74745b65193d0e51",
+          "rust_sha256": "08571ab297d3a72a8f283da2934ff68863ea4e8defb016bd256470b96723310c"
+        }
+      }
+    },
+    {
+      "id": "compiler/expandoFunctionExpressionsWithDynamicNames2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 97,
+          "rust_queries": 97,
+          "accepted": false,
+          "native_sha256": "e45d72cc4549dffdbfb7f93ed4e320354ea5f214099a1f923f65263a32fbb978",
+          "rust_sha256": "5e68b01edf3a30f0f45d5da2096c09058256c2d4f635d29094427131ff314a29"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "781893d7a2b52a2e3e7edf96c4bf7f89d7e6bffacf33c3912c15638350fb290c",
+          "rust_sha256": "8cacffb264f838ecd138f40ee13903508b484831274e6d1a3190781f55d0d58a"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 25,
+          "rust_queries": 25,
+          "accepted": false,
+          "native_sha256": "ae0941c066077713dad42815455b1f06230c1f90619f396b56b85010f79cd634",
+          "rust_sha256": "03b0da23e49ee934d8344f50a40ba180d8a8d22588a04b69195d6435a56e2ade"
+        }
+      }
+    },
+    {
+      "id": "compiler/expandoFunctionNestedAssigments.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 505,
+          "rust_queries": 505,
+          "accepted": false,
+          "native_sha256": "05b477fe1277480d02d544d7837944e802576a5d50c8c6a84349cf28d3043185",
+          "rust_sha256": "5ed3372e86430ab36802fba8d18e1b5f2087a86dbb0964ddf7fa659650b608b7"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 142,
+          "rust_queries": 142,
+          "accepted": false,
+          "native_sha256": "9624eb2d007b9cd80303d165450cdb6f411c7586ce6becd4682deb9bf06e4888",
+          "rust_sha256": "aac8aada00291c4433842b34df85c54d935fd831566a219605658a68b541277e"
+        }
+      }
+    },
+    {
+      "id": "compiler/expandoFunctionNestedAssigmentsDeclared.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 548,
+          "rust_queries": 548,
+          "accepted": false,
+          "native_sha256": "4aba6afe76af08793939f848e1025647bb54eee180bae33b785f3c273ccc476e",
+          "rust_sha256": "f03119c7456ea061acd6323e59f9616c51c6a91538d0bd5fb1d58c26361005b7"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 151,
+          "rust_queries": 151,
+          "accepted": false,
+          "native_sha256": "1208f2f627772f163d99ac985b6e796b539287d702ab57ffcfdc3a711c8091a4",
+          "rust_sha256": "b0e2afffe44f25213eec622d4098d3081217f3ef811c1d1229857df024bc5deb"
+        }
+      }
+    },
+    {
+      "id": "compiler/expandoFunctionSymbolProperty.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 52,
+          "rust_queries": 52,
+          "accepted": false,
+          "native_sha256": "934f14d5e7baffdd4cce3c53c96576b2171ae4fe2e3c56548c7b40b7b7fafbe0",
+          "rust_sha256": "c6abb03aa05625d74a28e3311221c466d43e6de88d65686ac2404e424a763c9a"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "9d897f820eaada886c67178f2c597b65fdab31a18cd7666484f59535f79ef94c",
+          "rust_sha256": "9f968ef8025cd341b7cc79d335bd0d2c06f6279969d8c40f655adc82c94803ec"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 13,
+          "rust_queries": 13,
+          "accepted": false,
+          "native_sha256": "305ee7888f1eb68568218ffbbf00bfb4664828e05a27150e23516f5b0122a75e",
+          "rust_sha256": "979dacf0b235c12214593653c39703d40d6029c086ae0290ea65a3032732164b"
+        }
+      }
+    },
+    {
+      "id": "compiler/jsExpandoObjectDefineProperty.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 71,
+          "rust_queries": 71,
+          "accepted": false,
+          "native_sha256": "a369da94c3f860fef6c141640505bb31f8e5947f193a5f9c07130c31c1948584",
+          "rust_sha256": "fcafc0e88073698d2da883d31923693b4672e3b22a4bf001370171adec14027b"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 20,
+          "rust_queries": 20,
+          "accepted": false,
+          "native_sha256": "eb887189756bdf56baafcd3ec6f2ca9173cd545361ca515c1232513641430b94",
+          "rust_sha256": "49aa8121a0cd44cf2fd62c5bac9597494867da2759bc7b38a55bcea7a5c6100f"
+        }
+      }
+    },
+    {
+      "id": "compiler/topLevelBlockExpando.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 258,
+          "rust_queries": 258,
+          "accepted": false,
+          "native_sha256": "f4a0e22b2c1062bee8817a701359e78bdee69c2480ad91816a76a4260c985c0f",
+          "rust_sha256": "adaa6198b0d1978d96ac54f057ce60e390cf26611e831355760d061c0c185b93"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 70,
+          "rust_queries": 70,
+          "accepted": false,
+          "native_sha256": "170ffec495ec3bc0e9c9beb464ac60eda8917971748b0d24c2f6da32b8defd75",
+          "rust_sha256": "7df5f4c22f353cf4d7d6bd00873c150dc7f44a8a37882cc0392ac02ee0e8e517"
+        }
+      }
+    },
+    {
+      "id": "compiler/wellKnownSymbolExpando.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 29,
+          "rust_queries": 28,
+          "accepted": false,
+          "native_sha256": "dd852d46ba6eff6d08e243cabcf41d2255c73f739c112e5c6c9a0c6c67ffcd98",
+          "rust_sha256": "5059be4d4944bc5d2b08e3e4ba7760a9e5cf0a868a346b3396340137eea54943"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 8,
+          "rust_queries": 8,
+          "accepted": false,
+          "native_sha256": "9edf0d9881ff3be925f030314dd075968df7cec2382aecb7113571aa9229d295",
+          "rust_sha256": "a669115b8848641161eec9aae74137914aed087275b571cc8e911dc2aa68794d"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/commonJSAliasedExport.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 103,
+          "rust_queries": 103,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 3,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "489bd2f7225d819519be2a15984ab3dcb321a29e36efeeed220a59fda13e8aa2",
+          "rust_sha256": "62534aac6ec9df9d636b55a11df986894de7255d914ce6449bb0189faebe67fc"
+        },
+        "type_to_string_parity": {
+          "state": "match",
+          "native_queries": 28,
+          "rust_queries": 28,
+          "accepted": true
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/commonJSImportNestedClassTypeReference.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 107,
+          "rust_queries": 107,
+          "accepted": false,
+          "native_sha256": "f4c5c9f8635196535a9e71131404c80cc883cf4892500f4fc65c7809c6336880",
+          "rust_sha256": "90d4740729fa9db585822b0c0655ef8b2eab974428ed3ff792ffaf1284b77c30"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 29,
+          "rust_queries": 29,
+          "accepted": false,
+          "native_sha256": "943cc9cd6751760ae4545dbf4e7def4601f0a14efd06282992cb866e1cd32925",
+          "rust_sha256": "dcd6796c6d756d48c81a1ec31807786ada51745d3ac4a49b6351364522546a98"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/contextualTypedSpecialAssignment.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 392,
+          "rust_queries": 392,
+          "accepted": false,
+          "native_sha256": "fc86c9aba0d8870fe5d7ee016db668527bd77c88cf35a69447403d92f96c280e",
+          "rust_sha256": "b0a8af8696c703134ee6a75876971b62bf0fb10be78034749d0264f224855559"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "8ad03920052275e822833e57df60b521a87f1bdf3bf4263ec4bae5da9dc0a9a3",
+          "rust_sha256": "2caffea84828865a97fb74b487a0e09beb86ce26fd5f5d18c373a08ce4cf35dc"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 106,
+          "rust_queries": 106,
+          "accepted": false,
+          "native_sha256": "bc3cdfc6fbb0ae58d32723cf4630c9eddf4c087ebf153bb79a5946c63b338af7",
+          "rust_sha256": "49c1217f7404986e020aa06c1ef824da2ab465dcea04d30a66848fe6619f8bc2"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/exportNestedNamespaces.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 186,
+          "rust_queries": 186,
+          "accepted": false,
+          "native_sha256": "a9dd6a927da40e9bf3ed2681e6da55a9c27de533aa0dd339a368ddec204b14d0",
+          "rust_sha256": "1d74275c0a92759a5d7beb0dbba74b0aeb861a9e0ddf2bb1461e6f0cf3784a09"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 52,
+          "rust_queries": 52,
+          "accepted": false,
+          "native_sha256": "b44b5111314c16ef8d254a9b1a515674cbabe79a85c01863e4bd698662ce79ab",
+          "rust_sha256": "d1a2cb5664353ab5ac36a457ac0ac9f0486165d8b065f5819c4e9a97581ab80b"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/globalMergeWithCommonJSAssignmentDeclaration.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "symbols",
+            "queries"
+          ],
+          "native_queries": 48,
+          "rust_queries": 48,
+          "accepted": false,
+          "native_sha256": "579283d3464be57252f1bc7cc96c85354410d45d38f2cc9022f11bd7af2a8497",
+          "rust_sha256": "8bee3cf25091ef6e6a015b1cc1bf2a205737fd46dec66d01c73f48f543a86276"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "cf4687bd4846fd1f7a7d56e59a64943b3ec25b80f62b0f744fbf481e44b6bf09",
+          "rust_sha256": "76405a69be91dbfe52241fd6d851a2c760ca3ab30a71157db4f960d7cbcd37df"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 13,
+          "rust_queries": 13,
+          "accepted": false,
+          "native_sha256": "21709f4f11a7d1f3d41a92039741c52dadc1c7d0a76f54fb03561ea798fcc363",
+          "rust_sha256": "545b11dcfdb66da550e95fe03ff5cceca81545a2051cbcd54bf049c7fd2d31eb"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/jsdocConstructorFunctionTypeReference.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 71,
+          "rust_queries": 71,
+          "accepted": false,
+          "native_sha256": "79b40f0fcb0ee874931d60d371e744b6847a1b424604413eddf734d41bbb726c",
+          "rust_sha256": "9ce469ffd1fe82ff0fe03c0f428053884613c22ad23b48864874207b23321e7f"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 21,
+          "rust_queries": 21,
+          "accepted": false,
+          "native_sha256": "883f5dd6954b99b6670b3ed7e5efdb8c388fb0f507299cabb4d590df17d0b268",
+          "rust_sha256": "84294a533b424f7e8f397d5df694d0034d50e3a2170bc690fb4bf4318b5366ee"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/lateBoundAssignmentDeclarationSupport7.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "symbols",
+            "queries"
+          ],
+          "native_queries": 178,
+          "rust_queries": 178,
+          "accepted": false,
+          "native_sha256": "984982b4e9060f73896e2edbb112927cb066ad8b9437cda417d17bcb3494acc5",
+          "rust_sha256": "7b68b209dd0ad885d3d8861f4529742c7eb8ecb0962416fc8aff2c982f58f64c"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "16926b60f133324d999a3fc654b2fc624ff65d4f11951f1e4534c140edc2b8a1",
+          "rust_sha256": "8902065958f6e1c78d802f28dd96d5c521771addb51102d1a303fee9e741a649"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 48,
+          "rust_queries": 48,
+          "accepted": false,
+          "native_sha256": "35aa09124d8e72f6ae1cc6496945c54fd713b6922acd5170f3b270c4092a0ca7",
+          "rust_sha256": "f3184f17a783ff0640b2d33ec958430df933e8fab709aebe28bcd9bdffa37fa3"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/moduleExportNestedNamespaces.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 214,
+          "rust_queries": 214,
+          "accepted": false,
+          "native_sha256": "b8c912756c3b47a8ca78591af860fb93b828e4dcbc31b6843be27f954bc391d0",
+          "rust_sha256": "373d737a5ed7c1bbb485b8ef2f19fa2ee9deec2111d7f49c9394f5446661b427"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 59,
+          "rust_queries": 59,
+          "accepted": false,
+          "native_sha256": "71e58844cfb1d75645d70790c64b9eb67d06a2e6967f44e99afb1bd67b83fa25",
+          "rust_sha256": "cb8ff1b0685ffc9b2e0526b016ce3d3519cc822d8cb6a43590bd3259d7c221bf"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/multipleDeclarations.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 324,
+          "rust_queries": 324,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 89,
+          "rust_queries": 89,
+          "accepted": false,
+          "native_sha256": "f3b846841526ec637443de3e9c442b2ffe3af2c2b99bf5d951598a5c47401625",
+          "rust_sha256": "f2968e0b927dc78c9666443316f930d62a82157b0fd2f4a04246179412a021eb"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/plainJSGrammarErrors.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 1187,
+          "rust_queries": 1187,
+          "accepted": false,
+          "native_sha256": "d91ccf7c5938535dd9792f4395d84ef68045c0455a6a1f9e004c03c9afe057d1",
+          "rust_sha256": "650b50d22e887fe716e736b650108b19cde564487bfff2dc7447a5a93d6e515a"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 101,
+          "rust_diagnostics": 100,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "ba7d73469885c3b7194ce22320cc5c079175bf5631d5abb7efa9f566b974f226",
+          "rust_sha256": "e9e220c369aded152e1a1d778dd8fbffd35aa23ee86fe18de5dea87c02e2c38c"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 334,
+          "rust_queries": 334,
+          "accepted": false,
+          "native_sha256": "fd104e87326a3b8ec04771e64262463694d7e5abcdf905eddf3190e945762aa6",
+          "rust_sha256": "f999ead7193e9ee8e226a4e582481d6f7b4b2dff2ae8791bd91f2bf7e5b8a73d"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/plainJSGrammarErrors3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 18,
+          "rust_queries": 18,
+          "accepted": false,
+          "native_sha256": "4e9f7a8fa5e4112fb50b90fe16e4190cbfdf548e0646035162efdb731ed497ec",
+          "rust_sha256": "bdd215d202fd1a5d248c513514d86d9ad3f7219cc388f2889a4b1e12db3d9001"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 5,
+          "rust_queries": 5,
+          "accepted": false,
+          "native_sha256": "2faa76ad7b26cc5d3a9d2c2184124d90754e5efeea6cd835ba31c864458f5fff",
+          "rust_sha256": "c2a4709c7515f244d7b992eb6b20d314ea967b745e4f99ad1416e8091a194ea6"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/plainJSRedeclare2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 35,
+          "rust_queries": 35,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 3,
+          "rust_diagnostics": 3,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "7c7fede8ecee95f03d155c68a8738abd641fcba436cb80959a34f8c3e82dcdd5",
+          "rust_sha256": "002245826e7cb695bb528de1ff47ce32c55b9a5f03eaec1650ef6e856210840f"
+        },
+        "type_to_string_parity": {
+          "state": "match",
+          "native_queries": 10,
+          "rust_queries": 10,
+          "accepted": true
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/prototypePropertyAssignmentMergeAcrossFiles2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 135,
+          "rust_queries": 135,
+          "accepted": false,
+          "native_sha256": "d0cb373afd7a57b0c5f44fcd521cba5bf059b2c370f383c26dcbecd744c814ff",
+          "rust_sha256": "0dd5b5185ceb6773374890b2668b22e242a0b2677cd634201806c7c6592a585f"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 37,
+          "rust_queries": 37,
+          "accepted": false,
+          "native_sha256": "d1890adc3c732063f05c62f244775e7152b7614f3d1cee54bb7c8c23329a61bc",
+          "rust_sha256": "3abb25684856edf8d1a25f6e387103a7740e668a95fd511338c325fee017a3c9"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromContextualThisType.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 104,
+          "rust_queries": 104,
+          "accepted": false,
+          "native_sha256": "c9808b027db9a31861c3bebfed0f1ba20585d8bd00966ba1f7629f7cb3b1c2ad",
+          "rust_sha256": "e0e339bc721115f4964defb0f8b70ffa654a130469f155ac3f4ed2ac0aeec49c"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 28,
+          "rust_queries": 28,
+          "accepted": false,
+          "native_sha256": "c3c56aed1220dda1064de8374a2e5c7de5f129455e4d0ca0485be6a1d92a6e3a",
+          "rust_sha256": "3a049450fda35124ea096cf00462e292fa7a1c380ebec851fdfa99980632d560"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromParamTagForFunction.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 436,
+          "rust_queries": 436,
+          "accepted": false,
+          "native_sha256": "2ecc16b1c6ee8bd7ea89cc771fd24a5974c7560bb9a525a86659cfbaf884d905",
+          "rust_sha256": "7a319e35f174e1f033c6997195e7fe46471ca804c00d1557aa30b333cf5e0f40"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 10,
+          "rust_diagnostics": 10,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 122,
+          "rust_queries": 122,
+          "accepted": false,
+          "native_sha256": "36c041baa7482915f054a7d701da94587dc5f6c6afb002d4f1c2f547667506f7",
+          "rust_sha256": "989b7a9f757aef25cf62636f26604277bcb4765a3604312b500439ab1d1de75e"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 85,
+          "rust_queries": 85,
+          "accepted": false,
+          "native_sha256": "8a999ac363103ea827f7448be769c4f479bab1ecfd4fa213648e6abe4c31cdf8",
+          "rust_sha256": "9fc33e4865949ecaff54f7ae5f3f94bbbf2bd0265900a6dba3444398fda89a6f"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 23,
+          "rust_queries": 23,
+          "accepted": false,
+          "native_sha256": "a1d0c6ec291e4f844a9e898321edfb5570dabe10976df2fdc0ad60624c77b09d",
+          "rust_sha256": "3b7c3dc1acdb2b15d7bac5acc8bca35ca69a3531c7430805cecc4e9eebef563c"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment10.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 369,
+          "rust_queries": 369,
+          "accepted": false,
+          "native_sha256": "f7a60d79f47ef0df399c0a9572cf848b34f544949be2391edb01373611d98e7b",
+          "rust_sha256": "0772eff3957513c4dca384682b58893a9a3379557f32064d0b4a663a7830a406"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 112,
+          "rust_queries": 112,
+          "accepted": false,
+          "native_sha256": "103e775ea795729f24cff6e3291404e4d25b599d1c87b9d9ae9c38e595cf36c8",
+          "rust_sha256": "960a8f5a89b9b6b861dd29b27b287fab181f6f6df7c1556d12abd89d9d15fcf0"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment10_1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 369,
+          "rust_queries": 369,
+          "accepted": false,
+          "native_sha256": "3e3f1faeb85b8016d8e697dab3c15c02660da403e409e2a42f90e472a411196e",
+          "rust_sha256": "6f82700bd64e7a6f4062bba18b4a03a4846512192b8587f3f51a38c6afeec390"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 112,
+          "rust_queries": 112,
+          "accepted": false,
+          "native_sha256": "103e775ea795729f24cff6e3291404e4d25b599d1c87b9d9ae9c38e595cf36c8",
+          "rust_sha256": "960a8f5a89b9b6b861dd29b27b287fab181f6f6df7c1556d12abd89d9d15fcf0"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment14.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 123,
+          "rust_queries": 123,
+          "accepted": false,
+          "native_sha256": "190040c42e8e28646c75359dc4aae52b90097e0f2c345eeb0ce8d64c75a9ee9f",
+          "rust_sha256": "d559db1dbaf18c9a1044e8d8e96e6f403dc7b76752fe89a48b1023569dbd6521"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 37,
+          "rust_queries": 37,
+          "accepted": false,
+          "native_sha256": "27ed2f357d2f2866bb8c2227b61bdc5c506b44f1405e6a9cb98167dab00b412f",
+          "rust_sha256": "b8f42b9670029ee0d990b9acb045b23585c91a57a716cb5ff4315be5547cd66b"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment15.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 120,
+          "rust_queries": 120,
+          "accepted": false,
+          "native_sha256": "0669775626a3c3a74c86e558eb0f8ba9360afe13dc6a3cbe1d4cd260a2a9e8ef",
+          "rust_sha256": "3d9dc27807f11742cb4f710e548cdf85b4087223a8128a587658e48d55838457"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 33,
+          "rust_queries": 33,
+          "accepted": false,
+          "native_sha256": "0840c1689926c0ec4ae73976a21d35d1d10e68f188f6021a35ec24341cd882f4",
+          "rust_sha256": "25361ad2dad6fa50794dbf0115153e7b40372b8b8dd8b14bf9d53113bac375e4"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment16.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 131,
+          "rust_queries": 131,
+          "accepted": false,
+          "native_sha256": "9e347e1bdd4b5bd2eb903e058a1578e86680e4ec4ec4c0d0eed23f76a0b2f9d0",
+          "rust_sha256": "48d8394f7ad40f6babfe518a5941d51ccdffaf75f890d2d464e672878861732c"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 37,
+          "rust_queries": 37,
+          "accepted": false,
+          "native_sha256": "177216ba34f0383d89e952dc50bb54bc4149c88382d109dcf4912dba558005d8",
+          "rust_sha256": "e89a7392b9776a5e8bea3d2c4b2c15e902e1be09706ec7f779f666729c9ffb10"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 87,
+          "rust_queries": 87,
+          "accepted": false,
+          "native_sha256": "62352a30db6c6064995774e3a87df28c2b123c437b85b675fa43411a2a740645",
+          "rust_sha256": "6f9fe0926cd2895a6634143c25d859b5ad997b23a0f37b0fb9a56dc4921d86d1"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 25,
+          "rust_queries": 25,
+          "accepted": false,
+          "native_sha256": "6964adf747252fc9e406fa1ff584257bf89fadebc741c48123675d4b3bca0947",
+          "rust_sha256": "5f885ac2146c2668324c7f33e8a68c27a5d1e0e10341289ee61e7ca3e579c51c"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment24.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 101,
+          "rust_queries": 101,
+          "accepted": false,
+          "native_sha256": "842727eda6ca0c7a4d1553724252bf745272c9fbf9716c88ab9462877ae6a955",
+          "rust_sha256": "084eae38700086cbcb213692afed7b4e9d00cb9c25303da1cce1657626589259"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 28,
+          "rust_queries": 28,
+          "accepted": false,
+          "native_sha256": "5ca08cae77f3853c3b21a9e923e7d1ab4b534ad2bd7c6a4905e05ef6b5286086",
+          "rust_sha256": "af643d9adc287f2677252ae6fd6227ab476ea47c77d54db831deb926f66cfdc3"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 94,
+          "rust_queries": 94,
+          "accepted": false,
+          "native_sha256": "1ccd625e9f587c120232d7845b8e06e7fb607371c914a14326be08a92fcf8472",
+          "rust_sha256": "ca97ec44147e972ff057471f097d33ec7d909baad18db4b38059cc68065e9b66"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 27,
+          "rust_queries": 27,
+          "accepted": false,
+          "native_sha256": "f8ad8994dfb2a0ded88ad0f13c605d78eb57138061080eb4bc9da7fd82177941",
+          "rust_sha256": "0338d851d4583603e045d7ce9fb81850df402c5006766fac589054730756a08f"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment35.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 112,
+          "rust_queries": 112,
+          "accepted": false,
+          "native_sha256": "1559f29125f0d3512b15590db775a8b818e2d7eddccf92cd8a4740d8006e86a6",
+          "rust_sha256": "334d3cb5c60fffcb0cb2849041cd4bad97bedf81aae13474f254aa6087f88588"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 33,
+          "rust_queries": 33,
+          "accepted": false,
+          "native_sha256": "5b143c6affc6ebcb750b47dbdb9b34ed7ae476e7fde2d55a552fc71e07715ccf",
+          "rust_sha256": "bed912e1b5b4f5a1b7dba34767c7c135790104396a777161944c40981237a70f"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment4.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 123,
+          "rust_queries": 123,
+          "accepted": false,
+          "native_sha256": "b78ba9928ce6627540ff25a8601c64654481f58b434ef6a21a62c4c8fee77150",
+          "rust_sha256": "dd2ecd9c22abcf83579ca27e06ecddbbbf3157f8ee152f280f4b876cc7bac78f"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 2,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 36,
+          "rust_queries": 36,
+          "accepted": false,
+          "native_sha256": "cc07ef9f77fd20b1160d4e0e5b27357d24e6c075f4f5f96d4359da08e5703b55",
+          "rust_sha256": "a453fb4d36e8304ae381fc23f73f285a3bbb753eb429bc9d1f63166fafda4b95"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPropertyAssignment40.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 41,
+          "rust_queries": 41,
+          "accepted": false,
+          "native_sha256": "cf8f24b07957c9e76b0f3c4b457074ee1bd9b72780b6e626483868ded9801491",
+          "rust_sha256": "1a6922870351c4be91041699b21fc6be5bbc8a5b0d9ce1b6d766d1d377a07d3b"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 1,
+          "rust_diagnostics": 1,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 12,
+          "rust_queries": 12,
+          "accepted": false,
+          "native_sha256": "7511fbf28ab5f69f28021bac506a2f20ed0061d45e605d341e5955654a0d8a58",
+          "rust_sha256": "b5b176a76fdf78e8d7819066d7846f241f7964de24b407d12427fa4a78014d2e"
+        }
+      }
+    },
+    {
+      "id": "conformance/salsa/typeFromPrototypeAssignment3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 99,
+          "rust_queries": 99,
+          "accepted": false,
+          "native_sha256": "766689762ddbb9d037107bd354126b809aeb17b02b05af788c7554eb1e761f66",
+          "rust_sha256": "5fe08c580a174b95c5fb137d1f155f2d367e3b92b13bc33c3d30b3c9b8b2fcfd"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 4,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 29,
+          "rust_queries": 29,
+          "accepted": false,
+          "native_sha256": "2812d560172e17fb14a70ca95f99bee45184ef94e293fca034cdda69c8fc1444",
+          "rust_sha256": "67f30bb4307ff080b28af0218d8bfb1c9b7cd4b48bd0ca9814c8926d499d1b30"
+        }
+      }
+    }
+  ]
+}

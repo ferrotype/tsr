@@ -402,6 +402,12 @@ impl CheckerState {
                 None
             };
             let Some(index) = index else {
+                let left_symbol = self.types.get(left_type)?.symbol;
+                let unchecked_js =
+                    self.is_unchecked_js_suggestion(Some(node), left_symbol, true)?;
+                if !unchecked_js && self.is_js_literal_type(left_type)? {
+                    return Ok(self.builtins.any_type);
+                }
                 if self.types.get(left_type)?.symbol == Some(self.builtins.global_this_symbol) {
                     let exports = self.symbol(self.builtins.global_this_symbol)?.exports();
                     let global = self.member_symbol(exports, name.as_bytes())?;
@@ -433,9 +439,6 @@ impl CheckerState {
                     return Ok(self.builtins.any_type);
                 }
                 if !name.as_bytes().is_empty() {
-                    let left_symbol = self.types.get(left_type)?.symbol;
-                    let unchecked_js =
-                        self.is_unchecked_js_suggestion(Some(node), left_symbol, true)?;
                     self.defer_missing_property_ex(
                         right,
                         if this { apparent } else { left_type },

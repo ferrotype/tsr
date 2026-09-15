@@ -827,6 +827,9 @@ impl CheckerState {
             if self.types.flags(index)? & tf::NEVER != 0 {
                 return Ok(Some(self.builtins.never_type));
             }
+            if self.is_js_literal_type(object)? {
+                return Ok(Some(self.builtins.any_type));
+            }
         }
         if let Some(expression) = expression {
             let constant_enum = self
@@ -860,6 +863,9 @@ impl CheckerState {
             && self.types.get(object)?.object_flags & of::OBJECT_LITERAL != 0
         {
             return Ok(Some(self.builtins.undefined_type));
+        }
+        if self.is_js_literal_type(object)? {
+            return Ok(Some(self.builtins.any_type));
         }
         if let Some(node) = self.index_access_node(node)? {
             let object_text = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;

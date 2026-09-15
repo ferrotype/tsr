@@ -499,6 +499,9 @@ impl CheckerState {
             self.get_symbol_of_declaration(node)?,
             "variable/property symbol",
         )?;
+        if self.check_require_alias_declaration(node, symbol)? {
+            return Ok(());
+        }
         let target = self.get_type_of_symbol(symbol)?;
         let target = self.auto_to_any(target)?;
         if self.symbol(symbol)?.value_declaration() != Some(node) {

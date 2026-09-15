@@ -270,7 +270,6 @@ impl CheckerState {
         );
         let read = self.symbol(symbol)?;
         let flags = read.flags();
-        let exports = read.exports();
         if flags & sf::CLASS != 0 {
             return self.resolve_class_static_members(ty, symbol);
         }
@@ -283,7 +282,9 @@ impl CheckerState {
         let members = if flags & sf::TYPE_LITERAL != 0 {
             self.members_of_symbol(symbol)?
         } else {
-            exports
+            // Function expandos may be keyed by a const string or unique
+            // symbol. Resolve their late exports before publishing members.
+            self.module_exports_of_symbol(symbol)?
         };
         if flags & (sf::TYPE_LITERAL | sf::FUNCTION | sf::METHOD) == 0 {
             return Err(Error::Unsupported(

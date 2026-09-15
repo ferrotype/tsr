@@ -17,6 +17,44 @@ struct ObjectChunk {
     flags: u32,
 }
 impl CheckerState {
+    // port: tsc/internal/checker/utilities.go:Checker.isJSLiteralType
+    pub(crate) fn is_js_literal_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+        if self.program.as_ref().is_some_and(|program| {
+            let options = program.host.options();
+            options.strict_option_value(options.no_implicit_any)
+        }) {
+            return Ok(false);
+        }
+        let record = self.types.get(ty)?;
+        if record.object_flags & of::JS_LITERAL != 0 {
+            return Ok(true);
+        }
+        let flags = record.flags;
+        if flags & tf::UNION != 0 {
+            for index in 0..self.types.compound_types(ty)?.len() {
+                let part = self.types.compound_types(ty)?[index];
+                if !self.is_js_literal_type(part)? {
+                    return Ok(false);
+                }
+            }
+            return Ok(true);
+        }
+        if flags & tf::INTERSECTION != 0 {
+            for index in 0..self.types.compound_types(ty)?.len() {
+                let part = self.types.compound_types(ty)?[index];
+                if self.is_js_literal_type(part)? {
+                    return Ok(true);
+                }
+            }
+            return Ok(false);
+        }
+        if flags & tf::INSTANTIABLE != 0 {
+            let constraint = self.resolved_base_constraint(ty, &mut Vec::new())?;
+            return Ok(constraint != ty && self.is_js_literal_type(constraint)?);
+        }
+        Ok(false)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkObjectLiteral
     pub(crate) fn check_object_literal(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let properties = self.source_list(node, self.ast(node)?.node(node)?.property_list())?;
