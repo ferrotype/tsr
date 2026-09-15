@@ -62,7 +62,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarHeritageClause
-    fn check_heritage_clause_grammar(&mut self, clause: NodeId) -> Result<bool, Error> {
+    pub(crate) fn check_heritage_clause_grammar(&mut self, clause: NodeId) -> Result<bool, Error> {
         let read = self.ast(clause)?.node(clause)?;
         let data = read
             .data_source()

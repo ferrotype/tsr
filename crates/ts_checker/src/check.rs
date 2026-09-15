@@ -366,7 +366,11 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeAliasDeclaration
     // port: tsc/internal/checker/checker.go:Checker.checkInterfaceDeclaration
     fn check_type_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.check_grammar_modifiers(node)?;
+        if !self.check_grammar_modifiers(node)?
+            && self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration
+        {
+            self.check_interface_heritage_grammar(node)?;
+        }
         self.check_type_parameters(node)?;
         let read = self.ast(node)?.node(node)?;
         let interface = read.kind() == K::InterfaceDeclaration;
@@ -402,10 +406,13 @@ impl CheckerState {
         )?;
         self.check_exports_on_merged_declarations(node)?;
         if interface {
-            let ty = self.get_declared_type_of_symbol(symbol)?;
-            self.check_object_type_members(node)?;
-            self.resolve_type_members(ty)?;
-            self.check_source_index_constraints(ty, node)?;
+            self.check_interface_inheritance(name, symbol)?;
+            self.check_object_duplicate_declarations(node, false)?;
+            self.check_interface_heritage(node)?;
+            for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+                self.check_source_element(member)?;
+            }
+            self.check_class_or_interface_duplicate_indexes(node)?;
         } else {
             let annotation = required(
                 self.ast(node)?.node(node)?.type_node(),

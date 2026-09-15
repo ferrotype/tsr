@@ -52,7 +52,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveDeclaredMembers
-    fn resolve_declared_members(&mut self, ty: TypeId) -> Result<(), Error> {
+    pub(crate) fn resolve_declared_members(&mut self, ty: TypeId) -> Result<(), Error> {
         if self.types.interface(ty)?.declared_members_resolved {
             return Ok(());
         }

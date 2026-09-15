@@ -113,7 +113,6 @@ impl CheckerState {
             .as_interface_declaration()
             .ok_or(Error::MissingLink("interface payload"))?
             .heritage_clauses();
-        let mut result = Vec::new();
         for clause in self.source_list(node, clauses)? {
             let read = self.ast(clause)?.node(clause)?;
             let clause_data = read
@@ -121,10 +120,12 @@ impl CheckerState {
                 .as_heritage_clause()
                 .ok_or(Error::MissingLink("heritage clause"))?;
             if clause_data.token() == K::ExtendsKeyword {
-                result.extend(self.source_list(clause, clause_data.types())?);
+                // GetExtendsHeritageClauseElements selects only the first
+                // clause. A later clause is a grammar error, not another base.
+                return self.source_list(clause, clause_data.types());
             }
         }
-        Ok(result)
+        Ok(Vec::new())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isThislessInterface

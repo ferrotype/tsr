@@ -114,7 +114,12 @@ impl CheckerState {
             .symbol
             .ok_or(Error::MissingLink("interface symbol"))?;
         if self.symbol(symbol)?.flags() & sf::CLASS != 0 {
-            return self.resolve_class_base_types(ty);
+            self.resolve_class_base_types(ty)?;
+        }
+        // A declaration-merged symbol can carry both flags. The class base
+        // precedes the interface bases; neither resolution excludes the other.
+        if self.symbol(symbol)?.flags() & sf::INTERFACE == 0 {
+            return Ok(());
         }
         for node in self
             .symbol_declarations(symbol)?
@@ -224,11 +229,25 @@ impl CheckerState {
         this: TypeId,
         need_apparent: bool,
     ) -> Result<TypeId, Error> {
+        self.get_type_with_optional_this_argument(ty, Some(this), need_apparent)
+    }
+
+    /// A missing argument selects the reference target's own polymorphic this
+    /// type. Thisless interfaces do not become references just for this check.
+    pub(crate) fn get_type_with_optional_this_argument(
+        &mut self,
+        ty: TypeId,
+        this: Option<TypeId>,
+        need_apparent: bool,
+    ) -> Result<TypeId, Error> {
         if self.types.get(ty)?.object_flags & of::REFERENCE != 0 {
             let target = self.types.target(ty)?;
             let arguments = self.get_type_arguments(ty)?;
             if self.types.interface(target)?.type_parameters().len() == arguments.len() {
                 let mut arguments = arguments.to_vec();
+                let this = this
+                    .or(self.types.interface(target)?.this_type)
+                    .ok_or(Error::MissingLink("reference target this type"))?;
                 arguments.push(this);
                 return self.create_type_reference(target, &arguments);
             }
@@ -238,7 +257,11 @@ impl CheckerState {
             let parts = self.types.compound_types(ty)?.clone();
             let mut mapped = Vec::with_capacity(parts.len());
             for &part in parts.iter() {
-                mapped.push(self.get_type_with_this_argument(part, this, need_apparent)?);
+                mapped.push(self.get_type_with_optional_this_argument(
+                    part,
+                    this,
+                    need_apparent,
+                )?);
             }
             return if mapped == parts.as_ref() {
                 Ok(ty)

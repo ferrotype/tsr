@@ -3255,3 +3255,95 @@ fn private_member_self_type_access_matches_native_program_diagnostics() {
         serde_json::Value::Array(mismatches)
     );
 }
+
+#[test]
+fn interface_inheritance_matches_native_diagnostic_chains() {
+    fn payload(program: &Program, d: &ts_ast::Diagnostic) -> serde_json::Value {
+        let file = d.file.map(|id| {
+            let file = program
+                .files()
+                .iter()
+                .find(|file| file.source() == id)
+                .unwrap();
+            String::from_utf8(
+                file.bound()
+                    .view()
+                    .source_file()
+                    .unwrap()
+                    .file_name()
+                    .to_vec(),
+            )
+            .unwrap()
+        });
+        let args = if d.message_args.is_empty() {
+            serde_json::Value::Null
+        } else {
+            serde_json::json!(d
+                .message_args
+                .iter()
+                .map(|a| String::from_utf8(a.as_bytes().to_vec()).unwrap())
+                .collect::<Vec<_>>())
+        };
+        serde_json::json!({
+            "file": file, "pos": d.loc.pos(), "end": d.loc.end(),
+            "code": d.code, "category": d.category, "args": args,
+            "chain": d.message_chain.iter().map(|d| payload(program, d)).collect::<Vec<_>>(),
+            "related": d.related_information.iter().map(|d| payload(program, d)).collect::<Vec<_>>(),
+            "unnecessary": d.reports_unnecessary, "skipped_on_no_emit": d.skipped_on_no_emit,
+        })
+    }
+
+    let requests: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/interface-inheritance/requests.json"
+    ))
+    .unwrap();
+    let native: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/interface-inheritance/observations.json"
+    ))
+    .unwrap();
+    let requests = requests["programs"].as_array().unwrap();
+    let observations = native["programs"].as_array().unwrap();
+    assert_eq!(requests.len(), observations.len());
+    let mut mismatches = Vec::new();
+    for (spec, expected) in requests.iter().zip(observations) {
+        assert_eq!(spec["id"], expected["id"]);
+        let (owner, program, _) = fixture(
+            spec["files"]["/main.ts"].as_str().unwrap().as_bytes(),
+            options(),
+        );
+        let file = program.file(b"/main.ts").unwrap();
+        let syntactic = program.syntactic_diagnostics(Some(file)).unwrap();
+        assert_eq!(
+            serde_json::json!(syntactic
+                .iter()
+                .map(|d| payload(&program, d))
+                .collect::<Vec<_>>()),
+            expected["syntactic"],
+            "{} syntactic",
+            spec["id"]
+        );
+        let mut op = owner.operation().unwrap();
+        // The repeat exercises the once-per-merged-symbol check and cached file
+        // diagnostics without discarding full chains, locations or related info.
+        for attempt in 0..2 {
+            match program.semantic_diagnostics_with_checker(&mut op, file) {
+                Ok(diagnostics) => {
+                    let actual = serde_json::json!(diagnostics
+                        .iter()
+                        .map(|d| payload(&program, d))
+                        .collect::<Vec<_>>());
+                    if actual != expected["semantic"] {
+                        mismatches.push(serde_json::json!({"id": spec["id"], "attempt": attempt, "rust": actual, "native": expected["semantic"]}));
+                    }
+                }
+                Err(error) => mismatches
+                    .push(serde_json::json!({"id": spec["id"], "error": format!("{error:?}")})),
+            }
+        }
+    }
+    assert!(
+        mismatches.is_empty(),
+        "{:#}",
+        serde_json::Value::Array(mismatches)
+    );
+}

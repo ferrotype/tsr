@@ -36,6 +36,9 @@ pub(crate) struct QueryState {
     pub source_signatures: LinkStore<NodeId, Option<crate::SignatureId>>,
     pub apparent_types: crate::types::Map<TypeId, TypeId>,
     pub type_parameters_checked: crate::types::Set<SymbolId>,
+    /// `declaredTypeLinks.interfaceChecked` and `indexSignaturesChecked`.
+    pub interfaces_checked: crate::types::Set<SymbolId>,
+    pub index_signatures_checked: crate::types::Set<SymbolId>,
     pub index_constraints_checked: crate::types::Set<TypeId>,
     pub accessor_pairs_checked: crate::types::Set<NodeId>,
     pub context_free_types: crate::types::Map<NodeId, TypeId>,

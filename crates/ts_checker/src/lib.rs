@@ -61,6 +61,7 @@ mod check;
 mod check_bodies;
 mod check_generics;
 mod check_indexes;
+mod check_interfaces;
 mod check_statements;
 mod check_type_syntax;
 mod class_accessibility;

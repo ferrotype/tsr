@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "scope": "Development comparison of the frozen 130-variant interface selection; no full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "f3d539156384f4a1a5cbf58063e36fdca98bd0ee4bf55dd66632ad318f57b18d",
+  "candidate_capture_sha256": "1616f2e664bbce213fce452efcadbee798dfa10a17564b7f65fd287618f90ecd",
+  "candidate_sources_sha256": "c07a5e2d8f066760ce109f5f644e8c460a84db1bfd5ed13d005daddc2462720c",
+  "selection_sha256": "bad5e812d57c30844ec09038d13d6ff47ecaf8126b7c43ea4b3acdbe8573ce3c",
+  "source_stable": true,
+  "counts_before": {
+    "types_parity": {
+      "match": 127,
+      "different": 3
+    },
+    "errors_parity": {
+      "different": 37,
+      "match": 93
+    },
+    "type_to_string_parity": {
+      "match": 129,
+      "different": 1
+    }
+  },
+  "counts_after": {
+    "types_parity": {
+      "match": 129,
+      "different": 1
+    },
+    "errors_parity": {
+      "match": 129,
+      "different": 1
+    },
+    "type_to_string_parity": {
+      "match": 129,
+      "different": 1
+    }
+  },
+  "changes": {
+    "types_parity": {
+      "improved": [
+        "compiler/derivedInterfaceCallSignature.ts#configuration=0",
+        "compiler/interfaceMayNotBeExtendedWitACall.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "errors_parity": {
+      "improved": [
+        "compiler/addMoreOverloadsToBaseSignature.ts#configuration=0",
+        "compiler/baseTypePrivateMemberClash.ts#configuration=0",
+        "compiler/conflictingMemberTypesInBases.ts#configuration=0",
+        "compiler/derivedInterfaceCallSignature.ts#configuration=0",
+        "compiler/derivedTypeIncompatibleSignatures.ts#configuration=0",
+        "compiler/inheritSameNamePrivatePropertiesFromDifferentOrigins.ts#configuration=0",
+        "compiler/inheritSameNamePropertiesWithDifferentOptionality.ts#configuration=0",
+        "compiler/inheritSameNamePropertiesWithDifferentVisibility.ts#configuration=0",
+        "compiler/inheritedStringIndexersFromDifferentBaseTypes.ts#configuration=0",
+        "compiler/interfaceDeclaration1.ts#configuration=0",
+        "compiler/interfaceDeclaration3.ts#configuration=0",
+        "compiler/interfaceDeclaration4.ts#configuration=0",
+        "compiler/interfaceDeclaration6.ts#configuration=0",
+        "compiler/interfaceImplementation7.ts#configuration=0",
+        "compiler/interfaceMayNotBeExtendedWitACall.ts#configuration=0",
+        "compiler/interfaceMemberValidation.ts#configuration=0",
+        "compiler/interfacePropertiesWithSameName2.ts#configuration=0",
+        "compiler/interfacePropertiesWithSameName3.ts#configuration=0",
+        "compiler/interfaceWithImplements1.ts#configuration=0",
+        "compiler/overloadOnConstInheritance2.ts#configuration=0",
+        "conformance/es6/Symbols/symbolProperty35.ts#configuration=0",
+        "conformance/interfaces/declarationMerging/mergedInheritedMembersSatisfyAbstractBase.ts#configuration=0",
+        "conformance/interfaces/declarationMerging/mergedInterfacesWithInheritedPrivates3.ts#configuration=0",
+        "conformance/interfaces/interfaceDeclarations/interfaceExtendingOptionalChain.ts#configuration=0",
+        "conformance/interfaces/interfaceDeclarations/interfaceThatHidesBaseProperty2.ts#configuration=0",
+        "conformance/interfaces/interfaceDeclarations/interfaceWithMultipleBaseTypes2.ts#configuration=0",
+        "conformance/interfaces/interfacesExtendingClasses/interfaceExtendingClassWithPrivates.ts#configuration=0",
+        "conformance/interfaces/interfacesExtendingClasses/interfaceExtendingClassWithPrivates2.ts#configuration=0",
+        "conformance/interfaces/interfacesExtendingClasses/interfaceExtendingClassWithProtecteds.ts#configuration=0",
+        "conformance/interfaces/interfacesExtendingClasses/interfaceExtendingClassWithProtecteds2.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithCallSignaturesWithOptionalParameters.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithCallSignaturesWithRestParameters.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithConstructSignaturesWithOptionalParameters.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithObjectMembers2.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithObjectMembers3.ts#configuration=0",
+        "conformance/types/typeRelationships/subtypesAndSuperTypes/subtypingWithObjectMembersOptionality2.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "type_to_string_parity": {
+      "improved": [],
+      "regressed": []
+    }
+  },
+  "remaining": [
+    {
+      "id": "compiler/interfaceClassMerging.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 239,
+          "rust_queries": 239,
+          "accepted": false,
+          "native_sha256": "b1c6d1f7ae30a4f145e671923668e30eff01789122a7dff450e0dbbe4043b821",
+          "rust_sha256": "02af6cacef5d2fb82a01f61908faf073261f318ba555f27954af193a234ca8a1"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 5,
+          "rust_diagnostics": 4,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "ddce931477bb2529b3e194c004f1e4736afd53d2c035218fe9dad2b4df460ad6",
+          "rust_sha256": "c3a32f07552b61f9159b8c9ec2bf2d23046e3c20bc73e0fedee2986069b9ef94"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 62,
+          "rust_queries": 62,
+          "accepted": false,
+          "native_sha256": "0407a9b52df31d2722a469665d22eed896cb7f691a186e72933e6192f382507e",
+          "rust_sha256": "467a24e8eb247f26743f8594655d9f72935d63dfafa7e612aba4d7fb3503ea45"
+        }
+      }
+    }
+  ]
+}

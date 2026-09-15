@@ -18,13 +18,13 @@ impl CheckerState {
             return Ok(());
         }
         self.check_index_constraints(ty)?;
-        self.check_duplicate_index_signatures(declaration)?;
+        self.check_class_or_interface_duplicate_indexes(declaration)?;
         self.query.index_constraints_checked.insert(ty);
         Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkIndexConstraints
-    fn check_index_constraints(&mut self, ty: TypeId) -> Result<(), Error> {
+    pub(crate) fn check_index_constraints(&mut self, ty: TypeId) -> Result<(), Error> {
         let indexes = self.index_infos_of_type(ty)?;
         if indexes.is_empty() {
             return Ok(());
@@ -217,6 +217,24 @@ impl CheckerState {
             }
         }
         Ok(None)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkClassOrInterfaceForDuplicateIndexSignatures
+    pub(crate) fn check_class_or_interface_duplicate_indexes(
+        &mut self,
+        node: NodeId,
+    ) -> Result<(), Error> {
+        let symbol = self
+            .get_symbol_of_declaration(node)?
+            .ok_or(Error::MissingLink("index owner symbol"))?;
+        if !self.query.index_signatures_checked.insert(symbol) {
+            return Ok(());
+        }
+        let result = self.check_duplicate_index_signatures(node);
+        if result.is_err() {
+            self.query.index_signatures_checked.remove(&symbol);
+        }
+        result
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeForDuplicateIndexSignatures
