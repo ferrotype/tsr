@@ -331,16 +331,18 @@ impl CheckerState {
         }
     }
 
+    /// Property access passes the receiver's resolved symbol as `parent`;
+    /// element access passes the apparent object type's symbol.
     // port: tsc/internal/checker/checker.go:Checker.markPropertyAsReferenced
     pub(crate) fn mark_access_property_referenced(
         &mut self,
         property: SymbolId,
         node: NodeId,
         left: NodeId,
+        parent: Option<SymbolId>,
     ) -> Result<(), Error> {
         // port: tsc/internal/checker/checker.go:Checker.isSelfTypeAccess
         let view = self.ast(left)?;
-        let parent = self.query.resolved_symbols.try_get(left).copied().flatten();
         let self_access = view.node(left)?.kind() == K::ThisKeyword
             || match parent {
                 Some(parent) if is_entity_name_expression(view, left)? => {
@@ -393,7 +395,8 @@ impl CheckerState {
             let mut current = node;
             while let Some(node) = current {
                 let read = self.ast(node)?.node(node)?;
-                if ts_ast::utilities::is_function_like(Some(&read)) {
+                // FindAncestor(node, IsFunctionLikeDeclaration): signatures and function types pass.
+                if ts_ast::utilities::is_function_like_declaration(Some(&read)) {
                     if self.get_symbol_of_declaration(node)? == Some(property) {
                         return Ok(());
                     }

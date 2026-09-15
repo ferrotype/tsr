@@ -676,7 +676,8 @@ impl CheckerState {
                         .node(expression)?
                         .expression()
                         .ok_or(Error::MissingLink("indexed receiver"))?;
-                    self.mark_access_property_referenced(symbol, expression, left)?;
+                    let parent = self.types.get(object)?.symbol;
+                    self.mark_access_property_referenced(symbol, expression, left, parent)?;
                     let assignment = self.assignment_target_kind(expression)?;
                     if self.assignment_to_readonly_property(expression, symbol, assignment)? {
                         let name = self.symbol_to_string(symbol)?;

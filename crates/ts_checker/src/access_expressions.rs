@@ -363,7 +363,8 @@ impl CheckerState {
         };
         let ty = if let Some(property) = property {
             self.check_property_use_before_declaration(property, node, right)?;
-            self.mark_access_property_referenced(property, node, left)?;
+            let parent = self.query.resolved_symbols.try_get(left).copied().flatten();
+            self.mark_access_property_referenced(property, node, left, parent)?;
             *self.query.resolved_symbols.get_or_default(node) = Some(property);
             self.check_access_property_accessibility(
                 node,

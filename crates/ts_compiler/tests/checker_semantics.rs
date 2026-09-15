@@ -3191,3 +3191,67 @@ fn destructuring_assignment_accessibility_errors_use_the_property_name_like_nati
         ]
     );
 }
+
+#[test]
+fn private_member_self_type_access_matches_native_program_diagnostics() {
+    // Focused native witness (data/s08/p6/element-self-access): element access
+    // passes the apparent object type's symbol to isSelfTypeAccess, property
+    // access passes the receiver's resolved symbol.
+    let request: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/element-self-access/requests.json"
+    ))
+    .unwrap();
+    let native: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../data/s08/p6/element-self-access/observations.json"
+    ))
+    .unwrap();
+    let programs = request["programs"].as_array().unwrap();
+    let observations = native["programs"].as_array().unwrap();
+    assert_eq!(programs.len(), observations.len());
+    let mut mismatches = Vec::new();
+    for (spec, native) in programs.iter().zip(observations) {
+        assert_eq!(spec["id"], native["id"]);
+        let (owner, program, _) = fixture(
+            spec["files"]["/main.ts"].as_str().unwrap().as_bytes(),
+            CompilerOptions {
+                no_unused_locals: Tristate::TRUE,
+                ..options()
+            },
+        );
+        let file = program.file(b"/main.ts").unwrap();
+        let mut op = owner.operation().unwrap();
+        let observed: Vec<_> = program
+            .semantic_diagnostics_with_checker(&mut op, file)
+            .unwrap()
+            .iter()
+            .map(|d| {
+                let args: Vec<_> = d
+                    .message_args
+                    .iter()
+                    .map(|arg| String::from_utf8(arg.as_bytes().to_vec()).unwrap())
+                    .collect();
+                serde_json::json!([d.code, d.loc.pos(), d.loc.end(), d.category, args])
+            })
+            .collect();
+        let expected: Vec<_> = native["semantic"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| {
+                let args = d["args"].as_array().cloned().unwrap_or_default();
+                serde_json::json!([d["code"], d["pos"], d["end"], d["category"], args])
+            })
+            .collect();
+        if observed != expected {
+            mismatches.push(serde_json::json!({
+                "id": spec["id"], "rust": observed, "native": expected
+            }));
+        }
+        assert!(native["syntactic"].as_array().unwrap().is_empty());
+    }
+    assert!(
+        mismatches.is_empty(),
+        "{:#}",
+        serde_json::Value::Array(mismatches)
+    );
+}
