@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "run_id": "e2",
+  "recorded_at": 1789505159,
+  "context": {
+    "revision": "adc2e51543532326fae2001e0c0570b9b0198380",
+    "source_sha256": "7d312146f92deb94d276ba55433b2cb95b35919ebe1edd364af1c04c1f023156",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "a419cd0eeda12b26254c05d95e83f88dfec3543b1d4e388fe3f6e6a2b8f7182c",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/divergences.toml": "b493505fbca126117391592d28305a7e76649e365d424cfac526cb44ed180019",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/operations.json": "68af4b9e0a35e7bd04d80256b82ecd05efc932c4e66c5a97902cf8ab9d1a9a2d",
+    "data/s07/subset-review.json": "4b3068701d584291dc7bdd90f02b9f286ef67bba5c82a1c11334ca96777f2e6d",
+    "data/s07/subset-rule.json": "e9ab68c99cb7c217667e53f506611eb8b41404a35e5a8ebca90ea7570693df23",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
+    "data/s08/baseline-requests.json": "b348aed7bd34fa8fdfe2c579204ed0340ed6887c7fd0e58f77f791d97ca11f89",
+    "data/s08/e2-obligations.json": "2282680e3ca21f3f24ec639db646c6e72c61487a5db444e9a1447d5ba9804a25",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_e2.py",
+    "producer"
+  ],
+  "target": "host",
+  "config": "S07 reviewed source-only denominator remains separately available; when target/s08/e2/corpus exists, replay complete current S08 E2 capture and obligations: exact type/symbol/error bytes and query schedule, post-walk public TypeToString, frozen comparator signs/permutations and foreign-owner rejection, native 512 KiB deep fixtures plus debug/release recursion/reentry tests; exact owner-approved divergence witnesses; informational cases never enter acceptance ratios; missing capture leaves correctness metrics unavailable; no implicit full corpus run",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\":{\"comparators\":true,\"divergences_approved\":true,\"eligible_variants\":10728,\"errors_parity\":1.0,\"frozen_subset\":true,\"recursion_fixtures\":true,\"type_to_string_parity\":1.0,\"types_parity\":1.0}}\n",
+  "stderr": "+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-sy5ucl29/s07-unmatched-prefix ./internal/testrunner -run ^TestS07SubsetExport$ -count=1 -timeout=15m\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ git ls-tree -r 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/baselines/reference/\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s07_program.py --requests /Users/cristian/git/ts-rust/target/s07-subset/review/loading-requests.candidate.json --output /Users/cristian/git/ts-rust/target/s07-subset/review/loading-observations.candidate.json\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-cyf3afet/s07-unmatched-prefix ./internal/compiler -run ^TestS07Programs$ -count=1\nsource package compiler\nsource package tsoptions\nsource package module\nsource package packagejson\nsource package tspath\nsource package core\nsource package bundled\nsource package collections\nsource package vfs/vfsmatch\nsource package vfs/internal\nsource package json\nsource package semver\nsource package ast\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ git ls-tree -r 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/baselines/reference/\n",
+  "stdout_sha256": "81566f70516d7049d8afba3047ae4d4aa469107d6e99c7732d43c686dbc03776",
+  "stderr_sha256": "9a9dca27f53dc9c5a94161319e7cd9e1ded0427c8a89aacf6a8a422c962f6340",
+  "valid_capture": true
+}
