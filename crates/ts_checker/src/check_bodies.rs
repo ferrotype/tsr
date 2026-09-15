@@ -1032,13 +1032,15 @@ impl CheckerState {
             }
         } else if kind != K::Constructor
             && self.program()?.host.options().no_implicit_returns == Tristate::TRUE
-            && !self.return_type_is_undefined_void_or_any(return_type)?
         {
-            self.error_at(
-                Some(node),
-                messages::Not_all_code_paths_return_a_value,
-                vec![],
-            )?;
+            let returned = self.unwrap_body_return_type(function, return_type)?;
+            if !self.return_type_is_undefined_void_or_any(returned)? {
+                self.error_at(
+                    Some(node),
+                    messages::Not_all_code_paths_return_a_value,
+                    vec![],
+                )?;
+            }
         }
         Ok(())
     }
@@ -1096,6 +1098,9 @@ impl CheckerState {
         } else {
             expression_type
         };
+        let expression = expression
+            .map(|expression| self.effective_expression_check_node(expression))
+            .transpose()?;
         let location =
             if self.ast(node)?.node(node)?.kind() == K::ReturnStatement && !in_conditional {
                 node

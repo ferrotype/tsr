@@ -307,11 +307,11 @@ impl CheckerState {
                 .ok_or(ts_arena::Error::InvalidGraph)?
                 .is_export_equals());
         }
-        if read.kind() == K::ExportSpecifier {
-            let name = read
-                .name()
-                .ok_or(Error::MissingLink("default export name"))?;
-            return Ok(self.ast(name)?.node_text(name)?.as_bytes() == b"default");
+        if matches!(
+            read.kind().known(),
+            Some(K::ExportSpecifier | K::NamespaceExport)
+        ) {
+            return Ok(true);
         }
         Ok(read.modifier_flags(self.ast(node)?)? & ts_ast::modifier_flags::DEFAULT != 0)
     }
@@ -323,6 +323,43 @@ impl CheckerState {
         dont_resolve_alias: bool,
     ) -> Result<Option<SymbolId>, Error> {
         let specifier = self.module_specifier(node)?;
+        if !self.shorthand_ambient_module(module)?
+            && (ModuleKind::NODE20..=ModuleKind::NODE_NEXT)
+                .contains(&self.program()?.host.options().emit_module_kind())
+        {
+            if let (Some(file), Some(specifier)) =
+                (self.module_source_declaration(module)?, specifier)
+            {
+                let (_, usage_file) = self.module_source(specifier)?;
+                let mode = self
+                    .program()?
+                    .host
+                    .get_emit_syntax_for_usage_location(usage_file.as_bytes(), specifier)?;
+                let file_name = self
+                    .ast(file)?
+                    .source_file(file)?
+                    .parse_options()
+                    .file_name
+                    .clone();
+                if mode == ModuleKind::COMMON_JS
+                    && self
+                        .program()?
+                        .host
+                        .get_implied_node_format_for_emit(file_name.as_bytes())?
+                        == ModuleKind::ESNEXT
+                {
+                    if let Some(export) = self.module_export_by_name(
+                        module,
+                        names::MODULE_EXPORTS,
+                        Some(node),
+                        dont_resolve_alias,
+                    )? {
+                        self.mark_module_alias_type_only(node, None)?;
+                        return Ok(Some(export));
+                    }
+                }
+            }
+        }
         let default =
             self.module_export_by_name(module, names::DEFAULT, Some(node), dont_resolve_alias)?;
         let Some(specifier) = specifier else {

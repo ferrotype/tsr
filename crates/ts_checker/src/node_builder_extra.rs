@@ -631,6 +631,45 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.addPropertyToElementList
+    // The property spelling is resolved in its declaration, but accessibility
+    // is checked in the declaration being emitted before changing that context.
+    fn track_late_property_name(&mut self, symbol: SymbolId) -> Result<(), Error> {
+        if !super::names::is_late_bound_name(self.checker.symbol(symbol)?.name_bytes()) {
+            return Ok(());
+        }
+        let declaration = self.checker.symbol_declarations(symbol)?.first().flatten();
+        let Some(declaration) = declaration else {
+            let name = self.checker.symbol_to_string(symbol)?;
+            self.report(
+                ts_printer::emit_resolver::DeclarationTrackerEvent::NonSerializableProperty(name),
+            );
+            return Ok(());
+        };
+        let Some(name) = self.checker.late_name(declaration)? else {
+            return Ok(());
+        };
+        if !self.reuse_late_bindable_name(name)? {
+            return Ok(());
+        }
+        let read = self.checker.ast(name)?.node(name)?;
+        if self.checker.ast(declaration)?.node(declaration)?.kind() == K::BinaryExpression {
+            if let Some(access) = read.data_source().as_element_access_expression() {
+                if let Some(argument) = access.argument_expression() {
+                    if ts_ast::is_property_access_entity_name_expression(
+                        self.checker.ast(argument)?,
+                        argument,
+                        false,
+                    )? {
+                        self.reuse_track_computed_name(argument)?;
+                    }
+                }
+            }
+        } else if let Some(expression) = read.expression() {
+            self.reuse_track_computed_name(expression)?;
+        }
+        Ok(())
+    }
+
     pub(super) fn property_elements(&mut self, symbol: SymbolId) -> Result<Vec<NodeId>, Error> {
         let flags = self.checker.symbol(symbol)?.flags();
         let placeholder = self.reverse_property_placeholder(symbol)?;
@@ -640,6 +679,7 @@ impl NodeBuilder<'_> {
             self.checker.get_type_of_symbol(symbol)?
         };
         let ty = self.without_missing(ty, flags & sf::OPTIONAL != 0)?;
+        self.track_late_property_name(symbol)?;
         self.approximate_length += self.checker.symbol(symbol)?.name_bytes().len() + 1;
         if flags & sf::ACCESSOR != 0 {
             let write = self.checker.write_type_of_symbol(symbol)?;

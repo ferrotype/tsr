@@ -455,8 +455,10 @@ impl CheckerState {
                 return Ok(ty);
             }
             let read = self.ast(node)?.node(node)?;
-            if read.body().is_some() {
-                return self.return_type_from_body(node);
+            if let Some(body) = read.body() {
+                if !ts_ast::node_is_missing(Some(&self.ast(body)?.node(body)?)) {
+                    return self.return_type_from_body(node);
+                }
             }
             Ok(self.builtins.any_type)
         })();

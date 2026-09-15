@@ -539,7 +539,7 @@ impl CheckerState {
         let symbol = required(self.get_symbol_of_declaration(node)?, "import alias symbol")?;
         let target = self.resolve_alias(symbol)?;
         if target != self.builtins.unknown_symbol {
-            let flags = self.symbol(target)?.flags();
+            let flags = self.module_symbol_flags(target, false, false)?;
             if flags & sf::VALUE != 0 {
                 let first = ts_ast::utilities_middle::get_first_identifier(
                     self.ast(reference)?,

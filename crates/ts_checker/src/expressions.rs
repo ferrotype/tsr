@@ -201,7 +201,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTruthinessExpression
     pub(crate) fn check_truthiness_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let ty = self.check_expression(node)?;
+        self.check_truthiness_expression_ex(node, 0)
+    }
+
+    fn check_truthiness_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        let ty = self.check_expression_ex(node, mode)?;
         self.check_truthiness_type(ty, node)?;
         Ok(ty)
     }
@@ -313,10 +317,11 @@ impl CheckerState {
         let condition = required(data.condition(), "conditional condition")?;
         let a = required(data.when_true(), "conditional true")?;
         let b = required(data.when_false(), "conditional false")?;
-        let ty = self.check_truthiness_expression(condition)?;
+        let mode = self.expression_mode;
+        let ty = self.check_truthiness_expression_ex(condition, mode)?;
         self.check_known_truthy_guard(condition, ty, Some(a))?;
-        let a = self.check_expression(a)?;
-        let b = self.check_expression(b)?;
+        let a = self.check_expression_ex(a, mode)?;
+        let b = self.check_expression_ex(b, mode)?;
         self.get_union_type_ex(&[a, b], crate::UnionReduction::Subtype, None, None)
     }
 

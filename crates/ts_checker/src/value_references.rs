@@ -399,17 +399,6 @@ impl CheckerState {
     }
 
     fn mark_value_identifier_alias(&mut self, node: NodeId, symbol: SymbolId) -> Result<(), Error> {
-        if self
-            .program()?
-            .host
-            .options()
-            .verbatim_module_syntax
-            .is_true()
-            || self.in_type_query(node)?
-            || !ts_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
-        {
-            return Ok(());
-        }
         let parent = self.ast(node)?.node(node)?.parent();
         if let Some(parent) = parent {
             let read = self.ast(parent)?.node(parent)?;
@@ -436,6 +425,26 @@ impl CheckerState {
                     }
                 }
             }
+        }
+        self.mark_alias_referenced_at(node, symbol)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.markAliasReferenced
+    pub(crate) fn mark_alias_referenced_at(
+        &mut self,
+        node: NodeId,
+        symbol: SymbolId,
+    ) -> Result<(), Error> {
+        if self
+            .program()?
+            .host
+            .options()
+            .verbatim_module_syntax
+            .is_true()
+            || self.in_type_query(node)?
+            || !ts_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
+        {
+            return Ok(());
         }
         let target = self.resolve_alias(symbol)?;
         if self.module_symbol_flags(symbol, true, false)? & (sf::VALUE | sf::EXPORT_VALUE) == 0 {

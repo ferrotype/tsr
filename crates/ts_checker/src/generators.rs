@@ -551,7 +551,10 @@ impl CheckerState {
             && !self.expression_result_is_unused(node)?
         {
             let context = self.contextual_expression_type(node)?;
-            if context.is_none_or(|ty| ty == self.builtins.any_type) {
+            if match context {
+                Some(ty) => self.types.flags(ty)? & tf::ANY != 0,
+                None => true,
+            } {
                 self.error_at(Some(node),d::X_yield_expression_implicitly_results_in_an_any_type_because_its_containing_generator_lacks_a_return_type_annotation,vec![])?;
             }
         }

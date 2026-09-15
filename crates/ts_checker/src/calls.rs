@@ -495,7 +495,21 @@ impl CheckerState {
             }
             let mut abstract_class = false;
             for &signature in &signatures {
-                if self.signatures.get(signature)?.flags & sg::ABSTRACT != 0 {
+                // someSignature examines the members of a union composite;
+                // the composite's own flags come from its first signature.
+                let signature = self.signatures.get(signature)?;
+                let found = if let Some(composite) = &signature.composite {
+                    let mut found = false;
+                    if composite.is_union {
+                        for &part in composite.signatures.iter() {
+                            found |= self.signatures.get(part)?.flags & sg::ABSTRACT != 0;
+                        }
+                    }
+                    found
+                } else {
+                    signature.flags & sg::ABSTRACT != 0
+                };
+                if found {
                     abstract_class = true;
                     break;
                 }

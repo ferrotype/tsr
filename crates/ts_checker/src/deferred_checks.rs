@@ -256,32 +256,7 @@ impl CheckerState {
         {
             return Ok(chain);
         }
-        let properties = self.get_properties_of_union_or_intersection_type(ty)?;
-        let mut never_property = None;
-        for &property in &properties {
-            if self.is_discriminant_with_never_type(property)? {
-                never_property = Some(property);
-                break;
-            }
-        }
-        let message_and_property = if let Some(property) = never_property {
-            Some((
-                ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents,
-                property,
-            ))
-        } else {
-            properties
-                .iter()
-                .copied()
-                .find(|&property| self.is_conflicting_private_property(property).unwrap_or(false))
-                .map(|property| {
-                    (
-                        ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some,
-                        property,
-                    )
-                })
-        };
-        let Some((message, property)) = message_and_property else {
+        let Some((message, property)) = self.never_intersection_cause(ty)? else {
             return Ok(chain);
         };
         let display = self.type_to_string(ty, crate::type_format_flags::NO_TYPE_REDUCTION)?;
@@ -292,6 +267,25 @@ impl CheckerState {
             self.diagnostic_for_node(Some(node), message, vec![display, name])?
         };
         Ok(Some(std::sync::Arc::new(diagnostic)))
+    }
+
+    // Both diagnostic paths prefer a discriminant over a private-name conflict.
+    pub(crate) fn never_intersection_cause(
+        &mut self,
+        ty: TypeId,
+    ) -> Result<Option<(&'static ts_diagnostics::Message, ts_arena::SymbolId)>, Error> {
+        let properties = self.get_properties_of_union_or_intersection_type(ty)?;
+        for &property in &properties {
+            if self.is_discriminant_with_never_type(property)? {
+                return Ok(Some((ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents, property)));
+            }
+        }
+        for property in properties {
+            if self.is_conflicting_private_property(property)? {
+                return Ok(Some((ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some, property)));
+            }
+        }
+        Ok(None)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.containerSeemsToBeEmptyDomElement

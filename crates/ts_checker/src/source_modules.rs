@@ -160,6 +160,13 @@ impl CheckerState {
         }
         if external {
             if ts_ast::is_module_augmentation_external(self.ast(node)?, node)? {
+                if let Some(attributes) = attributes {
+                    self.error_at(
+                        Some(attributes),
+                        d::Import_attributes_are_not_allowed_on_a_module_augmentation,
+                        vec![],
+                    )?;
+                }
                 if global || self.symbol(symbol)?.flags() & sf::TRANSIENT != 0 {
                     if let Some(body) = body {
                         for statement in

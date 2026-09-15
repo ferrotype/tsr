@@ -201,18 +201,14 @@ impl Relater<'_> {
                 & crate::object_flags::IS_NEVER_INTERSECTION
                 != 0
         {
-            for property in self
-                .checker
-                .get_properties_of_union_or_intersection_type(original_target)?
+            if let Some((message, property)) =
+                self.checker.never_intersection_cause(original_target)?
             {
-                if self.checker.is_discriminant_with_never_type(property)? {
-                    let target = self
-                        .checker
-                        .type_to_string(original_target, fmt::NO_TYPE_REDUCTION)?;
-                    let name = self.checker.symbol_to_string(property)?;
-                    self.report_error(messages::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents, vec![target, name]);
-                    break;
-                }
+                let target = self
+                    .checker
+                    .type_to_string(original_target, fmt::NO_TYPE_REDUCTION)?;
+                let name = self.checker.symbol_to_string(property)?;
+                self.report_error(message, vec![target, name]);
             }
         }
         self.report_relation_error(source, target, head)
@@ -228,18 +224,14 @@ impl Relater<'_> {
         let (source_name, target_name) =
             self.checker.type_names_for_error_display(source, target)?;
         let mut generalized = source;
+        let mut generalized_name = source_name.clone();
         if self.checker.types.flags(target)? & tf::NEVER == 0
             && self.checker.is_literal_type(source)?
             && !self.checker.type_could_have_top_level_singletons(target)?
         {
             generalized = self.checker.base_literal_type(source)?;
+            generalized_name = self.checker.type_name_for_error_display(generalized)?;
         }
-        let generalized_name = if generalized == source {
-            source_name.clone()
-        } else {
-            self.checker
-                .type_to_string(generalized, fmt::USE_FULLY_QUALIFIED_TYPE)?
-        };
         let target_flags = if self.checker.types.flags(target)? & tf::INDEXED_ACCESS != 0
             && self.checker.types.flags(source)? & tf::INDEXED_ACCESS == 0
         {

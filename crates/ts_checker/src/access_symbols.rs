@@ -136,14 +136,7 @@ impl CheckerState {
                     .flatten()
                     .collect::<Vec<_>>()
                 {
-                    if self.ast(declaration)?.node(declaration)?.kind() == K::PropertyDeclaration
-                        && self
-                            .ast(declaration)?
-                            .node(declaration)?
-                            .modifier_flags(self.ast(declaration)?)?
-                            & mf::ACCESSOR
-                            == 0
-                    {
+                    if self.is_class_instance_property(declaration)? {
                         if let Some(error_node) = error_node {
                             let name = self.symbol_to_string(property)?;
                             self.error_at(Some(error_node),d::Class_field_0_defined_by_the_parent_class_is_not_accessible_in_the_child_class_via_super,vec![name])?;
@@ -267,6 +260,47 @@ impl CheckerState {
             return Ok(false);
         }
         Ok(true)
+    }
+
+    // port: tsc/internal/checker/utilities.go:isClassInstanceProperty
+    fn is_class_instance_property(&self, node: NodeId) -> Result<bool, Error> {
+        use ts_ast::{
+            get_element_or_property_access_name, is_bindable_static_access_expression,
+            is_bindable_static_name_expression,
+        };
+        let view = self.ast(node)?;
+        let read = view.node(node)?;
+        if read.flags() & nf::JAVA_SCRIPT_FILE != 0
+            && ts_ast::utilities_tail::is_expando_property_declaration(Some(&read))
+        {
+            let left = read
+                .data_source()
+                .as_binary_expression()
+                .expect("expando declarations are binary expressions")
+                .left()
+                .ok_or(Error::MissingLink("expando left"))?;
+            let mut prototype = false;
+            if is_bindable_static_access_expression(view, left, false)? {
+                let receiver = view
+                    .node(left)?
+                    .expression()
+                    .ok_or(Error::MissingLink("expando receiver"))?;
+                if is_bindable_static_access_expression(view, receiver, false)? {
+                    if let Some(name) = get_element_or_property_access_name(view, receiver)? {
+                        prototype = view.node_text(name)?.as_bytes() == b"prototype";
+                    }
+                }
+            }
+            return Ok(!prototype && !is_bindable_static_name_expression(view, left, true)?);
+        }
+        let Some(parent) = read.parent() else {
+            return Ok(false);
+        };
+        Ok(matches!(
+            view.node(parent)?.kind().known(),
+            Some(K::ClassDeclaration | K::ClassExpression)
+        ) && read.kind() == K::PropertyDeclaration
+            && read.modifier_flags(view)? & mf::ACCESSOR == 0)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getEnclosingClassFromThisParameter

@@ -355,6 +355,34 @@ impl CheckerState {
             }
         } else {
             if any {
+                // markPropertyAliasReferenced also runs for an unresolved alias:
+                // following `alias.member` must retain/check its import chain.
+                if self.ast(left)?.node(left)?.kind() == K::Identifier
+                    && self.ast(left)?.node_text(left)?.as_bytes() != b"this"
+                {
+                    let mut ancestor = Some(node);
+                    let mut import_reference = false;
+                    while let Some(current) = ancestor {
+                        let read = self.ast(current)?.node(current)?;
+                        if read.kind() == K::ImportEqualsDeclaration {
+                            import_reference = true;
+                            break;
+                        }
+                        if !matches!(
+                            read.kind().known(),
+                            Some(K::Identifier | K::QualifiedName | K::PropertyAccessExpression)
+                        ) {
+                            break;
+                        }
+                        ancestor = read.parent();
+                    }
+                    if !import_reference {
+                        let parent = self.resolved_value_symbol(left)?;
+                        if parent != self.builtins.unknown_symbol {
+                            self.mark_alias_referenced_at(node, parent)?;
+                        }
+                    }
+                }
                 return Ok(if self.is_error_type(apparent)? {
                     self.builtins.error_type
                 } else {
