@@ -349,11 +349,21 @@ impl CheckerState {
                 {
                     self.error_at(Some(node),d::Module_0_has_no_default_export_Did_you_mean_to_use_import_1_from_0_instead,vec![module_text,name_text])?;
                 } else {
-                    self.error_at(
+                    let diagnostic = self.error_at(
                         Some(name),
                         d::Module_0_has_no_default_export,
                         vec![module_text],
                     )?;
+                    if let Some(diagnostic) = diagnostic {
+                        if let Some(related) = self.export_star_default_declaration(module)? {
+                            let related = self.diagnostic_for_node(
+                                Some(related),
+                                d::X_export_Asterisk_does_not_re_export_a_default,
+                                vec![],
+                            )?;
+                            self.add_related_diagnostic(diagnostic, related)?;
+                        }
+                    }
                 }
             } else {
                 let read = self.ast(node)?.node(node)?;
@@ -536,7 +546,21 @@ impl CheckerState {
             (_, Some(value)) | (Some(value), _) => Some(value),
             _ => None,
         };
-        if result.is_none() {
+        let specifier_node = matches!(
+            self.ast(node)?.node(node)?.kind().known(),
+            Some(K::ImportSpecifier | K::ExportSpecifier)
+        );
+        if specifier_node
+            && self.module_only_importable_as_default(specifier, Some(module))?
+            && text.as_bytes() != names::DEFAULT
+        {
+            let kind = self.program()?.host.options().emit_module_kind();
+            self.error_at(
+                Some(name),
+                d::Named_imports_from_a_JSON_file_into_an_ECMAScript_module_are_not_allowed_when_module_is_set_to_0,
+                vec![ts_ast::JsString::from_bytes(crate::emit_checks::module_kind_text(kind))],
+            )?;
+        } else if result.is_none() {
             self.error_no_module_member(module, target, node, name)?;
         }
         Ok(result)
@@ -554,6 +578,7 @@ impl CheckerState {
         }
         let module_name = self.fully_qualified_name(module, Some(node))?;
         let name_text = self.ast(name)?.node_text(name)?.into_js_string();
+        let declaration_name = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
         if self.ast(name)?.node(name)?.kind() == K::Identifier {
             let suggestion = self.suggested_module_member(name, target)?;
             if let Some(suggestion) = suggestion {
@@ -561,7 +586,7 @@ impl CheckerState {
                 if let Some(diagnostic) = self.error_at(
                     Some(name),
                     d::X_0_has_no_exported_member_named_1_Did_you_mean_2,
-                    vec![module_name, name_text, display.clone()],
+                    vec![module_name, declaration_name, display.clone()],
                 )? {
                     if let Some(declaration) = self.symbol(suggestion)?.value_declaration() {
                         let related = self.diagnostic_for_node(
@@ -582,7 +607,7 @@ impl CheckerState {
             self.error_at(
                 Some(name),
                 d::Module_0_has_no_exported_member_1_Did_you_mean_to_use_import_1_from_0_instead,
-                vec![module_name, name_text],
+                vec![module_name, declaration_name],
             )?;
         } else {
             let declaration = self.symbol(module)?.value_declaration();
@@ -603,10 +628,15 @@ impl CheckerState {
                             self.error_at(
                                 Some(name),
                                 d::X_0_can_only_be_imported_by_using_a_default_import,
-                                vec![name_text],
+                                vec![declaration_name],
                             )?;
+                        } else if self.ast(name)?.node(name)?.flags()
+                            & ts_ast::node_flags::JAVA_SCRIPT_FILE
+                            != 0
+                        {
+                            self.error_at(Some(name),d::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import,vec![declaration_name])?;
                         } else {
-                            self.error_at(Some(name),d::X_0_can_only_be_imported_by_using_import_1_require_2_or_a_default_import,vec![name_text.clone(),name_text,module_name])?;
+                            self.error_at(Some(name),d::X_0_can_only_be_imported_by_using_import_1_require_2_or_a_default_import,vec![declaration_name.clone(),declaration_name,module_name])?;
                         }
                         return Ok(());
                     }
@@ -627,13 +657,13 @@ impl CheckerState {
                         self.error_at(
                             Some(name),
                             d::Module_0_declares_1_locally_but_it_is_exported_as_2,
-                            vec![module_name, name_text.clone(), export_name],
+                            vec![module_name, declaration_name.clone(), export_name],
                         )?
                     } else {
                         self.error_at(
                             Some(name),
                             d::Module_0_declares_1_locally_but_it_is_not_exported,
-                            vec![module_name, name_text.clone()],
+                            vec![module_name, declaration_name.clone()],
                         )?
                     };
                     if let Some(diagnostic) = diagnostic {
@@ -651,7 +681,7 @@ impl CheckerState {
                                 } else {
                                     d::X_and_here
                                 },
-                                vec![name_text.clone()],
+                                vec![declaration_name.clone()],
                             )?;
                             self.add_related_diagnostic(diagnostic, related)?;
                         }
@@ -662,7 +692,7 @@ impl CheckerState {
             self.error_at(
                 Some(name),
                 d::Module_0_has_no_exported_member_1,
-                vec![module_name, name_text],
+                vec![module_name, declaration_name],
             )?;
         }
         Ok(())
@@ -731,5 +761,45 @@ impl CheckerState {
         target.members = members;
         target.exports = exports;
         Ok(result)
+    }
+
+    /// The `export *` declaration whose target module has a default export,
+    /// used as related information by reportNonDefaultExport.
+    // port: tsc/internal/checker/checker.go:Checker.reportNonDefaultExport
+    fn export_star_default_declaration(
+        &mut self,
+        module: SymbolId,
+    ) -> Result<Option<NodeId>, Error> {
+        let Some(export_star) =
+            self.member_symbol(self.symbol(module)?.exports(), names::EXPORT_STAR)?
+        else {
+            return Ok(None);
+        };
+        for declaration in self
+            .symbol_declarations(export_star)?
+            .to_vec()
+            .into_iter()
+            .flatten()
+        {
+            let read = self.ast(declaration)?.node(declaration)?;
+            if read.kind() != K::ExportDeclaration {
+                continue;
+            }
+            let Some(specifier) = read.module_specifier() else {
+                continue;
+            };
+            let Some(resolved) =
+                self.resolve_external_module_name(declaration, specifier, false)?
+            else {
+                continue;
+            };
+            if self
+                .member_symbol(self.symbol(resolved)?.exports(), names::DEFAULT)?
+                .is_some()
+            {
+                return Ok(Some(declaration));
+            }
+        }
+        Ok(None)
     }
 }

@@ -360,14 +360,21 @@ impl Relater<'_> {
                     .checker
                     .constraint_of_type(source)?
                     .unwrap_or(self.checker.builtins.unknown_type);
-                let result = self.related(constraint, target, SOURCE, intersection)?;
+                // hi-speed no-this-instantiation check (less accurate, but avoids costly
+                // `this`-instantiation when the constraint will suffice); it never reports.
+                let result =
+                    self.related_with_errors(constraint, target, SOURCE, intersection, false)?;
                 if result != tr::FALSE {
                     return Ok(result);
                 }
                 let with_this = self
                     .checker
                     .get_type_with_this_argument(constraint, source, false)?;
-                let result = self.related(with_this, target, SOURCE, intersection)?;
+                let report = self.report_errors
+                    && constraint != self.checker.builtins.unknown_type
+                    && t & s & tf::TYPE_PARAMETER == 0;
+                let result =
+                    self.related_with_errors(with_this, target, SOURCE, intersection, report)?;
                 if result != tr::FALSE {
                     return Ok(result);
                 }

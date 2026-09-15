@@ -63,6 +63,19 @@ impl CheckerState {
                         .flatten());
                 }
                 Some(K::ModuleDeclaration) => return Ok(read.name()),
+                // `const x = require("m")` aliases name their module through the call.
+                Some(K::VariableDeclaration) => {
+                    let Some(initializer) = read.initializer() else {
+                        return Ok(None);
+                    };
+                    let view = self.ast(initializer)?;
+                    let call = view.node(initializer)?;
+                    if !ts_ast::utilities_middle::is_require_call(view, &call, true)? {
+                        return Ok(None);
+                    }
+                    let arguments = call.argument_list();
+                    return Ok(self.source_list(initializer, arguments)?.first().copied());
+                }
                 Some(K::SourceFile) => return Ok(None),
                 _ => {
                     node = match read.parent() {
@@ -644,7 +657,7 @@ impl CheckerState {
                         .and_then(|data| data.import_clause());
                     return Ok(match clause {
                         Some(clause) => !self.ast(clause)?.node(clause)?.is_type_only(),
-                        None => true,
+                        None => false,
                     });
                 }
                 Some(K::ImportEqualsDeclaration | K::ExportDeclaration) => {

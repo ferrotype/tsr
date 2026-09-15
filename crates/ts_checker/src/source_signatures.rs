@@ -483,7 +483,7 @@ impl CheckerState {
                         vec![],
                     )?;
                 } else if no_implicit_any {
-                    let name = self.ast(node)?.node(node)?.name();
+                    let name = ts_ast::get_name_of_declaration(self.ast(node)?, Some(node))?;
                     if let Some(name) = name {
                         let text =
                             ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;

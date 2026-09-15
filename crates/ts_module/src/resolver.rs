@@ -832,6 +832,8 @@ pub fn is_relative(name: &[u8]) -> bool {
         || name == b".."
         || name.starts_with(b"./")
         || name.starts_with(b"../")
+        || name.starts_with(b".\\")
+        || name.starts_with(b"..\\")
         || path::encoded_root_length(name) > 0
 }
 pub(super) fn extension(path: &[u8]) -> &[u8] {

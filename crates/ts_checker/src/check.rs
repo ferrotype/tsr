@@ -308,10 +308,12 @@ impl CheckerState {
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }
-            Some(K::ExpressionStatement) => self
-                .check_expression(required(read.expression(), "expression statement")?)
-                .map(|_| ()),
-            Some(K::EmptyStatement) => Ok(()),
+            Some(K::ExpressionStatement) => {
+                let expression = required(read.expression(), "expression statement")?;
+                self.check_statement_ambient_context(node)?;
+                self.check_expression(expression).map(|_| ())
+            }
+            Some(K::EmptyStatement) => self.check_statement_ambient_context(node).map(|_| ()),
             Some(K::DebuggerStatement) => self.check_statement_ambient_context(node).map(|_| ()),
             Some(K::MissingDeclaration) => {
                 Self::check_missing_declaration(node);
@@ -374,7 +376,19 @@ impl CheckerState {
         self.check_type_parameters(node)?;
         let read = self.ast(node)?.node(node)?;
         let interface = read.kind() == K::InterfaceDeclaration;
+        let parent = required(read.parent(), "type declaration parent")?;
         let name = required(read.name(), "type declaration name")?;
+        if !self.container_allows_block_scoped_variable(parent)? {
+            self.grammar_error_node(
+                node,
+                messages::X_0_declarations_can_only_be_declared_inside_a_block,
+                vec![ts_ast::JsString::from_bytes(if interface {
+                    b"interface".as_slice()
+                } else {
+                    b"type".as_slice()
+                })],
+            )?;
+        }
         let text = self.ast(name)?.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),

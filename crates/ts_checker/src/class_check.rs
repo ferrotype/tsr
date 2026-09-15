@@ -247,10 +247,10 @@ impl CheckerState {
         if self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
             return Ok(());
         }
-        let docs = self
-            .ast(node)?
-            .eager_jsdoc(node)?
-            .map(|docs| docs.to_vec())
+        // JS files carry lazily parsed JSDoc; the provider covers both forms.
+        let docs: Vec<NodeId> = self
+            .jsdoc_for_node(node)?
+            .map(|docs| docs.iter().copied().collect())
             .unwrap_or_default();
         for doc in docs {
             let tags = self

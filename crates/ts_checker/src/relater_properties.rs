@@ -195,9 +195,14 @@ impl Relater<'_> {
         let targets = self.checker.get_properties_of_type(target)?;
         // The missing-property pass precedes type comparisons in Go. Keep it
         // separate: resolving a property's type may allocate or cache relations.
+        // getUnmatchedProperty skips only static private names; `prototype`
+        // is excluded from the type comparison loop below, not from here.
         for &property in &targets {
             let read = self.checker.symbol(property)?;
-            if read.flags() & sf::PROTOTYPE != 0 {
+            if self
+                .checker
+                .is_static_private_identifier_property(property)?
+            {
                 continue;
             }
             if require_optional

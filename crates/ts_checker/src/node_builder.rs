@@ -447,6 +447,13 @@ impl<'a> NodeBuilder<'a> {
                 return self.list(vec![first, elision, last]);
             }
         }
+        let nodes = self.type_nodes(types)?;
+        self.list(nodes)
+    }
+
+    /// The element loop of mapToTypeNodes, shared with tuple element lists.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
+    pub(super) fn type_nodes(&mut self, types: &[TypeId]) -> Result<Vec<NodeId>, Error> {
         let mut nodes = Vec::new();
         // To avoid printing types like `[Foo, Foo]` or `Bar & Bar` where occurrences
         // of the same name come from different namespaces, single-identifier
@@ -514,7 +521,7 @@ impl<'a> NodeBuilder<'a> {
             self.flags = saved;
             result?;
         }
-        self.list(nodes)
+        Ok(nodes)
     }
 
     /// Raw symbol parents, without the accessibility/alias selection of symbolToName.

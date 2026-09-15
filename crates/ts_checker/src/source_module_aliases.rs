@@ -710,19 +710,15 @@ impl CheckerState {
                         self.ast(reference)?,
                         reference,
                     )?;
-                    let text = self.ast(first)?.node_text(first)?.into_js_string();
-                    if let Some(alias) = self.resolve_name(
-                        Some(first),
-                        text.as_bytes(),
-                        sf::VALUE | sf::EXPORT_VALUE,
-                        None,
-                        true,
-                    )? {
-                        if self.symbol(alias)?.flags() & sf::ALIAS != 0
-                            && !self.module_aliases.type_only.contains_key(&alias)
-                        {
-                            self.mark_module_alias_referenced(alias)?;
-                        }
+                    // markIdentifierAliasReferenced resolves through getResolvedSymbol,
+                    // which reports unresolved names and namespaces used as values.
+                    let alias = self.resolved_value_symbol(first)?;
+                    if alias != self.builtins.unknown_symbol
+                        && alias != self.builtins.arguments_symbol
+                        && self.symbol(alias)?.flags() & sf::ALIAS != 0
+                        && !self.module_aliases.type_only.contains_key(&alias)
+                    {
+                        self.mark_module_alias_referenced(alias)?;
                     }
                 }
             }

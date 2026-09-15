@@ -29,7 +29,14 @@ impl CheckerState {
         if self.types.flags(ty)? & tf::UNION == 0 {
             return Ok(false);
         }
-        let Some(property) = self.constituent_property(ty, name, false)? else {
+        // Partial union properties still qualify; only the synthetic-property
+        // check applies (getUnionOrIntersectionProperty, not getPropertyOfType).
+        let Some(property) = self.compound_property_including_partial(
+            ty,
+            ts_ast::JsString::from_bytes(name),
+            false,
+        )?
+        else {
             return Ok(false);
         };
         let flags = self.symbol(property)?.check_flags();
@@ -119,7 +126,8 @@ impl Relater<'_> {
                     };
                     let mut found = false;
                     for &part in parts.iter() {
-                        if self.related(part, target_type, BOTH, 0)? != tr::FALSE {
+                        if self.related_with_errors(part, target_type, BOTH, 0, false)? != tr::FALSE
+                        {
                             found = true;
                             break;
                         }

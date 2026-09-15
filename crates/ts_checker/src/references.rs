@@ -485,12 +485,18 @@ impl CheckerState {
                 Ok(self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0)
             }
             Some(K::TypeQuery) => Ok(true),
+            Some(K::RestType) => {
+                let node = read.type_node().ok_or(Error::MissingLink("rest type"))?;
+                if self.ast(node)?.node(node)?.kind() != K::ArrayType {
+                    return Ok(true);
+                }
+                let element = self
+                    .array_element_type_node(node)?
+                    .ok_or(Error::MissingLink("rest array element"))?;
+                self.may_resolve_type_alias(element)
+            }
             Some(
-                K::ParenthesizedType
-                | K::OptionalType
-                | K::RestType
-                | K::NamedTupleMember
-                | K::TypeOperator,
+                K::ParenthesizedType | K::OptionalType | K::NamedTupleMember | K::TypeOperator,
             ) => {
                 let node = read.type_node().ok_or(Error::MissingLink("wrapped type"))?;
                 self.may_resolve_type_alias(node)

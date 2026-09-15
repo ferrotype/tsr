@@ -95,10 +95,13 @@ impl NodeBuilder<'_> {
         let data = self.checker.types.tuple(target)?;
         let readonly = data.readonly;
         let infos = data.element_infos.clone();
-        let mut nodes = Vec::new();
+        let mut element_types = Vec::with_capacity(infos.len());
         for (&argument, info) in arguments.iter().zip(infos.iter()) {
-            let argument = self.without_missing(argument, info.flags & ef::OPTIONAL != 0)?;
-            let mut node = self.type_node(argument)?;
+            element_types.push(self.without_missing(argument, info.flags & ef::OPTIONAL != 0)?);
+        }
+        let element_nodes = self.type_nodes(&element_types)?;
+        let mut nodes = Vec::new();
+        for (mut node, info) in element_nodes.into_iter().zip(infos.iter()) {
             if info.flags & ef::REST != 0 {
                 node = self.ast.new_array_type_node(Some(node));
             }

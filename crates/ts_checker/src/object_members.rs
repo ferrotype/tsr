@@ -196,6 +196,10 @@ impl CheckerState {
                     base
                 };
                 for property in self.get_properties_of_type(base)? {
+                    // addInheritedMembers never inherits static private names.
+                    if self.is_static_private_identifier_property(property)? {
+                        continue;
+                    }
                     let name = self.symbol(property)?.name_to_owned();
                     let mut table = self
                         .tables

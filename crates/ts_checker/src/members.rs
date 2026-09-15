@@ -160,8 +160,21 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getPropertyOfUnionOrIntersectionType
-    // port: tsc/internal/checker/checker.go:Checker.getUnionOrIntersectionProperty
     fn get_compound_property(
+        &mut self,
+        ty: TypeId,
+        name: JsString,
+        skip_augment: bool,
+    ) -> Result<Option<SymbolId>, Error> {
+        let Some(prop) = self.compound_property_including_partial(ty, name, skip_augment)? else {
+            return Ok(None);
+        };
+        // Partial properties are filtered out of union types.
+        Ok((self.symbol(prop)?.check_flags() & cf::READ_PARTIAL == 0).then_some(prop))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getUnionOrIntersectionProperty
+    pub(crate) fn compound_property_including_partial(
         &mut self,
         ty: TypeId,
         name: JsString,
@@ -175,9 +188,7 @@ impl CheckerState {
         };
         if let Some(cache) = cache {
             if let Some(prop) = self.table(cache)?.get(name.as_bytes()).flatten() {
-                return Ok(
-                    (self.symbol(prop)?.check_flags() & cf::READ_PARTIAL == 0).then_some(prop)
-                );
+                return Ok(Some(prop));
             }
         }
         let Some(prop) = self.create_compound_property(ty, &name, skip_augment)? else {
@@ -197,7 +208,7 @@ impl CheckerState {
                 self.tables.get_mut(augmented)?.insert(name, Some(prop));
             }
         }
-        Ok((flags & cf::READ_PARTIAL == 0).then_some(prop))
+        Ok(Some(prop))
     }
 
     fn compound_property_cache(

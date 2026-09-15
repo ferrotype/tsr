@@ -3616,3 +3616,461 @@ fn assert_native_semantic_fixture(requests: &str, native: &str) {
         serde_json::Value::Array(mismatches)
     );
 }
+
+fn semantic_codes(text: &[u8], options: CompilerOptions) -> Vec<(i32, Vec<String>)> {
+    let (owner, source) = checker(text, options);
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    codes_and_args(&diagnostics)
+}
+
+fn strings(items: &[&str]) -> Vec<String> {
+    items.iter().map(|s| (*s).to_string()).collect()
+}
+
+#[test]
+fn ambient_empty_and_expression_statements_are_reported_once_per_block() {
+    // Pinned Go: semicolonsInModuleDeclarations.errors.txt and the `cjs;`
+    // statements of nodeModulesDeclarationEmitWithPackageExports.
+    let text = b"declare namespace N1 { export interface I { }; }
+declare namespace N2 { export const a: number; a; a; }
+";
+    let codes = semantic_codes(text, options());
+    assert_eq!(
+        codes
+            .iter()
+            .filter(|(code, _)| *code
+                == ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code)
+            .count(),
+        2,
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn functions_with_missing_bodies_report_implicit_any_return_types() {
+    // Pinned Go: reservedWords3.errors.txt reports TS7010 for each function
+    // whose body is missing after the reserved-word parameter.
+    let codes = semantic_codes(b"function f1(enum) {}\nfunction f2(class) {}\n", options());
+    let code =
+        ts_diagnostics::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type.code;
+    assert!(
+        codes.contains(&(code, strings(&["f1", "any"]))),
+        "{codes:?}"
+    );
+    assert!(
+        codes.contains(&(code, strings(&["f2", "any"]))),
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn computed_class_members_are_checked_against_index_signatures() {
+    // Pinned Go: computedPropertyNames12_ES5.errors.txt, `[+s]: typeof s`.
+    let text = b"declare const s: string;
+class C {
+    [k: string]: number;
+    [+s]: string;
+}
+";
+    let codes = semantic_codes(text, options());
+    let code = ts_diagnostics::Property_0_of_type_1_is_not_assignable_to_2_index_type_3.code;
+    assert_eq!(
+        codes
+            .iter()
+            .filter(|(c, _)| *c == code)
+            .cloned()
+            .collect::<Vec<_>>(),
+        vec![(code, strings(&["[+s]", "string", "string", "number"]))],
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn parameter_grammar_errors_are_suppressed_by_parse_errors() {
+    // Pinned Go: fatarrowfunctionsOptionalArgs.errors.txt has no TS1015 because
+    // the file has parse errors; fatarrowfunctionsOptionalArgsErrors4 has them.
+    let clean = semantic_codes(b"((arg?: number = 0) => 47);\n", options());
+    assert_eq!(
+        clean.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
+        vec![ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code]
+    );
+    let broken = semantic_codes(b"((arg?: number = 0) => 47);\nlet x = ;\n", options());
+    assert!(
+        !broken.iter().any(|(code, _)| *code
+            == ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code),
+        "{broken:?}"
+    );
+}
+
+#[test]
+fn type_declarations_outside_blocks_are_grammar_errors() {
+    // Pinned Go: typeAliasDeclarationEmit3.errors.txt and
+    // typeInterfaceDeclarationsInBlockStatements1.
+    let text = b"function f1(): void {
+    if (true)
+        type foo = [];
+    while (false)
+        interface bar { }
+}
+";
+    let codes = semantic_codes(text, options());
+    let code = ts_diagnostics::X_0_declarations_can_only_be_declared_inside_a_block.code;
+    assert_eq!(
+        codes
+            .iter()
+            .filter(|(c, _)| *c == code)
+            .map(|(_, args)| args.clone())
+            .collect::<Vec<_>>(),
+        vec![strings(&["type"]), strings(&["interface"])],
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn private_method_signatures_outside_classes_and_abstract_bodies_are_reported() {
+    // Pinned Go: privateNameAndPropertySignature.errors.txt and
+    // classAbstractMethodWithImplementation.errors.txt.
+    let text = b"interface B {
+    #foo: string;
+    #bar(): string;
+}
+abstract class A {
+    abstract foo() {}
+}
+";
+    let codes = semantic_codes(text, options());
+    assert_eq!(
+        codes
+            .iter()
+            .filter(|(c, _)| *c
+                == ts_diagnostics::Private_identifiers_are_not_allowed_outside_class_bodies.code)
+            .count(),
+        2,
+        "{codes:?}"
+    );
+    assert!(
+        codes.contains(&(
+            ts_diagnostics::Method_0_cannot_have_an_implementation_because_it_is_marked_abstract
+                .code,
+            strings(&["foo"])
+        )),
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn same_named_types_display_fully_qualified_in_missing_property_errors() {
+    // Pinned Go: qualify.ts(58,5) reports TS2741 with 'I' and 'T.I'.
+    let text = b"namespace T {
+    export interface I { p: number; }
+}
+interface I { k: number; }
+declare var y: I;
+var x: T.I = y;
+";
+    assert_eq!(
+        semantic_codes(text, options()),
+        vec![(
+            ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code,
+            strings(&["p", "I", "T.I"])
+        )]
+    );
+}
+
+#[test]
+fn abstract_constructor_assignability_explains_the_mismatch() {
+    // Pinned Go: classAbstractConstructorAssignability.errors.txt chains TS2517.
+    let text = b"abstract class A {}
+class B extends A {}
+var BB: typeof B = A;
+";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(diagnostics.len(), 1, "{:?}", codes_and_args(&diagnostics));
+    assert_eq!(
+        diagnostics[0].code,
+        ts_diagnostics::Type_0_is_not_assignable_to_type_1.code
+    );
+    assert_eq!(
+        diagnostics[0].message_chain[0].code,
+        ts_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type.code
+    );
+}
+
+#[test]
+fn discriminants_narrow_unions_that_include_undefined() {
+    // Pinned Go: discriminantsAndNullOrUndefined.ts has no errors; the
+    // discriminant property is found through the partial union property.
+    let text = b"interface A { kind: 'A'; }
+interface B { kind: 'B'; }
+declare var c: A | B | undefined;
+declare function useA(_: A): void;
+declare function useB(_: B): void;
+if (c !== undefined) {
+    switch (c.kind) {
+        case 'A': useA(c); break;
+        case 'B': useB(c); break;
+    }
+}
+";
+    assert_eq!(semantic_codes(text, options()), vec![]);
+}
+
+#[test]
+fn exact_optional_property_mismatches_use_their_own_messages() {
+    // Pinned Go: exactOptionalPropertyTypesArgumentError.errors.txt (TS2379).
+    let text = b"declare function f(o: { y?: string }): void;
+f({ y: undefined });
+";
+    let codes = semantic_codes(
+        text,
+        CompilerOptions {
+            exact_optional_property_types: Tristate::TRUE,
+            ..options()
+        },
+    );
+    assert_eq!(
+        codes.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
+        vec![ts_diagnostics::Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties.code]
+    );
+}
+
+#[test]
+fn comparison_errors_name_same_named_types_by_module() {
+    // Pinned Go: errorWithSameNameType.errors.txt.
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import * as A from \"./a\";\nimport * as B from \"./b\";\ndeclare let a: A.F;\ndeclare let b: B.F;\nif (a === b) {}\n"),
+            (b"/a.ts", b"export interface F { a: number }\n"),
+            (b"/b.ts", b"export interface F { b: number }\n"),
+        ],
+        options(),
+    );
+    let source = program.file(b"/main.ts").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap.code,
+            strings(&["import(\"/a\").F", "import(\"/b\").F"])
+        )]
+    );
+}
+
+#[test]
+fn named_tuple_and_index_signature_grammar_is_reported() {
+    // Pinned Go: namedTupleMembersErrors.errors.txt and
+    // indexSignatureWithTrailingComma.errors.txt.
+    let text = b"type T1 = [...a?: string[]];
+type T2 = [a: string?];
+type T3 = [a: ...string[]];
+type A = { [key: string,]: string; };
+";
+    let codes = semantic_codes(text, options());
+    let expected = [
+        ts_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest.code,
+        ts_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type.code,
+        ts_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type.code,
+        ts_diagnostics::An_index_signature_cannot_have_a_trailing_comma.code,
+    ];
+    for code in expected {
+        assert!(
+            codes.iter().any(|(c, _)| *c == code),
+            "missing {code}: {codes:?}"
+        );
+    }
+}
+
+#[test]
+fn circular_return_types_name_the_assigned_variable() {
+    // Pinned Go: noTypeToStringRecursion.errors.txt reports TS7023 on `f`.
+    let codes = semantic_codes(b"const f = () => 42 satisfies typeof f;\n", options());
+    assert!(
+        codes.contains(&(
+            ts_diagnostics::X_0_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions.code,
+            strings(&["f"])
+        )),
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn backslash_relative_ambient_module_names_and_deferred_rest_tuples() {
+    // Pinned Go: ambientExternalModuleWithRelativeModuleName.errors.txt and
+    // arrayDestructuringInSwitch1.ts (no circularity error).
+    let codes = semantic_codes(
+        b"declare module \".\\\\relativeModule\" { var x: string; }\n",
+        options(),
+    );
+    assert_eq!(
+        codes.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
+        vec![ts_diagnostics::Ambient_module_declaration_cannot_specify_relative_module_name.code]
+    );
+    let text = b"export type Expression = BooleanLogicExpression | 'true' | 'false';
+export type BooleanLogicExpression = ['and', ...Expression[]] | ['not', Expression];
+";
+    assert_eq!(semantic_codes(text, options()), vec![]);
+}
+
+#[test]
+fn exported_import_aliases_resolve_their_first_identifier_as_a_value() {
+    // Pinned Go: importDeclWithExportModifier.errors.txt (TS2708 + TS2694) and
+    // declarationEmitUnknownImport.errors.txt (TS2304).
+    let codes = semantic_codes(
+        b"namespace x {\n    interface c {\n    }\n}\nexport import a = x.c;\n",
+        options(),
+    );
+    assert!(
+        codes.contains(&(
+            ts_diagnostics::Cannot_use_namespace_0_as_a_value.code,
+            strings(&["x"])
+        )),
+        "{codes:?}"
+    );
+    let codes = semantic_codes(
+        b"import Foo = SomeNonExistingName\nexport {Foo}\n",
+        options(),
+    );
+    assert!(
+        codes.contains(&(
+            ts_diagnostics::Cannot_find_name_0.code,
+            strings(&["SomeNonExistingName"])
+        )),
+        "{codes:?}"
+    );
+}
+
+#[test]
+fn export_equals_members_imported_from_js_get_the_require_hint() {
+    // Pinned Go: importNonExportedMember8 reports TS2597 in the JS importer.
+    let (owner, program, _) = fixture_files(
+        b"/b.js",
+        &[
+            (b"/a.ts", b"class Foo {}\nexport = Foo;\n"),
+            (b"/b.js", b"import { Foo } from './a';\n"),
+        ],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            module: ModuleKind::COMMON_JS,
+            ..options()
+        },
+    );
+    let source = program.file(b"/b.js").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import.code,
+            strings(&["Foo"])
+        )]
+    );
+}
+
+#[test]
+fn jsdoc_extends_tags_that_disagree_with_the_extends_clause_are_reported() {
+    // Pinned Go: jsdocExtendsClauseMismatch.errors.txt.
+    let (owner, program, _) = fixture_files(
+        b"/main.js",
+        &[
+            (b"/react.d.ts", b"declare namespace React {\n    class Component { component: string }\n    class PureComponent { pure: string }\n}\n"),
+            (b"/main.js", b"/**\n * @extends {React.Component}\n */\nclass C extends React.PureComponent {\n}\n"),
+        ],
+        CompilerOptions {
+            allow_js: Tristate::TRUE,
+            check_js: Tristate::TRUE,
+            ..options()
+        },
+    );
+    let source = program.file(b"/main.js").unwrap().source();
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    assert_eq!(
+        codes_and_args(&diagnostics),
+        vec![(
+            ts_diagnostics::JSDoc_0_1_does_not_match_the_extends_2_clause.code,
+            strings(&["extends", "Component", "PureComponent"])
+        )]
+    );
+}
+
+#[test]
+fn static_private_names_are_not_inherited_by_derived_constructors() {
+    // Pinned Go: privateNameStaticAccessorssDerivedClasses.errors.txt reports
+    // TS2339 on `x.#prop` for `typeof Derived`.
+    let text = b"class Base {
+    static #prop: number = 1;
+    static method(x: typeof Derived) {
+        x.#prop;
+    }
+}
+class Derived extends Base {}
+";
+    let codes = semantic_codes(text, options());
+    assert_eq!(
+        codes,
+        vec![(
+            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            strings(&["#prop", "typeof Derived"])
+        )]
+    );
+}
+
+#[test]
+fn reported_relation_failures_are_not_elaborated_twice() {
+    // Pinned Go: fuzzy.errors.txt chains one TS2741 under the `oneI: this`
+    // error. The `this` type parameter relates its constraint twice; the
+    // second pass reuses the reported failure instead of repeating the chain.
+    let text = b"namespace M {
+    export interface I { works: () => R; alsoWorks: () => R; }
+    export interface R { anything: number; oneI: I; }
+    export class C implements I {
+        works(): R {
+            return { anything: 1, oneI: this };
+        }
+    }
+}
+";
+    let (owner, source) = checker(text, options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    let this_error = diagnostics
+        .iter()
+        .find(|d| d.code == ts_diagnostics::Type_0_is_not_assignable_to_type_1.code)
+        .expect("assignment error for `this`");
+    assert_eq!(this_error.message_chain.len(), 1);
+    let missing = &this_error.message_chain[0];
+    assert_eq!(
+        missing.code,
+        ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
+    );
+    assert!(
+        missing.message_chain.is_empty(),
+        "{:?}",
+        codes_and_args(&diagnostics)
+    );
+    assert_eq!(missing.related_information.len(), 1);
+}

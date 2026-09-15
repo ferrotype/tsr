@@ -91,7 +91,7 @@ impl CheckerState {
                         && self.module_only_importable_as_default(specifier, resolved)?
                         && !self.has_type_json_import_attribute(node)?
                     {
-                        self.error_at(Some(specifier),d::Importing_a_JSON_file_into_an_ECMAScript_module_requires_a_type_Colon_json_import_attribute_when_module_is_set_to_0,vec![JsString::from_bytes(match kind {ModuleKind::NODE18=>b"node18".as_slice(),ModuleKind::NODE20=>b"node20".as_slice(),_=>b"nodenext".as_slice()})])?;
+                        self.error_at(Some(specifier),d::Importing_a_JSON_file_into_an_ECMAScript_module_requires_a_type_Colon_json_import_attribute_when_module_is_set_to_0,vec![JsString::from_bytes(crate::emit_checks::module_kind_text(kind))])?;
                     }
                 }
             } else if self
