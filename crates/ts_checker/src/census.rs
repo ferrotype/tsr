@@ -557,19 +557,55 @@ impl CheckerState {
             // Both inventories enumerate reachable types, not every occupied record.
             let mut names = Vec::with_capacity(reachable);
             for id in self.reachable_type_ids(roots)? {
-                let record = self.types.get(id)?;
-                let name = match record.symbol {
-                    Some(symbol) => {
-                        String::from_utf8_lossy(self.symbol(symbol)?.name_bytes()).into_owned()
+                let mut label = self.inventory_label(id)?;
+                let record = *self.types.get(id)?;
+                if matches!(
+                    record.kind,
+                    crate::types::TypeKind::Reference | crate::types::TypeKind::Anonymous
+                ) {
+                    label += &format!("{{flags={:#x}", record.object_flags);
+                    if self.bindings.pattern_for_type.contains_key(&id) {
+                        label += ",pattern";
                     }
-                    None => String::new(),
-                };
-                names.push(format!("{:?}:{name}", record.kind));
+                    label += "}";
+                }
+                if record.kind == crate::types::TypeKind::Reference {
+                    let target = self.inventory_label(self.types.target(id)?)?;
+                    let mut args = Vec::new();
+                    if let Some(list) = &self.types.type_reference(id)?.resolved_type_arguments {
+                        for &arg in list.iter() {
+                            args.push(self.inventory_label(arg)?);
+                        }
+                    }
+                    label += &format!("->{target}[{}]", args.join(","));
+                }
+                names.push(label);
             }
             names.sort();
             report["inventory"] = json!(names);
         }
         Ok(report)
+    }
+
+    /// kind:name, with a literal type's value in place of a name (diagnosis only).
+    #[cfg(any(test, feature = "storage-pilot"))]
+    fn inventory_label(&self, id: TypeId) -> Result<String, crate::Error> {
+        let record = self.types.get(id)?;
+        let name = match record.symbol {
+            Some(symbol) => String::from_utf8_lossy(self.symbol(symbol)?.name_bytes()).into_owned(),
+            None => String::new(),
+        };
+        let name = match record.kind {
+            crate::types::TypeKind::Literal => match &self.types.literal(id)?.value {
+                LiteralValue::String(text) => String::from_utf8_lossy(text.as_bytes()).into_owned(),
+                other => format!("{other:?}"),
+            },
+            crate::types::TypeKind::Intrinsic => {
+                String::from_utf8_lossy(self.types.intrinsic(id)?.name.as_bytes()).into_owned()
+            }
+            _ => name,
+        };
+        Ok(format!("{:?}:{name}", record.kind))
     }
 
     fn census_structured(

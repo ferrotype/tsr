@@ -983,14 +983,41 @@ func (v2 *s08V2) inventory() []string {
 	}
 	names := make([]string, 0, len(v2.types))
 	for t := range v2.types {
-		name := ""
-		if t.symbol != nil {
-			name = t.symbol.Name
+		label := s08TypeLabel(t)
+		switch t.data.(type) {
+		case *TypeReference, *ObjectType:
+			label += fmt.Sprintf("{flags=%#x", uint32(t.objectFlags))
+			if v2.c.patternForType[t] != nil {
+				label += ",pattern"
+			}
+			label += "}"
 		}
-		names = append(names, fmt.Sprintf("%T:%s", t.data, name))
+		if ref, ok := t.data.(*TypeReference); ok && ref.target != nil {
+			args := make([]string, 0, len(ref.resolvedTypeArguments))
+			for _, arg := range ref.resolvedTypeArguments {
+				args = append(args, s08TypeLabel(arg))
+			}
+			label += "->" + s08TypeLabel(ref.target) + "[" + strings.Join(args, ",") + "]"
+		}
+		names = append(names, label)
 	}
 	sort.Strings(names)
 	return names
+}
+
+// s08TypeLabel is kind:name, with a literal type's value in place of a name.
+func s08TypeLabel(t *Type) string {
+	name := ""
+	if t.symbol != nil {
+		name = t.symbol.Name
+	}
+	if literal, ok := t.data.(*LiteralType); ok {
+		name = fmt.Sprintf("%v", literal.value)
+	}
+	if intrinsic, ok := t.data.(*IntrinsicType); ok {
+		name = intrinsic.intrinsicName
+	}
+	return fmt.Sprintf("%T:%s", t.data, name)
 }
 
 // S08Census is the P7 structural census of one complete checker with `roots`
