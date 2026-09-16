@@ -324,7 +324,7 @@ impl CheckerState {
         if let Some(alias) = record.alias {
             work.types(self.types.alias(alias)?.type_arguments.iter().copied());
         }
-        match record.kind {
+        match record.kind() {
             TypeKind::Anonymous
             | TypeKind::EvolvingArray
             | TypeKind::Reference
@@ -334,7 +334,7 @@ impl CheckerState {
             | TypeKind::ReverseMapped
             | TypeKind::InstantiationExpression => {
                 let object = self.types.object(ty)?;
-                if record.kind == TypeKind::EvolvingArray {
+                if record.kind() == TypeKind::EvolvingArray {
                     let evolving = self.types.evolving_array(ty)?;
                     work.types([evolving.element_type]);
                     work.types(evolving.final_array_type);
@@ -346,7 +346,7 @@ impl CheckerState {
                     work.types(map.values().copied());
                 }
                 if matches!(
-                    record.kind,
+                    record.kind(),
                     TypeKind::Reference | TypeKind::Interface | TypeKind::Tuple
                 ) {
                     work.types(
@@ -357,7 +357,7 @@ impl CheckerState {
                             .flat_map(|types| types.iter().copied()),
                     );
                 }
-                if matches!(record.kind, TypeKind::Interface | TypeKind::Tuple) {
+                if matches!(record.kind(), TypeKind::Interface | TypeKind::Tuple) {
                     let interface = self.types.interface(ty)?;
                     work.types(
                         interface
@@ -389,7 +389,7 @@ impl CheckerState {
                         work.types([info.key_type, info.value_type]);
                     }
                 }
-                if record.kind == TypeKind::Mapped {
+                if record.kind() == TypeKind::Mapped {
                     let data = self.types.mapped(ty)?;
                     for id in [
                         data.type_parameter,
@@ -402,7 +402,7 @@ impl CheckerState {
                         work.types(id);
                     }
                 }
-                if record.kind == TypeKind::ReverseMapped {
+                if record.kind() == TypeKind::ReverseMapped {
                     let data = self.types.reverse_mapped(ty)?;
                     for id in [data.source, data.mapped_type, data.constraint_type] {
                         work.types(id);

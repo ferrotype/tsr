@@ -23,6 +23,7 @@ pub use bundle::{StorageBundle, StorageHandle};
 pub use census::StorageCensus;
 pub use counters::{Counters, Counts};
 pub use error::Error;
+pub mod growth;
 pub mod hash;
 pub use file::{CoreDataRead, CoreNodesMut, StorageBuilder, StorageOwner, StorageView};
 pub use ids::{ArenaId, AuxId, FileId, NodeId, SymbolId};

@@ -718,7 +718,7 @@ impl CheckerState {
     }
 
     pub(crate) fn kind(&self, t: TypeId) -> Result<TypeKind, Error> {
-        Ok(self.types.get(t)?.kind)
+        Ok(self.types.get(t)?.kind())
     }
 }
 

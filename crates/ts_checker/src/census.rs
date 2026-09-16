@@ -560,7 +560,7 @@ impl CheckerState {
                 let mut label = self.inventory_label(id)?;
                 let record = *self.types.get(id)?;
                 if matches!(
-                    record.kind,
+                    record.kind(),
                     crate::types::TypeKind::Reference | crate::types::TypeKind::Anonymous
                 ) {
                     label += &format!("{{flags={:#x}", record.object_flags);
@@ -569,7 +569,7 @@ impl CheckerState {
                     }
                     label += "}";
                 }
-                if record.kind == crate::types::TypeKind::Reference {
+                if record.kind() == crate::types::TypeKind::Reference {
                     let target = self.inventory_label(self.types.target(id)?)?;
                     let mut args = Vec::new();
                     if let Some(list) = &self.types.type_reference(id)?.resolved_type_arguments {
@@ -595,7 +595,7 @@ impl CheckerState {
             Some(symbol) => String::from_utf8_lossy(self.symbol(symbol)?.name_bytes()).into_owned(),
             None => String::new(),
         };
-        let name = match record.kind {
+        let name = match record.kind() {
             crate::types::TypeKind::Literal => match &self.types.literal(id)?.value {
                 LiteralValue::String(text) => String::from_utf8_lossy(text.as_bytes()).into_owned(),
                 other => format!("{other:?}"),
@@ -605,7 +605,7 @@ impl CheckerState {
             }
             _ => name,
         };
-        Ok(format!("{:?}:{name}", record.kind))
+        Ok(format!("{:?}:{name}", record.kind()))
     }
 
     fn census_structured(

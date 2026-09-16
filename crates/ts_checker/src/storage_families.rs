@@ -647,7 +647,7 @@ impl Live {
             row.insert("alias_symbol_name_hex".into(), Value::Null);
             row.insert("alias_args".into(), json!([]));
         }
-        let payload = match record.kind {
+        let payload = match record.kind() {
             TypeKind::Intrinsic => {
                 row.insert(
                     "name_hex".into(),
@@ -732,7 +732,7 @@ impl Live {
                     row.insert("combined_flags".into(), json!(tuple.combined_flags));
                     row.insert("readonly".into(), json!(tuple.readonly));
                 }
-                match record.kind {
+                match record.kind() {
                     TypeKind::Anonymous => "anonymous",
                     TypeKind::Reference => "reference",
                     TypeKind::Interface => "interface",
