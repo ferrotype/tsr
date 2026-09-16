@@ -663,6 +663,9 @@ impl CheckerState {
                 Some(K::ImportEqualsDeclaration | K::ExportDeclaration) => {
                     return Ok(!read.is_type_only())
                 }
+                Some(K::CallExpression) if is_import_call(self.ast(node)?, &read)? => {
+                    return Ok(true)
+                }
                 Some(K::ImportType) => return Ok(false),
                 Some(K::SourceFile) => return Ok(false),
                 _ => {

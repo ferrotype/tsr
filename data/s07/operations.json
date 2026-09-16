@@ -36425,7 +36425,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 962
+          "line": 965
         }
       ],
       "source_sha256": "c0d3ffdac4587ce7c12d5fc3d4ccfe562563ddfa5056c7e086b8c0e9c4940fed",
@@ -36553,7 +36553,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1086
+          "line": 1089
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36839,7 +36839,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1071
+          "line": 1074
         },
         {
           "file": "crates/ts_checker/src/node_builder_names.rs",

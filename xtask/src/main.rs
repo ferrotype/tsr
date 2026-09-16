@@ -383,6 +383,9 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
     let mut ledger = read_ledger(root);
     let mut metrics: Metrics = BTreeMap::new();
     let mut errors = Vec::new();
+    if let Err(error) = evidence::validate_history(root) {
+        errors.push(error);
+    }
     let provenance = evidence::provenance(root, &ledger.pin);
     metrics.insert(
         "provenance.valid".into(),

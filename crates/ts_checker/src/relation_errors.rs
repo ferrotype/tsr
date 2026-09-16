@@ -464,7 +464,11 @@ impl CheckerState {
     fn type_name_for_error_display_ex(&mut self, ty: TypeId) -> Result<JsString, Error> {
         let symbol = self.types.get(ty)?.symbol;
         if let Some(declaration) = self.symbol_value_declaration_is_context_sensitive(symbol)? {
-            return self.type_to_string_at(ty, Some(declaration), fmt::NONE);
+            return self.type_to_string_at(
+                ty,
+                Some(declaration),
+                crate::type_display::DEFAULT_FLAGS,
+            );
         }
         self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)
     }

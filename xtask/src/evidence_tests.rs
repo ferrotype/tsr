@@ -95,6 +95,44 @@ impl Drop for Fixture {
 }
 
 #[test]
+fn historical_artifacts_must_exist_and_keep_their_identity() {
+    let f = Fixture::new();
+    f.success();
+    let digest = fs::read_to_string(f.0.join("status/evidence/probe.latest")).unwrap();
+    let path = format!("status/evidence/{digest}.json");
+    let bytes = fs::read(f.0.join(&path)).unwrap();
+    let history = serde_json::json!({"evidence_artifacts": {"probe": path}}).to_string();
+    f.write("status/history.jsonl", &history);
+    validate_history(&f.0).unwrap();
+    // Source drift does not invalidate the historical artifact itself.
+    f.write("source.txt", "new source");
+    validate_history(&f.0).unwrap();
+    fs::remove_file(f.0.join(&path)).unwrap();
+    assert!(validate_history(&f.0)
+        .unwrap_err()
+        .contains("history.jsonl:1"));
+    f.write(&path, "{}");
+    assert!(validate_history(&f.0)
+        .unwrap_err()
+        .contains("checksum mismatch"));
+    fs::write(f.0.join(&path), bytes).unwrap();
+    f.write(
+        "status/history.jsonl",
+        &serde_json::json!({"evidence_artifacts": {"wrong": path}}).to_string(),
+    );
+    assert!(validate_history(&f.0)
+        .unwrap_err()
+        .contains("identity/contents mismatch"));
+    f.write(
+        "status/history.jsonl",
+        r#"{"evidence_artifacts":{"probe":"../secret.json"}}"#,
+    );
+    assert!(validate_history(&f.0)
+        .unwrap_err()
+        .contains("invalid historical artifact path"));
+}
+
+#[test]
 fn frozen_manifest_requires_exact_unique_results() {
     let f = Fixture::new();
     let mut spec = f.spec();

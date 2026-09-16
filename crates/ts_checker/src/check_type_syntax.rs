@@ -518,19 +518,20 @@ impl CheckerState {
         } else {
             vec![ty].into()
         };
-        for &ty in types.iter() {
-            if self.types.flags(ty)? & (tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE | tf::TYPE_PARAMETER)
-                != 0
-            {
-                let name = name.ok_or(Error::MissingLink("index parameter name"))?;
-                self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
-                return Ok(());
+        let mut literal_key = false;
+        for &part in types.iter() {
+            if self.types.flags(part)? & tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE != 0 {
+                literal_key = true;
+                break;
             }
         }
+        if literal_key || self.is_generic_type(ty)? {
+            let name = name.ok_or(Error::MissingLink("index parameter name"))?;
+            self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
+            return Ok(());
+        }
         for &ty in types.iter() {
-            if self.types.flags(ty)? & (tf::STRING | tf::NUMBER | tf::ES_SYMBOL) == 0
-                && !self.is_pattern_literal_type(ty)?
-            {
+            if !self.is_valid_index_key_type(ty)? {
                 let name = name.ok_or(Error::MissingLink("index parameter name"))?;
                 self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_must_be_string_number_symbol_or_a_template_literal_type, vec![])?;
                 return Ok(());
@@ -544,6 +545,24 @@ impl CheckerState {
             )?;
         }
         Ok(())
+    }
+    // port: tsc/internal/checker/checker.go:Checker.isValidIndexKeyType
+    fn is_valid_index_key_type(&mut self, ty: crate::TypeId) -> Result<bool, Error> {
+        let flags = self.types.flags(ty)?;
+        if flags & (tf::STRING | tf::NUMBER | tf::ES_SYMBOL) != 0
+            || self.is_pattern_literal_type(ty)?
+        {
+            return Ok(true);
+        }
+        if flags & tf::INTERSECTION != 0 && !self.is_generic_type(ty)? {
+            let types = self.types.types_of(ty)?.to_vec();
+            for ty in types {
+                if self.is_valid_index_key_type(ty)? {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(false)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkInferType
     pub(crate) fn check_infer_type(&mut self, node: ts_arena::NodeId) -> Result<(), Error> {

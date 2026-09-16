@@ -14,6 +14,10 @@ use ts_printer::{
     emit_resolver::{DeclarationTrackerEvent as Event, SymbolAccessibility},
 };
 
+#[cfg(test)]
+#[path = "node_builder_reuse_tests.rs"]
+mod tests;
+
 // Source: tsc/internal/checker/nodecopy.go:recoveryBoundary
 pub(super) struct RecoveryBoundary {
     had_error: bool,
@@ -527,13 +531,15 @@ impl NodeBuilder<'_> {
                 return visited;
             }
             let result = visited?;
-            // NodeVisitor.VisitNodes keeps the input list's Loc even for nonlocal
-            // nodes; only the nodes themselves get synthetic positions.
+            // nodecopy's VisitNodes hook overrides the visitor's preserved range
+            // for nonlocal lists. Clone an unchanged header before resetting it.
             let result = if visited == list {
                 v.factory_mut().clone_list_header(result)
             } else {
                 result
             };
+            v.factory_mut()
+                .set_list_location(result, ts_core::TextRange::new(-1, -1));
             Some(result)
         };
         let mut visitor = NodeVisitor::new(

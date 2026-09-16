@@ -99,7 +99,7 @@ impl NodeBuilder<'_> {
         for (&argument, info) in arguments.iter().zip(infos.iter()) {
             element_types.push(self.without_missing(argument, info.flags & ef::OPTIONAL != 0)?);
         }
-        let element_nodes = self.type_nodes(&element_types)?;
+        let element_nodes = self.type_nodes(&element_types, false)?;
         let mut nodes = Vec::new();
         for (mut node, info) in element_nodes.into_iter().zip(infos.iter()) {
             if info.flags & ef::REST != 0 {

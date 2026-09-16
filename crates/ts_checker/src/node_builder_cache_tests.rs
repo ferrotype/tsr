@@ -31,6 +31,30 @@ fn print(builder: &NodeBuilder<'_>, node: NodeId) -> Result<JsString, Error> {
 }
 
 #[test]
+fn tuple_truncation_uses_the_nonbare_list_prelude() {
+    let counters = Counters::new();
+    let mut checker = state(&counters);
+    let tuple = checker
+        .create_tuple_type(&[checker.builtins.number_type; 6])
+        .unwrap();
+    for (length, expected) in [
+        (
+            0,
+            b"[number, number, number, number, number, number]".as_slice(),
+        ),
+        (
+            crate::DEFAULT_MAXIMUM_TRUNCATION_LENGTH + 1,
+            b"[...]".as_slice(),
+        ),
+    ] {
+        let mut builder = NodeBuilder::new(&mut checker, 0);
+        builder.approximate_length = length;
+        let node = builder.type_node(tuple).unwrap();
+        assert_eq!(print(&builder, node).unwrap().as_bytes(), expected);
+    }
+}
+
+#[test]
 fn cached_object_survives_rotation_without_retaining_repeat_output() {
     let counters = Counters::new();
     let initial = counters.snapshot();

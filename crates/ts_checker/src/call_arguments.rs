@@ -717,10 +717,16 @@ impl CheckerState {
             minimum.to_string()
         };
         let between = minimum < args.len() && args.len() < maximum;
+        let void_promise_error = !rest
+            && count == "1"
+            && args.is_empty()
+            && self.is_promise_resolve_arity_error(node)?;
         let message = if between {
             messages::No_overload_expects_0_arguments_but_overloads_do_exist_that_expect_either_1_or_2_arguments
         } else if rest {
             messages::Expected_at_least_0_arguments_but_got_1
+        } else if void_promise_error {
+            messages::Expected_0_arguments_but_got_1_Did_you_forget_to_include_void_in_your_type_argument_to_Promise
         } else {
             messages::Expected_0_arguments_but_got_1
         };
@@ -762,10 +768,6 @@ impl CheckerState {
         } else {
             node
         };
-        let void_promise_error = !rest
-            && count == "1"
-            && args.is_empty()
-            && self.is_promise_resolve_arity_error(node)?;
         if void_promise_error
             && self.ast(node)?.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
         {

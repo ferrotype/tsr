@@ -434,26 +434,28 @@ impl<'a> NodeBuilder<'a> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
     fn type_list(&mut self, types: &[TypeId], bare: bool) -> Result<NodeListId, Error> {
+        let nodes = self.type_nodes(types, bare)?;
+        self.list(nodes)
+    }
+
+    /// Complete mapToTypeNodes, also used before decorating tuple elements.
+    fn type_nodes(&mut self, types: &[TypeId], bare: bool) -> Result<Vec<NodeId>, Error> {
+        if types.is_empty() {
+            return Ok(Vec::new());
+        }
         if self.check_truncation() {
             if !bare {
                 let node = self.elision(b"...")?;
-                return self.list(vec![node]);
+                return Ok(vec![node]);
             }
             if types.len() > 2 {
                 let first = self.type_node(types[0])?;
                 let last = self.type_node(types[types.len() - 1])?;
                 let elision =
                     self.elision(format!("... {} more ...", types.len() - 2).as_bytes())?;
-                return self.list(vec![first, elision, last]);
+                return Ok(vec![first, elision, last]);
             }
         }
-        let nodes = self.type_nodes(types)?;
-        self.list(nodes)
-    }
-
-    /// The element loop of mapToTypeNodes, shared with tuple element lists.
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
-    pub(super) fn type_nodes(&mut self, types: &[TypeId]) -> Result<Vec<NodeId>, Error> {
         let mut nodes = Vec::new();
         // To avoid printing types like `[Foo, Foo]` or `Bar & Bar` where occurrences
         // of the same name come from different namespaces, single-identifier

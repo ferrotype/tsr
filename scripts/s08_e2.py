@@ -24,10 +24,10 @@ def sources():
     result = corpus.sources()
     for pattern in ('scripts/s08_e2*.py', 'scripts/s08_contracts.py', 'scripts/s08_p3_comparators.py',
                     'scripts/s06_utilities.py', 'scripts/s04.py', 'scripts/s07_acceptance.py',
-                    'tools/s08/oracle/**', 'tools/s08/p3c/order-inputs.json',
+                    'tools/s08/oracle/**/*', 'tools/s08/p3c/order-inputs.json',
                     'data/s08/e2-obligations.json', 'data/s08/baseline-requests.json',
                     'data/s08/supplemental-report.json', 'data/s08/supplemental-observations.json.xz',
-                    'data/s07/subset*.json', 'data/s07/e2-*.json', 'rust-toolchain*', '.cargo/**'):
+                    'data/s07/subset*.json', 'data/s07/e2-*.json', 'rust-toolchain*', '.cargo/**/*'):
         for path in ROOT.glob(pattern):
             if path.is_file(): result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return result
@@ -92,10 +92,15 @@ def verify(directory, *, partial=False):
 
 def producer():
     from s07_producers import e2 as subset
-    correctness = verify(DEFAULT)['metrics'] if (DEFAULT / 'corpus').exists() else None
+    correctness = verify(DEFAULT) if (DEFAULT / 'corpus').exists() else None
     result = subset()
     if correctness is not None:
-        result['metrics'].update(correctness)
+        result['metrics'].update(correctness['metrics'])
+        # xtask authenticates and commits stderr with the producer record. Keep
+        # the capture identities there; metric values alone cannot identify it.
+        identity = {key: correctness[key] for key in
+                    ('capture_sha256', 'obligations_sha256', 'divergences_sha256')}
+        print('E2 verified capture: ' + p4.canonical(identity).decode(), file=sys.stderr)
     else:
         print('E2 correctness unavailable: no target/s08/e2/corpus capture. See docs/S08-E2.md; subset evidence only.', file=sys.stderr)
     return result

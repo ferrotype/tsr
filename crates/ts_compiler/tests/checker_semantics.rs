@@ -4275,3 +4275,115 @@ fn ordinary_tuple_context_skips_const_mutability_relation() {
     assert!(op.semantic_diagnostics(source).unwrap().is_empty());
     assert_eq!(op.type_count(), 115);
 }
+
+const REVIEW_PROMISE_LIBRARY: &[u8] = b"interface PromiseLike<T> { then<TResult>(onfulfilled: (value: T) => TResult): PromiseLike<TResult>; } interface Promise<T> extends PromiseLike<T> {} interface PromiseConstructor { new<T>(executor: (resolve: (value: T | PromiseLike<T>) => void) => void): Promise<T>; } declare var Promise: PromiseConstructor;";
+
+#[test]
+fn promise_resolve_arity_in_typescript_includes_the_void_hint() {
+    // Native getArgumentArityError: TS2794 for resolve, ordinary TS2554 otherwise.
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"new Promise<number>(resolve => { resolve(); });\ndeclare function ordinary(value: number): void; ordinary();"),
+            (b"/lib.d.ts", REVIEW_PROMISE_LIBRARY),
+        ],
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(program.file(b"/main.ts").unwrap().source())
+        .unwrap();
+    assert_eq!(
+        diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>(),
+        [(2794, 33, 40), (2554, 96, 104)]
+    );
+    for diagnostic in diagnostics {
+        assert_eq!(
+            diagnostic.message_args,
+            [
+                JsString::from_bytes(b"1".as_slice()),
+                JsString::from_bytes(b"0".as_slice())
+            ]
+        );
+        assert_eq!(
+            diagnostic
+                .related_information
+                .iter()
+                .map(|d| d.code)
+                .collect::<Vec<_>>(),
+            [6210]
+        );
+    }
+}
+
+#[test]
+fn dynamic_imports_check_emitted_typescript_extensions() {
+    for allow_ts in [false, true] {
+        let (owner, program, _) = fixture_files(
+            b"/main.ts",
+            &[
+                (b"/main.ts", b"import(\"./a.ts\"); import(\"./b.d.ts\");"),
+                (b"/a.ts", b"export const a = 1;"),
+                (b"/b.d.ts", b"export declare const b: number;"),
+                (b"/lib.d.ts", REVIEW_PROMISE_LIBRARY),
+            ],
+            CompilerOptions {
+                allow_importing_ts_extensions: if allow_ts {
+                    Tristate::TRUE
+                } else {
+                    Tristate::FALSE
+                },
+                ..options()
+            },
+        );
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(program.file(b"/main.ts").unwrap().source())
+            .unwrap();
+        let observed = diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>();
+        // Declaration files are never emittable, even when .ts imports are allowed.
+        assert_eq!(
+            observed,
+            if allow_ts {
+                vec![(2846, 25, 35)]
+            } else {
+                vec![(5097, 7, 15), (2846, 25, 35)]
+            }
+        );
+        assert_eq!(
+            diagnostics.last().unwrap().message_args,
+            [JsString::from_bytes(if allow_ts {
+                b"./b.ts".as_slice()
+            } else {
+                b"./b.js".as_slice()
+            })]
+        );
+    }
+}
+
+#[test]
+fn index_keys_distinguish_generic_types_and_branded_primitives() {
+    let (owner, source) = checker(b"type A<T> = { [key: keyof T]: number };\ntype B<T> = { [key: T]: number };\ntype Key = string & { __brand: true };\ntype C = { [key: Key]: number };\ntype D = { [key: { __brand: true }]: number };", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    // Pinned grammar: generic keys get TS1337, concrete branded strings are
+    // valid, and a nonprimitive object key still gets TS1268.
+    assert_eq!(
+        diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>(),
+        [(1337, 15, 18), (1337, 55, 58), (1268, 158, 161)]
+    );
+}
