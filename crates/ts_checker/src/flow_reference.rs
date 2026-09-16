@@ -8,7 +8,15 @@ fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
 
 impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsThisInTypeQuery
-    pub(crate) fn flow_this_type_query(&self, mut node: NodeId) -> Result<bool, Error> {
+    pub(crate) fn flow_this_type_query(&mut self, node: NodeId) -> Result<bool, Error> {
+        if let Some(&result) = self.flow.this_type_queries.get(&node) {
+            return Ok(result);
+        }
+        let result = self.flow_this_type_query_worker(node)?;
+        self.flow.this_type_queries.insert(node, result);
+        Ok(result)
+    }
+    fn flow_this_type_query_worker(&self, mut node: NodeId) -> Result<bool, Error> {
         if self.ast(node)?.node(node)?.kind() != K::Identifier
             || self.ast(node)?.node_text(node)?.as_bytes() != b"this"
         {
@@ -110,8 +118,22 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.isConstantReference
     pub(crate) fn constant_flow_reference(&mut self, node: NodeId) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let read = self.ast(node)?.node(node)?;
-            match read.kind().known() {
+            let (kind, expression, node_parent) = {
+                let read = self.ast(node)?.node(node)?;
+                let kind = read.kind();
+                // `expression` exists only on access expressions; reading it on
+                // another kind is a payload error.
+                let expression = if matches!(
+                    kind.known(),
+                    Some(K::PropertyAccessExpression | K::ElementAccessExpression)
+                ) {
+                    read.expression()
+                } else {
+                    None
+                };
+                (kind, expression, read.parent())
+            };
+            match kind.known() {
                 Some(K::ThisKeyword) => Ok(true),
                 Some(K::Identifier) if !self.flow_this_type_query(node)? => {
                     let symbol = self.resolved_value_symbol(node)?;
@@ -127,7 +149,7 @@ impl CheckerState {
                     })
                 }
                 Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
-                    let expression = required(read.expression(), "constant access expression")?;
+                    let expression = required(expression, "constant access expression")?;
                     if !self.constant_flow_reference(expression)? {
                         return Ok(false);
                     }
@@ -137,7 +159,7 @@ impl CheckerState {
                     }
                 }
                 Some(K::ObjectBindingPattern | K::ArrayBindingPattern) => {
-                    let parent = required(read.parent(), "constant binding root")?;
+                    let parent = required(node_parent, "constant binding root")?;
                     let root = ts_ast::utilities::get_root_declaration(self.ast(parent)?, parent)?;
                     let read = self.ast(root)?.node(root)?;
                     let is_parameter = read.kind() == K::Parameter;
@@ -169,8 +191,9 @@ impl CheckerState {
     }
     fn matching_reference_worker(&mut self, source: NodeId, target: NodeId) -> Result<bool, Error> {
         let read = self.ast(target)?.node(target)?;
+        let target_kind = read.kind();
         if matches!(
-            read.kind().known(),
+            target_kind.known(),
             Some(K::ParenthesizedExpression | K::NonNullExpression)
         ) {
             return self.matching_reference(
@@ -178,7 +201,11 @@ impl CheckerState {
                 required(read.expression(), "target reference operand")?,
             );
         }
-        if let Some(binary) = read.data_source().as_binary_expression() {
+        if target_kind == K::BinaryExpression {
+            let binary = read
+                .data_source()
+                .as_binary_expression()
+                .ok_or(ts_arena::Error::InvalidGraph)?;
             let left = required(binary.left(), "target binary left")?;
             let right = required(binary.right(), "target binary right")?;
             let operator = self
@@ -216,15 +243,14 @@ impl CheckerState {
             }
             Some(K::Identifier | K::PrivateIdentifier) => {
                 if self.flow_this_type_query(source)? {
-                    return Ok(self.ast(target)?.node(target)?.kind() == K::ThisKeyword);
+                    return Ok(target_kind == K::ThisKeyword);
                 }
                 let symbol = self.resolved_value_symbol(source)?;
-                let target_read = self.ast(target)?.node(target)?;
-                if target_read.kind() == K::Identifier {
+                if target_kind == K::Identifier {
                     return Ok(symbol == self.resolved_value_symbol(target)?);
                 }
                 if matches!(
-                    target_read.kind().known(),
+                    target_kind.known(),
                     Some(K::VariableDeclaration | K::BindingElement)
                 ) {
                     let record = self.symbol(symbol)?;
@@ -237,9 +263,7 @@ impl CheckerState {
                 }
                 Ok(false)
             }
-            Some(K::ThisKeyword | K::SuperKeyword) => {
-                Ok(kind == self.ast(target)?.node(target)?.kind())
-            }
+            Some(K::ThisKeyword | K::SuperKeyword) => Ok(kind == target_kind),
             Some(K::ParenthesizedExpression | K::NonNullExpression | K::SatisfiesExpression) => {
                 self.matching_reference(
                     required(read.expression(), "source reference operand")?,

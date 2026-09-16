@@ -16,6 +16,9 @@ pub(crate) struct FlowAnalysis {
     pub(crate) disabled: bool,
     pub(crate) invocation_count: u64,
     pub(crate) reachable: crate::types::Map<FlowId, bool>,
+    /// `isThisInTypeQuery` per identifier: the flow walk asks it for the
+    /// reference on every matching-reference check.
+    pub(crate) this_type_queries: crate::types::Map<NodeId, bool>,
     // Upstream's lastFlowNode cache also covers unshared straight-line flows.
     last_reachable: Option<(FlowId, bool)>,
     post_super: crate::types::Map<FlowId, bool>,
@@ -140,20 +143,26 @@ impl CheckerState {
         reduced: &mut Vec<ts_ast::FlowReduceLabelData>,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let mut shared = Vec::new();
+            // Every node passed on the way to the answer has the answer's
+            // reachability (a pass-through node is reachable exactly when its
+            // antecedent is), so all of them are memoized, not only the shared
+            // ones upstream caches. Nodes under temporary reduce-label
+            // antecedents stay uncached, as upstream. Without this, a chain of
+            // n assignments costs n walks of length n per reference query.
+            let mut passed = Vec::new();
             let result = loop {
                 if let Some((last, result)) = self.flow.last_reachable {
                     if last == flow {
                         break result;
                     }
                 }
-                let node = self.flow_node(owner, flow)?;
-                if node.flags & ff::SHARED != 0 && reduced.is_empty() {
+                if reduced.is_empty() {
                     if let Some(&result) = self.flow.reachable.get(&flow) {
                         break result;
                     }
-                    shared.push(flow);
+                    passed.push(flow);
                 }
+                let node = self.flow_node(owner, flow)?;
                 if node.flags & (ff::ASSIGNMENT | ff::CONDITION | ff::ARRAY_MUTATION) != 0 {
                     flow = required(node.antecedent, "reachable antecedent")?;
                 } else if node.flags & ff::BRANCH_LABEL != 0 {
@@ -216,7 +225,7 @@ impl CheckerState {
                     break node.flags & ff::UNREACHABLE == 0;
                 }
             };
-            for flow in shared {
+            for flow in passed {
                 self.flow.reachable.insert(flow, result);
             }
             Ok(result)
@@ -1150,6 +1159,12 @@ impl CheckerState {
 #[cfg(any(test, feature = "storage-pilot"))]
 impl FlowAnalysis {
     pub(crate) fn census(&self, charge: &mut impl FnMut(&str, usize, usize, usize)) {
+        charge(
+            "thisTypeQueries",
+            self.this_type_queries.len(),
+            self.this_type_queries.allocation_size(),
+            0,
+        );
         charge(
             "evolvingArrayTypes",
             self.evolving.len(),
