@@ -18,6 +18,8 @@ mod observation;
 /// checker and every escaping result live.
 #[allow(dead_code)]
 pub trait Hooks {
+    /// The program is loaded, parsed and bound; nothing is timed yet.
+    fn loaded(&mut self, _program: &Program) {}
     fn interval_start(&mut self) {}
     fn init_start(&mut self) {}
     fn init_end(&mut self) {}
@@ -57,6 +59,7 @@ pub struct BaselineResults {
 
 pub fn observe(
     request: &Value,
+    cache: &mut FileCache,
     hooks: &mut dyn Hooks,
     baseline: impl FnOnce(
         &Program,
@@ -67,7 +70,6 @@ pub fn observe(
     ) -> BaselineResults,
 ) -> Value {
     let counters = ts_arena::Counters::new();
-    let mut cache = FileCache::new();
     let capture_errors = request["error_baseline_requested"] == true;
     let mut diagnostic_values = capture_errors.then(Vec::new);
     let mut phases = json!({});
@@ -92,18 +94,22 @@ pub fn observe(
             return row;
         }
     };
-    let program =
-        match observation::try_load(&request["loading"], &mut cache, &counters, parsed_config) {
-            Ok(program) => Arc::new(program),
-            Err(ts_compiler_error::Error::Unsupported(reason)) => {
-                row["load"] = failure(reason, "unsupported");
-                return row;
-            }
-            Err(error) => {
-                row["load"] = failure(format!("{error:?}"), "compiler_error");
-                return row;
-            }
-        };
+    let program = match observation::try_load(&request["loading"], cache, &counters, parsed_config)
+    {
+        Ok(program) => {
+            let program = Arc::new(program);
+            hooks.loaded(&program);
+            program
+        }
+        Err(ts_compiler_error::Error::Unsupported(reason)) => {
+            row["load"] = failure(reason, "unsupported");
+            return row;
+        }
+        Err(error) => {
+            row["load"] = failure(format!("{error:?}"), "compiler_error");
+            return row;
+        }
+    };
     row["load"] = json!({"state":"executed","graph":observation::observe(request["id"].as_str().unwrap(), &program)});
     // Bound inputs and the loader state are complete: the checker interval
     // begins. Diagnostic JSON conversion is transport, bracketed out of it.

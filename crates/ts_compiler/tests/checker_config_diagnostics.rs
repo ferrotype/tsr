@@ -13,9 +13,12 @@ fn original_config_diagnostics_reach_the_baseline_executor() {
     .unwrap();
     assert_eq!(requests.len(), expected.len());
     for (request, expected) in requests.iter().zip(expected) {
-        let actual = executor::observe(request, &mut executor::NoHooks, |_, _, _, _, _| {
-            panic!("diagnostic-only request must not run a baseline walker")
-        });
+        let actual = executor::observe(
+            request,
+            &mut ts_compiler::FileCache::new(),
+            &mut executor::NoHooks,
+            |_, _, _, _, _| panic!("diagnostic-only request must not run a baseline walker"),
+        );
         assert_eq!(
             actual["load"]["state"], "executed",
             "{}: {actual}",
@@ -50,6 +53,7 @@ fn inherited_config_diagnostics_keep_their_source_during_formatting() {
     request["error_baseline_requested"] = true.into();
     let result = executor::observe(
         &request,
+        &mut ts_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |program, _, _, diagnostics, _| {
             let sorted = program
@@ -91,6 +95,7 @@ fn config_include_specs_reach_program_diagnostics() {
     .unwrap();
     let result = executor::observe(
         &request,
+        &mut ts_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |program, _, _, diagnostics, _| {
             let sorted = program
@@ -115,23 +120,28 @@ fn original_config_text_is_not_decoded_as_a_filesystem_read() {
     // ParseSourceFile. A BOM is part of this source, not a file-load prefix.
     let text = b"\xef\xbb\xbf{\"compilerOptions\":{}}";
     request["error_inputs"][0]["content_hex"] = executor::diagnostics::hex(text).into();
-    let result = executor::observe(&request, &mut executor::NoHooks, |program, _, _, _, _| {
-        let config = program.config().config_file.as_ref().unwrap();
-        assert_eq!(
-            config
-                .file
-                .view()
-                .source_file(config.root)
-                .unwrap()
-                .text()
-                .as_bytes(),
-            text
-        );
-        executor::BaselineResults {
-            type_symbols: serde_json::json!({"state":"not_requested"}),
-            errors: serde_json::json!({"state":"not_requested"}),
-        }
-    });
+    let result = executor::observe(
+        &request,
+        &mut ts_compiler::FileCache::new(),
+        &mut executor::NoHooks,
+        |program, _, _, _, _| {
+            let config = program.config().config_file.as_ref().unwrap();
+            assert_eq!(
+                config
+                    .file
+                    .view()
+                    .source_file(config.root)
+                    .unwrap()
+                    .text()
+                    .as_bytes(),
+                text
+            );
+            executor::BaselineResults {
+                type_symbols: serde_json::json!({"state":"not_requested"}),
+                errors: serde_json::json!({"state":"not_requested"}),
+            }
+        },
+    );
     assert_eq!(result["load"]["state"], "executed");
 }
 
@@ -143,9 +153,12 @@ fn missing_original_config_is_an_explicit_capture_failure() {
     .unwrap();
     let mut request = requests[0].clone();
     request["error_inputs"].as_array_mut().unwrap().remove(0);
-    let result = executor::observe(&request, &mut executor::NoHooks, |_, _, _, _, _| {
-        panic!("config failure must stop loading")
-    });
+    let result = executor::observe(
+        &request,
+        &mut ts_compiler::FileCache::new(),
+        &mut executor::NoHooks,
+        |_, _, _, _, _| panic!("config failure must stop loading"),
+    );
     assert_eq!(result["load"]["state"], "failed");
     assert_eq!(result["load"]["class"], "config_parse");
     assert_eq!(

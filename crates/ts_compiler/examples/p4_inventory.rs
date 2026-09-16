@@ -11,12 +11,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let request: Value = serde_json::from_slice(&std::fs::read(&args[1])?)?;
     let result = catch_unwind(AssertUnwindSafe(|| {
-        executor::observe(&request, &mut executor::NoHooks, |_, _, _, _, _| {
-            executor::BaselineResults {
+        executor::observe(
+            &request,
+            &mut ts_compiler::FileCache::new(),
+            &mut executor::NoHooks,
+            |_, _, _, _, _| executor::BaselineResults {
                 type_symbols: json!({"state":"not_implemented","reason":"P5 native baseline walker/display schedule"}),
                 errors: json!({"state":"not_requested"}),
-            }
-        })
+            },
+        )
     }));
     let row = match result {
         Ok(row) => row,

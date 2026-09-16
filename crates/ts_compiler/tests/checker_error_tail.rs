@@ -19,6 +19,7 @@ fn remaining_error_tail_matches_native_diagnostics() {
         assert_eq!(request["id"], expected["id"]);
         let actual = executor::observe(
             request,
+            &mut ts_compiler::FileCache::new(),
             &mut executor::NoHooks,
             |program, _, _, diagnostics, _| {
                 let sorted = program

@@ -48,12 +48,22 @@ fn input_files(request: &Value, key: &str) -> Result<Vec<InputBytes>, &'static s
 
 #[allow(dead_code)]
 pub fn observe(request: &Value) -> Value {
-    observe_with(request, &mut executor::NoHooks, false)
+    observe_with(
+        request,
+        &mut ts_compiler::FileCache::new(),
+        &mut executor::NoHooks,
+        false,
+    )
 }
 
 /// `count_only` keeps query JSON out of the measured interval and retains the
 /// walker's type results as checkpoint roots (checkerbench child).
-pub fn observe_with(request: &Value, hooks: &mut dyn executor::Hooks, count_only: bool) -> Value {
+pub fn observe_with(
+    request: &Value,
+    cache: &mut ts_compiler::FileCache,
+    hooks: &mut dyn executor::Hooks,
+    count_only: bool,
+) -> Value {
     let mut trace = baseline::Trace {
         collect_type_strings: request["public_type_strings"] == true,
         record_queries: !count_only,
@@ -63,6 +73,7 @@ pub fn observe_with(request: &Value, hooks: &mut dyn executor::Hooks, count_only
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         executor::observe(
             request,
+            cache,
             hooks,
             |program, op, phases, diagnostic_values, hooks| {
                 let complete = phases

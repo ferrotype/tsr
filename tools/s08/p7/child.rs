@@ -11,8 +11,10 @@ use crate::executor::Hooks;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::io::Write as _;
+use std::sync::Arc;
 use std::time::Instant;
 use ts_checker::{Operation, TypeRef};
+use ts_compiler::{FileCache, Program, ProgramFile};
 
 // S07's allocator wrapper: requested bytes (layout sizes) and live requested
 // bytes at the allocator boundary; allocator size-class slack excluded.
@@ -36,6 +38,11 @@ pub const MODE: &str = if cfg!(feature = "s08-allocation") {
 /// between `interval_start`/`pause`/`resume` and the checkpoint.
 #[derive(Default)]
 struct Measure {
+    /// Library files of the previous variant, kept alive until this variant
+    /// has loaded so the shared cache reuses their parse and bind (the Go
+    /// harness caches parsed files across tests the same way). Never checker
+    /// state; live at both retained endpoints.
+    libraries: Vec<Arc<ProgramFile>>,
     running: Option<Instant>,
     interval_ns: u64,
     roots: Vec<TypeRef>,
@@ -80,6 +87,19 @@ impl Measure {
     }
 }
 impl Hooks for Measure {
+    fn loaded(&mut self, program: &Program) {
+        self.libraries = program
+            .files()
+            .iter()
+            .filter(|file| {
+                file.bound()
+                    .view()
+                    .source_file()
+                    .is_ok_and(|source| program.is_lib(source.parse_options().path.as_bytes()))
+            })
+            .cloned()
+            .collect();
+    }
     fn interval_start(&mut self) {
         #[cfg(feature = "s08-allocation")]
         {
@@ -216,9 +236,13 @@ fn executed(row: &Value) -> Result<(), String> {
     Ok(())
 }
 
-fn variant(request: &Value) -> Value {
-    let mut measure = Measure::default();
-    let observed = corpus::observe_with(request, &mut measure, true);
+fn variant(request: &Value, cache: &mut FileCache, libraries: &mut Vec<Arc<ProgramFile>>) -> Value {
+    let mut measure = Measure {
+        libraries: std::mem::take(libraries),
+        ..Measure::default()
+    };
+    let observed = corpus::observe_with(request, cache, &mut measure, true);
+    *libraries = std::mem::take(&mut measure.libraries);
     let mut row = json!({
         "id": request["id"], "acceptance_tier": request["acceptance_tier"],
         "interval_ns": measure.interval_ns, "actions": corpus::action_counts(&observed),
@@ -274,8 +298,11 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut digests = Sha256::new();
     let mut actions = Sha256::new();
     let started = Instant::now();
+    let mut cache = FileCache::new();
+    let mut libraries = Vec::new();
     for request in &requests {
-        let row = variant(request);
+        let row = variant(request, &mut cache, &mut libraries);
+        cache.prune();
         digests.update(row["output_sha256"].as_str().unwrap_or("").as_bytes());
         digests.update(b"\n");
         actions.update(serde_json::to_vec(&row["actions"])?);
