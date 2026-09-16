@@ -70,9 +70,7 @@ impl NodeBuilder<'_> {
                         NameTableId::Members(symbol),
                         self.checker.symbol(symbol)?.members(),
                     );
-                    if !self.name_table_symbols(&table)?.is_empty()
-                        && callback(self, table, Some(node))?
-                    {
+                    if self.name_table_has_symbols(&table)? && callback(self, table, Some(node))? {
                         return Ok(true);
                     }
                     if kind == K::ClassExpression {
@@ -125,6 +123,28 @@ impl NodeBuilder<'_> {
             }
         }
         Ok(value)
+    }
+
+    /// Whether a name table has any symbol (a members table counts only its
+    /// type members), without listing them.
+    pub(super) fn name_table_has_symbols(&self, table: &NameTable) -> Result<bool, Error> {
+        if table.singleton.is_some() {
+            return Ok(true);
+        }
+        let Some(id) = table.table else {
+            return Ok(false);
+        };
+        for (_, value) in self.checker.table(id)? {
+            if let Some(value) = value {
+                if matches!(table.id, NameTableId::Members(_))
+                    && self.checker.symbol(value)?.flags() & (sf::TYPE & !sf::ASSIGNMENT) == 0
+                {
+                    continue;
+                }
+                return Ok(true);
+            }
+        }
+        Ok(false)
     }
 
     /// The symbols of a name table in table order (a members table keeps only

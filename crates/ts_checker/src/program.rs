@@ -132,23 +132,16 @@ impl ProgramContext {
             .unwrap_or(0)
     }
 
+    // Symbol, table and declaration lookups take the shared view too: the
+    // display path asks for a symbol on nearly every name-chain step.
     pub(crate) fn symbol(&self, symbol: SymbolId) -> Result<SymbolRef<'_>, Error> {
         let &index = self.symbols.get(&symbol.arena()).ok_or(Error::WrongOwner)?;
-        self.host
-            .source_file(index)
-            .view()
-            .symbol(symbol)
-            .map(SymbolRef::Stored)
+        self.file_view(index).symbol(symbol).map(SymbolRef::Stored)
     }
 
     pub(crate) fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, Error> {
         let &index = self.tables.get(&table.arena()).ok_or(Error::WrongOwner)?;
-        self.host
-            .source_file(index)
-            .view()
-            .result()
-            .tables()
-            .get(table)
+        self.file_view(index).result().tables().get(table)
     }
 
     pub(crate) fn declarations(
@@ -160,12 +153,7 @@ impl ProgramContext {
             .declarations
             .get(&backing.arena())
             .ok_or(Error::WrongOwner)?;
-        self.host
-            .source_file(index)
-            .view()
-            .result()
-            .declarations()
-            .get(slice)
+        self.file_view(index).result().declarations().get(slice)
     }
 }
 
