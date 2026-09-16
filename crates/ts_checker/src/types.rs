@@ -538,6 +538,15 @@ impl TypeStore {
         self.records.len()
     }
 
+    /// Every record with its id, for storage censuses.
+    #[cfg(any(test, feature = "storage-pilot"))]
+    pub(crate) fn records(&self) -> impl Iterator<Item = (TypeId, &TypeRecord)> {
+        self.records
+            .iter()
+            .enumerate()
+            .filter_map(|(index, record)| Some((TypeId::next(self.base, index).ok()?, record)))
+    }
+
     /// The id the next `new_type` call will issue.
     pub(crate) fn next_id(&self) -> Result<TypeId, Error> {
         TypeId::next(self.base, self.records.len())

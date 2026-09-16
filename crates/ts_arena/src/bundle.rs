@@ -190,3 +190,23 @@ impl<N: NodeRecord, S> StorageHandle<N, S> {
         }
     }
 }
+
+impl<N: NodeRecord, S> StorageHandle<N, S> {
+    /// Structural storage of the owner(s) behind this handle; see
+    /// [`StorageOwner::structural_bytes`].
+    pub fn structural_bytes(&self, store: impl Fn(&N::Store) -> (usize, usize)) -> (usize, usize) {
+        match &self.root {
+            Root::File(owner) => owner.structural_bytes(&store),
+            Root::Bundle(bundle, _) => {
+                let mut known = bundle.files.capacity() * size_of::<Arc<StorageOwner<N, S>>>();
+                let mut unmeasured = 0;
+                for owner in &bundle.files {
+                    let (k, u) = owner.structural_bytes(&store);
+                    known += 16 + size_of::<StorageOwner<N, S>>() + k;
+                    unmeasured += u;
+                }
+                (known, unmeasured)
+            }
+        }
+    }
+}

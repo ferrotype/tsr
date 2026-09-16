@@ -382,6 +382,18 @@ impl SymbolTables {
     pub fn table_count(&self) -> usize {
         self.tables.len()
     }
+    /// Bytes reserved by one table's own hash storage, for censuses that
+    /// attribute a member table to the record owning it. `None` for a table of
+    /// another store.
+    pub fn table_structural_bytes(&self, id: SymbolTableId) -> Option<usize> {
+        if id.arena() != self.tables.id() {
+            return None;
+        }
+        self.tables.get(id.0).ok().map(|record| match record {
+            TableRecord::Compact(table) => table.allocation_size(),
+            TableRecord::Full(table) => table.allocation_size(),
+        })
+    }
     pub fn iter(&self) -> impl Iterator<Item = (SymbolTableId, SymbolTableRead<'_>)> {
         self.tables.iter().map(|(id, table)| {
             (

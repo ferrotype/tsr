@@ -3,7 +3,7 @@
 //! table lock is held while invoking factory or checker code.
 
 use crate::EmitFlags;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::sync::{
     atomic::{AtomicU32, Ordering},
     Arc, Mutex, MutexGuard,
@@ -63,11 +63,11 @@ pub struct SynthesizedComment {
 
 #[derive(Debug, Default)]
 struct SideTables {
-    emit_flags: HashMap<NodeId, EmitFlags>,
-    original: HashMap<NodeId, NodeId>,
-    comment_ranges: HashMap<NodeId, ts_core::TextRange>,
-    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>>,
-    auto_generate: HashMap<NodeId, AutoGenerateInfo>,
+    emit_flags: HashMap<NodeId, EmitFlags, std::hash::RandomState>,
+    original: HashMap<NodeId, NodeId, std::hash::RandomState>,
+    comment_ranges: HashMap<NodeId, ts_core::TextRange, std::hash::RandomState>,
+    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, std::hash::RandomState>,
+    auto_generate: HashMap<NodeId, AutoGenerateInfo, std::hash::RandomState>,
 }
 impl SideTables {
     fn set_original(&mut self, node: NodeId, original: NodeId) {
@@ -138,6 +138,23 @@ impl EmitContext {
 
     /// Occupied side-table entries. This is not an allocation-byte measurement:
     /// the standard maps retain capacity and comments/names own variable text.
+    /// Structural bytes of the side tables: table allocations and comment
+    /// list capacities.
+    pub fn structural_bytes(&self) -> usize {
+        let tables = self.tables();
+        size_of::<SideTables>()
+            + tables.emit_flags.allocation_size()
+            + tables.original.allocation_size()
+            + tables.comment_ranges.allocation_size()
+            + tables.leading_comments.allocation_size()
+            + tables
+                .leading_comments
+                .values()
+                .map(|comments| comments.capacity() * size_of::<SynthesizedComment>())
+                .sum::<usize>()
+            + tables.auto_generate.allocation_size()
+    }
+
     pub fn metadata_entries(&self) -> usize {
         let tables = self.tables();
         tables.emit_flags.len()

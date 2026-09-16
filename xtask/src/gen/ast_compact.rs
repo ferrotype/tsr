@@ -158,7 +158,17 @@ pub(super) fn emit(nodes: &[Value], pin: &str) -> Result<String, String> {
             ));
         }
     }
-    code.push_str("}\n\nimpl AstPayloadStore {\n    pub(crate) fn shape_of(data: &NodeData) -> u16 {\n        match data {\n");
+    code.push_str("}\n\nimpl AstPayloadStore {\n    /// Reserved page bytes of every populated typed directory, including the\n    /// boxed directory records (storage census).\n    pub(crate) fn structural_bytes(&self) -> usize {\n        let mut bytes = 0;\n");
+    for node in nodes {
+        if has_row(node)? {
+            code.push_str(&format!(
+                "        if let Some(pages) = &self.{} {{\n            bytes += size_of::<RowPages<{}Row>>() + pages.structural_bytes();\n        }}\n",
+                snake(string(node, "name")?),
+                string(node, "name")?
+            ));
+        }
+    }
+    code.push_str("        bytes\n    }\n\n    pub(crate) fn shape_of(data: &NodeData) -> u16 {\n        match data {\n");
     for (shape, node) in nodes.iter().enumerate() {
         code.push_str(&format!(
             "            NodeData::{}(_) => {shape},\n",

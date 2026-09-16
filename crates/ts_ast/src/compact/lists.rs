@@ -4,7 +4,7 @@
 //! retain full non-owning IDs; the enclosing owner retains their dependencies.
 
 use crate::NodeId;
-use std::{collections::BTreeMap, ops::Range};
+use std::ops::Range;
 use ts_arena::{ArenaId, Error};
 
 const PAGE_WORDS: usize = 256;
@@ -23,7 +23,8 @@ pub(crate) struct EdgePages {
     #[allow(clippy::vec_box)] // Directory growth must not copy existing edge pages.
     pages: Vec<Box<[u32; PAGE_WORDS]>>,
     len: usize,
-    escapes: BTreeMap<usize, NodeId>,
+    escapes:
+        hashbrown::HashMap<usize, NodeId, std::hash::BuildHasherDefault<std::hash::DefaultHasher>>,
 }
 
 impl EdgePages {
@@ -31,7 +32,7 @@ impl EdgePages {
         Self {
             pages: Vec::new(),
             len: 0,
-            escapes: BTreeMap::new(),
+            escapes: hashbrown::HashMap::with_hasher(std::hash::BuildHasherDefault::new()),
         }
     }
 
@@ -40,13 +41,15 @@ impl EdgePages {
         !self.escapes.is_empty()
     }
 
-    /// Known page/directory bytes and the count of escape entries whose B-tree
-    /// allocation extent is not exposed by std. A census must report that gap.
+    /// Known page/directory bytes plus the escape table's allocation; the
+    /// second value counts entries a census cannot size and is always zero
+    /// now that the escape table exposes its allocation size.
     pub(crate) fn storage_bytes(&self) -> (usize, usize) {
         (
             self.pages.capacity() * size_of::<Box<[u32; PAGE_WORDS]>>()
-                + self.pages.len() * size_of::<[u32; PAGE_WORDS]>(),
-            self.escapes.len(),
+                + self.pages.len() * size_of::<[u32; PAGE_WORDS]>()
+                + self.escapes.allocation_size(),
+            0,
         )
     }
 

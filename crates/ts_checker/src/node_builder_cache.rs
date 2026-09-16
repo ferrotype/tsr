@@ -77,16 +77,23 @@ impl CachedBuilder {
                 entry.value.symbols.capacity() * size_of::<TrackedSymbol>(),
             );
             if frames.insert(entry.value.node.arena()) {
+                // Each cached display owns one published synthetic AST file.
+                let (known, unmeasured) = entry.owner.structural_bytes();
                 census.add(
                     "display_ast",
                     entry.owner.view().file_info().node_count as usize,
-                    0,
+                    known,
                 );
+                if unmeasured != 0 {
+                    census.mark_unavailable("display_ast");
+                }
             }
         }
-        census.add("display_emit", self.emit.metadata_entries(), 0);
-        // AST page capacity and std-map/comment backing accounting still need
-        // a measurement adapter. These families must never appear as zero-cost.
+        census.add(
+            "display_emit",
+            self.emit.metadata_entries(),
+            self.emit.structural_bytes(),
+        );
     }
 }
 

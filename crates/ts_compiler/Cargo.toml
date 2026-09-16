@@ -26,6 +26,10 @@ required-features = ["relation-probe"]
 name = "p7_relater"
 required-features = ["relation-probe"]
 
+[[example]]
+name = "p7_census"
+required-features = ["s08-allocation"]
+
 [dependencies]
 stacker = "=0.1.25"
 ts_core = { version = "0.1.0", path = "../ts_core" }

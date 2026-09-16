@@ -1,7 +1,7 @@
 //! Text words select a source suffix or a reusable source/owned exception slot.
 use super::FieldKey;
 use crate::JsString;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::ops::Range;
 use ts_jsstring::SourceText;
 
@@ -65,7 +65,7 @@ pub(super) struct TextPool {
     entries: Vec<TextEntry>,
     free: Vec<u32>,
     // Cooked/foreign values and exhausted pool words retain their original Arc.
-    owned: HashMap<FieldKey, JsString>,
+    owned: HashMap<FieldKey, JsString, std::hash::RandomState>,
 }
 
 fn raw_range(word: u32, end: i32, source: &SourceText) -> Range<usize> {
@@ -241,6 +241,21 @@ impl TextPool {
         }
         let value = self.owned(key, word, old_end, source);
         self.insert_pool(key, value, source, POOL_LIMIT)
+    }
+}
+
+impl TextPool {
+    /// Entry and free-list capacities, the owned-text table and the owned
+    /// strings' backings (source-backed entries alias the file text).
+    pub(super) fn structural_bytes(&self) -> usize {
+        self.entries.capacity() * size_of::<TextEntry>()
+            + self.free.capacity() * size_of::<u32>()
+            + self.owned.allocation_size()
+            + self
+                .owned
+                .values()
+                .map(|text| 16 + text.backing_bytes().len())
+                .sum::<usize>()
     }
 }
 

@@ -143,6 +143,7 @@ def overlay_sources(upstream):
     sources["testutil/tsbaseline/s08_checkerbench_walker.go"] = (BENCH / "walker_hooks.go").read_text()
     sources["testrunner/s08_checkerbench_test.go"] = (BENCH / "driver_test.go").read_text()
     sources["checker/s08_families_bridge.go"] = FAMILIES.read_text()
+    sources["checker/s08_families_census_v2.go"] = (FAMILIES.parent / "census_v2.go").read_text()
     return sources
 
 

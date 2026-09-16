@@ -237,11 +237,7 @@ func TestS08Checkerbench(t *testing.T) {
 							checkpoint["census"] = map[string]any{"state": "failed", "reason": fmt.Sprint(value)}
 						}
 					}()
-					census := checker.S08FamiliesCensus(checkerHandle, tsbaseline.S08Roots)
-					// This P1 adapter cannot certify P7's full root and family inventory.
-					census["unavailable"] = append(census["unavailable"].([]string),
-						"p7_semantic_type_roots", "p7_checker_family_coverage")
-					checkpoint["census"] = census
+					checkpoint["census"] = checker.S08Census(checkerHandle, tsbaseline.S08Roots)
 				}()
 				row["allocation"] = map[string]any{"requested_bytes": clock.Requested, "allocation_calls": clock.Mallocs,
 					"live_before_interval": harnessutil.S08LiveBeforeInterval, "live_at_checkpoint": checkpointLive}

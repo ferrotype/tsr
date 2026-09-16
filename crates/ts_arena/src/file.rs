@@ -3,10 +3,8 @@ use crate::{
     CoreScopeMut, Counters, Error, FileId, NodeId, NodeParentRecord, NodeRecord, StorageHandle,
     StorageRead, StorageTransaction, SymbolId,
 };
-use std::{
-    collections::HashMap,
-    sync::{Arc, OnceLock},
-};
+use hashbrown::HashMap;
+use std::sync::{Arc, OnceLock};
 use ts_jsstring::{PositionMap, SourceText};
 
 /// Exclusive construction owns the same storage later transferred into a file.
@@ -102,7 +100,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
                 supplemental: Vec::new(),
                 metadata: None,
                 imports: Vec::new(),
-                imported_arenas: HashMap::new(),
+                imported_arenas: HashMap::default(),
                 _owner: counters.owner(),
             },
             counters: counters.clone(),
@@ -409,7 +407,7 @@ pub struct StorageOwner<N: NodeRecord, S = ()> {
     supplemental: Vec<FileId>,
     metadata: Option<AuxId>,
     imports: Vec<Box<dyn RetainedImport<N, S>>>,
-    imported_arenas: HashMap<ArenaId, usize>,
+    imported_arenas: HashMap<ArenaId, usize, std::hash::RandomState>,
     _owner: Track,
 }
 impl<N: NodeRecord, S> std::fmt::Debug for StorageOwner<N, S> {
@@ -900,5 +898,40 @@ mod construction_tests {
         .join()
         .unwrap();
         assert_eq!(builder.symbol_mut(id).unwrap().get(), 2);
+    }
+}
+
+/// Structural storage of one owner for allocation censuses: reserved arena
+/// pages and directories, the lazy arena, the record store (measured by the
+/// caller's store-specific closure) and the owner's own directories. Returns
+/// known bytes and the number of entries whose allocation extent is not
+/// exposed (a census reports those as unavailable, never as zero).
+impl<N: NodeRecord, S> StorageOwner<N, S> {
+    pub fn structural_bytes(
+        &self,
+        store: impl FnOnce(&N::Store) -> (usize, usize),
+    ) -> (usize, usize) {
+        let (store_known, store_unmeasured) = store(&self.store);
+        let (lazy_known, lazy_unmeasured) = self.lazy.structural_bytes();
+        let known = self.core.structural_bytes()
+            + self.symbols.structural_bytes()
+            + self.auxiliary.structural_bytes()
+            + store_known
+            + lazy_known
+            + self.supplemental.capacity() * size_of::<FileId>()
+            + self.imports.capacity() * size_of::<Box<dyn RetainedImport<N, S>>>()
+            + self.imported_arenas.allocation_size()
+            + self.source.backing_bytes().len();
+        (known, store_unmeasured + lazy_unmeasured)
+    }
+}
+
+impl<N: NodeRecord, S> StorageBuilder<N, S> {
+    /// See [`StorageOwner::structural_bytes`].
+    pub fn structural_bytes(
+        &self,
+        store: impl FnOnce(&N::Store) -> (usize, usize),
+    ) -> (usize, usize) {
+        self.owner.structural_bytes(store)
     }
 }

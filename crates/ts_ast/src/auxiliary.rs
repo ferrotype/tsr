@@ -1,7 +1,7 @@
 //! Core auxiliary identities select compact rows; lazy records keep full values.
 use crate::compact::{lists::CompactNodes, CompactSlice, CoreStore, RowPages, StoredNode};
 use crate::{AstStorageData, NodeList, NodeSlice};
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use ts_arena::{ArenaId, AuxId, AuxiliaryRead, Error, StorageRead, StorageView};
 use ts_core::TextRange;
 
@@ -37,7 +37,7 @@ pub(crate) struct AuxStore {
     lists: RowPages<ListRow>,
     backings: RowPages<BackingRow>,
     cold: Vec<AstStorageData>,
-    foreign: HashMap<u32, AuxId>,
+    foreign: HashMap<u32, AuxId, std::hash::RandomState>,
 }
 
 pub(crate) enum AuxValue<'a> {
@@ -335,6 +335,39 @@ impl<'a> AuxRead<'a> {
             AuxValue::Full(AstStorageData::List(list)) => Ok(list.clone()),
             _ => Err(Error::InvalidGraph),
         }
+    }
+}
+
+impl AuxStore {
+    /// Known structural bytes and the count of nested std collections whose
+    /// allocation extent is not exposed.
+    pub(crate) fn structural_bytes(&self) -> (usize, usize) {
+        let mut known = self.lists.structural_bytes()
+            + self.backings.structural_bytes()
+            + self.cold.capacity() * size_of::<AstStorageData>()
+            + self.foreign.allocation_size();
+        let mut unmeasured = 0;
+        for data in &self.cold {
+            match data {
+                AstStorageData::FallbackNode(_) => known += 16 + size_of::<crate::Node>(),
+                AstStorageData::List(_)
+                | AstStorageData::CompactNodes(_)
+                | AstStorageData::File(_) => {}
+                AstStorageData::Nodes(nodes) => {
+                    known += nodes.len() * size_of::<Option<crate::NodeId>>();
+                }
+                AstStorageData::Text(texts) => {
+                    known += texts.len() * size_of::<crate::JsString>();
+                    known += texts
+                        .iter()
+                        .map(|text| 16 + text.backing_bytes().len())
+                        .sum::<usize>();
+                }
+                AstStorageData::SourceMetadata(_) => unmeasured += 1,
+                AstStorageData::SourceFiles(files) => unmeasured += files.len(),
+            }
+        }
+        (known, unmeasured)
     }
 }
 

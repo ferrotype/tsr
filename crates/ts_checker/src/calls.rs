@@ -56,7 +56,8 @@ pub(crate) struct CallState {
 impl CallState {
     pub(crate) fn census(&self, census: &mut crate::census::Census) {
         census.map("call_resolution", &self.resolved);
-        census.map("optional_call_signatures", &self.optional_signatures);
+        // Go keeps the optional-call clones in `cachedSignatures`; same family here.
+        census.map("signature_caches", &self.optional_signatures);
         census.map("instantiation_expression", &self.instantiation_expressions);
         census.vec_capacity("call_resolution", &self.contexts, self.contexts.capacity());
         census.vec_capacity(
