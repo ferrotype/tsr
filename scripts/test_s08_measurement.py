@@ -9,6 +9,48 @@ import s08_checkerbench as checker
 import s08_measurement as measurement
 import s08_relater as relater
 from s08_oracle import canonical, digest
+from s08_p4 import canonical as request_bytes
+
+
+class CheckerRequests(unittest.TestCase):
+    def test_written_requests_preserve_semantic_map_order(self):
+        loading = {
+            'options': {'paths': {'@interface/*': ['src/interface/*'], '@blah': ['blah'], '@humbug/*': ['*/generated']}},
+            'config_raw': {'files': ['main.ts'], 'compilerOptions': {'paths': {'z/*': ['z/*'], 'a/*': ['a/*']}}},
+        }
+        request = {
+            'id': 'case', 'acceptance_tier': 'acceptance', 'loading': loading,
+            'diagnostic_phases': ['config'], 'type_baseline_requested': False,
+            'public_type_strings': True, 'error_baseline_requested': True,
+        }
+        frozen = {**request, 'loading_request_sha256': digest(request_bytes(loading) + b'\n')}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            corpus = root / 'corpus'
+            corpus.mkdir()
+            (corpus / 'requests.json').write_bytes(request_bytes([request]) + b'\n')
+            (root / 'data/s07').mkdir(parents=True)
+            (root / 'data/s08').mkdir(parents=True)
+            (root / 'data/s07/subset.json').write_text('{}')
+            (root / 'data/s08/baseline-requests.json').write_bytes(canonical({'requests': [frozen]}))
+            with patch.object(checker, 'ROOT', root), patch.object(checker, 'CORPUS', corpus), \
+                    patch.object(checker, 'frozen_ids', return_value=['case']), \
+                    patch.object(checker, 'method', return_value={'acceptance_variants': 1}), \
+                    patch.object(checker.s08_baselines, 'requests_from_subset', return_value=(None, [{'id': 'case'}])):
+                for smoke in (None, 1):
+                    with self.subTest(smoke=smoke):
+                        result = checker.prepare_requests(root, smoke)
+                        raw = (root / 'rust-requests.json').read_bytes()
+                        written = checker.strict_json_loads(raw)
+                        # Use the real replay contract after serialization, not
+                        # dictionary equality (which ignores map order).
+                        checker.inventory(written, [frozen], partial=True)
+                        actual = written[0]['loading']
+                        self.assertEqual(list(actual['options']['paths']), ['@interface/*', '@blah', '@humbug/*'])
+                        self.assertEqual(list(actual['config_raw']), ['files', 'compilerOptions'])
+                        self.assertEqual(list(actual['config_raw']['compilerOptions']['paths']), ['z/*', 'a/*'])
+                        self.assertEqual(raw, request_bytes([request]) + b'\n')
+                        self.assertEqual(result['rust_requests_sha256'], digest(raw))
 
 
 class CheckerCapture(unittest.TestCase):

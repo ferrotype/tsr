@@ -436,7 +436,20 @@ impl NodeBuilder<'_> {
         for child in children {
             replacements.insert(child, Some(self.clone_binding_name_native(child)?));
         }
-        let mut result = self.reuse_replace_children(node, &replacements)?;
+        // Go's cloneBindingNameVisitor has no nodecopy hooks. Preserve list
+        // ranges here: they carry trailing commas even without a local context.
+        let mut result = {
+            let visit = |_: &mut NodeVisitor<'_>, node: Option<NodeId>| {
+                node.and_then(|n| replacements.get(&n).copied().unwrap_or(Some(n)))
+            };
+            NodeVisitor::new(
+                Some(&visit),
+                Some(&mut self.ast),
+                NodeVisitorHooks::default(),
+            )
+            .visit_each_child(Some(node))
+            .ok_or(Error::MissingLink("binding name parent node"))?
+        };
         if self.ast.view().node(result)?.kind() == K::BindingElement {
             let d = self
                 .ast

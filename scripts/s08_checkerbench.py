@@ -27,6 +27,7 @@ from s07_benchmark import cargo_executable, native_environment
 from s07_benchmark_measure import host_info, reject_concurrent_builds
 from s07_benchmark_stats import ratio_summary
 from s08_oracle import ROOT, canonical, digest
+from s08_p4 import canonical as request_canonical
 import s08_baselines
 import s08_measurement as measurement
 from s08_census_runtime import runtime_overlay
@@ -54,7 +55,7 @@ def sources():
                 "tools/s08/p4/**", "tools/s08/p5/**", "tools/s08/p7/**", "tools/s08/oracle/**",
                 "tools/s07/program/*.rs", "tools/s07/config/host.rs",
                 "scripts/s08_checkerbench.py", "scripts/s08_census_runtime.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
-                "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
+                "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py", "scripts/s07_subset.py",
                 "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                 "data/s08/checker-workload.json", "data/s08/type-footprint.json", "data/s08/baseline-requests.json",
                 "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml")
@@ -95,8 +96,10 @@ def prepare_requests(directory, smoke=None):
         raise ValueError("smoke count must select a nonempty acceptance prefix")
     if smoke:
         rust, go = rust[:smoke], go[:smoke]
-    (directory / "rust-requests.json").write_bytes(canonical(rust) + b"\n")
-    (directory / "go-requests.json").write_bytes(canonical(go) + b"\n")
+    # Paths and raw config contain ordered semantic maps, as in the frozen E2
+    # loading fingerprint. Metadata canonicalization would reorder their keys.
+    (directory / "rust-requests.json").write_bytes(request_canonical(rust) + b"\n")
+    (directory / "go-requests.json").write_bytes(request_canonical(go) + b"\n")
     return {"variants": len(rust), "smoke": smoke, "ids_sha256": digest(canonical([r["id"] for r in rust])),
             "rust_requests_sha256": digest((directory / "rust-requests.json").read_bytes()),
             "go_requests_sha256": digest((directory / "go-requests.json").read_bytes())}

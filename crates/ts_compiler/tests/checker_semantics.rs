@@ -4075,6 +4075,32 @@ fn reported_relation_failures_are_not_elaborated_twice() {
     assert_eq!(missing.related_information.len(), 1);
 }
 
+#[test]
+fn binding_pattern_display_preserves_trailing_commas() {
+    // Pinned native display witnesses: declarationEmitDestructuring5 and
+    // arrayBindingPatternOmittedExpressions. Binding-name cloning uses the
+    // plain visitor, unlike annotation reuse's nonlocal position reset.
+    for (text, expected) in [
+        (
+            "interface Arg { a: number } const f = ({ a, }: Arg) => a;",
+            "({ a, }: Arg) => number",
+        ),
+        (
+            "const f = ([, z, ,]: [any, any, any?]) => {};",
+            "([, z, ,]: [any, any, any?]) => void",
+        ),
+        (
+            "interface Arg { a: number } const f = ({ a }: Arg) => a;",
+            "({ a }: Arg) => number",
+        ),
+    ] {
+        assert_eq!(
+            variable_type_display(text.as_bytes(), options(), b"f"),
+            expected
+        );
+    }
+}
+
 /// The displayed type of the top-level `const`/`let` named `name` in `/main.ts`.
 fn variable_type_display(text: &[u8], options: CompilerOptions, name: &[u8]) -> String {
     let (owner, program, _) = fixture(text, options);
