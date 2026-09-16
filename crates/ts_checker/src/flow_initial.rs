@@ -33,11 +33,7 @@ impl CheckerState {
             match read.kind().known() {
                 Some(K::VariableDeclaration) => {
                     if let Some(initializer) = read.initializer() {
-                        // port: tsc/internal/checker/flow.go:Checker.getTypeOfInitializer
-                        if let Some(Some(ty)) = self.query.type_nodes.try_get(initializer) {
-                            return Ok(*ty);
-                        }
-                        return self.get_type_of_expression(initializer);
+                        return self.type_of_initializer(initializer);
                     }
                     let list = required(read.parent(), "flow initial declaration list")?;
                     let parent = required(

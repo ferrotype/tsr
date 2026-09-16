@@ -329,7 +329,7 @@ impl CheckerState {
             parent_type = self.non_nullable_type(parent_type)?;
         } else if self.options.strict_null_checks {
             if let Some(initializer) = parent_initializer {
-                let initialized = self.get_type_of_expression(initializer)?;
+                let initialized = self.type_of_initializer(initializer)?;
                 if self.type_facts(initialized, facts::EQ_UNDEFINED)? == 0 {
                     parent_type = self.type_with_facts(parent_type, facts::NE_UNDEFINED)?;
                 }
@@ -511,6 +511,18 @@ impl CheckerState {
             ty
         };
         self.type_with_facts(ty, facts::NE_UNDEFINED)
+    }
+
+    /// The cached type of an initializer when the variable's type was inferred
+    /// from it; otherwise computed now without caching, so transient types are
+    /// reflected. Re-checking the initializer here once per binding element
+    /// cloned the pattern's contextual type each time.
+    // port: tsc/internal/checker/flow.go:Checker.getTypeOfInitializer
+    pub(crate) fn type_of_initializer(&mut self, node: NodeId) -> Result<TypeId, Error> {
+        if let Some(Some(ty)) = self.query.type_nodes.try_get(node) {
+            return Ok(*ty);
+        }
+        self.get_type_of_expression(node)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromBindingPattern
