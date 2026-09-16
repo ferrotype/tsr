@@ -177,12 +177,14 @@ impl CheckerState {
             return self.create_tuple_type_ex(&types, &infos, false);
         }
         if self.expression_mode & 128 != 0 || constant || tuple_context {
-            let mutable = if let Some(context) = contextual {
-                self.some_mutable_array_like(context)?
-            } else {
-                false
-            };
-            let tuple = self.create_tuple_type_ex(&types, &infos, constant && !mutable)?;
+            // Go tests mutability only in const contexts. The relation can
+            // resolve tuple bases and instantiate types even when it is false.
+            let readonly = constant
+                && match contextual {
+                    Some(context) => !self.some_mutable_array_like(context)?,
+                    None => true,
+                };
+            let tuple = self.create_tuple_type_ex(&types, &infos, readonly)?;
             return self.array_literal_type(tuple);
         }
         let element = if types.is_empty() {

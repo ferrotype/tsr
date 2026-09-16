@@ -351,31 +351,28 @@ impl Relater<'_> {
         source: TypeId,
         target: TypeId,
     ) -> Result<(), Error> {
-        let wrapper =
-            |name: &'static str, primitive: TypeId| -> (&'static str, TypeId) { (name, primitive) };
-        let candidates = [
-            wrapper("String", self.checker.builtins.string_type),
-            wrapper("Number", self.checker.builtins.number_type),
-            wrapper("Boolean", self.checker.builtins.boolean_type),
-            wrapper("Symbol", self.checker.builtins.es_symbol_type),
-        ];
-        for (name, primitive) in candidates {
-            if target != primitive {
-                continue;
-            }
-            if self.checker.get_global_type(name, 0, false)? == source {
-                let target = self
-                    .checker
-                    .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
-                let source = self
-                    .checker
-                    .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
-                self.report_error(
-                    messages::X_0_is_a_primitive_but_1_is_a_wrapper_object_Prefer_using_0_when_possible,
-                    vec![target, source],
-                );
-            }
-            return Ok(());
+        // Preserve Go's left-to-right evaluation: the final source comparison
+        // resolves the lazy Symbol wrapper even when the target is not symbol.
+        let builtins = &self.checker.builtins;
+        let wrapper = (self.checker.query.global_types.get("String") == Some(&source)
+            && target == builtins.string_type)
+            || (self.checker.query.global_types.get("Number") == Some(&source)
+                && target == builtins.number_type)
+            || (self.checker.query.global_types.get("Boolean") == Some(&source)
+                && target == builtins.boolean_type)
+            || (self.checker.apparent_type(builtins.es_symbol_type)? == source
+                && target == self.checker.builtins.es_symbol_type);
+        if wrapper {
+            let target = self
+                .checker
+                .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
+            let source = self
+                .checker
+                .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
+            self.report_error(
+                messages::X_0_is_a_primitive_but_1_is_a_wrapper_object_Prefer_using_0_when_possible,
+                vec![target, source],
+            );
         }
         Ok(())
     }

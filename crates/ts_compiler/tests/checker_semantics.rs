@@ -4187,3 +4187,91 @@ interface AsyncIterableIterator<T, R = any, N = any> {}";
     assert_eq!(op.type_to_string(reference, 0).unwrap().as_bytes(), b"C");
     assert_eq!(op.type_count(), before + 20);
 }
+
+#[test]
+fn missing_property_checks_promised_type_before_suggestions() {
+    // Native probe at the pin: TS2339 at all three accesses, with TS2773
+    // related information only when the promised value actually has the name.
+    let text = b"interface Promise<T> { then(onfulfilled: (value: T) => unknown): unknown; }\ndeclare let value: Promise<{ foo: number }>;\nvalue.foo;\nvalue.bar;\ndeclare let inert: {then: number}; inert.foo;";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    let diagnostics = op.semantic_diagnostics(source).unwrap();
+    assert_eq!(diagnostics.len(), 3);
+    for (diagnostic, (pos, end, related)) in diagnostics.iter().zip([
+        (127, 130, vec![2773]),
+        (138, 141, vec![]),
+        (184, 187, vec![]),
+    ]) {
+        assert_eq!(diagnostic.code, 2339);
+        assert_eq!((diagnostic.loc.pos(), diagnostic.loc.end()), (pos, end));
+        assert_eq!(
+            diagnostic
+                .related_information
+                .iter()
+                .map(|d| d.code)
+                .collect::<Vec<_>>(),
+            related
+        );
+    }
+    let before = op.type_count();
+    assert_eq!(op.semantic_diagnostics(source).unwrap(), diagnostics);
+    assert_eq!(op.type_count(), before);
+}
+
+#[test]
+fn relation_error_initializes_symbol_wrapper_in_upstream_order() {
+    // Native check leaves Symbol unresolved for the valid assignment, but
+    // resolves it in error elaboration even though the target is string.
+    for (text, expected_errors, resolve_delta) in [
+        (
+            b"declare function f(): void; let s: string = f;".as_slice(),
+            1,
+            0,
+        ),
+        (b"declare function f(): void; let s = f;".as_slice(), 0, 1),
+    ] {
+        let (owner, program, _) = fixture_files(
+            b"/main.ts",
+            &[(b"/main.ts", text), (b"/lib.d.ts", b"interface Symbol {}")],
+            options(),
+        );
+        let source = program.file(b"/main.ts").unwrap().source();
+        let library = program.file(b"/lib.d.ts").unwrap();
+        let view = library.bound().view().ast();
+        let declaration = view
+            .node_slice(
+                view.node(library.source())
+                    .unwrap()
+                    .statements(view)
+                    .unwrap(),
+            )
+            .unwrap()
+            .iter()
+            .flatten()
+            .next()
+            .unwrap();
+        let name = view.node(declaration).unwrap().name().unwrap();
+        let mut op = owner.operation().unwrap();
+        let diagnostics = op.semantic_diagnostics(source).unwrap();
+        assert_eq!(diagnostics.len(), expected_errors);
+        if let Some(diagnostic) = diagnostics.first() {
+            assert_eq!(diagnostic.code, 2322);
+        }
+        let before = op.type_count();
+        let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+        op.get_declared_type_of_symbol(symbol).unwrap();
+        assert_eq!(op.type_count(), before + resolve_delta);
+    }
+}
+
+#[test]
+fn ordinary_tuple_context_skips_const_mutability_relation() {
+    // The readonly tuple is inferred through a generic call. Go does not run
+    // the const-only mutability relation for this ordinary array literal.
+    // Native check creates 115 types; the eager relation creates 118.
+    let text = b"interface Array<T> { length: number; [n: number]: T; push(...items: T[]): number; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T; }\ndeclare function consume<K extends object | symbol, V>(value: readonly (readonly [K, V])[]): void;\ndeclare const s: symbol;\nconsume([[s, false]]);";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(source).unwrap().is_empty());
+    assert_eq!(op.type_count(), 115);
+}

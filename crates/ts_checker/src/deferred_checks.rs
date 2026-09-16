@@ -109,7 +109,6 @@ impl CheckerState {
                 }
             }
         }
-        let apparent = self.reduced_apparent_type(containing)?;
         if self.index_type_has_static_property(text.as_bytes(), containing)? {
             let display = self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
             let mut qualified = display.as_bytes().to_vec();
@@ -126,13 +125,31 @@ impl CheckerState {
             self.deferred_checks.reported_properties.insert(name);
             return Ok(());
         }
-        if self
-            .constituent_property(apparent, b"then", false)?
-            .is_some()
-        {
-            return Err(Error::Unsupported(
-                "reportNonexistentProperty: promised type",
-            ));
+        if let Some(promised) = self.get_promised_type_of_promise(containing)? {
+            if self
+                .constituent_property(promised, text.as_bytes(), false)?
+                .is_some()
+            {
+                let display =
+                    self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
+                let message = ts_diagnostics::Property_0_does_not_exist_on_type_1;
+                let args = vec![spelling, display];
+                let mut diagnostic = if child.is_some() {
+                    ts_ast::Diagnostic::chain(child, message, args)
+                } else {
+                    self.diagnostic_for_node(Some(name), message, args)?
+                };
+                diagnostic.related_information.push(std::sync::Arc::new(
+                    self.diagnostic_for_node(
+                        Some(name),
+                        ts_diagnostics::Did_you_forget_to_use_await,
+                        vec![],
+                    )?,
+                ));
+                self.add_diagnostic(diagnostic)?;
+                self.deferred_checks.reported_properties.insert(name);
+                return Ok(());
+            }
         }
         // port: tsc/internal/checker/checker.go:Checker.getSuggestedLibForNonExistentProperty
         let unreduced_apparent = self.apparent_type(containing)?;
