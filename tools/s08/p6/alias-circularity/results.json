@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "scope": "Development comparison of the frozen 44-variant alias-circularity selection; no full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "f3d539156384f4a1a5cbf58063e36fdca98bd0ee4bf55dd66632ad318f57b18d",
+  "candidate_capture_sha256": "89b33dbab999254181478784e68a76fb105e6592128ee601d4e3ac472ce69f0c",
+  "candidate_sources_sha256": "d8915627f3af0ab9243d8617cecd581006ec01b730671afb69fe588b9cafe34b",
+  "selection_sha256": "7ef812a64662106ad17b14243b00d95c125b501a374e819977b0a481d7c2884c",
+  "source_stable": true,
+  "counts_before": {
+    "types_parity": {
+      "match": 43,
+      "different": 1
+    },
+    "errors_parity": {
+      "different": 22,
+      "match": 22
+    },
+    "type_to_string_parity": {
+      "match": 43,
+      "different": 1
+    }
+  },
+  "counts_after": {
+    "types_parity": {
+      "match": 43,
+      "different": 1
+    },
+    "errors_parity": {
+      "match": 40,
+      "different": 4
+    },
+    "type_to_string_parity": {
+      "match": 43,
+      "different": 1
+    }
+  },
+  "changes": {
+    "types_parity": {
+      "improved": [],
+      "regressed": []
+    },
+    "errors_parity": {
+      "improved": [
+        "compiler/ExportAssignment7.ts#configuration=0",
+        "compiler/ExportAssignment8.ts#configuration=0",
+        "compiler/aliasErrors.ts#configuration=0",
+        "compiler/blockScopedFunctionDeclarationInStrictModule.ts#configuration=0",
+        "compiler/declareModifierOnImport1.ts#configuration=0",
+        "compiler/exportDefaultMissingName.ts#configuration=0",
+        "compiler/reexportedMissingAlias.ts#configuration=0",
+        "compiler/unknownSymbols2.ts#configuration=0",
+        "conformance/externalModules/verbatimModuleSyntaxInternalImportEquals.ts#configuration=0",
+        "conformance/internalModules/importDeclarations/invalidImportAliasIdentifiers.ts#configuration=0",
+        "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment1.ts#configuration=0",
+        "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment2.ts#configuration=0",
+        "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment6.ts#configuration=0",
+        "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment7.ts#configuration=0",
+        "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment8.ts#configuration=0",
+        "conformance/parser/ecmascript5/parserImportDeclaration1.ts#configuration=0",
+        "conformance/salsa/moduleExportAliasUnknown.ts#configuration=0",
+        "conformance/scanner/ecmascript5/scannerImportDeclaration1.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "type_to_string_parity": {
+      "improved": [],
+      "regressed": []
+    }
+  },
+  "remaining": [
+    {
+      "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 2034,
+          "rust_queries": 2034,
+          "accepted": false,
+          "native_sha256": "df7eb50b9d646209f66e8e9cf3ceddb67f0dc0b8656bf32a9a9bd03facc2bb38",
+          "rust_sha256": "45b6c2d93640b88b11811241d1278bf75492c9efa79312420c61c6c6fe5941dc"
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 95,
+          "rust_diagnostics": 93,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "1c69d068ade4d10ea3aa75eaf2d97588302402ad15317a8dbd1ee9aad559bcf1",
+          "rust_sha256": "4d88dc54dfd987421a4f8721d43f5eecb8707ed0d502bc2c2c7b98209cdb94ce"
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 583,
+          "rust_queries": 583,
+          "accepted": false,
+          "native_sha256": "95426e8c7a2489c27cd541f754520157a7834ba3009cc250ffd8448b664ce01f",
+          "rust_sha256": "d247cbdf4734d7cbf8857147e3562fd9fe7503576804eee16c77f517d4f81ada"
+        }
+      }
+    },
+    {
+      "id": "compiler/declarationEmitUnknownImport.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 11,
+          "rust_queries": 11,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 4,
+          "rust_diagnostics": 3,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "9032255e87201a6c4a83d334afa3b425f7df5e02ca905797fd9fe043beb49945",
+          "rust_sha256": "60278260cfc80be223eaea92980bb7647586fdb6f342cbb83cbae47dc982121e"
+        },
+        "type_to_string_parity": {
+          "state": "match",
+          "native_queries": 3,
+          "rust_queries": 3,
+          "accepted": true
+        }
+      }
+    },
+    {
+      "id": "compiler/declarationEmitUnknownImport2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 14,
+          "rust_queries": 14,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 6,
+          "rust_diagnostics": 5,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "2cf293f7a955eca452a77bb99f634edc63195d8ee63f2f6712f6e39e00ba5bb3",
+          "rust_sha256": "02320dbba20ee34df3378d2815cebd9556676b3c6a9158a8ec6c3c72dc18841a"
+        },
+        "type_to_string_parity": {
+          "state": "match",
+          "native_queries": 4,
+          "rust_queries": 4,
+          "accepted": true
+        }
+      }
+    },
+    {
+      "id": "conformance/parser/ecmascript5/RegressionTests/parser519458.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "match",
+          "differences": [],
+          "native_queries": 30,
+          "rust_queries": 30,
+          "accepted": true
+        },
+        "errors_parity": {
+          "state": "different",
+          "differences": [
+            "pre_diagnostics",
+            "post_diagnostics",
+            "render_diagnostics",
+            "bytes"
+          ],
+          "native_diagnostics": 3,
+          "rust_diagnostics": 2,
+          "emit": "not_executed",
+          "accepted": false,
+          "native_sha256": "071fb67be16b61007145dd5c562fad2b70e0993ba55336b12e0399a882e072b9",
+          "rust_sha256": "c38267d44fe09768770b5029c4eb853157381121528567a5ffc44e2404c9d1ed"
+        },
+        "type_to_string_parity": {
+          "state": "match",
+          "native_queries": 9,
+          "rust_queries": 9,
+          "accepted": true
+        }
+      }
+    }
+  ],
+  "target_diagnostic": {
+    "code": 2303,
+    "affected_variants": 20,
+    "all_counts_match_after": true,
+    "variants": [
+      {
+        "id": "compiler/ExportAssignment7.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/ExportAssignment8.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/aliasErrors.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 3,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/blockScopedFunctionDeclarationInStrictModule.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/declareModifierOnImport1.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/exportDefaultMissingName.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/reexportedMissingAlias.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/unknownSymbols2.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/externalModules/verbatimModuleSyntaxInternalImportEquals.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/internalModules/importDeclarations/invalidImportAliasIdentifiers.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment1.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment2.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment6.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment7.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/ExportAssignments/parserExportAssignment8.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/RegressionTests/parser519458.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/parser/ecmascript5/parserImportDeclaration1.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/salsa/moduleExportAliasUnknown.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/scanner/ecmascript5/scannerImportDeclaration1.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      }
+    ]
+  }
+}

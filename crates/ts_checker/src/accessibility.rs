@@ -8,6 +8,18 @@ use ts_printer::emit_resolver::{
 };
 
 impl CheckerState {
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.IsTypeSymbolAccessible
+    pub(crate) fn type_symbol_accessible(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+    ) -> Result<bool, Error> {
+        Ok(self
+            .emit_symbol_accessible(Some(symbol), enclosing, sf::TYPE, false, true)?
+            .accessibility
+            == Access::Accessible)
+    }
+
     // port: tsc/internal/checker/symbolaccessibility.go:Checker.isSymbolAccessibleWorker
     pub(crate) fn emit_symbol_accessible(
         &mut self,

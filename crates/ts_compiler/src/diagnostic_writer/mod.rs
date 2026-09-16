@@ -84,8 +84,9 @@ impl<'a> DiagnosticWriter<'a> {
             .program
             .config()
             .config_file
-            .as_ref()
-            .filter(|c| c.root == id)
+            .iter()
+            .chain(&self.program.config().config_dependencies)
+            .find(|c| c.root == id)
         {
             return Ok(config.file.view().source_file(id)?);
         }

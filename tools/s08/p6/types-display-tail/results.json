@@ -1,0 +1,681 @@
+{
+ "version": 1,
+ "scope": "Bounded development comparison of the 44 types/display differences of the full E2 capture at 2b5cc4d plus 300 sampled acceptance controls matching both domains. No full E2 metrics emitted.",
+ "control_corpus_capture_sha256": "502cde3a73909927df34dc1b21fce1235458b1a15c2b35772d75c605b9e3894f",
+ "candidate_capture_sha256": "72c246a466d63d9b9832d5f7552be67836856b34ccf3aa611dc49cb2cb22b1f6",
+ "candidate_sources_sha256": "057d64ef30f8d99206fc8a23c6c2280c17b48f14ce972b399c062fcf15c358f7",
+ "selection_sha256": "f1df236c284d351b9e7d0d2d860d22e3b6f9eb6a0818660d23a84c23154db89b",
+ "source_stable": true,
+ "counts_before": {
+  "acceptance": {
+   "types_parity": {
+    "match": 300,
+    "different": 35
+   },
+   "errors_parity": {
+    "match": 335
+   },
+   "type_to_string_parity": {
+    "match": 325,
+    "different": 10
+   }
+  },
+  "informational": {
+   "types_parity": {
+    "different": 9
+   },
+   "errors_parity": {
+    "match": 9
+   },
+   "type_to_string_parity": {
+    "match": 9
+   }
+  }
+ },
+ "counts_after": {
+  "acceptance": {
+   "types_parity": {
+    "match": 335
+   },
+   "errors_parity": {
+    "match": 335
+   },
+   "type_to_string_parity": {
+    "match": 335
+   }
+  },
+  "informational": {
+   "types_parity": {
+    "match": 9
+   },
+   "errors_parity": {
+    "match": 9
+   },
+   "type_to_string_parity": {
+    "match": 9
+   }
+  }
+ },
+ "regressions": [],
+ "changes": [
+  {
+   "id": "compiler/abstractClassUnionInstantiation.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/arrayBindingPatternOmittedExpressions.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/circularGetAccessor.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/circularGetAccessor.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitDestructuring5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitPrivateNameInTypeQuery.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitTypeofThisInClass.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/dependentDestructuringBindingElementInitializer.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/duplicateObjectLiteralProperty_computedName1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/noImplicitAnyDestructuringInPrivateMethod.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/objectFreeze.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/shadowedReservedCompilerDeclarationsWithNoEmit.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/shadowedReservedCompilerDeclarationsWithNoEmit.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/thisInTypeQuery.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/typeofThisInMethodSignature.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classExtendingNonConstructor.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classStaticBlock/classStaticBlock6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classStaticBlock/classStaticBlock6.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/controlFlow/controlFlowInOperator.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=0",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=2",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=4",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=5",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=6",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMeta.ts#configuration=7",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMetaNarrowing.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMetaNarrowing.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2019/importMeta/importMetaNarrowing.ts#configuration=2",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/newTarget/newTarget.es5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/newTarget/newTarget.es5.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/newTarget/newTarget.es6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/newTarget/newTargetNarrowing.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/allowJs/nodeModulesAllowJsImportMeta.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/allowJs/nodeModulesAllowJsImportMeta.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/allowJs/nodeModulesAllowJsImportMeta.ts#configuration=2",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/allowJs/nodeModulesAllowJsImportMeta.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesImportMeta.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesImportMeta.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesImportMeta.ts#configuration=2",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesImportMeta.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/specifyingTypes/typeQueries/typeofThis.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/union/unionTypeConstructSignatures.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  }
+ ],
+ "remaining_error_differences": [],
+ "remaining_types_differences": [],
+ "remaining_display_differences": []
+}

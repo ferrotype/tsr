@@ -131,10 +131,12 @@ impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForEsModuleMarkerInBindingName
     fn check_binding_export_marker(&mut self, name: NodeId) -> Result<bool, Error> {
         if self.ast(name)?.node(name)?.kind() == K::Identifier {
-            if self.ast(name)?.node_text(name)?.as_bytes() == b"__esModule"
-                && !self.program()?.host.options().no_emit.is_true()
-            {
-                return self.grammar_error_node(name,d::Identifier_expected_esModule_is_reserved_as_an_exported_marker_when_transforming_ECMAScript_modules,vec![]);
+            if self.ast(name)?.node_text(name)?.as_bytes() == b"__esModule" {
+                return self.grammar_error_node_skipped_on_no_emit(
+                    name,
+                    d::Identifier_expected_esModule_is_reserved_as_an_exported_marker_when_transforming_ECMAScript_modules,
+                    vec![],
+                );
             }
         } else {
             for element in self.source_list(name, self.ast(name)?.node(name)?.element_list())? {

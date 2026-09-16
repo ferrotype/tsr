@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "enum-member-parent-import-type",
+      "files": {
+        "/e.ts": "export enum E {\n    Plain = 'p',\n    'quoted-member' = 'q',\n}\n",
+        "/a.ts": "import { E } from './e.js'\nexport const Holder = {\n    item: {\n        plain: E.Plain,\n        quoted: E['quoted-member'],\n    },\n} as const\n",
+        "/b.ts": "import { Holder } from './a.js'\nexport const Spread = { ...Holder } as const\n"
+      },
+      "roots": [
+        "/e.ts",
+        "/a.ts",
+        "/b.ts"
+      ],
+      "queries": [
+        {
+          "id": "declaration-Spread",
+          "declaration": "Spread",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "source-Spread",
+          "declaration": "Spread",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "declaration-Holder",
+          "declaration": "Holder",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    }
+  ]
+}

@@ -49,6 +49,15 @@ impl Relater<'_> {
             if self.checker.signatures.get(sources[0])?.flags & sg::ABSTRACT != 0
                 && self.checker.signatures.get(targets[0])?.flags & sg::ABSTRACT == 0
             {
+                // An abstract constructor type is not assignable to a non-abstract
+                // constructor type, as it would otherwise be possible to new an
+                // abstract class.
+                if self.report_errors {
+                    self.report_error(
+                        ts_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type,
+                        vec![],
+                    );
+                }
                 return Ok(tr::FALSE);
             }
             if !self.constructor_visibilities_are_compatible(sources[0], targets[0])? {
@@ -241,10 +250,16 @@ impl Relater<'_> {
                 if related == tr::FALSE {
                     related = self.related(target_this, source_this, BOTH, intersection)?;
                 }
-                result &= related;
-                if result == tr::FALSE {
-                    return Ok(result);
+                if related == tr::FALSE {
+                    if self.report_errors {
+                        self.report_error(
+                            ts_diagnostics::The_this_types_of_each_signature_are_incompatible,
+                            vec![],
+                        );
+                    }
+                    return Ok(tr::FALSE);
                 }
+                result &= related;
             }
         }
         let has_rest = source_rest.is_some() || target_rest.is_some();

@@ -527,14 +527,13 @@ impl NodeBuilder<'_> {
                 return visited;
             }
             let result = visited?;
+            // NodeVisitor.VisitNodes keeps the input list's Loc even for nonlocal
+            // nodes; only the nodes themselves get synthetic positions.
             let result = if visited == list {
                 v.factory_mut().clone_list_header(result)
             } else {
                 result
             };
-            v.factory_mut()
-                .mutable_list(result)
-                .set_loc(TextRange::new(-1, -1));
             Some(result)
         };
         let mut visitor = NodeVisitor::new(
@@ -1155,7 +1154,11 @@ impl NodeBuilder<'_> {
                 return Ok(Some(self.ast.new_union_type_node(Some(members))));
             }
             Some(K::JSDocVariadicType) => {
-                let inner = self.reuse_optional_node(read.type_node())?;
+                let operand = read
+                    .data_source()
+                    .as_js_doc_variadic_type()
+                    .and_then(|data| data.r#type());
+                let inner = self.reuse_optional_node(operand)?;
                 return Ok(Some(self.ast.new_array_type_node(inner)));
             }
             Some(K::JSDocTypeLiteral) => return self.reuse_jsdoc_type_literal(node).map(Some),

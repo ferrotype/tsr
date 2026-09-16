@@ -1,5 +1,6 @@
-# Phase 0, sprint 8. Producer to register: e2 (cases = the frozen subset; inputs include
-# data/divergences.toml so an allow-list change reruns the comparison).
+# Phase 0, sprint 8. The e2 producer consumes the complete frozen subset capture;
+# inputs include data/divergences.toml so an approval change reruns comparison.
+# See docs/S08-E2.md. Missing captures leave correctness metrics unavailable.
 #   run.e2.types_parity, run.e2.errors_parity, run.e2.comparators, run.e2.frozen_subset, run.e2.divergences_approved
 #   run.e2.type_to_string_parity   typeToString output on the subset matches the oracle
 #   run.e2.recursion_fixtures      deep-recursion and reentrancy fixtures pass with reserved stacks and growth guards

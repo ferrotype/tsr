@@ -3,7 +3,7 @@
 use crate::{Error, Program};
 use std::{collections::BTreeMap, sync::OnceLock};
 use ts_arena::Error as AstError;
-use ts_ast::{Diagnostic, NodeId};
+use ts_ast::{Diagnostic, NodeId, SourceFileRead};
 use ts_jsstring::JsString;
 type LocationIndex<'a> = BTreeMap<(&'a [u8], i64, i64, i32), Vec<usize>>;
 
@@ -114,14 +114,15 @@ impl Snapshot {
         Ok(())
     }
 }
-fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
-    let state = if let Some(config) = program
+fn source_state(program: &Program, source: NodeId) -> Result<SourceFileRead<'_>, AstError> {
+    if let Some(config) = program
         .config()
         .config_file
-        .as_ref()
-        .filter(|config| config.root == source)
+        .iter()
+        .chain(&program.config().config_dependencies)
+        .find(|config| config.root == source)
     {
-        config.file.view().source_file(source)?
+        config.file.view().source_file(source)
     } else {
         let index = program
             .owners
@@ -131,8 +132,11 @@ fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), Ast
             .bound()
             .view()
             .ast()
-            .source_file(source)?
-    };
+            .source_file(source)
+    }
+}
+fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
+    let state = source_state(program, source)?;
     Ok((state.file_name(), state.parse_options().path.as_bytes()))
 }
 
@@ -216,6 +220,28 @@ impl Program {
             ts_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
         });
         Ok(compact_and_merge_related_infos(sorted, &file_name))
+    }
+    /// Unnecessary-code reports on content-mapped files survive only when their
+    /// span maps back to original text; that span translation is not ported.
+    /// port: tsc/internal/compiler/program.go:filterAndSortDiagnostics
+    pub(crate) fn filter_and_sort_diagnostics(
+        &self,
+        diagnostics: &[Diagnostic],
+    ) -> Result<Vec<Diagnostic>, Error> {
+        for diagnostic in diagnostics {
+            let Some(file) = diagnostic.file else {
+                continue;
+            };
+            if diagnostic.reports_unnecessary
+                && diagnostic.source.is_empty()
+                && source_state(self, file)?.span_map().is_some()
+            {
+                return Err(Error::Unsupported(
+                    "filterAndSortDiagnostics content-map span fidelity",
+                ));
+            }
+        }
+        self.sort_and_deduplicate_diagnostics(diagnostics)
     }
     /// Source Program.GetProgramDiagnostics: direct verifier diagnostics plus
     /// only the include processor's global diagnostics. Checker work is absent.

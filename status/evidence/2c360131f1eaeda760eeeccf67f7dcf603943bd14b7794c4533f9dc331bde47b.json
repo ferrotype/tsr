@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "run_id": "fmt",
+  "recorded_at": 1789421110,
+  "context": {
+    "revision": "2a70abc5a0bfe780c8f93cf3726f86eacf3ca3d3",
+    "source_sha256": "08fc9bfa8eb95d29c8aeec76bcb5091f5e526f7af829d47c4dccda4b37680d1f",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "caaf9259539adba00f95b277a19b07dd4c41cdba6607aba516ff3687766d2fd5",
+  "inputs": {
+    "rustfmt.toml": "0e16ce90338c6ce4f06c234061fed7538d7f06f57cbda23aecc6d5c899075d57"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "fmt"
+  ],
+  "target": "host",
+  "config": "cargo fmt --all --check",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "rustfmt 1.9.0-stable (8bab26f4f6 2026-07-14)\n+ cargo fmt --all --check\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "19ec1255c9a771b307c7e46a0a8f5f66b3c2121fdd418e346cf27ffd116158af",
+  "valid_capture": true
+}

@@ -191,7 +191,11 @@ impl CheckerState {
         let return_type = self.return_type_from_annotation(function)?;
         self.check_function_return_paths(function, return_type)?;
         self.check_full_signature_arity(function)?;
-        if annotation.is_none() && body.is_none() {
+        let body_missing = match body {
+            None => true,
+            Some(body) => ts_ast::node_is_missing(Some(&self.ast(body)?.node(body)?)),
+        };
+        if annotation.is_none() && body_missing {
             let read = self.ast(function)?.node(function)?;
             let private_ambient = self.binding_private_ambient(function)?;
             if !private_ambient
@@ -206,7 +210,7 @@ impl CheckerState {
                 self.error_at(Some(function), messages::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type, vec![name, ts_ast::JsString::from_bytes(b"any".as_slice())])?;
             }
         }
-        if annotation.is_none() && body.is_some() && self.body_function_flags(function)?.1 {
+        if annotation.is_none() && !body_missing && self.body_function_flags(function)?.1 {
             let signature = self.signature_from_declaration(function)?;
             self.return_type_of_signature(signature)?;
         }
@@ -214,6 +218,33 @@ impl CheckerState {
             self.check_grammar_generator(function)?;
             self.check_function_name_collision_boundary(function)?;
         } else {
+            let read = self.ast(function)?.node(function)?;
+            if kind == K::MethodDeclaration
+                && read.modifier_flags(self.ast(function)?)? & ts_ast::modifier_flags::ABSTRACT != 0
+                && body.is_some()
+            {
+                let name =
+                    ts_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
+                self.error_at(
+                    Some(function),
+                    messages::Method_0_cannot_have_an_implementation_because_it_is_marked_abstract,
+                    vec![name],
+                )?;
+            }
+            // Private named methods are only allowed in class declarations.
+            let read = self.ast(function)?.node(function)?;
+            if let Some(name) = read.name() {
+                if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier
+                    && ts_ast::utilities::get_containing_class(self.ast(function)?, function)?
+                        .is_none()
+                {
+                    self.error_at(
+                        Some(function),
+                        messages::Private_identifiers_are_not_allowed_outside_class_bodies,
+                        vec![],
+                    )?;
+                }
+            }
             self.set_node_links_for_private_identifier_scope(function)?;
         }
         Ok(())
@@ -1001,13 +1032,15 @@ impl CheckerState {
             }
         } else if kind != K::Constructor
             && self.program()?.host.options().no_implicit_returns == Tristate::TRUE
-            && !self.return_type_is_undefined_void_or_any(return_type)?
         {
-            self.error_at(
-                Some(node),
-                messages::Not_all_code_paths_return_a_value,
-                vec![],
-            )?;
+            let returned = self.unwrap_body_return_type(function, return_type)?;
+            if !self.return_type_is_undefined_void_or_any(returned)? {
+                self.error_at(
+                    Some(node),
+                    messages::Not_all_code_paths_return_a_value,
+                    vec![],
+                )?;
+            }
         }
         Ok(())
     }
@@ -1065,6 +1098,9 @@ impl CheckerState {
         } else {
             expression_type
         };
+        let expression = expression
+            .map(|expression| self.effective_expression_check_node(expression))
+            .transpose()?;
         let location =
             if self.ast(node)?.node(node)?.kind() == K::ReturnStatement && !in_conditional {
                 node

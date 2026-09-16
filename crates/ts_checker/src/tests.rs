@@ -31,6 +31,21 @@ fn owner() -> (
 }
 
 #[test]
+fn missing_indexed_property_without_a_program_remains_unresolved() {
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let object = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+    let name = state
+        .get_string_literal_type(JsString::from_bytes(b"missing".as_slice()))
+        .unwrap();
+    assert_eq!(
+        state.indexed_access_or_undefined(object, name, 0, None, None),
+        Ok(None)
+    );
+}
+
+#[test]
 fn unused_pass_failure_is_sticky_without_poisoning_completed_type_checks() {
     use ts_ast::FactoryMethods;
     let (_counters, _generation, _identity, owner) = owner();
@@ -108,6 +123,38 @@ fn alias_circularity_without_a_declaration_returns_any() {
         );
         assert!(state.diagnostics_for_file(None).unwrap().is_empty());
     }
+}
+
+#[test]
+fn speculative_alias_resolution_preserves_the_active_chain() {
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let alias = state
+        .new_symbol(
+            symbol_flags::ALIAS,
+            JsString::from_bytes(b"alias".as_slice()),
+        )
+        .unwrap();
+    let intermediate = state
+        .new_symbol(
+            symbol_flags::PROPERTY,
+            JsString::from_bytes(b"value".as_slice()),
+        )
+        .unwrap();
+    assert!(state.push_source_resolution(alias, TypeSystemPropertyName::AliasTarget));
+    assert!(state.push_source_resolution(intermediate, TypeSystemPropertyName::Type));
+    assert_eq!(state.try_resolve_alias(alias), Ok(None));
+    assert_eq!(state.resolution.depth(), 2);
+    assert!(!state.module_aliases.targets.contains_key(&alias));
+    assert!(
+        state.resolution.pop(),
+        "speculation must not fail intermediate work"
+    );
+    assert!(
+        state.resolution.pop(),
+        "speculation must not manufacture a cycle"
+    );
 }
 
 #[test]

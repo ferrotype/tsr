@@ -2723,12 +2723,16 @@ impl<'a> Session<'a, '_> {
                 }
                 None => (-1, -1),
             };
+            let has_trailing_comma = match children {
+                Some(list) => self.has_trailing_comma(parent, list)?,
+                None => false,
+            };
             self.emit_list_items(
                 emit,
                 parent,
                 &nodes[start as usize..end],
                 format,
-                false,
+                has_trailing_comma,
                 children_range,
             )?;
         }
@@ -2760,8 +2764,87 @@ impl<'a> Session<'a, '_> {
         }
     }
 
-    /// Emits a list without brackets. Trailing commas are never requested by the
-    /// supported formats; the node lists do not record them yet either.
+    /// NodeList.HasTrailingComma is unreliable on transformed nodes as some nodes
+    /// may have been removed; the original node's list decides when it has the
+    /// same kind as the printed parent.
+    // port: tsc/internal/printer/printer.go:Printer.hasTrailingComma
+    fn has_trailing_comma(&self, parent: NodeId, children: NodeListId) -> Result<bool, Error> {
+        if !self.view.list_has_trailing_comma(children)? {
+            return Ok(false);
+        }
+        let original = self.printer.emit_context.most_original(parent);
+        if original == parent {
+            return Ok(true);
+        }
+        let parent_read = self.node(parent)?;
+        let original_read = self.node(original)?;
+        if original_read.kind() != parent_read.kind() {
+            return Ok(false);
+        }
+        let original_list = match parent_read.kind().known() {
+            Some(K::ObjectLiteralExpression) => original_read.property_list(),
+            Some(K::ArrayLiteralExpression | K::NamedImports | K::NamedExports) => {
+                original_read.element_list()
+            }
+            Some(K::CallExpression | K::NewExpression) => {
+                if parent_read.type_argument_list() == Some(children) {
+                    original_read.type_argument_list()
+                } else if parent_read.argument_list() == Some(children) {
+                    original_read.argument_list()
+                } else {
+                    Some(children)
+                }
+            }
+            Some(
+                K::Constructor
+                | K::MethodDeclaration
+                | K::GetAccessor
+                | K::SetAccessor
+                | K::FunctionDeclaration
+                | K::FunctionExpression
+                | K::ArrowFunction
+                | K::FunctionType
+                | K::ConstructorType
+                | K::CallSignature
+                | K::ConstructSignature,
+            ) => {
+                if parent_read.type_parameter_list() == Some(children) {
+                    original_read.type_parameter_list()
+                } else if parent_read.parameter_list() == Some(children) {
+                    original_read.parameter_list()
+                } else {
+                    Some(children)
+                }
+            }
+            Some(
+                K::ClassDeclaration
+                | K::ClassExpression
+                | K::InterfaceDeclaration
+                | K::TypeAliasDeclaration
+                | K::JSTypeAliasDeclaration,
+            ) => {
+                if parent_read.type_parameter_list() == Some(children) {
+                    original_read.type_parameter_list()
+                } else {
+                    Some(children)
+                }
+            }
+            Some(K::ObjectBindingPattern | K::ArrayBindingPattern) => {
+                if parent_read.element_list() == Some(children) {
+                    original_read.element_list()
+                } else {
+                    Some(children)
+                }
+            }
+            _ => Some(children),
+        };
+        match original_list {
+            Some(list) => Ok(self.view.list_has_trailing_comma(list)?),
+            None => Ok(false),
+        }
+    }
+
+    /// Emits a list without brackets.
     // port: tsc/internal/printer/printer.go:Printer.emitListItems
     fn emit_list_items(
         &mut self,

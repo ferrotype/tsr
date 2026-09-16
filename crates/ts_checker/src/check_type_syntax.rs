@@ -252,11 +252,40 @@ impl CheckerState {
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }
-            Some(K::OptionalType | K::RestType | K::NamedTupleMember) => {
+            Some(K::OptionalType | K::RestType) => {
                 let annotation = read
                     .type_node()
                     .ok_or(Error::MissingLink("tuple element annotation"))?;
                 self.check_source_element(annotation)
+            }
+            // port: tsc/internal/checker/checker.go:Checker.checkNamedTupleMember
+            Some(K::NamedTupleMember) => {
+                let data = read
+                    .data_source()
+                    .as_named_tuple_member()
+                    .ok_or(Error::MissingLink("named tuple member"))?;
+                let annotation = read
+                    .type_node()
+                    .ok_or(Error::MissingLink("tuple element annotation"))?;
+                if data.dot_dot_dot_token().is_some() && data.question_token().is_some() {
+                    self.grammar_error_node(
+                        node,
+                        ts_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest,
+                        vec![],
+                    )?;
+                }
+                match self.ast(annotation)?.node(annotation)?.kind().known() {
+                    Some(K::OptionalType) => {
+                        self.grammar_error_node(annotation, ts_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type, vec![])?;
+                    }
+                    Some(K::RestType) => {
+                        self.grammar_error_node(annotation, ts_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type, vec![])?;
+                    }
+                    _ => {}
+                }
+                self.check_source_element(annotation)?;
+                self.get_type_from_type_node(node)?;
+                Ok(())
             }
             _ => Err(Error::MissingLink("array/tuple syntax kind")),
         }
@@ -326,7 +355,7 @@ impl CheckerState {
             let flags = self.body_function_flags(node)?;
             if flags.1 && self.ast(node)?.node(node)?.body().is_some() {
                 self.check_generator_return_annotation(node, annotation)?;
-            } else if flags.0 {
+            } else if flags.0 && !flags.1 {
                 self.check_async_return_annotation(node, annotation)?;
             }
         }
@@ -352,6 +381,23 @@ impl CheckerState {
             let rest = data.dot_dot_dot_token();
             let question = data.question_token();
             let initializer = data.initializer();
+            if rest.is_some()
+                && index + 1 == parameters.len()
+                && read.flags() & ts_ast::node_flags::AMBIENT == 0
+            {
+                let owner = read
+                    .parent()
+                    .ok_or(Error::MissingLink("parameter parent"))?;
+                let list = self
+                    .ast(owner)?
+                    .node(owner)?
+                    .parameter_list()
+                    .ok_or(Error::MissingLink("parameter list"))?;
+                // Native reports the comma and still checks optionality and
+                // initializers on the same rest parameter.
+                self.check_grammar_trailing_comma(owner, list,
+                    ts_diagnostics::A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma)?;
+            }
             let diagnostic = if let Some(rest) = rest {
                 if index + 1 != parameters.len() {
                     Some((
@@ -371,9 +417,12 @@ impl CheckerState {
                 } else {
                     None
                 }
-            } else if question.is_some() {
+            } else if let Some(question) = question {
                 optional = true;
-                initializer.map(|_| {
+                // A reparsed '?' token indicates a bracketed name in a @param tag.
+                let reparsed =
+                    self.ast(question)?.node(question)?.flags() & ts_ast::node_flags::REPARSED != 0;
+                initializer.filter(|_| !reparsed).map(|_| {
                     (
                         name,
                         ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer,
@@ -388,8 +437,8 @@ impl CheckerState {
                 None
             };
             if let Some((node, diagnostic)) = diagnostic {
-                self.error_at(node, diagnostic, vec![])?;
-                return Ok(true);
+                let node = node.ok_or(Error::MissingLink("parameter grammar node"))?;
+                return self.grammar_error_node(node, diagnostic, vec![]);
             }
         }
         Ok(false)
@@ -406,12 +455,20 @@ impl CheckerState {
                 Some(&parameter) => self.ast(parameter)?.node(parameter)?.name(),
                 None => Some(node),
             };
-            self.error_at(
+            let at = at.ok_or(Error::MissingLink("index parameter name"))?;
+            self.grammar_error_node(
                 at,
                 ts_diagnostics::An_index_signature_must_have_exactly_one_parameter,
                 vec![],
             )?;
             return Ok(());
+        }
+        if let Some(list) = self.ast(node)?.node(node)?.parameter_list() {
+            self.check_grammar_trailing_comma(
+                node,
+                list,
+                ts_diagnostics::An_index_signature_cannot_have_a_trailing_comma,
+            )?;
         }
         let read = self.ast(parameters[0])?.node(parameters[0])?;
         let data = read
@@ -449,7 +506,8 @@ impl CheckerState {
             None
         };
         if let Some((node, diagnostic)) = diagnostic {
-            self.error_at(node, diagnostic, vec![])?;
+            let node = node.ok_or(Error::MissingLink("index signature grammar node"))?;
+            self.grammar_error_node(node, diagnostic, vec![])?;
             return Ok(());
         }
         let ty = self.get_type_from_type_node(
@@ -464,7 +522,8 @@ impl CheckerState {
             if self.types.flags(ty)? & (tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE | tf::TYPE_PARAMETER)
                 != 0
             {
-                self.error_at(name, ts_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
+                let name = name.ok_or(Error::MissingLink("index parameter name"))?;
+                self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
                 return Ok(());
             }
         }
@@ -472,13 +531,14 @@ impl CheckerState {
             if self.types.flags(ty)? & (tf::STRING | tf::NUMBER | tf::ES_SYMBOL) == 0
                 && !self.is_pattern_literal_type(ty)?
             {
-                self.error_at(name, ts_diagnostics::An_index_signature_parameter_type_must_be_string_number_symbol_or_a_template_literal_type, vec![])?;
+                let name = name.ok_or(Error::MissingLink("index parameter name"))?;
+                self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_must_be_string_number_symbol_or_a_template_literal_type, vec![])?;
                 return Ok(());
             }
         }
         if self.ast(node)?.node(node)?.type_node().is_none() {
-            self.error_at(
-                Some(node),
+            self.grammar_error_node(
+                node,
                 ts_diagnostics::An_index_signature_must_have_a_type_annotation,
                 vec![],
             )?;

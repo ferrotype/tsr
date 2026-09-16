@@ -248,6 +248,21 @@ impl CheckerState {
                 "reportOperatorError: awaited operand suggestions",
             ));
         }
+        let (mut a, mut b) = (a, b);
+        if matches!(operator.known(), Some(K::PlusToken | K::PlusEqualsToken)) {
+            // reportOperatorError's getBaseTypesIfUnrelated uses the caller's
+            // closeEnoughKind predicate for addition. Keep the original types
+            // when their bases would make the operands compatible.
+            let left_base = self.base_literal_type(a)?;
+            let right_base = self.base_literal_type(b)?;
+            let close = tf::NUMBER_LIKE | tf::BIG_INT_LIKE | tf::STRING_LIKE | tf::ANY_OR_UNKNOWN;
+            if !(self.type_assignable_to_kind(left_base, close)?
+                && self.type_assignable_to_kind(right_base, close)?)
+            {
+                a = left_base;
+                b = right_base;
+            }
+        }
         let a = self.type_to_string(a, crate::type_display::DEFAULT_FLAGS)?;
         let b = self.type_to_string(b, crate::type_display::DEFAULT_FLAGS)?;
         self.error_at(

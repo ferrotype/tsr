@@ -55,12 +55,17 @@ enum Effect {
     Failed(Option<NodeId>, JsString, SymbolFlags, &'static Message),
     InvalidInitializer(Option<NodeId>, JsString, NodeId, Option<SymbolId>),
 }
+enum PendingAlias {
+    Lookup(SymbolId),
+    SpellingCandidate(SymbolId),
+}
 struct Hooks<'a> {
     state: &'a CheckerState,
     effects: Vec<Effect>,
     failure: Option<Error>,
     alias_flags: &'a crate::types::Map<SymbolId, SymbolFlags>,
-    pending_alias: Option<SymbolId>,
+    spelling_alias_flags: &'a crate::types::Map<SymbolId, SymbolFlags>,
+    pending_alias: Option<PendingAlias>,
     suggestion: bool,
 }
 impl Hooks<'_> {
@@ -84,15 +89,16 @@ impl Hooks<'_> {
                 }
                 let mut flags = read.flags();
                 if flags & meaning == 0 && flags & sf::ALIAS != 0 {
-                    if let Some(known) = self
-                        .alias_flags
-                        .get(&candidate)
-                        .copied()
-                        .or(self.state.cached_module_symbol_flags(candidate)?)
-                    {
+                    // port: tsc/internal/checker/checker.go:Checker.getSpellingSuggestionForName
+                    // Suggestions use the first resolved target's flags, not
+                    // getSymbolFlags' accumulated meanings (or ALL for unknown).
+                    if let Some(&known) = self.spelling_alias_flags.get(&candidate) {
                         flags = known;
+                    } else if let Some(&target) = self.state.module_aliases.targets.get(&candidate)
+                    {
+                        flags = self.state.symbol(target?)?.flags();
                     } else {
-                        self.pending_alias = Some(candidate);
+                        self.pending_alias = Some(PendingAlias::SpellingCandidate(candidate));
                         return Err(Error::Unsupported("getSymbolFlags: alias resolution"));
                     }
                 }
@@ -190,7 +196,7 @@ impl NameResolverHooks for Hooks<'_> {
                         }
                         return Ok(Hook::Value((flags & meaning != 0).then_some(symbol)));
                     }
-                    self.pending_alias = Some(symbol);
+                    self.pending_alias = Some(PendingAlias::Lookup(symbol));
                 }
             }
         }
@@ -517,6 +523,7 @@ impl CheckerState {
         suggestion: bool,
     ) -> Result<Option<SymbolId>, Error> {
         let mut alias_flags = crate::types::Map::default();
+        let mut spelling_alias_flags = crate::types::Map::default();
         loop {
             let options = self.program()?.host.options();
             let mut resolver = NameResolver {
@@ -535,6 +542,7 @@ impl CheckerState {
                 effects: Vec::new(),
                 failure: None,
                 alias_flags: &alias_flags,
+                spelling_alias_flags: &spelling_alias_flags,
                 pending_alias: None,
                 suggestion,
             };
@@ -553,8 +561,21 @@ impl CheckerState {
             let effects = hooks.effects;
             if let Some(alias) = pending_alias {
                 drop(effects);
-                let flags = self.module_symbol_flags(alias, false, false)?;
-                alias_flags.insert(alias, flags);
+                match alias {
+                    PendingAlias::Lookup(alias) => {
+                        let flags = self.module_symbol_flags(alias, false, false)?;
+                        alias_flags.insert(alias, flags);
+                    }
+                    PendingAlias::SpellingCandidate(alias) => {
+                        let flags = match self.try_resolve_alias(alias)? {
+                            Some(target) => self.symbol(target)?.flags(),
+                            None => 0,
+                        };
+                        // A skipped in-progress alias is local to this lookup;
+                        // do not cache an unknown target on the alias itself.
+                        spelling_alias_flags.insert(alias, flags);
+                    }
+                }
                 continue;
             }
             for effect in effects {

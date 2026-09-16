@@ -211,6 +211,23 @@ pub struct ParsedCommandLine {
     pub content_mappers: Option<Vec<config_mappers::ContentMapper>>,
 }
 impl ParsedCommandLine {
+    /// Syntax diagnostics precede option/conversion diagnostics, as in the
+    /// native API; neither collection alone is the complete config phase.
+    /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetConfigFileParsingDiagnostics
+    pub fn config_file_parsing_diagnostics(&self) -> Vec<ts_ast::Diagnostic> {
+        let mut diagnostics = self.config_file.as_ref().map_or_else(Vec::new, |config| {
+            config
+                .file
+                .view()
+                .source_file(config.root)
+                .expect("config source")
+                .diagnostics
+                .clone()
+        });
+        diagnostics.extend_from_slice(&self.errors);
+        diagnostics
+    }
+
     /// The program loader consumes an already interpreted configuration. Full
     /// tsconfig extends/include/project-reference interpretation is a separate API.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:NewParsedCommandLine

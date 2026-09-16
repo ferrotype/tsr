@@ -495,7 +495,21 @@ impl CheckerState {
             }
             let mut abstract_class = false;
             for &signature in &signatures {
-                if self.signatures.get(signature)?.flags & sg::ABSTRACT != 0 {
+                // someSignature examines the members of a union composite;
+                // the composite's own flags come from its first signature.
+                let signature = self.signatures.get(signature)?;
+                let found = if let Some(composite) = &signature.composite {
+                    let mut found = false;
+                    if composite.is_union {
+                        for &part in composite.signatures.iter() {
+                            found |= self.signatures.get(part)?.flags & sg::ABSTRACT != 0;
+                        }
+                    }
+                    found
+                } else {
+                    signature.flags & sg::ABSTRACT != 0
+                };
+                if found {
                     abstract_class = true;
                     break;
                 }
@@ -757,7 +771,14 @@ impl CheckerState {
                 *candidate
             } else {
                 let type_arguments = if type_arguments.is_empty() {
-                    let context = self.new_inference_context(&parameters, Some(*candidate), 0)?;
+                    let flags =
+                        if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
+                            crate::inference::ANY_DEFAULT
+                        } else {
+                            0
+                        };
+                    let context =
+                        self.new_inference_context(&parameters, Some(*candidate), flags)?;
                     inference = Some(context);
                     let arguments = self.infer_call_type_arguments_ex(
                         node,

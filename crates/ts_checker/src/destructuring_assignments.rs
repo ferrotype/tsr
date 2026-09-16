@@ -146,18 +146,19 @@ impl CheckerState {
                     )?;
                 }
                 let key = self.literal_type_from_property_name(name)?;
-                if let Some(name) = self.index_property_name(key)? {
+                if let Some(text) = self.index_property_name(key)? {
                     if let Some(symbol) =
-                        self.constituent_property(source, name.as_bytes(), false)?
+                        self.constituent_property(source, text.as_bytes(), false)?
                     {
                         self.mark_property_as_referenced(symbol, Some(property), right_is_this)?;
+                        // checkPropertyAccessibilityEx reports on node.Name() for these kinds.
                         self.check_access_property_accessibility(
                             property,
                             false,
                             true,
                             source,
                             symbol,
-                            Some(property),
+                            Some(name),
                         )?;
                     }
                 }

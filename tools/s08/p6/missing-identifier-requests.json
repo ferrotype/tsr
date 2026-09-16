@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "scope": "S08 P6 focused native witnesses: checker name resolution at parser-inserted missing identifiers; not E2 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "arrow-body-or",
+      "files": {
+        "/main.ts": "declare const anchor: number;\na = () => { } || a\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-initializer",
+      "files": {
+        "/main.ts": "declare const anchor: number;\nvar x = ;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-binary-operand",
+      "files": {
+        "/main.ts": "declare const anchor: number;\nlet y = anchor + ;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-call-argument",
+      "files": {
+        "/main.ts": "declare function f(a: number, b: number): void;\ndeclare const anchor: number;\nf(, anchor);\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-type-name",
+      "files": {
+        "/main.ts": "declare const anchor: number;\nlet z: = anchor;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-qualified-right",
+      "files": {
+        "/main.ts": "declare namespace N { type T = number }\ndeclare const anchor: number;\nlet q: N. = anchor;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-property-name",
+      "files": {
+        "/main.ts": "declare const anchor: { p: number };\nanchor.;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-element-access",
+      "files": {
+        "/main.ts": "declare const anchor: number[];\nanchor[];\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "anchor.name.type_at_location",
+          "file": "/main.ts",
+          "declaration": "anchor",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

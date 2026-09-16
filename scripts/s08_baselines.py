@@ -68,7 +68,7 @@ def replace_exact(source, before, after, count=1):
     return source.replace(before, after)
 
 
-def overlay_sources(upstream, *, walker_inputs=False, error_inputs=False):
+def overlay_sources(upstream, *, walker_inputs=False, error_inputs=False, public_type_strings=False):
     harness = (upstream / "tsc/internal/testutil/harnessutil/harnessutil.go").read_text()
     harness = replace_exact(harness, "\t// Parse harness and compiler options from the test configuration\n",
                             '\tif S08ObserveStage != nil { S08ObserveStage("native_options") }\n\t// Parse harness and compiler options from the test configuration\n')
@@ -98,6 +98,13 @@ def overlay_sources(upstream, *, walker_inputs=False, error_inputs=False):
     walker = replace_exact(walker,symbol,symbol+
         '\ts08RecordDisplay("SymbolToStringEx",walker,node.Parent,nil,uint32(checker.SymbolFormatFlagsAllowAnyNodeKind),0)\n')
     driver = (BRIDGES/"baselines_test.go").read_text()
+    if public_type_strings:
+        if not walker_inputs:
+            raise ValueError('public type strings require walker inputs')
+        driver = replace_exact(driver, '\t\trow := map[string]any', '\t\ttsbaseline.S08CollectTypeStrings = true\n\t\trow := map[string]any')
+        driver = replace_exact(driver, '\t\t\t\trow["queries"] = tsbaseline.S08Queries\n',
+            '\t\t\t\trow["queries"] = tsbaseline.S08Queries\n'
+            '\t\t\t\trow["public_type_strings"] = map[string]any{"state":"executed", "queries":tsbaseline.S08TypeStrings}\n')
     if walker_inputs:
         anchor = '\t\t\t\ttsbaseline.S08Queries = []tsbaseline.S08Query{}\n'
         driver = replace_exact(driver, anchor,
@@ -251,7 +258,7 @@ def validate_observations(rows, requests, observed, file_observations, *, legacy
     return mismatches
 
 
-def capture(directory, smoke=False, case_id=None, include_informational=False, *, walker_inputs=False, error_inputs=False):
+def capture(directory, smoke=False, case_id=None, include_informational=False, *, walker_inputs=False, error_inputs=False, public_type_strings=False):
     directory = Path(directory).resolve()
     directory.mkdir(parents=True,exist_ok=False)
     upstream = verified_upstream()
@@ -260,7 +267,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False, *
     rows, requests = requests_from_subset(subset,smoke,case_id)
     raw = canonical(requests)+b"\n"
     (directory/"requests.json").write_bytes(raw)
-    sources = overlay_sources(upstream, walker_inputs=walker_inputs, error_inputs=error_inputs)
+    sources = overlay_sources(upstream, walker_inputs=walker_inputs, error_inputs=error_inputs, public_type_strings=public_type_strings)
     replacements = {}
     for name, source in sources.items():
         path = directory/"overlay"/name
@@ -302,7 +309,7 @@ def capture(directory, smoke=False, case_id=None, include_informational=False, *
     if any(digest((ROOT/name).read_bytes())!=value for name,value in inputs.items()):
         raise ValueError("capture inputs changed")
     report = {"version":3,"pin":subset["pin"],"smoke":smoke,"case_id":case_id,"source_inputs":inputs,
-              "include_informational":include_informational, "walker_inputs":walker_inputs, "walker_input_encoding":"hex-v1" if walker_inputs else None,
+              "public_type_strings":public_type_strings, "include_informational":include_informational, "walker_inputs":walker_inputs, "walker_input_encoding":"hex-v1" if walker_inputs else None,
               "error_inputs":error_inputs, "error_input_encoding":"native-hex-v2" if error_inputs else None,
               "request_sha256":digest(raw),"observation_sha256":digest((directory/"observations.ndjson").read_bytes()),
               "requests":len(requests),"states":dict(states),"test_exit":completed.returncode,
@@ -425,6 +432,7 @@ if __name__=="__main__":
     parser.add_argument("--include-informational",action="store_true",help="collect available baselines beyond native option guards for informational cases only")
     parser.add_argument("--walker-inputs",action="store_true",help="retain native ordered input files and header for the P5 walker")
     parser.add_argument("--error-inputs",action="store_true",help="retain native error input/selection metadata for P5")
+    parser.add_argument("--public-type-strings", action="store_true", help="observe default TypeToString after the baseline walk for E2")
     selection=parser.add_mutually_exclusive_group()
     selection.add_argument("--smoke",action="store_true")
     selection.add_argument("--case",dest="case_id",help="one exact frozen variant ID, for diagnosis only")
@@ -434,7 +442,7 @@ if __name__=="__main__":
         if args.review_capture:
             review_capture(args.review_capture,args.output)
         else:
-            capture(args.output,args.smoke,args.case_id,args.include_informational,walker_inputs=args.walker_inputs,error_inputs=args.error_inputs)
+            capture(args.output,args.smoke,args.case_id,args.include_informational,walker_inputs=args.walker_inputs,error_inputs=args.error_inputs,public_type_strings=args.public_type_strings)
     except (OSError,ValueError,RuntimeError,KeyError,TypeError,subprocess.TimeoutExpired) as error:
         print(f"S08 baseline capture failed: {error}",file=sys.stderr)
         raise SystemExit(1) from error

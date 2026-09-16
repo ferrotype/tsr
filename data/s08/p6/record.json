@@ -1,0 +1,32 @@
+{
+  "archive": "dynamic-import-evidence.tar.xz",
+  "archive_bytes": 2040344,
+  "archive_sha256": "b66bb4e9458b2277272fd5da5b07cac95a9f9476d1046d1f96cf72656f08bf1e",
+  "binaries_archived": false,
+  "corpus": "p6-imports-recheck-01",
+  "corpus_acceptance": {
+    "different": 3,
+    "match": 19,
+    "selected": 22
+  },
+  "corpus_informational": {
+    "different": 1,
+    "selected": 1
+  },
+  "corpus_source_stable": true,
+  "focused_programs": 11,
+  "focused_queries": 59,
+  "full_acceptance_total": 9369,
+  "full_comparison_difference": "50 nested property display fields (25 display_hex and 25 in_alias_display_hex); no other native observation differences",
+  "full_comparison_different_programs": 8,
+  "full_comparison_matched_programs": 3,
+  "full_informational_total": 1359,
+  "native_captures": [
+    "p6-dynamic-imports-native-02",
+    "p6-dynamic-imports-missing-native-02",
+    "p6-dynamic-imports-commonjs-native-01"
+  ],
+  "scope": "Supplemental P6 dynamic-import comparisons; not full E2 acceptance",
+  "top_level_type_and_semantic_regressions": "59/59 query displays and 11/11 semantic payloads match native",
+  "version": 1
+}

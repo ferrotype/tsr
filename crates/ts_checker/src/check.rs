@@ -236,7 +236,7 @@ impl CheckerState {
                 Ok(())
             }
             Some(K::PropertySignature) => self.check_property_signature(node),
-            Some(K::VariableDeclaration) => self.check_variable_like(node),
+            Some(K::VariableDeclaration) => self.check_variable_declaration(node),
             Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration | K::InterfaceDeclaration) => {
                 self.check_type_declaration(node)
             }
@@ -244,7 +244,7 @@ impl CheckerState {
                 self.check_object_type_members(node)?;
                 let ty = self.get_type_from_type_node(node)?;
                 self.resolve_type_members(ty)?;
-                self.check_source_index_constraints(ty, node)
+                self.check_source_index_constraints(ty, node, false)
             }
             Some(K::ParenthesizedType) => {
                 self.check_source_element(required(read.type_node(), "parenthesized type")?)
@@ -308,10 +308,12 @@ impl CheckerState {
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }
-            Some(K::ExpressionStatement) => self
-                .check_expression(required(read.expression(), "expression statement")?)
-                .map(|_| ()),
-            Some(K::EmptyStatement) => Ok(()),
+            Some(K::ExpressionStatement) => {
+                let expression = required(read.expression(), "expression statement")?;
+                self.check_statement_ambient_context(node)?;
+                self.check_expression(expression).map(|_| ())
+            }
+            Some(K::EmptyStatement) => self.check_statement_ambient_context(node).map(|_| ()),
             Some(K::DebuggerStatement) => self.check_statement_ambient_context(node).map(|_| ()),
             Some(K::MissingDeclaration) => {
                 Self::check_missing_declaration(node);
@@ -366,11 +368,27 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeAliasDeclaration
     // port: tsc/internal/checker/checker.go:Checker.checkInterfaceDeclaration
     fn check_type_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.check_grammar_modifiers(node)?;
+        if !self.check_grammar_modifiers(node)?
+            && self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration
+        {
+            self.check_interface_heritage_grammar(node)?;
+        }
         self.check_type_parameters(node)?;
         let read = self.ast(node)?.node(node)?;
         let interface = read.kind() == K::InterfaceDeclaration;
+        let parent = required(read.parent(), "type declaration parent")?;
         let name = required(read.name(), "type declaration name")?;
+        if !self.container_allows_block_scoped_variable(parent)? {
+            self.grammar_error_node(
+                node,
+                messages::X_0_declarations_can_only_be_declared_inside_a_block,
+                vec![ts_ast::JsString::from_bytes(if interface {
+                    b"interface".as_slice()
+                } else {
+                    b"type".as_slice()
+                })],
+            )?;
+        }
         let text = self.ast(name)?.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),
@@ -402,10 +420,13 @@ impl CheckerState {
         )?;
         self.check_exports_on_merged_declarations(node)?;
         if interface {
-            let ty = self.get_declared_type_of_symbol(symbol)?;
-            self.check_object_type_members(node)?;
-            self.resolve_type_members(ty)?;
-            self.check_source_index_constraints(ty, node)?;
+            self.check_interface_inheritance(name, symbol)?;
+            self.check_object_duplicate_declarations(node, false)?;
+            self.check_interface_heritage(node)?;
+            for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+                self.check_source_element(member)?;
+            }
+            self.check_class_or_interface_duplicate_indexes(node)?;
         } else {
             let annotation = required(
                 self.ast(node)?.node(node)?.type_node(),
@@ -429,8 +450,14 @@ impl CheckerState {
         Ok(())
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclaration
+    fn check_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_grammar_variable(node)?;
+        self.check_variable_like(node)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
-    fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.ast(node)?.node(node)?;
         let name = required(read.name(), "variable/property name")?;
         let name_kind = self.ast(name)?.node(name)?.kind();
@@ -457,9 +484,6 @@ impl CheckerState {
             return Err(Error::Unsupported(
                 "checkGrammarProperty: signature initializer",
             ));
-        }
-        if !property {
-            self.check_grammar_variable(node)?;
         }
         if binding {
             self.check_binding_variable(node)
@@ -489,6 +513,9 @@ impl CheckerState {
             self.get_symbol_of_declaration(node)?,
             "variable/property symbol",
         )?;
+        if self.check_require_alias_declaration(node, symbol)? {
+            return Ok(());
+        }
         let target = self.get_type_of_symbol(symbol)?;
         let target = self.auto_to_any(target)?;
         if self.symbol(symbol)?.value_declaration() != Some(node) {

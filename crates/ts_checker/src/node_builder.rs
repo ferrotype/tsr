@@ -447,6 +447,13 @@ impl<'a> NodeBuilder<'a> {
                 return self.list(vec![first, elision, last]);
             }
         }
+        let nodes = self.type_nodes(types)?;
+        self.list(nodes)
+    }
+
+    /// The element loop of mapToTypeNodes, shared with tuple element lists.
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.mapToTypeNodes
+    pub(super) fn type_nodes(&mut self, types: &[TypeId]) -> Result<Vec<NodeId>, Error> {
         let mut nodes = Vec::new();
         // To avoid printing types like `[Foo, Foo]` or `Bar & Bar` where occurrences
         // of the same name come from different namespaces, single-identifier
@@ -514,7 +521,7 @@ impl<'a> NodeBuilder<'a> {
             self.flags = saved;
             result?;
         }
-        self.list(nodes)
+        Ok(nodes)
     }
 
     /// Raw symbol parents, without the accessibility/alias selection of symbolToName.
@@ -696,10 +703,16 @@ impl<'a> NodeBuilder<'a> {
         if !in_alias {
             let alias = self.checker.types.alias_of(ty)?.cloned();
             if let Some(symbol) = crate::type_display::alias_symbol(alias.as_ref()) {
-                return self.type_reference(
-                    symbol,
-                    crate::type_display::alias_type_arguments(alias.as_ref()),
-                );
+                if self.flags & nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE != 0
+                    || self
+                        .checker
+                        .type_symbol_accessible(symbol, self.enclosing)?
+                {
+                    return self.type_reference(
+                        symbol,
+                        crate::type_display::alias_type_arguments(alias.as_ref()),
+                    );
+                }
             }
         }
         if record.object_flags & of::REFERENCE != 0 {
@@ -1168,18 +1181,26 @@ impl<'a> NodeBuilder<'a> {
                 "getPropertyNameNodeForSymbol: late/private name",
             ));
         }
+        let is_identifier =
+            ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
+        let is_numeric_name = ts_jsnum::from_string(name.as_bytes())
+            .to_string()
+            .as_bytes()
+            == name.as_bytes();
         let property_name =
-            if ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD)
-                && !(is_method && name.as_bytes() == b"new")
-            {
+            if name_type.is_some() && !is_identifier && (string_named || !is_numeric_name) {
+                // A string-named or non-numeric literal name type is always a string literal.
+                self.ast.new_string_literal(
+                    name.clone(),
+                    if single_quote {
+                        token_flags::SINGLE_QUOTE
+                    } else {
+                        0
+                    },
+                )
+            } else if is_identifier && !(is_method && name.as_bytes() == b"new") {
                 self.ast.new_identifier(name.clone())
-            } else if name_type.is_some()
-                && ts_jsnum::from_string(name.as_bytes())
-                    .to_string()
-                    .as_bytes()
-                    == name.as_bytes()
-                && name.as_bytes().starts_with(b"-")
-            {
+            } else if name_type.is_some() && is_numeric_name && name.as_bytes().starts_with(b"-") {
                 let number = self
                     .ast
                     .new_numeric_literal(JsString::from_bytes(&name.as_bytes()[1..]), 0);

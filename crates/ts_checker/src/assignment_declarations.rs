@@ -14,6 +14,54 @@ pub(crate) enum ThisAssignment {
 }
 
 impl CheckerState {
+    // port: tsc/internal/checker/checker.go:Checker.isReadonlyAssignmentDeclaration
+    pub(crate) fn is_readonly_assignment_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> Result<bool, Error> {
+        let view = self.ast(node)?;
+        let read = view.node(node)?;
+        if read.kind() != K::CallExpression {
+            return Ok(false);
+        }
+        let args = read
+            .argument_list()
+            .ok_or(Error::MissingLink("property descriptor arguments"))?;
+        let descriptor = view
+            .node_slice(view.list(args)?.nodes())?
+            .get(2)
+            .flatten()
+            .ok_or(Error::MissingLink("property descriptor"))?;
+        let ty = self.check_expression_cached(descriptor)?;
+        if self.property_type(ty, b"value")?.is_some() {
+            let Some(writable) = self.constituent_property(ty, b"writable", false)? else {
+                return Ok(true);
+            };
+            let initializer = if let Some(declaration) = self.symbol(writable)?.value_declaration()
+            {
+                let read = self.ast(declaration)?.node(declaration)?;
+                if read.kind() == K::PropertyAssignment {
+                    read.initializer()
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+            let writable_type = if let Some(initializer) = initializer {
+                self.check_expression(initializer)?
+            } else {
+                self.get_type_of_symbol(writable)?
+            };
+            return Ok(self.types.flags(writable_type)? & tf::BOOLEAN_LITERAL != 0
+                && matches!(
+                    self.types.literal(writable_type)?.value,
+                    crate::LiteralValue::Boolean(false)
+                ));
+        }
+        Ok(self.property_type(ty, b"set")?.is_none())
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getDeclaringConstructor
     pub(crate) fn declaring_constructor(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {

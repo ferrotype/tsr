@@ -194,6 +194,13 @@ impl CheckerState {
                 let Some(index) = args.iter().position(|&arg| arg == node) else {
                     return Ok(None);
                 };
+                if crate::external_resolution::is_import_call(self.ast(parent)?, &read)? {
+                    return match index {
+                        0 => Ok(Some(self.builtins.string_type)),
+                        1 => self.global_import_call_options_type(false).map(Some),
+                        _ => Ok(Some(self.builtins.any_type)),
+                    };
+                }
                 let signature = if let Some(signature) = self.cached_call_signature(parent) {
                     signature
                 } else {
@@ -524,14 +531,17 @@ impl CheckerState {
         if view.node(options)?.kind() != K::ObjectLiteralExpression {
             return Ok(false);
         }
-        let Some(import_call) = ts_ast::utilities::find_ancestor(view, Some(options), |node| {
-            node.kind() == K::CallExpression
-                && node
-                    .expression()
-                    .and_then(|expression| view.node(expression).ok())
-                    .is_some_and(|expression| expression.kind() == K::ImportKeyword)
-        })?
-        else {
+        let mut ancestor = Some(options);
+        let mut import_call = None;
+        while let Some(id) = ancestor {
+            let read = view.node(id)?;
+            if crate::external_resolution::is_import_call(view, &read)? {
+                import_call = Some(id);
+                break;
+            }
+            ancestor = read.parent();
+        }
+        let Some(import_call) = import_call else {
             return Ok(false);
         };
         let arguments = self.source_list(import_call, view.node(import_call)?.argument_list())?;

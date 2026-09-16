@@ -235,7 +235,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint
-    fn resolved_base_constraint(
+    pub(crate) fn resolved_base_constraint(
         &mut self,
         ty: TypeId,
         stack: &mut Vec<RecursionIdentity>,

@@ -548,6 +548,144 @@ pub fn is_source_file_js(file: &SourceFileState) -> bool {
     file.is_js()
 }
 
+/// port: tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile
+pub fn is_check_js_enabled_for_file(
+    file: &SourceFileState,
+    options: &ts_core::CompilerOptions,
+) -> bool {
+    file.check_js_directive
+        .map_or(options.check_js == ts_core::Tristate::TRUE, |directive| {
+            directive.enabled
+        })
+}
+
+/// Mirrors the AccessKind enumeration in tsc/internal/ast/ast.go.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AccessKind {
+    /// Only reads from a variable.
+    Read,
+    /// Only writes to a variable without ever reading it, as in `x = 1`.
+    Write,
+    /// Reads from and writes to a variable, as in `f(x++)` or `x /= 1`.
+    ReadWrite,
+}
+
+/// port: tsc/internal/ast/ast.go:IsWriteOnlyAccess
+pub fn is_write_only_access(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    Ok(access_kind(view, node)? == AccessKind::Write)
+}
+
+/// port: tsc/internal/ast/ast.go:IsWriteAccess
+pub fn is_write_access(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    Ok(access_kind(view, node)? != AccessKind::Read)
+}
+
+/// Nested parentheses and destructuring patterns recurse once per level.
+/// port: tsc/internal/ast/ast.go:accessKind
+pub fn access_kind(view: AstView<'_>, node: NodeId) -> Result<AccessKind, Error> {
+    stacker::maybe_grow(64 * 1024, 1024 * 1024, || access_kind_worker(view, node))
+}
+
+fn access_kind_worker(view: AstView<'_>, node: NodeId) -> Result<AccessKind, Error> {
+    let Some(parent) = view.node(node)?.parent() else {
+        return Ok(AccessKind::Read);
+    };
+    let read = view.node(parent)?;
+    let data = read.data_source();
+    Ok(match read.kind().known() {
+        Some(K::ParenthesizedExpression | K::ArrayLiteralExpression) => access_kind(view, parent)?,
+        Some(K::PrefixUnaryExpression) => {
+            let operator = data
+                .as_prefix_unary_expression()
+                .ok_or(Error::InvalidGraph)?
+                .operator();
+            if operator == K::PlusPlusToken || operator == K::MinusMinusToken {
+                AccessKind::ReadWrite
+            } else {
+                AccessKind::Read
+            }
+        }
+        Some(K::PostfixUnaryExpression) => {
+            let operator = data
+                .as_postfix_unary_expression()
+                .ok_or(Error::InvalidGraph)?
+                .operator();
+            if operator == K::PlusPlusToken || operator == K::MinusMinusToken {
+                AccessKind::ReadWrite
+            } else {
+                AccessKind::Read
+            }
+        }
+        Some(K::BinaryExpression) => {
+            let binary = data.as_binary_expression().ok_or(Error::InvalidGraph)?;
+            if binary.left() == Some(node) {
+                let operator = view
+                    .node(binary.operator_token().ok_or(Error::InvalidGraph)?)?
+                    .kind();
+                if !crate::is_assignment_operator(operator) {
+                    AccessKind::Read
+                } else if operator == K::EqualsToken {
+                    AccessKind::Write
+                } else {
+                    AccessKind::ReadWrite
+                }
+            } else {
+                AccessKind::Read
+            }
+        }
+        Some(K::PropertyAccessExpression) => {
+            let access = data
+                .as_property_access_expression()
+                .ok_or(Error::InvalidGraph)?;
+            if access.name() == Some(node) {
+                access_kind(view, parent)?
+            } else {
+                AccessKind::Read
+            }
+        }
+        Some(K::PropertyAssignment) => {
+            let parent_access = access_kind(view, read.parent().ok_or(Error::InvalidGraph)?)?;
+            // In `({ x: varname }) = { x: 1 }`, the left `x` is a read and the right `x` a write.
+            let assignment = data.as_property_assignment().ok_or(Error::InvalidGraph)?;
+            if assignment.name() == Some(node) {
+                reverse_access_kind(parent_access)
+            } else {
+                parent_access
+            }
+        }
+        Some(K::ShorthandPropertyAssignment) => {
+            let assignment = data
+                .as_shorthand_property_assignment()
+                .ok_or(Error::InvalidGraph)?;
+            if assignment.object_assignment_initializer() == Some(node) {
+                AccessKind::Read
+            } else {
+                access_kind(view, read.parent().ok_or(Error::InvalidGraph)?)?
+            }
+        }
+        Some(K::ForInStatement | K::ForOfStatement) => {
+            let statement = data
+                .as_for_in_or_of_statement()
+                .ok_or(Error::InvalidGraph)?;
+            if statement.initializer() == Some(node) {
+                AccessKind::Write
+            } else {
+                AccessKind::Read
+            }
+        }
+        _ => AccessKind::Read,
+    })
+}
+
+/// port: tsc/internal/ast/ast.go:reverseAccessKind
+fn reverse_access_kind(access: AccessKind) -> AccessKind {
+    match access {
+        AccessKind::Read => AccessKind::Write,
+        AccessKind::Write => AccessKind::Read,
+        AccessKind::ReadWrite => AccessKind::ReadWrite,
+    }
+}
+
 /// port: tsc/internal/ast/utilities.go:IsJsonSourceFile
 pub fn is_json_source_file(file: &SourceFileState) -> bool {
     file.script_kind == ts_core::ScriptKind::JSON

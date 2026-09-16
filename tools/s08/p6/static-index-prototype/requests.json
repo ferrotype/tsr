@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "synthetic-prototype",
+      "files": {
+        "/main.ts": "class C { static [name: string]: number; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "real-static-property",
+      "files": {
+        "/main.ts": "class C { static [name: string]: number; static bad: string; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "instance-prototype",
+      "files": {
+        "/main.ts": "class C { [name: string]: number; prototype: string; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "interface-prototype",
+      "files": {
+        "/main.ts": "interface I { [name: string]: number; prototype: string; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "inherited-static-property",
+      "files": {
+        "/main.ts": "class A { static bad: string; } class B extends A { static [name: string]: number; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "static-and-instance-indexes",
+      "files": {
+        "/main.ts": "class C { static [name: string]: number; [name: string]: string; static valid: number; valid: string; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "numeric-index-control",
+      "files": {
+        "/main.ts": "class C { static [name: string]: number; static [name: number]: string; }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    }
+  ]
+}

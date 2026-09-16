@@ -299,6 +299,25 @@ impl CheckerState {
                 vec![source, target],
             )?)
         } else {
+            // A quickfix hint for a slightly incorrect namespace-style import
+            // whose target type would have related.
+            if head.is_some() && error_node.is_some() && result == tr::FALSE {
+                if let Some(symbol) = relater.checker.types.get(source)?.symbol {
+                    if let Some(&(alias_target, import)) =
+                        relater.checker.module_aliases.export_types.get(&symbol)
+                    {
+                        if relater.checker.ast(import)?.node(import)?.kind()
+                            != ts_ast::SyntaxKind::CallExpression
+                        {
+                            let ty = relater.checker.get_type_of_symbol(alias_target)?;
+                            if relater.checker.is_type_related_to(ty, target, kind)? {
+                                let related = relater.checker.diagnostic_for_node(Some(import), ts_diagnostics::Type_originates_at_this_import_A_namespace_style_import_cannot_be_called_or_constructed_and_will_cause_a_failure_at_runtime_Consider_using_a_default_import_or_import_require_here_instead, vec![])?;
+                                relater.errors.related.push(std::sync::Arc::new(related));
+                            }
+                        }
+                    }
+                }
+            }
             let error_node = relater.errors.error_node;
             relater.error_diagnostic(error_node)?
         };
@@ -427,7 +446,7 @@ impl CheckerState {
         if self.types.object_flags(ty)? & of::IS_UNKNOWN_LIKE_UNION_COMPUTED != 0 {
             return Ok(self.types.object_flags(ty)? & of::IS_UNKNOWN_LIKE_UNION != 0);
         }
-        let types = self.types.types_of(ty)?;
+        let types = self.types.types_of(ty)?.to_vec();
         let mut result = false;
         if types.len() >= 3
             && self.types.flags(types[0])? & tf::UNDEFINED != 0

@@ -286,7 +286,7 @@ impl CheckerState {
             return self.tuple_slice_element_type_ex(ty, start, end_skip, false, true);
         }
         if first_spread.is_none_or(|first| index < first) {
-            if let Some(property) = self.property_type(
+            if let Some(property) = self.type_of_property_of_contextual_type(
                 ty,
                 JsString::from_bytes(index.to_string().into_bytes()).as_bytes(),
             )? {

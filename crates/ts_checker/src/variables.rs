@@ -2,7 +2,7 @@
 //! step. Binding parents must consume the raw type, including its optionality.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
 use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn type_of_variable_like(&mut self, declaration: NodeId) -> Result<TypeId, Error> {
@@ -86,7 +86,13 @@ impl CheckerState {
                         .expression()
                         .ok_or(Error::MissingLink("for-in expression"))?;
                     let ty = self.check_expression_ex(expression, mode)?;
-                    return self.for_in_index_type(ty).map(Some);
+                    let ty = self.non_nullable_type_if_needed(ty)?;
+                    let index = self.get_index_type(ty, 0)?;
+                    return if self.types.flags(index)? & (tf::TYPE_PARAMETER | tf::INDEX) != 0 {
+                        self.extract_string_type(index).map(Some)
+                    } else {
+                        Ok(Some(self.builtins.string_type))
+                    };
                 }
                 if read.kind() == K::ForOfStatement {
                     return self.check_right_hand_side_of_for_of(grandparent).map(Some);
@@ -281,7 +287,21 @@ impl CheckerState {
         let readonly =
             ts_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
                 & mf::READONLY
-                != 0;
+                != 0
+                && !self
+                    .ast(declaration)?
+                    .node(declaration)?
+                    .parent()
+                    .map(|parent| {
+                        ts_ast::utilities::is_parameter_property_declaration(
+                            self.ast(declaration)?,
+                            declaration,
+                            parent,
+                        )
+                        .map_err(Error::from)
+                    })
+                    .transpose()?
+                    .unwrap_or(false);
         let ty = if constant || readonly {
             ty
         } else {
@@ -318,6 +338,15 @@ impl CheckerState {
         report: bool,
     ) -> Result<TypeId, Error> {
         if let Some(mut ty) = ty {
+            if self.types.flags(ty)? & tf::ES_SYMBOL != 0 {
+                if let Some(parent) = self.ast(declaration)?.node(declaration)?.parent() {
+                    let global =
+                        self.resolve_name(None, b"SymbolConstructor", sf::TYPE, None, false)?;
+                    if global.is_some() && self.get_symbol_of_declaration(parent)? == global {
+                        ty = self.es_symbol_like_type_for_node(declaration)?;
+                    }
+                }
+            }
             if report
                 && self
                     .program()?

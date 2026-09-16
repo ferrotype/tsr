@@ -455,8 +455,10 @@ impl CheckerState {
                 return Ok(ty);
             }
             let read = self.ast(node)?.node(node)?;
-            if read.body().is_some() {
-                return self.return_type_from_body(node);
+            if let Some(body) = read.body() {
+                if !ts_ast::node_is_missing(Some(&self.ast(body)?.node(body)?)) {
+                    return self.return_type_from_body(node);
+                }
             }
             Ok(self.builtins.any_type)
         })();
@@ -483,7 +485,7 @@ impl CheckerState {
                         vec![],
                     )?;
                 } else if no_implicit_any {
-                    let name = self.ast(node)?.node(node)?.name();
+                    let name = ts_ast::get_name_of_declaration(self.ast(node)?, Some(node))?;
                     if let Some(name) = name {
                         let text =
                             ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;

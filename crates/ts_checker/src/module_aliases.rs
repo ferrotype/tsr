@@ -8,6 +8,7 @@ use ts_ast::{symbol_flags as sf, SyntaxKind as K};
 #[derive(Default)]
 pub(crate) struct ModuleAliasState {
     pub(crate) global_import_attributes: Option<TypeId>,
+    pub(crate) global_import_call_options: [Option<TypeId>; 2],
     pub(crate) attributes_types: crate::types::Map<SymbolId, TypeId>,
     pub(crate) referenced: crate::types::Set<SymbolId>,
     pub(crate) exports_checked: crate::types::Set<SymbolId>,
@@ -34,6 +35,7 @@ impl ModuleAliasState {
             .flat_map(|(&key, &value)| [key, value])
             .chain(self.attributes_types.values().copied())
             .chain(self.global_import_attributes)
+            .chain(self.global_import_call_options.into_iter().flatten())
     }
     #[cfg(any(test, feature = "storage-pilot"))]
     pub(crate) fn census(&self, census: &mut crate::census::Census) {
@@ -224,6 +226,29 @@ impl CheckerState {
             self.module_aliases.immediate_targets.insert(symbol, target);
         }
         Ok(target)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.tryResolveAlias
+    pub(crate) fn try_resolve_alias(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<Option<SymbolId>, Error> {
+        if self.module_aliases.targets.contains_key(&symbol)
+            || self
+                .resolution
+                .find_resolution_cycle_start_index(
+                    crate::TypeSystemEntity::Symbol(symbol),
+                    TypeSystemPropertyName::AliasTarget,
+                    |entry| self.type_resolution_has_property(entry),
+                )
+                .is_none()
+        {
+            self.resolve_alias(symbol).map(Some)
+        } else {
+            // Unlike pushTypeResolution, the speculative probe must not mark
+            // the active chain as circular merely to reject a suggestion.
+            Ok(None)
+        }
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveAlias

@@ -92,12 +92,14 @@ impl CheckerState {
             if !construct
                 && (matches!(
                     self.ast(callee)?.node(callee)?.kind().known(),
-                    Some(K::SuperKeyword | K::ImportKeyword)
-                ) || ts_ast::utilities_middle::is_require_call(
-                    self.ast(expression)?,
-                    &self.ast(expression)?.node(expression)?,
-                    true,
-                )? || self.is_symbol_or_symbol_for_call(expression)?)
+                    Some(K::SuperKeyword)
+                ) || crate::external_resolution::is_import_call(self.ast(expression)?, &read)?
+                    || ts_ast::utilities_middle::is_require_call(
+                        self.ast(expression)?,
+                        &self.ast(expression)?.node(expression)?,
+                        true,
+                    )?
+                    || self.is_symbol_or_symbol_for_call(expression)?)
             {
                 return Ok(None);
             }
@@ -112,16 +114,26 @@ impl CheckerState {
             } else {
                 self.check_non_null_type(ty, callee)?
             };
-            let signatures = self.signatures_of_type(ty, construct)?;
-            if signatures.len() == 1
-                && self
-                    .signatures
-                    .get(signatures[0])?
-                    .type_parameters
-                    .as_ref()
-                    .is_none_or(|p| p.is_empty())
-            {
-                let result = self.return_type_of_signature(signatures[0])?;
+            // getSingleSignature(t, kind, allowMembers=true): one object type
+            // with exactly one signature of the kind and none of the other kind.
+            let single = if self.types.flags(ty)? & tf::OBJECT != 0 {
+                let calls = self.signatures_of_type(ty, false)?;
+                let constructs = self.signatures_of_type(ty, true)?;
+                let (wanted, other) = if construct {
+                    (constructs, calls)
+                } else {
+                    (calls, constructs)
+                };
+                (wanted.len() == 1 && other.is_empty()).then(|| wanted[0])
+            } else {
+                None
+            };
+            if let Some(signature) = single.filter(|&signature| {
+                self.signatures
+                    .get(signature)
+                    .is_ok_and(|s| s.type_parameters.as_ref().is_none_or(|p| p.is_empty()))
+            }) {
+                let result = self.return_type_of_signature(signature)?;
                 return if optional_chain {
                     self.propagate_optional_type_marker(result, expression, non_optional != ty)
                         .map(Some)
@@ -159,17 +171,22 @@ impl CheckerState {
         if let Some(Some(symbol)) = self.query.resolved_symbols.try_get(node) {
             return Ok(*symbol);
         }
-        let name = self.ast(node)?.node_text(node)?.into_js_string();
-        let message = self.cannot_find_name_diagnostic(node)?;
-        let symbol = self
-            .resolve_name(
+        let missing = ts_ast::node_is_missing(Some(&self.ast(node)?.node(node)?));
+        let symbol = if missing {
+            None
+        } else {
+            let name = self.ast(node)?.node_text(node)?.into_js_string();
+            let message = self.cannot_find_name_diagnostic(node)?;
+            let write_only = ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?;
+            self.resolve_name(
                 Some(node),
                 name.as_bytes(),
                 sf::VALUE | sf::EXPORT_VALUE,
                 Some(message),
-                true,
+                !write_only,
             )?
-            .unwrap_or(self.builtins.unknown_symbol);
+        }
+        .unwrap_or(self.builtins.unknown_symbol);
         *self.query.resolved_symbols.get_or_default(node) = Some(symbol);
         Ok(symbol)
     }
@@ -194,7 +211,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTruthinessExpression
     pub(crate) fn check_truthiness_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let ty = self.check_expression(node)?;
+        self.check_truthiness_expression_ex(node, 0)
+    }
+
+    fn check_truthiness_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        let ty = self.check_expression_ex(node, mode)?;
         self.check_truthiness_type(ty, node)?;
         Ok(ty)
     }
@@ -306,10 +327,11 @@ impl CheckerState {
         let condition = required(data.condition(), "conditional condition")?;
         let a = required(data.when_true(), "conditional true")?;
         let b = required(data.when_false(), "conditional false")?;
-        let ty = self.check_truthiness_expression(condition)?;
+        let mode = self.expression_mode;
+        let ty = self.check_truthiness_expression_ex(condition, mode)?;
         self.check_known_truthy_guard(condition, ty, Some(a))?;
-        let a = self.check_expression(a)?;
-        let b = self.check_expression(b)?;
+        let a = self.check_expression_ex(a, mode)?;
+        let b = self.check_expression_ex(b, mode)?;
         self.get_union_type_ex(&[a, b], crate::UnionReduction::Subtype, None, None)
     }
 
@@ -395,9 +417,7 @@ impl CheckerState {
                 let nullable = self.types.flags(a)? & tf::NULLABLE != 0
                     || self.types.flags(b)? & tf::NULLABLE != 0;
                 if !nullable && !self.types_comparable(a, b)? {
-                    let a = self.type_to_string(a, crate::type_format_flags::NONE)?;
-                    let b = self.type_to_string(b, crate::type_format_flags::NONE)?;
-                    self.error_at(Some(node), ts_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap, vec![a,b])?;
+                    self.report_equality_operator_error(a, b, node)?;
                 }
                 Ok(self.builtins.boolean_type)
             }
@@ -429,5 +449,66 @@ impl CheckerState {
             ) => self.arithmetic_binary(node, left, right, op, a, b),
             _ => Err(Error::Unsupported("checkBinaryLikeExpression: operator")),
         }
+    }
+
+    /// The equality case of reportOperatorError: literal base types when
+    /// those are also unrelated, error-display names, and the await hint.
+    // port: tsc/internal/checker/checker.go:Checker.reportOperatorError
+    // port: tsc/internal/checker/checker.go:Checker.getBaseTypesIfUnrelated
+    // port: tsc/internal/checker/checker.go:Checker.errorAndMaybeSuggestAwait
+    fn report_equality_operator_error(
+        &mut self,
+        left: TypeId,
+        right: TypeId,
+        node: NodeId,
+    ) -> Result<(), Error> {
+        let mut would_work_with_await = false;
+        if let (Some(awaited_left), Some(awaited_right)) = (
+            self.awaited_type_no_alias(left)?,
+            self.awaited_type_no_alias(right)?,
+        ) {
+            would_work_with_await = !(awaited_left == left && awaited_right == right)
+                && self.equality_comparable(awaited_left, awaited_right)?;
+        }
+        let (mut effective_left, mut effective_right) = (left, right);
+        if !would_work_with_await {
+            let left_base = self.base_literal_type(left)?;
+            let right_base = self.base_literal_type(right)?;
+            if !self.equality_comparable(left_base, right_base)? {
+                effective_left = left_base;
+                effective_right = right_base;
+            }
+        }
+        let (left_name, right_name) =
+            self.type_names_for_error_display(effective_left, effective_right)?;
+        let mut diagnostic = self.diagnostic_for_node(
+            Some(node),
+            ts_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap,
+            vec![left_name, right_name],
+        )?;
+        if would_work_with_await {
+            diagnostic
+                .related_information
+                .push(std::sync::Arc::new(self.diagnostic_for_node(
+                    Some(node),
+                    ts_diagnostics::Did_you_forget_to_use_await,
+                    vec![],
+                )?));
+        }
+        self.add_diagnostic(diagnostic)?;
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isTypeEqualityComparableTo
+    fn equality_comparable(&mut self, left: TypeId, right: TypeId) -> Result<bool, Error> {
+        let comparable = |this: &mut Self, source: TypeId, target: TypeId| -> Result<bool, Error> {
+            Ok(this.types.flags(target)? & tf::NULLABLE != 0
+                || this.is_type_related_to(
+                    source,
+                    target,
+                    crate::relater::RelationKind::Comparable,
+                )?)
+        };
+        Ok(comparable(self, left, right)? || comparable(self, right, left)?)
     }
 }

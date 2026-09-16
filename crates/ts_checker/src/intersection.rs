@@ -305,7 +305,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.removeRedundantSupertypes
     fn remove_redundant_supertypes(
-        &self,
+        &mut self,
         types: &mut Vec<TypeId>,
         includes: u32,
     ) -> Result<(), Error> {
@@ -328,8 +328,8 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.IsEmptyAnonymousObjectType
-    pub(crate) fn is_empty_anonymous_object_type(&self, ty: TypeId) -> Result<bool, Error> {
-        let record = self.types.get(ty)?;
+    pub(crate) fn is_empty_anonymous_object_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+        let record = *self.types.get(ty)?;
         if record.object_flags & of::ANONYMOUS == 0 {
             return Ok(false);
         }
@@ -344,9 +344,9 @@ impl CheckerState {
             }
         }
         if let Some(symbol) = record.symbol {
-            let symbol = self.symbol(symbol)?;
-            if symbol.flags() & sf::TYPE_LITERAL != 0 {
-                return Ok(match symbol.members() {
+            if self.symbol(symbol)?.flags() & sf::TYPE_LITERAL != 0 {
+                // getMembersOfSymbol resolves late-bound members first.
+                return Ok(match self.members_of_symbol(symbol)? {
                     Some(table) => self.table(table)?.is_empty(),
                     None => true,
                 });

@@ -52,7 +52,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveDeclaredMembers
-    fn resolve_declared_members(&mut self, ty: TypeId) -> Result<(), Error> {
+    pub(crate) fn resolve_declared_members(&mut self, ty: TypeId) -> Result<(), Error> {
         if self.types.interface(ty)?.declared_members_resolved {
             return Ok(());
         }
@@ -196,6 +196,10 @@ impl CheckerState {
                     base
                 };
                 for property in self.get_properties_of_type(base)? {
+                    // addInheritedMembers never inherits static private names.
+                    if self.is_static_private_identifier_property(property)? {
+                        continue;
+                    }
                     let name = self.symbol(property)?.name_to_owned();
                     let mut table = self
                         .tables
@@ -270,7 +274,6 @@ impl CheckerState {
         );
         let read = self.symbol(symbol)?;
         let flags = read.flags();
-        let exports = read.exports();
         if flags & sf::CLASS != 0 {
             return self.resolve_class_static_members(ty, symbol);
         }
@@ -283,7 +286,9 @@ impl CheckerState {
         let members = if flags & sf::TYPE_LITERAL != 0 {
             self.members_of_symbol(symbol)?
         } else {
-            exports
+            // Function expandos may be keyed by a const string or unique
+            // symbol. Resolve their late exports before publishing members.
+            self.module_exports_of_symbol(symbol)?
         };
         if flags & (sf::TYPE_LITERAL | sf::FUNCTION | sf::METHOD) == 0 {
             return Err(Error::Unsupported(

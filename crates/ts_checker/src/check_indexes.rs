@@ -6,34 +6,79 @@ use crate::{
     IndexInfoId, TypeId,
 };
 use ts_arena::{NodeId, SymbolId};
-use ts_ast::{internal_symbol_names as names, SyntaxKind as K};
+use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn check_source_index_constraints(
         &mut self,
         ty: TypeId,
         declaration: NodeId,
+        is_static_index: bool,
     ) -> Result<(), Error> {
         if self.query.index_constraints_checked.contains(&ty) {
             return Ok(());
         }
-        self.check_index_constraints(ty)?;
-        self.check_duplicate_index_signatures(declaration)?;
+        self.check_index_constraints(ty, is_static_index)?;
+        self.check_class_or_interface_duplicate_indexes(declaration)?;
         self.query.index_constraints_checked.insert(ty);
         Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkIndexConstraints
-    fn check_index_constraints(&mut self, ty: TypeId) -> Result<(), Error> {
+    pub(crate) fn check_index_constraints(
+        &mut self,
+        ty: TypeId,
+        is_static_index: bool,
+    ) -> Result<(), Error> {
         let indexes = self.index_infos_of_type(ty)?;
         if indexes.is_empty() {
             return Ok(());
         }
         for property in self.get_properties_of_type(ty)? {
+            if is_static_index && self.symbol(property)?.flags() & sf::PROTOTYPE != 0 {
+                continue;
+            }
             let key =
                 self.literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
             let value = self.non_missing_symbol_type(property)?;
             self.check_index_property(ty, property, key, value, &indexes)?;
+        }
+        let declaration = match self.types.get(ty)?.symbol {
+            Some(symbol) => self.symbol(symbol)?.value_declaration(),
+            None => None,
+        };
+        if let Some(declaration) = declaration {
+            if ts_ast::utilities::is_class_like(&self.ast(declaration)?.node(declaration)?) {
+                let members = self.source_list(
+                    declaration,
+                    self.ast(declaration)?.node(declaration)?.member_list(),
+                )?;
+                for member in members {
+                    // Only process instance properties against instance index signatures
+                    // and static properties against static index signatures.
+                    if ts_ast::utilities::is_static(self.ast(member)?, member)? != is_static_index
+                        || self.has_bindable_name(member)?
+                    {
+                        continue;
+                    }
+                    let Some(symbol) = self.get_symbol_of_declaration(member)? else {
+                        continue;
+                    };
+                    let name = self
+                        .ast(member)?
+                        .node(member)?
+                        .name()
+                        .ok_or(Error::MissingLink("computed member name"))?;
+                    let expression = self
+                        .ast(name)?
+                        .node(name)?
+                        .expression()
+                        .ok_or(Error::MissingLink("computed member expression"))?;
+                    let key = self.get_type_of_expression(expression)?;
+                    let value = self.non_missing_symbol_type(symbol)?;
+                    self.check_index_property(ty, symbol, key, value, &indexes)?;
+                }
+            }
         }
         if indexes.len() > 1 {
             for &source in &indexes {
@@ -219,6 +264,24 @@ impl CheckerState {
         Ok(None)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkClassOrInterfaceForDuplicateIndexSignatures
+    pub(crate) fn check_class_or_interface_duplicate_indexes(
+        &mut self,
+        node: NodeId,
+    ) -> Result<(), Error> {
+        let symbol = self
+            .get_symbol_of_declaration(node)?
+            .ok_or(Error::MissingLink("index owner symbol"))?;
+        if !self.query.index_signatures_checked.insert(symbol) {
+            return Ok(());
+        }
+        let result = self.check_duplicate_index_signatures(node);
+        if result.is_err() {
+            self.query.index_signatures_checked.remove(&symbol);
+        }
+        result
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkTypeForDuplicateIndexSignatures
     fn check_duplicate_index_signatures(&mut self, node: NodeId) -> Result<(), Error> {
         let symbol = self
@@ -287,5 +350,22 @@ impl CheckerState {
                 )
             })
             .collect()
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.hasBindableName
+    pub(crate) fn has_bindable_name(&mut self, node: NodeId) -> Result<bool, Error> {
+        if !ts_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
+            return Ok(true);
+        }
+        match self.late_name(node)? {
+            Some(name) => {
+                let ty = self.late_name_type(name)?;
+                Ok(
+                    self.types.flags(ty)? & (tf::STRING_OR_NUMBER_LITERAL | tf::UNIQUE_ES_SYMBOL)
+                        != 0,
+                )
+            }
+            None => Ok(false),
+        }
     }
 }

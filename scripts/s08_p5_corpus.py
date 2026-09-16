@@ -22,7 +22,7 @@ from s08_queries import action, expected_baseline
 
 def sources():
     result = p4_sources()
-    for pattern in ('tools/s08/p5/**', 'scripts/s08_p5*.py', 'scripts/s08_queries.py', 'scripts/s08_baselines.py'):
+    for pattern in ('tools/s08/p5/**/*', 'scripts/s08_p5*.py', 'scripts/s08_queries.py', 'scripts/s08_baselines.py'):
         for path in ROOT.glob(pattern):
             if path.is_file():
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
@@ -236,21 +236,28 @@ def replay(output, allow_partial=False):
                      summarizer=lambda reqs, rows: summarize(reqs, rows, expected))
 
 
-def run(native, loading, output, timeout, resume=False):
+def run(native, loading, output, timeout, resume=False, *, public_type_strings=False, source_fn=None):
+    source_fn = source_fn or sources
+    if public_type_strings and read(native / 'report.json').get('public_type_strings') is not True:
+        raise ValueError('E2 needs a native --public-type-strings capture before building Rust')
     if output.exists():
         if not resume: raise ValueError('existing capture requires --resume')
         metadata = read(output / 'capture.json')
         if metadata['timeout_seconds'] != timeout or digest((native / 'report.json').read_bytes()) != metadata['native_report_sha256']:
             raise ValueError('resume requires identical native capture and timeout')
         requests, completed, _ = replay(output, True)
+        if any(r.get('public_type_strings', False) != public_type_strings for r in requests):
+            raise ValueError('resume changed public TypeToString observation mode')
         expected = [strict_json_loads(line) for line in (output / 'native-observations.ndjson').read_bytes().splitlines()]
         start = len(completed)
     else:
         pairs = prepare(native, loading)
         requests, expected = map(list, zip(*pairs, strict=True))
+        if public_type_strings:
+            for request in requests: request['public_type_strings'] = True
         output.mkdir(parents=True)
         (output / 'cases').mkdir()
-        record = p4.build(output / 'build', example='p5_inventory', source_fn=sources, optimize=True)
+        record = p4.build(output / 'build', example='p5_inventory', source_fn=source_fn, optimize=True)
         # Keep a single source snapshot in the capture, not a second copy.
         Path(record['source_snapshot']).rename(output / 'source-snapshot')
         record['source_snapshot'] = str(output / 'source-snapshot')
@@ -277,7 +284,7 @@ def run(native, loading, output, timeout, resume=False):
         if (index + 1) % 100 == 0 or index + 1 == len(requests):
             print(f'P5 inventory {index + 1}/{len(requests)}', file=sys.stderr, flush=True)
     _, _, report = replay(output)
-    report['source_stable'] = sources() == metadata['build']['sources']
+    report['source_stable'] = source_fn() == metadata['build']['sources']
     p4.atomic(output / 'report.json', report)
     print(report['counts_by_tier'])
     if not report['source_stable']:

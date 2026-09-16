@@ -127,13 +127,7 @@ impl CheckerState {
                 }
             }
             Some(K::CallExpression) => {
-                let expression = read.expression();
-                let is_import = if let Some(expr) = expression {
-                    self.ast(expr)?.node(expr)?.kind() == K::ImportKeyword
-                } else {
-                    false
-                };
-                if is_import {
+                if crate::external_resolution::is_import_call(self.ast(parent)?, &read)? {
                     let arguments = self.source_list(parent, read.argument_list())?;
                     if let Some(&options) = arguments.get(1) {
                         let options = self.check_expression_cached(options)?;

@@ -225,8 +225,8 @@ impl CheckerState {
                 self.error_at(Some(reference), messages::A_class_can_only_implement_an_object_type_or_intersection_of_object_types_with_statically_known_members, vec![])?;
             }
         }
-        self.check_source_index_constraints(class, node)?;
-        self.check_source_index_constraints(static_type, node)?;
+        self.check_source_index_constraints(class, node, false)?;
+        self.check_source_index_constraints(static_type, node, true)?;
         self.check_class_property_initialization(node, &members)?;
         if self.ast(node)?.node(node)?.kind() != K::ClassExpression {
             for member in members {
@@ -247,10 +247,10 @@ impl CheckerState {
         if self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
             return Ok(());
         }
-        let docs = self
-            .ast(node)?
-            .eager_jsdoc(node)?
-            .map(|docs| docs.to_vec())
+        // JS files carry lazily parsed JSDoc; the provider covers both forms.
+        let docs: Vec<NodeId> = self
+            .jsdoc_for_node(node)?
+            .map(|docs| docs.iter().copied().collect())
             .unwrap_or_default();
         for doc in docs {
             let tags = self

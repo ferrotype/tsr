@@ -1,0 +1,1371 @@
+{
+  "cases": [
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const pending = import(\"./dep.mjs\"); const result = await pending; const value = result.value;"
+        },
+        "id": "namespace-and-awaited",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "result",
+            "file": "/main.mts",
+            "id": "result.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "result",
+            "file": "/main.mts",
+            "id": "result.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.initializer"
+        },
+        {
+          "display_hex": "747970656f6620696d706f727428222f6465702229",
+          "id": "result.name"
+        },
+        {
+          "display_hex": "747970656f6620696d706f727428222f6465702229",
+          "id": "result.initializer"
+        },
+        {
+          "display_hex": "3432",
+          "id": "value.name"
+        },
+        {
+          "display_hex": "3432",
+          "id": "value.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const plain = import(\"plain.resource\"); const typed = import(\"typed/file.resource\", { with: { type: \"text\" } }); const options = { with: { type: \"text\" as const } }; const parenthesized = import(\"typed/other.resource\", ({ with: { type: \"text\" } })); const indirect = import(\"typed/more.resource\", options); const fallback = import(\"typed/none.resource\");",
+          "/types.d.ts": "declare module \"*.resource\" { export const kind: \"plain\"; } declare module \"typed/*.resource\" with { type: \"text\" } { export const kind: \"text\"; }"
+        },
+        "id": "attributed-patterns",
+        "queries": [
+          {
+            "declaration": "plain",
+            "file": "/main.mts",
+            "id": "plain.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "plain",
+            "file": "/main.mts",
+            "id": "plain.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "typed",
+            "file": "/main.mts",
+            "id": "typed.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "typed",
+            "file": "/main.mts",
+            "id": "typed.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "parenthesized",
+            "file": "/main.mts",
+            "id": "parenthesized.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "parenthesized",
+            "file": "/main.mts",
+            "id": "parenthesized.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "indirect",
+            "file": "/main.mts",
+            "id": "indirect.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "indirect",
+            "file": "/main.mts",
+            "id": "indirect.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "fallback",
+            "file": "/main.mts",
+            "id": "fallback.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "fallback",
+            "file": "/main.mts",
+            "id": "fallback.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts",
+          "/types.d.ts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a2022706c61696e223b2064656661756c743a20747970656f6620696d706f727428222a2e7265736f7572636522293b207d3e",
+          "id": "plain.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a2022706c61696e223b2064656661756c743a20747970656f6620696d706f727428222a2e7265736f7572636522293b207d3e",
+          "id": "plain.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "typed.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "typed.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "parenthesized.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "parenthesized.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "indirect.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "indirect.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a2022706c61696e223b2064656661756c743a20747970656f6620696d706f727428222a2e7265736f7572636522293b207d3e",
+          "id": "fallback.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a2022706c61696e223b2064656661756c743a20747970656f6620696d706f727428222a2e7265736f7572636522293b207d3e",
+          "id": "fallback.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const pending = import(\"./settings.json\", { with: { type: \"json\" } }); const value = await pending;",
+          "/settings.json": "{\"name\":\"example\",\"count\":1}"
+        },
+        "id": "json-default-only",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts",
+          "/settings.json"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c7b2064656661756c743a207b206e616d653a20737472696e673b20636f756e743a206e756d6265723b207d3b207d3e",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b2064656661756c743a207b206e616d653a20737472696e673b20636f756e743a206e756d6265723b207d3b207d3e",
+          "id": "pending.initializer"
+        },
+        {
+          "display_hex": "7b2064656661756c743a207b206e616d653a20737472696e673b20636f756e743a206e756d6265723b207d3b207d",
+          "id": "value.name"
+        },
+        {
+          "display_hex": "7b2064656661756c743a207b206e616d653a20737472696e673b20636f756e743a206e756d6265723b207d3b207d",
+          "id": "value.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/legacy.cts": "const legacy = { item: 1 }; export = legacy;",
+          "/main.mts": "const pending = import(\"./legacy.cjs\"); const value = await pending;"
+        },
+        "id": "commonjs-namespace",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "value",
+            "file": "/main.mts",
+            "id": "value.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts",
+          "/legacy.cts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c7b206974656d3a206e756d6265723b2064656661756c743a207b206974656d3a206e756d6265723b207d3b207d3e",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206974656d3a206e756d6265723b2064656661756c743a207b206974656d3a206e756d6265723b207d3b207d3e",
+          "id": "pending.initializer"
+        },
+        {
+          "display_hex": "7b206974656d3a206e756d6265723b2064656661756c743a207b206974656d3a206e756d6265723b207d3b207d",
+          "id": "value.name"
+        },
+        {
+          "display_hex": "7b206974656d3a206e756d6265723b2064656661756c743a207b206974656d3a206e756d6265723b207d3b207d",
+          "id": "value.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "declare const name: string; const dynamic = import(name); const invalid = import(42); const nullable = import(null); const absent = import(\"./missing.mjs\");"
+        },
+        "id": "nonliteral-and-invalid-specifiers",
+        "queries": [
+          {
+            "declaration": "dynamic",
+            "file": "/main.mts",
+            "id": "dynamic.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "dynamic",
+            "file": "/main.mts",
+            "id": "dynamic.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "invalid",
+            "file": "/main.mts",
+            "id": "invalid.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "invalid",
+            "file": "/main.mts",
+            "id": "invalid.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "nullable",
+            "file": "/main.mts",
+            "id": "nullable.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "nullable",
+            "file": "/main.mts",
+            "id": "nullable.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "absent",
+            "file": "/main.mts",
+            "id": "absent.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "absent",
+            "file": "/main.mts",
+            "id": "absent.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [
+        {
+          "args": [
+            "42"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 7036,
+          "deprecated": false,
+          "end": 83,
+          "file": "/main.mts",
+          "key_hex": "44796e616d69635f696d706f72745f735f7370656369666965725f6d7573745f62655f6f665f747970655f737472696e675f6275745f686572655f6861735f747970655f305f37303336",
+          "pos": 81,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": [
+            "null"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 7036,
+          "deprecated": false,
+          "end": 114,
+          "file": "/main.mts",
+          "key_hex": "44796e616d69635f696d706f72745f735f7370656369666965725f6d7573745f62655f6f665f747970655f737472696e675f6275745f686572655f6861735f747970655f305f37303336",
+          "pos": 110,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": [
+            "./missing.mjs"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2307,
+          "deprecated": false,
+          "end": 154,
+          "file": "/main.mts",
+          "key_hex": "43616e6e6f745f66696e645f6d6f64756c655f305f6f725f6974735f636f72726573706f6e64696e675f747970655f6465636c61726174696f6e735f32333037",
+          "pos": 139,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "dynamic.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "dynamic.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "invalid.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "invalid.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "nullable.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "nullable.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "absent.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "absent.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const empty = import(); const extra = import(\"./dep.mjs\", {}, missing); const spread = import(...[\"./dep.mjs\"]); const generic = import<string>(\"./dep.mjs\");"
+        },
+        "id": "argument-grammar",
+        "queries": [
+          {
+            "declaration": "empty",
+            "file": "/main.mts",
+            "id": "empty.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "empty",
+            "file": "/main.mts",
+            "id": "empty.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "extra",
+            "file": "/main.mts",
+            "id": "extra.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "extra",
+            "file": "/main.mts",
+            "id": "extra.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "spread",
+            "file": "/main.mts",
+            "id": "spread.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "spread",
+            "file": "/main.mts",
+            "id": "spread.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "generic",
+            "file": "/main.mts",
+            "id": "generic.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "generic",
+            "file": "/main.mts",
+            "id": "generic.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [
+        {
+          "args": null,
+          "category": 3,
+          "chain": [],
+          "code": 1450,
+          "deprecated": false,
+          "end": 22,
+          "file": "/main.mts",
+          "key_hex": "44796e616d69635f696d706f7274735f63616e5f6f6e6c795f6163636570745f615f6d6f64756c655f7370656369666965725f616e645f616e5f6f7074696f6e616c5f7365745f6f665f617474726962757465735f61735f617267756d656e74735f31343530",
+          "pos": 14,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 3,
+          "chain": [],
+          "code": 1450,
+          "deprecated": false,
+          "end": 70,
+          "file": "/main.mts",
+          "key_hex": "44796e616d69635f696d706f7274735f63616e5f6f6e6c795f6163636570745f615f6d6f64756c655f7370656369666965725f616e645f616e5f6f7074696f6e616c5f7365745f6f665f617474726962757465735f61735f617267756d656e74735f31343530",
+          "pos": 38,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": [
+            "missing"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2304,
+          "deprecated": false,
+          "end": 69,
+          "file": "/main.mts",
+          "key_hex": "43616e6e6f745f66696e645f6e616d655f305f32333034",
+          "pos": 62,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 1325,
+          "deprecated": false,
+          "end": 110,
+          "file": "/main.mts",
+          "key_hex": "417267756d656e745f6f665f64796e616d69635f696d706f72745f63616e6e6f745f62655f7370726561645f656c656d656e745f31333235",
+          "pos": 94,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 1326,
+          "deprecated": false,
+          "end": 156,
+          "file": "/main.mts",
+          "key_hex": "546869735f7573655f6f665f696d706f72745f69735f696e76616c69645f696d706f72745f63616c6c735f63616e5f62655f7772697474656e5f6275745f746865795f6d7573745f686176655f706172656e7468657365735f616e645f63616e6e6f745f5f31333236",
+          "pos": 129,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "empty.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "empty.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "extra.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "extra.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "spread.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c616e793e",
+          "id": "spread.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "generic.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "generic.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const invalid = import(\"./dep.mjs\", { with: { type: 42 } }); const legacy = import(\"./dep.mjs\", { assert: { type: \"json\" } }); const missingOptions = import(\"./dep.mjs\", undefined);"
+        },
+        "id": "option-diagnostics",
+        "queries": [
+          {
+            "declaration": "invalid",
+            "file": "/main.mts",
+            "id": "invalid.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "invalid",
+            "file": "/main.mts",
+            "id": "invalid.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "legacy",
+            "file": "/main.mts",
+            "id": "legacy.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "legacy",
+            "file": "/main.mts",
+            "id": "legacy.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "missingOptions",
+            "file": "/main.mts",
+            "id": "missingOptions.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "missingOptions",
+            "file": "/main.mts",
+            "id": "missingOptions.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [
+        {
+          "args": [
+            "{ with: { readonly type: 42; }; }",
+            "ImportCallOptions"
+          ],
+          "category": 1,
+          "chain": [
+            {
+              "args": [
+                "with"
+              ],
+              "category": 1,
+              "chain": [
+                {
+                  "args": [
+                    "{ readonly type: 42; }",
+                    "ImportAttributes"
+                  ],
+                  "category": 1,
+                  "chain": [
+                    {
+                      "args": [
+                        "type"
+                      ],
+                      "category": 1,
+                      "chain": [
+                        {
+                          "args": [
+                            "number",
+                            "string"
+                          ],
+                          "category": 1,
+                          "chain": [],
+                          "code": 2322,
+                          "deprecated": false,
+                          "end": 58,
+                          "file": "/main.mts",
+                          "key_hex": "547970655f305f69735f6e6f745f61737369676e61626c655f746f5f747970655f315f32333232",
+                          "pos": 36,
+                          "related": [],
+                          "skipped_on_no_emit": false,
+                          "source_hex": "",
+                          "text_hex": "",
+                          "unnecessary": false
+                        }
+                      ],
+                      "code": 2530,
+                      "deprecated": false,
+                      "end": 58,
+                      "file": "/main.mts",
+                      "key_hex": "50726f70657274795f305f69735f696e636f6d70617469626c655f776974685f696e6465785f7369676e61747572655f32353330",
+                      "pos": 36,
+                      "related": [],
+                      "skipped_on_no_emit": false,
+                      "source_hex": "",
+                      "text_hex": "",
+                      "unnecessary": false
+                    }
+                  ],
+                  "code": 2322,
+                  "deprecated": false,
+                  "end": 58,
+                  "file": "/main.mts",
+                  "key_hex": "547970655f305f69735f6e6f745f61737369676e61626c655f746f5f747970655f315f32333232",
+                  "pos": 36,
+                  "related": [],
+                  "skipped_on_no_emit": false,
+                  "source_hex": "",
+                  "text_hex": "",
+                  "unnecessary": false
+                }
+              ],
+              "code": 2326,
+              "deprecated": false,
+              "end": 58,
+              "file": "/main.mts",
+              "key_hex": "54797065735f6f665f70726f70657274795f305f6172655f696e636f6d70617469626c655f32333236",
+              "pos": 36,
+              "related": [],
+              "skipped_on_no_emit": false,
+              "source_hex": "",
+              "text_hex": "",
+              "unnecessary": false
+            }
+          ],
+          "code": 2322,
+          "deprecated": false,
+          "end": 58,
+          "file": "/main.mts",
+          "key_hex": "547970655f305f69735f6e6f745f61737369676e61626c655f746f5f747970655f315f32333232",
+          "pos": 36,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 2880,
+          "deprecated": false,
+          "end": 104,
+          "file": "/main.mts",
+          "key_hex": "496d706f72745f617373657274696f6e735f686176655f6265656e5f7265706c616365645f62795f696d706f72745f617474726962757465735f5573655f776974685f696e73746561645f6f665f6173736572745f32383830",
+          "pos": 98,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "invalid.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "invalid.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "legacy.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "legacy.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "missingOptions.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "missingOptions.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-native-02",
+      "options": {
+        "module": "NodeNext",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const pending = import.defer(\"./dep.mjs\"); const typed = import.defer(\"typed/file.resource\", { with: { type: \"text\" } }); const parenthesized = import.defer(\"typed/other.resource\", ({ with: { type: \"text\" } }));",
+          "/types.d.ts": "declare module \"*.resource\" { export const kind: \"plain\"; } declare module \"typed/*.resource\" with { type: \"text\" } { export const kind: \"text\"; }"
+        },
+        "id": "deferred-import-mode",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "typed",
+            "file": "/main.mts",
+            "id": "typed.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "typed",
+            "file": "/main.mts",
+            "id": "typed.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "parenthesized",
+            "file": "/main.mts",
+            "id": "parenthesized.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "parenthesized",
+            "file": "/main.mts",
+            "id": "parenthesized.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts",
+          "/types.d.ts"
+        ]
+      },
+      "request_sha256": "c4185a8841757c37939e439a335b68d175858ee55f259bbade263529f5113481",
+      "semantic": [
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 18060,
+          "deprecated": false,
+          "end": 41,
+          "file": "/main.mts",
+          "key_hex": "44656665727265645f696d706f7274735f6172655f6f6e6c795f737570706f727465645f7768656e5f7468655f6d6f64756c655f666c61675f69735f7365745f746f5f65736e6578745f6f725f70726573657276655f3138303630",
+          "pos": 16,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 18060,
+          "deprecated": false,
+          "end": 120,
+          "file": "/main.mts",
+          "key_hex": "44656665727265645f696d706f7274735f6172655f6f6e6c795f737570706f727465645f7768656e5f7468655f6d6f64756c655f666c61675f69735f7365745f746f5f65736e6578745f6f725f70726573657276655f3138303630",
+          "pos": 57,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 18060,
+          "deprecated": false,
+          "end": 210,
+          "file": "/main.mts",
+          "key_hex": "44656665727265645f696d706f7274735f6172655f6f6e6c795f737570706f727465645f7768656e5f7468655f6d6f64756c655f666c61675f69735f7365745f746f5f65736e6578745f6f725f70726573657276655f3138303630",
+          "pos": 144,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "typed.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "typed.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "parenthesized.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c7b206b696e643a202274657874223b2064656661756c743a20747970656f6620696d706f7274282274797065642f2a2e7265736f75726365222c207b20776974683a207b20747970653a20227465787422207d207d293b207d3e",
+          "id": "parenthesized.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-missing-native-02",
+      "options": {
+        "module": "ESNext",
+        "noLib": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const pending = import(\"./dep.mjs\");"
+        },
+        "id": "missing-promise",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts"
+        ]
+      },
+      "request_sha256": "ef8b0a5be8ce72918e8ed9fea22cc16696a1ad4585daba61b8a2961c369a11ae",
+      "semantic": [
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 2711,
+          "deprecated": false,
+          "end": 35,
+          "file": "/main.mts",
+          "key_hex": "415f64796e616d69635f696d706f72745f63616c6c5f72657475726e735f615f50726f6d6973655f4d616b655f737572655f796f755f686176655f615f6465636c61726174696f6e5f666f725f50726f6d6973655f6f725f696e636c7564655f455332305f32373131",
+          "pos": 16,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "616e79",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "616e79",
+          "id": "pending.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-missing-native-02",
+      "options": {
+        "module": "ESNext",
+        "noLib": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.mts": "export const value = 42; export default \"hello\";",
+          "/main.mts": "const pending = import(\"./dep.mjs\");",
+          "/promise.d.ts": "interface Promise<T> { then(onfulfilled: (value: T) => unknown): unknown; }"
+        },
+        "id": "missing-promise-constructor",
+        "queries": [
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.name",
+            "operation": "type_at_location",
+            "target": "name"
+          },
+          {
+            "declaration": "pending",
+            "file": "/main.mts",
+            "id": "pending.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.mts",
+          "/dep.mts",
+          "/promise.d.ts"
+        ]
+      },
+      "request_sha256": "ef8b0a5be8ce72918e8ed9fea22cc16696a1ad4585daba61b8a2961c369a11ae",
+      "semantic": [
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 2712,
+          "deprecated": false,
+          "end": 35,
+          "file": "/main.mts",
+          "key_hex": "415f64796e616d69635f696d706f72745f63616c6c5f696e5f4553355f72657175697265735f7468655f50726f6d6973655f636f6e7374727563746f725f4d616b655f737572655f796f755f686176655f615f6465636c61726174696f6e5f666f725f745f32373132",
+          "pos": 16,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.name"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "pending.initializer"
+        }
+      ]
+    },
+    {
+      "native_capture": "p6-dynamic-imports-commonjs-native-01",
+      "options": {
+        "module": "CommonJS",
+        "noLib": false,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ESNext"
+      },
+      "program": {
+        "files": {
+          "/dep.ts": "export const value = 42;",
+          "/main.ts": "const trailing = import(\"./dep\",); const attributes = import(\"./dep\", { with: { type: \"json\" } }); const extra = import(\"./dep\", {}, missing);"
+        },
+        "id": "commonjs-argument-order",
+        "queries": [
+          {
+            "declaration": "trailing",
+            "file": "/main.ts",
+            "id": "trailing.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "attributes",
+            "file": "/main.ts",
+            "id": "attributes.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          },
+          {
+            "declaration": "extra",
+            "file": "/main.ts",
+            "id": "extra.initializer",
+            "operation": "type_at_location",
+            "target": "initializer"
+          }
+        ],
+        "roots": [
+          "/main.ts",
+          "/dep.ts"
+        ]
+      },
+      "request_sha256": "1e4c1fdae82058fab71a7a2062c332548893266210dbd050dbe6179530c9828c",
+      "semantic": [
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 1009,
+          "deprecated": false,
+          "end": 32,
+          "file": "/main.ts",
+          "key_hex": "547261696c696e675f636f6d6d615f6e6f745f616c6c6f7765645f31303039",
+          "pos": 31,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 1324,
+          "deprecated": false,
+          "end": 96,
+          "file": "/main.ts",
+          "key_hex": "44796e616d69635f696d706f7274735f6f6e6c795f737570706f72745f615f7365636f6e645f617267756d656e745f7768656e5f7468655f6d6f64756c655f6f7074696f6e5f69735f7365745f746f5f65736e6578745f6e6f646531365f6e6f646531385f31333234",
+          "pos": 70,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": null,
+          "category": 1,
+          "chain": [],
+          "code": 1324,
+          "deprecated": false,
+          "end": 131,
+          "file": "/main.ts",
+          "key_hex": "44796e616d69635f696d706f7274735f6f6e6c795f737570706f72745f615f7365636f6e645f617267756d656e745f7768656e5f7468655f6d6f64756c655f6f7074696f6e5f69735f7365745f746f5f65736e6578745f6e6f646531365f6e6f646531385f31333234",
+          "pos": 129,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        },
+        {
+          "args": [
+            "missing"
+          ],
+          "category": 1,
+          "chain": [],
+          "code": 2304,
+          "deprecated": false,
+          "end": 140,
+          "file": "/main.ts",
+          "key_hex": "43616e6e6f745f66696e645f6e616d655f305f32333034",
+          "pos": 133,
+          "related": [],
+          "skipped_on_no_emit": false,
+          "source_hex": "",
+          "text_hex": "",
+          "unnecessary": false
+        }
+      ],
+      "types": [
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "trailing.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "attributes.initializer"
+        },
+        {
+          "display_hex": "50726f6d6973653c747970656f6620696d706f727428222f64657022293e",
+          "id": "extra.initializer"
+        }
+      ]
+    }
+  ],
+  "scope": "Native top-level public type displays and complete semantic diagnostics; nested properties and signatures remain in the separate full comparison",
+  "version": 1
+}

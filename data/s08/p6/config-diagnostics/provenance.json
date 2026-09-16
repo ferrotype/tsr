@@ -1,0 +1,11 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "native_source": "target/s08/e2/corpus/native-observations.ndjson",
+  "corpus_capture_sha256": "224d2fa6a25ef1ef1ded940828baa3f46da895a960ffe4e046124ddd652e5f91",
+  "scope": "Exact original loading/config bytes and pre-emit config diagnostic payloads extracted from the recorded native full E2 capture; no modeled outcomes.",
+  "requests_sha256": "59393273572f20a42267f9b8abc35cab2ee955fe5b6d5cfa8748109320776c8a",
+  "observations_sha256": "96adbfbca0974d2c118fa323cb03efd27e44e1e81fd8bcab68ca3a11ae6edb6b",
+  "native_observations_sha256": "47303cd4697b98c4708d2b64953efd65f9f76f1ed5e9e548036a4a666690592b",
+  "rootdir-request_sha256": "2f5c5622fa516dac484390fbeb339d449ac0092cd20d62d84dee6ebfff52a04c",
+  "rootdir-observations_sha256": "f3b8ff2741b32daad9acf82cb1343eb57ecb01f24a709ac1a239ce65dd7e7a99"
+}

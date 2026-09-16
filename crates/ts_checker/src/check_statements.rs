@@ -141,11 +141,7 @@ impl CheckerState {
         let expression = required(data.expression(), "for-in expression")?;
         let statement = required(data.statement(), "for-in body")?;
         let right = self.check_expression(expression)?;
-        let right = if self.options.strict_null_checks {
-            self.adjusted_type_with_facts(right, crate::type_facts::NE_UNDEFINED_OR_NULL)?
-        } else {
-            right
-        };
+        let right = self.non_nullable_type_if_needed(right)?;
         if self.ast(initializer)?.node(initializer)?.kind() == K::VariableDeclarationList {
             let declarations = self.source_list(
                 initializer,
@@ -206,9 +202,21 @@ impl CheckerState {
         self.register_locals_for_unused_check(node)
     }
     // port: tsc/internal/checker/checker.go:Checker.getIndexTypeOrString
-    // port: tsc/internal/checker/checker.go:Checker.getExtractStringType
     pub(crate) fn for_in_index_type(&mut self, ty: crate::TypeId) -> Result<crate::TypeId, Error> {
         let key = self.get_index_type(ty, 0)?;
+        let extracted = self.extract_string_type(key)?;
+        Ok(if self.types.flags(extracted)? & tf::NEVER != 0 {
+            self.builtins.string_type
+        } else {
+            extracted
+        })
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getExtractStringType
+    pub(crate) fn extract_string_type(
+        &mut self,
+        key: crate::TypeId,
+    ) -> Result<crate::TypeId, Error> {
         if let Some(symbol) =
             self.lookup_symbol(self.builtins.globals, b"Extract", sf::TYPE_ALIAS)?
         {
@@ -220,16 +228,13 @@ impl CheckerState {
                 .and_then(|links| links.parameters.clone())
                 .unwrap_or_default();
             if parameters.len() == 2 {
-                let extracted = self.type_alias_instantiation(
+                return self.type_alias_instantiation(
                     symbol,
                     declared,
                     &parameters,
                     &[key, self.builtins.string_type],
                     None,
-                )?;
-                if self.types.flags(extracted)? & tf::NEVER == 0 {
-                    return Ok(extracted);
-                }
+                );
             }
         }
         Ok(self.builtins.string_type)
@@ -576,7 +581,9 @@ impl CheckerState {
         let declaration = data.variable_declaration();
         let block = required(data.block(), "catch block")?;
         if let Some(declaration) = declaration {
-            self.check_source_element(declaration)?;
+            // Catch bindings have their own grammar below. In particular,
+            // destructuring here does not require a variable initializer.
+            self.check_variable_like(declaration)?;
             let read = self.ast(declaration)?.node(declaration)?;
             if let Some(annotation) = read.type_node() {
                 let ty = self.get_type_from_type_node(annotation)?;

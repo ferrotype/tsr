@@ -279,7 +279,12 @@ impl CheckerState {
             .type_parameters
             .clone()
             .unwrap_or_else(|| [].into());
-        let context = self.new_inference_context(&parameters, Some(signature), 0)?;
+        let flags = if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
+            crate::inference::ANY_DEFAULT
+        } else {
+            0
+        };
+        let context = self.new_inference_context(&parameters, Some(signature), flags)?;
         self.infer_call_type_arguments_ex(node, signature, args, 4 | 8, context)
     }
 
@@ -757,6 +762,16 @@ impl CheckerState {
         } else {
             node
         };
+        let void_promise_error = !rest
+            && count == "1"
+            && args.is_empty()
+            && self.is_promise_resolve_arity_error(node)?;
+        if void_promise_error
+            && self.ast(node)?.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
+        {
+            self.error_at(Some(error_node), messages::Expected_1_argument_but_got_0_new_Promise_needs_a_JSDoc_hint_to_produce_a_resolve_that_can_be_called_without_arguments, vec![])?;
+            return Ok(());
+        }
         let mut diagnostic = if args.len() <= maximum {
             self.diagnostic_for_node(Some(error_node), message, diagnostic_args)?
         } else {
@@ -833,5 +848,62 @@ impl CheckerState {
         }
         self.add_diagnostic(diagnostic)?;
         Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isPromiseResolveArityError
+    fn is_promise_resolve_arity_error(&mut self, node: NodeId) -> Result<bool, Error> {
+        let read = self.ast(node)?.node(node)?;
+        if read.kind() != K::CallExpression {
+            return Ok(false);
+        }
+        let callee = read
+            .expression()
+            .ok_or(Error::MissingLink("call expression callee"))?;
+        if self.ast(callee)?.node(callee)?.kind() != K::Identifier {
+            return Ok(false);
+        }
+        let text = self.ast(callee)?.node_text(callee)?.into_js_string();
+        let Some(symbol) = self.resolve_name(
+            Some(callee),
+            text.as_bytes(),
+            ts_ast::symbol_flags::VALUE,
+            None,
+            false,
+        )?
+        else {
+            return Ok(false);
+        };
+        let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
+            return Ok(false);
+        };
+        let view = self.ast(declaration)?;
+        if view.node(declaration)?.kind() != K::Parameter {
+            return Ok(false);
+        }
+        let Some(function) = view.node(declaration)?.parent() else {
+            return Ok(false);
+        };
+        if !matches!(
+            view.node(function)?.kind().known(),
+            Some(K::FunctionExpression | K::ArrowFunction)
+        ) {
+            return Ok(false);
+        }
+        let Some(construct) = view.node(function)?.parent() else {
+            return Ok(false);
+        };
+        if view.node(construct)?.kind() != K::NewExpression {
+            return Ok(false);
+        }
+        let Some(constructor) = view.node(construct)?.expression() else {
+            return Ok(false);
+        };
+        if view.node(constructor)?.kind() != K::Identifier {
+            return Ok(false);
+        }
+        let Some(promise) = self.global_promise_constructor_symbol(false)? else {
+            return Ok(false);
+        };
+        Ok(self.resolved_value_symbol(constructor)? == promise)
     }
 }

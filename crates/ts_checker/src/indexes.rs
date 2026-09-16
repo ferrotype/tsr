@@ -676,7 +676,8 @@ impl CheckerState {
                         .node(expression)?
                         .expression()
                         .ok_or(Error::MissingLink("indexed receiver"))?;
-                    self.mark_access_property_referenced(symbol, expression, left)?;
+                    let parent = self.types.get(object)?.symbol;
+                    self.mark_access_property_referenced(symbol, expression, left, parent)?;
                     let assignment = self.assignment_target_kind(expression)?;
                     if self.assignment_to_readonly_property(expression, symbol, assignment)? {
                         let name = self.symbol_to_string(symbol)?;
@@ -826,6 +827,9 @@ impl CheckerState {
             if self.types.flags(index)? & tf::NEVER != 0 {
                 return Ok(Some(self.builtins.never_type));
             }
+            if self.is_js_literal_type(object)? {
+                return Ok(Some(self.builtins.any_type));
+            }
         }
         if let Some(expression) = expression {
             let constant_enum = self
@@ -859,6 +863,9 @@ impl CheckerState {
             && self.types.get(object)?.object_flags & of::OBJECT_LITERAL != 0
         {
             return Ok(Some(self.builtins.undefined_type));
+        }
+        if self.is_js_literal_type(object)? {
+            return Ok(Some(self.builtins.any_type));
         }
         if let Some(node) = self.index_access_node(node)? {
             let object_text = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;

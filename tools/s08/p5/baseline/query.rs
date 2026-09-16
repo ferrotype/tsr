@@ -32,6 +32,10 @@ impl Walker<'_, '_> {
         q["result_flags"] = json!(self.op.type_flags(typ)?);
         q["type_id"] = json!(typ.id());
         self.trace.queries.push(q);
+        if self.trace.collect_type_strings {
+            self.type_strings
+                .push((self.stamp(source, id, "TypeToString")?, typ));
+        }
         Ok(typ)
     }
     pub(super) fn write(

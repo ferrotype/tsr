@@ -175,6 +175,10 @@ impl NodeBuilder<'_> {
         enclosing: Option<NodeId>,
         meaning: u32,
     ) -> Result<NodeId, Error> {
+        let previous = std::mem::replace(&mut self.enclosing, enclosing);
+        let tracked = self.track_symbol(symbol, meaning);
+        self.enclosing = previous;
+        tracked?;
         let chain = self.display_name_chain(symbol, enclosing, meaning)?;
         self.expression_from_name_chain(
             &chain,
@@ -907,6 +911,10 @@ impl NodeBuilder<'_> {
         symbol: SymbolId,
         enclosing: Option<NodeId>,
     ) -> Result<NodeId, Error> {
+        let previous = std::mem::replace(&mut self.enclosing, enclosing);
+        let tracked = self.track_symbol(symbol, sf::VALUE);
+        self.enclosing = previous;
+        tracked?;
         let chain = self.display_name_chain(symbol, enclosing, sf::VALUE)?;
         self.expression_from_name_chain(
             &chain,
@@ -1055,7 +1063,7 @@ fn unquote_name(mut name: &[u8]) -> JsString {
 }
 
 // port: tsc/internal/checker/utilities.go:isLateBoundName
-fn is_late_bound_name(name: &[u8]) -> bool {
+pub(super) fn is_late_bound_name(name: &[u8]) -> bool {
     name.len() >= 2 && name[0] == 0xFE && name[1] == b'@'
 }
 

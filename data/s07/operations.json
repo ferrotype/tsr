@@ -32895,7 +32895,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
-          "line": 222
+          "line": 248
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33082,7 +33082,7 @@
         },
         {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
-          "line": 207
+          "line": 211
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33096,7 +33096,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_compiler/src/program_diagnostics.rs",
-          "line": 171
+          "line": 175
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33975,7 +33975,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 872
+          "line": 874
         }
       ],
       "source_sha256": "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629",
@@ -34823,7 +34823,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_module/src/resolver.rs",
-          "line": 857
+          "line": 859
         }
       ],
       "source_sha256": "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480",
@@ -36425,7 +36425,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 949
+          "line": 962
         }
       ],
       "source_sha256": "c0d3ffdac4587ce7c12d5fc3d4ccfe562563ddfa5056c7e086b8c0e9c4940fed",
@@ -36553,7 +36553,7 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1073
+          "line": 1086
         }
       ],
       "source_sha256": "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e",
@@ -36839,11 +36839,11 @@
       "rust_mappings": [
         {
           "file": "crates/ts_checker/src/external_resolution.rs",
-          "line": 1058
+          "line": 1071
         },
         {
           "file": "crates/ts_checker/src/node_builder_names.rs",
-          "line": 1424
+          "line": 1432
         },
         {
           "file": "crates/ts_tspath/src/comparison.rs",

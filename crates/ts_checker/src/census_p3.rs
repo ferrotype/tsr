@@ -158,6 +158,8 @@ impl CheckerState {
         census.links("query_links", &query.source_signatures);
         census.map("query_links", &query.apparent_types);
         census.set("query_links", &query.type_parameters_checked);
+        census.set("query_links", &query.interfaces_checked);
+        census.set("query_links", &query.index_signatures_checked);
         census.set("query_links", &query.index_constraints_checked);
         census.set("query_links", &query.accessor_pairs_checked);
         census.map("query_links", &query.context_free_types);

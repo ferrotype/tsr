@@ -118,7 +118,7 @@ impl CheckerState {
                 .get(ty)?
                 .symbol
                 .ok_or(Error::MissingLink("equivalent base symbol"))?;
-            if let Some(table) = self.symbol(symbol)?.members() {
+            if let Some(table) = self.members_of_symbol(symbol)? {
                 if !self.table(table)?.is_empty() {
                     return Ok(None);
                 }

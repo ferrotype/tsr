@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "scope": "Bounded development comparison of all 149 original error differences plus 300 sampled error-matching acceptance controls. Fixes the 26 error differences remaining after a515aec. No full E2 metrics emitted.",
+  "control_revision": "a515aec",
+  "control_capture_sha256": "9d15f6dcc2aa2274d0db5724f2c268a1841a5eaa25c66a9b76c11ed4665870aa",
+  "candidate_capture_sha256": "5a11d398e669297cc0a5780731ca44fe4f23342bc943f78caa379443376fc8e6",
+  "candidate_sources_sha256": "ca8345d03fb217a0847b6a5bd784e7b92fc78a10c06023f574cc3b13c76f879b",
+  "candidate_binary_sha256": "35192e1592cd6a528a592eb88bf0759027d6137a05a3c4a22afffb656f2cb2e7",
+  "producer_sha256": "d022d361bce3e2d66a739fc2d6a2b0b01766eb46933e88c3755ce2c0f2b74eaf",
+  "selection": "tools/s08/p6/error-parity-tail/selection.json",
+  "selection_sha256": "8b765707b7ab1310d28ed5b3005778a96aa779dde51d12a1658674f1db45ac40",
+  "source_stable": true,
+  "complete": true,
+  "requested": 449,
+  "counts_before": {
+    "acceptance": {
+      "types_parity": {
+        "match": 410,
+        "different": 19,
+        "disabled": 11
+      },
+      "errors_parity": {
+        "match": 415,
+        "different": 25
+      },
+      "type_to_string_parity": {
+        "match": 412,
+        "different": 17,
+        "disabled": 11
+      }
+    },
+    "informational": {
+      "types_parity": {
+        "match": 7,
+        "different": 2
+      },
+      "errors_parity": {
+        "match": 8,
+        "different": 1
+      },
+      "type_to_string_parity": {
+        "match": 7,
+        "different": 2
+      }
+    }
+  },
+  "counts_after": {
+    "acceptance": {
+      "types_parity": {
+        "match": 427,
+        "different": 2,
+        "disabled": 11
+      },
+      "errors_parity": {
+        "match": 440
+      },
+      "type_to_string_parity": {
+        "match": 427,
+        "different": 2,
+        "disabled": 11
+      }
+    },
+    "informational": {
+      "types_parity": {
+        "match": 9
+      },
+      "errors_parity": {
+        "match": 9
+      },
+      "type_to_string_parity": {
+        "match": 9
+      }
+    }
+  },
+  "changes": [
+    {
+      "id": "compiler/abstractClassUnionInstantiation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/classFieldSuperNotAccessibleJs.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/concatTuples.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/concatTuples.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/concatTuples.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/conditionalReturnExpression.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/declarationEmitComputedPropertyNameSymbol1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/declarationEmitComputedPropertyNameSymbol2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/declarationEmitPrivateSymbolCausesVarDeclarationEmit2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/declarationEmitReadonlyComputedProperty.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/dottedModuleName.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/dottedModuleName.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/dottedModuleName.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/importAttributeType1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/intersectionWithConflictingPrivates.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/reservedWords2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/reservedWords2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/reservedWords3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/reservedWords3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/sameComputedNameError.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/symbolObserverMismatchingPolyfillsWorkTogether.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/symbolObserverMismatchingPolyfillsWorkTogether.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/symbolObserverMismatchingPolyfillsWorkTogether.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/yieldExpressionInFlowLoop.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "compiler/yieldExpressionInFlowLoop.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/controlFlow/controlFlowNoIntermediateErrors.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es2020/modules/exportAsNamespace5.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es2020/modules/exportAsNamespace5.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es2020/modules/exportAsNamespace5.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/Symbols/symbolType2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/destructuring/destructuringParameterDeclaration6.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/destructuring/destructuringParameterDeclaration6.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/yieldExpressions/generatorNoImplicitReturns.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/yieldExpressions/generatorNoImplicitReturns.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/es6/yieldExpressions/yieldExpressionInControlFlow.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/internalModules/importDeclarations/shadowedInternalModule.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=1",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=1",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports2.ts#configuration=1",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/node/esmModuleExports3.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=0",
+      "acceptance_tier": "informational",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=1",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=1",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction1.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction2.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/RegressionTests/parser519458.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/SkippedTokens/parserSkippedTokens16.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/parser/ecmascript5/SkippedTokens/parserSkippedTokens16.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/types/literal/literalTypesWidenInParameterPosition.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "types_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/types/literal/literalTypesWidenInParameterPosition.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "errors_parity",
+      "before": "different",
+      "after": "match"
+    },
+    {
+      "id": "conformance/types/literal/literalTypesWidenInParameterPosition.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "metric": "type_to_string_parity",
+      "before": "different",
+      "after": "match"
+    }
+  ],
+  "regressions": [],
+  "remaining": [
+    {
+      "id": "compiler/abstractClassUnionInstantiation.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 247,
+          "rust_queries": 247,
+          "accepted": false,
+          "native_sha256": "ac0c54e56fb4de7a1f8325b9880b4af7679764d11c952abdd8af37f3c61934ed",
+          "rust_sha256": "f9436f3ac10569c60815b091b889ed062672bbd214eed016597bd5d6581ac69a"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 7,
+          "rust_diagnostics": 7,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 64,
+          "rust_queries": 64,
+          "accepted": false,
+          "native_sha256": "d62588248771f60abe2cc5d91485caffcb145b58fe6868663554364e4ebfc2f8",
+          "rust_sha256": "6f892367cc4fc5bc13e36a65833a0bdff89b3e67c3df33d8aa27d46cac4a24e8"
+        }
+      }
+    },
+    {
+      "id": "compiler/noImplicitAnyDestructuringInPrivateMethod.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types"
+          ],
+          "native_queries": 38,
+          "rust_queries": 38,
+          "accepted": false,
+          "native_sha256": "d4761fea792c7488849d1beeb38ac891f69b54d911cb61c56a7a82e7d712a0e9",
+          "rust_sha256": "4f14f3ad8055d96b5c62b36b1efdcaf0b2705adb6130b9c895290cab52e72c96"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 9,
+          "rust_queries": 9,
+          "accepted": false,
+          "native_sha256": "dcec6b81b70dd70aee63a963737a5f033dcb798833aa93d98c97f01ae427b293",
+          "rust_sha256": "0c83aaa0a6005a63d46b5f89705f6c6a85cbd345ead32e907629387298be5c78"
+        }
+      }
+    }
+  ],
+  "within_different_review": {
+    "compiler/abstractClassUnionInstantiation.ts#configuration=0": "Four baseline lines improve to the native any return/array types; five direct new-expression type queries still use the old non-any result. No changed line moves away from native.",
+    "compiler/noImplicitAnyDestructuringInPrivateMethod.ts#configuration=0": "Unchanged: object-binding display omits a trailing comma in two signatures."
+  }
+}

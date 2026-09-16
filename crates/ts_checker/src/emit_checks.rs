@@ -516,7 +516,7 @@ fn helper_names(helper: u32, legacy: bool) -> Result<&'static [&'static [u8]], E
 }
 
 // Source: tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String
-fn module_kind_text(kind: ModuleKind) -> Vec<u8> {
+pub(crate) fn module_kind_text(kind: ModuleKind) -> Vec<u8> {
     let text: &[u8] = match kind {
         ModuleKind::NONE => b"None",
         ModuleKind::COMMON_JS => b"CommonJS",

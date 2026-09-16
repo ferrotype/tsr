@@ -14,6 +14,19 @@ import s08_p4 as p4
 
 
 class InventoryProtocol(unittest.TestCase):
+    def test_capture_and_e2_ledger_include_config_adapter_sources(self):
+        import fnmatch
+        import tomllib
+        import s08_p5_corpus as p5
+        with (p4.ROOT / 'status/runs.toml').open('rb') as stream:
+            patterns = tomllib.load(stream)['e2']['sources']
+        captured = p5.sources()
+        for name in ('tools/s08/p4/config.rs', 'tools/s07/program/rust_observation.rs',
+                     'tools/s07/config/host.rs', 'tools/s08/p5/corpus.rs',
+                     'tools/s08/p5/baseline/query.rs'):
+            self.assertEqual(captured[name], p4.digest((p4.ROOT / name).read_bytes()))
+            self.assertTrue(any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns), name)
+
     def setUp(self):
         self.request = {'id': 'case#configuration=0', 'acceptance_tier': 'acceptance',
                         'diagnostic_phases': ['config', 'program', 'syntactic', 'semantic', 'global', 'declaration'],

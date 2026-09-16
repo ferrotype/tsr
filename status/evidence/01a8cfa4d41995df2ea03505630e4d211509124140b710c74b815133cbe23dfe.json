@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "workspace",
+  "recorded_at": 1789415283,
+  "context": {
+    "revision": "2a70abc5a0bfe780c8f93cf3726f86eacf3ca3d3",
+    "source_sha256": "d1fca6bd7c545dae7d27e1363bc412862398a34581266942b76a1f73f5d8ca0b",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "7125adc570becdc7573f60a7251592e083fa608a5aaf3ac246b965c55f373e5a",
+  "inputs": {
+    "Cargo.lock": "7a07318408d02690527784b18f0605567dc0278619d4a0d461c9281bd88c5651",
+    "Cargo.toml": "7a198be8faf2fea33ecfd99d4fccf9be34b6fec39a764face8b50d66124e8f8a"
+  },
+  "command": [
+    "python3",
+    "scripts/tracking-bootstrap.py",
+    "workspace"
+  ],
+  "target": "host",
+  "config": "debug",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"build\": true}}\n",
+  "stderr": "    Checking s08_relater_prototype v0.1.0 (/Users/cristian/git/ts-rust/tools/s08/relater-prototype)\n    Checking ts_ast v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_ast)\n    Checking xtask v0.1.0 (/Users/cristian/git/ts-rust/xtask)\n    Checking ts_scanner v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_scanner)\n    Checking ts_nodebuilder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_nodebuilder)\n    Checking ts_pseudochecker v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_pseudochecker)\n    Checking ts_encoder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_encoder)\n    Checking ts_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_parser)\n    Checking ts_printer v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_printer)\n    Checking ts_transformers v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_transformers)\n    Checking ts_tsoptions v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_tsoptions)\n    Checking ts_binder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_binder)\n    Checking ts_bench v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_bench)\n    Checking ts_module v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_module)\n    Checking ts_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_checker)\n    Checking ts_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_compiler)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.29s\n",
+  "stdout_sha256": "37e4617d57653056a89a491698ab3b31399dcfdde0e1ff39b61e6770337a4965",
+  "stderr_sha256": "c6350eeb4efb0f056d924391fc7af48409717da6679cea2e58cbea607fa18c36",
+  "valid_capture": true
+}

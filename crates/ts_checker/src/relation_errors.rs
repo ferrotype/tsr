@@ -2,10 +2,10 @@
 //! revisited while reporting, and speculative alternatives preserve the chain.
 use crate::{
     relater::{Relater, RelationKind},
-    type_flags as tf, type_format_flags as fmt, Error, Ternary, TypeId,
+    type_flags as tf, type_format_flags as fmt, CheckerState, Error, Ternary, TypeId,
 };
 use std::sync::Arc;
-use ts_arena::NodeId;
+use ts_arena::{NodeId, SymbolId};
 use ts_ast::{Diagnostic, JsString};
 use ts_diagnostics::{self as messages, Message};
 
@@ -183,23 +183,32 @@ impl Relater<'_> {
                 );
             }
         }
+        let source_flags = self.checker.types.flags(source)?;
+        let target_flags = self.checker.types.flags(target)?;
+        if source_flags & tf::OBJECT != 0 && target_flags & tf::PRIMITIVE != 0 {
+            self.try_elaborate_errors_for_primitives_and_objects(source, target)?;
+        } else if self.checker.types.get(source)?.symbol.is_some()
+            && source_flags & tf::OBJECT != 0
+            && self.checker.get_global_type("Object", 0, false)? == source
+        {
+            self.report_error(
+                messages::The_Object_type_is_assignable_to_very_few_other_types_Did_you_mean_to_use_the_any_type_instead,
+                vec![],
+            );
+        }
         if self.checker.types.flags(original_target)? & tf::INTERSECTION != 0
             && self.checker.types.object_flags(original_target)?
                 & crate::object_flags::IS_NEVER_INTERSECTION
                 != 0
         {
-            for property in self
-                .checker
-                .get_properties_of_union_or_intersection_type(original_target)?
+            if let Some((message, property)) =
+                self.checker.never_intersection_cause(original_target)?
             {
-                if self.checker.is_discriminant_with_never_type(property)? {
-                    let target = self
-                        .checker
-                        .type_to_string(original_target, fmt::NO_TYPE_REDUCTION)?;
-                    let name = self.checker.symbol_to_string(property)?;
-                    self.report_error(messages::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents, vec![target, name]);
-                    break;
-                }
+                let target = self
+                    .checker
+                    .type_to_string(original_target, fmt::NO_TYPE_REDUCTION)?;
+                let name = self.checker.symbol_to_string(property)?;
+                self.report_error(message, vec![target, name]);
             }
         }
         self.report_relation_error(source, target, head)
@@ -212,33 +221,17 @@ impl Relater<'_> {
         target: TypeId,
         head: Option<&'static Message>,
     ) -> Result<(), Error> {
-        let mut source_name = self
-            .checker
-            .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
-        let mut target_name = self
-            .checker
-            .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
-        if source_name == target_name {
-            source_name = self
-                .checker
-                .type_to_string(source, fmt::USE_FULLY_QUALIFIED_TYPE)?;
-            target_name = self
-                .checker
-                .type_to_string(target, fmt::USE_FULLY_QUALIFIED_TYPE)?;
-        }
+        let (source_name, target_name) =
+            self.checker.type_names_for_error_display(source, target)?;
         let mut generalized = source;
+        let mut generalized_name = source_name.clone();
         if self.checker.types.flags(target)? & tf::NEVER == 0
             && self.checker.is_literal_type(source)?
             && !self.checker.type_could_have_top_level_singletons(target)?
         {
             generalized = self.checker.base_literal_type(source)?;
+            generalized_name = self.checker.type_name_for_error_display(generalized)?;
         }
-        let generalized_name = if generalized == source {
-            source_name.clone()
-        } else {
-            self.checker
-                .type_to_string(generalized, fmt::USE_FULLY_QUALIFIED_TYPE)?
-        };
         let target_flags = if self.checker.types.flags(target)? & tf::INDEXED_ACCESS != 0
             && self.checker.types.flags(source)? & tf::INDEXED_ACCESS == 0
         {
@@ -282,12 +275,28 @@ impl Relater<'_> {
                 self.report_error(messages::X_0_could_be_instantiated_with_an_arbitrary_type_which_could_be_unrelated_to_1, vec![target_name.clone(), generalized_name.clone()]);
             }
         }
+        let exact_optional_mismatch = |this: &mut Self| -> Result<bool, Error> {
+            Ok(this.checker.options.exact_optional_property_types
+                && !this
+                    .checker
+                    .exact_optional_unassignable_properties(source, target)?
+                    .is_empty())
+        };
         let message = if let Some(head) = head {
-            head
+            if head.code
+                == messages::Argument_of_type_0_is_not_assignable_to_parameter_of_type_1.code
+                && exact_optional_mismatch(self)?
+            {
+                messages::Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties
+            } else {
+                head
+            }
         } else if self.kind == RelationKind::Comparable {
             messages::Type_0_is_not_comparable_to_type_1
         } else if source_name == target_name {
             messages::Type_0_is_not_assignable_to_type_1_Two_different_types_with_this_name_exist_but_they_are_unrelated
+        } else if exact_optional_mismatch(self)? {
+            messages::Type_0_is_not_assignable_to_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties
         } else {
             messages::Type_0_is_not_assignable_to_type_1
         };
@@ -332,6 +341,154 @@ impl Relater<'_> {
         }
         self.report_error(message, vec![generalized_name, target_name]);
         Ok(())
+    }
+}
+
+impl Relater<'_> {
+    // port: tsc/internal/checker/relater.go:Relater.tryElaborateErrorsForPrimitivesAndObjects
+    fn try_elaborate_errors_for_primitives_and_objects(
+        &mut self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<(), Error> {
+        let wrapper =
+            |name: &'static str, primitive: TypeId| -> (&'static str, TypeId) { (name, primitive) };
+        let candidates = [
+            wrapper("String", self.checker.builtins.string_type),
+            wrapper("Number", self.checker.builtins.number_type),
+            wrapper("Boolean", self.checker.builtins.boolean_type),
+            wrapper("Symbol", self.checker.builtins.es_symbol_type),
+        ];
+        for (name, primitive) in candidates {
+            if target != primitive {
+                continue;
+            }
+            if self.checker.get_global_type(name, 0, false)? == source {
+                let target = self
+                    .checker
+                    .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
+                let source = self
+                    .checker
+                    .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
+                self.report_error(
+                    messages::X_0_is_a_primitive_but_1_is_a_wrapper_object_Prefer_using_0_when_possible,
+                    vec![target, source],
+                );
+            }
+            return Ok(());
+        }
+        Ok(())
+    }
+}
+
+impl CheckerState {
+    // port: tsc/internal/checker/utilities.go:isStaticPrivateIdentifierProperty
+    pub(crate) fn is_static_private_identifier_property(
+        &self,
+        symbol: SymbolId,
+    ) -> Result<bool, Error> {
+        let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
+            return Ok(false);
+        };
+        let view = self.ast(declaration)?;
+        Ok(
+            ts_ast::utilities::is_private_identifier_class_element_declaration(view, declaration)?
+                && ts_ast::utilities::is_static(view, declaration)?,
+        )
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getExactOptionalUnassignableProperties
+    pub(crate) fn exact_optional_unassignable_properties(
+        &mut self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<Vec<SymbolId>, Error> {
+        if self.is_tuple_type(source)? && self.is_tuple_type(target)? {
+            return Ok(Vec::new());
+        }
+        let mut result = Vec::new();
+        for property in self.get_properties_of_type(target)? {
+            let name = self.symbol(property)?.name_to_owned();
+            let Some(source_type) = self.property_type(source, name.as_bytes())? else {
+                continue;
+            };
+            let target_type = self.get_type_of_symbol(property)?;
+            if self.is_exact_optional_property_mismatch(source_type, target_type)? {
+                result.push(property);
+            }
+        }
+        Ok(result)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isExactOptionalPropertyMismatch
+    fn is_exact_optional_property_mismatch(
+        &mut self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<bool, Error> {
+        Ok(
+            self.maybe_type_of_kind(source, tf::UNDEFINED)?
+                && self.contains_missing_type(target)?,
+        )
+    }
+
+    /// Mirrors containsMissingType in checker.go.
+    fn contains_missing_type(&self, ty: TypeId) -> Result<bool, Error> {
+        if ty == self.builtins.missing_type {
+            return Ok(true);
+        }
+        Ok(self.types.flags(ty)? & tf::UNION != 0
+            && self
+                .types
+                .types_of(ty)?
+                .contains(&self.builtins.missing_type))
+    }
+
+    // port: tsc/internal/checker/relater.go:Checker.getTypeNamesForErrorDisplay
+    pub(crate) fn type_names_for_error_display(
+        &mut self,
+        left: TypeId,
+        right: TypeId,
+    ) -> Result<(JsString, JsString), Error> {
+        let mut left_name = self.type_name_for_error_display_ex(left)?;
+        let mut right_name = self.type_name_for_error_display_ex(right)?;
+        if left_name == right_name {
+            left_name = self.type_name_for_error_display(left)?;
+            right_name = self.type_name_for_error_display(right)?;
+        }
+        Ok((left_name, right_name))
+    }
+
+    // port: tsc/internal/checker/relater.go:Checker.getTypeNameForErrorDisplay
+    pub(crate) fn type_name_for_error_display(&mut self, ty: TypeId) -> Result<JsString, Error> {
+        self.type_to_string(ty, fmt::USE_FULLY_QUALIFIED_TYPE)
+    }
+
+    fn type_name_for_error_display_ex(&mut self, ty: TypeId) -> Result<JsString, Error> {
+        let symbol = self.types.get(ty)?.symbol;
+        if let Some(declaration) = self.symbol_value_declaration_is_context_sensitive(symbol)? {
+            return self.type_to_string_at(ty, Some(declaration), fmt::NONE);
+        }
+        self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)
+    }
+
+    // port: tsc/internal/checker/relater.go:Checker.symbolValueDeclarationIsContextSensitive
+    fn symbol_value_declaration_is_context_sensitive(
+        &mut self,
+        symbol: Option<SymbolId>,
+    ) -> Result<Option<NodeId>, Error> {
+        let Some(symbol) = symbol else {
+            return Ok(None);
+        };
+        let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
+            return Ok(None);
+        };
+        if crate::query::is_expression_node(self.ast(declaration)?, declaration)?
+            && !self.expression_is_context_sensitive(declaration)?
+        {
+            return Ok(Some(declaration));
+        }
+        Ok(None)
     }
 }
 
@@ -439,6 +596,44 @@ impl Relater<'_> {
         first: ts_arena::SymbolId,
         require_optional: bool,
     ) -> Result<(), Error> {
+        // Give a specific error when private names have the same description.
+        if let Some(declaration) = self.checker.symbol(first)?.value_declaration() {
+            let view = self.checker.ast(declaration)?;
+            if let Some(name) = view.node(declaration)?.name() {
+                if view.node(name)?.kind() == ts_ast::SyntaxKind::PrivateIdentifier {
+                    if let Some(source_symbol) = self.checker.types.get(source)?.symbol {
+                        if self.checker.symbol(source_symbol)?.flags() & ts_ast::symbol_flags::CLASS
+                            != 0
+                        {
+                            let description = view.node_text(name)?.into_js_string();
+                            let key = ts_binder::get_symbol_name_for_private_identifier(
+                                &self.checker.symbol(source_symbol)?,
+                                description.as_bytes(),
+                            );
+                            if self
+                                .checker
+                                .constituent_property(source, key.as_bytes(), false)?
+                                .is_some()
+                            {
+                                let source_name = self.checker.symbol_to_string(source_symbol)?;
+                                let target_name = match self.checker.types.get(target)?.symbol {
+                                    Some(symbol) => self.checker.symbol_to_string(symbol)?,
+                                    None => self.checker.type_to_string(
+                                        target,
+                                        crate::type_display::DEFAULT_FLAGS,
+                                    )?,
+                                };
+                                self.report_error(
+                                    messages::Property_0_in_type_1_refers_to_a_different_member_that_cannot_be_accessed_from_within_type_2,
+                                    vec![description, source_name, target_name],
+                                );
+                                return Ok(());
+                            }
+                        }
+                    }
+                }
+            }
+        }
         let calls = self.checker.signatures_of_type(source, false)?;
         let constructs = self.checker.signatures_of_type(source, true)?;
         if (!calls.is_empty() || !constructs.is_empty())
@@ -451,7 +646,10 @@ impl Relater<'_> {
         let mut missing = Vec::new();
         for property in self.checker.get_properties_of_type(target)? {
             let read = self.checker.symbol(property)?;
-            if read.flags() & ts_ast::symbol_flags::PROTOTYPE != 0 {
+            if self
+                .checker
+                .is_static_private_identifier_property(property)?
+            {
                 continue;
             }
             if require_optional
@@ -469,12 +667,7 @@ impl Relater<'_> {
             }
         }
         if missing.len() == 1 {
-            let source = self
-                .checker
-                .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
-            let target = self
-                .checker
-                .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
+            let (source, target) = self.checker.type_names_for_error_display(source, target)?;
             let name = self.checker.symbol_to_string(first)?;
             self.report_error(
                 messages::Property_0_is_missing_in_type_1_but_required_in_type_2,
@@ -507,12 +700,7 @@ impl Relater<'_> {
                 true
             };
             if array_like {
-                let source = self
-                    .checker
-                    .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
-                let target = self
-                    .checker
-                    .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
+                let (source, target) = self.checker.type_names_for_error_display(source, target)?;
                 let mut names = Vec::new();
                 for &property in
                     missing

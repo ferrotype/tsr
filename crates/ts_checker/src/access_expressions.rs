@@ -355,7 +355,39 @@ impl CheckerState {
             }
         } else {
             if any {
-                return Ok(apparent);
+                // markPropertyAliasReferenced also runs for an unresolved alias:
+                // following `alias.member` must retain/check its import chain.
+                if self.ast(left)?.node(left)?.kind() == K::Identifier
+                    && self.ast(left)?.node_text(left)?.as_bytes() != b"this"
+                {
+                    let mut ancestor = Some(node);
+                    let mut import_reference = false;
+                    while let Some(current) = ancestor {
+                        let read = self.ast(current)?.node(current)?;
+                        if read.kind() == K::ImportEqualsDeclaration {
+                            import_reference = true;
+                            break;
+                        }
+                        if !matches!(
+                            read.kind().known(),
+                            Some(K::Identifier | K::QualifiedName | K::PropertyAccessExpression)
+                        ) {
+                            break;
+                        }
+                        ancestor = read.parent();
+                    }
+                    if !import_reference {
+                        let parent = self.resolved_value_symbol(left)?;
+                        if parent != self.builtins.unknown_symbol {
+                            self.mark_alias_referenced_at(node, parent)?;
+                        }
+                    }
+                }
+                return Ok(if self.is_error_type(apparent)? {
+                    self.builtins.error_type
+                } else {
+                    apparent
+                });
             }
             let skip_augment = self.const_enum_object_type(apparent)?;
             let qualified = self.ast(node)?.node(node)?.kind() == K::QualifiedName;
@@ -363,12 +395,13 @@ impl CheckerState {
         };
         let ty = if let Some(property) = property {
             self.check_property_use_before_declaration(property, node, right)?;
-            self.mark_access_property_referenced(property, node, left)?;
+            let parent = self.query.resolved_symbols.try_get(left).copied().flatten();
+            self.mark_access_property_referenced(property, node, left, parent)?;
             *self.query.resolved_symbols.get_or_default(node) = Some(property);
             self.check_access_property_accessibility(
                 node,
                 self.ast(left)?.node(left)?.kind() == K::SuperKeyword,
-                assignment != AssignmentKind::None,
+                ts_ast::utilities::is_write_access(self.ast(node)?, node)?,
                 apparent,
                 property,
                 Some(right),
@@ -383,7 +416,8 @@ impl CheckerState {
             }
             if self.this_property_access_in_constructor(node, property)? {
                 self.builtins.auto_type
-            } else if write_only || assignment == AssignmentKind::Definite {
+            } else if write_only || ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?
+            {
                 self.write_type_of_symbol(property)?
             } else {
                 self.get_type_of_symbol(property)?
@@ -400,6 +434,12 @@ impl CheckerState {
                 None
             };
             let Some(index) = index else {
+                let left_symbol = self.types.get(left_type)?.symbol;
+                let unchecked_js =
+                    self.is_unchecked_js_suggestion(Some(node), left_symbol, true)?;
+                if !unchecked_js && self.is_js_literal_type(left_type)? {
+                    return Ok(self.builtins.any_type);
+                }
                 if self.types.get(left_type)?.symbol == Some(self.builtins.global_this_symbol) {
                     let exports = self.symbol(self.builtins.global_this_symbol)?.exports();
                     let global = self.member_symbol(exports, name.as_bytes())?;
@@ -431,9 +471,6 @@ impl CheckerState {
                     return Ok(self.builtins.any_type);
                 }
                 if !name.as_bytes().is_empty() {
-                    let left_symbol = self.types.get(left_type)?.symbol;
-                    let unchecked_js =
-                        self.is_unchecked_js_suggestion(Some(node), left_symbol, true)?;
                     self.defer_missing_property_ex(
                         right,
                         if this { apparent } else { left_type },

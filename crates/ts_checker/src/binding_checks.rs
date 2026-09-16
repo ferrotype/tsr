@@ -227,6 +227,9 @@ impl CheckerState {
         let symbol = self
             .get_symbol_of_declaration(node)?
             .ok_or(Error::MissingLink("binding variable symbol"))?;
+        if self.check_require_alias_declaration(node, symbol)? {
+            return Ok(());
+        }
         let target = self.get_type_of_symbol(symbol)?;
         let target = if target == self.builtins.auto_type {
             self.builtins.any_type

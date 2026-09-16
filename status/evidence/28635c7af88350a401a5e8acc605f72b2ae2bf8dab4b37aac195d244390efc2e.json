@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "deny",
+  "recorded_at": 1789415218,
+  "context": {
+    "revision": "2a70abc5a0bfe780c8f93cf3726f86eacf3ca3d3",
+    "source_sha256": "1ebe087c54d766ca6a99191c399901a89cdf562601859ddb64cdd4c5412b0d66",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "93bdeae76cbb7b878560c5378f8546cc4c2194c7084bbdccb48cfefc25a800a8",
+  "inputs": {
+    "Cargo.lock": "7a07318408d02690527784b18f0605567dc0278619d4a0d461c9281bd88c5651",
+    "deny.toml": "169a444cb9b24a1b618a73cef7a1ea9f1ba6026351aed27e70a786e13a3ae490"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "deny"
+  ],
+  "target": "host",
+  "config": "advisories, licenses, bans, sources",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "cargo-deny 0.20.2\n+ cargo deny --locked check\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:30:4\n   │\n30 │   \"0BSD\",\n   │    ━━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:26:4\n   │\n26 │   \"BSD-2-Clause\",\n   │    ━━━━━━━━━━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:27:4\n   │\n27 │   \"BSD-3-Clause\",\n   │    ━━━━━━━━━━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:33:4\n   │\n33 │   \"CC0-1.0\",\n   │    ━━━━━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:28:4\n   │\n28 │   \"ISC\",\n   │    ━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:32:4\n   │\n32 │   \"Unicode-DFS-2016\",\n   │    ━━━━━━━━━━━━━━━━ unmatched license allowance\n\nwarning[license-not-encountered]: license was not encountered\n   ┌─ /Users/cristian/git/ts-rust/deny.toml:29:4\n   │\n29 │   \"Zlib\",\n   │    ━━━━ unmatched license allowance\n\nadvisories ok, bans ok, licenses ok, sources ok\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "c27098b2b3db902c3af5e24850138aeba2fb2f5b42b60ceb331a33a810e9f4b6",
+  "valid_capture": true
+}

@@ -9,6 +9,23 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
 impl CheckerState {
+    /// The CommonJS branch of checkVariableLikeDeclaration precedes ordinary
+    /// variable type/initializer checks, including for destructured aliases.
+    pub(crate) fn check_require_alias_declaration(
+        &mut self,
+        node: NodeId,
+        symbol: SymbolId,
+    ) -> Result<bool, Error> {
+        if self.symbol(symbol)?.flags() & sf::ALIAS != 0
+            && ts_ast::is_variable_declaration_initialized_to_require(self.ast(node)?, node)?
+        {
+            self.check_source_alias_symbol(node)?;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkExportDeclaration
     pub(crate) fn check_export_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.ast(node)?.node(node)?;
@@ -522,7 +539,7 @@ impl CheckerState {
         let symbol = required(self.get_symbol_of_declaration(node)?, "import alias symbol")?;
         let target = self.resolve_alias(symbol)?;
         if target != self.builtins.unknown_symbol {
-            let flags = self.symbol(target)?.flags();
+            let flags = self.module_symbol_flags(target, false, false)?;
             if flags & sf::VALUE != 0 {
                 let first = ts_ast::utilities_middle::get_first_identifier(
                     self.ast(reference)?,
@@ -693,19 +710,15 @@ impl CheckerState {
                         self.ast(reference)?,
                         reference,
                     )?;
-                    let text = self.ast(first)?.node_text(first)?.into_js_string();
-                    if let Some(alias) = self.resolve_name(
-                        Some(first),
-                        text.as_bytes(),
-                        sf::VALUE | sf::EXPORT_VALUE,
-                        None,
-                        true,
-                    )? {
-                        if self.symbol(alias)?.flags() & sf::ALIAS != 0
-                            && !self.module_aliases.type_only.contains_key(&alias)
-                        {
-                            self.mark_module_alias_referenced(alias)?;
-                        }
+                    // markIdentifierAliasReferenced resolves through getResolvedSymbol,
+                    // which reports unresolved names and namespaces used as values.
+                    let alias = self.resolved_value_symbol(first)?;
+                    if alias != self.builtins.unknown_symbol
+                        && alias != self.builtins.arguments_symbol
+                        && self.symbol(alias)?.flags() & sf::ALIAS != 0
+                        && !self.module_aliases.type_only.contains_key(&alias)
+                    {
+                        self.mark_module_alias_referenced(alias)?;
                     }
                 }
             }

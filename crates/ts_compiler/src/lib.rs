@@ -11,6 +11,7 @@ mod include_reason;
 mod output_paths;
 mod plain_js_errors;
 mod program_diagnostics;
+mod syntactic_diagnostics;
 mod verify_options;
 pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionVerification};
 mod loader;
