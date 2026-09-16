@@ -116,18 +116,20 @@ func TestS08Checkerbench(t *testing.T) {
 	encoder := json.NewEncoder(output)
 	clock := core.S08Bench
 	clock.Mode = mode
+	harnessutil.S08ObserveStage = func(_ string) func() { return clock.Pause() }
+	defer func() { harnessutil.S08ObserveStage = nil }()
 	harnessutil.S08InstallCheckerbenchCompile()
 	defer func() { harnessutil.S08CheckerbenchCompile = nil }()
 	tsbaseline.S08CountOnly = true
-	tsbaseline.S08CollectRoots = mode == "alloc"
+	tsbaseline.S08CollectRoots = true
 	tsbaseline.S08CollectTypeStrings = true
 	defer func() {
 		tsbaseline.S08CountOnly = false
 		tsbaseline.S08CollectRoots = false
 		tsbaseline.S08CollectTypeStrings = false
 	}()
-	totals := s08BenchTotals{Version: 1, Mode: mode, Variants: len(requests),
-		PhasesNs: map[string]int64{"init": 0, "check": 0, "display": 0},
+	totals := s08BenchTotals{Version: 2, Mode: mode, Variants: len(requests),
+		PhasesNs:   map[string]int64{"init": 0, "check": 0, "display": 0},
 		Allocation: map[string]int64{"requested_bytes": 0, "allocation_calls": 0, "retained_bytes": 0},
 		Census:     map[string]int64{"type_storage_bytes": 0, "checker_bytes": 0, "types_reachable": 0, "types_created": 0, "unavailable": 0, "failed": 0},
 		Failures:   []map[string]any{}, Go: runtime.Version(), GOOS: runtime.GOOS, GOARCH: runtime.GOARCH}
@@ -235,7 +237,11 @@ func TestS08Checkerbench(t *testing.T) {
 							checkpoint["census"] = map[string]any{"state": "failed", "reason": fmt.Sprint(value)}
 						}
 					}()
-					checkpoint["census"] = checker.S08FamiliesCensus(checkerHandle, tsbaseline.S08Roots)
+					census := checker.S08FamiliesCensus(checkerHandle, tsbaseline.S08Roots)
+					// This P1 adapter cannot certify P7's full root and family inventory.
+					census["unavailable"] = append(census["unavailable"].([]string),
+						"p7_semantic_type_roots", "p7_checker_family_coverage")
+					checkpoint["census"] = census
 				}()
 				row["allocation"] = map[string]any{"requested_bytes": clock.Requested, "allocation_calls": clock.Mallocs,
 					"live_before_interval": harnessutil.S08LiveBeforeInterval, "live_at_checkpoint": checkpointLive}

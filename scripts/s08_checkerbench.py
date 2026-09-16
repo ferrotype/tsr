@@ -28,6 +28,8 @@ from s07_benchmark_measure import host_info, reject_concurrent_builds
 from s07_benchmark_stats import ratio_summary
 from s08_oracle import ROOT, canonical, digest
 import s08_baselines
+import s08_measurement as measurement
+from s08_e2_contract import inventory
 
 DEFAULT = ROOT / "target/s08/checkerbench"
 CORPUS = ROOT / "target/s08/e2/corpus"
@@ -50,7 +52,7 @@ def sources():
     patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**",
                 "tools/s08/p4/**", "tools/s08/p5/**", "tools/s08/p7/**", "tools/s08/oracle/**",
                 "tools/s07/program/*.rs", "tools/s07/config/host.rs",
-                "scripts/s08_checkerbench.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
+                "scripts/s08_checkerbench.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
                 "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
                 "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                 "data/s08/checker-workload.json", "data/s08/type-footprint.json", "data/s08/baseline-requests.json",
@@ -87,6 +89,9 @@ def prepare_requests(directory, smoke=None):
     _, go_all = s08_baselines.requests_from_subset(subset)
     by_id = {r["id"]: r for r in go_all}
     go = [by_id[i] for i in ids]
+    inventory(rust, strict_json_loads((ROOT / "data/s08/baseline-requests.json").read_bytes())["requests"], partial=True)
+    if smoke is not None and (type(smoke) is not int or not 1 <= smoke <= len(ids)):
+        raise ValueError("smoke count must select a nonempty acceptance prefix")
     if smoke:
         rust, go = rust[:smoke], go[:smoke]
     (directory / "rust-requests.json").write_bytes(canonical(rust) + b"\n")
@@ -113,13 +118,19 @@ def overlay_sources(upstream):
     walker = replace(walker, symbol,
                      "\ts08DisplayBegin()\n\ts08SymbolText := fileChecker.SymbolToStringEx(symbol, node.Parent, ast.SymbolFlagsNone, checker.SymbolFormatFlagsAllowAnyNodeKind)\n"
                      "\ts08DisplayEnd()\n\tsymbolString.WriteString(ast.EscapeAllInternalSymbolNames(s08SymbolText))\n")
+    # Baseline assembly is outside the interval; the native walk itself resumes it.
+    walker = replace(walker, "\tvar result strings.Builder\n", "\trestoreClock := core.S08Bench.Pause()\n\tdefer restoreClock()\n\tvar result strings.Builder\n")
+    walker = replace(walker, "\t\tvar results []*typeWriterResult\n", "\t\tvar results []*typeWriterResult\n\t\tcore.S08Bench.Start()\n")
+    walker = replace(walker, "\t\tlastIndexWritten := -1\n", "\t\tcore.S08Bench.Stop()\n\t\tlastIndexWritten := -1\n")
     sources["testutil/tsbaseline/type_symbol_baseline.go"] = walker
     bridge = sources["testutil/tsbaseline/s08_baselines_bridge.go"]
+    bridge = replace(bridge, '\t"encoding/hex"\n',
+                     '\t"encoding/hex"\n\t"github.com/microsoft/TypeScript/tsc/internal/core"\n')
     bridge = replace(bridge, "\tS08Queries = append(S08Queries, q)\n", "\ts08Record(q)\n", 3)
     bridge = replace(bridge, "\tresult := c.GetTypeAtLocation(node)\n",
-                     "\tresult := c.GetTypeAtLocation(node)\n\tif S08CollectRoots && result != nil {\n\t\tS08Roots = append(S08Roots, result)\n\t}\n")
+                     "\tresult := c.GetTypeAtLocation(node)\n\ts08RestoreRoots := core.S08Bench.Pause()\n\tif S08CollectRoots && result != nil {\n\t\tS08Roots = append(S08Roots, result)\n\t}\n\ts08RestoreRoots()\n")
     bridge = replace(bridge, '\t\t\treturn map[string]any{"operation":stamp.Operation,',
-                     '\t\t\ts08DisplayBegin()\n\t\t\ts08Text := c.TypeToString(result)\n\t\t\ts08DisplayEnd()\n\t\t\treturn map[string]any{"operation":stamp.Operation,')
+                     '\t\t\trestoreClock := core.S08Bench.Pause()\n\t\t\tdefer restoreClock()\n\t\t\tcore.S08Bench.Start()\n\t\t\ts08DisplayBegin()\n\t\t\ts08Text := c.TypeToString(result)\n\t\t\ts08DisplayEnd()\n\t\t\tcore.S08Bench.Stop()\n\t\t\treturn map[string]any{"operation":stamp.Operation,')
     bridge = replace(bridge, 'hex.EncodeToString([]byte(c.TypeToString(result)))', 'hex.EncodeToString([]byte(s08Text))')
     sources["testutil/tsbaseline/s08_baselines_bridge.go"] = bridge
     pool = (upstream / "tsc/internal/compiler/checkerpool.go").read_text()
@@ -152,6 +163,7 @@ def write_overlay(directory, upstream):
 def build(directory):
     """Release Rust executables per mode and one Go test binary; exact artifact digests recorded."""
     reject_concurrent_builds()
+    initial_sources = sources()
     directory.mkdir(parents=True, exist_ok=True)
     bin_dir = directory / "bin"
     bin_dir.mkdir(exist_ok=True)
@@ -178,7 +190,9 @@ def build(directory):
     binaries["go"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
                       "go": command(["go", "version"], cwd=ROOT, env=go_env).decode().strip()}
     verified_upstream()
-    report = {"version": 1, "binaries": binaries, "sources": sources(), "rust_toolchain": command(["rustc", "--version"], cwd=ROOT, env=env).decode().strip()}
+    if sources() != initial_sources:
+        raise ValueError("measurement sources changed during build")
+    report = {"version": 1, "binaries": binaries, "sources": initial_sources, "rust_toolchain": command(["rustc", "--version"], cwd=ROOT, env=env).decode().strip()}
     report["sources_sha256"] = fingerprint(report["sources"])
     (directory / "build.json").write_bytes(canonical(report) + b"\n")
     return report
@@ -240,11 +254,16 @@ def sample(directory, build_report, runtime, mode, label):
         raise ValueError("sample executable mode mismatch")
     if totals["failed"] or totals["executed"] != totals["variants"]:
         raise ValueError(f"{runtime} {mode} sample did not complete the fixed work: {totals['failures'][:5]}")
-    return {"runtime": runtime, "mode": mode, "label": label, "totals": totals, "process": result,
+    artifacts = {p.name: measurement.file_digest(p) for p in (rows, stdout, Path(str(stdout) + ".stderr"))}
+    if runtime == "go":
+        artifacts[summary.name] = measurement.file_digest(summary)
+    return {"artifacts": artifacts, "runtime": runtime, "mode": mode, "label": label, "totals": totals, "process": result,
             "rows_sha256": digest(rows.read_bytes()), "load_average": os.getloadavg()}
 
 
 def capture(directory, samples_per_runtime=7, smoke=None):
+    if (directory / "capture.json").exists():
+        raise ValueError("capture already exists; select a new output directory")
     directory.mkdir(parents=True, exist_ok=True)
     build_report = build(directory)
     plan = method()
@@ -262,7 +281,7 @@ def capture(directory, samples_per_runtime=7, smoke=None):
         for index, pair in enumerate(order):
             for runtime in pair:
                 runs.append({**sample(directory, build_report, runtime, mode, f"sample-{index}"), "warmup": False})
-    capture_report = {"version": 1, "pin": plan["pin"], "host": host, "smoke": smoke, "requests": requests,
+    capture_report = {"version": 2, "pin": plan["pin"], "host": host, "smoke": smoke, "requests": requests,
                       "build_sha256": digest((directory / "build.json").read_bytes()), "sources_sha256": build_report["sources_sha256"],
                       "method_sha256": digest(METHOD.read_bytes()), "footprint_sha256": digest(FOOTPRINT.read_bytes()),
                       "samples_per_runtime": samples_per_runtime, "runs": runs, "finished": time.time()}
@@ -272,7 +291,62 @@ def capture(directory, samples_per_runtime=7, smoke=None):
 
 def rows_of(directory, run):
     path = directory / "samples" / run["mode"] / f"{run['runtime']}-{run['label']}.rows.ndjson"
-    return [strict_json_loads(line) for line in path.read_bytes().splitlines()]
+    return [strict_json_loads(line) for line in measurement.authenticated(path, run["rows_sha256"]).splitlines()]
+
+
+def verify_capture(directory, capture_report):
+    plan = method()
+    build = measurement.build_record(directory, capture_report, sources(), METHOD)
+    if set(build['binaries']) != {'go', *(f'rust-{mode}' for mode in MODES)}:
+        raise ValueError('measurement executable inventory differs')
+    if capture_report['pin'] != plan['pin'] or capture_report['footprint_sha256'] != measurement.file_digest(FOOTPRINT):
+        raise ValueError('measurement pin or footprint contract differs')
+    measurement.roster(capture_report, plan, MODES, 'runtime')
+    inputs = capture_report['requests']
+    rust = strict_json_loads(measurement.authenticated(directory / 'rust-requests.json', inputs['rust_requests_sha256']))
+    go = strict_json_loads(measurement.authenticated(directory / 'go-requests.json', inputs['go_requests_sha256']))
+    ids = frozen_ids()
+    smoke = capture_report['smoke']
+    if smoke is not None:
+        if type(smoke) is not int or not 1 <= smoke <= len(ids):
+            raise ValueError('invalid smoke inventory')
+        ids = ids[:smoke]
+    if inputs['smoke'] != smoke or inputs['variants'] != len(ids) or inputs['ids_sha256'] != digest(canonical(ids)):
+        raise ValueError('measurement request count/identity differs')
+    if [r['id'] for r in rust] != ids or [r['id'] for r in go] != ids:
+        raise ValueError('measurement requests differ from frozen inventory')
+    manifest = strict_json_loads((ROOT / 'data/s08/baseline-requests.json').read_bytes())
+    inventory(rust, manifest['requests'], partial=True)
+    _, native = s08_baselines.requests_from_subset(strict_json_loads((ROOT / 'data/s07/subset.json').read_bytes()))
+    selected = {r['id']: r for r in native}
+    if go != [selected[i] for i in ids]:
+        raise ValueError('native measurement requests changed')
+    identity = None
+    for run in capture_report['runs']:
+        prefix = f"{run['runtime']}-{run['label']}"
+        names = {prefix + suffix for suffix in ('.rows.ndjson', '.stdout', '.stdout.stderr')}
+        if run['runtime'] == 'go':
+            names.add(prefix + '.summary.json')
+        if set(run['artifacts']) != names or run['process']['returncode'] != 0:
+            raise ValueError('missing sample artifacts or failed process')
+        sample_dir = directory / 'samples' / run['mode']
+        for name, sha in run['artifacts'].items():
+            measurement.authenticated(sample_dir / name, sha)
+        totals_path = sample_dir / (prefix + ('.stdout' if run['runtime'] == 'rust' else '.summary.json'))
+        totals = strict_json_loads(totals_path.read_bytes())
+        if totals != run['totals'] or totals['version'] != 2 or totals['mode'] != run['mode']:
+            raise ValueError('sample totals or executable mode changed')
+        request_hash = inputs[run['runtime'] + '_requests_sha256']
+        if totals['request_sha256'] != request_hash:
+            raise ValueError('child loaded different requests')
+        rows = rows_of(directory, run)
+        measurement.check_totals(totals, measurement.checker_rows(rows, ids, run['mode']))
+        observed = [(r['id'], r['actions'], r['output_sha256']) for r in rows]
+        if identity is not None and identity != observed:
+            raise ValueError('measurement output or action schedule differs across samples/runtimes')
+        identity = observed
+    return build
+
 
 
 def stability(values):
@@ -283,9 +357,7 @@ def stability(values):
 
 def report(directory):
     capture_report = strict_json_loads((directory / "capture.json").read_bytes())
-    build_report = strict_json_loads((directory / "build.json").read_bytes())
-    if digest((directory / "build.json").read_bytes()) != capture_report["build_sha256"]:
-        raise ValueError("build record changed after the capture")
+    verify_capture(directory, capture_report)
     measured = [r for r in capture_report["runs"] if not r["warmup"]]
     result = {"version": 1, "pin": capture_report["pin"], "smoke": capture_report["smoke"], "variants": capture_report["requests"]["variants"],
               "host": capture_report["host"], "sources_sha256": capture_report["sources_sha256"],
@@ -308,7 +380,7 @@ def report(directory):
     digest_mismatches = [i for i in go_rows if go_rows[i]["output_sha256"] != rust_rows[i]["output_sha256"]]
     result["work"] = {"identity": identity, "action_mismatches": action_mismatches, "digest_mismatches": digest_mismatches,
                       "digest_agreement": len(go_rows) - len(digest_mismatches)}
-    valid = not action_mismatches
+    valid = not action_mismatches and not digest_mismatches
     if not valid:
         result["unavailable"]["actions"] = f"{len(action_mismatches)} variants executed different action counts; samples invalid"
     for mode in MODES:
@@ -356,12 +428,14 @@ def report(directory):
                 census[runtime] = {key: [t[key] for t in totals] for key in ("type_storage_bytes", "checker_bytes", "types_reachable", "types_created", "unavailable")}
                 census[runtime]["failed"] = sum(t.get("failed", 0) for t in totals)
                 census[runtime]["mean_bytes_per_reachable_type"] = median(means) if len(means) == len(totals) else None
-                census[runtime]["mean_bytes_max_over_min"] = (max(means) / min(means)) if means else None
+                census[runtime]["mean_bytes_max_over_min"] = (max(means) / min(means)) if means and min(means) > 0 else None
             summary["census"] = census
             if census["go"]["failed"] or census["rust"]["failed"]:
                 result["unavailable"]["type_footprint_ratio"] = "a census failed on at least one variant"
-            elif not census["go"]["mean_bytes_per_reachable_type"] or census["rust"]["mean_bytes_per_reachable_type"] is None:
-                result["unavailable"]["type_footprint_ratio"] = "Go census denominator is not positive"
+            elif any(any(census[r]["unavailable"]) for r in RUNTIMES):
+                result["unavailable"]["type_footprint_ratio"] = "required census families or semantic roots are unavailable"
+            elif any(not census[r]["mean_bytes_per_reachable_type"] for r in RUNTIMES):
+                result["unavailable"]["type_footprint_ratio"] = "census bytes per reachable type are not positive"
             else:
                 summary["type_footprint_ratio"] = census["rust"]["mean_bytes_per_reachable_type"] / census["go"]["mean_bytes_per_reachable_type"]
         result["modes"][mode] = summary
@@ -387,15 +461,16 @@ def report(directory):
 
 
 def current_report(directory=DEFAULT):
-    path = directory / "report.json"
+    path = directory / "capture.json"
     if not path.exists():
         return None
-    result = strict_json_loads(path.read_bytes())
+    try:
+        result = report(directory)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(f"checkerbench capture invalid/unavailable: {error}", file=sys.stderr)
+        return None
     if result.get("smoke"):
         print("checkerbench report is a smoke capture; no acceptance metrics", file=sys.stderr)
-        return None
-    if fingerprint(sources()) != result["sources_sha256"]:
-        print("checkerbench report is stale: sources changed since the capture", file=sys.stderr)
         return None
     return result
 

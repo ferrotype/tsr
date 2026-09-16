@@ -121,3 +121,14 @@ func (c *S08Clock) DisplayEnd() {
 }
 
 func (c *S08Clock) Depth() int { return len(c.stack) }
+
+// Pause excludes nested observation/decoration work and restores its caller's state.
+func (c *S08Clock) Pause() func() {
+	running := c.running
+	c.Stop()
+	return func() {
+		if running {
+			c.Start()
+		}
+	}
+}

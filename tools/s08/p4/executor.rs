@@ -169,7 +169,9 @@ pub fn observe(
     let mut semantic = Vec::new();
     for file in program.files() {
         let source = file.bound().view().source_file().expect("published source");
+        hooks.pause();
         let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
+        hooks.resume();
         let result = match program.skip_type_checking(file, false) {
             Ok(skipped) => match program.semantic_diagnostics_with_checker(&mut op, file) {
                 Ok(values) => {
@@ -184,9 +186,13 @@ pub fn observe(
             },
             Err(error) => compiler_failure(error),
         };
+        hooks.pause();
         semantic.push(json!({"file_hex":name,"result":result}));
+        hooks.resume();
     }
+    hooks.pause();
     row["phases"]["semantic"] = json!({"state":if semantic.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":semantic,"api":"Program.getSemanticDiagnosticsWithChecker"});
+    hooks.resume();
     let global_values = op.global_diagnostics();
     hooks.pause();
     row["phases"]["global"] = match global_values {
@@ -198,7 +204,9 @@ pub fn observe(
         let mut declarations = Vec::new();
         for file in program.files() {
             let source = file.bound().view().source_file().expect("published source");
+            hooks.pause();
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
+            hooks.resume();
             let values = program.declaration_diagnostics_with_checker(&mut op, file);
             hooks.pause();
             let result = match values {
@@ -207,16 +215,20 @@ pub fn observe(
                 }
                 Err(error) => compiler_failure(error),
             };
-            hooks.resume();
             declarations.push(json!({"file_hex":name,"result":result}));
+            hooks.resume();
         }
+        hooks.pause();
         row["phases"]["declaration"] = json!({"state":if declarations.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":declarations,"api":"Program.getDeclarationDiagnostics"});
+        hooks.resume();
     }
     if row["phases"].get("suggestion").is_some() {
         let mut suggestions = Vec::new();
         for file in program.files() {
             let source = file.bound().view().source_file().expect("published source");
+            hooks.pause();
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
+            hooks.resume();
             let values = op.recorded_suggestions(file.source());
             hooks.pause();
             let result = match values {
@@ -225,10 +237,12 @@ pub fn observe(
                 }
                 Err(error) => checker_failure(error),
             };
-            hooks.resume();
             suggestions.push(json!({"file_hex":name,"result":result}));
+            hooks.resume();
         }
+        hooks.pause();
         row["phases"]["suggestion"] = json!({"state":if suggestions.iter().all(|r|r["result"]["state"]=="executed") {"executed"} else {"failed"},"files":suggestions,"api":"Checker.GetSuggestionDiagnostics"});
+        hooks.resume();
     }
     if request["type_baseline_requested"] == true || capture_errors {
         let results = baseline(
@@ -238,10 +252,12 @@ pub fn observe(
             diagnostic_values.as_deref(),
             hooks,
         );
+        hooks.pause();
         row["type_symbol_baselines"] = results.type_symbols;
         if capture_errors {
             row["error_baseline"] = results.errors;
         }
+        hooks.resume();
     }
     hooks.checkpoint(&mut op);
     row

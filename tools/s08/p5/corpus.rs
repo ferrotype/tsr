@@ -147,7 +147,6 @@ pub fn observe_with(
                         }
                     }
                 };
-                hooks.resume();
                 let type_symbols = if request["type_baseline_requested"] == true {
                     let result = (|| -> Result<Value, Box<dyn std::error::Error>> {
                         let contents = input_files(request, "baseline_inputs")?;
@@ -158,20 +157,25 @@ pub fn observe_with(
                         let header = request["baseline_header"]
                             .as_str()
                             .ok_or("missing baseline header")?;
-                        Ok(baseline::generate(
+                        hooks.resume();
+                        let result = baseline::generate_with_timing(
                             program,
                             op,
                             &files,
                             header.as_bytes(),
                             had_errors,
                             &mut trace,
-                        ))
+                            &mut WalkerTiming(hooks),
+                        );
+                        hooks.pause();
+                        Ok(result)
                     })();
                     result.unwrap_or_else(|error| executor::failure(error, "baseline_prerequisite"))
                 } else {
                     json!({"state":"not_requested"})
                 };
                 hooks.roots(&trace.retained_types);
+                hooks.resume();
                 executor::BaselineResults {
                     type_symbols,
                     errors,
@@ -223,4 +227,14 @@ pub fn action_counts(row: &Value) -> Value {
             .map_or(0, Vec::len)),
     );
     Value::Object(counts)
+}
+
+struct WalkerTiming<'a>(&'a mut dyn executor::Hooks);
+impl baseline::Timing for WalkerTiming<'_> {
+    fn pause(&mut self) {
+        self.0.pause();
+    }
+    fn resume(&mut self) {
+        self.0.resume();
+    }
 }

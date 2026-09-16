@@ -227,6 +227,12 @@ fn executed(row: &Value) -> Result<(), String> {
     if baselines["state"] != "executed" && baselines["state"] != "not_requested" {
         return Err(format!("type_symbol_baselines: {}", baselines["reason"]));
     }
+    if baselines["state"] == "executed" && baselines["public_type_strings"]["state"] != "executed" {
+        return Err(format!(
+            "public display: {}",
+            baselines["public_type_strings"]["reason"]
+        ));
+    }
     if row["error_baseline"]["state"] != "executed" {
         return Err(format!(
             "error_baseline: {}",
@@ -286,13 +292,14 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args.len() != 3 {
         return Err("usage: p7_checkerbench REQUESTS ROWS".into());
     }
-    let requests: Vec<Value> = serde_json::from_slice(&std::fs::read(&args[1])?)?;
+    let request_bytes = std::fs::read(&args[1])?;
+    let requests: Vec<Value> = serde_json::from_slice(&request_bytes)?;
     let mut rows = std::io::BufWriter::new(std::fs::File::create(&args[2])?);
     let mut totals = json!({
-        "version": 1, "mode": MODE, "variants": requests.len(), "executed": 0, "failed": 0,
+        "version": 2, "mode": MODE, "request_sha256": hex(&Sha256::digest(&request_bytes)), "variants": requests.len(), "executed": 0, "failed": 0,
         "interval_ns": 0u64, "phases_ns": {"init": 0u64, "check": 0u64, "display": 0u64},
         "allocation": {"requested_bytes": 0u64, "retained_bytes": 0u64},
-        "census": {"type_storage_bytes": 0u64, "checker_bytes": 0u64, "types_reachable": 0u64, "types_created": 0u64, "unavailable": 0u64},
+        "census": {"type_storage_bytes": 0u64, "checker_bytes": 0u64, "types_reachable": 0u64, "types_created": 0u64, "unavailable": 0u64, "failed": 0u64},
         "failures": [],
     });
     let mut digests = Sha256::new();
@@ -341,14 +348,22 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             &["allocation", "requested_bytes"],
             allocation["requested_bytes"].as_u64().unwrap_or(0),
         );
-        add(
-            &mut totals,
-            &["allocation", "retained_bytes"],
-            allocation["live_at_checkpoint"]
-                .as_u64()
-                .unwrap_or(0)
-                .saturating_sub(allocation["live_before_interval"].as_u64().unwrap_or(0)),
-        );
+        if MODE == "alloc" {
+            let delta = i128::from(
+                allocation["live_at_checkpoint"]
+                    .as_u64()
+                    .ok_or("missing checkpoint")?,
+            ) - i128::from(
+                allocation["live_before_interval"]
+                    .as_u64()
+                    .ok_or("missing baseline")?,
+            );
+            let previous = totals["allocation"]["retained_bytes"]
+                .as_i64()
+                .ok_or("retained sum overflow")?;
+            totals["allocation"]["retained_bytes"] =
+                json!(i64::try_from(i128::from(previous) + delta)?);
+        }
         let census = &row["checkpoint"]["census"];
         if census.is_object() && census["state"].is_null() {
             add(
@@ -376,6 +391,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &["census", "unavailable"],
                 census["unavailable"].as_array().map_or(0, Vec::len) as u64,
             );
+        } else if MODE == "alloc" {
+            add(&mut totals, &["census", "failed"], 1);
         }
         serde_json::to_writer(&mut rows, &row)?;
         rows.write_all(b"\n")?;

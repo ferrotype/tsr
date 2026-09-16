@@ -610,14 +610,10 @@ fn observe(request_bytes: &[u8], implementation: Implementation) -> Result<Value
                     .as_u64()
                     .unwrap_or(0),
             );
-            add(
-                &mut totals,
-                "retained_bytes",
-                value["allocation"]["live_after"]
-                    .as_u64()
-                    .unwrap_or(0)
-                    .saturating_sub(value["allocation"]["live_before"].as_u64().unwrap_or(0)),
-            );
+            let live_before = i128::from(value["allocation"]["live_before"].as_u64().unwrap_or(0));
+            let live_after = i128::from(value["allocation"]["live_after"].as_u64().unwrap_or(0));
+            let retained = i128::from(totals["retained_bytes"].as_i64().unwrap_or(0));
+            totals["retained_bytes"] = json!(i64::try_from(retained + live_after - live_before)?);
             if value["state"] == "executed" {
                 add(&mut totals, "groups_executed", 1);
             } else {

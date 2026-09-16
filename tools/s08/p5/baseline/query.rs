@@ -35,9 +35,12 @@ impl Walker<'_, '_> {
             self.trace.queries.push(q);
             typ
         } else {
+            self.timing.pause();
             self.trace.count("GetTypeAtLocation");
+            self.timing.resume();
             self.op.get_type_at_location(id)?
         };
+        self.timing.pause();
         if self.trace.retain_types {
             self.trace.retained_types.push(typ);
         }
@@ -49,6 +52,7 @@ impl Walker<'_, '_> {
             };
             self.type_strings.push((stamp, typ));
         }
+        self.timing.resume();
         Ok(typ)
     }
     pub(super) fn write(
@@ -128,6 +132,7 @@ impl Walker<'_, '_> {
             self.op.intrinsic_type_name(typ)?.as_bytes().to_vec()
         } else {
             let flags = (TYPE_FLAGS & ff::NODE_BUILDER_FLAGS_MASK) | IGNORE_ERRORS;
+            self.timing.pause();
             let mut q = json!({});
             if self.trace.record_queries {
                 q = self.stamp(source, parent, "TypeToTypeNode")?;
@@ -139,6 +144,7 @@ impl Walker<'_, '_> {
             } else {
                 self.trace.count("TypeToTypeNode");
             }
+            self.timing.resume();
             #[cfg(feature = "s08-phase-timer")]
             let _display = super::instrument::Display::begin();
             let mut builder = self.op.node_builder();
@@ -155,6 +161,7 @@ impl Walker<'_, '_> {
                 false
             };
             if retry {
+                self.timing.pause();
                 let flags = flags | (ff::IN_TYPE_ALIAS & ff::NODE_BUILDER_FLAGS_MASK);
                 if self.trace.record_queries {
                     q["flags"] = json!(flags);
@@ -163,6 +170,7 @@ impl Walker<'_, '_> {
                 } else {
                     self.trace.count("TypeToTypeNode");
                 }
+                self.timing.resume();
                 generated =
                     builder.type_to_type_node(typ, Some(parent), flags, ALLOW_UNRESOLVED_NAMES)?;
             }
@@ -206,12 +214,15 @@ impl Walker<'_, '_> {
             self.trace.queries.push(q);
             symbol
         } else {
+            self.timing.pause();
             self.trace.count("GetSymbolAtLocation");
+            self.timing.resume();
             self.op.get_symbol_at_location(id)?
         };
         let Some(symbol) = symbol else {
             return Ok(None);
         };
+        self.timing.pause();
         if self.trace.record_queries {
             let mut q = self.stamp(source, parent, "SymbolToStringEx")?;
             q["flags"] = json!(ts_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND);
@@ -221,6 +232,7 @@ impl Walker<'_, '_> {
             self.trace.count("SymbolToStringEx");
         }
         let text = {
+            self.timing.resume();
             #[cfg(feature = "s08-phase-timer")]
             let _display = super::instrument::Display::begin();
             self.op.symbol_to_string_at(
