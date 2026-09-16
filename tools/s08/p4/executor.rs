@@ -229,13 +229,13 @@ pub fn observe(
             hooks.pause();
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
             hooks.resume();
-            let values = op.recorded_suggestions(file.source());
+            let values = program.suggestion_diagnostics_with_checker(&mut op, file);
             hooks.pause();
             let result = match values {
                 Ok(values) => {
                     diagnostics::captured_phase(&program, &values, &mut diagnostic_values)
                 }
-                Err(error) => checker_failure(error),
+                Err(error) => compiler_failure(error),
             };
             suggestions.push(json!({"file_hex":name,"result":result}));
             hooks.resume();

@@ -96,6 +96,21 @@ impl Program {
         apply_mapped_directives(file.source(), &source, diagnostics)
     }
 
+    /// Suggestion diagnostics after the same per-file selection as semantic
+    /// diagnostics: a default library, a declaration file under skipLibCheck or a
+    /// noCheck program is never checked for suggestions.
+    // port: tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker
+    pub fn suggestion_diagnostics_with_checker(
+        &self,
+        operation: &mut Operation<'_>,
+        file: &ProgramFile,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        if self.skip_type_checking(file, false)? {
+            return Ok(Vec::new());
+        }
+        Ok(operation.recorded_suggestions(file.source())?)
+    }
+
     /// Native semantic diagnostics include the include processor's file diagnostics
     /// after checking, while noEmit filtering applies only to bind/check diagnostics.
     // port: tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker
