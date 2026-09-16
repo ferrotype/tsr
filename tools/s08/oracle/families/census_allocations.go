@@ -13,6 +13,9 @@ type s08Allocations struct {
 	byBase   map[uintptr][]s08Allocation
 	base     func(uintptr) uintptr
 	overflow bool
+	// Log use reported by the runtime observer: requested records (dropped ones
+	// included), the pre-interval snapshot's share, and the log capacity.
+	recorded, snapshot, capacity uint64
 }
 
 var s08AllocationStart = func() {}

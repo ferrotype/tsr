@@ -50,6 +50,23 @@ class CensusValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "family inventory"):
             census.validate_workload(rows, ["case"])
 
+    def test_observer_cross_check_compares_measured_families(self):
+        def row(bytes_by_family, unavailable=()):
+            families = {name: {"count": 1, "bytes": value} for name, value in bytes_by_family.items()}
+            return {"state": "executed", "census": {"families": families, "unavailable": list(unavailable),
+                                                    "types": {"created": 3, "reachable": 3, "unreachable_occupied": 0}}}
+        observed = row({"union": 1000, "literal": 500, "query_links": 80, "relations": 40})
+        structural = row({"union": 1000, "literal": 505, "query_links": 80}, unavailable=["closure:relations"])
+        check = census.observer_cross_check(observed, structural)
+        self.assertTrue(check["comparable"])
+        self.assertEqual(check["skipped_families"], ["relations"])
+        self.assertEqual(check["type_storage"], {"observed": 1500, "structural": 1505})
+        self.assertEqual(check["problems"], [])
+        structural["census"]["families"]["union"]["bytes"] = 1200
+        self.assertIn("type storage", census.observer_cross_check(observed, structural)["problems"][0])
+        structural["census"]["types"]["reachable"] = 2
+        self.assertTrue(any("type counts" in p for p in census.observer_cross_check(observed, structural)["problems"]))
+
     def test_failed_validation_returns_nonzero(self):
         report = {"pass": False, "problems": ["unavailable"], "family_inventory": {}, "cases": []}
         with patch("sys.argv", ["s08_census.py", "fixtures"]), patch.object(census, "fixtures", return_value=report), patch("builtins.print"):

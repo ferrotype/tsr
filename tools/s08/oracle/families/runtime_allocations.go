@@ -9,8 +9,14 @@ import (
 
 type S08Allocation struct{ Address, Size, Type, Base, Slot uintptr }
 
-var s08AllocationLog [1 << 20]S08Allocation
+// Fixed log: the recorder runs inside mallocgc and cannot allocate. The first
+// full checkerbench capture (2026-09-16) needed up to 1.93M interval records
+// plus a pre-interval snapshot below 0.67M, and overflowed the former 1<<20
+// entries on 9 of 9,369 variants. 1<<23 entries of 40 bytes is 335 MB of BSS,
+// resident only as far as it is written (about 100 MB on the largest variant).
+var s08AllocationLog [1 << 23]S08Allocation
 var s08AllocationCount atomic.Uint64
+var s08AllocationSnapshot atomic.Uint64
 var s08AllocationActive atomic.Uint32
 
 //go:nosplit
@@ -52,8 +58,16 @@ func S08AllocationBegin() {
 			bits.advance()
 		}
 	}
+	s08AllocationSnapshot.Store(s08AllocationCount.Load())
 	s08AllocationActive.Store(1)
 	startTheWorld(stw)
+}
+
+// S08AllocationStatus reports the log's use after S08AllocationEnd: records
+// requested (including those dropped past the capacity), the pre-interval
+// snapshot's share of them, and the capacity.
+func S08AllocationStatus() (recorded, snapshot, capacity uint64) {
+	return s08AllocationCount.Load(), s08AllocationSnapshot.Load(), uint64(len(s08AllocationLog))
 }
 func S08AllocationEnd() ([]S08Allocation, bool) {
 	stw := stopTheWorld(stwWriteHeapDump)

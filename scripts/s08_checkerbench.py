@@ -408,6 +408,27 @@ def verify_capture(directory, capture_report):
 
 
 
+def census_diagnosis(rows):
+    """Why a census sample is unavailable, by family name and variant count, and the Go
+    allocation observer's log use over the sample (headroom before it overflows)."""
+    reasons = {}
+    observer = {"variants": 0, "overflow_variants": 0, "max_recorded_over_capacity": None}
+    for row in rows:
+        census = row["checkpoint"]["census"]
+        if census.get("state") == "failed":
+            continue
+        for name in census["unavailable"]:
+            reasons[name] = reasons.get(name, 0) + 1
+        status = census.get("observer")
+        if status and status.get("present"):
+            observer["variants"] += 1
+            observer["overflow_variants"] += bool(status.get("overflow"))
+            use = status["recorded"] / status["capacity"] if status.get("capacity") else None
+            if use is not None and (observer["max_recorded_over_capacity"] is None or use > observer["max_recorded_over_capacity"]):
+                observer["max_recorded_over_capacity"] = use
+    return {"unavailable_reasons": dict(sorted(reasons.items())), "observer": observer}
+
+
 def stability(values):
     return {"samples": values, "median": median(values), "max_over_min": max(values) / min(values),
             "coefficient_of_variation": pstdev(values) / mean(values) if len(values) > 1 else 0.0,
@@ -488,11 +509,13 @@ def report(directory):
                 census[runtime]["failed"] = sum(t.get("failed", 0) for t in totals)
                 census[runtime]["mean_bytes_per_reachable_type"] = median(means) if len(means) == len(totals) else None
                 census[runtime]["mean_bytes_max_over_min"] = (max(means) / min(means)) if means and min(means) > 0 else None
+                census[runtime].update(census_diagnosis(rows_of(directory, runs[runtime][0])))
             summary["census"] = census
             if census["go"]["failed"] or census["rust"]["failed"]:
                 result["unavailable"]["type_footprint_ratio"] = "a census failed on at least one variant"
             elif any(any(census[r]["unavailable"]) for r in RUNTIMES):
-                result["unavailable"]["type_footprint_ratio"] = "required census families or semantic roots are unavailable"
+                reasons = {r: census[r]["unavailable_reasons"] for r in RUNTIMES if census[r]["unavailable_reasons"]}
+                result["unavailable"]["type_footprint_ratio"] = f"required census families or semantic roots are unavailable: {reasons}"
             elif any(not census[r]["mean_bytes_per_reachable_type"] for r in RUNTIMES):
                 result["unavailable"]["type_footprint_ratio"] = "census bytes per reachable type are not positive"
             else:

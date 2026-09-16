@@ -10,6 +10,8 @@ func init() {
 		for i, r := range raw {
 			records[i] = s08Allocation{r.Address, r.Size, r.Type, r.Base, r.Slot}
 		}
-		return s08IndexAllocations(records, runtime.S08AllocationBase, overflow)
+		index := s08IndexAllocations(records, runtime.S08AllocationBase, overflow)
+		index.recorded, index.snapshot, index.capacity = runtime.S08AllocationStatus()
+		return index
 	}
 }

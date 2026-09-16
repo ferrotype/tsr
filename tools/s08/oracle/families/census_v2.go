@@ -1012,6 +1012,16 @@ func S08Census(c *Checker, roots []*Type) map[string]any {
 		symbolSeen:       map[*ast.Symbol]bool{},
 		tables:           map[uintptr]s08TableCharge{},
 	}
+	// The certified census needs the runtime observer for closure environments
+	// and allocation extents; without it, or once its log overflowed, the
+	// variant is unavailable rather than partially charged. The observer's log
+	// use is reported so the capture shows the headroom.
+	observer := map[string]any{"present": v2.allocations != nil, "overflow": v2.allocations != nil && v2.allocations.overflow}
+	if v2.allocations != nil {
+		observer["recorded"] = v2.allocations.recorded
+		observer["snapshot"] = v2.allocations.snapshot
+		observer["capacity"] = v2.allocations.capacity
+	}
 	if v2.allocations == nil || v2.allocations.overflow {
 		v2.markUnavailable("allocation_observer")
 	}
@@ -1133,6 +1143,7 @@ func S08Census(c *Checker, roots []*Type) map[string]any {
 			"references": v2.boundReferences, "binder_table_references": v2.boundTableRefs,
 			"binder_symbol_references": v2.boundSymbolRefs},
 		"symbols_transient": len(v2.transientSymbols),
+		"observer":          observer,
 		"inventory":         v2.inventory(),
 		// Bytes each Checker field's walk attributed (before type payloads), for diagnosis.
 		"fields": fieldBytes,

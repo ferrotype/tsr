@@ -53,7 +53,10 @@ def build_rust(directory):
     return target
 
 
-def run_go_fixtures(directory, requests_path, output):
+def run_go_fixtures(directory, requests_path, output, observer=True):
+    """The Go census over the fixture programs; `observer=False` compiles the same census
+    without the runtime allocation observer, so every family it can still measure comes
+    from the structural model alone (the cross-check for the observed extents)."""
     upstream = verified_upstream()
     env = go_environment()
     overlay = {}
@@ -66,17 +69,53 @@ def run_go_fixtures(directory, requests_path, output):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(source.read_bytes())
         overlay[str(virtual)] = str(path)
-    runtime_overlay(directory, overlay, upstream, env)
-    (directory / "overlay.json").write_bytes(canonical({"Replace": overlay}) + b"\n")
+    label = "" if observer else "-structural"
+    if observer:
+        runtime_overlay(directory, overlay, upstream, env)
+    (directory / f"overlay{label}.json").write_bytes(canonical({"Replace": overlay}) + b"\n")
     env.update(S08_REQUESTS=str(requests_path), S08_OUTPUT=str(output))
-    args = ["go", "test", "-mod=readonly", "-trimpath", "-overlay", str(directory / "overlay.json"), "./internal/checker",
-            "-run", "^TestS08ProgramCensus$|^TestS08MapBytes|^TestS08Arena|^TestS08Census", "-v", "-count=1", "-timeout=10m"]
-    (directory / "go-command.json").write_bytes(canonical(args) + b"\n")
-    with (directory / "go.stdout").open("wb") as stdout, (directory / "go.stderr").open("wb") as stderr:
+    # The unit tests exercise the observer; the structural run only needs the programs.
+    selector = "^TestS08ProgramCensus$|^TestS08MapBytes|^TestS08Arena|^TestS08Census" if observer else "^TestS08ProgramCensus$"
+    args = ["go", "test", "-mod=readonly", "-trimpath", "-overlay", str(directory / f"overlay{label}.json"), "./internal/checker",
+            "-run", selector, "-v", "-count=1", "-timeout=10m"]
+    (directory / f"go-command{label}.json").write_bytes(canonical(args) + b"\n")
+    with (directory / f"go{label}.stdout").open("wb") as stdout, (directory / f"go{label}.stderr").open("wb") as stderr:
         completed = subprocess.run(args, cwd=upstream / "tsc", env=env, stdout=stdout, stderr=stderr, timeout=900, check=False)
     if completed.returncode != 0 or not output.exists():
-        raise ValueError(f"Go census fixtures failed (exit {completed.returncode}); see {directory / 'go.stdout'}")
+        raise ValueError(f"Go census fixtures failed (exit {completed.returncode}); see {directory / f'go{label}.stdout'}")
     return strict_json_loads(output.read_bytes())
+
+
+# Observed allocation extents and the structural model measure the same allocations;
+# on the fixtures their type-storage sums must agree within this fraction.
+OBSERVER_TOLERANCE = 0.02
+
+
+def observer_cross_check(observed, structural):
+    """Compare one Go census taken with the runtime allocation observer against the same
+    program's census from the structural model. Families the structural model cannot
+    measure (closure environments) are skipped; the type-storage sums over the families
+    both measured must agree within OBSERVER_TOLERANCE."""
+    if observed.get("state", "executed") != "executed" or structural.get("state", "executed") != "executed":
+        return {"comparable": False, "problems": ["observer cross-check: a census was not executed"]}
+    obs, struct = observed["census"], structural["census"]
+    skipped = sorted(name.split(":", 1)[1] for name in struct["unavailable"] if ":" in name)
+    families = {}
+    for name in sorted(set(obs["families"]) | set(struct["families"])):
+        if name in skipped:
+            continue
+        o = obs["families"].get(name, {"bytes": 0})["bytes"]
+        t = struct["families"].get(name, {"bytes": 0})["bytes"]
+        families[name] = {"observed": o, "structural": t, "difference": o - t}
+    type_observed = sum(f["observed"] for n, f in families.items() if n in TYPE_FAMILIES)
+    type_structural = sum(f["structural"] for n, f in families.items() if n in TYPE_FAMILIES)
+    problems = []
+    if not type_structural or abs(type_observed - type_structural) > OBSERVER_TOLERANCE * type_structural:
+        problems.append(f"observer cross-check: type storage observed {type_observed} vs structural {type_structural}")
+    if obs["types"] != struct["types"]:
+        problems.append(f"observer cross-check: type counts differ {obs['types']} vs {struct['types']}")
+    return {"comparable": True, "skipped_families": skipped, "families": families,
+            "type_storage": {"observed": type_observed, "structural": type_structural}, "problems": problems}
 
 
 def invariants(row, runtime, case):
@@ -127,20 +166,24 @@ def fixtures(directory):
     command([str(rust_binary), str(requests_path), str(rust_output)], cwd=ROOT, env=s08_checkerbench.native_environment())
     rust = strict_json_loads(rust_output.read_bytes())
     go = run_go_fixtures(directory, requests_path, directory / "go.json")
-    if [r["id"] for r in rust["rows"]] != [c["id"] for c in fixture_file["cases"]] or [r["id"] for r in go["rows"]] != [c["id"] for c in fixture_file["cases"]]:
+    structural = run_go_fixtures(directory, requests_path, directory / "go-structural.json", observer=False)
+    expected = [c["id"] for c in fixture_file["cases"]]
+    if any([r["id"] for r in result["rows"]] != expected for result in (rust, go, structural)):
         raise ValueError("fixture inventory drift")
     cases = []
     all_problems = []
-    for case, rust_row, go_row in zip(fixture_file["cases"], rust["rows"], go["rows"], strict=True):
+    for case, rust_row, go_row, structural_row in zip(fixture_file["cases"], rust["rows"], go["rows"], structural["rows"], strict=True):
         problems = invariants(rust_row, "rust", case) + invariants(go_row, "go", case)
         problems.extend(paired_inventory(rust_row["census"], go_row["census"]))
+        cross_check = observer_cross_check(go_row, structural_row)
+        problems.extend(cross_check["problems"])
         all_problems.extend(f"{case['id']}: {p}" for p in problems)
         counts = {}
         for name in TYPE_FAMILIES:
             r = rust_row["census"]["families"].get(name, {"count": None, "bytes": None})
             g = go_row["census"]["families"].get(name, {"count": None, "bytes": None})
             counts[name] = {"rust": r, "go": g, "count_equal": r["count"] == g["count"]}
-        cases.append({"id": case["id"], "rule": case["rule"], "problems": problems,
+        cases.append({"id": case["id"], "rule": case["rule"], "problems": problems, "observer_cross_check": cross_check,
                       "types": {"rust": rust_row["census"]["types"], "go": go_row["census"]["types"]},
                       "created": {"rust": {"types": rust_row["types_created"], "symbols": rust_row["symbols_created"], "signatures": rust_row["signatures_created"]},
                                   "go": {"types": go_row["types_created"], "symbols": go_row["symbols_created"], "signatures": go_row["signatures_created"]}},
