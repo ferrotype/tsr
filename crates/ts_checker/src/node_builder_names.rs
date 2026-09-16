@@ -511,22 +511,36 @@ impl NodeBuilder<'_> {
         if matches!(table.id, NameTableId::Members(_)) {
             return Ok(vec![]);
         }
-        // Globals and exports tables are large and revisited by every display
-        // query, so their alias lists live on the checker (Go's
-        // symbolTableAliasCache); locals tables are small and per scope.
-        let cached = matches!(
-            table.id,
-            NameTableId::Globals | NameTableId::Exports(_) | NameTableId::ResolvedExports(_)
-        );
+        // Alias lists live on the checker (Go's symbolTableAliasCache) for the
+        // globals and exports tables and, beyond upstream's rule, for any locals
+        // table the binder owns: those are immutable once bound, and a module
+        // with n exported members otherwise scans n locals for each of its n
+        // display queries. Checker-owned locals (synthetic serialization scopes)
+        // stay uncached because they change while a scope is open.
+        let cached = match table.id {
+            NameTableId::Globals | NameTableId::Exports(_) | NameTableId::ResolvedExports(_) => {
+                true
+            }
+            NameTableId::Locals(_) => table
+                .table
+                .is_some_and(|id| id.arena() != self.checker.tables.id()),
+            NameTableId::Members(_) => false,
+        };
         if cached {
             if let Some(values) = self.checker.query.symbol_table_aliases.get(&table.id) {
                 return Ok(values.clone());
             }
         }
         let mut aliases = vec![];
-        for symbol in self.name_table_symbols(table)? {
-            if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
-                aliases.push(symbol);
+        if let Some((_, value)) = &table.singleton {
+            if self.checker.symbol(*value)?.flags() & sf::ALIAS != 0 {
+                aliases.push(*value);
+            }
+        } else if let Some(id) = table.table {
+            for symbol in self.checker.table(id)?.symbols().flatten() {
+                if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
+                    aliases.push(symbol);
+                }
             }
         }
         if cached {

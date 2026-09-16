@@ -11,8 +11,32 @@ use ts_ast::{
     SymbolTableRead,
 };
 
+/// The last (arena, file index) a directory resolved, packed in one word so the
+/// context stays `Sync`: consecutive lookups almost always hit the same file,
+/// and a compare beats a hash probe on every node and symbol read.
+#[derive(Default)]
+struct LastHit(std::sync::atomic::AtomicU64);
+impl LastHit {
+    #[inline]
+    fn get(&self, arena: ArenaId) -> Option<usize> {
+        let word = self.0.load(std::sync::atomic::Ordering::Relaxed);
+        (word != 0 && (word >> 32) as u32 == arena.get()).then_some((word & 0xffff_ffff) as usize)
+    }
+    #[inline]
+    fn set(&self, arena: ArenaId, index: usize) {
+        if let Ok(index) = u32::try_from(index) {
+            self.0.store(
+                (u64::from(arena.get()) << 32) | u64::from(index),
+                std::sync::atomic::Ordering::Relaxed,
+            );
+        }
+    }
+}
+
 pub(crate) struct ProgramContext {
     pub(crate) host: Arc<dyn CheckerHost>,
+    last_node: LastHit,
+    last_symbol: LastHit,
     /// Per file, the shared owner and binding: a view from here is two
     /// borrows, where the host's completed file routes through its handle on
     /// every call. `None` for a bundle member, which keeps the routed path.
@@ -48,6 +72,8 @@ impl ProgramContext {
             .collect();
         let mut result = Self {
             host,
+            last_node: LastHit::default(),
+            last_symbol: LastHit::default(),
             shared,
             nodes: HashMap::default(),
             file_indices: HashMap::default(),
@@ -102,7 +128,7 @@ impl ProgramContext {
     /// The binding of the file whose core arena holds `node`, without reading
     /// the node: flow and binding lookups validate their own ids.
     pub(crate) fn bind_result(&self, node: NodeId) -> Result<&ts_ast::BindResult, Error> {
-        if let Some(&index) = self.nodes.get(&node.arena()) {
+        if let Some(index) = self.core_file_index(node) {
             if let Some(shared) = &self.shared[index] {
                 return Ok(shared.result());
             }
@@ -113,7 +139,7 @@ impl ProgramContext {
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, Error> {
         // `for_node_owner` validates the slot, so the core index needs no
         // second node lookup before it.
-        if let Some(&index) = self.nodes.get(&node.arena()) {
+        if let Some(index) = self.core_file_index(node) {
             return self.file_view(index).ast().for_node_owner(node);
         }
         self.bound(node)?.ast().for_node_owner(node)
@@ -122,7 +148,13 @@ impl ProgramContext {
     /// The file index of the file whose core arena holds `node`, or `None`
     /// when the node lives elsewhere (lazy, auxiliary or checker-owned arenas).
     pub(crate) fn core_file_index(&self, node: NodeId) -> Option<usize> {
-        self.nodes.get(&node.arena()).copied()
+        let arena = node.arena();
+        if let Some(index) = self.last_node.get(arena) {
+            return Some(index);
+        }
+        let index = self.nodes.get(&arena).copied()?;
+        self.last_node.set(arena, index);
+        Some(index)
     }
 
     pub(crate) fn file_index(&self, source: Option<NodeId>) -> usize {
@@ -135,7 +167,14 @@ impl ProgramContext {
     // Symbol, table and declaration lookups take the shared view too: the
     // display path asks for a symbol on nearly every name-chain step.
     pub(crate) fn symbol(&self, symbol: SymbolId) -> Result<SymbolRef<'_>, Error> {
-        let &index = self.symbols.get(&symbol.arena()).ok_or(Error::WrongOwner)?;
+        let arena = symbol.arena();
+        let index = if let Some(index) = self.last_symbol.get(arena) {
+            index
+        } else {
+            let &index = self.symbols.get(&arena).ok_or(Error::WrongOwner)?;
+            self.last_symbol.set(arena, index);
+            index
+        };
         self.file_view(index).symbol(symbol).map(SymbolRef::Stored)
     }
 

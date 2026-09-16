@@ -451,6 +451,22 @@ impl<'a> SymbolTableRead<'a> {
             symbols: self.symbols,
         }
     }
+    /// The stored symbols alone, without decoding any name: the accessibility
+    /// walk filters tables by symbol flags and never looks at the keys.
+    pub fn symbols(self) -> impl ExactSizeIterator<Item = Option<SymbolId>> + 'a {
+        let symbols = self.symbols;
+        let (compact, full) = match self.table {
+            TableRecord::Compact(table) => (Some(table.iter()), None),
+            TableRecord::Full(table) => (None, Some(table.iter())),
+        };
+        let len = self.len();
+        SymbolsOnly {
+            compact,
+            full,
+            symbols,
+            remaining: len,
+        }
+    }
     pub fn keys(self) -> impl ExactSizeIterator<Item = &'a [u8]> {
         self.iter().map(|(name, _)| name)
     }
@@ -532,6 +548,33 @@ enum Entries<'a> {
     Compact(hashbrown::hash_table::Iter<'a, CompactEntry>),
     Full(hashbrown::hash_table::Iter<'a, FullEntry>),
 }
+struct SymbolsOnly<'a> {
+    compact: Option<hashbrown::hash_table::Iter<'a, CompactEntry>>,
+    full: Option<hashbrown::hash_table::Iter<'a, FullEntry>>,
+    symbols: Option<ArenaId>,
+    remaining: usize,
+}
+impl Iterator for SymbolsOnly<'_> {
+    type Item = Option<SymbolId>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = match (&mut self.compact, &mut self.full) {
+            (Some(entries), _) => entries
+                .next()
+                .map(|entry| decode_symbol(entry.symbol, self.symbols)),
+            (_, Some(entries)) => entries.next().map(|entry| entry.symbol),
+            (None, None) => None,
+        };
+        if next.is_some() {
+            self.remaining -= 1;
+        }
+        next
+    }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.remaining, Some(self.remaining))
+    }
+}
+impl ExactSizeIterator for SymbolsOnly<'_> {}
+
 pub struct SymbolTableIter<'a> {
     entries: Entries<'a>,
     names: &'a NamePool,
