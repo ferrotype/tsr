@@ -135,7 +135,7 @@ impl NodeBuilder<'_> {
             if self.checker.types.flags(declared)? & tf::OBJECT != 0 {
                 self.some_name_scope(query.enclosing, |this, table, _| {
                     let mut found = false;
-                    for (_, symbol) in this.name_table_entries(&table)? {
+                    for symbol in this.name_table_symbols(&table)? {
                         if this.checker.symbol(symbol)?.flags() & meaning != 0
                             && this.checker.get_type_of_symbol(symbol)?
                                 == this.checker.get_declared_type_of_symbol(container)?

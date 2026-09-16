@@ -4,7 +4,7 @@ use super::{NameTable, NameTableId};
 use crate::node_builder::NodeBuilder;
 use crate::Error;
 use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
+use ts_ast::{symbol_flags as sf, SymbolTableId, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     fn name_table(id: NameTableId, table: Option<SymbolTableId>) -> NameTable {
@@ -70,7 +70,7 @@ impl NodeBuilder<'_> {
                         NameTableId::Members(symbol),
                         self.checker.symbol(symbol)?.members(),
                     );
-                    if !self.name_table_entries(&table)?.is_empty()
+                    if !self.name_table_symbols(&table)?.is_empty()
                         && callback(self, table, Some(node))?
                     {
                         return Ok(true);
@@ -127,25 +127,26 @@ impl NodeBuilder<'_> {
         Ok(value)
     }
 
-    pub(super) fn name_table_entries(
-        &self,
-        table: &NameTable,
-    ) -> Result<Vec<(JsString, SymbolId)>, Error> {
-        if let Some(value) = &table.singleton {
-            return Ok(vec![value.clone()]);
+    /// The symbols of a name table in table order (a members table keeps only
+    /// its type members). No caller needs the names, and copying every name of
+    /// the globals table per lookup was most of the display path's allocation.
+    pub(super) fn name_table_symbols(&self, table: &NameTable) -> Result<Vec<SymbolId>, Error> {
+        if let Some((_, value)) = &table.singleton {
+            return Ok(vec![*value]);
         }
         let Some(id) = table.table else {
             return Ok(vec![]);
         };
-        let mut result = Vec::new();
-        for (name, value) in self.checker.table(id)? {
+        let read = self.checker.table(id)?;
+        let mut result = Vec::with_capacity(read.len());
+        for (_, value) in read {
             if let Some(value) = value {
                 if matches!(table.id, NameTableId::Members(_))
                     && self.checker.symbol(value)?.flags() & (sf::TYPE & !sf::ASSIGNMENT) == 0
                 {
                     continue;
                 }
-                result.push((JsString::from_bytes(name), value));
+                result.push(value);
             }
         }
         Ok(result)

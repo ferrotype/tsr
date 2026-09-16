@@ -25,7 +25,7 @@ mod declaration_emit;
 #[path = "node_builder_extra.rs"]
 mod extra;
 #[path = "node_builder_names.rs"]
-mod names;
+pub(crate) mod names;
 #[path = "node_builder_pseudo.rs"]
 mod pseudo;
 #[path = "node_builder_pseudo_output.rs"]

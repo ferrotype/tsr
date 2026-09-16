@@ -17,6 +17,10 @@ pub(crate) struct QueryState {
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    /// `symbolTableAliasCache`: alias symbols of the globals and exports tables,
+    /// shared by every display query of this checker.
+    pub symbol_table_aliases:
+        crate::types::Map<crate::node_builder::names::NameTableId, Vec<SymbolId>>,
     /// `deferredGlobalImportMetaExpressionType`: the synthetic `ImportMetaExpression`.
     pub import_meta_expression_type: Option<TypeId>,
     pub global_type_aliases: crate::types::Map<(&'static str, usize, bool), Option<SymbolId>>,

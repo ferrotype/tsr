@@ -18,7 +18,7 @@ mod containers;
 mod scope;
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
-pub(super) enum NameTableId {
+pub(crate) enum NameTableId {
     Locals(NodeId),
     Exports(SymbolId),
     Members(SymbolId),
@@ -41,7 +41,6 @@ struct NameQuery {
 #[derive(Default)]
 pub(super) struct NameAccess {
     chains: Map<(SymbolId, bool, Option<NodeId>, u32), Vec<SymbolId>>,
-    aliases: Map<NameTableId, Vec<SymbolId>>,
     visited: Set<(SymbolId, NameTableId)>,
     extended: Map<SymbolId, Vec<SymbolId>>,
     extended_by_file: Map<(SymbolId, NodeId), Vec<SymbolId>>,
@@ -512,20 +511,29 @@ impl NodeBuilder<'_> {
         if matches!(table.id, NameTableId::Members(_)) {
             return Ok(vec![]);
         }
-        let cached = !matches!(table.id, NameTableId::Locals(_));
+        // Globals and exports tables are large and revisited by every display
+        // query, so their alias lists live on the checker (Go's
+        // symbolTableAliasCache); locals tables are small and per scope.
+        let cached = matches!(
+            table.id,
+            NameTableId::Globals | NameTableId::Exports(_) | NameTableId::ResolvedExports(_)
+        );
         if cached {
-            if let Some(values) = self.name_access.aliases.get(&table.id) {
+            if let Some(values) = self.checker.query.symbol_table_aliases.get(&table.id) {
                 return Ok(values.clone());
             }
         }
         let mut aliases = vec![];
-        for (_, symbol) in self.name_table_entries(table)? {
+        for symbol in self.name_table_symbols(table)? {
             if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
                 aliases.push(symbol);
             }
         }
         if cached {
-            self.name_access.aliases.insert(table.id, aliases.clone());
+            self.checker
+                .query
+                .symbol_table_aliases
+                .insert(table.id, aliases.clone());
         }
         Ok(aliases)
     }
