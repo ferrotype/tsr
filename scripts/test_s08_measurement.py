@@ -161,8 +161,15 @@ class CheckerCapture(unittest.TestCase):
                 'phases_ns': {'init': 40, 'check': 40, 'display': 20},
                 'allocation': {'requested_bytes': 40, 'live_before_interval': 10,
                                'live_at_checkpoint': 30, 'live_after_release': 10},
-                'checkpoint': {'census': {'type_storage_bytes': 16, 'checker_bytes': 32,
-                                         'types': {'reachable': 1, 'created': 2}, 'unavailable': []}}}
+                'checkpoint': {'census': CheckerCapture.census()}}
+
+    @staticmethod
+    def census():
+        families = {name: {'count': 0, 'bytes': 0} for name in measurement.TYPE_FAMILIES}
+        families['type_records'] = {'count': 2, 'bytes': 16}
+        families['symbols'] = {'count': 1, 'bytes': 16}
+        return {'type_storage_bytes': 16, 'checker_bytes': 32, 'families': families,
+                'types': {'reachable': 1, 'created': 2, 'unreachable_occupied': 1}, 'unavailable': []}
 
     def write_sample(self, run, rows):
         sample = self.root / 'samples' / run['mode']
@@ -341,6 +348,40 @@ class CheckerCapture(unittest.TestCase):
             self.assertNotIn('type_footprint_ratio', report['metrics'])
             self.assertIn('type_footprint_ratio', report['unavailable'])
 
+    def test_zero_rust_requested_bytes_is_unavailable_not_one(self):
+        for run in self.capture['runs']:
+            if run['mode'] == 'alloc' and run['runtime'] == 'rust':
+                row = self.row()
+                row['allocation']['requested_bytes'] = 0
+                self.write_sample(run, [row])
+        self.save()
+        report = checker.report(self.root)
+        self.assertNotIn('allocated_bytes_ratio', report['metrics'])
+        self.assertIn('instrumentation inactive', report['unavailable']['allocated_bytes_ratio'])
+
+    def test_negative_retained_delta_is_reported_signed(self):
+        for run in self.capture['runs']:
+            if run['mode'] == 'alloc' and run['runtime'] == 'rust':
+                row = self.row()
+                row['allocation']['live_at_checkpoint'] = 5
+                self.write_sample(run, [row])
+        self.save()
+        report = checker.report(self.root)
+        summary = report['modes']['alloc']['retained_bytes_ratio']
+        self.assertTrue(summary['signed'])
+        self.assertEqual(summary['rust_median'], -5)
+        self.assertNotIn('retained_bytes_ratio', report['unavailable'])
+
+    def test_busy_host_is_flagged_and_disclosed(self):
+        self.assertFalse(checker.report(self.root)['host_busy'])
+        run = next(r for r in self.capture['runs'] if r['mode'] == 'normal' and not r['warmup'])
+        run['load_average'] = [checker.HOST_BUSY_LOAD + 1, 1.0, 1.0]
+        self.save()
+        report = checker.report(self.root)
+        self.assertTrue(report['host_busy'])
+        self.assertTrue(report['modes']['normal']['host_load']['busy'])
+        self.assertIn('normal', report['modes'])
+
     def test_runtime_observer_sdk_identity_is_authenticated(self):
         (self.root / 'runtime-overlay/sdk.json').write_text('{"changed": true}')
         with self.assertRaisesRegex(ValueError, 'artifact changed'):
@@ -366,6 +407,43 @@ class CheckerCapture(unittest.TestCase):
         self.capture['runs'].pop()
         self.save()
         self.assertIsNone(checker.current_report(self.root))
+
+
+class CensusInvariants(unittest.TestCase):
+    def rows(self, **census):
+        row = CheckerCapture.row()
+        row['checkpoint']['census'].update(census)
+        return [row]
+
+    def test_consistent_row_passes(self):
+        measurement.checker_rows(self.rows(), ['case'], 'alloc')
+
+    def test_family_sum_and_triple_are_enforced(self):
+        with self.assertRaisesRegex(ValueError, 'type-family sum'):
+            measurement.checker_rows(self.rows(type_storage_bytes=17), ['case'], 'alloc')
+        with self.assertRaisesRegex(ValueError, 'family sum'):
+            measurement.checker_rows(self.rows(checker_bytes=33), ['case'], 'alloc')
+        with self.assertRaisesRegex(ValueError, 'triple'):
+            measurement.checker_rows(self.rows(types={'reachable': 3, 'created': 2, 'unreachable_occupied': 0}), ['case'], 'alloc')
+        with self.assertRaisesRegex(ValueError, 'triple'):
+            measurement.checker_rows(self.rows(types={'reachable': 1, 'created': 2, 'unreachable_occupied': 0}), ['case'], 'alloc')
+
+    def test_incomplete_or_negative_inventory_is_rejected(self):
+        families = dict(CheckerCapture.census()['families'])
+        del families['alias']
+        with self.assertRaisesRegex(ValueError, 'type family alias missing'):
+            measurement.checker_rows(self.rows(families=families), ['case'], 'alloc')
+        families = dict(CheckerCapture.census()['families'])
+        families['symbols'] = {'count': 1, 'bytes': -16}
+        with self.assertRaises(ValueError):
+            measurement.checker_rows(self.rows(families=families), ['case'], 'alloc')
+
+    def test_inventory_must_match_across_rows(self):
+        first, second = CheckerCapture.row(), CheckerCapture.row()
+        second['id'] = 'other'
+        second['checkpoint']['census']['families']['extra'] = {'count': 0, 'bytes': 0}
+        with self.assertRaisesRegex(ValueError, 'inventory differs'):
+            measurement.checker_rows([first, second], ['case', 'other'], 'alloc')
 
 
 class RelaterContract(unittest.TestCase):

@@ -14,8 +14,9 @@ class CensusValidationTests(unittest.TestCase):
                "allocation": {"requested_bytes": 16, "live_before_interval": 0,
                               "live_at_checkpoint": 16, "live_after_release": 0},
                "checkpoint": {"census": {"type_storage_bytes": 16, "checker_bytes": 16,
-                                         "types": {"reachable": 1, "created": 1}, "unavailable": [],
-                                         "families": {"type_records": {"count": 1, "bytes": 16}}}}}
+                                         "types": {"reachable": 1, "created": 1, "unreachable_occupied": 0}, "unavailable": [],
+                                         "families": {**{name: {"count": 0, "bytes": 0} for name in measurement.TYPE_FAMILIES},
+                                                      "type_records": {"count": 1, "bytes": 16}}}}}
         result = {r: [copy.deepcopy(row)] for r in ("rust", "go")}
         self.totals(result)
         return result

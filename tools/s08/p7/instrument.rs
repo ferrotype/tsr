@@ -63,24 +63,35 @@ pub fn pop() {
     });
 }
 
-/// Stop every clock (interval pause); `push` resumes charging.
-pub fn suspend() {
+/// Stop every clock (interval pause) at `now`, the timestamp the interval
+/// clock stops at, so a pause leaks no clock-read gap into the phases.
+pub fn suspend_at(now: Instant) {
     CLOCKS.with(|c| {
         let mut clocks = c.borrow_mut();
-        let now = Instant::now();
         settle(&mut clocks, now);
         clocks.since = None;
     });
 }
 
-/// Resume charging the current top phase after `suspend`.
-pub fn resume() {
+/// Resume charging the current top phase at `now`, the timestamp the
+/// interval clock resumes at.
+pub fn resume_at(now: Instant) {
     CLOCKS.with(|c| {
         let mut clocks = c.borrow_mut();
         if !clocks.stack.is_empty() {
-            clocks.since = Some(Instant::now());
+            clocks.since = Some(now);
         }
     });
+}
+
+/// `suspend_at` now.
+pub fn suspend() {
+    suspend_at(Instant::now());
+}
+
+/// `resume_at` now.
+pub fn resume() {
+    resume_at(Instant::now());
 }
 
 pub fn totals() -> [u64; 3] {

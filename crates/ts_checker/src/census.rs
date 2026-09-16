@@ -351,7 +351,7 @@ impl CheckerState {
         census.vec_capacity("union", tables.unions, tables.unions.capacity());
         for data in tables.unions {
             census.list("type_lists", &data.types);
-            Self::census_union_common(&mut census, &data.common);
+            Self::census_union_common(&mut census, "union", &data.common);
             if let Some(name) = &data.key_property_name {
                 census.text("union", name);
             }
@@ -370,7 +370,7 @@ impl CheckerState {
         );
         for data in tables.intersections {
             census.list("type_lists", &data.types);
-            Self::census_union_common(&mut census, &data.common);
+            Self::census_union_common(&mut census, "intersection", &data.common);
         }
         census.vec_capacity(
             "type_parameter",
@@ -669,10 +669,14 @@ impl CheckerState {
         }
     }
 
-    fn census_union_common(census: &mut Census, data: &crate::UnionOrIntersectionMembers) {
-        Self::census_structured(census, "union", &data.structured);
+    fn census_union_common(
+        census: &mut Census,
+        family: &'static str,
+        data: &crate::UnionOrIntersectionMembers,
+    ) {
+        Self::census_structured(census, family, &data.structured);
         if let Some(list) = &data.resolved_properties {
-            census.list("union", list);
+            census.list(family, list);
         }
     }
 

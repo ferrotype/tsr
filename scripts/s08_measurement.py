@@ -61,6 +61,39 @@ def roster(capture, plan, modes, runtime_key):
         raise ValueError('missing, extra, duplicated or reordered measurement samples')
 
 
+# Type families whose bytes sum to the footprint numerator (data/s08/type-footprint.json).
+TYPE_FAMILIES = ('type_records', 'intrinsic', 'literal', 'unique_es_symbol', 'anonymous', 'evolving_arrays', 'reference',
+                 'interface', 'tuple', 'union', 'intersection', 'type_parameter', 'template_literal', 'mapped',
+                 'reverse_mapped', 'instantiation_expression', 'index', 'indexed_access', 'string_mapping',
+                 'substitution', 'conditional', 'alias', 'type_lists', 'type_caches')
+
+
+def census_invariants(census, inventory, variant):
+    """The accounting rules every executed census row must satisfy (type-footprint.json):
+    a complete type-family inventory that is the same on every row of the sample,
+    non-negative counts and bytes, the family sums, and a consistent type triple."""
+    families = census.get('families')
+    if not isinstance(families, dict):
+        raise ValueError(f'{variant}: census families missing')
+    for name in TYPE_FAMILIES:
+        if name not in families:
+            raise ValueError(f'{variant}: census type family {name} missing')
+    for name, family in families.items():
+        if not isinstance(family, dict) or number(family.get('count'), name) < 0 or number(family.get('bytes'), name) < 0:
+            raise ValueError(f'{variant}: census family {name} has a negative or missing count or bytes')
+    if inventory is not None and set(families) != inventory:
+        raise ValueError(f'{variant}: census family inventory differs within the sample')
+    if number(census['type_storage_bytes'], 'type storage') != sum(families[n]['bytes'] for n in TYPE_FAMILIES):
+        raise ValueError(f'{variant}: census type_storage_bytes is not the type-family sum')
+    if number(census['checker_bytes'], 'checker bytes') != sum(f['bytes'] for f in families.values()):
+        raise ValueError(f'{variant}: census checker_bytes is not the family sum')
+    types = census['types']
+    created, reachable = number(types['created'], 'created'), number(types['reachable'], 'reachable')
+    if reachable > created or number(types.get('unreachable_occupied'), 'unreachable_occupied') != created - reachable:
+        raise ValueError(f'{variant}: census reachable/created/unreachable_occupied triple is inconsistent')
+    return set(families)
+
+
 def checker_rows(rows, ids, mode):
     if [row['id'] for row in rows] != ids or len(set(ids)) != len(ids):
         raise ValueError('measurement rows differ from the frozen ordered inventory')
@@ -69,6 +102,7 @@ def checker_rows(rows, ids, mode):
               'allocation': {'requested_bytes': 0, 'retained_bytes': 0},
               'census': {k: 0 for k in ('type_storage_bytes', 'checker_bytes', 'types_reachable', 'types_created', 'unavailable', 'failed')}}
     outputs, actions = hashlib.sha256(), hashlib.sha256()
+    inventory = None
     for row in rows:
         if row['outcome'] != 'executed':
             raise ValueError(f"measurement work failed: {row['id']}")
@@ -99,6 +133,7 @@ def checker_rows(rows, ids, mode):
         unavailable = census['unavailable']
         if not isinstance(unavailable, list) or any(not isinstance(s, str) or not s for s in unavailable):
             raise ValueError('invalid unavailable census families')
+        inventory = census_invariants(census, inventory, row['id'])
         totals['census']['unavailable'] += len(unavailable)
         for name in ('type_storage_bytes', 'checker_bytes'):
             totals['census'][name] += number(census[name], name)

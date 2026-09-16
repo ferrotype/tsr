@@ -69,16 +69,25 @@ fn total() -> u64 {
 }
 
 impl Measure {
+    /// The interval and the phase clocks start and stop on one timestamp, so
+    /// their sums agree exactly (a pause taken on two clock reads leaked the
+    /// gap into the phases).
     fn start(&mut self) {
-        self.running = Some(Instant::now());
+        let now = Instant::now();
+        self.running = Some(now);
+        #[cfg(feature = "s08-phase-timer")]
+        crate::baseline::instrument::resume_at(now);
         #[cfg(feature = "s08-allocation")]
         {
             self.allocation.running = Some(total());
         }
     }
     fn stop(&mut self) {
+        let now = Instant::now();
+        #[cfg(feature = "s08-phase-timer")]
+        crate::baseline::instrument::suspend_at(now);
         if let Some(since) = self.running.take() {
-            self.interval_ns += u64::try_from(since.elapsed().as_nanos()).unwrap_or(u64::MAX);
+            self.interval_ns += u64::try_from((now - since).as_nanos()).unwrap_or(u64::MAX);
         }
         #[cfg(feature = "s08-allocation")]
         if let Some(before) = self.allocation.running.take() {
@@ -122,12 +131,8 @@ impl Hooks for Measure {
     }
     fn pause(&mut self) {
         self.stop();
-        #[cfg(feature = "s08-phase-timer")]
-        crate::baseline::instrument::suspend();
     }
     fn resume(&mut self) {
-        #[cfg(feature = "s08-phase-timer")]
-        crate::baseline::instrument::resume();
         self.start();
     }
     fn roots(&mut self, types: &[TypeRef]) {
@@ -243,6 +248,10 @@ fn executed(row: &Value) -> Result<(), String> {
 }
 
 fn variant(request: &Value, cache: &mut FileCache, libraries: &mut Vec<Arc<ProgramFile>>) -> Value {
+    // A variant that fails before its interval must report its own (zero)
+    // phases, not the previous variant's.
+    #[cfg(feature = "s08-phase-timer")]
+    crate::baseline::instrument::reset();
     let mut measure = Measure {
         libraries: std::mem::take(libraries),
         ..Measure::default()

@@ -408,6 +408,20 @@ def verify_capture(directory, capture_report):
 
 
 
+# One-minute load average above which the host was doing other work while a sample
+# ran: a serial child on a quiet host contributes about 1 itself. Disclosed, never a
+# reason to drop or repeat samples (the method's stability rule).
+HOST_BUSY_LOAD = 2.0
+
+
+def host_load(runs):
+    """The one-minute load average recorded after each sample, and whether any exceeded
+    HOST_BUSY_LOAD."""
+    values = [r["load_average"][0] for r in runs if isinstance(r.get("load_average"), list) and r["load_average"]]
+    return {"one_minute": values, "max": max(values) if values else None, "threshold": HOST_BUSY_LOAD,
+            "busy": any(v > HOST_BUSY_LOAD for v in values)}
+
+
 def census_diagnosis(rows):
     """Why a census sample is unavailable, by family name and variant count, and the Go
     allocation observer's log use over the sample (headroom before it overflows)."""
@@ -467,7 +481,9 @@ def report(directory):
         runs = {runtime: [r for r in measured if r["runtime"] == runtime and r["mode"] == mode] for runtime in RUNTIMES}
         summary = {"interval_ns": {runtime: stability([r["totals"]["interval_ns"] for r in runs[runtime]]) for runtime in RUNTIMES},
                    "process_ns": {runtime: [r["process"]["process_ns"] for r in runs[runtime]] for runtime in RUNTIMES},
-                   "peak_rss_bytes": {runtime: [r["process"]["peak_rss_bytes"] for r in runs[runtime]] for runtime in RUNTIMES}}
+                   "peak_rss_bytes": {runtime: [r["process"]["peak_rss_bytes"] for r in runs[runtime]] for runtime in RUNTIMES},
+                   "host_load": host_load([r for runtime in RUNTIMES for r in runs[runtime]])}
+        result["host_busy"] = result.get("host_busy", False) or summary["host_load"]["busy"]
         go_ns = [r["totals"]["interval_ns"] for r in runs["go"]]
         rust_ns = [r["totals"]["interval_ns"] for r in runs["rust"]]
         try:
@@ -491,11 +507,24 @@ def report(directory):
             summary["allocation"] = allocation
             for key, metric in (("requested_bytes", "allocated_bytes_ratio"), ("retained_bytes", "retained_bytes_ratio")):
                 go_values, rust_values = allocation["go"][key], allocation["rust"][key]
-                if min(go_values) <= 0 or min(rust_values) < 0:
+                if min(go_values) <= 0:
                     result["unavailable"][metric] = f"non-positive Go {key} denominator"
                     continue
+                if key == "requested_bytes" and min(rust_values) <= 0:
+                    # A zero request total means the counting allocator was not active; it
+                    # is never a valid ratio of zero.
+                    result["unavailable"][metric] = "Rust requested bytes are zero: allocation instrumentation inactive"
+                    continue
+                if key == "retained_bytes" and min(rust_values) <= 0:
+                    # Retained deltas are signed (live before minus live at the checkpoint
+                    # can go either way); the raw values and the ratio of medians are
+                    # reported without the positive-sample bootstrap.
+                    summary[metric] = {"samples_per_runtime": len(go_values), "go_median": median(go_values),
+                                       "rust_median": median(rust_values), "ratio": median(rust_values) / median(go_values),
+                                       "signed": True}
+                    continue
                 try:
-                    summary[metric] = ratio_summary(go_values, [max(v, 1) for v in rust_values])
+                    summary[metric] = ratio_summary(go_values, rust_values)
                     summary[metric]["ratio"] = median(rust_values) / median(go_values)
                 except ValueError as error:
                     result["unavailable"][metric] = str(error)

@@ -25,10 +25,7 @@ from s08_census_runtime import runtime_overlay
 DEFAULT = ROOT / "target/s08/census"
 FIXTURES = ROOT / "tools/s08/p7/census-fixtures.json"
 FAMILIES_DIR = ROOT / "tools/s08/oracle/families"
-TYPE_FAMILIES = ("type_records", "intrinsic", "literal", "unique_es_symbol", "anonymous", "evolving_arrays", "reference",
-                 "interface", "tuple", "union", "intersection", "type_parameter", "template_literal", "mapped",
-                 "reverse_mapped", "instantiation_expression", "index", "indexed_access", "string_mapping",
-                 "substitution", "conditional", "alias", "type_lists", "type_caches")
+TYPE_FAMILIES = measurement.TYPE_FAMILIES
 
 
 def requests_from_fixtures():
