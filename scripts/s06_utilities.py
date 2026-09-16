@@ -50,15 +50,25 @@ def load_manifest(root):
 
 def invoke(args, root, prefix, *, timeout=300):
     print("+ " + " ".join(map(str, args)), file=sys.stderr)
-    result = subprocess.run(args, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout, check=False)
+    try:
+        result = subprocess.run(args, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout, check=False)
+    except subprocess.TimeoutExpired as error:
+        prefix.with_suffix(".stdout").write_bytes(error.stdout or b"")
+        prefix.with_suffix(".stderr").write_bytes(error.stderr or b"")
+        prefix.with_suffix(".command.json").write_bytes(canonical({
+            "command": list(map(str, args)), "returncode": None,
+            "timed_out": True, "timeout_seconds": timeout,
+        }) + b"\n")
+        print(f"Command exceeded {timeout}s; partial output retained at {prefix}", file=sys.stderr)
+        raise
     prefix.with_suffix(".stdout").write_bytes(result.stdout)
     prefix.with_suffix(".stderr").write_bytes(result.stderr)
     prefix.with_suffix(".command.json").write_bytes(canonical({"command": list(map(str,args)), "returncode": result.returncode})+b"\n")
     return result
 
 
-def setup(args, root, prefix):
-    result = invoke(args, root, prefix)
+def setup(args, root, prefix, *, timeout=300):
+    result = invoke(args, root, prefix, timeout=timeout)
     if result.returncode:
         raise RuntimeError(f"AST utility setup/check failed: {args}; output retained at {prefix}")
     return result.stdout

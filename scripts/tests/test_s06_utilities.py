@@ -66,7 +66,7 @@ class UtilityTests(unittest.TestCase):
 
     def test_measured_failure_does_not_skip_other_families(self):
         data=manifest();invocations=[]
-        def invoke(args, root, prefix):
+        def invoke(args, root, prefix, *, timeout=300):
             invocations.append(args)
             if args[0]=='cargo':
                 rows=[{'reason':'compiler-artifact','executable':'/'+target,'target':{'name':'ts_ast' if target=='lib' else target,'kind':['lib'] if target=='lib' else ['test']},'profile':{'test':True}} for target in ('lib','utilities_front','utilities_tail','node_accessors')]
@@ -90,6 +90,34 @@ class UtilityTests(unittest.TestCase):
         with patch.object(utility,'invoke',return_value=result):
             with self.assertRaisesRegex(RuntimeError,'setup/check failed'):
                 utility.setup(['python3','check.py','--check'],Path('/root'),Path('/output'))
+
+    def test_setup_forwards_explicit_budget_and_keeps_default_test_budget(self):
+        result = subprocess.CompletedProcess([], 0, b'output', b'')
+        with tempfile.TemporaryDirectory() as temporary, \
+                patch.object(utility.subprocess, 'run', return_value=result) as run:
+            root = Path(temporary)
+            self.assertEqual(utility.setup(['build'], root, root/'build', timeout=1800), b'output')
+            self.assertEqual(run.call_args.kwargs['timeout'], 1800)
+            utility.setup(['list'], root, root/'list')
+            self.assertEqual(run.call_args.kwargs['timeout'], 300)
+            utility.invoke(['test'], root, root/'test')
+            self.assertEqual(run.call_args.kwargs['timeout'], 300)
+
+    def test_timeout_preserves_partial_output_and_cannot_become_success(self):
+        for stdout, stderr in ((b'cargo artifact', b'Compiling ts_checker'), (None, None)):
+            error = subprocess.TimeoutExpired(['cargo', 'test'], 1800, output=stdout, stderr=stderr)
+            with self.subTest(stdout=stdout), tempfile.TemporaryDirectory() as temporary, \
+                    patch.object(utility.subprocess, 'run', side_effect=error):
+                root = Path(temporary)
+                prefix = root/'build'
+                with self.assertRaises(subprocess.TimeoutExpired):
+                    utility.setup(['cargo', 'test'], root, prefix, timeout=1800)
+                self.assertEqual(prefix.with_suffix('.stdout').read_bytes(), stdout or b'')
+                self.assertEqual(prefix.with_suffix('.stderr').read_bytes(), stderr or b'')
+                self.assertEqual(json.loads(prefix.with_suffix('.command.json').read_bytes()), {
+                    'command': ['cargo', 'test'], 'returncode': None,
+                    'timed_out': True, 'timeout_seconds': 1800,
+                })
 
 
 if __name__=='__main__':unittest.main()

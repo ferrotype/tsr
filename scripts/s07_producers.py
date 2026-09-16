@@ -122,7 +122,7 @@ def program():
     from s07_verify_compare import capture as capture_verification
     def production_inputs():
         values = input_fingerprints()
-        for pattern in ("scripts/s07_program*.py", "scripts/s07_verify*.py", "scripts/s07_config*.py",
+        for pattern in ("scripts/s06_utilities.py", "scripts/s07_program*.py", "scripts/s07_verify*.py", "scripts/s07_config*.py",
                         "scripts/s07_subset*.py", "scripts/s07_operations.py", "scripts/s07_operation_validation.py", "scripts/s07_producers.py",
                         "tools/s07/program/*", "tools/s07/verify-options/*", "tools/s07/config/*"):
             values.update((str(path.relative_to(ROOT)), digest(path)) for path in ROOT.glob(pattern) if path.is_file())
