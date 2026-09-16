@@ -20,7 +20,6 @@ enum Edge {
 struct Work {
     pending: Vec<Edge>,
     seen: HashSet<Edge>,
-    types: usize,
 }
 impl Work {
     fn types(&mut self, values: impl IntoIterator<Item = TypeId>) {
@@ -50,6 +49,10 @@ impl Work {
 
 impl CheckerState {
     pub(crate) fn reachable_types(&self, roots: &[TypeId]) -> Result<usize, Error> {
+        Ok(self.reachable_type_ids(roots)?.len())
+    }
+
+    pub(crate) fn reachable_type_ids(&self, roots: &[TypeId]) -> Result<HashSet<TypeId>, Error> {
         let mut work = Work::default();
         for name in crate::BUILTIN_TYPE_NAMES {
             work.types(self.builtins.type_by_name(name));
@@ -235,7 +238,6 @@ impl CheckerState {
             match edge {
                 Edge::Type(ty) => {
                     self.census_type_edges(ty, &mut work)?;
-                    work.types += 1;
                 }
                 Edge::Signature(id) => {
                     let signature = self.signatures.get(id)?;
@@ -307,7 +309,14 @@ impl CheckerState {
                 }
             }
         }
-        Ok(work.types)
+        Ok(work
+            .seen
+            .into_iter()
+            .filter_map(|edge| match edge {
+                Edge::Type(id) => Some(id),
+                _ => None,
+            })
+            .collect())
     }
 
     fn census_type_edges(&self, ty: TypeId, work: &mut Work) -> Result<(), Error> {

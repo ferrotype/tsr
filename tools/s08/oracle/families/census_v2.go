@@ -90,7 +90,7 @@ var s08V2FieldFamilies = map[string]string{
 	"membersAndExportsLinks": "symbol_tables", "typeAliasLinks": "query_links", "declaredTypeLinks": "query_links",
 	"spreadLinks": "query_links", "varianceLinks": "variance", "ReverseMappedSymbolLinks": "mapped_symbol_links",
 	"markedAssignmentSymbolLinks": "flow_analysis", "symbolContainerLinks": "query_links", "sourceFileLinks": "query_links",
-	"regExpScanner": "", "patternForType": "query_links", "contextFreeTypes": "query_links",
+	"regExpScanner": "query_links", "patternForType": "query_links", "contextFreeTypes": "query_links",
 	"uniqueLiteralMapper": "mappers", "reliabilityFlags": "", "reportUnreliableMapper": "mappers",
 	"reportUnmeasurableMapper": "mappers", "restrictiveMapper": "mappers", "permissiveMapper": "mappers",
 	"noTypePredicate": "type_predicates", "anySignature": "", "unknownSignature": "", "resolvingSignature": "",
@@ -110,10 +110,10 @@ var s08V2FieldFamilies = map[string]string{
 	"reverseMappedTargetStack": "mapped_symbol_links", "reverseExpandingFlags": "", "freeRelater": "relations",
 	"subtypeRelation": "relations", "strictSubtypeRelation": "relations", "assignableRelation": "relations",
 	"comparableRelation": "relations", "identityRelation": "relations", "enumRelation": "enum_relations",
-	"syncIterationTypesResolver": "", "asyncIterationTypesResolver": "", "isPrimitiveOrObjectOrEmptyType": "",
+	"syncIterationTypesResolver": "iteration_cache", "asyncIterationTypesResolver": "iteration_cache", "isPrimitiveOrObjectOrEmptyType": "",
 	"containsMissingType": "", "couldContainTypeVariables": "", "isStringIndexSignatureOnlyType": "",
-	"markNodeAssignments": "", "compareTypesAssignable": "", "emitResolver": "", "emitResolverOnce": "",
-	"_jsxNamespace": "", "_jsxFactoryEntity": "", "skipDirectInferenceNodes": "query_links", "ctx": "",
+	"markNodeAssignments": "", "compareTypesAssignable": "", "emitResolver": "declarations", "emitResolverOnce": "",
+	"_jsxNamespace": "query_links", "_jsxFactoryEntity": "", "skipDirectInferenceNodes": "query_links", "ctx": "",
 	"packagesMap": "module_aliases", "activeMappers": "mappers", "activeTypeMappersCaches": "type_caches",
 	"ambientModulesOnce": "", "ambientModules": "module_aliases", "withinUnreachableCode": "",
 	"reportedUnreachableNodes": "body_check_state", "nonExistentProperties": "deferred_checks",
@@ -294,6 +294,9 @@ func s08ArenaFromCurrentChunk(elem reflect.Type, current reflect.Value) (records
 // The census.
 
 type s08V2 struct {
+	path        []string
+	allocations *s08Allocations
+	charges     map[uintptr]s08AllocationCharge
 	c           *Checker
 	families    map[string]*s08Family
 	seen        map[uintptr]bool
@@ -308,12 +311,21 @@ type s08V2 struct {
 	boundSymbolRefs  int
 	transientSymbols map[*ast.Symbol]bool
 
-	types      map[*Type]bool
-	pending    []*Type
-	signatures map[*Signature]bool
-	visited    map[uintptr]bool
-	symbolSeen map[*ast.Symbol]bool
-	tables     map[uintptr]s08TableCharge
+	types       map[*Type]bool
+	pending     []*Type
+	signatures  map[*Signature]bool
+	visited     map[uintptr]bool
+	sliceVisits map[s08SliceView]int
+	symbolSeen  map[*ast.Symbol]bool
+	mapFamilies map[uintptr]string
+	tables      map[uintptr]s08TableCharge
+}
+
+// Allocation charging and edge traversal are independent: a short view may
+// be encountered before a longer view of the very same backing allocation.
+type s08SliceView struct {
+	address uintptr
+	typeOf  reflect.Type
 }
 
 // s08TableCharge is where one checker-created SymbolTable's bytes were charged.
@@ -387,12 +399,20 @@ func (v2 *s08V2) text(family string, s string) {
 	if len(s) == 0 || v2.isBoundText(s) {
 		return
 	}
+	if v2.allocations != nil {
+		v2.allocation(family, uintptr(unsafe.Pointer(unsafe.StringData(s))))
+		return
+	}
 	if v2.once(uintptr(unsafe.Pointer(unsafe.StringData(s)))) {
 		v2.add(family, 0, int64(len(s)))
 	}
 }
 
 func (v2 *s08V2) sliceBytes(family string, v reflect.Value) {
+	if v2.allocations != nil {
+		v2.allocation(family, uintptr(v.UnsafePointer()))
+		return
+	}
 	if v.Cap() == 0 {
 		return
 	}
@@ -406,6 +426,9 @@ func (v2 *s08V2) mapBytes(family string, v reflect.Value, count bool) {
 		return
 	}
 	if !v2.once(uintptr(v.UnsafePointer())) {
+		if v2.allocations != nil {
+			v2.mapAllocations(family, v)
+		}
 		return
 	}
 	bytes, ok := s08MapBytes(v)
@@ -417,7 +440,31 @@ func (v2 *s08V2) mapBytes(family string, v reflect.Value, count bool) {
 	if count {
 		n = int64(v.Len())
 	}
+	if v2.allocations != nil {
+		v2.mapAllocations(family, v)
+		bytes = 0
+	}
 	v2.add(family, n, bytes)
+}
+
+// Runtime layout selects the live pieces; provenance supplies their requested
+// extents and shared-allocation identity (including table/group coallocation).
+func (v2 *s08V2) mapAllocations(family string, v reflect.Value) {
+	m := (*s08RtMap)(v.UnsafePointer())
+	v2.allocation(family, uintptr(v.UnsafePointer()))
+	if m.dirPtr == nil {
+		return
+	}
+	v2.allocation(family, uintptr(m.dirPtr))
+	if m.dirLen == 0 {
+		return
+	}
+	for _, table := range unsafe.Slice((**s08RtTable)(m.dirPtr), m.dirLen) {
+		if table != nil {
+			v2.allocation(family, uintptr(unsafe.Pointer(table)))
+			v2.allocation(family, uintptr(table.groupsData))
+		}
+	}
 }
 
 // symbolTable charges a checker-owned table or records a bound-input reference.
@@ -431,6 +478,9 @@ func (v2 *s08V2) symbolTable(family string, v reflect.Value) {
 		return
 	}
 	if charge, ok := v2.tables[address]; ok {
+		if v2.allocations != nil {
+			v2.mapAllocations(family, v)
+		}
 		// Type-owned member backing has precedence over the other checker
 		// buckets: a table first reached through a symbol or a link moves to the
 		// type family that owns it. Its entries were walked on the first visit.
@@ -438,6 +488,10 @@ func (v2 *s08V2) symbolTable(family string, v reflect.Value) {
 			v2.add(charge.family, -1, -charge.bytes)
 			v2.add(family, 0, charge.bytes)
 			v2.tables[address] = s08TableCharge{family: family, bytes: charge.bytes}
+			iter := v.MapRange()
+			for iter.Next() {
+				v2.text(family, iter.Key().String())
+			}
 		}
 		return
 	}
@@ -445,6 +499,10 @@ func (v2 *s08V2) symbolTable(family string, v reflect.Value) {
 	if !ok {
 		v2.markUnavailable("map_layout:SymbolTable")
 		return
+	}
+	if v2.allocations != nil {
+		v2.mapAllocations(family, v)
+		bytes = 0
 	}
 	v2.tables[address] = s08TableCharge{family: family, bytes: bytes}
 	// A member table is its type record's storage, not another record.
@@ -476,6 +534,9 @@ func (v2 *s08V2) symbol(v reflect.Value) {
 		return
 	}
 	v2.transientSymbols[symbol] = true
+	if v2.allocations != nil {
+		v2.allocation("symbols", uintptr(v.UnsafePointer()))
+	}
 	v2.text("symbols", symbol.Name)
 	v2.sliceBytes("symbols", reflect.ValueOf(symbol.Declarations))
 	if symbol.Members != nil {
@@ -490,7 +551,11 @@ func (v2 *s08V2) symbol(v reflect.Value) {
 // semantic roots (types, signatures, mappers, inference state). Pointers to
 // bound inputs (nodes, source files, the program) stop the walk.
 func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
-	if !v.IsValid() || depth > 64 {
+	if !v.IsValid() {
+		return
+	}
+	if depth > 64 {
+		v2.markUnavailable("walk_depth:" + v.Type().String())
 		return
 	}
 	t := v.Type()
@@ -507,13 +572,35 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 				v2.pending = append(v2.pending, ty)
 			}
 			return
-		case s08NodeType, s08SourceFileType, s08CheckerType:
+		case s08NodeType, s08SourceFileType:
+			allocation, ok := v2.allocations.find(uintptr(v.UnsafePointer()))
+			if v2.allocations != nil && !ok {
+				v2.markUnavailable("allocation_extent:checker_ast")
+			}
+			if ok && allocation.size != 0 {
+				address := uintptr(v.UnsafePointer())
+				if v2.visited[address] {
+					return
+				}
+				v2.visited[address] = true
+				v2.allocation("checker_ast", address)
+				payload := v.Elem()
+				if t == s08NodeType {
+					payload = payload.FieldByName("data").Elem().Elem()
+				}
+				v2.walkFields(payload, "checker_ast", depth+1)
+			}
+			return
+		case s08CheckerType:
 			return
 		case s08SymbolType:
 			v2.symbol(v)
 			return
 		}
 		address := uintptr(v.UnsafePointer())
+		if allocation, ok := v2.allocations.find(address); ok && allocation.size == 0 {
+			return
+		}
 		if v2.visited[address] {
 			return
 		}
@@ -521,44 +608,65 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 		element := v.Elem()
 		switch t {
 		case s08SignatureType:
-			// Arena record; only its owned storage is charged here.
+			// Provenance identifies the complete retained arena chunk.
+			if v2.allocations != nil {
+				v2.allocation("signatures", address)
+			}
 			v2.walkFields(element, "signatures", depth+1)
 		case s08IndexInfoType:
+			if v2.allocations != nil {
+				v2.allocation("index_infos", address)
+			}
 			v2.walkFields(element, "index_infos", depth+1)
 		case s08TypeMapperType:
-			v2.add("mappers", 1, int64(unsafe.Sizeof(TypeMapper{})))
-			v2.walkFields(element, "mappers", depth+1)
+			// TypeMapper is embedded at offset zero of its concrete payload.
+			// Recursing through data normally would skip it as already visited.
+			mapper := (*TypeMapper)(v.UnsafePointer())
+			switch mapper.data.(type) {
+			case *SimpleTypeMapper, *ArrayTypeMapper, *ArrayToSingleTypeMapper,
+				*MergedTypeMapper, *CompositeTypeMapper, *InferenceTypeMapper:
+			case *DeferredTypeMapper, *FunctionTypeMapper:
+				if v2.allocations == nil {
+					v2.markUnavailable("mapper_closure:" + reflect.TypeOf(mapper.data).String())
+				}
+			default:
+				v2.markUnavailable(fmt.Sprintf("mapper_payload:%T", mapper.data))
+				return
+			}
+			payload := reflect.ValueOf(mapper.data).Elem()
+			v2.record("mappers", address, 1, int64(payload.Type().Size()))
+			v2.walkFields(payload, "mappers", depth+1)
 		case s08TypeAliasType:
-			v2.add("alias", 1, int64(unsafe.Sizeof(TypeAlias{})))
+			v2.record("alias", address, 1, int64(unsafe.Sizeof(TypeAlias{})))
 			v2.walkFields(element, "alias", depth+1)
 		case s08TypePredicateType:
-			v2.add("type_predicates", 1, int64(unsafe.Sizeof(TypePredicate{})))
+			v2.record("type_predicates", address, 1, int64(unsafe.Sizeof(TypePredicate{})))
 			v2.walkFields(element, "type_predicates", depth+1)
 		case s08InferenceContextType, s08InferenceInfoType, s08InferenceStateType:
-			v2.add("inference", 1, int64(element.Type().Size()))
+			v2.record("inference", address, 1, int64(element.Type().Size()))
 			v2.walkFields(element, "inference", depth+1)
 		case s08FlowStateType:
-			v2.add("flow_analysis", 1, int64(element.Type().Size()))
+			v2.record("flow_analysis", address, 1, int64(element.Type().Size()))
 			v2.walkFields(element, "flow_analysis", depth+1)
 		case s08ConditionalRootType:
-			v2.add("conditional_roots", 1, int64(unsafe.Sizeof(ConditionalRoot{})))
+			v2.record("conditional_roots", address, 1, int64(unsafe.Sizeof(ConditionalRoot{})))
 			v2.walkFields(element, "conditional_roots", depth+1)
 		case s08RelationType, s08RelaterType:
-			v2.add("relations", 1, int64(element.Type().Size()))
+			v2.record("relations", address, 1, int64(element.Type().Size()))
 			v2.walkFields(element, "relations", depth+1)
 		case s08DiagnosticType:
-			v2.add("diagnostics", 1, int64(unsafe.Sizeof(ast.Diagnostic{})))
+			v2.record("diagnostics", address, 1, int64(unsafe.Sizeof(ast.Diagnostic{})))
 			v2.walkFields(element, "diagnostics", depth+1)
 		default:
 			switch element.Kind() {
 			case reflect.Struct:
-				v2.add(family, 0, int64(element.Type().Size()))
+				v2.record(family, address, 0, int64(element.Type().Size()))
 				v2.walkFields(element, family, depth+1)
 			case reflect.Slice, reflect.Map, reflect.Array, reflect.String, reflect.Interface, reflect.Pointer:
-				v2.add(family, 0, int64(element.Type().Size()))
+				v2.record(family, address, 0, int64(element.Type().Size()))
 				v2.walk(element, family, depth+1)
 			default:
-				v2.add(family, 0, int64(element.Type().Size()))
+				v2.record(family, address, 0, int64(element.Type().Size()))
 			}
 		}
 	case reflect.Interface:
@@ -566,6 +674,13 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 			return
 		}
 		inner := v.Elem()
+		if v2.allocations != nil {
+			// Only indirect interface payloads have a separate box.
+			abi := (*s08RtType)(unsafe.Pointer(s08TypePointer(inner.Type())))
+			if abi.Kind_&(1<<5) == 0 {
+				v2.allocation(family, s08InterfaceBox(v))
+			}
+		}
 		switch inner.Kind() {
 		case reflect.Pointer:
 			v2.walk(inner, family, depth+1)
@@ -575,11 +690,15 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 		case reflect.Struct:
 			// Boxed struct value (an interface holding a non-pointer): its
 			// allocation is the struct itself.
-			v2.add(family, 0, int64(inner.Type().Size()))
+			if v2.allocations == nil {
+				v2.add(family, 0, int64(inner.Type().Size()))
+			}
 			v2.walkFields(inner, family, depth+1)
 		default:
-			// Boxed scalars use the runtime's static tables or fit the word.
+			v2.walk(inner, family, depth+1)
 		}
+	case reflect.Func:
+		v2.function(v, family, depth)
 	case reflect.Map:
 		if t == s08SymbolTableType {
 			v2.symbolTable(family, v)
@@ -592,11 +711,20 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 		if t.Key() == s08CacheHashKeyType && t.Elem() == s08TypeType {
 			valueFamily = "type_caches"
 		}
-		if !v2.seen[uintptr(v.UnsafePointer())] {
+		address := uintptr(v.UnsafePointer())
+		if v2.mapFamilies == nil {
+			v2.mapFamilies = map[uintptr]string{}
+		}
+		oldFamily, visited := v2.mapFamilies[address]
+		upgrade := s08V2TypeFamilies[valueFamily] && !s08V2TypeFamilies[oldFamily]
+		if !visited || upgrade {
+			v2.mapFamilies[address] = valueFamily
+		}
+		v2.mapBytes(valueFamily, v, depth == 0 || valueFamily != family)
+		if !visited || upgrade {
 			// Entries count as records only for the checker's own cache maps (its
 			// fields and the type caches); a map nested in a record is that record's
 			// storage, so it adds bytes without inflating the family's record count.
-			v2.mapBytes(valueFamily, v, depth == 0 || valueFamily != family)
 			iter := v.MapRange()
 			for iter.Next() {
 				v2.walk(iter.Key(), valueFamily, depth+1)
@@ -611,9 +739,15 @@ func (v2 *s08V2) walk(v reflect.Value, family string, depth int) {
 		if t.Elem() == s08TypeType {
 			elementFamily = "type_lists"
 		}
-		if !v2.seen[uintptr(v.UnsafePointer())] {
-			v2.sliceBytes(elementFamily, v)
-			for i := range v.Len() {
+		v2.sliceBytes(elementFamily, v)
+		if v2.sliceVisits == nil {
+			v2.sliceVisits = map[s08SliceView]int{}
+		}
+		view := s08SliceView{uintptr(v.UnsafePointer()), t}
+		start := v2.sliceVisits[view]
+		if v.Len() > start {
+			v2.sliceVisits[view] = v.Len()
+			for i := start; i < v.Len(); i++ {
 				v2.walk(v.Index(i), family, depth+1)
 			}
 		}
@@ -634,10 +768,12 @@ func (v2 *s08V2) walkFields(v reflect.Value, family string, depth int) {
 	t := v.Type()
 	for i := range t.NumField() {
 		field := t.Field(i)
-		if field.Type.Kind() == reflect.Func || field.Type.Kind() == reflect.Chan || field.Type.Kind() == reflect.UnsafePointer {
+		if field.Type.Kind() == reflect.Chan || field.Type.Kind() == reflect.UnsafePointer {
 			continue
 		}
+		v2.path = append(v2.path, field.Name)
 		v2.walk(v.Field(i), family, depth)
+		v2.path = v2.path[:len(v2.path)-1]
 	}
 }
 
@@ -652,12 +788,17 @@ func (v2 *s08V2) linkStore(family string, v reflect.Value) {
 	}
 	v2.mapBytes(family, entries, true)
 	recordType := arena.Type().Field(0).Type.Elem()
-	v2.add(family, 0, int64(s08ArenaCapacityByCount(recordType, entries.Len()))*int64(recordType.Size()))
+	if v2.allocations == nil {
+		v2.add(family, 0, int64(s08ArenaCapacityByCount(recordType, entries.Len()))*int64(recordType.Size()))
+	}
 	iter := entries.MapRange()
 	for iter.Next() {
 		record := iter.Value()
 		if record.IsNil() {
 			continue
+		}
+		if v2.allocations != nil {
+			v2.allocation(family, uintptr(record.UnsafePointer()))
 		}
 		v2.visited[uintptr(record.UnsafePointer())] = true
 		v2.walk(record.Elem(), family, 1)
@@ -680,7 +821,7 @@ func (v2 *s08V2) pagedLinkStore(family string, v reflect.Value) (slots int) {
 			return
 		}
 		if v2.once(uintptr(page.UnsafePointer())) {
-			v2.add(family, 0, int64(page.Elem().Type().Size()))
+			v2.record(family, uintptr(page.UnsafePointer()), 0, int64(page.Elem().Type().Size()))
 		}
 		array := page.Elem()
 		for i := range array.Len() {
@@ -690,6 +831,9 @@ func (v2 *s08V2) pagedLinkStore(family string, v reflect.Value) (slots int) {
 					continue
 				}
 				slots++
+				if v2.allocations != nil {
+					v2.allocation(family, uintptr(slot.UnsafePointer()))
+				}
 				v2.visited[uintptr(slot.UnsafePointer())] = true
 				v2.walk(slot.Elem(), family, 1)
 			} else {
@@ -717,6 +861,18 @@ func (v2 *s08V2) arena(family string, v reflect.Value, count int) {
 	}
 	elem := data.Type().Elem()
 	elemSize := int(elem.Size())
+	if v2.allocations != nil {
+		v2.sliceBytes(family, data)
+		if count >= 0 {
+			v2.add(family, int64(count), 0)
+		}
+		if family == "checker_ast" {
+			for i := 0; i < data.Len(); i++ {
+				v2.walk(data.Index(i), family, 0)
+			}
+		}
+		return
+	}
 	if count < 0 {
 		records, capacity, ok := s08ArenaFromCurrentChunk(elem, data)
 		if !ok {
@@ -812,7 +968,7 @@ func (v2 *s08V2) typePayload(t *Type) {
 		v2.markUnavailable(fmt.Sprintf("type_payload:%T", t.data))
 		return
 	}
-	v2.add(family, 1, int64(size))
+	v2.record(family, uintptr(reflect.ValueOf(t.data).UnsafePointer()), 1, int64(size))
 	v2.add("type_records", 1, 0)
 	payload := reflect.ValueOf(t.data).Elem()
 	v2.visited[uintptr(reflect.ValueOf(t.data).UnsafePointer())] = true
@@ -841,6 +997,7 @@ func (v2 *s08V2) inventory() []string {
 // as the retained query results.
 func S08Census(c *Checker, roots []*Type) map[string]any {
 	v2 := &s08V2{
+		allocations:      s08AllocationFinish(),
 		c:                c,
 		families:         map[string]*s08Family{},
 		seen:             map[uintptr]bool{},
@@ -855,9 +1012,13 @@ func S08Census(c *Checker, roots []*Type) map[string]any {
 		symbolSeen:       map[*ast.Symbol]bool{},
 		tables:           map[uintptr]s08TableCharge{},
 	}
+	if v2.allocations == nil || v2.allocations.overflow {
+		v2.markUnavailable("allocation_observer")
+	}
 	for _, name := range s08V2Families {
 		v2.add(name, 0, 0)
 	}
+	v2.record("query_links", uintptr(unsafe.Pointer(c)), 0, int64(unsafe.Sizeof(Checker{})))
 	for _, file := range c.files {
 		text := file.Text()
 		if len(text) == 0 {
@@ -888,19 +1049,19 @@ func S08Census(c *Checker, roots []*Type) map[string]any {
 		before := totalSoFar()
 		family, known := s08V2FieldFamilies[field.Name]
 		if !known {
-			// Named types are roots; memoized accessors hold their result in a
-			// closure reflection cannot open, but every such global type is also
-			// reachable through its symbol's declared-type link.
+			// Named types and memoized accessors are roots. The diagnostic
+			// runtime supplies typed allocation metadata for closure captures.
 			switch {
 			case field.Type == s08TypeType:
 				family, known = "", true
 			case field.Type.Kind() == reflect.Func:
-				continue
+				family, known = "query_links", true
 			default:
 				v2.markUnavailable("unclassified_field:" + field.Name)
 				continue
 			}
 		}
+		v2.path = []string{field.Name}
 		value := checker.Field(i)
 		typeName := field.Type.String()
 		switch {
@@ -922,6 +1083,9 @@ func S08Census(c *Checker, roots []*Type) map[string]any {
 		case family == "":
 			// Options, scalars, functions, bound inputs: nothing owned here.
 			// Named types are still roots.
+			if field.Type.Kind() == reflect.Func {
+				v2.walk(value, "query_links", 0)
+			}
 			if field.Type == s08TypeType || field.Type == s08SignatureType || field.Type == s08IndexInfoType {
 				v2.walk(value, "", 0)
 			}

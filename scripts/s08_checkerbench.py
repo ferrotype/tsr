@@ -29,6 +29,7 @@ from s07_benchmark_stats import ratio_summary
 from s08_oracle import ROOT, canonical, digest
 import s08_baselines
 import s08_measurement as measurement
+from s08_census_runtime import runtime_overlay
 from s08_e2_contract import inventory
 
 DEFAULT = ROOT / "target/s08/checkerbench"
@@ -52,7 +53,7 @@ def sources():
     patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**",
                 "tools/s08/p4/**", "tools/s08/p5/**", "tools/s08/p7/**", "tools/s08/oracle/**",
                 "tools/s07/program/*.rs", "tools/s07/config/host.rs",
-                "scripts/s08_checkerbench.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
+                "scripts/s08_checkerbench.py", "scripts/s08_census_runtime.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
                 "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
                 "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                 "data/s08/checker-workload.json", "data/s08/type-footprint.json", "data/s08/baseline-requests.json",
@@ -144,6 +145,7 @@ def overlay_sources(upstream):
     sources["testrunner/s08_checkerbench_test.go"] = (BENCH / "driver_test.go").read_text()
     sources["checker/s08_families_bridge.go"] = FAMILIES.read_text()
     sources["checker/s08_families_census_v2.go"] = (FAMILIES.parent / "census_v2.go").read_text()
+    sources["checker/s08_census_allocations.go"] = (FAMILIES.parent / "census_allocations.go").read_text()
     return sources
 
 
@@ -161,8 +163,14 @@ def write_overlay(directory, upstream):
     return directory / "overlay.json"
 
 
-def build(directory):
-    """Release Rust executables per mode and one Go test binary; exact artifact digests recorded."""
+def build(directory, modes=None):
+    """Release executables, with a separate Go allocation observer binary.
+
+    Bounded census checks request only alloc; acceptance captures build all modes.
+    """
+    selected_modes = tuple(MODES) if modes is None else tuple(modes)
+    if not selected_modes or not set(selected_modes) <= set(MODES):
+        raise ValueError("invalid checkerbench build modes")
     reject_concurrent_builds()
     initial_sources = sources()
     directory.mkdir(parents=True, exist_ok=True)
@@ -171,7 +179,8 @@ def build(directory):
     env = native_environment()
     manifest = ROOT / "crates/ts_compiler/Cargo.toml"
     binaries = {}
-    for mode, features in MODES.items():
+    for mode in selected_modes:
+        features = MODES[mode]
         args = ["cargo", "build", "--release", "--locked", "--example", "p7_checkerbench", "--message-format=json",
                 "--manifest-path", str(manifest)]
         if features:
@@ -190,6 +199,16 @@ def build(directory):
     command(args, cwd=upstream / "tsc", env=go_env)
     binaries["go"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
                       "go": command(["go", "version"], cwd=ROOT, env=go_env).decode().strip()}
+    allocation_overlay = strict_json_loads(overlay.read_bytes())["Replace"]
+    runtime_overlay(directory, allocation_overlay, upstream, go_env)
+    allocation_overlay_path = directory / "allocation-overlay.json"
+    allocation_overlay_path.write_bytes(canonical({"Replace": allocation_overlay}) + b"\n")
+    target = bin_dir / "go-checkerbench-alloc.test"
+    args = ["go", "test", "-c", "-o", str(target), "-trimpath", "-mod=readonly", repo_flag, "-overlay", str(allocation_overlay_path), "./internal/testrunner"]
+    command(args, cwd=upstream / "tsc", env=go_env)
+    binaries["go-alloc"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
+                            "runtime_observer": "requested-allocation-provenance-v1",
+                            "sdk_sha256": digest((directory / "runtime-overlay/sdk.json").read_bytes())}
     verified_upstream()
     if sources() != initial_sources:
         raise ValueError("measurement sources changed during build")
@@ -245,7 +264,7 @@ def sample(directory, build_report, runtime, mode, label):
         for key in ("GOMEMLIMIT", "GODEBUG", "GOMAXPROCS"):
             env.pop(key, None)
         env["GOGC"] = "100"
-        binary = build_report["binaries"]["go"]["path"]
+        binary = build_report["binaries"]["go-alloc" if mode == "alloc" else "go"]["path"]
         result = run_child([binary, "-test.run", "^TestS08Checkerbench$", "-test.count=1", "-test.timeout=0"],
                            env, verified_upstream() / "tsc", stdout, SAMPLE_TIMEOUT)
         if result["returncode"] != 0 or not summary.exists():
@@ -298,8 +317,12 @@ def rows_of(directory, run):
 def verify_capture(directory, capture_report):
     plan = method()
     build = measurement.build_record(directory, capture_report, sources(), METHOD)
-    if set(build['binaries']) != {'go', *(f'rust-{mode}' for mode in MODES)}:
+    if set(build['binaries']) != {'go', 'go-alloc', *(f'rust-{mode}' for mode in MODES)}:
         raise ValueError('measurement executable inventory differs')
+    observer = build['binaries']['go-alloc']
+    if observer.get('runtime_observer') != 'requested-allocation-provenance-v1':
+        raise ValueError('allocation provenance observer missing')
+    measurement.authenticated(directory / 'runtime-overlay/sdk.json', observer['sdk_sha256'])
     if capture_report['pin'] != plan['pin'] or capture_report['footprint_sha256'] != measurement.file_digest(FOOTPRINT):
         raise ValueError('measurement pin or footprint contract differs')
     measurement.roster(capture_report, plan, MODES, 'runtime')

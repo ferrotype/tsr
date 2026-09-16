@@ -10,6 +10,7 @@ import (
 	"runtime"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
+	"github.com/microsoft/TypeScript/tsc/internal/checker"
 	"github.com/microsoft/TypeScript/tsc/internal/compiler"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
@@ -42,6 +43,7 @@ func S08InstallCheckerbenchCompile() {
 		clock := core.S08Bench
 		if clock.Mode == "alloc" {
 			S08LiveBeforeInterval = S08LiveHeap()
+			checker.S08CensusBegin()
 		}
 		clock.Start()
 		var errors []*ast.Diagnostic

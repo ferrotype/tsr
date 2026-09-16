@@ -4,6 +4,7 @@
 
 mod arena;
 mod bundle;
+mod census;
 mod counters;
 mod error;
 mod file;
@@ -19,6 +20,7 @@ mod scope;
 mod scratch;
 
 pub use bundle::{StorageBundle, StorageHandle};
+pub use census::StorageCensus;
 pub use counters::{Counters, Counts};
 pub use error::Error;
 pub use file::{CoreDataRead, CoreNodesMut, StorageBuilder, StorageOwner, StorageView};

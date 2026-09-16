@@ -148,13 +148,24 @@ impl NodeBuilder<'_> {
         ty: TypeId,
         arguments: &[TypeId],
     ) -> Result<usize, Error> {
+        // Native performs the global-identity probes only for a nonempty
+        // argument list with declared type parameters. Those probes can
+        // initialize otherwise untouched global types.
+        if arguments.is_empty() {
+            return Ok(0);
+        }
         let target = self.checker.types.target(ty)?;
-        let parameters = self
-            .checker
-            .types
-            .interface(target)?
-            .type_parameters()
-            .to_vec();
+        let interface = self.checker.types.interface(target)?;
+        // TypeParameters() is non-nil even when it contains only an implicit
+        // this parameter (and therefore returns an empty slice in Go).
+        if interface
+            .all_type_parameters
+            .as_ref()
+            .is_none_or(|all| all.is_empty())
+        {
+            return Ok(0);
+        }
+        let parameters = interface.type_parameters().to_vec();
         let mut count = parameters.len().min(arguments.len());
         // The pin elides trailing defaults only for these four global identities,
         // not arbitrary interfaces or a same-spelled declaration in another scope.

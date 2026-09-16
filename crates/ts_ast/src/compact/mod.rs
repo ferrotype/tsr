@@ -365,12 +365,15 @@ impl CoreStore {
     /// count of entries whose allocation extent std does not expose (edge
     /// escape entries, nested source metadata).
     pub fn structural_bytes(&self) -> (usize, usize) {
-        let (auxiliary, auxiliary_unmeasured) = self.auxiliary.structural_bytes();
+        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+    }
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        let (auxiliary, auxiliary_unmeasured) = self.auxiliary.structural_bytes_with(census);
         let (edges, escapes) = self.edges.storage_bytes();
         let mut known = self.payloads.structural_bytes()
             + auxiliary
             + self.links.allocation_size()
-            + self.text.structural_bytes()
+            + self.text.structural_bytes_with(census)
             + edges
             + self.binding_overrides.allocation_size();
         if let Some(parked) = &self.parked_facts {

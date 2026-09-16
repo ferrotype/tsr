@@ -263,7 +263,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | e6 | stale: source, pin, command or inputs changed | [result](status/evidence/2b01576766f38e65a440cc933442c5fd7df833d8c89924ff8448797ce8fbf36a.json) |
 | fmt | stale: source, pin, command or inputs changed | [result](status/evidence/2c360131f1eaeda760eeeccf67f7dcf603943bd14b7794c4533f9dc331bde47b.json) |
 | gen | stale: source, pin, command or inputs changed | [result](status/evidence/e45ec2dd03cc8a61ea3b84138edcd4ca7c38ca7bae07a0f8bc99596239bbafdb.json) |
-| oracle | current | [result](status/evidence/2b71ff1a3286440f59befb780814481acab1716b24cf2cce4194322b4f957e3c.json) |
+| oracle | stale: source, pin, command or inputs changed | [result](status/evidence/2b71ff1a3286440f59befb780814481acab1716b24cf2cce4194322b4f957e3c.json) |
 | program | stale: source, pin, command or inputs changed | [result](status/evidence/00814e46d2db7d3bb7ae9928a9812d8050484cb15fc01a3a4705144ab76dad05.json) |
 | relater | missing | — |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/519c36d88600c6257ecdae96e00698f6ca4639c48e233fab391d999a12ec2fae.json) |
@@ -284,15 +284,15 @@ Exit checks:
 - [x] `provenance.valid == 1`
 - [x] `upstream.ready == 1`
 - [ ] `run.workspace.build == true` (unknown metric)
-- [x] `run.oracle.build == true`
-- [x] `run.oracle.smoke == true`
+- [ ] `run.oracle.build == true` (unknown metric)
+- [ ] `run.oracle.smoke == true` (unknown metric)
 
 Items:
 
 - [x] S01-1 Node ownership contract as ADR 0006, with its reviewed ownership design note (adr 0006)
 - [x] S01-2 Symbol ownership contract as ADR 0007, with its reviewed ownership design note (adr 0007)
 - [x] S01-3 Source/string/wire contract as ADR 0013, with its reviewed representation design note (adr 0013)
-- [x] S01-4 Registered upstream/ submodule matches the pin; its Go oracle builds and passes --version
+- [ ] S01-4 Registered upstream/ submodule matches the pin; its Go oracle builds and passes --version
 - [x] S01-5 Ledger and function inventory have validated provenance from the same full upstream commit
 - [ ] S01-6 The locked Rust workspace builds
 

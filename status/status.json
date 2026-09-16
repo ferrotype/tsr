@@ -16,8 +16,8 @@
       "S04_RUSTUP_HOME": ""
     },
     "host": "macos-aarch64",
-    "revision": "4856d40ef2a4af3081d9d40970ebbc36ed64921e",
-    "source_sha256": "e6cf7454768a13aecb2abd487ca7addeb1b96b1df8810e4e4bbec68b6c1372a1",
+    "revision": "9db6c984c559734d723c8df3bf0b895f205e6dd8",
+    "source_sha256": "70d07f1464446e9b2caf3ee0e91814f7523841ae87c552f854515a95b2f53b08",
     "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
     "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1"
   },
@@ -57,7 +57,7 @@
     "e6": "stale: source, pin, command or inputs changed",
     "fmt": "stale: source, pin, command or inputs changed",
     "gen": "stale: source, pin, command or inputs changed",
-    "oracle": "current",
+    "oracle": "stale: source, pin, command or inputs changed",
     "program": "stale: source, pin, command or inputs changed",
     "relater": "missing",
     "scanner": "stale: source, pin, command or inputs changed",
@@ -1116,8 +1116,6 @@
     "ledger.phase[6].loc_total": 7909.0,
     "ledger.phase[6].loc_verified_ratio": 0.0,
     "provenance.valid": 1.0,
-    "run.oracle.build": true,
-    "run.oracle.smoke": true,
     "sprint.S01.done": 0.0,
     "sprint.S02.done": 0.0,
     "sprint.S03.done": 0.0,

@@ -907,13 +907,20 @@ mod construction_tests {
 /// known bytes and the number of entries whose allocation extent is not
 /// exposed (a census reports those as unavailable, never as zero).
 impl<N: NodeRecord, S> StorageOwner<N, S> {
-    pub fn structural_bytes(
+    pub fn structural_bytes(&self, store: impl Fn(&N::Store) -> (usize, usize)) -> (usize, usize) {
+        self.structural_bytes_with(
+            &|store_value, _| store(store_value),
+            &mut crate::StorageCensus::default(),
+        )
+    }
+    pub(crate) fn structural_bytes_with(
         &self,
-        store: impl FnOnce(&N::Store) -> (usize, usize),
+        store: &impl Fn(&N::Store, &mut crate::StorageCensus) -> (usize, usize),
+        census: &mut crate::StorageCensus,
     ) -> (usize, usize) {
-        let (store_known, store_unmeasured) = store(&self.store);
+        let (store_known, store_unmeasured) = store(&self.store, census);
         let (lazy_known, lazy_unmeasured) = self.lazy.structural_bytes();
-        let known = self.core.structural_bytes()
+        let mut known = self.core.structural_bytes()
             + self.symbols.structural_bytes()
             + self.auxiliary.structural_bytes()
             + store_known
@@ -921,17 +928,40 @@ impl<N: NodeRecord, S> StorageOwner<N, S> {
             + self.supplemental.capacity() * size_of::<FileId>()
             + self.imports.capacity() * size_of::<Box<dyn RetainedImport<N, S>>>()
             + self.imported_arenas.allocation_size()
-            + self.source.backing_bytes().len();
-        (known, store_unmeasured + lazy_unmeasured)
+            + census.text(self.source.backing_bytes())
+            + self
+                .position_map
+                .get()
+                .map_or(0, PositionMap::structural_bytes);
+        let mut unmeasured = store_unmeasured + lazy_unmeasured;
+        for import in &self.imports {
+            // The box retains a handle; its referenced owner may be a bound
+            // program file or a previously published checker-created frame.
+            known += size_of_val(&**import);
+            let (bytes, unknown) = import
+                .borrowed_handle()
+                .structural_bytes_with(store, census);
+            known += bytes;
+            unmeasured += unknown;
+        }
+        (known, unmeasured)
     }
 }
-
 impl<N: NodeRecord, S> StorageBuilder<N, S> {
-    /// See [`StorageOwner::structural_bytes`].
-    pub fn structural_bytes(
+    pub fn structural_bytes(&self, store: impl Fn(&N::Store) -> (usize, usize)) -> (usize, usize) {
+        self.structural_bytes_with(
+            &|value, _| store(value),
+            &mut crate::StorageCensus::default(),
+        )
+    }
+    pub fn structural_bytes_with(
         &self,
-        store: impl FnOnce(&N::Store) -> (usize, usize),
+        store: &impl Fn(&N::Store, &mut crate::StorageCensus) -> (usize, usize),
+        census: &mut crate::StorageCensus,
     ) -> (usize, usize) {
-        self.owner.structural_bytes(store)
+        if !census.owner(self.id()) {
+            return (0, 0);
+        }
+        self.owner.structural_bytes_with(store, census)
     }
 }

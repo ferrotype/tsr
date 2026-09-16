@@ -58,7 +58,11 @@ impl CachedBuilder {
     }
 
     #[cfg(any(test, feature = "storage-pilot"))]
-    pub(crate) fn census(&self, census: &mut crate::census::Census) {
+    pub(crate) fn census(
+        &self,
+        census: &mut crate::census::Census,
+        storage: &mut ts_arena::StorageCensus,
+    ) {
         census.add(
             "display_cache",
             self.entries.len() + self.identifiers.len() + self.specifiers.len(),
@@ -67,7 +71,7 @@ impl CachedBuilder {
                 + self.specifiers.allocation_size(),
         );
         for specifier in self.specifiers.values() {
-            census.text("display_cache", specifier);
+            census.add("display_cache", 0, storage.text(specifier.backing_bytes()));
         }
         let mut frames = std::collections::HashSet::new();
         for entry in self.entries.values() {
@@ -78,7 +82,7 @@ impl CachedBuilder {
             );
             if frames.insert(entry.value.node.arena()) {
                 // Each cached display owns one published synthetic AST file.
-                let (known, unmeasured) = entry.owner.structural_bytes();
+                let (known, unmeasured) = entry.owner.structural_bytes_with(storage);
                 census.add(
                     "display_ast",
                     entry.owner.view().file_info().node_count as usize,
@@ -92,7 +96,7 @@ impl CachedBuilder {
         census.add(
             "display_emit",
             self.emit.metadata_entries(),
-            self.emit.structural_bytes(),
+            self.emit.structural_bytes_with(storage),
         );
     }
 }

@@ -3,12 +3,55 @@ package checker
 import (
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
+	"time"
 	"unsafe"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
 )
+
+func s08TestWalker() *s08V2 {
+	return &s08V2{
+		families: map[string]*s08Family{}, seen: map[uintptr]bool{},
+		unavailable: map[string]bool{}, visited: map[uintptr]bool{}, types: map[*Type]bool{},
+		fileTextLengths: map[uintptr]int{}, boundReferenced: map[uintptr]bool{},
+	}
+}
+
+func TestS08CensusConcreteMapperIncludesItsEdges(t *testing.T) {
+	source, target := &Type{}, &Type{}
+	v2 := s08TestWalker()
+	v2.walk(reflect.ValueOf(newSimpleTypeMapper(source, target)), "mappers", 0)
+	if len(v2.types) != 2 || v2.families["mappers"].Bytes != int64(unsafe.Sizeof(SimpleTypeMapper{})) {
+		t.Fatalf("mapper: reached %d types, charged %d bytes; want 2 types and %d bytes",
+			len(v2.types), v2.families["mappers"].Bytes, unsafe.Sizeof(SimpleTypeMapper{}))
+	}
+}
+
+func TestS08CensusLongerSharedSliceStillVisitsEveryEdge(t *testing.T) {
+	shared := []*Type{{}, {}}
+	v2 := s08TestWalker()
+	v2.walk(reflect.ValueOf(shared[:1]), "type_lists", 0)
+	v2.walk(reflect.ValueOf(shared), "type_lists", 0)
+	if len(v2.types) != 2 || v2.families["type_lists"].Bytes != int64(2*unsafe.Sizeof((*Type)(nil))) {
+		t.Fatalf("shared slice: reached %d types, charged %d bytes", len(v2.types), v2.families["type_lists"].Bytes)
+	}
+}
+
+func TestS08CensusDepthLimitIsUnavailable(t *testing.T) {
+	type link struct{ next *link }
+	root := &link{}
+	for range 80 {
+		root = &link{root}
+	}
+	v2 := s08TestWalker()
+	v2.walk(reflect.ValueOf(root), "mappers", 0)
+	if len(v2.unavailable) == 0 {
+		t.Fatal("depth-limited walk silently claimed a complete census")
+	}
+}
 
 func allocationTraffic(work func()) uint64 {
 	var before, after runtime.MemStats
@@ -176,4 +219,115 @@ func TestS08CensusChargesSharedAllocationsOnce(t *testing.T) {
 	if v2.families["symbols"] != nil || v2.boundReferences != 1 || !v2.boundReferenced[start] {
 		t.Fatalf("source-backed string must be a bound input: %v %d", v2.families["symbols"], v2.boundReferences)
 	}
+}
+
+var s08AllocationTestRoots []any
+
+func TestS08CensusAllocationProvenance(t *testing.T) {
+	S08CensusBegin()
+	shared := make([]int64, 5)
+	text := strings.Clone("shared owned string")
+	number := float64(time.Now().UnixNano())
+	var box any = number
+	endpoint := &Type{}
+	closure := func() *Type { return endpoint }
+	// Escape all operands before stopping the allocator observer.
+	roots := []any{shared, text, &box, closure}
+	s08AllocationTestRoots = roots
+	defer func() { s08AllocationTestRoots = nil }()
+	v2 := s08TestWalker()
+	v2.allocations = s08AllocationFinish()
+	for _, view := range [][]int64{shared[1:], shared[:1:1], shared} {
+		v2.sliceBytes("type_lists", reflect.ValueOf(view))
+	}
+	if got := v2.families["type_lists"].Bytes; got != 40 {
+		t.Fatalf("shared allocation: %d, want 40", got)
+	}
+	v2.text("symbols", text[:3])
+	v2.text("literal", text)
+	if v2.families["literal"].Bytes != int64(len(text)) || v2.families["symbols"].Bytes != 0 {
+		t.Fatalf("shared text attribution: %v", v2.families)
+	}
+	before := v2.families["literal"].Bytes
+	v2.walk(reflect.ValueOf(&box).Elem(), "literal", 0)
+	if v2.families["literal"].Bytes-before != 8 {
+		t.Fatal("numeric interface box was not charged exactly once")
+	}
+	v2.walk(reflect.ValueOf(closure), "mappers", 0)
+	if !v2.types[endpoint] || len(v2.unavailable) != 0 {
+		t.Fatalf("closure edges/unavailable: %v / %v", v2.types, v2.unavailable)
+	}
+	runtime.KeepAlive(roots)
+}
+
+// The allocation log is uintptr metadata, not an all-types registry/root.
+func TestS08CensusDoesNotRootCreatedTypes(t *testing.T) {
+	c := &Checker{}
+	root := c.newIntrinsicType(TypeFlagsUnknown, "root")
+	_ = c.newIntrinsicType(TypeFlagsUnknown, "discarded")
+	v2 := s08TestWalker()
+	v2.walk(reflect.ValueOf(root), "intrinsic", 0)
+	if c.TypeCount != 2 || len(v2.types) != 1 || !v2.types[root] {
+		t.Fatalf("created/reachable = %d/%d", c.TypeCount, len(v2.types))
+	}
+}
+
+func TestS08CensusAllocationSlotReuseDoesNotInheritBoundStatus(t *testing.T) {
+	base := func(uintptr) uintptr { return 1024 }
+	a := s08IndexAllocations([]s08Allocation{
+		{address: 1024, base: 1024, slot: 1024},
+		{address: 1032, base: 1024, size: 600, slot: 1024},
+	}, base, false)
+	if got, ok := a.find(1100); !ok || got.size != 600 {
+		t.Fatal("current allocation extent missing")
+	}
+	if _, ok := a.find(1800); ok {
+		t.Fatal("reused slot inherited the old bound-input marker")
+	}
+	// New tiny requests can legitimately coexist with a live bound allocation.
+	a = s08IndexAllocations([]s08Allocation{
+		{address: 1024, base: 1024, slot: 16},
+		{address: 1032, base: 1024, size: 4, slot: 16},
+	}, base, false)
+	if got, ok := a.find(1024); !ok || got.size != 0 {
+		t.Fatal("bound tiny allocation lost")
+	}
+	if got, ok := a.find(1033); !ok || got.size != 4 {
+		t.Fatal("new tiny allocation lost")
+	}
+}
+
+func TestS08CensusPagedStoreKeepsEveryReferencedArenaChunk(t *testing.T) {
+	type link struct {
+		value   *Type
+		padding [5]uintptr
+	}
+	S08CensusBegin()
+	first, last := make([]link, 2), make([]link, 4)
+	endpoint := &Type{}
+	first[0].value = endpoint
+	store := struct {
+		pageList []*[2]*link
+		pageMap  map[uint32]*[2]*link
+	}{
+		pageList: []*[2]*link{{&first[0], &last[0]}},
+	}
+	s08AllocationTestRoots = []any{first, last, store}
+	defer func() { s08AllocationTestRoots = nil }()
+	v2 := s08TestWalker()
+	v2.allocations = s08AllocationFinish()
+	v2.pagedLinkStore("query_links", reflect.ValueOf(store))
+	for _, records := range [][]link{first, last} {
+		allocation, ok := v2.allocations.find(uintptr(unsafe.Pointer(&records[0])))
+		if !ok {
+			t.Fatal("missing allocation provenance")
+		}
+		if _, found := v2.charges[allocation.address]; !found {
+			t.Fatal("referenced arena chunk omitted")
+		}
+	}
+	if !v2.types[endpoint] || len(v2.unavailable) != 0 {
+		t.Fatal("record edges lost", v2.unavailable)
+	}
+	runtime.KeepAlive(store)
 }

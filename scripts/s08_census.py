@@ -19,6 +19,8 @@ from s04 import go_environment, verified_upstream
 from s04_common import command, strict_json_loads
 from s08_oracle import ROOT, canonical, digest
 import s08_checkerbench
+import s08_measurement as measurement
+from s08_census_runtime import runtime_overlay
 
 DEFAULT = ROOT / "target/s08/census"
 FIXTURES = ROOT / "tools/s08/p7/census-fixtures.json"
@@ -41,9 +43,10 @@ def requests_from_fixtures():
 
 def build_rust(directory):
     env = s08_checkerbench.native_environment()
-    command(["cargo", "build", "--release", "--locked", "--example", "p7_census", "--features", "s08-allocation",
-             "--manifest-path", str(ROOT / "crates/ts_compiler/Cargo.toml")], cwd=ROOT, env=env)
-    binary = ROOT / "target/release/examples/p7_census"
+    manifest = ROOT / "crates/ts_compiler/Cargo.toml"
+    messages = command(["cargo", "build", "--release", "--locked", "--example", "p7_census", "--features", "s08-allocation",
+                        "--message-format=json", "--manifest-path", str(manifest)], cwd=ROOT, env=env).decode()
+    binary = s08_checkerbench.cargo_executable(messages, manifest, "p7_census", "example", ["s08-allocation"])
     target = directory / "bin" / "p7_census"
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(binary, target)
@@ -54,7 +57,7 @@ def run_go_fixtures(directory, requests_path, output):
     upstream = verified_upstream()
     env = go_environment()
     overlay = {}
-    for name in ("bridge.go", "census_v2.go", "program_census_test.go"):
+    for name in ("bridge.go", "census_v2.go", "census_allocations.go", "census_v2_test.go", "program_census_test.go"):
         source = FAMILIES_DIR / name
         virtual = upstream / "tsc/internal/checker" / ("s08_families_" + name)
         if virtual.exists():
@@ -63,10 +66,11 @@ def run_go_fixtures(directory, requests_path, output):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(source.read_bytes())
         overlay[str(virtual)] = str(path)
+    runtime_overlay(directory, overlay, upstream, env)
     (directory / "overlay.json").write_bytes(canonical({"Replace": overlay}) + b"\n")
     env.update(S08_REQUESTS=str(requests_path), S08_OUTPUT=str(output))
     args = ["go", "test", "-mod=readonly", "-trimpath", "-overlay", str(directory / "overlay.json"), "./internal/checker",
-            "-run", "^TestS08ProgramCensus$|^TestS08MapBytes|^TestS08Arena|^TestS08Census", "-count=1", "-timeout=10m"]
+            "-run", "^TestS08ProgramCensus$|^TestS08MapBytes|^TestS08Arena|^TestS08Census", "-v", "-count=1", "-timeout=10m"]
     (directory / "go-command.json").write_bytes(canonical(args) + b"\n")
     with (directory / "go.stdout").open("wb") as stdout, (directory / "go.stderr").open("wb") as stderr:
         completed = subprocess.run(args, cwd=upstream / "tsc", env=env, stdout=stdout, stderr=stderr, timeout=900, check=False)
@@ -129,6 +133,7 @@ def fixtures(directory):
     all_problems = []
     for case, rust_row, go_row in zip(fixture_file["cases"], rust["rows"], go["rows"], strict=True):
         problems = invariants(rust_row, "rust", case) + invariants(go_row, "go", case)
+        problems.extend(paired_inventory(rust_row["census"], go_row["census"]))
         all_problems.extend(f"{case['id']}: {p}" for p in problems)
         counts = {}
         for name in TYPE_FAMILIES:
@@ -157,19 +162,41 @@ def fixtures(directory):
     return report
 
 
+def paired_inventory(rust, go):
+    rust_families, go_families = set(rust["families"]), set(go["families"])
+    if rust_families != go_families:
+        return [f"family inventory differs: Rust-only {sorted(rust_families - go_families)}, Go-only {sorted(go_families - rust_families)}"]
+    return []
+
+
+def validate_workload(rows, ids):
+    """A census comparison still needs identical successful semantic work."""
+    for runtime in ("rust", "go"):
+        totals = measurement.checker_rows(rows[runtime], ids, "alloc")
+        measurement.check_totals(rows[runtime + "_totals"], totals)
+    for rust, go in zip(rows["rust"], rows["go"], strict=True):
+        for field in ("output_sha256", "actions"):
+            if rust[field] != go[field]:
+                raise ValueError(f"{rust['id']}: cross-runtime {field} differs; footprint is not comparable")
+        r, g = rust["checkpoint"]["census"], go["checkpoint"]["census"]
+        if r.get("state") != "failed" and g.get("state") != "failed":
+            problems = paired_inventory(r, g)
+            if problems:
+                raise ValueError(f"{rust['id']}: {problems[0]}")
+
+
 def workload(directory, variants):
     """The allocation executables of both runtimes over the first `variants` acceptance variants."""
     directory.mkdir(parents=True, exist_ok=True)
-    build_report = s08_checkerbench.build(directory)
+    build_report = s08_checkerbench.build(directory, modes=("alloc",))
     requests = s08_checkerbench.prepare_requests(directory, variants)
     rows = {}
     for runtime in ("rust", "go"):
         sample = s08_checkerbench.sample(directory, build_report, runtime, "alloc", "workload")
         rows[runtime] = s08_checkerbench.rows_of(directory, sample)
         rows[runtime + "_totals"] = sample["totals"]
-    ids = [row["id"] for row in rows["rust"]]
-    if ids != [row["id"] for row in rows["go"]]:
-        raise ValueError("runtimes observed different variant inventories")
+    ids = [row["id"] for row in strict_json_loads((directory / "rust-requests.json").read_bytes())]
+    validate_workload(rows, ids)
     per_variant = []
     unavailable = {"rust": 0, "go": 0}
     failed = {"rust": 0, "go": 0}
@@ -226,11 +253,12 @@ def main():
     else:
         report = workload(directory / "workload", args.variants)
         print(json.dumps({k: report[k] for k in ("variants", "valid", "failed", "unavailable_variants", "sums", "mean_bytes_per_reachable_type", "type_footprint_ratio", "reachable_equal_variants")}, indent=1))
+    return 0 if report.get("pass", report.get("valid", False)) else 1
 
 
 if __name__ == "__main__":
     try:
-        main()
+        sys.exit(main())
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         print(f"error: {error}", file=sys.stderr)
         sys.exit(1)

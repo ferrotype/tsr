@@ -4158,3 +4158,32 @@ fn negative_numeric_string_property_names_display_as_string_literals() {
         "{ \"-1\": number; }"
     );
 }
+
+#[test]
+fn nongeneric_type_display_does_not_resolve_iterable_globals() {
+    // The pin checks iterable defaults only inside len(typeArguments) > 0.
+    // Keep these globals unqueried so accidental resolution is observable.
+    let text = b"class C {}
+interface Iterable<T, R = any, N = any> {}
+interface IterableIterator<T, R = any, N = any> {}
+interface AsyncIterable<T, R = any, N = any> {}
+interface AsyncIterableIterator<T, R = any, N = any> {}";
+    let (owner, program, _) = fixture(text, options());
+    let name = declaration_name(&program, declarations(&program)[0]);
+    let mut op = owner.operation().unwrap();
+    let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+    let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+    let before = op.type_count();
+    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"C");
+    assert_eq!(
+        op.type_count(),
+        before,
+        "display must not initialize unrelated iterable types"
+    );
+    // A reference with an implicit this argument is different: Go has a
+    // non-nil empty TypeParameters slice and still runs the four probes.
+    let reference = op.type_reference(ty, &[ty]).unwrap();
+    let before = op.type_count();
+    assert_eq!(op.type_to_string(reference, 0).unwrap().as_bytes(), b"C");
+    assert_eq!(op.type_count(), before + 20);
+}

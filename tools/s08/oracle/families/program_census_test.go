@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
@@ -82,6 +83,8 @@ func TestS08ProgramCensus(t *testing.T) {
 			if file == nil {
 				t.Fatal("missing source")
 			}
+			runtime.GC()
+			checker.S08CensusBegin()
 			ctx := t.Context()
 			diagnostics := len(program.GetSemanticDiagnostics(ctx, nil)) + len(program.GetGlobalDiagnostics(ctx))
 			c, done := program.GetTypeChecker(ctx)

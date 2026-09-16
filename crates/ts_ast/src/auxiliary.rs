@@ -341,7 +341,10 @@ impl<'a> AuxRead<'a> {
 impl AuxStore {
     /// Known structural bytes and the count of nested std collections whose
     /// allocation extent is not exposed.
-    pub(crate) fn structural_bytes(&self) -> (usize, usize) {
+    pub(crate) fn structural_bytes_with(
+        &self,
+        census: &mut ts_arena::StorageCensus,
+    ) -> (usize, usize) {
         let mut known = self.lists.structural_bytes()
             + self.backings.structural_bytes()
             + self.cold.capacity() * size_of::<AstStorageData>()
@@ -349,7 +352,15 @@ impl AuxStore {
         let mut unmeasured = 0;
         for data in &self.cold {
             match data {
-                AstStorageData::FallbackNode(_) => known += 16 + size_of::<crate::Node>(),
+                AstStorageData::FallbackNode(node) => {
+                    known += census.allocation(
+                        std::sync::Arc::as_ptr(node) as usize,
+                        16 + size_of::<crate::Node>(),
+                    );
+                    // The full enum may retain boxed payloads and nested backing.
+                    // Its header alone cannot certify a complete census.
+                    unmeasured += 1;
+                }
                 AstStorageData::List(_)
                 | AstStorageData::CompactNodes(_)
                 | AstStorageData::File(_) => {}
@@ -360,7 +371,7 @@ impl AuxStore {
                     known += texts.len() * size_of::<crate::JsString>();
                     known += texts
                         .iter()
-                        .map(|text| 16 + text.backing_bytes().len())
+                        .map(|text| census.text(text.backing_bytes()))
                         .sum::<usize>();
                 }
                 AstStorageData::SourceMetadata(_) => unmeasured += 1,

@@ -75,7 +75,11 @@ impl Census {
 
     pub(crate) fn list<T>(&mut self, family: &'static str, list: &Arc<[T]>) {
         if self.seen.insert(list.as_ptr() as usize) {
-            self.add(family, 0, ARC_HEADER + list.len() * size_of::<T>());
+            self.add(
+                family,
+                0,
+                ts_arena::StorageCensus::arc_slice_bytes::<T>(list.len()),
+            );
         }
     }
 
@@ -88,7 +92,11 @@ impl Census {
             return;
         }
         if self.seen.insert(address) {
-            self.add(family, 0, ARC_HEADER + backing.len());
+            self.add(
+                family,
+                0,
+                ts_arena::StorageCensus::arc_slice_bytes::<u8>(backing.len()),
+            );
         }
     }
 
@@ -237,7 +245,7 @@ fn shared_lists_and_bound_texts_are_charged_once_or_not_at_all() {
     let mut census = Census::default();
     census.list("type_lists", &list);
     census.list("union", &list.clone());
-    assert_eq!(census.families["type_lists"].bytes, ARC_HEADER + 12);
+    assert_eq!(census.families["type_lists"].bytes, 32);
     assert!(!census.families.contains_key("union"));
     // A checker string that aliases a program file's text is bound input.
     let file = JsString::from_bytes(b"export const x = 'inside';".to_vec());
@@ -249,7 +257,7 @@ fn shared_lists_and_bound_texts_are_charged_once_or_not_at_all() {
     assert_eq!(census.bound_references, 2);
     assert_eq!(census.bound_backings_referenced.len(), 1);
     let report = census.finish(&["type_lists"], 0, 0);
-    assert_eq!(report["checker_bytes"], json!(ARC_HEADER + 12));
+    assert_eq!(report["checker_bytes"], json!(32));
     assert_eq!(
         report["bound_inputs"]["referenced_bytes"],
         json!(file.len())
@@ -279,6 +287,9 @@ impl CheckerState {
                 census.bound_input(file.view().source_file()?.text().backing_bytes());
             }
         }
+        // Inline record-store and cache headers live in the checker state;
+        // their backing allocations are charged separately below.
+        census.add("query_links", 0, size_of::<Self>());
         let tables = self.types.tables();
         census.vec_capacity("type_records", tables.records, tables.records.capacity());
         census.vec_capacity("intrinsic", tables.intrinsics, tables.intrinsics.capacity());
@@ -331,7 +342,9 @@ impl CheckerState {
                 census.add(
                     "tuple",
                     0,
-                    ARC_HEADER + data.element_infos.len() * size_of::<crate::TupleElementInfo>(),
+                    ts_arena::StorageCensus::arc_slice_bytes::<crate::TupleElementInfo>(
+                        data.element_infos.len(),
+                    ),
                 );
             }
         }
@@ -375,7 +388,7 @@ impl CheckerState {
                 census.add(
                     "template_literal",
                     0,
-                    ARC_HEADER + data.texts.len() * size_of::<JsString>(),
+                    ts_arena::StorageCensus::arc_slice_bytes::<JsString>(data.texts.len()),
                 );
             }
             for text in data.texts.iter() {
@@ -516,7 +529,15 @@ impl CheckerState {
         );
         // The checker's synthetic AST: reserved arena pages, payload rows,
         // edges, texts and directories of `Checker.factory`.
-        let (known, unmeasured) = self.factory.structural_bytes();
+        let mut storage = ts_arena::StorageCensus::new(std::mem::take(&mut census.seen));
+        if let Some(program) = &self.program {
+            for index in 0..program.host.source_file_count() {
+                let file = program.host.source_file(index);
+                storage.exclude_owner(file.source().arena());
+                storage.exclude_text(file.view().source_file()?.text().backing_bytes());
+            }
+        }
+        let (known, unmeasured) = self.factory.structural_bytes_with(&mut storage);
         census.add(
             "checker_ast",
             usize::try_from(self.factory.node_count()).unwrap_or(0),
@@ -526,16 +547,17 @@ impl CheckerState {
             census.unavailable.push("checker_ast");
         }
 
-        self.display_builder.census(&mut census);
+        self.display_builder.census(&mut census, &mut storage);
+        census.seen = storage.into_allocations();
 
         let created = self.types.len();
         let reachable = self.reachable_types(roots)?;
         let mut report = census.finish(TYPE_FAMILIES, created, reachable);
         if std::env::var_os("S08_CENSUS_INVENTORY").is_some() {
-            // Diagnosis only: every created type as kind:symbol, for comparison
-            // with the Go census's inventory under the same variable.
-            let mut names = Vec::with_capacity(created);
-            for (_, record) in self.types.records() {
+            // Both inventories enumerate reachable types, not every occupied record.
+            let mut names = Vec::with_capacity(reachable);
+            for id in self.reachable_type_ids(roots)? {
+                let record = self.types.get(id)?;
                 let name = match record.symbol {
                     Some(symbol) => {
                         String::from_utf8_lossy(self.symbol(symbol)?.name_bytes()).into_owned()

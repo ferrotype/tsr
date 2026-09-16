@@ -33,7 +33,11 @@ class CheckerCapture(unittest.TestCase):
         self.binary.write_bytes(b'fixture executable identity')
         build = {'sources': {}, 'sources_sha256': digest(canonical({})), 'binaries': {
             name: {'path': str(self.binary), 'sha256': measurement.file_digest(self.binary)}
-            for name in ('go', 'rust-normal', 'rust-phase', 'rust-alloc')}}
+            for name in ('go', 'go-alloc', 'rust-normal', 'rust-phase', 'rust-alloc')}}
+        (self.root / 'runtime-overlay').mkdir()
+        sdk = self.root / 'runtime-overlay/sdk.json'
+        sdk.write_text('{}')
+        build['binaries']['go-alloc'].update(runtime_observer='requested-allocation-provenance-v1', sdk_sha256=measurement.file_digest(sdk))
         (self.root / 'build.json').write_bytes(canonical(build))
         self.capture = {
             'version': 2, 'pin': self.plan['pin'], 'host': {}, 'smoke': None,
@@ -159,6 +163,21 @@ class CheckerCapture(unittest.TestCase):
             report = checker.report(self.root)
             self.assertNotIn('type_footprint_ratio', report['metrics'])
             self.assertIn('type_footprint_ratio', report['unavailable'])
+
+    def test_runtime_observer_sdk_identity_is_authenticated(self):
+        (self.root / 'runtime-overlay/sdk.json').write_text('{"changed": true}')
+        with self.assertRaisesRegex(ValueError, 'artifact changed'):
+            checker.report(self.root)
+
+    def test_missing_allocation_binary_is_rejected(self):
+        path = self.root / 'build.json'
+        build = measurement.strict_json_loads(path.read_bytes())
+        del build['binaries']['go-alloc']
+        path.write_bytes(canonical(build))
+        self.capture['build_sha256'] = measurement.file_digest(path)
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'executable inventory'):
+            checker.report(self.root)
 
     def test_changed_executable_is_stale(self):
         self.binary.write_text('replacement executable')

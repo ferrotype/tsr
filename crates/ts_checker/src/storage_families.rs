@@ -859,10 +859,7 @@ mod tests {
         assert_eq!(roots[10]["type"], roots[2]["id"]);
         let census = &observation["census"];
         assert!(census["type_storage_bytes"].as_u64().unwrap() > 0);
-        assert_eq!(
-            census["unavailable"],
-            json!(["checker_ast", "display_ast", "display_emit"])
-        );
+        assert_eq!(census["unavailable"], json!([]));
         assert!(
             census["types"]["reachable"].as_u64().unwrap()
                 <= census["types"]["created"].as_u64().unwrap()

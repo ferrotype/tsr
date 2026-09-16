@@ -108,7 +108,8 @@ fn cached_object_survives_rotation_without_retaining_repeat_output() {
                 .unwrap()
                 > 0
         );
-        assert!(measured["unavailable"]
+        // Imported synthetic owners now participate in the shared storage walk.
+        assert!(!measured["unavailable"]
             .as_array()
             .unwrap()
             .contains(&serde_json::json!("display_ast")));
