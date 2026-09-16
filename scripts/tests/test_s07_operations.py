@@ -10,6 +10,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from s07_operation_validation import ROOT, validate_document
 import s07_operations
+from s07_subset import json_bytes, sha256
 
 
 class OperationMatrixTests(unittest.TestCase):
@@ -21,6 +22,22 @@ class OperationMatrixTests(unittest.TestCase):
         result = validate_document(self.document, regenerate=False)
         self.assertEqual(len(result), 6)
         self.assertEqual(sum(row['required_generated_functions'] for row in result), 2)
+
+    def test_committed_subset_review_covers_current_operation_inventory(self):
+        # A valid regenerated inventory can still invalidate the accepted subset
+        # through its fingerprint. Catch that before either producer runs Go.
+        directory = ROOT / 'data/s07'
+        rule = json.loads((directory / 'subset-rule.json').read_bytes())
+        review = json.loads((directory / 'subset-review.json').read_bytes())
+        self.assertEqual(rule['operation_matrix']['sha256'],
+                         sha256((directory / 'operations.json').read_bytes()),
+                         'operation anchors changed: review and refreeze the dependent subset rule')
+        self.assertEqual(rule.pop('review_sha256'), sha256(json_bytes(review)))
+        self.assertEqual(rule['state'], 'frozen')
+        rule['state'] = 'candidate_pending_dependency_closure_and_review'
+        self.assertEqual(review['candidate_sha256']['subset-rule.json'], sha256(json_bytes(rule)))
+        for name in ('subset.json', 'checker-obligations.json'):
+            self.assertEqual(review['candidate_sha256'][name], sha256((directory / name).read_bytes()), name)
 
     def test_embedded_inventory_progress_does_not_corrupt_producer_json(self):
         stdout, stderr = io.StringIO(), io.StringIO()
