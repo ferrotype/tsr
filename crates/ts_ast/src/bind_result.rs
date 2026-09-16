@@ -6,6 +6,7 @@ use crate::node_map::NodeMap;
 use crate::symbol_store::{SymbolRead, Symbols, SymbolsMut, SymbolsRead};
 use crate::symbols::{DeclarationLists, SymbolTableId, SymbolTables};
 use crate::{AstFile, AstView, Diagnostic, Node, NodeId, NodeRead, ParsedFile, SourceFileRead};
+use std::sync::Arc;
 use std::{
     panic::{catch_unwind, resume_unwind, AssertUnwindSafe},
     sync::OnceLock,
@@ -335,9 +336,14 @@ impl std::fmt::Display for BindError {
 impl std::error::Error for BindError {}
 
 #[derive(Debug, Default)]
-pub(crate) struct BindCell(OnceLock<Result<BindResult, ()>>);
+pub(crate) struct BindCell(OnceLock<Result<Arc<BindResult>, ()>>);
 impl BindCell {
     pub(crate) fn result(&self) -> Option<&BindResult> {
+        self.shared().map(|result| &**result)
+    }
+    /// The completed result itself, so a retained bound file can reach it
+    /// without routing through the source-file payload on every view.
+    pub(crate) fn shared(&self) -> Option<&Arc<BindResult>> {
         self.0.get().and_then(|result| result.as_ref().ok())
     }
     fn initialize(
@@ -347,7 +353,10 @@ impl BindCell {
         initialize: impl FnOnce(&mut BindBuilder<'_>) -> Result<(), Error>,
     ) -> Result<&BindResult, BindError> {
         if let Some(result) = self.0.get() {
-            return result.as_ref().map_err(|()| BindError::Failed);
+            return result
+                .as_ref()
+                .map(|result| &**result)
+                .map_err(|()| BindError::Failed);
         }
         InitializationGuard::assert_inactive(
             view.0.id().arena(),
@@ -371,7 +380,7 @@ impl BindCell {
                 builder.validate()?;
                 Ok(builder.result)
             })) {
-                Ok(Ok(result)) => Ok(result),
+                Ok(Ok(result)) => Ok(Arc::new(result)),
                 Ok(Err(error)) => {
                     original_error = Some(error);
                     Err(())
@@ -388,7 +397,10 @@ impl BindCell {
         if let Some(error) = original_error {
             return Err(error.into());
         }
-        result.as_ref().map_err(|()| BindError::Failed)
+        result
+            .as_ref()
+            .map(|result| &**result)
+            .map_err(|()| BindError::Failed)
     }
 }
 
@@ -850,6 +862,13 @@ impl AstFile {
     pub fn is_bound(&self, source: NodeId) -> Result<bool, Error> {
         Ok(self.bound_view(source)?.is_some())
     }
+    /// The shared completed binding of `source`, for retained bound files.
+    fn bound_result(&self, source: NodeId) -> Result<Option<Arc<BindResult>>, Error> {
+        let parsed = self.view().for_node_owner(source)?;
+        let parsed = AstView(parsed.0.owner_retention()?, None);
+        let state = parsed.source_file(source)?.state_ref();
+        Ok(state.binding.shared().cloned())
+    }
 }
 
 /// Retains the complete file/bundle while selecting its completed logical source.
@@ -857,13 +876,24 @@ impl AstFile {
 pub struct BoundFile {
     file: AstFile,
     source: NodeId,
+    /// The completed binding, shared with the source-file payload: a view only
+    /// needs the owner routing, not the payload lookup `AstFile::bound_view`
+    /// performs, and the checker takes a view on nearly every node access.
+    result: Arc<BindResult>,
 }
 impl BoundFile {
     pub fn view(&self) -> BoundView<'_> {
-        self.file
-            .bound_view(self.source)
-            .expect("retained source identity")
-            .expect("binding completion is permanent")
+        let parsed = self
+            .file
+            .0
+            .view()
+            .for_node_owner(self.source)
+            .and_then(ts_arena::StorageView::owner_retention)
+            .expect("retained source identity");
+        BoundView {
+            ast: AstView(parsed, Some(&self.result)),
+            result: &self.result,
+        }
     }
     pub fn source(&self) -> NodeId {
         self.source
@@ -886,10 +916,12 @@ impl BoundFile {
             .bound_view(source)?
             .ok_or(Error::InvalidGraph)?
             .node(id)?;
+        let result = self.file.bound_result(source)?.ok_or(Error::InvalidGraph)?;
         Ok(RetainedBoundNode {
             file: BoundFile {
                 file: self.file.clone(),
                 source,
+                result,
             },
             id,
         })
@@ -937,10 +969,38 @@ impl RetainedBoundNode {
 }
 impl AstFile {
     pub fn retain_bound(&self, source: NodeId) -> Result<BoundFile, BindError> {
-        self.bound_view(source)?.ok_or(BindError::Failed)?;
+        let result = self.bound_result(source)?.ok_or(BindError::Failed)?;
         Ok(BoundFile {
             file: self.clone(),
             source,
+            result,
+        })
+    }
+}
+
+/// A completed file's owner and binding held directly, so that a view is two
+/// borrows instead of the handle routing `BoundFile::view` performs. Only a
+/// file root can be shared this way; the owner's views resolve imported
+/// arenas exactly as the file handle does.
+#[derive(Clone, Debug)]
+pub struct SharedBoundFile {
+    owner: Arc<ts_arena::StorageOwner<crate::compact::StoredNode>>,
+    result: Arc<BindResult>,
+}
+impl SharedBoundFile {
+    pub fn view(&self) -> BoundView<'_> {
+        BoundView {
+            ast: AstView(self.owner.view(), Some(&self.result)),
+            result: &self.result,
+        }
+    }
+}
+impl BoundFile {
+    /// The shared form of this file, `None` for a bundle member.
+    pub fn shared(&self) -> Option<SharedBoundFile> {
+        Some(SharedBoundFile {
+            owner: self.file.0.file_owner()?,
+            result: self.result.clone(),
         })
     }
 }
@@ -954,6 +1014,12 @@ impl AstFile {
 #[derive(Clone, Debug)]
 pub struct CompletedFile {
     bound: BoundFile,
+}
+impl CompletedFile {
+    /// The shared form of this file (`BoundFile::shared`).
+    pub fn shared(&self) -> Option<SharedBoundFile> {
+        self.bound.shared()
+    }
 }
 impl crate::AstBuilder {
     /// Retain completed syntax before creating synthetic nodes that refer to it.
@@ -1076,7 +1142,7 @@ impl ParsedFile {
             .state_ref()
             .binding
             .0
-            .set(Ok(result))
+            .set(Ok(Arc::new(result)))
             .map_err(|_| Error::InvalidGraph)?;
         let file = self.try_publish_unbound()?;
         Ok(CompletedFile {

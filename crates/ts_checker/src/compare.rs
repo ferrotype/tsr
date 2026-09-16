@@ -33,16 +33,43 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:Checker.sortSymbols
     pub(crate) fn sort_symbols(&self, symbols: &mut [SymbolId]) -> Result<(), Error> {
-        let failure: Cell<Option<Error>> = Cell::new(None);
-        symbols.sort_by(|a, b| match self.compare_symbols(Some(*a), Some(*b)) {
-            Ok(order) => order,
-            Err(error) => {
-                if failure.get().is_none() {
-                    failure.set(Some(error));
+        // `compareSymbols` orders by the first declaration's file and position
+        // before names and ids. Each symbol's key is computed once; only equal
+        // keys fall back to the full comparison, which decides by name and id.
+        let mut keyed = Vec::with_capacity(symbols.len());
+        for &symbol in symbols.iter() {
+            let read = self.symbol(symbol)?;
+            let key = if read.declarations().is_empty() {
+                (1u8, 0, 0)
+            } else {
+                let first = self.declaration_slice(read.declarations())?.at(0);
+                match first {
+                    Some(first) => (
+                        0u8,
+                        self.node_file_index(first)?,
+                        self.ast(first)?.node(first)?.pos(),
+                    ),
+                    None => (1u8, 0, 0),
                 }
-                Ordering::Equal
-            }
+            };
+            keyed.push((key, symbol));
+        }
+        let failure: Cell<Option<Error>> = Cell::new(None);
+        keyed.sort_by(|a, b| {
+            a.0.cmp(&b.0)
+                .then_with(|| match self.compare_symbols(Some(a.1), Some(b.1)) {
+                    Ok(order) => order,
+                    Err(error) => {
+                        if failure.get().is_none() {
+                            failure.set(Some(error));
+                        }
+                        Ordering::Equal
+                    }
+                })
         });
+        for (slot, (_, symbol)) in symbols.iter_mut().zip(keyed) {
+            *slot = symbol;
+        }
         failure.get().map_or(Ok(()), Err)
     }
 
@@ -516,17 +543,29 @@ impl CheckerState {
             (Some(_), None) => Ok(Ordering::Less),
             (Some(a), Some(b)) if a == b => Ok(Ordering::Equal),
             (Some(a), Some(b)) => {
-                let v1 = self.ast(a)?;
-                let v2 = self.ast(b)?;
-                let s1 = ts_ast::utilities::get_source_file_of_node(v1, Some(a))?;
-                let s2 = ts_ast::utilities::get_source_file_of_node(v2, Some(b))?;
-                if s1 != s2 {
-                    let program = self.program()?;
-                    return Ok(program.file_index(s1).cmp(&program.file_index(s2)));
+                let (f1, f2) = (self.node_file_index(a)?, self.node_file_index(b)?);
+                if f1 != f2 {
+                    return Ok(f1.cmp(&f2));
                 }
-                Ok(v1.node(a)?.pos().cmp(&v2.node(b)?.pos()))
+                Ok(self
+                    .ast(a)?
+                    .node(a)?
+                    .pos()
+                    .cmp(&self.ast(b)?.node(b)?.pos()))
             }
         }
+    }
+
+    /// `fileIndexMap[GetSourceFileOfNode(node)]`: a core node's file comes from
+    /// the arena index; other nodes walk their ancestors as Go does.
+    fn node_file_index(&self, node: NodeId) -> Result<usize, Error> {
+        let program = self.program()?;
+        if let Some(index) = program.core_file_index(node) {
+            return Ok(index);
+        }
+        let view = self.ast(node)?;
+        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?;
+        Ok(program.file_index(source))
     }
 
     fn literal_string(&self, t: TypeId) -> Result<&[u8], Error> {

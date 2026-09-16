@@ -110,14 +110,18 @@ impl CheckerState {
             .builtins
             .globals
             .ok_or(Error::MissingLink("checker globals"))?;
-        let name = self.symbol(symbol)?.name_to_owned();
-        let target = self.table(globals)?.get(name.as_bytes()).flatten();
+        let name = self.symbol(symbol)?.name_bytes();
+        let target = self.table(globals)?.get(name).flatten();
         let merged = if let Some(target) = target {
             self.merge_symbol(target, symbol, false)?
         } else {
             self.get_merged_symbol(symbol)
         };
-        self.tables.get_mut(globals)?.insert(name, Some(merged));
+        // The name may live in a binder pool; copy it for the insert only.
+        let name = self.symbol(symbol)?.name_bytes().to_vec();
+        self.tables
+            .get_mut(globals)?
+            .insert_bytes(&name, Some(merged));
         Ok(())
     }
 

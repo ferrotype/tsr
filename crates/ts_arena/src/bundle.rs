@@ -133,6 +133,17 @@ impl<N: NodeRecord, S> StorageHandle<N, S> {
         crate::StorageView::retained(self)
     }
 
+    /// The single owner of a file root, shared. A holder can take the owner's
+    /// own views (`StorageOwner::view`) without routing through the handle;
+    /// for a file root that resolves arenas exactly as the handle does. `None`
+    /// for a bundle member, whose views must keep the sibling retention.
+    pub fn file_owner(&self) -> Option<Arc<StorageOwner<N, S>>> {
+        match &self.root {
+            Root::File(owner) => Some(owner.clone()),
+            Root::Bundle(..) => None,
+        }
+    }
+
     pub(crate) fn retained_owner(&self, arena: crate::ArenaId) -> Option<&StorageOwner<N, S>> {
         let contains = |owner: &&StorageOwner<N, S>| {
             owner.core.id == arena

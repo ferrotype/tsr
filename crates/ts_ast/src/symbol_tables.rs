@@ -498,8 +498,18 @@ impl SymbolTableMut<'_> {
     /// Insertion stores the exact input identity without target validation.
     #[allow(clippy::option_option, clippy::needless_pass_by_value)]
     pub fn insert(&mut self, name: JsString, symbol: Option<SymbolId>) -> Option<Option<SymbolId>> {
-        let hash = self.names.hash(name.as_bytes());
-        let name = self.names.intern_hashed(name.as_bytes(), hash);
+        self.insert_bytes(name.as_bytes(), symbol)
+    }
+    /// `insert` for a name already held as bytes; the pool copies what it
+    /// keeps, so no owning string is needed on the way in.
+    #[allow(clippy::option_option)]
+    pub fn insert_bytes(
+        &mut self,
+        name: &[u8],
+        symbol: Option<SymbolId>,
+    ) -> Option<Option<SymbolId>> {
+        let hash = self.names.hash(name);
+        let name = self.names.intern_hashed(name, hash);
         if let Some(symbol) = symbol {
             self.symbols.get_or_insert(symbol.arena());
         }

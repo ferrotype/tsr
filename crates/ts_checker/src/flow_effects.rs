@@ -7,7 +7,7 @@ use ts_ast::{check_flags as cf, node_flags as nf, symbol_flags as sf, SyntaxKind
 #[derive(Default)]
 pub(crate) struct FlowEffects {
     pub(crate) signatures: Map<NodeId, Result<Option<SignatureId>, Error>>,
-    pub(crate) explicit_symbols: hashbrown::HashSet<SymbolId, std::hash::RandomState>,
+    pub(crate) explicit_symbols: crate::types::Set<SymbolId>,
 }
 
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
