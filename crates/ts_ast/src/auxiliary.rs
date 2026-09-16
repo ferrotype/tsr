@@ -37,7 +37,7 @@ pub(crate) struct AuxStore {
     lists: RowPages<ListRow>,
     backings: RowPages<BackingRow>,
     cold: Vec<AstStorageData>,
-    foreign: HashMap<u32, AuxId, std::hash::RandomState>,
+    foreign: HashMap<u32, AuxId, ts_arena::hash::FastState>,
 }
 
 pub(crate) enum AuxValue<'a> {
@@ -392,7 +392,8 @@ mod tests {
         assert_eq!(std::mem::size_of::<StoredAux>(), 8);
         assert_eq!(std::mem::size_of::<ListRow>(), 24);
         assert_eq!(std::mem::size_of::<BackingRow>(), 8);
-        assert_eq!(std::mem::size_of::<AuxStore>(), 136);
+        // The foreign map's zero-sized fast hasher took 16 bytes off the store.
+        assert_eq!(std::mem::size_of::<AuxStore>(), 120);
         assert_eq!(std::mem::size_of::<AstStorageData>(), 40);
         let builder =
             StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &Counters::new());

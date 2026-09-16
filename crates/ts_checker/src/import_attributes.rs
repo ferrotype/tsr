@@ -69,7 +69,7 @@ impl CheckerState {
             sf::OBJECT_LITERAL,
             JsString::from_bytes(names::IMPORT_ATTRIBUTES),
         )?;
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         for attribute in self.import_attribute_nodes(node)? {
             let read = self.ast(attribute)?.node(attribute)?;
             let data = read

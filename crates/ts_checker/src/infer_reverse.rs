@@ -224,7 +224,7 @@ impl CheckerState {
                 None,
             )?);
         }
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         let limited = self.limited_reverse_constraint(mapped, constraint)?;
         for property in self.get_properties_of_type(source)? {
             if let Some(limited) = limited {

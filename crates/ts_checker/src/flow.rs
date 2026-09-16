@@ -75,8 +75,7 @@ impl CheckerState {
             .map_or(owner, |&(source, _)| source);
         Ok(self
             .program()?
-            .bound(owner)?
-            .result()
+            .bind_result(owner)?
             .flows()
             .get(flow)?
             .to_owned())
@@ -103,7 +102,7 @@ impl CheckerState {
             .synthetic
             .get(&owner)
             .map_or(owner, |&(source, _)| source);
-        let lists = self.program()?.bound(owner)?.result().flow_lists();
+        let lists = self.program()?.bind_result(owner)?.flow_lists();
         let mut result = Vec::new();
         while let Some(id) = list {
             let item = lists.get(id)?;

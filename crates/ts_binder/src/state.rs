@@ -184,7 +184,7 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             ts_ast::is_locals_container(&self.n(node)),
             "locals-container payload required"
         );
-        let table = self.builder.alloc_table(SymbolTable::new());
+        let table = self.builder.alloc_table(SymbolTable::default());
         self.set_node_locals(node, Some(table));
         table
     }

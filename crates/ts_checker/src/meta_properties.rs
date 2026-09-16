@@ -131,7 +131,7 @@ impl CheckerState {
         )?;
         self.symbol_mut(meta)?.parent = Some(symbol);
         self.value_symbol_links.get_or_default(meta).resolved_type = Some(import_meta);
-        let mut table = ts_ast::SymbolTable::new();
+        let mut table = ts_ast::SymbolTable::default();
         table.insert(JsString::from_bytes(&b"meta"[..]), Some(meta));
         let members = self.alloc_symbol_table(table);
         self.symbol_mut(symbol)?.members = Some(members);

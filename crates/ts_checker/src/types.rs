@@ -33,53 +33,7 @@ pub type IndexInfoList = Arc<[IndexInfoId]>;
 
 /// The hash map the checker's caches use. `hashbrown` reports its exact
 /// allocation size, which the storage census charges; the hasher is `std`'s.
-/// Multiplicative hasher for the checker's id-keyed maps (node, symbol, type
-/// and arena ids, cache keys built from them). SipHash's flooding resistance
-/// buys nothing for these keys and was a measurable share of every link and
-/// cache lookup.
-#[derive(Default, Clone, Copy)]
-pub struct FastHasher(u64);
-impl FastHasher {
-    #[inline]
-    fn add(&mut self, word: u64) {
-        self.0 = (self.0.rotate_left(5) ^ word).wrapping_mul(0x517c_c1b7_2722_0a95);
-    }
-}
-impl std::hash::Hasher for FastHasher {
-    #[inline]
-    fn finish(&self) -> u64 {
-        self.0
-    }
-    #[inline]
-    fn write(&mut self, bytes: &[u8]) {
-        for chunk in bytes.chunks(8) {
-            let mut word = [0u8; 8];
-            word[..chunk.len()].copy_from_slice(chunk);
-            self.add(u64::from_le_bytes(word));
-        }
-    }
-    #[inline]
-    fn write_u8(&mut self, i: u8) {
-        self.add(u64::from(i));
-    }
-    #[inline]
-    fn write_u16(&mut self, i: u16) {
-        self.add(u64::from(i));
-    }
-    #[inline]
-    fn write_u32(&mut self, i: u32) {
-        self.add(u64::from(i));
-    }
-    #[inline]
-    fn write_u64(&mut self, i: u64) {
-        self.add(i);
-    }
-    #[inline]
-    fn write_usize(&mut self, i: usize) {
-        self.add(i as u64);
-    }
-}
-pub type FastState = std::hash::BuildHasherDefault<FastHasher>;
+pub use ts_arena::hash::FastState;
 pub type Map<K, V> = hashbrown::HashMap<K, V, FastState>;
 pub(crate) type Set<T> = hashbrown::HashSet<T, FastState>;
 

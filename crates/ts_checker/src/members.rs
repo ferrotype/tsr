@@ -225,7 +225,7 @@ impl CheckerState {
         if let Some(cache) = cache {
             return Ok(cache);
         }
-        let cache = self.alloc_symbol_table(SymbolTable::new());
+        let cache = self.alloc_symbol_table(SymbolTable::default());
         let common = self.types.compound_members_mut(ty)?;
         if skip_augment {
             common.property_cache_without_function_property_augment = Some(cache);

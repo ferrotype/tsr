@@ -74,7 +74,7 @@ impl CheckerState {
             .resolve_module_symbol(Some(symbol), false)?
             .ok_or(Error::MissingLink("module default alias target"))?;
         self.module_aliases.targets.insert(default, Ok(target));
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         members.insert(JsString::from_bytes(names::DEFAULT), Some(default));
         if anonymous.is_none() {
             if let Some(original) = original {

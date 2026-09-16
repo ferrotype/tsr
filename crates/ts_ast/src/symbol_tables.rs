@@ -8,8 +8,9 @@
 #![allow(clippy::option_option)]
 
 use std::collections::HashMap;
-use std::hash::{BuildHasher, RandomState};
+use std::hash::BuildHasher;
 use std::ops::Range;
+use ts_arena::hash::FastState;
 
 use hashbrown::HashTable;
 use ts_arena::{ArenaId, AuxId, Counters, Error, OwnedArena, SymbolId};
@@ -63,7 +64,7 @@ struct NamePool {
     #[allow(clippy::box_collection)]
     wide_ranges: Option<Box<HashMap<NameId, Range<usize>>>>,
     names: HashTable<NameId>,
-    hash_builder: RandomState,
+    hash_builder: FastState,
 }
 impl std::fmt::Debug for NamePool {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -84,7 +85,7 @@ impl NamePool {
             ranges: Vec::new(),
             wide_ranges: None,
             names: HashTable::new(),
-            hash_builder: RandomState::new(),
+            hash_builder: FastState::default(),
         }
     }
     fn hash(&self, bytes: &[u8]) -> u64 {
@@ -410,7 +411,7 @@ impl SymbolTables {
         &mut self,
         id: &mut Option<SymbolTableId>,
     ) -> Result<SymbolTableMut<'_>, Error> {
-        let id = *id.get_or_insert_with(|| self.alloc(SymbolTable::new()));
+        let id = *id.get_or_insert_with(|| self.alloc(SymbolTable::default()));
         self.get_mut(id)
     }
 }
@@ -622,8 +623,8 @@ mod tests {
         let mut tables = SymbolTables::new(&counters);
         tables.configure_symbols(symbols.id());
         let name = tables.intern_name(js(b"same"));
-        let one = tables.alloc(SymbolTable::from([(js(b"same"), None)]));
-        let two = tables.alloc(SymbolTable::from([(js(b"same"), Some(symbol))]));
+        let one = tables.alloc(SymbolTable::from_iter([(js(b"same"), None)]));
+        let two = tables.alloc(SymbolTable::from_iter([(js(b"same"), Some(symbol))]));
         assert_eq!(tables.names.ranges.len(), 1);
         assert_eq!(tables.name_bytes(name), b"same");
         assert_eq!(tables.get(one).unwrap().get(b"same"), Some(None));
@@ -657,8 +658,8 @@ mod tests {
         let full_slot = SymbolId::from_parts(symbols.id(), u32::MAX).unwrap();
         let foreign_id = SymbolId::from_parts(foreign.id(), 1).unwrap();
         let mut tables = SymbolTables::new(&counters);
-        let first = tables.alloc(SymbolTable::from([(js(b"empty"), None)]));
-        let untouched = tables.alloc(SymbolTable::new());
+        let first = tables.alloc(SymbolTable::from_iter([(js(b"empty"), None)]));
+        let untouched = tables.alloc(SymbolTable::default());
         assert!(tables.symbols.is_none());
         assert_eq!(tables.get(first).unwrap().get(b"empty"), Some(None));
         tables
@@ -753,8 +754,8 @@ mod tests {
         let foreign = SymbolId::from_parts(other.id(), 9).unwrap();
         let mut tables = SymbolTables::new(&counters);
         tables.configure_symbols(symbols.id());
-        let id = tables.alloc(SymbolTable::new());
-        let mut expected = SymbolTable::new();
+        let id = tables.alloc(SymbolTable::default());
+        let mut expected = SymbolTable::default();
         for index in 0u32..300 {
             let name = index.to_le_bytes();
             let value = if index % 3 == 0 { None } else { Some(local) };
@@ -831,7 +832,7 @@ mod tests {
         };
         assert_eq!(counters.snapshot(), before);
         let mut replacement = SymbolTables::new(&counters);
-        replacement.alloc(SymbolTable::new());
+        replacement.alloc(SymbolTable::default());
         assert!(matches!(replacement.get(stale), Err(Error::WrongOwner)));
         assert!(matches!(replacement.get_mut(stale), Err(Error::WrongOwner)));
         assert_eq!(std::mem::size_of::<CompactEntry>(), 8);

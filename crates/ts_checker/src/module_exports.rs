@@ -98,7 +98,7 @@ impl CheckerState {
             Some(resolved) => self
                 .visit_module_exports(resolved, None, false, &mut traversal)?
                 .unwrap_or_default(),
-            None => SymbolTable::new(),
+            None => SymbolTable::default(),
         };
         if let Some(original) = original {
             if let Some(table) = self.symbol(original)?.exports() {
@@ -152,8 +152,8 @@ impl CheckerState {
             let table = self.symbol(symbol)?.exports();
             if !is_type_only {
                 if let Some(table) = table {
-                    for (name, _) in self.module_table_entries(table)? {
-                        traversal.non_type_only.insert(name);
+                    for (name, _) in self.table(table)? {
+                        traversal.non_type_only.insert(JsString::from_bytes(name));
                     }
                 }
             }
@@ -161,9 +161,13 @@ impl CheckerState {
             if !traversal.visited.insert(symbol) {
                 return Ok(None);
             }
-            let mut symbols: SymbolTable = self.module_table_entries(table)?.into_iter().collect();
+            let mut symbols: SymbolTable = self
+                .table(table)?
+                .into_iter()
+                .map(|(name, value)| (JsString::from_bytes(name), value))
+                .collect();
             if let Some(stars) = symbols.get(names::EXPORT_STAR).copied().flatten() {
-                let mut nested = SymbolTable::new();
+                let mut nested = SymbolTable::default();
                 let mut collisions = crate::types::Map::default();
                 for declaration in self
                     .symbol_declarations(stars)?

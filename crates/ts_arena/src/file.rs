@@ -407,7 +407,7 @@ pub struct StorageOwner<N: NodeRecord, S = ()> {
     supplemental: Vec<FileId>,
     metadata: Option<AuxId>,
     imports: Vec<Box<dyn RetainedImport<N, S>>>,
-    imported_arenas: HashMap<ArenaId, usize, std::hash::RandomState>,
+    imported_arenas: HashMap<ArenaId, usize, crate::hash::FastState>,
     _owner: Track,
 }
 impl<N: NodeRecord, S> std::fmt::Debug for StorageOwner<N, S> {

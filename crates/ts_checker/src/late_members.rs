@@ -71,7 +71,7 @@ impl CheckerState {
         };
         let mut journal = Vec::new();
         let result = (|| {
-            let mut late = SymbolTable::new();
+            let mut late = SymbolTable::default();
             for declaration in self
                 .symbol_declarations(symbol)?
                 .to_vec()
@@ -157,7 +157,7 @@ impl CheckerState {
             if early_empty {
                 return Ok(Some(late));
             }
-            let combined = self.alloc_symbol_table(SymbolTable::new());
+            let combined = self.alloc_symbol_table(SymbolTable::default());
             self.merge_symbol_table(combined, early.expect("nonempty early table"), false, None)?;
             self.merge_symbol_table(combined, late, false, None)?;
             Ok(Some(combined))

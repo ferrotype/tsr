@@ -153,7 +153,7 @@ impl CheckerState {
             Some(self.new_type_mapper(parameters, arguments)?)
         };
         if let Some(mapper) = mapper {
-            let mut table = SymbolTable::new();
+            let mut table = SymbolTable::default();
             if let Some(members) = members {
                 let entries = self
                     .table(members)?
@@ -179,7 +179,7 @@ impl CheckerState {
         }
         let bases = self.interface_base_types(source)?;
         if !bases.is_empty() {
-            let mut table = SymbolTable::new();
+            let mut table = SymbolTable::default();
             if let Some(members) = members {
                 for (name, symbol) in self.table(members)? {
                     table.insert(ts_ast::JsString::from_bytes(name), symbol);
@@ -242,7 +242,7 @@ impl CheckerState {
         if let Some(target) = target {
             self.set_structured_type_members(ty, None, &[], &[], &[])?;
             let mapper = mapper.ok_or(Error::MissingLink("anonymous instantiation mapper"))?;
-            let mut table = SymbolTable::new();
+            let mut table = SymbolTable::default();
             for property in self.get_properties_of_type(target)? {
                 let instantiated = self.instantiate_symbol(property, mapper)?;
                 table.insert(self.symbol(property)?.name_to_owned(), Some(instantiated));

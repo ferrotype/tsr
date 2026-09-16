@@ -383,7 +383,7 @@ mod tests {
             .value_symbol_links
             .get_or_default(property)
             .resolved_type = Some(ty);
-        let members = state.alloc_symbol_table(SymbolTable::from([(
+        let members = state.alloc_symbol_table(SymbolTable::from_iter([(
             JsString::from_bytes(b"field-name".as_slice()),
             Some(property),
         )]));

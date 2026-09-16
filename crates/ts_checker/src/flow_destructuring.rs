@@ -12,8 +12,7 @@ impl CheckerState {
             .synthetic
             .get(&owner)
             .map_or(owner, |&(source, _)| source);
-        let bound = self.program()?.bound(source_owner)?;
-        let source = bound.result().source();
+        let source = self.program()?.bind_result(source_owner)?.source();
         let index = self.program()?.file_index(Some(source));
         let completed = self.program()?.host.source_file(index).clone();
         completed

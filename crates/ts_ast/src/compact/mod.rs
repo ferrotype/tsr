@@ -60,15 +60,16 @@ enum FullReference {
 pub struct CoreStore {
     pub(crate) payloads: crate::AstPayloadStore,
     pub(crate) auxiliary: crate::auxiliary::AuxStore,
-    links: HashMap<FieldKey, FullReference, std::hash::RandomState>,
+    links: HashMap<FieldKey, FullReference, ts_arena::hash::FastState>,
     text: text::TextPool,
     pub(crate) edges: lists::EdgePages,
     #[allow(clippy::box_collection)]
     // The cold shape-change directory costs one word in other owners.
-    parked_facts: Option<Box<HashMap<u32, u32, std::hash::RandomState>>>,
-    runtime_ids: std::sync::OnceLock<std::sync::Mutex<HashMap<u32, u64, std::hash::RandomState>>>,
+    parked_facts: Option<Box<HashMap<u32, u32, ts_arena::hash::FastState>>>,
+    runtime_ids:
+        std::sync::OnceLock<std::sync::Mutex<HashMap<u32, u64, ts_arena::hash::FastState>>>,
     binding_arenas: Option<binding::BindingArenas>,
-    binding_overrides: HashMap<u32, crate::NodeBinding, std::hash::RandomState>,
+    binding_overrides: HashMap<u32, crate::NodeBinding, ts_arena::hash::FastState>,
 }
 
 #[derive(Clone, Copy)]
@@ -84,7 +85,7 @@ pub(crate) struct PackingContext<'a> {
     pub(crate) auxiliary: ArenaId,
     pub(crate) source: &'a SourceText,
     pub(crate) end: i32,
-    links: &'a mut HashMap<FieldKey, FullReference, std::hash::RandomState>,
+    links: &'a mut HashMap<FieldKey, FullReference, ts_arena::hash::FastState>,
     text: &'a mut text::TextPool,
     binding_arenas: Option<binding::BindingArenas>,
 }
@@ -377,8 +378,8 @@ impl CoreStore {
             + edges
             + self.binding_overrides.allocation_size();
         if let Some(parked) = &self.parked_facts {
-            known +=
-                size_of::<HashMap<u32, u32, std::hash::RandomState>>() + parked.allocation_size();
+            known += size_of::<HashMap<u32, u32, ts_arena::hash::FastState>>()
+                + parked.allocation_size();
         }
         if let Some(ids) = self.runtime_ids.get() {
             known += ids

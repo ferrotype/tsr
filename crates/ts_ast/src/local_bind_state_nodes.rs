@@ -349,7 +349,7 @@ mod tests {
                             builder.tables_mut(),
                             crate::SymbolTables::new(&counters),
                         );
-                        let replacement = builder.tables_mut().alloc(crate::SymbolTable::new());
+                        let replacement = builder.tables_mut().alloc(crate::SymbolTable::default());
                         assert_eq!(replacement.slot(), table.slot());
                         assert!(builder
                             .with_local_scope(|_| panic!("replacement table namespace"))

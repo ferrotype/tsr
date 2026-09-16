@@ -63,11 +63,11 @@ pub struct SynthesizedComment {
 
 #[derive(Debug, Default)]
 struct SideTables {
-    emit_flags: HashMap<NodeId, EmitFlags, std::hash::RandomState>,
-    original: HashMap<NodeId, NodeId, std::hash::RandomState>,
-    comment_ranges: HashMap<NodeId, ts_core::TextRange, std::hash::RandomState>,
-    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, std::hash::RandomState>,
-    auto_generate: HashMap<NodeId, AutoGenerateInfo, std::hash::RandomState>,
+    emit_flags: HashMap<NodeId, EmitFlags, ts_arena::hash::FastState>,
+    original: HashMap<NodeId, NodeId, ts_arena::hash::FastState>,
+    comment_ranges: HashMap<NodeId, ts_core::TextRange, ts_arena::hash::FastState>,
+    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, ts_arena::hash::FastState>,
+    auto_generate: HashMap<NodeId, AutoGenerateInfo, ts_arena::hash::FastState>,
 }
 impl SideTables {
     fn set_original(&mut self, node: NodeId, original: NodeId) {

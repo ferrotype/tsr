@@ -236,7 +236,7 @@ impl CheckerState {
             let members = if let Some(table) = self.symbol(target)?.members() {
                 table
             } else {
-                let table = self.alloc_symbol_table(SymbolTable::new());
+                let table = self.alloc_symbol_table(SymbolTable::default());
                 self.symbol_mut(target)?.members = Some(table);
                 table
             };
@@ -246,7 +246,7 @@ impl CheckerState {
             let exports = if let Some(table) = self.symbol(target)?.exports() {
                 table
             } else {
-                let table = self.alloc_symbol_table(SymbolTable::new());
+                let table = self.alloc_symbol_table(SymbolTable::default());
                 self.symbol_mut(target)?.exports = Some(table);
                 table
             };

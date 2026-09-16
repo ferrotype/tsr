@@ -718,7 +718,7 @@ impl CheckerState {
             self.distributed_types(keys)?
         };
         let mapper = self.types.object(ty)?.mapper;
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         let mut indexes = Vec::new();
         for key in keys {
             let name = match name_type {

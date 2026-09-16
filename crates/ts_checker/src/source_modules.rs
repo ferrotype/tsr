@@ -469,7 +469,7 @@ impl CheckerState {
         if symbol == self.builtins.global_this_symbol {
             // resolveAnonymousTypeMembers exposes runtime globals, excluding
             // lexical declarations and modules declared only by ambient names.
-            let mut members = ts_ast::SymbolTable::new();
+            let mut members = ts_ast::SymbolTable::default();
             for (_, property) in self.table(exports)? {
                 let Some(property) = property else { continue };
                 let read = self.symbol(property)?;

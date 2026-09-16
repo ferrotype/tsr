@@ -251,7 +251,7 @@ fn pattern_literal_property_conflicts_reduce_the_intersection() {
                 .value_symbol_links
                 .get_or_default(property)
                 .resolved_type = Some(ty);
-            let mut table = ts_ast::SymbolTable::new();
+            let mut table = ts_ast::SymbolTable::default();
             table.insert(name, Some(property));
             let members = state.alloc_symbol_table(table);
             objects.push(

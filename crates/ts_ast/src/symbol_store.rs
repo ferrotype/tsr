@@ -927,7 +927,10 @@ mod tests {
         let second = symbols
             .write(&mut tables)
             .push(Symbol::new(2, JsString::from_bytes(raw)));
-        let table = tables.alloc(SymbolTable::from([(JsString::from_bytes(raw), Some(id))]));
+        let table = tables.alloc(SymbolTable::from_iter([(
+            JsString::from_bytes(raw),
+            Some(id),
+        )]));
         let read = symbols.read(&tables).get(id).unwrap();
         assert_eq!(
             read.name_id(),

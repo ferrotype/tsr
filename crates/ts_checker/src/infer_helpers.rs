@@ -6,7 +6,7 @@ use crate::{
 impl CheckerState {
     // port: tsc/internal/checker/inference.go:Checker.createEmptyObjectTypeFromStringLiteral
     pub(crate) fn empty_object_from_literal(&mut self, ty: TypeId) -> Result<TypeId, Error> {
-        let mut members = ts_ast::SymbolTable::new();
+        let mut members = ts_ast::SymbolTable::default();
         for part in self.distributed_types(ty)? {
             if self.types.flags(part)? & tf::STRING_LITERAL == 0 {
                 continue;

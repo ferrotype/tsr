@@ -65,7 +65,7 @@ pub(super) struct TextPool {
     entries: Vec<TextEntry>,
     free: Vec<u32>,
     // Cooked/foreign values and exhausted pool words retain their original Arc.
-    owned: HashMap<FieldKey, JsString, std::hash::RandomState>,
+    owned: HashMap<FieldKey, JsString, ts_arena::hash::FastState>,
 }
 
 fn raw_range(word: u32, end: i32, source: &SourceText) -> Range<usize> {

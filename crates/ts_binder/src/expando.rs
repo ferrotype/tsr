@@ -327,7 +327,7 @@ impl Binder<'_, '_, '_> {
             self.set_symbol_declarations(exports, declarations);
             self.set_symbol_value_declaration(exports, Some(source));
             self.set_symbol_parent(exports, Some(symbol));
-            let table = self.builder.alloc_table(SymbolTable::from([(
+            let table = self.builder.alloc_table(SymbolTable::from_iter([(
                 JsString::from_bytes(&b"exports"[..]),
                 Some(exports),
             )]));

@@ -99,6 +99,17 @@ impl ProgramContext {
         Err(Error::WrongOwner)
     }
 
+    /// The binding of the file whose core arena holds `node`, without reading
+    /// the node: flow and binding lookups validate their own ids.
+    pub(crate) fn bind_result(&self, node: NodeId) -> Result<&ts_ast::BindResult, Error> {
+        if let Some(&index) = self.nodes.get(&node.arena()) {
+            if let Some(shared) = &self.shared[index] {
+                return Ok(shared.result());
+            }
+        }
+        self.bound(node).map(ts_ast::BoundView::result)
+    }
+
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, Error> {
         // `for_node_owner` validates the slot, so the core index needs no
         // second node lookup before it.

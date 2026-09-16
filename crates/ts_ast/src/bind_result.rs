@@ -988,6 +988,10 @@ pub struct SharedBoundFile {
     result: Arc<BindResult>,
 }
 impl SharedBoundFile {
+    /// The completed binding without building a view.
+    pub fn result(&self) -> &BindResult {
+        &self.result
+    }
     pub fn view(&self) -> BoundView<'_> {
         BoundView {
             ast: AstView(self.owner.view(), Some(&self.result)),
