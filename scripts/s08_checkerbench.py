@@ -285,29 +285,49 @@ def sample(directory, build_report, runtime, mode, label):
 
 
 def capture(directory, samples_per_runtime=7, smoke=None):
-    if (directory / "capture.json").exists():
+    if any((directory / name).exists() for name in ("capture.json", "capture-failure.json")):
         raise ValueError("capture already exists; select a new output directory")
     directory.mkdir(parents=True, exist_ok=True)
-    build_report = build(directory)
     plan = method()
-    if samples_per_runtime != plan["sampling"]["measured_samples_per_runtime"] and not smoke:
+    if type(samples_per_runtime) is not int or not 1 <= samples_per_runtime <= len(plan["sampling"]["measured_order"]):
+        raise ValueError("invalid measurement sample count")
+    if samples_per_runtime != plan["sampling"]["measured_samples_per_runtime"] and smoke is None:
         raise ValueError("full captures use the frozen sample count")
     requests = prepare_requests(directory, smoke)
+    # Check the bytes the children will read, not just the pre-write objects.
+    # Share the replay checks so a writer regression fails before compilation.
+    ids = verify_requests(directory, requests, smoke)
+    build_report = build(directory)
     host = host_info() if not smoke else {"os": sys.platform, "architecture": platform.machine(), "smoke": True}
     runs = []
-    order = [[r.lower() for r in pair] for pair in plan["sampling"]["measured_order"]][:samples_per_runtime]
-    if len(order) != samples_per_runtime:
-        raise ValueError("measured order shorter than the sample count")
-    for mode in MODES:
-        for warmup in [r.lower() for r in plan["sampling"]["warmup_order"]]:
-            runs.append({**sample(directory, build_report, warmup, mode, "warmup"), "warmup": True})
-        for index, pair in enumerate(order):
-            for runtime in pair:
-                runs.append({**sample(directory, build_report, runtime, mode, f"sample-{index}"), "warmup": False})
     capture_report = {"version": 2, "pin": plan["pin"], "host": host, "smoke": smoke, "requests": requests,
                       "build_sha256": digest((directory / "build.json").read_bytes()), "sources_sha256": build_report["sources_sha256"],
                       "method_sha256": digest(METHOD.read_bytes()), "footprint_sha256": digest(FOOTPRINT.read_bytes()),
-                      "samples_per_runtime": samples_per_runtime, "runs": runs, "finished": time.time()}
+                      "samples_per_runtime": samples_per_runtime, "runs": runs}
+    identity = None
+
+    def take_sample(runtime, mode, label, warmup):
+        nonlocal identity
+        try:
+            run = {**sample(directory, build_report, runtime, mode, label), "warmup": warmup}
+            runs.append(run)
+            identity = verify_sample(directory, run, requests, ids, identity)
+        except (OSError, ValueError, RuntimeError, KeyError, TypeError, subprocess.SubprocessError) as error:
+            # Keep the failed sample and completed prefix for diagnosis, without
+            # publishing an incomplete batch as capture.json.
+            failure = {**capture_report, "failure": {"runtime": runtime, "mode": mode, "label": label,
+                                                    "reason": str(error)}, "finished": time.time()}
+            (directory / "capture-failure.json").write_bytes(canonical(failure) + b"\n")
+            raise
+
+    order = [[r.lower() for r in pair] for pair in plan["sampling"]["measured_order"]][:samples_per_runtime]
+    for mode in MODES:
+        for warmup in [r.lower() for r in plan["sampling"]["warmup_order"]]:
+            take_sample(warmup, mode, "warmup", True)
+        for index, pair in enumerate(order):
+            for runtime in pair:
+                take_sample(runtime, mode, f"sample-{index}", False)
+    capture_report["finished"] = time.time()
     (directory / "capture.json").write_bytes(canonical(capture_report) + b"\n")
     return capture_report
 
@@ -315,6 +335,56 @@ def capture(directory, samples_per_runtime=7, smoke=None):
 def rows_of(directory, run):
     path = directory / "samples" / run["mode"] / f"{run['runtime']}-{run['label']}.rows.ndjson"
     return [strict_json_loads(line) for line in measurement.authenticated(path, run["rows_sha256"]).splitlines()]
+
+
+def verify_requests(directory, inputs, smoke):
+    """Authenticate serialized requests against the frozen semantic inventory."""
+    rust = strict_json_loads(measurement.authenticated(directory / 'rust-requests.json', inputs['rust_requests_sha256']))
+    go = strict_json_loads(measurement.authenticated(directory / 'go-requests.json', inputs['go_requests_sha256']))
+    ids = frozen_ids()
+    if smoke is not None:
+        if type(smoke) is not int or not 1 <= smoke <= len(ids):
+            raise ValueError('invalid smoke inventory')
+        ids = ids[:smoke]
+    if inputs['smoke'] != smoke or inputs['variants'] != len(ids) or inputs['ids_sha256'] != digest(canonical(ids)):
+        raise ValueError('measurement request count/identity differs')
+    if [r['id'] for r in rust] != ids or [r['id'] for r in go] != ids:
+        raise ValueError('measurement requests differ from frozen inventory')
+    manifest = strict_json_loads((ROOT / 'data/s08/baseline-requests.json').read_bytes())
+    inventory(rust, manifest['requests'], partial=True)
+    _, native = s08_baselines.requests_from_subset(strict_json_loads((ROOT / 'data/s07/subset.json').read_bytes()))
+    selected = {r['id']: r for r in native}
+    if go != [selected[i] for i in ids]:
+        raise ValueError('native measurement requests changed')
+    return ids
+
+
+def verify_sample(directory, run, inputs, ids, identity=None):
+    """Reconstruct a sample from raw rows before accepting its work identity."""
+    prefix = f"{run['runtime']}-{run['label']}"
+    names = {prefix + suffix for suffix in ('.rows.ndjson', '.stdout', '.stdout.stderr')}
+    if run['runtime'] == 'go':
+        names.add(prefix + '.summary.json')
+    if set(run['artifacts']) != names or run['process']['returncode'] != 0:
+        raise ValueError('missing sample artifacts or failed process')
+    sample_dir = directory / 'samples' / run['mode']
+    for name, sha in run['artifacts'].items():
+        measurement.authenticated(sample_dir / name, sha)
+    totals_path = sample_dir / (prefix + ('.stdout' if run['runtime'] == 'rust' else '.summary.json'))
+    totals = strict_json_loads(totals_path.read_bytes())
+    if totals != run['totals'] or totals['version'] != 2 or totals['mode'] != run['mode']:
+        raise ValueError('sample totals or executable mode changed')
+    request_hash = inputs[run['runtime'] + '_requests_sha256']
+    if totals['request_sha256'] != request_hash:
+        raise ValueError('child loaded different requests')
+    rows = rows_of(directory, run)
+    measurement.check_totals(totals, measurement.checker_rows(rows, ids, run['mode']))
+    observed = [(r['id'], r['actions'], r['output_sha256']) for r in rows]
+    if identity is not None and identity != observed:
+        different = next(row[0] for previous, row in zip(identity, observed, strict=True) if previous != row)
+        raise ValueError('measurement output or action schedule differs across samples/runtimes: '
+                         f"{run['runtime']} {run['mode']} {run['label']}, variant {different}")
+    return observed
 
 
 def verify_capture(directory, capture_report):
@@ -330,48 +400,10 @@ def verify_capture(directory, capture_report):
         raise ValueError('measurement pin or footprint contract differs')
     measurement.roster(capture_report, plan, MODES, 'runtime')
     inputs = capture_report['requests']
-    rust = strict_json_loads(measurement.authenticated(directory / 'rust-requests.json', inputs['rust_requests_sha256']))
-    go = strict_json_loads(measurement.authenticated(directory / 'go-requests.json', inputs['go_requests_sha256']))
-    ids = frozen_ids()
-    smoke = capture_report['smoke']
-    if smoke is not None:
-        if type(smoke) is not int or not 1 <= smoke <= len(ids):
-            raise ValueError('invalid smoke inventory')
-        ids = ids[:smoke]
-    if inputs['smoke'] != smoke or inputs['variants'] != len(ids) or inputs['ids_sha256'] != digest(canonical(ids)):
-        raise ValueError('measurement request count/identity differs')
-    if [r['id'] for r in rust] != ids or [r['id'] for r in go] != ids:
-        raise ValueError('measurement requests differ from frozen inventory')
-    manifest = strict_json_loads((ROOT / 'data/s08/baseline-requests.json').read_bytes())
-    inventory(rust, manifest['requests'], partial=True)
-    _, native = s08_baselines.requests_from_subset(strict_json_loads((ROOT / 'data/s07/subset.json').read_bytes()))
-    selected = {r['id']: r for r in native}
-    if go != [selected[i] for i in ids]:
-        raise ValueError('native measurement requests changed')
+    ids = verify_requests(directory, inputs, capture_report['smoke'])
     identity = None
     for run in capture_report['runs']:
-        prefix = f"{run['runtime']}-{run['label']}"
-        names = {prefix + suffix for suffix in ('.rows.ndjson', '.stdout', '.stdout.stderr')}
-        if run['runtime'] == 'go':
-            names.add(prefix + '.summary.json')
-        if set(run['artifacts']) != names or run['process']['returncode'] != 0:
-            raise ValueError('missing sample artifacts or failed process')
-        sample_dir = directory / 'samples' / run['mode']
-        for name, sha in run['artifacts'].items():
-            measurement.authenticated(sample_dir / name, sha)
-        totals_path = sample_dir / (prefix + ('.stdout' if run['runtime'] == 'rust' else '.summary.json'))
-        totals = strict_json_loads(totals_path.read_bytes())
-        if totals != run['totals'] or totals['version'] != 2 or totals['mode'] != run['mode']:
-            raise ValueError('sample totals or executable mode changed')
-        request_hash = inputs[run['runtime'] + '_requests_sha256']
-        if totals['request_sha256'] != request_hash:
-            raise ValueError('child loaded different requests')
-        rows = rows_of(directory, run)
-        measurement.check_totals(totals, measurement.checker_rows(rows, ids, run['mode']))
-        observed = [(r['id'], r['actions'], r['output_sha256']) for r in rows]
-        if identity is not None and identity != observed:
-            raise ValueError('measurement output or action schedule differs across samples/runtimes')
-        identity = observed
+        identity = verify_sample(directory, run, inputs, ids, identity)
     return build
 
 

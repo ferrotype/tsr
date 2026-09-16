@@ -1,4 +1,4 @@
-"""P7 evidence replay tests; no builds, benchmark processes or corpus runs."""
+"""P7 capture/replay protocol tests; no builds, benchmark processes or corpus runs."""
 import copy
 import tempfile
 import unittest
@@ -13,44 +13,86 @@ from s08_p4 import canonical as request_bytes
 
 
 class CheckerRequests(unittest.TestCase):
-    def test_written_requests_preserve_semantic_map_order(self):
-        loading = {
+    def setUp(self):
+        self.loading = {
             'options': {'paths': {'@interface/*': ['src/interface/*'], '@blah': ['blah'], '@humbug/*': ['*/generated']}},
             'config_raw': {'files': ['main.ts'], 'compilerOptions': {'paths': {'z/*': ['z/*'], 'a/*': ['a/*']}}},
         }
-        request = {
-            'id': 'case', 'acceptance_tier': 'acceptance', 'loading': loading,
+        self.request = {
+            'id': 'case', 'acceptance_tier': 'acceptance', 'loading': self.loading,
             'diagnostic_phases': ['config'], 'type_baseline_requested': False,
             'public_type_strings': True, 'error_baseline_requested': True,
         }
-        frozen = {**request, 'loading_request_sha256': digest(request_bytes(loading) + b'\n')}
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            corpus = root / 'corpus'
-            corpus.mkdir()
-            (corpus / 'requests.json').write_bytes(request_bytes([request]) + b'\n')
-            (root / 'data/s07').mkdir(parents=True)
-            (root / 'data/s08').mkdir(parents=True)
-            (root / 'data/s07/subset.json').write_text('{}')
-            (root / 'data/s08/baseline-requests.json').write_bytes(canonical({'requests': [frozen]}))
-            with patch.object(checker, 'ROOT', root), patch.object(checker, 'CORPUS', corpus), \
-                    patch.object(checker, 'frozen_ids', return_value=['case']), \
-                    patch.object(checker, 'method', return_value={'acceptance_variants': 1}), \
-                    patch.object(checker.s08_baselines, 'requests_from_subset', return_value=(None, [{'id': 'case'}])):
-                for smoke in (None, 1):
-                    with self.subTest(smoke=smoke):
-                        result = checker.prepare_requests(root, smoke)
-                        raw = (root / 'rust-requests.json').read_bytes()
-                        written = checker.strict_json_loads(raw)
-                        # Use the real replay contract after serialization, not
-                        # dictionary equality (which ignores map order).
-                        checker.inventory(written, [frozen], partial=True)
-                        actual = written[0]['loading']
-                        self.assertEqual(list(actual['options']['paths']), ['@interface/*', '@blah', '@humbug/*'])
-                        self.assertEqual(list(actual['config_raw']), ['files', 'compilerOptions'])
-                        self.assertEqual(list(actual['config_raw']['compilerOptions']['paths']), ['z/*', 'a/*'])
-                        self.assertEqual(raw, request_bytes([request]) + b'\n')
-                        self.assertEqual(result['rust_requests_sha256'], digest(raw))
+        self.frozen = {**self.request, 'loading_request_sha256': digest(request_bytes(self.loading) + b'\n')}
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        corpus = self.root / 'corpus'
+        corpus.mkdir()
+        (corpus / 'requests.json').write_bytes(request_bytes([self.request]) + b'\n')
+        (self.root / 'data/s07').mkdir(parents=True)
+        (self.root / 'data/s08').mkdir(parents=True)
+        (self.root / 'data/s07/subset.json').write_text('{}')
+        (self.root / 'data/s08/baseline-requests.json').write_bytes(canonical({'requests': [self.frozen]}))
+        plan = copy.deepcopy(checker.method())
+        plan['acceptance_variants'] = 1
+        self.enterContext(patch.object(checker, 'ROOT', self.root))
+        self.enterContext(patch.object(checker, 'CORPUS', corpus))
+        self.enterContext(patch.object(checker, 'frozen_ids', return_value=['case']))
+        self.enterContext(patch.object(checker, 'method', return_value=plan))
+        self.enterContext(patch.object(checker.s08_baselines, 'requests_from_subset',
+                                       return_value=(None, [{'id': 'case'}])))
+
+    def test_written_requests_preserve_semantic_map_order(self):
+        for smoke in (None, 1):
+            with self.subTest(smoke=smoke):
+                result = checker.prepare_requests(self.root, smoke)
+                raw = (self.root / 'rust-requests.json').read_bytes()
+                written = checker.strict_json_loads(raw)
+                # Use the real replay contract after serialization, not
+                # dictionary equality (which ignores map order).
+                checker.inventory(written, [self.frozen], partial=True)
+                actual = written[0]['loading']
+                self.assertEqual(list(actual['options']['paths']), ['@interface/*', '@blah', '@humbug/*'])
+                self.assertEqual(list(actual['config_raw']), ['files', 'compilerOptions'])
+                self.assertEqual(list(actual['config_raw']['compilerOptions']['paths']), ['z/*', 'a/*'])
+                self.assertEqual(raw, request_bytes([self.request]) + b'\n')
+                self.assertEqual(result['rust_requests_sha256'], digest(raw))
+
+    def test_reordered_written_requests_fail_before_build_or_sample(self):
+        # Reintroduce the actual writer bug; the in-memory inventory is valid.
+        # Capture must re-read the serialized inputs through the real verifier.
+        with patch.object(checker, 'request_canonical', canonical), \
+                patch.object(checker, 'build', side_effect=AssertionError('build reached before request validation')) as build, \
+                patch.object(checker, 'sample') as sample:
+            with self.assertRaisesRegex(ValueError, 'E2 loading input changed'):
+                checker.capture(self.root)
+            build.assert_not_called()
+            sample.assert_not_called()
+
+    def test_bad_sample_count_fails_before_build_or_sample(self):
+        for count in (0, -1, 8, True):
+            with self.subTest(count=count), \
+                    patch.object(checker, 'build', side_effect=AssertionError('build reached before sample count validation')) as build, \
+                    patch.object(checker, 'sample') as sample:
+                with self.assertRaisesRegex(ValueError, 'sample count'):
+                    checker.capture(self.root, count, smoke=1)
+                build.assert_not_called()
+                sample.assert_not_called()
+
+    def test_changed_native_requests_fail_before_build_or_sample(self):
+        def changed_native(value):
+            if value == [{'id': 'case'}]:
+                value = [{'id': 'case', 'settings': {'module': 'amd'}}]
+            return request_bytes(value)
+
+        with patch.object(checker, 'request_canonical', side_effect=changed_native), \
+                patch.object(checker, 'build', side_effect=AssertionError('build reached before request validation')) as build, \
+                patch.object(checker, 'sample') as sample:
+            with self.assertRaisesRegex(ValueError, 'native measurement requests changed'):
+                checker.capture(self.root)
+            build.assert_not_called()
+            sample.assert_not_called()
 
 
 class CheckerCapture(unittest.TestCase):
@@ -143,6 +185,99 @@ class CheckerCapture(unittest.TestCase):
 
     def save(self):
         (self.root / 'capture.json').write_bytes(canonical(self.capture))
+
+    def run_capture(self):
+        # Replace expensive execution, not validation. Each sample supplies real
+        # authenticated files, just as sample() does after a child exits.
+        (self.root / 'capture.json').unlink(missing_ok=True)
+        build = checker.strict_json_loads((self.root / 'build.json').read_bytes())
+        self.sample_calls = []
+
+        def sample(directory, build_report, runtime, mode, label):
+            self.sample_calls.append((runtime, mode, label))
+            return next(copy.deepcopy(run) for run in self.capture['runs']
+                        if (run['runtime'], run['mode'], run['label']) == (runtime, mode, label))
+
+        with patch.object(checker, 'prepare_requests', return_value=self.capture['requests']), \
+                patch.object(checker, 'build', return_value=build), \
+                patch.object(checker, 'host_info', return_value={}), \
+                patch.object(checker, 'sample', side_effect=sample):
+            return checker.capture(self.root)
+
+    def test_capture_preserves_the_full_sample_order_and_replays(self):
+        result = self.run_capture()
+        expected = [(run['runtime'], run['mode'], run['label']) for run in self.capture['runs']]
+        self.assertEqual(self.sample_calls, expected)
+        self.assertEqual(len(result['runs']), 48)
+        self.assertFalse((self.root / 'capture-failure.json').exists())
+        checker.verify_capture(self.root, result)
+
+    def test_warmup_output_mismatch_stops_before_measured_samples(self):
+        run = self.capture['runs'][1]
+        row = self.row()
+        row['output_sha256'] = 'b' * 64
+        self.write_sample(run, [row])
+        with self.assertRaisesRegex(ValueError, 'output or action schedule.*case'):
+            self.run_capture()
+        self.assertEqual(self.sample_calls, [('go', 'normal', 'warmup'), ('rust', 'normal', 'warmup')])
+        failure = checker.strict_json_loads((self.root / 'capture-failure.json').read_bytes())
+        self.assertEqual(failure['failure']['label'], 'warmup')
+        self.assertEqual(len(failure['runs']), 2)
+        self.assertTrue((self.root / 'samples/normal/rust-warmup.rows.ndjson').exists())
+        self.assertFalse((self.root / 'capture.json').exists())
+        with patch.object(checker, 'build') as build:
+            with self.assertRaisesRegex(ValueError, 'capture already exists'):
+                checker.capture(self.root)
+            build.assert_not_called()
+
+    def test_warmup_action_mismatch_stops_before_measured_samples(self):
+        run = self.capture['runs'][1]
+        row = self.row()
+        row['actions']['GetTypeAtLocation'] += 1
+        self.write_sample(run, [row])
+        with self.assertRaisesRegex(ValueError, 'output or action schedule'):
+            self.run_capture()
+        self.assertEqual(len(self.sample_calls), 2)
+
+    def test_each_mode_checks_its_first_warmup_against_the_same_work(self):
+        run = next(r for r in self.capture['runs'] if r['mode'] == 'phase' and r['warmup'])
+        row = self.row()
+        row['output_sha256'] = 'b' * 64
+        self.write_sample(run, [row])
+        with self.assertRaisesRegex(ValueError, 'output or action schedule'):
+            self.run_capture()
+        self.assertEqual(len(self.sample_calls), 17)
+        self.assertEqual(self.sample_calls[-1], ('go', 'phase', 'warmup'))
+
+    def test_measured_sample_is_checked_before_the_next_child(self):
+        run = self.capture['runs'][2]
+        row = self.row()
+        row['output_sha256'] = 'b' * 64
+        self.write_sample(run, [row])
+        with self.assertRaisesRegex(ValueError, 'output or action schedule'):
+            self.run_capture()
+        self.assertEqual(len(self.sample_calls), 3)
+        self.assertEqual(self.sample_calls[-1], ('go', 'normal', 'sample-0'))
+
+    def test_first_sample_totals_are_verified_before_the_next_child(self):
+        run = self.capture['runs'][0]
+        run['totals']['interval_ns'] += 1
+        path = self.root / 'samples/normal/go-warmup.summary.json'
+        path.write_bytes(canonical(run['totals']))
+        run['artifacts'][path.name] = measurement.file_digest(path)
+        with self.assertRaisesRegex(ValueError, 'interval_ns differs'):
+            self.run_capture()
+        self.assertEqual(self.sample_calls, [('go', 'normal', 'warmup')])
+
+    def test_child_request_identity_is_verified_before_the_next_child(self):
+        run = self.capture['runs'][0]
+        run['totals']['request_sha256'] = 'b' * 64
+        path = self.root / 'samples/normal/go-warmup.summary.json'
+        path.write_bytes(canonical(run['totals']))
+        run['artifacts'][path.name] = measurement.file_digest(path)
+        with self.assertRaisesRegex(ValueError, 'child loaded different requests'):
+            self.run_capture()
+        self.assertEqual(self.sample_calls, [('go', 'normal', 'warmup')])
 
     def test_valid_capture_replays_and_ignores_cached_report(self):
         (self.root / 'report.json').write_text('{"metrics":{"elapsed_ratio":0.01}}')
