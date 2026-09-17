@@ -9,7 +9,11 @@ use ts_ast::{
 #[derive(Default)]
 struct ExportTraversal {
     visited: crate::types::Set<SymbolId>,
-    non_type_only: crate::types::Set<JsString>,
+    /// The export tables visited other than through a type-only star; their
+    /// names cancel type-only provenance. Go collects the names into a set
+    /// up front; the tables are immutable, so reading them at the end when
+    /// (rarely) a type-only star recorded anything is the same set.
+    non_type_only: Vec<SymbolTableId>,
     type_only: crate::types::Map<JsString, NodeId>,
 }
 #[derive(Default)]
@@ -94,42 +98,48 @@ impl CheckerState {
             .resolve_module_symbol(export_equals, false)?
             .map(|_| symbol);
         let resolved = self.resolve_external_module_symbol(Some(symbol), false)?;
-        let mut exports = match resolved {
-            Some(resolved) => self
-                .visit_module_exports(resolved, None, false, &mut traversal)?
-                .unwrap_or_default(),
-            None => SymbolTable::default(),
+        let exports = match resolved {
+            Some(resolved) => self.visit_module_exports(resolved, None, false, &mut traversal)?,
+            None => None,
+        };
+        let exports = match exports {
+            Some(exports) => exports,
+            None => self.tables.alloc(SymbolTable::default()),
         };
         if let Some(original) = original {
             if let Some(table) = self.symbol(original)?.exports() {
-                let entries = self.module_table_entries(table)?;
+                let (bytes, entries) = self.collect_table_entries(table)?;
                 if entries.len() > 1 {
-                    for (_, current) in entries {
+                    for (range, current) in entries {
                         let Some(current) = current else { continue };
-                        let name = self.symbol(current)?.name_to_owned();
-                        if name.as_bytes() == names::EXPORT_EQUALS
-                            || name.as_bytes() == names::EXPORT_STAR
-                        {
+                        let name = &bytes[range];
+                        if name == names::EXPORT_EQUALS || name == names::EXPORT_STAR {
                             continue;
                         }
                         let flags = self.module_symbol_flags(current, false, false)?;
                         if flags & (sf::TYPE | sf::NAMESPACE) != 0
                             && flags & sf::VALUE == 0
-                            && exports.get(name.as_bytes()).copied().flatten().is_none()
+                            && self.table(exports)?.get(name).flatten().is_none()
                         {
-                            exports.insert(name, Some(current));
+                            self.tables
+                                .get_mut(exports)?
+                                .insert_bytes(name, Some(current));
                         }
                     }
                 }
             }
         }
-        for name in traversal.non_type_only {
-            traversal.type_only.remove(&name);
+        if !traversal.type_only.is_empty() {
+            for table in traversal.non_type_only {
+                for (name, _) in self.table(table)? {
+                    traversal.type_only.remove(name);
+                }
+            }
         }
         self.module_aliases
             .type_only_exports
             .insert(symbol, traversal.type_only);
-        Ok(self.alloc_symbol_table(exports))
+        Ok(exports)
     }
     pub(crate) fn module_table_entries(
         &self,
@@ -147,27 +157,25 @@ impl CheckerState {
         export_star: Option<NodeId>,
         is_type_only: bool,
         traversal: &mut ExportTraversal,
-    ) -> Result<Option<SymbolTable>, Error> {
+    ) -> Result<Option<SymbolTableId>, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             let table = self.symbol(symbol)?.exports();
             if !is_type_only {
                 if let Some(table) = table {
-                    for (name, _) in self.table(table)? {
-                        traversal.non_type_only.insert(JsString::from_bytes(name));
-                    }
+                    traversal.non_type_only.push(table);
                 }
             }
             let Some(table) = table else { return Ok(None) };
             if !traversal.visited.insert(symbol) {
                 return Ok(None);
             }
-            let mut symbols: SymbolTable = self
-                .table(table)?
-                .into_iter()
-                .map(|(name, value)| (JsString::from_bytes(name), value))
-                .collect();
-            if let Some(stars) = symbols.get(names::EXPORT_STAR).copied().flatten() {
-                let mut nested = SymbolTable::default();
+            // Go's `maps.Clone(symbol.Exports)`: a checker-owned copy the
+            // star exports extend.
+            let symbols = self
+                .clone_symbol_table(Some(table))?
+                .expect("exports table cloned");
+            if let Some(stars) = self.table(symbols)?.get(names::EXPORT_STAR).flatten() {
+                let nested = self.tables.alloc(SymbolTable::default());
                 let mut collisions = crate::types::Map::default();
                 for declaration in self
                     .symbol_declarations(stars)?
@@ -194,7 +202,7 @@ impl CheckerState {
                             traversal,
                         )? {
                             self.extend_module_exports(
-                                &mut nested,
+                                nested,
                                 exported,
                                 Some((&mut collisions, declaration)),
                             )?;
@@ -204,7 +212,11 @@ impl CheckerState {
                 for (name, collision) in collisions {
                     if name.as_bytes() == names::EXPORT_EQUALS
                         || collision.duplicates.is_empty()
-                        || symbols.get(name.as_bytes()).copied().flatten().is_some()
+                        || self
+                            .table(symbols)?
+                            .get(name.as_bytes())
+                            .flatten()
+                            .is_some()
                     {
                         continue;
                     }
@@ -212,12 +224,12 @@ impl CheckerState {
                         self.error_at(Some(declaration),ts_diagnostics::Module_0_has_already_exported_a_member_named_1_Consider_explicitly_re_exporting_to_resolve_the_ambiguity,vec![collision.specifier.clone(),name.clone()])?;
                     }
                 }
-                self.extend_module_exports(&mut symbols, nested, None)?;
+                self.extend_module_exports(symbols, nested, None)?;
             }
             if let Some(star) = export_star {
                 if self.node(star)?.is_type_only() {
-                    for name in symbols.keys() {
-                        traversal.type_only.insert(name.clone(), star);
+                    for (name, _) in self.table(symbols)? {
+                        traversal.type_only.insert(JsString::from_bytes(name), star);
                     }
                 }
             }
@@ -227,23 +239,25 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.extendExportSymbols
     fn extend_module_exports(
         &mut self,
-        target: &mut SymbolTable,
-        source: SymbolTable,
+        target: SymbolTableId,
+        source: SymbolTableId,
         mut collision: Option<(&mut crate::types::Map<JsString, ExportCollision>, NodeId)>,
     ) -> Result<(), Error> {
-        for (name, value) in source {
-            if name.as_bytes() == names::DEFAULT {
+        let (bytes, entries) = self.collect_table_entries(source)?;
+        for (range, value) in entries {
+            let name = &bytes[range];
+            if name == names::DEFAULT {
                 continue;
             }
-            let current = target.get(name.as_bytes()).copied().flatten();
+            let current = self.table(target)?.get(name).flatten();
             if current.is_none() {
-                target.insert(name.clone(), value);
+                self.tables.get_mut(target)?.insert_bytes(name, value);
                 if let Some((table, node)) = &mut collision {
                     let specifier = self
                         .module_specifier(*node)?
                         .ok_or(Error::MissingLink("collision export specifier"))?;
                     table.insert(
-                        name,
+                        JsString::from_bytes(name),
                         ExportCollision {
                             specifier: ts_scanner::get_text_of_node(
                                 self.ast(specifier)?,
@@ -258,7 +272,7 @@ impl CheckerState {
                     != self.resolve_module_symbol(value, false)?
                 {
                     table
-                        .get_mut(&name)
+                        .get_mut(name)
                         .ok_or(Error::MissingLink("export collision entry"))?
                         .duplicates
                         .push(*node);

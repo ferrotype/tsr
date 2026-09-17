@@ -73,7 +73,7 @@ impl CheckerState {
         if self.factory.id().arena() == node.arena() {
             return Ok(self.factory.view().node_text(node)?);
         }
-        Ok(self.program()?.view_of(node)?.node_text(node)?)
+        Ok(self.program()?.ast(node)?.node_text(node)?)
     }
 
     /// `ast(source)?.source_file(source)?` by the directory alone; the
@@ -86,7 +86,7 @@ impl CheckerState {
         if self.factory.id().arena() == source.arena() {
             return Ok(self.factory.view().source_file(source)?);
         }
-        Ok(self.program()?.view_of(source)?.source_file(source)?)
+        Ok(self.program()?.ast(source)?.source_file(source)?)
     }
 
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, crate::Error> {
@@ -170,17 +170,6 @@ impl ProgramContext {
         self.bound(node).map(ts_ast::BoundView::result)
     }
 
-    /// The view of the file whose core arena holds `node`, selected by the
-    /// directory alone and validating nothing: for reads that validate the id
-    /// themselves. Other arenas take the routed, validating path.
-    #[inline]
-    pub(crate) fn view_of(&self, node: NodeId) -> Result<AstView<'_>, Error> {
-        if let Some(index) = self.core_file_index(node) {
-            return Ok(self.file_view(index).ast());
-        }
-        self.ast(node)
-    }
-
     /// One node read by the shortest path; see `SharedBoundFile::node`.
     #[inline]
     pub(crate) fn node(&self, node: NodeId) -> Result<ts_ast::NodeRead<'_>, Error> {
@@ -192,11 +181,15 @@ impl ProgramContext {
         self.ast(node)?.node(node)
     }
 
+    /// The view of the file whose core arena holds `node`. A directory hit
+    /// selects the owner without validating `node`: every caller reads the
+    /// node (or another of the same file) through the view, and those reads
+    /// validate their own ids, so the selection paid twice for nothing.
+    /// Other arenas take the routed, validating path.
+    #[inline]
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, Error> {
-        // `for_node_owner` validates the slot, so the core index needs no
-        // second node lookup before it.
         if let Some(index) = self.core_file_index(node) {
-            return self.file_view(index).ast().for_node_owner(node);
+            return Ok(self.file_view(index).ast());
         }
         self.bound(node)?.ast().for_node_owner(node)
     }
