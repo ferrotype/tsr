@@ -52,7 +52,7 @@ fn compatible(target: SymbolFlags, source: SymbolFlags) -> bool {
 }
 
 /// One table's names in a single buffer, each entry a byte range and its symbol.
-type TableEntries = (Vec<u8>, Vec<(std::ops::Range<usize>, Option<SymbolId>)>);
+pub(crate) type TableEntries = (Vec<u8>, Vec<(std::ops::Range<usize>, Option<SymbolId>)>);
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getMergedSymbol
@@ -115,7 +115,10 @@ impl CheckerState {
     /// The entries of a table copied into one byte buffer, for a merge that
     /// mutates the checker while it walks them: one allocation per table
     /// instead of an owning string per entry.
-    fn collect_table_entries(&self, table: SymbolTableId) -> Result<TableEntries, Error> {
+    pub(crate) fn collect_table_entries(
+        &self,
+        table: SymbolTableId,
+    ) -> Result<TableEntries, Error> {
         let read = self.table(table)?;
         let mut bytes = Vec::with_capacity(read.len() * 12);
         let mut entries = Vec::with_capacity(read.len());

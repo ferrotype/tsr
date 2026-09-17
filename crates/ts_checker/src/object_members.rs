@@ -2,6 +2,7 @@
 //! member state only for recursive reads in the current operation; errors clear
 //! its completion flag, so a later operation retries rather than using a prefix.
 
+use crate::symbols::split_symbol;
 use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, IndexInfoId, MapperId, SignatureId,
     TypeId,
@@ -153,22 +154,24 @@ impl CheckerState {
             Some(self.new_type_mapper(parameters, arguments)?)
         };
         if let Some(mapper) = mapper {
-            let mut table = SymbolTable::default();
+            // The instantiated members go straight into a checker table: the
+            // names are read once from the source table into one buffer, with
+            // no owned string or intermediate map per member.
+            let mut instantiated = None;
             if let Some(members) = members {
-                let entries = self
-                    .table(members)?
-                    .into_iter()
-                    .map(|(name, symbol)| (ts_ast::JsString::from_bytes(name), symbol))
-                    .collect::<Vec<_>>();
-                for (name, symbol) in entries {
-                    if let Some(symbol) = symbol {
-                        if self.is_named_member(symbol, name.as_bytes())? {
-                            table.insert(name, Some(self.instantiate_symbol(symbol, mapper)?));
-                        }
+                let (bytes, entries) = self.collect_table_entries(members)?;
+                for (range, symbol) in entries {
+                    let Some(symbol) = symbol else { continue };
+                    let name = &bytes[range];
+                    if self.is_named_member(symbol, name)? {
+                        let value = self.instantiate_symbol(symbol, mapper)?;
+                        self.tables
+                            .get_or_create(&mut instantiated)?
+                            .insert_bytes(name, Some(value));
                     }
                 }
             }
-            members = (!table.is_empty()).then(|| self.alloc_symbol_table(table));
+            members = instantiated;
             for call in &mut calls {
                 *call = self.instantiate_signature(*call, mapper)?;
             }
@@ -179,13 +182,8 @@ impl CheckerState {
         }
         let bases = self.interface_base_types(source)?;
         if !bases.is_empty() {
-            let mut table = SymbolTable::default();
-            if let Some(members) = members {
-                for (name, symbol) in self.table(members)? {
-                    table.insert(ts_ast::JsString::from_bytes(name), symbol);
-                }
-            }
-            members = Some(self.alloc_symbol_table(table));
+            let copied = self.clone_symbol_table(members)?;
+            members = Some(copied.unwrap_or_else(|| self.tables.alloc(SymbolTable::default())));
             self.set_structured_type_members(ty, members, &calls, &constructs, &indexes)?;
             self.types.get_mut(ty)?.object_flags |= of::UNRESOLVED_MEMBERS;
             for &base in bases.iter() {
@@ -195,17 +193,29 @@ impl CheckerState {
                 } else {
                     base
                 };
-                for property in self.get_properties_of_type(base)? {
+                let inherited = self.get_properties_of_type(base)?;
+                // Room for the base's properties up front: the inherited table
+                // otherwise rehashes every name it holds at each doubling.
+                self.tables
+                    .get_mut(members.expect("inherited table created above"))?
+                    .reserve(inherited.len());
+                for property in inherited.iter().copied() {
                     // addInheritedMembers never inherits static private names.
                     if self.is_static_private_identifier_property(property)? {
                         continue;
                     }
-                    let name = self.symbol(property)?.name_to_owned();
-                    let mut table = self
-                        .tables
-                        .get_mut(members.expect("inherited table created above"))?;
-                    if table.get(name.as_bytes()).flatten().is_none() {
-                        table.insert(name, Some(property));
+                    let CheckerState {
+                        program,
+                        symbols,
+                        tables,
+                        ..
+                    } = &mut *self;
+                    let name = split_symbol(program.as_ref(), symbols, property)?;
+                    let name = name.name_bytes();
+                    let mut table =
+                        tables.get_mut(members.expect("inherited table created above"))?;
+                    if table.get(name).flatten().is_none() {
+                        table.insert_bytes(name, Some(property));
                     }
                 }
                 // A class extending an `any` base records `any` as its base type;
@@ -242,10 +252,19 @@ impl CheckerState {
         if let Some(target) = target {
             self.set_structured_type_members(ty, None, &[], &[], &[])?;
             let mapper = mapper.ok_or(Error::MissingLink("anonymous instantiation mapper"))?;
-            let mut table = SymbolTable::default();
+            let mut table = None;
             for property in self.get_properties_of_type(target)? {
                 let instantiated = self.instantiate_symbol(property, mapper)?;
-                table.insert(self.symbol(property)?.name_to_owned(), Some(instantiated));
+                let CheckerState {
+                    program,
+                    symbols,
+                    tables,
+                    ..
+                } = &mut *self;
+                let name = split_symbol(program.as_ref(), symbols, property)?;
+                tables
+                    .get_or_create(&mut table)?
+                    .insert_bytes(name.name_bytes(), Some(instantiated));
             }
             self.resolve_type_members(target)?;
             let structured = self.types.structured(target)?;
@@ -263,7 +282,7 @@ impl CheckerState {
                 }
             }
             let indexes = self.instantiate_index_infos(&index_infos, mapper)?;
-            let members = (!table.is_empty()).then(|| self.alloc_symbol_table(table));
+            let members = table;
             return self.set_structured_type_members(ty, members, &calls, &constructs, &indexes);
         }
         let symbol = self.get_merged_symbol(

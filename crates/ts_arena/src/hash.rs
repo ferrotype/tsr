@@ -18,15 +18,19 @@ impl Hasher for FastHasher {
     }
     #[inline]
     fn write(&mut self, bytes: &[u8]) {
-        let mut chunks = bytes.chunks_exact(8);
-        for chunk in &mut chunks {
-            self.add(u64::from_le_bytes(chunk.try_into().expect("eight bytes")));
+        // Whole words straight from the slice, and the tail folded by shifts:
+        // no per-chunk conversion check and no library copy for a few bytes.
+        // Symbol names are hashed on every table lookup, so this is hot.
+        let (chunks, rest) = bytes.as_chunks::<8>();
+        for chunk in chunks {
+            self.add(u64::from_le_bytes(*chunk));
         }
-        let rest = chunks.remainder();
         if !rest.is_empty() {
-            let mut word = [0u8; 8];
-            word[..rest.len()].copy_from_slice(rest);
-            self.add(u64::from_le_bytes(word) ^ (rest.len() as u64) << 56);
+            let mut word = 0u64;
+            for (index, &byte) in rest.iter().enumerate() {
+                word |= u64::from(byte) << (8 * index);
+            }
+            self.add(word ^ (rest.len() as u64) << 56);
         }
     }
     #[inline]
