@@ -2271,7 +2271,6 @@
       "tsc/internal/compiler/program.go:Program.extractUnresolvedImportsFromSourceFile",
       "tsc/internal/compiler/program.go:Program.getModeForTypeReferenceDirectiveInFile",
       "tsc/internal/compiler/program.go:Program.getSourceFilesToEmit",
-      "tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker",
       "tsc/internal/compiler/program.go:Program.initCheckerPool",
       "tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier",
       "tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier",
