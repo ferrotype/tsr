@@ -28,6 +28,13 @@ pub trait Hooks {
     /// Query results the walker retains as roots of the retained checkpoint.
     fn roots(&mut self, _types: &[ts_checker::TypeRef]) {}
     fn checkpoint(&mut self, _op: &mut ts_checker::Operation<'_>) {}
+    /// Whether the row needs the loaded graph's observation (file digests,
+    /// metadata, imports). A driver that compares only checker output skips
+    /// it: hashing every file text per variant is most of the child's time
+    /// and streams megabytes through the caches just before the interval.
+    fn wants_graph(&self) -> bool {
+        true
+    }
 }
 #[allow(dead_code)]
 pub struct NoHooks;
@@ -110,7 +117,11 @@ pub fn observe(
             return row;
         }
     };
-    row["load"] = json!({"state":"executed","graph":observation::observe(request["id"].as_str().unwrap(), &program)});
+    row["load"] = if hooks.wants_graph() {
+        json!({"state":"executed","graph":observation::observe(request["id"].as_str().unwrap(), &program)})
+    } else {
+        json!({"state":"executed"})
+    };
     // Bound inputs and the loader state are complete: the checker interval
     // begins. Diagnostic JSON conversion is transport, bracketed out of it.
     hooks.interval_start();

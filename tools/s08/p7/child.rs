@@ -96,6 +96,10 @@ impl Measure {
     }
 }
 impl Hooks for Measure {
+    fn wants_graph(&self) -> bool {
+        // The row keeps checker output only; the graph observation is unused.
+        false
+    }
     fn loaded(&mut self, program: &Program) {
         self.libraries = program
             .files()

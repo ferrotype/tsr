@@ -18,6 +18,12 @@ use ts_jsstring::JsString;
 
 /// Owned construction input. Stored tables expose borrowed byte keys instead.
 pub type SymbolTable = HashMap<JsString, Option<SymbolId>>;
+/// The hash every store's name pool gives `bytes`: the hasher carries no
+/// per-pool state, so a caller can hash a name once for a lookup in one table
+/// and an insert into another.
+pub fn name_hash(bytes: &[u8]) -> u64 {
+    FastState::default().hash_one(bytes)
+}
 pub(crate) type NameId = usize;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -170,7 +176,7 @@ struct FullEntry {
     name: NameId,
     symbol: Option<SymbolId>,
 }
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum TableRecord {
     Compact(HashTable<CompactEntry>),
     Full(HashTable<FullEntry>),
@@ -201,6 +207,14 @@ impl TableRecord {
             Self::Full(table) => table
                 .find(hash, |entry| equal_name(entry.name))
                 .map(|entry| entry.symbol),
+        }
+    }
+    fn reserve(&mut self, additional: usize, hash_name: impl Fn(NameId) -> u64) {
+        match self {
+            Self::Compact(table) => {
+                table.reserve(additional, |entry| hash_name(entry.name as usize));
+            }
+            Self::Full(table) => table.reserve(additional, |entry| hash_name(entry.name)),
         }
     }
     fn make_full(&mut self, symbols: Option<ArenaId>, hash_name: &impl Fn(NameId) -> u64) {
@@ -330,6 +344,52 @@ impl SymbolTables {
         }
         id
     }
+    /// A new table with the entries of one of this store's own tables. Names
+    /// and symbol slots are already encoded for this store, so the hash table
+    /// is copied wholesale with nothing rehashed.
+    pub fn clone_own(&mut self, source: SymbolTableId) -> Result<SymbolTableId, Error> {
+        let record = self.tables.get(source.0)?.clone();
+        Ok(SymbolTableId(self.tables.push(record)))
+    }
+    /// A new table with the entries of a table from another store: every name
+    /// is interned here once, into a table sized for its final length so that
+    /// no growth rehashes it. The caller keeps `source` off this store.
+    pub fn clone_foreign(&mut self, source: SymbolTableRead<'_>) -> SymbolTableId {
+        debug_assert!(
+            !std::ptr::eq(source.names, &raw const self.names),
+            "own table cloned as foreign"
+        );
+        let id = SymbolTableId(
+            self.tables
+                .push(TableRecord::Compact(HashTable::with_capacity(source.len()))),
+        );
+        let mut table = self.get_mut(id).expect("new symbol table belongs to owner");
+        for (name, symbol) in source {
+            table.insert_bytes(name, symbol);
+        }
+        id
+    }
+    /// Room in the shared name pool for `additional` more distinct names.
+    pub fn reserve_names(&mut self, additional: usize) {
+        let NamePool {
+            bytes,
+            ranges,
+            wide_ranges,
+            names,
+            hash_builder,
+        } = &mut self.names;
+        names.reserve(additional, |&name| {
+            let range = ranges[name - 1];
+            let range = if range.is_escape() {
+                wide_ranges.as_ref().expect("wide ranges")[&name].clone()
+            } else {
+                let start = range.start as usize;
+                start..start + range.len as usize
+            };
+            hash_builder.hash_one(&bytes[range])
+        });
+        ranges.reserve(additional);
+    }
     pub fn get(&self, id: SymbolTableId) -> Result<SymbolTableRead<'_>, Error> {
         Ok(SymbolTableRead {
             table: self.tables.get(id.0)?,
@@ -432,10 +492,13 @@ impl<'a> SymbolTableRead<'a> {
     /// Absent entries and present entries containing a null symbol differ.
     #[allow(clippy::option_option)]
     pub fn get(self, bytes: &[u8]) -> Option<Option<SymbolId>> {
+        self.get_hashed(bytes, self.names.hash(bytes))
+    }
+    /// `get` with `hash` from [`name_hash`], for callers that hash once.
+    pub fn get_hashed(self, bytes: &[u8], hash: u64) -> Option<Option<SymbolId>> {
+        debug_assert_eq!(hash, self.names.hash(bytes));
         self.table
-            .find(self.names.hash(bytes), self.symbols, |name| {
-                self.names.bytes(name) == bytes
-            })
+            .find(hash, self.symbols, |name| self.names.bytes(name) == bytes)
     }
     pub fn contains_key(self, bytes: &[u8]) -> bool {
         self.get(bytes).is_some()
@@ -525,7 +588,16 @@ impl SymbolTableMut<'_> {
         name: &[u8],
         symbol: Option<SymbolId>,
     ) -> Option<Option<SymbolId>> {
-        let hash = self.names.hash(name);
+        self.insert_bytes_hashed(name, self.names.hash(name), symbol)
+    }
+    /// `insert_bytes` with `hash` from [`name_hash`], for callers that hash once.
+    pub fn insert_bytes_hashed(
+        &mut self,
+        name: &[u8],
+        hash: u64,
+        symbol: Option<SymbolId>,
+    ) -> Option<Option<SymbolId>> {
+        debug_assert_eq!(hash, self.names.hash(name));
         let name = self.names.intern_hashed(name, hash);
         if let Some(symbol) = symbol {
             self.symbols.get_or_insert(symbol.arena());
@@ -534,6 +606,13 @@ impl SymbolTableMut<'_> {
             .insert(name, symbol, *self.symbols, hash, |name| {
                 self.names.hash(self.names.bytes(name))
             })
+    }
+    /// Room for `additional` more entries, so a table whose final size is
+    /// known up front (the globals of a program) is never rehashed while it
+    /// fills; the census charges the same capacity either way.
+    pub fn reserve(&mut self, additional: usize) {
+        self.table
+            .reserve(additional, |name| self.names.hash(self.names.bytes(name)));
     }
     #[allow(clippy::option_option)]
     pub fn remove(&mut self, bytes: &[u8]) -> Option<Option<SymbolId>> {
@@ -620,6 +699,36 @@ mod tests {
 
     fn js(bytes: &[u8]) -> JsString {
         JsString::from_bytes(bytes)
+    }
+
+    #[test]
+    fn cloned_tables_keep_entries_across_and_within_stores() {
+        let counters = Counters::new();
+        let mut symbols = SymbolArena::new(&counters);
+        let a = symbols.push(());
+        let b = symbols.push(());
+        let mut binder = SymbolTables::new(&counters);
+        let source = binder.alloc(SymbolTable::from_iter([
+            (js(b"a"), Some(a)),
+            (js(b"b"), Some(b)),
+            (js(b"null"), None),
+        ]));
+        let mut checker = SymbolTables::new(&counters);
+        let foreign = checker.clone_foreign(binder.get(source).unwrap());
+        let own = checker.clone_own(foreign).unwrap();
+        for id in [foreign, own] {
+            let read = checker.get(id).unwrap();
+            assert_eq!(read.len(), 3);
+            assert_eq!(read.get(b"a"), Some(Some(a)));
+            assert_eq!(read.get(b"b"), Some(Some(b)));
+            assert_eq!(read.get(b"null"), Some(None));
+            assert_eq!(read.get(b"c"), None);
+        }
+        // The clones are independent tables: a later insert stays local.
+        checker.get_mut(own).unwrap().insert_bytes(b"c", Some(a));
+        assert_eq!(checker.get(foreign).unwrap().len(), 3);
+        assert_eq!(checker.get(own).unwrap().len(), 4);
+        assert_eq!(binder.get(source).unwrap().len(), 3);
     }
 
     #[test]

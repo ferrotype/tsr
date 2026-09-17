@@ -132,16 +132,7 @@ impl CheckerState {
         &mut self,
         table: Option<ts_ast::SymbolTableId>,
     ) -> Result<Option<ts_ast::SymbolTableId>, Error> {
-        table
-            .map(|table| {
-                let copied = self
-                    .table(table)?
-                    .iter()
-                    .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
-                    .collect();
-                Ok(self.alloc_symbol_table(copied))
-            })
-            .transpose()
+        self.clone_symbol_table(table)
     }
     // port: tsc/internal/checker/checker.go:Checker.invocationErrorRecovery
     pub(crate) fn module_invocation_error_related(

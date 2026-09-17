@@ -16,6 +16,7 @@ mod symbol_access;
 pub mod symbol_flags;
 mod symbol_store;
 mod symbol_tables;
+pub use symbol_tables::name_hash;
 mod symbols;
 pub use flow::*;
 pub use symbol_access::{SymbolAccess, SymbolRef};
