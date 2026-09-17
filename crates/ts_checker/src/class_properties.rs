@@ -14,7 +14,7 @@ impl CheckerState {
         kind: K,
     ) -> Result<Option<NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
-            if self.ast(declaration)?.node(declaration)?.kind() == kind {
+            if self.node(declaration)?.kind() == kind {
                 return Ok(Some(declaration));
             }
         }
@@ -23,7 +23,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:isPrivateWithinAmbient
     fn private_within_ambient(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::AMBIENT == 0 {
             return Ok(false);
         }
@@ -44,13 +44,12 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let parameters = self.source_list(node, self.ast(node)?.node(node)?.parameter_list())?;
+        let parameters = self.source_list(node, self.node(node)?.parameter_list())?;
         let Some(&first) = parameters.first() else {
             return Ok(None);
         };
-        let is_this = if let Some(name) = self.ast(first)?.node(first)?.name() {
-            self.ast(name)?.node(name)?.kind() == K::Identifier
-                && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+        let is_this = if let Some(name) = self.node(first)?.name() {
+            self.node(name)?.kind() == K::Identifier && self.node_text(name)?.as_bytes() == b"this"
         } else {
             false
         };
@@ -65,7 +64,7 @@ impl CheckerState {
         let Some(node) = node else {
             return Ok(None);
         };
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::GetAccessor | K::PropertyDeclaration) => Ok(read.type_node()),
             Some(K::SetAccessor) => self
@@ -94,7 +93,7 @@ impl CheckerState {
 
     fn auto_accessor_declaration(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() == K::PropertyDeclaration
                 && read.modifier_flags(self.ast(declaration)?)? & mf::ACCESSOR != 0
             {
@@ -129,7 +128,7 @@ impl CheckerState {
             }
             if ty.is_none() {
                 if let Some(getter) = getter {
-                    if self.ast(getter)?.node(getter)?.body().is_some() {
+                    if self.node(getter)?.body().is_some() {
                         ty = Some(self.return_type_from_body(getter)?);
                     }
                 }
@@ -259,7 +258,7 @@ impl CheckerState {
         include_optionality: bool,
         mode: u32,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let optional = include_optionality && read.question_token(self.ast(node)?)?.is_some();
         let initializer = read.initializer();
@@ -279,11 +278,10 @@ impl CheckerState {
                     .node(node)?
                     .parent()
                     .ok_or(Error::MissingLink("property class"))?;
-                let members =
-                    self.source_list(class, self.ast(class)?.node(class)?.member_list())?;
+                let members = self.source_list(class, self.node(class)?.member_list())?;
                 let mut containers = Vec::new();
                 for member in members {
-                    let read = self.ast(member)?.node(member)?;
+                    let read = self.node(member)?;
                     if modifiers & mf::STATIC == 0
                         && read.kind() == K::Constructor
                         && read.body().is_some()
@@ -356,8 +354,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkPropertySignature
     pub(crate) fn check_property_signature(&mut self, node: NodeId) -> Result<(), Error> {
-        if let Some(name) = self.ast(node)?.node(node)?.name() {
-            if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+        if let Some(name) = self.node(node)?.name() {
+            if self.node(name)?.kind() == K::PrivateIdentifier {
                 self.error_at(
                     Some(node),
                     messages::Private_identifiers_are_not_allowed_outside_class_bodies,
@@ -371,7 +369,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkPropertyDeclaration
     pub(crate) fn check_class_property(&mut self, node: NodeId) -> Result<(), Error> {
         let grammar_error = self.check_grammar_modifiers(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let name = read.name().ok_or(Error::MissingLink("property name"))?;
         let initializer = read.initializer();
@@ -379,7 +377,7 @@ impl CheckerState {
             self.check_grammar_computed_property_name(name)?;
         }
         self.check_variable_initializer(node)?;
-        if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+        if self.node(name)?.kind() == K::PrivateIdentifier {
             self.set_node_links_for_private_identifier_scope(node)?;
         }
         if modifiers & mf::ABSTRACT != 0 && initializer.is_some() {
@@ -397,7 +395,7 @@ impl CheckerState {
         &mut self,
         name: NodeId,
     ) -> Result<bool, Error> {
-        if self.ast(name)?.node(name)?.kind() != K::ComputedPropertyName {
+        if self.node(name)?.kind() != K::ComputedPropertyName {
             return Ok(false);
         }
         let expression = self
@@ -414,7 +412,7 @@ impl CheckerState {
             let operator = binary
                 .operator_token()
                 .ok_or(Error::MissingLink("computed grammar operator"))?;
-            if self.ast(operator)?.node(operator)?.kind() == K::CommaToken {
+            if self.node(operator)?.kind() == K::CommaToken {
                 return self.grammar_error_node(
                     expression,
                     messages::A_comma_expression_is_not_allowed_in_a_computed_property_name,
@@ -434,7 +432,7 @@ impl CheckerState {
         if !ts_ast::is_dynamic_name(self.ast(name)?, name)? {
             return Ok(false);
         }
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let computed = read.kind() == K::ComputedPropertyName;
         let expression = if computed {
             read.expression()
@@ -468,7 +466,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarProperty
     fn check_class_property_grammar(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read.name().ok_or(Error::MissingLink("property name"))?;
         let postfix = read.postfix_token();
         let initializer = read.initializer();
@@ -477,10 +475,10 @@ impl CheckerState {
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let parent = read.parent().ok_or(Error::MissingLink("property parent"))?;
         let class = matches!(
-            self.ast(parent)?.node(parent)?.kind().known(),
+            self.node(parent)?.kind().known(),
             Some(K::ClassDeclaration | K::ClassExpression)
         );
-        let name_read = self.ast(name)?.node(name)?;
+        let name_read = self.node(name)?;
         if name_read.kind() == K::ComputedPropertyName {
             if let Some(expression) = name_read.expression() {
                 if let Some(binary) = self
@@ -492,9 +490,8 @@ impl CheckerState {
                     let operator = binary
                         .operator_token()
                         .ok_or(Error::MissingLink("computed grammar operator"))?;
-                    if self.ast(operator)?.node(operator)?.kind() == K::InKeyword {
-                        let members = self
-                            .source_list(parent, self.ast(parent)?.node(parent)?.member_list())?;
+                    if self.node(operator)?.kind() == K::InKeyword {
+                        let members = self.source_list(parent, self.node(parent)?.member_list())?;
                         return self.grammar_error_node(
                             *members
                                 .first()
@@ -507,8 +504,8 @@ impl CheckerState {
             }
         }
         if class
-            && self.ast(name)?.node(name)?.kind() == K::StringLiteral
-            && self.ast(name)?.node_text(name)?.as_bytes() == b"constructor"
+            && self.node(name)?.kind() == K::StringLiteral
+            && self.node_text(name)?.as_bytes() == b"constructor"
         {
             return self.grammar_error_node(
                 name,
@@ -518,9 +515,9 @@ impl CheckerState {
         }
         let dynamic_message = if class {
             Some(messages::A_computed_property_name_in_a_class_property_declaration_must_have_a_simple_literal_type_or_a_unique_symbol_type)
-        } else if self.ast(parent)?.node(parent)?.kind() == K::InterfaceDeclaration {
+        } else if self.node(parent)?.kind() == K::InterfaceDeclaration {
             Some(messages::A_computed_property_name_in_an_interface_must_refer_to_an_expression_whose_type_is_a_literal_type_or_a_unique_symbol_type)
-        } else if self.ast(parent)?.node(parent)?.kind() == K::TypeLiteral {
+        } else if self.node(parent)?.kind() == K::TypeLiteral {
             Some(messages::A_computed_property_name_in_a_type_literal_must_refer_to_an_expression_whose_type_is_a_literal_type_or_a_unique_symbol_type)
         } else {
             None
@@ -532,7 +529,7 @@ impl CheckerState {
         }
         if !class {
             if let Some(initializer) = initializer {
-                let message = match self.ast(parent)?.node(parent)?.kind().known() {
+                let message = match self.node(parent)?.kind().known() {
                     Some(K::InterfaceDeclaration) => {
                         Some(messages::An_interface_property_cannot_have_an_initializer)
                     }
@@ -548,7 +545,7 @@ impl CheckerState {
         }
         if class && modifiers & mf::ACCESSOR != 0 {
             if let Some(token) = postfix {
-                if self.ast(token)?.node(token)?.kind() == K::QuestionToken {
+                if self.node(token)?.kind() == K::QuestionToken {
                     return self.grammar_error_node(
                         token,
                         messages::An_accessor_property_cannot_be_declared_optional,
@@ -561,7 +558,7 @@ impl CheckerState {
             self.check_ambient_initializer(node)?;
         }
         if let Some(token) = postfix {
-            if self.ast(token)?.node(token)?.kind() == K::ExclamationToken {
+            if self.node(token)?.kind() == K::ExclamationToken {
                 let message = if initializer.is_some() {
                     Some(messages::Declarations_with_initializers_cannot_also_have_definite_assignment_assertions)
                 } else if annotation.is_none() {
@@ -591,13 +588,13 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("accessor name"))?;
             self.check_grammar_computed_property_name(name)?;
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read.name().ok_or(Error::MissingLink("accessor name"))?;
         let getter_kind = read.kind() == K::GetAccessor;
         let flags = read.flags();
         let body = read.body();
-        if self.ast(name)?.node(name)?.kind() == K::Identifier
-            && self.ast(name)?.node_text(name)?.as_bytes() == b"constructor"
+        if self.node(name)?.kind() == K::Identifier
+            && self.node_text(name)?.as_bytes() == b"constructor"
         {
             let parent = self
                 .ast(node)?
@@ -605,7 +602,7 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("accessor parent"))?;
             if matches!(
-                self.ast(parent)?.node(parent)?.kind().known(),
+                self.node(parent)?.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression)
             ) {
                 self.error_at(
@@ -628,7 +625,7 @@ impl CheckerState {
                 vec![],
             )?;
         }
-        if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+        if self.node(name)?.kind() == K::ComputedPropertyName {
             self.check_computed_property_name(name)?;
         }
         let bindable = !self.non_bindable_dynamic_name(name)?;
@@ -647,8 +644,8 @@ impl CheckerState {
                     .ast(setter)?
                     .node(setter)?
                     .modifier_flags(self.ast(setter)?)?;
-                let getter_name = self.ast(getter)?.node(getter)?.name();
-                let setter_name = self.ast(setter)?.node(setter)?.name();
+                let getter_name = self.node(getter)?.name();
+                let setter_name = self.node(setter)?.name();
                 if getter_flags & mf::ABSTRACT != setter_flags & mf::ABSTRACT {
                     self.error_at(
                         getter_name,
@@ -691,13 +688,13 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarAccessor
     fn check_accessor_grammar(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read.name().ok_or(Error::MissingLink("accessor name"))?;
         let body = read.body();
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let parent = read.parent().ok_or(Error::MissingLink("accessor parent"))?;
         let interface = matches!(
-            self.ast(parent)?.node(parent)?.kind().known(),
+            self.node(parent)?.kind().known(),
             Some(K::TypeLiteral | K::InterfaceDeclaration)
         );
         if read.flags() & nf::AMBIENT == 0
@@ -741,10 +738,10 @@ impl CheckerState {
         let parameters = self.source_list(node, read.parameter_list())?;
         let this = if parameters.len() == if getter { 1 } else { 2 } {
             let parameter = parameters[0];
-            match self.ast(parameter)?.node(parameter)?.name() {
+            match self.node(parameter)?.name() {
                 Some(name) => {
-                    self.ast(name)?.node(name)?.kind() == K::Identifier
-                        && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+                    self.node(name)?.kind() == K::Identifier
+                        && self.node_text(name)?.as_bytes() == b"this"
                 }
                 None => false,
             }
@@ -773,7 +770,7 @@ impl CheckerState {
             let parameter = self
                 .set_accessor_value_parameter(node)?
                 .ok_or(Error::MissingLink("setter parameter after arity check"))?;
-            let parameter_read = self.ast(parameter)?.node(parameter)?;
+            let parameter_read = self.node(parameter)?;
             let data = parameter_read
                 .data_source()
                 .as_parameter_declaration()

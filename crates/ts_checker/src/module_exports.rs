@@ -175,7 +175,7 @@ impl CheckerState {
                     .into_iter()
                     .flatten()
                 {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     let data = read
                         .data_source()
                         .as_export_declaration()
@@ -215,7 +215,7 @@ impl CheckerState {
                 self.extend_module_exports(&mut symbols, nested, None)?;
             }
             if let Some(star) = export_star {
-                if self.ast(star)?.node(star)?.is_type_only() {
+                if self.node(star)?.is_type_only() {
                     for name in symbols.keys() {
                         traversal.type_only.insert(name.clone(), star);
                     }

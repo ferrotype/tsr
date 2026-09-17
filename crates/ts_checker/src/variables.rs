@@ -16,7 +16,7 @@ impl CheckerState {
         &self,
         mut declaration: NodeId,
     ) -> Result<bool, Error> {
-        while self.ast(declaration)?.node(declaration)?.kind() == K::BindingElement {
+        while self.node(declaration)?.kind() == K::BindingElement {
             let pattern = self
                 .ast(declaration)?
                 .node(declaration)?
@@ -28,14 +28,14 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("binding declaration"))?;
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if read.kind() != K::Parameter {
             return Ok(false);
         }
         let function = read
             .parent()
             .ok_or(Error::MissingLink("parameter function"))?;
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let method = read.kind() == K::MethodDeclaration
             && read
                 .parent()
@@ -61,7 +61,7 @@ impl CheckerState {
         include_optionality: bool,
         mode: u32,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let kind = read.kind();
         if kind == K::BindingElement {
             return self.type_for_binding_element(declaration);
@@ -79,8 +79,8 @@ impl CheckerState {
         }
         let parent = read.parent().ok_or(Error::MissingLink("variable parent"))?;
         if kind == K::VariableDeclaration {
-            if let Some(grandparent) = self.ast(parent)?.node(parent)?.parent() {
-                let read = self.ast(grandparent)?.node(grandparent)?;
+            if let Some(grandparent) = self.node(parent)?.parent() {
+                let read = self.node(grandparent)?;
                 if read.kind() == K::ForInStatement {
                     let expression = read
                         .expression()
@@ -99,7 +99,7 @@ impl CheckerState {
                 }
             }
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let optional =
             include_optionality && read.question_token(self.ast(declaration)?)?.is_some();
         let annotation = read.type_node();
@@ -108,9 +108,7 @@ impl CheckerState {
         let declared = annotation
             .map(|node| self.get_type_from_type_node(node))
             .transpose()?;
-        if kind == K::VariableDeclaration
-            && self.ast(parent)?.node(parent)?.kind() == K::CatchClause
-        {
+        if kind == K::VariableDeclaration && self.node(parent)?.kind() == K::CatchClause {
             if let Some(ty) = declared {
                 return Ok(Some(if self.types.flags(ty)? & tf::ANY_OR_UNKNOWN != 0 {
                     ty
@@ -133,7 +131,7 @@ impl CheckerState {
                 .map(Some);
         }
         let binding = matches!(
-            self.ast(name)?.node(name)?.kind().known(),
+            self.node(name)?.kind().known(),
             Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
         );
         let no_implicit = self
@@ -147,7 +145,7 @@ impl CheckerState {
             && ts_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
                 & mf::EXPORT
                 == 0
-            && self.ast(declaration)?.node(declaration)?.flags() & nf::AMBIENT == 0
+            && self.node(declaration)?.flags() & nf::AMBIENT == 0
         {
             let constant =
                 ts_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
@@ -162,7 +160,7 @@ impl CheckerState {
                 return Ok(Some(self.builtins.auto_type));
             }
             if let Some(node) = initializer {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 if read.kind() == K::ArrayLiteralExpression
                     && self.source_list(node, read.element_list())?.is_empty()
                 {
@@ -171,7 +169,7 @@ impl CheckerState {
             }
         }
         if kind == K::Parameter {
-            if self.ast(parent)?.node(parent)?.kind() == K::SetAccessor {
+            if self.node(parent)?.kind() == K::SetAccessor {
                 if let Some(symbol) = self.get_symbol_of_declaration(parent)? {
                     if let Some(getter) = self.declaration_of_kind(symbol, K::GetAccessor)? {
                         let signature = self.signature_from_declaration(getter)?;
@@ -190,8 +188,8 @@ impl CheckerState {
             if let Some(ty) = self.parameter_type_of_full_signature(parent, declaration)? {
                 return Ok(Some(ty));
             }
-            let contextual = if self.ast(name)?.node(name)?.kind() == K::Identifier
-                && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+            let contextual = if self.node(name)?.kind() == K::Identifier
+                && self.node_text(name)?.as_bytes() == b"this"
             {
                 self.contextual_this_parameter_type(parent)?
             } else {
@@ -243,7 +241,7 @@ impl CheckerState {
             self.check_expression_ex(initializer, mode)?
         };
         let mut root = declaration;
-        while self.ast(root)?.node(root)?.kind() == K::BindingElement {
+        while self.node(root)?.kind() == K::BindingElement {
             let pattern = self
                 .ast(root)?
                 .node(root)?
@@ -255,13 +253,13 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("initializer root"))?;
         }
-        if self.ast(root)?.node(root)?.kind() == K::Parameter {
+        if self.node(root)?.kind() == K::Parameter {
             let name = self
                 .ast(declaration)?
                 .node(declaration)?
                 .name()
                 .ok_or(Error::MissingLink("initializer name"))?;
-            let kind = self.ast(name)?.node(name)?.kind();
+            let kind = self.node(name)?.kind();
             if kind == K::ObjectBindingPattern
                 && self.types.get(ty)?.object_flags & of::OBJECT_LITERAL != 0
             {
@@ -307,7 +305,7 @@ impl CheckerState {
         } else {
             self.widen_literal_type(ty)?
         };
-        if self.ast(declaration)?.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0 {
+        if self.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0 {
             let empty = if self.options.strict_null_checks {
                 self.builtins.implicit_never_type
             } else {
@@ -339,7 +337,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         if let Some(mut ty) = ty {
             if self.types.flags(ty)? & tf::ES_SYMBOL != 0 {
-                if let Some(parent) = self.ast(declaration)?.node(declaration)?.parent() {
+                if let Some(parent) = self.node(declaration)?.parent() {
                     let global =
                         self.resolve_name(None, b"SymbolConstructor", sf::TYPE, None, false)?;
                     if global.is_some() && self.get_symbol_of_declaration(parent)? == global {
@@ -359,7 +357,7 @@ impl CheckerState {
                 self.report_implicit_any(declaration, ty)?;
             }
             if self.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0
-                && (self.ast(declaration)?.node(declaration)?.kind() == K::BindingElement
+                && (self.node(declaration)?.kind() == K::BindingElement
                     || self
                         .ast(declaration)?
                         .node(declaration)?
@@ -373,7 +371,7 @@ impl CheckerState {
             }
             return self.widened_type(ty);
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let rest = read.kind() == K::Parameter
             && read
                 .data_source()

@@ -382,9 +382,9 @@ impl CheckerState {
         container: SymbolId,
     ) -> Result<bool, Error> {
         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            let node = self.ast(declaration)?.node(declaration)?;
+            let node = self.node(declaration)?;
             for declaration in self.symbol_declarations(container)?.iter().flatten() {
-                let containing = self.ast(declaration)?.node(declaration)?;
+                let containing = self.node(declaration)?;
                 // Source compares ranges, without an extra same-file condition.
                 if node.pos() >= containing.pos() && node.end() <= containing.end() {
                     return Ok(true);

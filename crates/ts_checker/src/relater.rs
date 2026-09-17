@@ -306,7 +306,7 @@ impl CheckerState {
                     if let Some(&(alias_target, import)) =
                         relater.checker.module_aliases.export_types.get(&symbol)
                     {
-                        if relater.checker.ast(import)?.node(import)?.kind()
+                        if relater.checker.node(import)?.kind()
                             != ts_ast::SyntaxKind::CallExpression
                         {
                             let ty = relater.checker.get_type_of_symbol(alias_target)?;

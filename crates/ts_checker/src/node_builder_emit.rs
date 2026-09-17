@@ -49,7 +49,7 @@ impl NodeBuilder<'_> {
                                     continue;
                                 }
                             }
-                            let read = self.checker.ast(component)?.node(component)?;
+                            let read = self.checker.node(component)?;
                             let name = read
                                 .name()
                                 .ok_or(Error::MissingLink("late index component name"))?;
@@ -64,7 +64,7 @@ impl NodeBuilder<'_> {
                                 self.checker.ast(expression)?,
                                 expression,
                             )?;
-                            let text = self.checker.ast(first)?.node_text(first)?.into_js_string();
+                            let text = self.checker.node_text(first)?.into_js_string();
                             if let Some(symbol) = self.checker.resolve_name(
                                 Some(first),
                                 text.as_bytes(),

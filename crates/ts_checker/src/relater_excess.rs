@@ -175,8 +175,7 @@ impl Relater<'_> {
                 continue;
             };
             if container_declaration.is_none()
-                || self.checker.ast(declaration)?.node(declaration)?.parent()
-                    != container_declaration
+                || self.checker.node(declaration)?.parent() != container_declaration
                 || jsx && name.as_bytes().contains(&b'-')
             {
                 continue;
@@ -247,7 +246,7 @@ impl Relater<'_> {
             .errors
             .error_node
             .ok_or(Error::MissingLink("No errorNode in hasExcessProperties"))?;
-        let error_read = self.checker.ast(error_node)?.node(error_node)?;
+        let error_read = self.checker.node(error_node)?;
         let jsx_error = jsx
             || ts_ast::is_jsx_attributes(&error_read)
             || ts_ast::utilities_middle::is_jsx_opening_like_element(&error_read)
@@ -255,7 +254,7 @@ impl Relater<'_> {
                 .parent()
                 .map(|parent| {
                     Ok::<_, Error>(ts_ast::utilities_middle::is_jsx_opening_like_element(
-                        &self.checker.ast(parent)?.node(parent)?,
+                        &self.checker.node(parent)?,
                     ))
                 })
                 .transpose()?

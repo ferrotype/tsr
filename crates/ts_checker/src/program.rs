@@ -55,6 +55,40 @@ impl CheckerState {
             .ok_or(crate::Error::Unsupported("query without a checker program"))
     }
 
+    /// `ast(node)?.node(node)?` in one step: the current core file's header
+    /// directly, with one slot validation instead of two and no owner
+    /// selection in between.
+    #[inline]
+    pub(crate) fn node(&self, node: NodeId) -> Result<ts_ast::NodeRead<'_>, crate::Error> {
+        if self.factory.id().arena() == node.arena() {
+            return Ok(self.factory.view().node(node)?);
+        }
+        Ok(self.program()?.node(node)?)
+    }
+
+    /// `ast(node)?.node_text(node)?` without the view's own validation of
+    /// `node`: the text read validates the id itself.
+    #[inline]
+    pub(crate) fn node_text(&self, node: NodeId) -> Result<ts_ast::NodeText<'_>, crate::Error> {
+        if self.factory.id().arena() == node.arena() {
+            return Ok(self.factory.view().node_text(node)?);
+        }
+        Ok(self.program()?.view_of(node)?.node_text(node)?)
+    }
+
+    /// `ast(source)?.source_file(source)?` by the directory alone; the
+    /// source-file read validates the id itself.
+    #[inline]
+    pub(crate) fn source_file_read(
+        &self,
+        source: NodeId,
+    ) -> Result<ts_ast::SourceFileRead<'_>, crate::Error> {
+        if self.factory.id().arena() == source.arena() {
+            return Ok(self.factory.view().source_file(source)?);
+        }
+        Ok(self.program()?.view_of(source)?.source_file(source)?)
+    }
+
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, crate::Error> {
         if self.factory.id().arena() == node.arena() {
             let view = self.factory.view();
@@ -134,6 +168,28 @@ impl ProgramContext {
             }
         }
         self.bound(node).map(ts_ast::BoundView::result)
+    }
+
+    /// The view of the file whose core arena holds `node`, selected by the
+    /// directory alone and validating nothing: for reads that validate the id
+    /// themselves. Other arenas take the routed, validating path.
+    #[inline]
+    pub(crate) fn view_of(&self, node: NodeId) -> Result<AstView<'_>, Error> {
+        if let Some(index) = self.core_file_index(node) {
+            return Ok(self.file_view(index).ast());
+        }
+        self.ast(node)
+    }
+
+    /// One node read by the shortest path; see `SharedBoundFile::node`.
+    #[inline]
+    pub(crate) fn node(&self, node: NodeId) -> Result<ts_ast::NodeRead<'_>, Error> {
+        if let Some(index) = self.core_file_index(node) {
+            if let Some(shared) = &self.shared[index] {
+                return shared.node(node);
+            }
+        }
+        self.ast(node)?.node(node)
     }
 
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, Error> {

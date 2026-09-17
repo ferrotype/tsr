@@ -18,7 +18,7 @@ impl CheckerState {
             expression,
         )? {
             self.non_nullable_type(ty)
-        } else if self.ast(expression)?.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0 {
+        } else if self.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0 {
             self.remove_optional_type_marker(ty)
         } else {
             Ok(ty)
@@ -64,7 +64,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkNonNullAssertion
     // port: tsc/internal/checker/checker.go:Checker.checkNonNullChain
     pub(crate) fn check_non_null_assertion(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let chain = read.flags() & nf::OPTIONAL_CHAIN != 0;
         let expression = read
             .expression()

@@ -333,12 +333,12 @@ impl CheckerState {
         location: Option<NodeId>,
     ) -> Result<Option<SymbolId>, Error> {
         use ts_ast::{internal_symbol_names as names, SyntaxKind as K};
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         if read.pos() == read.end() {
             return Ok(None);
         }
         let symbol = if read.kind() == K::Identifier {
-            let text = self.ast(name)?.node_text(name)?.into_js_string();
+            let text = self.node_text(name)?.into_js_string();
             let message = if meaning == sf::NAMESPACE || read.pos() < 0 {
                 ts_diagnostics::Cannot_find_namespace_0
             } else {
@@ -410,12 +410,12 @@ impl CheckerState {
             if namespace == self.builtins.unknown_symbol {
                 return Ok(Some(namespace));
             }
-            if self.ast(right)?.node(right)?.pos() == self.ast(right)?.node(right)?.end() {
+            if self.node(right)?.pos() == self.node(right)?.end() {
                 return Ok(None);
             }
             let namespace = self.resolve_common_js_namespace(namespace)?;
             let exports = self.module_exports_of_symbol(namespace)?;
-            let text = self.ast(right)?.node_text(right)?.into_js_string();
+            let text = self.node_text(right)?.into_js_string();
             let mut symbol = self.lookup_symbol_resolving(exports, text.as_bytes(), meaning)?;
             if symbol.is_none() && self.symbol(namespace)?.flags() & sf::ALIAS != 0 {
                 let target = self.resolve_alias(namespace)?;
@@ -650,13 +650,12 @@ impl CheckerState {
                 if view.node(last)?.kind() == ts_ast::SyntaxKind::SourceFile
                     && ts_ast::utilities::is_external_or_common_js_module(&view.source_file(last)?)
                 {
-                    if self.ast(location)?.node(location)?.flags() & ts_ast::node_flags::JS_DOC == 0
-                    {
+                    if self.node(location)?.flags() & ts_ast::node_flags::JS_DOC == 0 {
                         let merged = self.get_merged_symbol(resolution.symbol);
                         let declarations = self.symbol_declarations(merged)?.to_vec();
                         let mut umd = !declarations.is_empty();
                         for declaration in declarations.into_iter().flatten() {
-                            let kind = self.ast(declaration)?.node(declaration)?.kind();
+                            let kind = self.node(declaration)?.kind();
                             if kind != ts_ast::SyntaxKind::NamespaceExportDeclaration
                                 && !(kind == ts_ast::SyntaxKind::SourceFile
                                     && self
@@ -705,7 +704,7 @@ impl CheckerState {
                                     .flatten()
                                 {
                                     if matches!(
-                                        self.ast(declaration)?.node(declaration)?.kind().known(),
+                                        self.node(declaration)?.kind().known(),
                                         Some(
                                             ts_ast::SyntaxKind::ImportSpecifier
                                                 | ts_ast::SyntaxKind::ImportClause
@@ -751,7 +750,7 @@ impl CheckerState {
         {
             if let Some(declaration) = self.module_type_only_alias(resolution.symbol, sf::VALUE)? {
                 let exported = matches!(
-                    self.ast(declaration)?.node(declaration)?.kind().known(),
+                    self.node(declaration)?.kind().known(),
                     Some(
                         ts_ast::SyntaxKind::ExportSpecifier
                             | ts_ast::SyntaxKind::ExportDeclaration

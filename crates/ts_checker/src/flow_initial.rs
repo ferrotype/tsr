@@ -15,7 +15,7 @@ impl CheckerState {
         reference: NodeId,
     ) -> Result<TypeId, Error> {
         let ty = if matches!(
-            self.ast(target)?.node(target)?.kind().known(),
+            self.node(target)?.kind().known(),
             Some(K::VariableDeclaration | K::BindingElement)
         ) {
             self.flow_initial_type(target)?
@@ -29,18 +29,15 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getInitialTypeOfBindingElement
     fn flow_initial_type(&mut self, node: NodeId) -> Result<TypeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::VariableDeclaration) => {
                     if let Some(initializer) = read.initializer() {
                         return self.type_of_initializer(initializer);
                     }
                     let list = required(read.parent(), "flow initial declaration list")?;
-                    let parent = required(
-                        self.ast(list)?.node(list)?.parent(),
-                        "flow initial statement",
-                    )?;
-                    match self.ast(parent)?.node(parent)?.kind().known() {
+                    let parent = required(self.node(list)?.parent(), "flow initial statement")?;
+                    match self.node(parent)?.kind().known() {
                         Some(K::ForInStatement) => Ok(self.builtins.string_type),
                         Some(K::ForOfStatement) => self.check_right_hand_side_of_for_of(parent),
                         _ => Ok(self.builtins.error_type),
@@ -51,19 +48,13 @@ impl CheckerState {
                     let initializer = read.initializer();
                     let name =
                         required(read.property_name().or(read.name()), "initial binding name")?;
-                    let parent = required(
-                        self.ast(pattern)?.node(pattern)?.parent(),
-                        "initial binding parent",
-                    )?;
+                    let parent = required(self.node(pattern)?.parent(), "initial binding parent")?;
                     let ty = self.flow_initial_type(parent)?;
-                    let ty = if self.ast(pattern)?.node(pattern)?.kind() == K::ObjectBindingPattern
-                    {
+                    let ty = if self.node(pattern)?.kind() == K::ObjectBindingPattern {
                         self.flow_destructured_property_type(ty, name)?
                     } else if !self.binding_is_rest(node)? {
-                        let elements = self.source_list(
-                            pattern,
-                            self.ast(pattern)?.node(pattern)?.element_list(),
-                        )?;
+                        let elements =
+                            self.source_list(pattern, self.node(pattern)?.element_list())?;
                         let index = elements
                             .iter()
                             .position(|&element| element == node)
@@ -82,11 +73,8 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getAssignedType
     fn flow_assigned_type(&mut self, node: NodeId) -> Result<TypeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let parent = required(
-                self.ast(node)?.node(node)?.parent(),
-                "flow assignment parent",
-            )?;
-            let read = self.ast(parent)?.node(parent)?;
+            let parent = required(self.node(node)?.parent(), "flow assignment parent")?;
+            let read = self.node(parent)?;
             match read.kind().known() {
                 Some(K::ForInStatement) => Ok(self.builtins.string_type),
                 Some(K::ForOfStatement) => self.check_right_hand_side_of_for_of(parent),
@@ -99,12 +87,12 @@ impl CheckerState {
                         "assigned binary right",
                     )?;
                     let outer = required(read.parent(), "assigned binary parent")?;
-                    let kind = self.ast(outer)?.node(outer)?.kind();
+                    let kind = self.node(outer)?.kind();
                     let default = kind == K::ArrayLiteralExpression
                         && self.reference_destructuring_target(outer)?
                         || kind == K::PropertyAssignment
                             && self.reference_destructuring_target(required(
-                                self.ast(outer)?.node(outer)?.parent(),
+                                self.node(outer)?.parent(),
                                 "default object literal",
                             )?)?;
                     if default {

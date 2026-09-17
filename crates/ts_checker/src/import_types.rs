@@ -10,7 +10,7 @@ impl CheckerState {
         if let Some(Some(ty)) = self.query.type_nodes.try_get(node) {
             return Ok(*ty);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_import_type_node()
@@ -20,15 +20,13 @@ impl CheckerState {
             .ok_or(Error::MissingLink("import type argument"))?;
         let qualifier = data.qualifier();
         let type_of = data.is_type_of();
-        let argument_read = self.ast(argument)?.node(argument)?;
+        let argument_read = self.node(argument)?;
         let literal = argument_read
             .data_source()
             .as_literal_type_node()
             .and_then(|d| d.literal());
         let literal = match literal {
-            Some(literal) if self.ast(literal)?.node(literal)?.kind() == K::StringLiteral => {
-                literal
-            }
+            Some(literal) if self.node(literal)?.kind() == K::StringLiteral => literal,
             _ => {
                 self.error_at(Some(argument), d::String_literal_expected, vec![])?;
                 *self.query.resolved_symbols.get_or_default(node) =
@@ -48,10 +46,7 @@ impl CheckerState {
             .resolve_external_module_symbol(Some(inner), false)?
             .ok_or(Error::MissingLink("import type module"))?;
         let qualifier = match qualifier {
-            Some(qualifier)
-                if self.ast(qualifier)?.node(qualifier)?.pos()
-                    != self.ast(qualifier)?.node(qualifier)?.end() =>
-            {
+            Some(qualifier) if self.node(qualifier)?.pos() != self.node(qualifier)?.end() => {
                 Some(qualifier)
             }
             _ => None,
@@ -60,7 +55,7 @@ impl CheckerState {
             let mut chain = Vec::new();
             let mut part = qualifier;
             loop {
-                let read = self.ast(part)?.node(part)?;
+                let read = self.node(part)?;
                 if read.kind() == K::Identifier {
                     chain.push(part);
                     break;
@@ -86,7 +81,7 @@ impl CheckerState {
                 } else {
                     sf::NAMESPACE
                 };
-                let text = self.ast(current)?.node_text(current)?.into_js_string();
+                let text = self.node_text(current)?.into_js_string();
                 let resolved = self
                     .resolve_module_symbol(Some(namespace), false)?
                     .ok_or(Error::MissingLink("import qualifier namespace"))?;
@@ -104,7 +99,7 @@ impl CheckerState {
                             .resolve_external_module_symbol(Some(inner), true)?
                             .ok_or(Error::MissingLink("immediate import namespace"))?;
                         for declaration in self.symbol_declarations(immediate)?.iter().flatten() {
-                            if self.ast(declaration)?.node(declaration)?.flags()
+                            if self.node(declaration)?.flags()
                                 & ts_ast::node_flags::JAVA_SCRIPT_FILE
                                 != 0
                             {
@@ -138,7 +133,7 @@ impl CheckerState {
         } else if self.module_symbol_flags(module, false, false)? & meaning != 0 {
             self.resolve_import_symbol_type(node, module, meaning)?
         } else {
-            let text = self.ast(literal)?.node_text(literal)?.into_js_string();
+            let text = self.node_text(literal)?.into_js_string();
             self.error_at(Some(node),if type_of{d::Module_0_does_not_refer_to_a_value_but_is_used_as_a_value_here}else{d::Module_0_does_not_refer_to_a_type_but_is_used_as_a_type_here_Did_you_mean_typeof_import_0},vec![text])?;
             *self.query.resolved_symbols.get_or_default(node) = Some(self.builtins.unknown_symbol);
             self.builtins.error_type
@@ -166,7 +161,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkImportType
     pub(crate) fn check_import_type_node(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_import_type_node()
@@ -183,7 +178,7 @@ impl CheckerState {
         let ty = self.get_type_from_type_node(node)?;
         if ty != self.builtins.error_type
             && !self
-                .source_list(node, self.ast(node)?.node(node)?.type_argument_list())?
+                .source_list(node, self.node(node)?.type_argument_list())?
                 .is_empty()
         {
             if let Some(symbol) = self.query.resolved_symbols.try_get(node).copied().flatten() {

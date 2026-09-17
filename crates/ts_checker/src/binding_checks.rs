@@ -16,7 +16,7 @@ impl CheckerState {
         if !self.binding_is_rest(node)? {
             return Ok(());
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parent = read.parent().ok_or(Error::MissingLink("rest pattern"))?;
         let property = read.property_name();
         let initializer = read.initializer();
@@ -49,7 +49,7 @@ impl CheckerState {
             return Ok(());
         }
         if let Some(initializer) = initializer {
-            let pos = i64::from(self.ast(initializer)?.node(initializer)?.pos());
+            let pos = i64::from(self.node(initializer)?.pos());
             self.grammar_error_range(
                 node,
                 pos - 1,
@@ -62,12 +62,12 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
     pub(crate) fn check_binding_variable(&mut self, node: NodeId) -> Result<(), Error> {
-        for modifier in self.source_list(node, self.ast(node)?.node(node)?.modifiers())? {
-            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
+            if self.node(modifier)?.kind() == K::Decorator {
                 return Err(Error::Unsupported("checkDecorators: parameter or binding"));
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(name) = read.name() else {
             return Ok(());
         };
@@ -76,22 +76,22 @@ impl CheckerState {
         let annotation = read.type_node();
         let pattern = self.is_binding_pattern(name)?;
         let root = self.root_binding_declaration(node)?;
-        let parameter = self.ast(root)?.node(root)?.kind() == K::Parameter;
+        let parameter = self.node(root)?.kind() == K::Parameter;
         if !binding_element {
             if let Some(annotation) = annotation {
                 self.check_source_element(annotation)?;
             }
         }
         if binding_element {
-            if let Some(property) = self.ast(node)?.node(node)?.property_name() {
-                if self.ast(property)?.node(property)?.kind() == K::PrivateIdentifier {
+            if let Some(property) = self.node(node)?.property_name() {
+                if self.node(property)?.kind() == K::PrivateIdentifier {
                     self.grammar_error_node(
                         property,
                         d::Private_identifiers_cannot_be_used_in_destructuring_patterns,
                         vec![],
                     )?;
                 }
-                if self.ast(name)?.node(name)?.kind() == K::Identifier
+                if self.node(name)?.kind() == K::Identifier
                     && parameter
                     && !self.parameter_function_body_present(root)?
                 {
@@ -102,7 +102,7 @@ impl CheckerState {
                     self.query.renamed_binding_elements_in_types.push(node);
                     return Ok(());
                 }
-                if self.ast(property)?.node(property)?.kind() == K::ComputedPropertyName {
+                if self.node(property)?.kind() == K::ComputedPropertyName {
                     self.check_computed_property_name(property)?;
                 }
             }
@@ -111,7 +111,7 @@ impl CheckerState {
                 .node(node)?
                 .parent()
                 .ok_or(Error::MissingLink("binding pattern"))?;
-            if self.ast(parent)?.node(parent)?.kind() == K::ObjectBindingPattern
+            if self.node(parent)?.kind() == K::ObjectBindingPattern
                 && self.binding_is_rest(node)?
                 && self.program()?.host.options().emit_script_target()
                     < ts_core::ScriptTarget::ES2018
@@ -125,7 +125,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("parent binding declaration"))?;
             let mode = if self.binding_is_rest(node)? { 32 } else { 0 };
             if let Some(parent_type) = self.type_for_binding_element_parent(declaration, mode)? {
-                let property = self.ast(node)?.node(node)?.property_name().unwrap_or(name);
+                let property = self.node(node)?.property_name().unwrap_or(name);
                 if !self.is_binding_pattern(property)? {
                     let literal = self.literal_type_from_property_name(property)?;
                     if let Some(text) = self.index_property_name(literal)? {
@@ -140,13 +140,12 @@ impl CheckerState {
                                 .initializer()
                                 .map(|initializer| {
                                     Ok::<_, Error>(
-                                        self.ast(initializer)?.node(initializer)?.kind()
-                                            == K::SuperKeyword,
+                                        self.node(initializer)?.kind() == K::SuperKeyword,
                                     )
                                 })
                                 .transpose()?
                                 .unwrap_or(false);
-                            let error_node = self.ast(node)?.node(node)?.property_name_or_name();
+                            let error_node = self.node(node)?.property_name_or_name();
                             self.check_access_property_accessibility(
                                 node,
                                 is_super,
@@ -161,7 +160,7 @@ impl CheckerState {
             }
         }
         if pattern {
-            for element in self.source_list(name, self.ast(name)?.node(name)?.element_list())? {
+            for element in self.source_list(name, self.node(name)?.element_list())? {
                 self.check_source_element(element)?;
             }
         }
@@ -178,14 +177,14 @@ impl CheckerState {
                 .node(node)?
                 .parent()
                 .ok_or(Error::MissingLink("binding owner parent"))?;
-            let for_in = match self.ast(parent)?.node(parent)?.parent() {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::ForInStatement,
+            let for_in = match self.node(parent)?.parent() {
+                Some(parent) => self.node(parent)?.kind() == K::ForInStatement,
                 None => false,
             };
             let check_initial = initializer.is_some() && !for_in;
             let mut empty = true;
-            for element in self.source_list(name, self.ast(name)?.node(name)?.element_list())? {
-                empty &= self.ast(element)?.node(element)?.name().is_none();
+            for element in self.source_list(name, self.node(name)?.element_list())? {
+                empty &= self.node(element)?.name().is_none();
             }
             if check_initial || empty {
                 let raw = self.type_for_variable_like_raw(node, true, 0)?;
@@ -208,7 +207,7 @@ impl CheckerState {
                     }
                 }
                 if empty {
-                    if self.ast(name)?.node(name)?.kind() == K::ArrayBindingPattern {
+                    if self.node(name)?.kind() == K::ArrayBindingPattern {
                         self.check_iterated_type_or_element_type(
                             crate::iteration::ALLOW_SYNC
                                 | crate::iteration::ALLOW_STRING
@@ -260,7 +259,7 @@ impl CheckerState {
         }
         self.check_exports_on_merged_declarations(node)?;
         if matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::VariableDeclaration | K::BindingElement)
         ) {
             self.check_var_names_not_shadowed(node)?;
@@ -272,9 +271,9 @@ impl CheckerState {
         let function = self
             .containing_body_function(parameter)?
             .ok_or(Error::MissingLink("parameter function"))?;
-        match self.ast(function)?.node(function)?.body() {
+        match self.node(function)?.body() {
             Some(body) => {
-                let read = self.ast(body)?.node(body)?;
+                let read = self.node(body)?;
                 Ok(read.pos() != read.end())
             }
             None => Ok(false),
@@ -283,12 +282,12 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:isInAmbientOrTypeNode
     fn binding_ambient_or_type(&self, node: NodeId) -> Result<bool, Error> {
-        if self.ast(node)?.node(node)?.flags() & nf::AMBIENT != 0 {
+        if self.node(node)?.flags() & nf::AMBIENT != 0 {
             return Ok(true);
         }
         let mut current = Some(node);
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(K::InterfaceDeclaration | K::TypeAliasDeclaration | K::TypeLiteral)
@@ -310,9 +309,7 @@ impl CheckerState {
         if self.types.flags(ty)? & tf::VOID != 0 {
             if ts_ast::is_entity_name_expression(self.ast(node)?, node)? {
                 let text = self.entity_name_text(node)?;
-                if self.ast(node)?.node(node)?.kind() == K::Identifier
-                    && text.as_bytes() == b"undefined"
-                {
+                if self.node(node)?.kind() == K::Identifier && text.as_bytes() == b"undefined" {
                     self.error_at(Some(node), d::The_value_0_cannot_be_used_here, vec![text])?;
                     return Ok(ty);
                 }

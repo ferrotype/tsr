@@ -16,7 +16,7 @@ struct Resolution {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionWithTypeArguments
     pub(crate) fn check_instantiation_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let value_expression = read.kind() == K::ExpressionWithTypeArguments;
         let expression = if value_expression {
             read.expression()
@@ -28,27 +28,27 @@ impl CheckerState {
         }
         .ok_or(Error::MissingLink("instantiation expression"))?;
         if value_expression
-            && self.ast(expression)?.node(expression)?.kind() == K::ImportKeyword
-            && self.ast(node)?.node(node)?.type_argument_list().is_some()
+            && self.node(expression)?.kind() == K::ImportKeyword
+            && self.node(node)?.type_argument_list().is_some()
         {
             self.grammar_error_node(node,d::This_use_of_import_is_invalid_import_calls_can_be_written_but_they_must_have_parentheses_and_cannot_have_type_arguments,vec![])?;
         } else {
             self.check_grammar_type_arguments(node)?;
         }
-        for argument in self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())? {
+        for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
             self.check_source_element(argument)?;
         }
         if value_expression {
-            let mut parent = self.ast(node)?.node(node)?.parent();
+            let mut parent = self.node(node)?.parent();
             while let Some(id) = parent {
-                if self.ast(id)?.node(id)?.kind() != K::ParenthesizedExpression {
+                if self.node(id)?.kind() != K::ParenthesizedExpression {
                     break;
                 }
-                parent = self.ast(id)?.node(id)?.parent();
+                parent = self.node(id)?.parent();
             }
             if let Some(parent) = parent {
-                if self.ast(parent)?.node(parent)?.kind() == K::BinaryExpression {
-                    let read = self.ast(parent)?.node(parent)?;
+                if self.node(parent)?.kind() == K::BinaryExpression {
+                    let read = self.node(parent)?;
                     let data = read
                         .data_source()
                         .as_binary_expression()
@@ -57,7 +57,7 @@ impl CheckerState {
                         .operator_token()
                         .ok_or(Error::MissingLink("instantiation binary operator"))?;
                     let right = data.right();
-                    if self.ast(operator)?.node(operator)?.kind() == K::InstanceOfKeyword
+                    if self.node(operator)?.kind() == K::InstanceOfKeyword
                         && ts_ast::utilities::is_node_descendant_of(
                             self.ast(node)?,
                             Some(node),
@@ -79,7 +79,7 @@ impl CheckerState {
         ty: TypeId,
         node: NodeId,
     ) -> Result<TypeId, Error> {
-        let list = self.ast(node)?.node(node)?.type_argument_list();
+        let list = self.node(node)?.type_argument_list();
         if ty == self.builtins.silent_never_type || self.is_error_type(ty)? || list.is_none() {
             return Ok(ty);
         }

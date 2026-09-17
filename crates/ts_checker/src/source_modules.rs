@@ -11,7 +11,7 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 }
 impl CheckerState {
     pub(crate) fn check_module_block(&mut self, node: NodeId) -> Result<(), Error> {
-        for statement in self.source_list(node, self.ast(node)?.node(node)?.statement_list())? {
+        for statement in self.source_list(node, self.node(node)?.statement_list())? {
             self.check_source_element(statement)?;
         }
         Ok(())
@@ -22,12 +22,9 @@ impl CheckerState {
         node: NodeId,
         message: &'static d::Message,
     ) -> Result<bool, Error> {
-        let parent = required(
-            self.ast(node)?.node(node)?.parent(),
-            "module element parent",
-        )?;
+        let parent = required(self.node(node)?.parent(), "module element parent")?;
         let invalid = !matches!(
-            self.ast(parent)?.node(parent)?.kind().known(),
+            self.node(parent)?.kind().known(),
             Some(K::SourceFile | K::ModuleBlock | K::ModuleDeclaration)
         );
         if invalid {
@@ -37,7 +34,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkModuleDeclaration
     pub(crate) fn check_module_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let body = read.body();
         let global = ts_ast::utilities::is_global_scope_augmentation(&read);
         let ambient = read.flags() & nf::AMBIENT != 0;
@@ -71,11 +68,11 @@ impl CheckerState {
         }
         if !self.check_grammar_modifiers(node)?
             && !ambient
-            && self.ast(name)?.node(name)?.kind() == K::StringLiteral
+            && self.node(name)?.kind() == K::StringLiteral
         {
             self.grammar_error_node(name, d::Only_ambient_modules_can_use_quoted_names, vec![])?;
         }
-        if self.ast(name)?.node(name)?.kind() == K::Identifier {
+        if self.node(name)?.kind() == K::Identifier {
             self.check_module_name_collision(node, name)?;
             if keyword == K::ModuleKeyword {
                 self.error_at(Some(name),d::A_namespace_declaration_should_not_be_declared_using_the_module_keyword_Please_use_the_namespace_keyword_instead,vec![])?;
@@ -89,7 +86,7 @@ impl CheckerState {
         {
             let options = self.program()?.host.options();
             let erasable = options.erasable_syntax_only.is_true()
-                && self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0;
+                && self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0;
             let isolated = options.isolated_modules();
             let verbatim = options.verbatim_module_syntax.is_true();
             if erasable {
@@ -118,7 +115,7 @@ impl CheckerState {
                 .into_iter()
                 .flatten()
             {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 let real_class_or_function = read.kind() == K::ClassDeclaration
                     || read.kind() == K::FunctionDeclaration && read.body().is_some();
                 if real_class_or_function && read.flags() & nf::AMBIENT == 0 {
@@ -128,7 +125,7 @@ impl CheckerState {
                     )?;
                     if Some(source) != declaration_source {
                         self.error_at(Some(name),d::A_namespace_declaration_cannot_be_in_a_different_file_from_a_class_or_function_with_which_it_is_merged,vec![])?;
-                    } else if self.ast(node)?.node(node)?.pos() < read.pos() {
+                    } else if self.node(node)?.pos() < read.pos() {
                         self.error_at(Some(name),d::A_namespace_declaration_cannot_be_located_prior_to_a_class_or_function_with_which_it_is_merged,vec![])?;
                     }
                     break;
@@ -143,10 +140,10 @@ impl CheckerState {
                     != 0
                 && self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS
             {
-                let modifiers = self.source_list(node, self.ast(node)?.node(node)?.modifiers())?;
+                let modifiers = self.source_list(node, self.node(node)?.modifiers())?;
                 let mut export_modifier = None;
                 for modifier in modifiers {
-                    if self.ast(modifier)?.node(modifier)?.kind() == K::ExportKeyword {
+                    if self.node(modifier)?.kind() == K::ExportKeyword {
                         export_modifier = Some(modifier);
                         break;
                     }
@@ -170,21 +167,18 @@ impl CheckerState {
                 if global || self.symbol(symbol)?.flags() & sf::TRANSIENT != 0 {
                     if let Some(body) = body {
                         for statement in
-                            self.source_list(body, self.ast(body)?.node(body)?.statement_list())?
+                            self.source_list(body, self.node(body)?.statement_list())?
                         {
                             self.check_module_augmentation_element(statement)?;
                         }
                     }
                 }
             } else {
-                let parent = required(
-                    self.ast(node)?.node(node)?.parent(),
-                    "ambient module parent",
-                )?;
+                let parent = required(self.node(node)?.parent(), "ambient module parent")?;
                 if ts_ast::utilities_middle::is_global_source_file(self.ast(parent)?, parent)? {
                     if global {
                         self.error_at(Some(name),d::Augmentations_for_the_global_scope_can_only_be_directly_nested_in_external_modules_or_ambient_module_declarations,vec![])?;
-                    } else if ts_module::is_relative(self.ast(name)?.node_text(name)?.as_bytes()) {
+                    } else if ts_module::is_relative(self.node_text(name)?.as_bytes()) {
                         self.error_at(
                             Some(name),
                             d::Ambient_module_declaration_cannot_specify_relative_module_name,
@@ -234,7 +228,7 @@ impl CheckerState {
             }
             symbol
         };
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         let declarations = self.symbol_declarations(symbol)?.to_vec();
         let mut first = None;
         for declaration in declarations.iter().flatten() {
@@ -265,7 +259,7 @@ impl CheckerState {
         if common != 0 || common_default != 0 {
             for declaration in declarations.into_iter().flatten() {
                 let spaces = self.declaration_spaces(declaration)?;
-                let name = self.ast(declaration)?.node(declaration)?.name();
+                let name = self.node(declaration)?.name();
                 let message = if spaces & common_default != 0 {
                     Some(d::Merged_declaration_0_cannot_include_a_default_export_declaration_Consider_adding_a_separate_export_default_0_declaration_instead)
                 } else if spaces & common != 0 {
@@ -284,7 +278,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.getDeclarationSpaces
     fn declaration_spaces(&mut self, node: NodeId) -> Result<u8, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::InterfaceDeclaration
@@ -396,7 +390,7 @@ impl CheckerState {
             let declarations = self.symbol_declarations(symbol)?.to_vec();
             let mut count = 0;
             for &declaration in declarations.iter().flatten() {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if self.module_not_overload(declaration)?
                     && !matches!(
                         read.kind().known(),
@@ -453,7 +447,7 @@ impl CheckerState {
         Ok(false)
     }
     fn module_not_overload(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(!matches!(
             read.kind().known(),
             Some(K::FunctionDeclaration | K::MethodDeclaration)
@@ -507,7 +501,7 @@ impl CheckerState {
     /// entity-name expression whose symbol is an alias.
     // port: tsc/internal/checker/checker.go:Checker.getDeclarationSpaces
     fn export_assignment_declares_alias(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = if read.kind() == K::ExportAssignment {
             read.expression()
         } else {

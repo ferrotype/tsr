@@ -39,7 +39,7 @@ impl CheckerState {
             };
             let initializer = if let Some(declaration) = self.symbol(writable)?.value_declaration()
             {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if read.kind() == K::PropertyAssignment {
                     read.initializer()
                 } else {
@@ -67,7 +67,7 @@ impl CheckerState {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             let container =
                 ts_ast::get_this_container(self.ast(declaration)?, declaration, false, false)?;
-            if self.ast(container)?.node(container)?.kind() == K::Constructor {
+            if self.node(container)?.kind() == K::Constructor {
                 return Ok(Some(container));
             }
         }
@@ -82,7 +82,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
             return Ok(ThisAssignment::None);
         };
-        if self.ast(declaration)?.node(declaration)?.kind() != K::BinaryExpression {
+        if self.node(declaration)?.kind() != K::BinaryExpression {
             return Ok(ThisAssignment::None);
         }
         if let Some(&cached) = self.query.this_assignments.get(&symbol) {
@@ -96,7 +96,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() != K::BinaryExpression
                 || ts_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
                     != J::ThisProperty
@@ -121,7 +121,7 @@ impl CheckerState {
                     .argument_expression()
                     .ok_or(Error::MissingLink("this declaration key"))?;
                 if !matches!(
-                    self.ast(argument)?.node(argument)?.kind().known(),
+                    self.node(argument)?.kind().known(),
                     Some(K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral)
                 ) {
                     all_this = false;
@@ -166,7 +166,7 @@ impl CheckerState {
                 let Some(declaration) = declaration else {
                     continue;
                 };
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if read.kind() == K::BinaryExpression {
                     if let Some(annotation) = read.type_node() {
                         ty = Some(self.get_type_from_type_node(annotation)?);
@@ -204,10 +204,7 @@ impl CheckerState {
         }
         let ty = self.widened_type(ty.expect("assignment declaration type"))?;
         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            if self.ast(declaration)?.node(declaration)?.flags()
-                & ts_ast::node_flags::JAVA_SCRIPT_FILE
-                != 0
-            {
+            if self.node(declaration)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0 {
                 let filtered = self.filter_type(ty, &mut |checker, ty| {
                     Ok(checker.types.flags(ty)? & !tf::NULLABLE != 0)
                 })?;
@@ -225,7 +222,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if let Some(binary) = read.data_source().as_binary_expression() {
             let left = binary
                 .left()
@@ -244,7 +241,7 @@ impl CheckerState {
                     let operator = binary
                         .operator_token()
                         .ok_or(Error::MissingLink("assigned operator"))?;
-                    if self.ast(operator)?.node(operator)?.kind() != K::EqualsToken {
+                    if self.node(operator)?.kind() != K::EqualsToken {
                         break;
                     }
                     right = binary.right().ok_or(Error::MissingLink("assigned right"))?;
@@ -297,7 +294,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(parent)?.value_declaration() else {
             return Ok(false);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if !matches!(
             read.kind().known(),
             Some(K::FunctionExpression | K::ArrowFunction)
@@ -331,7 +328,7 @@ impl CheckerState {
             if self.matching_reference(property, node)? {
                 return Ok(true);
             }
-            if ts_ast::utilities::is_function_like(Some(&self.ast(node)?.node(node)?)) {
+            if ts_ast::utilities::is_function_like(Some(&self.node(node)?)) {
                 continue;
             }
             pending.extend(self.source_children(node)?.into_iter().rev());

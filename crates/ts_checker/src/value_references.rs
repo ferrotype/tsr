@@ -36,7 +36,7 @@ impl CheckerState {
         }
         let immediate = self.symbol(symbol)?.value_declaration();
         if let Some(declaration) = immediate {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() == K::BindingElement {
                 let pattern = required(read.parent(), "binding pattern")?;
                 if self.bindings.contextual_patterns.contains(&pattern)
@@ -49,7 +49,7 @@ impl CheckerState {
         let mut ty = self.narrowed_type_of_symbol(symbol, node)?;
         let assignment = self.assignment_target_kind(node)?;
         if assignment != AssignmentKind::None {
-            let js_module = self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0
+            let js_module = self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0
                 && flags & sf::VALUE_MODULE != 0;
             let error = if flags & sf::VARIABLE == 0 && !js_module {
                 Some(if flags & sf::ENUM != 0 {
@@ -100,17 +100,17 @@ impl CheckerState {
         };
         ty = self.narrowable_reference_type(ty, node, self.expression_mode)?;
         let root = ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
-        let parameter = self.ast(root)?.node(root)?.kind() == K::Parameter;
+        let parameter = self.node(root)?.kind() == K::Parameter;
         let declaration_container = self.control_flow_container_or_none(declaration)?;
         let mut container = self.control_flow_container(node)?;
         let outer = Some(container) != declaration_container;
-        let parent = required(self.ast(node)?.node(node)?.parent(), "identifier parent")?;
-        let nonnull = self.ast(parent)?.node(parent)?.kind() == K::NonNullExpression;
+        let parent = required(self.node(node)?.parent(), "identifier parent")?;
+        let nonnull = self.node(parent)?.kind() == K::NonNullExpression;
         let automatic = ty == self.builtins.auto_type
             || self.query.global_types.get("autoArrayType") == Some(&ty);
         let auto_nonnull = automatic && nonnull;
         while Some(container) != declaration_container {
-            let read = self.ast(container)?.node(container)?;
+            let read = self.node(container)?;
             if !matches!(
                 read.kind().known(),
                 Some(K::FunctionExpression | K::ArrowFunction)
@@ -130,19 +130,16 @@ impl CheckerState {
             container = self.control_flow_container(container)?;
         }
         let never_initialized = if let Some(declaration) = immediate {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() == K::VariableDeclaration {
                 let data = read
                     .data_source()
                     .as_variable_declaration()
                     .ok_or(ts_arena::Error::InvalidGraph)?;
                 let list = required(read.parent(), "uninitialized declaration list")?;
-                let statement = required(
-                    self.ast(list)?.node(list)?.parent(),
-                    "uninitialized statement",
-                )?;
+                let statement = required(self.node(list)?.parent(), "uninitialized statement")?;
                 !matches!(
-                    self.ast(statement)?.node(statement)?.kind().known(),
+                    self.node(statement)?.kind().known(),
                     Some(K::ForInStatement | K::ForOfStatement)
                 ) && data.initializer().is_none()
                     && data.exclamation_token().is_none()
@@ -154,13 +151,13 @@ impl CheckerState {
         } else {
             false
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let ambient = read.flags() & nf::AMBIENT != 0;
         let assertion = read
             .data_source()
             .as_variable_declaration()
             .is_some_and(|data| data.exclamation_token().is_some());
-        let spread = self.ast(parent)?.node(parent)?.kind() == K::SpreadAssignment
+        let spread = self.node(parent)?.kind() == K::SpreadAssignment
             && self
                 .ast(parent)?
                 .node(parent)?
@@ -179,7 +176,7 @@ impl CheckerState {
                     || self.types.flags(ty)? & (tf::ANY_OR_UNKNOWN | tf::VOID) != 0
                     || self.in_type_query(node)?
                     || self.in_ambient_or_type_node(node)?
-                    || self.ast(parent)?.node(parent)?.kind() == K::ExportSpecifier)
+                    || self.node(parent)?.kind() == K::ExportSpecifier)
             || nonnull
             || assertion
             || ambient;
@@ -210,7 +207,7 @@ impl CheckerState {
                 {
                     let name = self.symbol_to_string(local)?;
                     let display = self.type_to_string(flow, crate::type_display::DEFAULT_FLAGS)?;
-                    self.error_at(self.ast(declaration)?.node(declaration)?.name(),d::Variable_0_implicitly_has_type_1_in_some_locations_where_its_type_cannot_be_determined,vec![name.clone(),display.clone()])?;
+                    self.error_at(self.node(declaration)?.name(),d::Variable_0_implicitly_has_type_1_in_some_locations_where_its_type_cannot_be_determined,vec![name.clone(),display.clone()])?;
                     self.error_at(
                         Some(node),
                         d::Variable_0_implicitly_has_an_1_type,
@@ -247,7 +244,7 @@ impl CheckerState {
             if node == ancestor {
                 return Ok(true);
             }
-            let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+            let Some(parent) = self.node(node)?.parent() else {
                 return Ok(false);
             };
             node = parent;
@@ -255,10 +252,10 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:Checker.isDestructuringAssignmentTarget
     pub(crate) fn reference_destructuring_target(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if let Some(data) = read.data_source().as_binary_expression() {
             return Ok(data.left() == Some(node));
         }
@@ -273,12 +270,12 @@ impl CheckerState {
         node: NodeId,
         declaration: NodeId,
     ) -> Result<bool, Error> {
-        if self.ast(declaration)?.node(declaration)?.kind() != K::BindingElement {
+        if self.node(declaration)?.kind() != K::BindingElement {
             return Ok(false);
         }
         let mut ancestor = Some(node);
         while let Some(node) = ancestor {
-            if self.ast(node)?.node(node)?.kind() == K::BindingElement {
+            if self.node(node)?.kind() == K::BindingElement {
                 return Ok(
                     ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?
                         == ts_ast::utilities::get_root_declaration(
@@ -287,7 +284,7 @@ impl CheckerState {
                         )?,
                 );
             }
-            ancestor = self.ast(node)?.node(node)?.parent();
+            ancestor = self.node(node)?.parent();
         }
         Ok(false)
     }
@@ -297,7 +294,7 @@ impl CheckerState {
         ty: TypeId,
         declaration: NodeId,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if self.options.strict_null_checks
             && read.kind() == K::Parameter
             && read.initializer().is_some()
@@ -373,7 +370,7 @@ impl CheckerState {
         ignore_arrows: bool,
     ) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let parent = read.parent();
             match read.kind().known() {
                 Some(K::PropertyDeclaration | K::ClassStaticBlockDeclaration) => return Ok(true),
@@ -381,7 +378,7 @@ impl CheckerState {
                 Some(K::ArrowFunction) if !ignore_arrows => return Ok(false),
                 Some(K::Block) => {
                     if let Some(parent) = parent {
-                        let read = self.ast(parent)?.node(parent)?;
+                        let read = self.node(parent)?;
                         if ts_ast::utilities::is_function_like(Some(&read))
                             && read.kind() != K::ArrowFunction
                         {
@@ -399,9 +396,9 @@ impl CheckerState {
     }
 
     fn mark_value_identifier_alias(&mut self, node: NodeId, symbol: SymbolId) -> Result<(), Error> {
-        let parent = self.ast(node)?.node(node)?.parent();
+        let parent = self.node(node)?.parent();
         if let Some(parent) = parent {
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             if read.kind() == K::PropertyAccessExpression && read.expression() == Some(node) {
                 return Ok(());
             }
@@ -413,7 +410,7 @@ impl CheckerState {
                 return Ok(());
             }
             if let Some(grandparent) = read.parent() {
-                if let Some(great) = self.ast(grandparent)?.node(grandparent)?.parent() {
+                if let Some(great) = self.node(grandparent)?.parent() {
                     if self
                         .ast(great)?
                         .node(great)?

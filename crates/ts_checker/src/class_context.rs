@@ -11,11 +11,11 @@ impl CheckerState {
         &self,
         function: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let Some(parent) = read.parent() else {
             return Ok(None);
         };
-        let parent_read = self.ast(parent)?.node(parent)?;
+        let parent_read = self.node(parent)?;
         match read.kind().known() {
             Some(K::MethodDeclaration | K::GetAccessor | K::SetAccessor)
                 if parent_read.kind() == K::ObjectLiteralExpression =>
@@ -77,7 +77,7 @@ impl CheckerState {
                 .node(literal)?
                 .parent()
                 .ok_or(Error::MissingLink("object context parent"))?;
-            if self.ast(parent)?.node(parent)?.kind() != K::PropertyAssignment {
+            if self.node(parent)?.kind() != K::PropertyAssignment {
                 break;
             }
             literal = self
@@ -116,10 +116,10 @@ impl CheckerState {
             };
             return self.widened_type(this).map(Some);
         }
-        let Some(mut parent) = self.ast(function)?.node(function)?.parent() else {
+        let Some(mut parent) = self.node(function)?.parent() else {
             return Ok(None);
         };
-        while self.ast(parent)?.node(parent)?.kind() == K::ParenthesizedExpression {
+        while self.node(parent)?.kind() == K::ParenthesizedExpression {
             parent = self
                 .ast(parent)?
                 .node(parent)?
@@ -127,14 +127,14 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("parenthesized function parent"))?;
         }
         if ts_ast::is_assignment_expression(self.ast(parent)?, parent, false)? {
-            let parent_read = self.ast(parent)?.node(parent)?;
+            let parent_read = self.node(parent)?;
             let target = parent_read
                 .data_source()
                 .as_binary_expression()
                 .and_then(|data| data.left())
                 .ok_or(Error::MissingLink("function assignment target"))?;
             if matches!(
-                self.ast(target)?.node(target)?.kind().known(),
+                self.node(target)?.kind().known(),
                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
             ) {
                 let expression = self
@@ -142,7 +142,7 @@ impl CheckerState {
                     .node(target)?
                     .expression()
                     .ok_or(Error::MissingLink("function assignment receiver"))?;
-                if javascript && self.ast(expression)?.node(expression)?.kind() == K::Identifier {
+                if javascript && self.node(expression)?.kind() == K::Identifier {
                     let source = ts_ast::utilities::get_source_file_of_node(
                         self.ast(parent)?,
                         Some(parent),

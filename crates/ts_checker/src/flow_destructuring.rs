@@ -54,7 +54,7 @@ impl CheckerState {
             .get(&parent_access)
             .map_or(parent_access, |&(owner, _)| owner);
         self.retain_flow_source(source_owner)?;
-        let range = self.ast(node)?.node(node)?.range();
+        let range = self.node(node)?.range();
         let literal = self.factory.new_string_literal(name, 0);
         self.factory.set_node_range(literal, range);
         let lhs = if ts_ast::is_left_hand_side_expression(self.ast(parent_access)?, parent_access)?
@@ -91,7 +91,7 @@ impl CheckerState {
             .node(parent)?
             .parent()
             .ok_or(Error::MissingLink("destructuring ancestor"))?;
-        let read = self.ast(ancestor)?.node(ancestor)?;
+        let read = self.node(ancestor)?;
         match read.kind().known() {
             Some(K::BindingElement | K::PropertyAssignment) => {
                 self.synthetic_element_access(ancestor)
@@ -111,11 +111,11 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<JsString>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("destructuring property parent"))?;
-        let parent_kind = self.ast(parent)?.node(parent)?.kind();
+        let parent_kind = self.node(parent)?.kind();
         let name = if read.kind() == K::BindingElement && parent_kind == K::ObjectBindingPattern {
             let data = read
                 .data_source()
@@ -142,8 +142,7 @@ impl CheckerState {
             parent_kind.known(),
             Some(K::ArrayLiteralExpression | K::ArrayBindingPattern)
         ) {
-            let elements =
-                self.source_list(parent, self.ast(parent)?.node(parent)?.element_list())?;
+            let elements = self.source_list(parent, self.node(parent)?.element_list())?;
             // Native slices.Index returns -1, including on malformed input.
             let index = match elements.iter().position(|&element| element == node) {
                 Some(index) => isize::try_from(index).map_err(|_| Error::IdExhausted)?,

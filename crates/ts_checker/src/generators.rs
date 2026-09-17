@@ -111,7 +111,7 @@ impl CheckerState {
         let mut yields = Vec::new();
         let mut nexts = Vec::new();
         for node in self.yield_expressions(body)? {
-            let operand = self.ast(node)?.node(node)?.expression();
+            let operand = self.node(node)?.expression();
             let mut operand_type = match operand {
                 Some(operand) => self.check_expression_ex(operand, mode & !8)?,
                 None => self.builtins.undefined_widening_type,
@@ -155,7 +155,7 @@ impl CheckerState {
         let mut result = Vec::new();
         let mut stack = vec![body];
         while let Some(node) = stack.pop() {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::YieldExpression) => {
                     result.push(node);
@@ -172,10 +172,9 @@ impl CheckerState {
                 _ => {
                     if ts_ast::utilities::is_function_like(Some(&read)) {
                         if let Some(name) = read.name() {
-                            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+                            if self.node(name)?.kind() == K::ComputedPropertyName {
                                 stack.push(
-                                    self.ast(name)?
-                                        .node(name)?
+                                    self.node(name)?
                                         .expression()
                                         .ok_or(Error::MissingLink("computed yield name"))?,
                                 );
@@ -209,7 +208,7 @@ impl CheckerState {
         sent: TypeId,
         asynchronous: bool,
     ) -> Result<Option<TypeId>, Error> {
-        let error = self.ast(node)?.node(node)?.expression().or(Some(node));
+        let error = self.node(node)?.expression().or(Some(node));
         let star = self.yield_is_star(node)?;
         let yielded = if star {
             self.check_iterated_type_or_element_type(
@@ -334,7 +333,7 @@ impl CheckerState {
         }
         let widened = self.widened_type(ty)?;
         let text = self.type_to_string(widened, crate::type_display::DEFAULT_FLAGS)?;
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let name = read.name();
         let yield_kind = matches!(kind, IterationKind::Yield);
         if name.is_none() {
@@ -419,7 +418,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForGenerator
     pub(crate) fn check_grammar_generator(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read.data_source();
         let token = match read.kind().known() {
             Some(K::FunctionDeclaration) => data
@@ -457,7 +456,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkYieldExpression
     pub(crate) fn check_yield_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        if self.ast(node)?.node(node)?.flags() & nf::YIELD_CONTEXT == 0 {
+        if self.node(node)?.flags() & nf::YIELD_CONTEXT == 0 {
             self.grammar_error_first_token(
                 node,
                 d::A_yield_expression_is_only_allowed_in_a_generator_body,
@@ -471,7 +470,7 @@ impl CheckerState {
                 vec![],
             )?;
         }
-        let operand = self.ast(node)?.node(node)?.expression();
+        let operand = self.node(node)?.expression();
         let operand_type = match operand {
             Some(operand) => self.check_expression(operand)?,
             None => self.builtins.undefined_widening_type,
@@ -564,10 +563,10 @@ impl CheckerState {
     // port: tsc/internal/checker/utilities.go:expressionResultIsUnused
     pub(crate) fn expression_result_is_unused(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
-            let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+            let Some(parent) = self.node(node)?.parent() else {
                 return Ok(false);
             };
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             match read.kind().known() {
                 Some(K::ParenthesizedExpression) => node = parent,
                 Some(K::ExpressionStatement | K::VoidExpression) => return Ok(true),
@@ -586,7 +585,7 @@ impl CheckerState {
                     let operator = data
                         .operator_token()
                         .ok_or(Error::MissingLink("unused binary operator"))?;
-                    if self.ast(operator)?.node(operator)?.kind() != K::CommaToken {
+                    if self.node(operator)?.kind() != K::CommaToken {
                         return Ok(false);
                     }
                     if data.left() == Some(node) {

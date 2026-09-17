@@ -998,6 +998,17 @@ impl SharedBoundFile {
             result: &self.result,
         }
     }
+    /// The node `id` names, by the shortest path: a core node of this file
+    /// whose binding wrote the core directly is one slot read on the owner;
+    /// anything else takes the view's general routing.
+    #[inline]
+    pub fn node(&self, id: NodeId) -> Result<NodeRead<'_>, Error> {
+        if self.result.reads_core_directly(id) {
+            let header = self.owner.view().core_node(id)?;
+            return Ok(NodeRead::core(id, header, &self.owner));
+        }
+        self.view().node(id)
+    }
 }
 impl BoundFile {
     /// The shared form of this file, `None` for a bundle member.

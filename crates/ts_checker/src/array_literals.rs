@@ -71,23 +71,23 @@ impl CheckerState {
     }
 
     fn check_array_literal_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let elements = self.source_list(node, self.ast(node)?.node(node)?.element_list())?;
+        let elements = self.source_list(node, self.node(node)?.element_list())?;
         let destructuring = ts_ast::is_assignment_target(self.ast(node)?, node)?;
         let constant = self.is_const_context(node)?;
         let contextual = self.apparent_contextual_expression_type(node)?;
-        let mut parent = self.ast(node)?.node(node)?.parent();
+        let mut parent = self.node(node)?.parent();
         while let Some(id) = parent {
-            if self.ast(id)?.node(id)?.kind() != K::ParenthesizedExpression {
+            if self.node(id)?.kind() != K::ParenthesizedExpression {
                 break;
             }
-            parent = self.ast(id)?.node(id)?.parent();
+            parent = self.node(id)?.parent();
         }
         let mut tuple_context = false;
         if let Some(parent) = parent {
-            if self.ast(parent)?.node(parent)?.kind() == K::SpreadElement {
-                if let Some(call) = self.ast(parent)?.node(parent)?.parent() {
+            if self.node(parent)?.kind() == K::SpreadElement {
+                if let Some(call) = self.node(parent)?.parent() {
                     tuple_context = matches!(
-                        self.ast(call)?.node(call)?.kind().known(),
+                        self.node(call)?.kind().known(),
                         Some(K::CallExpression | K::NewExpression)
                     );
                 }
@@ -111,7 +111,7 @@ impl CheckerState {
         let mut infos = Vec::with_capacity(elements.len());
         let mut omitted = false;
         for element in elements {
-            let read = self.ast(element)?.node(element)?;
+            let read = self.node(element)?;
             let (ty, flags) = if read.kind() == K::SpreadElement {
                 let expression = read
                     .expression()
@@ -217,13 +217,13 @@ impl CheckerState {
         else {
             return Ok(None);
         };
-        let elements = self.source_list(array, self.ast(array)?.node(array)?.element_list())?;
+        let elements = self.source_list(array, self.node(array)?.element_list())?;
         let Some(index) = elements.iter().position(|&element| element == node) else {
             return Ok(None);
         };
         let mut spreads = Vec::new();
         for (i, &element) in elements.iter().enumerate() {
-            if self.ast(element)?.node(element)?.kind() == K::SpreadElement {
+            if self.node(element)?.kind() == K::SpreadElement {
                 spreads.push(i);
             }
         }

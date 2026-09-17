@@ -140,12 +140,12 @@ impl CheckerState {
         let mut constraints = Vec::new();
         let mut covariant = true;
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::JSDoc || ts_ast::utilities::is_statement(self.ast(node)?, node)? {
                 break;
             }
             let Some(parent) = read.parent() else { break };
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             if read.kind() == K::Parameter {
                 covariant = !covariant;
             }
@@ -214,11 +214,9 @@ impl CheckerState {
         check: NodeId,
         extends: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        if self.ast(check)?.node(check)?.kind() == K::TupleType
-            && self.ast(extends)?.node(extends)?.kind() == K::TupleType
-        {
-            let a = self.source_list(check, self.ast(check)?.node(check)?.element_list())?;
-            let b = self.source_list(extends, self.ast(extends)?.node(extends)?.element_list())?;
+        if self.node(check)?.kind() == K::TupleType && self.node(extends)?.kind() == K::TupleType {
+            let a = self.source_list(check, self.node(check)?.element_list())?;
+            let b = self.source_list(extends, self.node(extends)?.element_list())?;
             if a.len() == 1 && b.len() == 1 {
                 return self.implied_constraint(ty, a[0], b[0]);
             }

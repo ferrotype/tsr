@@ -12,7 +12,7 @@ use ts_jsstring::JsString;
 impl CheckerState {
     /// The keyword and the name of a meta property.
     pub(crate) fn meta_property_parts(&self, node: NodeId) -> Result<(NodeKind, NodeId), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_meta_property()
@@ -30,7 +30,7 @@ impl CheckerState {
         match keyword.known() {
             Some(K::NewKeyword) => self.check_new_target_meta_property(node),
             Some(K::ImportKeyword) => {
-                if self.ast(name)?.node_text(name)?.as_bytes() == b"defer" {
+                if self.node_text(name)?.as_bytes() == b"defer" {
                     // `import.defer` is only meaningful as a callee, whose type
                     // the call check computes; the bare property is an error.
                     return Ok(self.builtins.error_type);
@@ -51,7 +51,7 @@ impl CheckerState {
             )?;
             return Ok(self.builtins.error_type);
         };
-        let read = self.ast(container)?.node(container)?;
+        let read = self.node(container)?;
         let declaration = if read.kind() == K::Constructor {
             read.parent()
                 .ok_or(Error::MissingLink("constructor parent"))?
@@ -109,7 +109,7 @@ impl CheckerState {
             )?;
         }
         let (_, name) = self.meta_property_parts(node)?;
-        if self.ast(name)?.node_text(name)?.as_bytes() == b"meta" {
+        if self.node_text(name)?.as_bytes() == b"meta" {
             return self.global_import_meta_type();
         }
         Ok(self.builtins.error_type)
@@ -155,7 +155,7 @@ impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarMetaProperty
     fn check_grammar_meta_property(&mut self, node: NodeId) -> Result<bool, Error> {
         let (keyword, name) = self.meta_property_parts(node)?;
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let keyword_text = |keyword: NodeKind| {
             JsString::from_bytes(
                 ts_scanner::token_to_string(keyword.known().expect("keyword token")).as_bytes(),
@@ -172,10 +172,10 @@ impl CheckerState {
                 ],
             ),
             Some(K::ImportKeyword) if text.as_bytes() != b"meta" => {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let is_callee = match read.parent() {
                     Some(parent) => {
-                        let parent_read = self.ast(parent)?.node(parent)?;
+                        let parent_read = self.node(parent)?;
                         parent_read.kind() == K::CallExpression
                             && parent_read.expression() == Some(node)
                     }

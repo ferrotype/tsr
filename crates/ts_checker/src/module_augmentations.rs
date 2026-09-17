@@ -23,7 +23,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.mergeModuleAugmentation
     pub(crate) fn merge_external_module_augmentation(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read
             .name()
             .ok_or(Error::MissingLink("augmentation module name"))?;
@@ -39,14 +39,14 @@ impl CheckerState {
         if self.symbol_declarations(symbol)?.first().flatten() != Some(node) {
             return Ok(());
         }
-        let message = (self.ast(parent)?.node(parent)?.flags() & nf::AMBIENT == 0)
+        let message = (self.node(parent)?.flags() & nf::AMBIENT == 0)
             .then_some(d::Invalid_module_name_in_augmentation_module_0_cannot_be_found);
         let main =
             self.resolve_external_module_name_with_error(name, name, false, message, true)?;
         let Some(main) = self.resolve_external_module_symbol(main, false)? else {
             return Ok(());
         };
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         if self.symbol(main)?.flags() & sf::NAMESPACE == 0 {
             self.error_at(
                 Some(name),
@@ -92,7 +92,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkModuleAugmentationElement
     pub(crate) fn check_module_augmentation_element(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::VariableStatement) => {
                 let list = read
@@ -102,8 +102,7 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("augmentation declarations"))?;
                 for declaration in self.source_list(
                     list,
-                    self.ast(list)?
-                        .node(list)?
+                    self.node(list)?
                         .data_source()
                         .as_variable_declaration_list()
                         .and_then(|d| d.declarations()),
@@ -127,16 +126,14 @@ impl CheckerState {
                     .as_import_equals_declaration()
                     .and_then(|d| d.module_reference())
                     .ok_or(Error::MissingLink("augmentation import reference"))?;
-                if self.ast(reference)?.node(reference)?.kind() == K::ExternalModuleReference {
+                if self.node(reference)?.kind() == K::ExternalModuleReference {
                     self.grammar_error_first_token(node,d::Imports_are_not_permitted_in_module_augmentations_Consider_moving_them_to_the_enclosing_external_module,vec![])?;
                 }
             }
             Some(K::BindingElement | K::VariableDeclaration) => {
                 if let Some(name) = read.name() {
                     if self.is_binding_pattern(name)? {
-                        for element in
-                            self.source_list(name, self.ast(name)?.node(name)?.element_list())?
-                        {
+                        for element in self.source_list(name, self.node(name)?.element_list())? {
                             self.check_module_augmentation_element(element)?;
                         }
                     }

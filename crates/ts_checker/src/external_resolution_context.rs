@@ -18,7 +18,7 @@ impl CheckerState {
         let mode = match context {
             Some(node)
                 if matches!(
-                    self.ast(node)?.node(node)?.kind().known(),
+                    self.node(node)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                 ) =>
             {

@@ -146,7 +146,7 @@ impl CheckerState {
         let Some(&(target, import)) = self.module_aliases.export_types.get(&symbol) else {
             return Ok(None);
         };
-        if self.ast(import)?.node(import)?.kind() == ts_ast::SyntaxKind::CallExpression {
+        if self.node(import)?.kind() == ts_ast::SyntaxKind::CallExpression {
             return Ok(None);
         }
         let ty = self.get_type_of_symbol(target)?;

@@ -9,10 +9,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromTemplateTypeNode
     pub(crate) fn source_template_type(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let (head, spans) = self.template_source_parts(node)?;
-        let mut texts = vec![self.ast(head)?.node_text(head)?.into_js_string()];
+        let mut texts = vec![self.node_text(head)?.into_js_string()];
         let mut types = Vec::new();
         for span in spans {
-            let read = self.ast(span)?.node(span)?;
+            let read = self.node(span)?;
             let data = read
                 .data_source()
                 .as_template_literal_type_span()
@@ -23,14 +23,14 @@ impl CheckerState {
             let annotation = read
                 .type_node()
                 .ok_or(Error::MissingLink("template span type"))?;
-            texts.push(self.ast(literal)?.node_text(literal)?.into_js_string());
+            texts.push(self.node_text(literal)?.into_js_string());
             types.push(self.get_type_from_type_node(annotation)?);
         }
         self.get_template_literal_type(&texts, &types)
     }
 
     fn template_source_parts(&self, node: NodeId) -> Result<(NodeId, Vec<NodeId>), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_template_literal_type_node()

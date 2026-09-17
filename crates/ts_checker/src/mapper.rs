@@ -263,8 +263,7 @@ impl CheckerState {
                     return Ok(ty);
                 };
                 let sources = sources.clone();
-                let nodes =
-                    self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+                let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
                 if let Some(&node) = nodes.get(index) {
                     self.get_type_from_type_node(node)
                 } else {

@@ -302,7 +302,7 @@ impl CheckerState {
         &mut self,
         node: ts_arena::NodeId,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_indexed_access_type_node()
@@ -451,7 +451,7 @@ impl CheckerState {
         let fixed_index = self.is_tuple_type(object)?
             && self.index_less_than(index, self.total_fixed_elements(object)?)?;
         if let Some(node) = node {
-            if self.ast(node)?.node(node)?.kind() != K::IndexedAccessType {
+            if self.node(node)?.kind() != K::IndexedAccessType {
                 return Ok(self.is_generic_tuple_type(object)? && !fixed_index);
             }
         }
@@ -634,9 +634,7 @@ impl CheckerState {
     ) -> Result<Option<TypeId>, Error> {
         use crate::access_flags as af;
         let expression = match node {
-            Some(node) if self.ast(node)?.node(node)?.kind() == K::ElementAccessExpression => {
-                Some(node)
-            }
+            Some(node) if self.node(node)?.kind() == K::ElementAccessExpression => Some(node),
             _ => None,
         };
         let name = if node
@@ -653,7 +651,7 @@ impl CheckerState {
         } else if let Some(name) = self.index_property_name(index)? {
             Some(name)
         } else if let Some(node) = node {
-            if ts_ast::utilities::is_property_name(&self.ast(node)?.node(node)?) {
+            if ts_ast::utilities::is_property_name(&self.node(node)?) {
                 let name = self.index_property_name_node(node)?;
                 (name.as_bytes() != ts_ast::internal_symbol_names::MISSING).then_some(name)
             } else {
@@ -870,7 +868,7 @@ impl CheckerState {
         if let Some(node) = self.index_access_node(node)? {
             let object_text = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;
             let index_text = self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
-            if self.ast(node)?.node(node)?.kind() != K::BigIntLiteral
+            if self.node(node)?.kind() != K::BigIntLiteral
                 && self.types.flags(index)? & tf::STRING_OR_NUMBER_LITERAL != 0
             {
                 self.error_at(
@@ -889,7 +887,7 @@ impl CheckerState {
                     vec![object_text, index_text],
                 )?;
             } else {
-                let index_text = if self.ast(node)?.node(node)?.kind() == K::BigIntLiteral {
+                let index_text = if self.node(node)?.kind() == K::BigIntLiteral {
                     JsString::from_bytes(b"bigint".to_vec())
                 } else {
                     index_text
@@ -909,7 +907,7 @@ impl CheckerState {
         node: Option<ts_arena::NodeId>,
     ) -> Result<Option<ts_arena::NodeId>, Error> {
         node.map(|node| {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ElementAccessExpression) => read
                     .data_source()
@@ -1000,9 +998,7 @@ impl CheckerState {
             }
         }
         let expression = match node {
-            Some(node) if self.ast(node)?.node(node)?.kind() == K::ElementAccessExpression => {
-                Some(node)
-            }
+            Some(node) if self.node(node)?.kind() == K::ElementAccessExpression => Some(node),
             _ => None,
         };
         self.error_writing_readonly_index(numeric_info, ty, expression)?;

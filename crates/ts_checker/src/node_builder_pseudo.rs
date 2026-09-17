@@ -250,8 +250,7 @@ impl NodeBuilder<'_> {
                     if target.is_none() {
                         for &symbol in &properties {
                             if let Some(decl) = self.checker.symbol(symbol)?.value_declaration() {
-                                if self.checker.ast(decl)?.node(decl)?.name() == Some(element.name)
-                                {
+                                if self.checker.node(decl)?.name() == Some(element.name) {
                                     target = Some(symbol);
                                     break;
                                 }
@@ -439,7 +438,7 @@ impl NodeBuilder<'_> {
                 self.pseudo_report(report, location);
                 return Ok(false);
             };
-            if self.checker.ast(first.name)?.node(first.name)?.kind() != K::Identifier
+            if self.checker.node(first.name)?.kind() != K::Identifier
                 || self
                     .checker
                     .ast(first.name)?
@@ -511,13 +510,12 @@ impl NodeBuilder<'_> {
         let name = data
             .parameter_name
             .ok_or(Error::MissingLink("predicate parameter name"))?;
-        let is_this = self.checker.ast(name)?.node(name)?.kind() == K::ThisType;
+        let is_this = self.checker.node(name)?.kind() == K::ThisType;
         if is_this != matches!(predicate.kind, PK::This | PK::AssertsThis) {
             return Ok(false);
         }
         if !is_this
-            && self.checker.ast(name)?.node_text(name)?.as_bytes()
-                != predicate.parameter_name.as_bytes()
+            && self.checker.node_text(name)?.as_bytes() != predicate.parameter_name.as_bytes()
         {
             return Ok(false);
         }

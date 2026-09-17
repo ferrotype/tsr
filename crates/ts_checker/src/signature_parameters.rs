@@ -114,7 +114,7 @@ impl CheckerState {
     pub(crate) fn type_of_parameter(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         let declaration = self.symbol(symbol)?.value_declaration();
         let optional = if let Some(node) = declaration {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             read.initializer().is_some() || read.question_token(self.ast(node)?)?.is_some()
         } else {
             false
@@ -383,13 +383,13 @@ impl CheckerState {
         let Some(declaration) = declaration else {
             return Ok(None);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if read.kind() == ts_ast::SyntaxKind::NamedTupleMember {
             return Ok(Some(declaration));
         }
         if read.kind() == ts_ast::SyntaxKind::Parameter {
             if let Some(name) = read.name() {
-                if self.ast(name)?.node(name)?.kind() == ts_ast::SyntaxKind::Identifier {
+                if self.node(name)?.kind() == ts_ast::SyntaxKind::Identifier {
                     return Ok(Some(declaration));
                 }
             }
@@ -513,10 +513,10 @@ impl CheckerState {
                 .node(node)?
                 .name()
                 .ok_or(Error::MissingLink("named tuple parameter"))?;
-            return Ok(self.ast(name)?.node_text(name)?.into_js_string());
+            return Ok(self.node_text(name)?.into_js_string());
         }
         if let Some(declaration) = self.symbol(rest)?.value_declaration() {
-            if self.ast(declaration)?.node(declaration)?.kind() == ts_ast::SyntaxKind::Parameter {
+            if self.node(declaration)?.kind() == ts_ast::SyntaxKind::Parameter {
                 return self.tuple_label_from_binding(declaration, index, info.flags);
             }
         }
@@ -533,7 +533,7 @@ impl CheckerState {
         flags: crate::ElementFlags,
     ) -> Result<ts_ast::JsString, Error> {
         use ts_ast::SyntaxKind as K;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let rest = match read.kind().known() {
             Some(K::Parameter) => read
                 .data_source()
@@ -550,9 +550,9 @@ impl CheckerState {
             _ => false,
         };
         if let Some(name) = read.name() {
-            let name_read = self.ast(name)?.node(name)?;
+            let name_read = self.node(name)?;
             if name_read.kind() == K::Identifier {
-                let mut text = self.ast(name)?.node_text(name)?.as_bytes().to_vec();
+                let mut text = self.node_text(name)?.as_bytes().to_vec();
                 if rest {
                     if flags & ef::VARIABLE == 0 {
                         text.extend_from_slice(format!("_{index}").as_bytes());
@@ -565,7 +565,7 @@ impl CheckerState {
             if name_read.kind() == K::ArrayBindingPattern && rest {
                 let elements = self.source_list(name, name_read.element_list())?;
                 let last_rest = if let Some(&last) = elements.last() {
-                    let read = self.ast(last)?.node(last)?;
+                    let read = self.node(last)?;
                     read.data_source()
                         .as_binding_element()
                         .is_some_and(|data| data.dot_dot_dot_token().is_some())

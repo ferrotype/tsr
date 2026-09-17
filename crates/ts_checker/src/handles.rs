@@ -222,7 +222,7 @@ impl Operation<'_> {
             return Err(Error::MissingLink("relation observer already installed"));
         }
         if let Some(node) = error_node {
-            state.ast(node)?.node(node)?;
+            state.node(node)?;
         }
         state.relations.observer = Some(Vec::new());
         let result = state.check_type_related_ex(source, target, mode, error_node, None);

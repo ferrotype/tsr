@@ -15,7 +15,7 @@ fn required<T>(v: Option<T>, name: &'static str) -> Result<T, Error> {
 }
 impl CheckerState {
     fn flow_switch_clauses(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let block = required(
             read.data_source()
                 .as_switch_statement()
@@ -23,7 +23,7 @@ impl CheckerState {
                 .case_block(),
             "switch case block",
         )?;
-        let read = self.ast(block)?.node(block)?;
+        let read = self.node(block)?;
         self.source_list(
             block,
             read.data_source()
@@ -40,7 +40,7 @@ impl CheckerState {
         }
         let mut types = Vec::new();
         for clause in self.flow_switch_clauses(node)? {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             let ty = if read.kind() == K::CaseClause {
                 let expression = required(read.expression(), "case expression")?;
                 let ty = self.get_type_of_expression(expression)?;
@@ -62,11 +62,11 @@ impl CheckerState {
         let clauses = self.flow_switch_clauses(node)?;
         let mut witnesses = vec![JsString::default(); clauses.len()];
         for (index, clause) in clauses.into_iter().enumerate() {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             if read.kind() == K::CaseClause {
                 let expression = required(read.expression(), "case witness")?;
                 if !matches!(
-                    self.ast(expression)?.node(expression)?.kind().known(),
+                    self.node(expression)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                 ) {
                     self.flow.switches.witnesses.insert(node, None);
@@ -118,11 +118,8 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:Checker.computeExhaustiveSwitchStatement
     fn compute_flow_switch_exhaustive(&mut self, node: NodeId) -> Result<bool, Error> {
-        let expression = required(
-            self.ast(node)?.node(node)?.expression(),
-            "switch expression",
-        )?;
-        let read = self.ast(expression)?.node(expression)?;
+        let expression = required(self.node(node)?.expression(), "switch expression")?;
+        let read = self.node(expression)?;
         if read.kind() == K::TypeOfExpression {
             let inner = required(read.expression(), "typeof switch operand")?;
             let Some(witnesses) = self.flow_switch_witnesses(node)? else {
@@ -177,18 +174,15 @@ impl CheckerState {
         data: FlowSwitchClauseData,
     ) -> Result<TypeId, Error> {
         let statement = required(data.switch_statement, "flow switch statement")?;
-        let expression = required(
-            self.ast(statement)?.node(statement)?.expression(),
-            "switch discriminant",
-        )?;
+        let expression = required(self.node(statement)?.expression(), "switch discriminant")?;
         let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
-        let kind = self.ast(expression)?.node(expression)?.kind();
+        let kind = self.node(expression)?.kind();
         if self.matching_reference(reference, expression)? {
             return self.narrow_switch_discriminant(ty, data);
         }
         if kind == K::TypeOfExpression {
             let inner = required(
-                self.ast(expression)?.node(expression)?.expression(),
+                self.node(expression)?.expression(),
                 "typeof switch expression",
             )?;
             if self.matching_reference(reference, inner)? {
@@ -201,7 +195,7 @@ impl CheckerState {
         if self.options.strict_null_checks {
             let optional_typeof = if kind == K::TypeOfExpression {
                 let inner = required(
-                    self.ast(expression)?.node(expression)?.expression(),
+                    self.node(expression)?.expression(),
                     "typeof chain expression",
                 )?;
                 self.optional_chain_contains_reference(inner, reference)?
@@ -347,7 +341,7 @@ impl CheckerState {
         let range = clause_range(data, clauses.len())?;
         let mut default = range.is_empty();
         for &clause in &clauses[range.clone()] {
-            default |= self.ast(clause)?.node(clause)?.kind() == K::DefaultClause;
+            default |= self.node(clause)?.kind() == K::DefaultClause;
         }
         if default {
             let facts = not_equal_facts(range.start, range.end, &witnesses);
@@ -378,10 +372,10 @@ impl CheckerState {
         let range = clause_range(data, clauses.len())?;
         let mut default = range.is_empty();
         for &clause in &clauses[range.clone()] {
-            default |= self.ast(clause)?.node(clause)?.kind() == K::DefaultClause;
+            default |= self.node(clause)?.kind() == K::DefaultClause;
         }
         for &clause in &clauses[..range.start] {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             if read.kind() == K::CaseClause {
                 ty = self.narrow_reference_type(
                     reference,
@@ -394,7 +388,7 @@ impl CheckerState {
         }
         if default {
             for &clause in &clauses[range.end..] {
-                let read = self.ast(clause)?.node(clause)?;
+                let read = self.node(clause)?;
                 if read.kind() == K::CaseClause {
                     ty = self.narrow_reference_type(
                         reference,
@@ -409,7 +403,7 @@ impl CheckerState {
         }
         let mut parts = Vec::new();
         for &clause in &clauses[range] {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             parts.push(if read.kind() == K::CaseClause {
                 self.narrow_reference_type(
                     reference,

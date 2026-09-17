@@ -10,28 +10,28 @@ impl CheckerState {
     fn check_unique_type_operator(&mut self, node: NodeId) -> Result<(), Error> {
         use ts_ast::{modifier_flags as mf, node_flags as nf};
         use ts_diagnostics as d;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let annotation = read
             .type_node()
             .ok_or(Error::MissingLink("unique type annotation"))?;
         let mut parent = read
             .parent()
             .ok_or(Error::MissingLink("unique type parent"))?;
-        while self.ast(parent)?.node(parent)?.kind() == K::ParenthesizedType {
+        while self.node(parent)?.kind() == K::ParenthesizedType {
             parent = self
                 .ast(parent)?
                 .node(parent)?
                 .parent()
                 .ok_or(Error::MissingLink("parenthesized unique type parent"))?;
         }
-        if self.ast(annotation)?.node(annotation)?.kind() == K::SymbolKeyword {
-            let read = self.ast(parent)?.node(parent)?;
+        if self.node(annotation)?.kind() == K::SymbolKeyword {
+            let read = self.node(parent)?;
             let name = read.name().unwrap_or(parent);
             let diagnostic = match read.kind().known() {
                 Some(K::VariableDeclaration) => {
                     let list = read.parent().ok_or(Error::MissingLink("unique variable list"))?;
-                    let list = self.ast(list)?.node(list)?;
-                    if self.ast(name)?.node(name)?.kind() != K::Identifier {
+                    let list = self.node(list)?;
+                    if self.node(name)?.kind() != K::Identifier {
                         Some((node, d::X_unique_symbol_types_may_not_be_used_on_a_variable_declaration_with_a_binding_name))
                     } else if list.kind() != K::VariableDeclarationList || list.parent().map(|parent| self.ast(parent)?.node(parent).map(|read| read.kind() != K::VariableStatement).map_err(Error::from)).transpose()?.unwrap_or(true) {
                         Some((node, d::X_unique_symbol_types_are_only_allowed_on_variables_in_a_variable_statement))
@@ -61,7 +61,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypePredicate
     pub(crate) fn check_type_predicate(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let annotation = read.type_node();
         let parent = read
             .parent()
@@ -69,7 +69,7 @@ impl CheckerState {
         if let Some(annotation) = annotation {
             self.check_source_element(annotation)?;
         }
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if !matches!(
             read.kind().known(),
             Some(
@@ -105,11 +105,9 @@ impl CheckerState {
             .ok_or(Error::MissingLink("predicate"))?
             .parameter_name();
         if data.parameter_index < 0 {
-            for parameter in
-                self.source_list(parent, self.ast(parent)?.node(parent)?.parameter_list())?
-            {
-                if let Some(name) = self.ast(parameter)?.node(parameter)?.name() {
-                    if self.ast(name)?.node(name)?.kind() != K::Identifier {
+            for parameter in self.source_list(parent, self.node(parent)?.parameter_list())? {
+                if let Some(name) = self.node(parameter)?.name() {
+                    if self.node(name)?.kind() != K::Identifier {
                         return Err(Error::Unsupported(
                             "checkIfTypePredicateVariableIsDeclaredInBindingPattern",
                         ));
@@ -153,7 +151,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkArrayType
     // port: tsc/internal/checker/checker.go:Checker.checkTupleType
     pub(crate) fn check_array_tuple_syntax(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::ArrayType) => {
                 let element = self
@@ -184,7 +182,7 @@ impl CheckerState {
                     .type_node()
                     .ok_or(Error::MissingLink("readonly type"))?;
                 if !matches!(
-                    self.ast(annotation)?.node(annotation)?.kind().known(),
+                    self.node(annotation)?.kind().known(),
                     Some(K::ArrayType | K::TupleType)
                 ) {
                     self.grammar_error_first_token(
@@ -274,7 +272,7 @@ impl CheckerState {
                         vec![],
                     )?;
                 }
-                match self.ast(annotation)?.node(annotation)?.kind().known() {
+                match self.node(annotation)?.kind().known() {
                     Some(K::OptionalType) => {
                         self.grammar_error_node(annotation, ts_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type, vec![])?;
                     }
@@ -293,7 +291,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkSignatureDeclaration
     pub(crate) fn check_signature_syntax(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let index = read.kind() == K::IndexSignature;
         let parameters = self.source_list(node, read.parameter_list())?;
         let annotation = read.type_node();
@@ -314,7 +312,7 @@ impl CheckerState {
         ) {
             self.check_grammar_function_like(node)?;
         }
-        if self.ast(node)?.node(node)?.body().is_some() {
+        if self.node(node)?.body().is_some() {
             let (asynchronous, generator) = self.body_function_flags(node)?;
             let target = self.program()?.host.options().emit_script_target();
             if asynchronous && generator && target < ts_core::ScriptTarget::ES2018 {
@@ -338,7 +336,7 @@ impl CheckerState {
         } else {
             let options = self.program()?.host.options();
             if options.strict_option_value(options.no_implicit_any) {
-                let kind = self.ast(node)?.node(node)?.kind();
+                let kind = self.node(node)?.kind();
                 let diagnostic = if kind == K::CallSignature {
                     Some(ts_diagnostics::Call_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type)
                 } else if kind == K::ConstructSignature {
@@ -353,7 +351,7 @@ impl CheckerState {
         }
         if let Some(annotation) = annotation {
             let flags = self.body_function_flags(node)?;
-            if flags.1 && self.ast(node)?.node(node)?.body().is_some() {
+            if flags.1 && self.node(node)?.body().is_some() {
                 self.check_generator_return_annotation(node, annotation)?;
             } else if flags.0 && !flags.1 {
                 self.check_async_return_annotation(node, annotation)?;
@@ -372,7 +370,7 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         let mut optional = false;
         for (index, &parameter) in parameters.iter().enumerate() {
-            let read = self.ast(parameter)?.node(parameter)?;
+            let read = self.node(parameter)?;
             let data = read
                 .data_source()
                 .as_parameter_declaration()
@@ -420,8 +418,7 @@ impl CheckerState {
             } else if let Some(question) = question {
                 optional = true;
                 // A reparsed '?' token indicates a bracketed name in a @param tag.
-                let reparsed =
-                    self.ast(question)?.node(question)?.flags() & ts_ast::node_flags::REPARSED != 0;
+                let reparsed = self.node(question)?.flags() & ts_ast::node_flags::REPARSED != 0;
                 initializer.filter(|_| !reparsed).map(|_| {
                     (
                         name,
@@ -452,7 +449,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         if parameters.len() != 1 {
             let at = match parameters.first() {
-                Some(&parameter) => self.ast(parameter)?.node(parameter)?.name(),
+                Some(&parameter) => self.node(parameter)?.name(),
                 None => Some(node),
             };
             let at = at.ok_or(Error::MissingLink("index parameter name"))?;
@@ -463,7 +460,7 @@ impl CheckerState {
             )?;
             return Ok(());
         }
-        if let Some(list) = self.ast(node)?.node(node)?.parameter_list() {
+        if let Some(list) = self.node(node)?.parameter_list() {
             self.check_grammar_trailing_comma(
                 node,
                 list,
@@ -537,7 +534,7 @@ impl CheckerState {
                 return Ok(());
             }
         }
-        if self.ast(node)?.node(node)?.type_node().is_none() {
+        if self.node(node)?.type_node().is_none() {
             self.grammar_error_node(
                 node,
                 ts_diagnostics::An_index_signature_must_have_a_type_annotation,
@@ -568,8 +565,8 @@ impl CheckerState {
     pub(crate) fn check_infer_type(&mut self, node: ts_arena::NodeId) -> Result<(), Error> {
         let mut current = node;
         let mut valid = false;
-        while let Some(parent) = self.ast(current)?.node(current)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        while let Some(parent) = self.node(current)?.parent() {
+            let read = self.node(parent)?;
             if read
                 .data_source()
                 .as_conditional_type_node()
@@ -605,7 +602,7 @@ impl CheckerState {
                 .into_iter()
                 .flatten()
             {
-                if self.ast(node)?.node(node)?.kind() == K::TypeParameter {
+                if self.node(node)?.kind() == K::TypeParameter {
                     declarations.push(node);
                 }
             }
@@ -617,7 +614,7 @@ impl CheckerState {
                 let name = self.symbol_to_string(symbol)?;
                 for node in declarations {
                     self.error_at(
-                        self.ast(node)?.node(node)?.name(),
+                        self.node(node)?.name(),
                         ts_diagnostics::All_declarations_of_0_must_have_identical_constraints,
                         vec![name.clone()],
                     )?;
@@ -640,11 +637,11 @@ impl CheckerState {
             .ok_or(Error::MissingLink("infer parameter symbol"))?;
         let name = self.symbol(symbol)?.name_to_owned();
         for &node in declarations {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let node_name = read
                 .name()
                 .ok_or(Error::MissingLink("type parameter name"))?;
-            if self.ast(node_name)?.node_text(node_name)?.as_bytes() != name.as_bytes() {
+            if self.node_text(node_name)?.as_bytes() != name.as_bytes() {
                 return Ok(false);
             }
             let data = read
@@ -679,7 +676,7 @@ impl CheckerState {
 impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
     pub(crate) fn is_part_of_type_node(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let kind = read.kind();
         if kind.raw() >= K::TypePredicate as i16 && kind.raw() <= K::ImportType as i16 {
             return Ok(true);
@@ -722,7 +719,7 @@ impl CheckerState {
             Some(K::Identifier) => {
                 let mut target = node;
                 if let Some(parent) = read.parent() {
-                    let read = self.ast(parent)?.node(parent)?;
+                    let read = self.node(parent)?;
                     if read.kind() == K::QualifiedName
                         && read
                             .data_source()
@@ -746,10 +743,10 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:isPartOfTypeNodeInParent
     fn is_part_of_type_in_parent(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         let kind = read.kind();
         if kind == K::TypeQuery {
             return Ok(false);
@@ -800,10 +797,10 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:isPartOfTypeExpressionWithTypeArguments
     pub(crate) fn is_type_heritage_expression(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if matches!(
             read.kind().known(),
             Some(K::JSDocImplementsTag | K::JSDocAugmentsTag)

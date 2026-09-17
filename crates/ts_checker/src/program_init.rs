@@ -90,7 +90,7 @@ impl CheckerState {
                 .node(name)?
                 .parent()
                 .ok_or(Error::MissingLink("augmentation parent"))?;
-            if ast::is_global_scope_augmentation(&self.ast(declaration)?.node(declaration)?) {
+            if ast::is_global_scope_augmentation(&self.node(declaration)?) {
                 self.merge_global_augmentation(declaration)?;
             }
         }
@@ -165,7 +165,7 @@ impl CheckerState {
                 .node(name)?
                 .parent()
                 .ok_or(Error::MissingLink("augmentation parent"))?;
-            if !ast::is_global_scope_augmentation(&self.ast(declaration)?.node(declaration)?) {
+            if !ast::is_global_scope_augmentation(&self.node(declaration)?) {
                 self.merge_external_module_augmentation(declaration)?;
             }
         }
@@ -269,7 +269,7 @@ impl CheckerState {
     fn global_type_declaration(&self, symbol: SymbolId) -> Result<Option<ts_arena::NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             if matches!(
-                self.ast(declaration)?.node(declaration)?.kind().known(),
+                self.node(declaration)?.kind().known(),
                 Some(
                     K::ClassDeclaration
                         | K::InterfaceDeclaration

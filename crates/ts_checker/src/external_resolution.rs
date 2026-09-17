@@ -26,8 +26,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("external module source file"))?;
         Ok((
             source,
-            self.ast(source)?
-                .source_file(source)?
+            self.source_file_read(source)?
                 .parse_options()
                 .file_name
                 .clone(),
@@ -37,7 +36,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getModuleSpecifierForImportOrExport
     pub(crate) fn module_specifier(&self, mut node: NodeId) -> Result<Option<NodeId>, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ImportDeclaration | K::JSImportDeclaration) => {
                     return Ok(read
@@ -57,7 +56,7 @@ impl CheckerState {
                         .as_import_equals_declaration()
                         .and_then(|data| data.module_reference())
                         .ok_or(Error::MissingLink("import equals module reference"))?;
-                    let read = self.ast(reference)?.node(reference)?;
+                    let read = self.node(reference)?;
                     return Ok((read.kind() == K::ExternalModuleReference)
                         .then(|| read.expression())
                         .flatten());
@@ -114,8 +113,8 @@ impl CheckerState {
         ignore_errors: bool,
     ) -> Result<Option<SymbolId>, Error> {
         let mut message = d::Cannot_find_module_0_or_its_corresponding_type_declarations;
-        if self.ast(specifier)?.node(specifier)?.kind() == K::StringLiteral
-            && node_core_module(self.ast(specifier)?.node_text(specifier)?.as_bytes())
+        if self.node(specifier)?.kind() == K::StringLiteral
+            && node_core_module(self.node_text(specifier)?.as_bytes())
         {
             message = if self.program()?.host.options().uses_wildcard_types() {
                 d::Cannot_find_name_0_Do_you_need_to_install_type_definitions_for_node_Try_npm_i_save_dev_types_Slashnode
@@ -143,12 +142,12 @@ impl CheckerState {
         augmentation: bool,
     ) -> Result<Option<SymbolId>, Error> {
         if !matches!(
-            self.ast(specifier)?.node(specifier)?.kind().known(),
+            self.node(specifier)?.kind().known(),
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
         ) {
             return Ok(None);
         }
-        let module_reference = self.ast(specifier)?.node_text(specifier)?.into_js_string();
+        let module_reference = self.node_text(specifier)?.into_js_string();
         let host = self.program()?.host.clone();
         let (_, file_name) = self.module_source(location)?;
         let mode = host.get_mode_for_usage_location(file_name.as_bytes(), specifier)?;
@@ -233,7 +232,7 @@ impl CheckerState {
         let (source, file_name) = self.module_source(location)?;
         let resolved =
             host.get_resolved_module(file_name.as_bytes(), module_reference.as_bytes(), mode)?;
-        let is_declaration_file = self.ast(source)?.source_file(source)?.is_declaration_file;
+        let is_declaration_file = self.source_file_read(source)?.is_declaration_file;
         let diagnostic = if error_node.is_some() {
             resolved
                 .filter(|resolved| resolved.is_resolved())
@@ -405,7 +404,7 @@ impl CheckerState {
     }
 
     fn side_effect_import(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
         Ok(self
@@ -552,7 +551,7 @@ impl CheckerState {
             .options()
             .rewrite_relative_import_extensions
             .is_true()
-            && self.ast(location)?.node(location)?.flags() & ts_ast::node_flags::AMBIENT == 0
+            && self.node(location)?.flags() & ts_ast::node_flags::AMBIENT == 0
             && !path::is_declaration_file_name(name.as_bytes())
             && !self.is_literal_import_type_node(location)?
             && !self.is_part_of_type_only_import_or_export_declaration(location)?
@@ -648,7 +647,7 @@ impl CheckerState {
     )]
     fn module_import_emittable(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ImportDeclaration | K::JSImportDeclaration) => {
                     let clause = read
@@ -656,7 +655,7 @@ impl CheckerState {
                         .as_import_declaration()
                         .and_then(|data| data.import_clause());
                     return Ok(match clause {
-                        Some(clause) => !self.ast(clause)?.node(clause)?.is_type_only(),
+                        Some(clause) => !self.node(clause)?.is_type_only(),
                         None => false,
                     });
                 }
@@ -813,16 +812,14 @@ impl CheckerState {
         };
         let mut message = d::The_current_file_is_a_CommonJS_module_whose_imports_will_produce_require_calls_however_the_referenced_file_is_an_ECMAScript_module_and_cannot_be_imported_with_require_Consider_writing_a_dynamic_import_0_call_instead;
         if let Some(host_node) = override_host {
-            let read = self.ast(host_node)?.node(host_node)?;
+            let read = self.node(host_node)?;
             match read.kind().known() {
                 Some(K::ImportDeclaration) => {
                     let type_only = read
                         .data_source()
                         .as_import_declaration()
                         .and_then(|data| data.import_clause())
-                        .map(|clause| {
-                            Ok::<_, Error>(self.ast(clause)?.node(clause)?.is_type_only())
-                        })
+                        .map(|clause| Ok::<_, Error>(self.node(clause)?.is_type_only()))
                         .transpose()?
                         .unwrap_or(false);
                     if type_only {
@@ -847,7 +844,7 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:HasResolutionModeOverride
     fn has_resolution_mode_override(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let attributes = match read.kind().known() {
             Some(
                 K::ImportType

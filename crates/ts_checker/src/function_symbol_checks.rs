@@ -25,8 +25,7 @@ impl CheckerState {
     }
 
     fn declaration_body_present(&self, node: NodeId) -> Result<bool, Error> {
-        self.ast(node)?
-            .node(node)?
+        self.node(node)?
             .body()
             .map(|body| {
                 self.ast(body)?
@@ -50,7 +49,7 @@ impl CheckerState {
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("overload declaration parent"))?;
-        let parent_kind = self.ast(parent)?.node(parent)?.kind();
+        let parent_kind = self.node(parent)?.kind();
         if !matches!(
             parent_kind.known(),
             Some(K::InterfaceDeclaration | K::ClassDeclaration | K::ClassExpression)
@@ -64,12 +63,11 @@ impl CheckerState {
                 {
                     break;
                 }
-                container = self.ast(current)?.node(current)?.parent();
+                container = self.node(current)?.parent();
             }
             if let Some(container) = container {
                 let global_augmentation = if parent_kind == K::ModuleBlock {
-                    self.ast(parent)?
-                        .node(parent)?
+                    self.node(parent)?
                         .parent()
                         .map(|parent| {
                             self.ast(parent)?
@@ -82,7 +80,7 @@ impl CheckerState {
                 } else {
                     false
                 };
-                if self.ast(container)?.node(container)?.flags() & nf::EXPORT_CONTEXT != 0
+                if self.node(container)?.flags() & nf::EXPORT_CONTEXT != 0
                     && flags & mf::AMBIENT == 0
                     && !global_augmentation
                 {
@@ -112,7 +110,7 @@ impl CheckerState {
         let mut nonambient_class = false;
         let mut functions = Vec::new();
         for &node in &declarations {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let ambient = read.flags() & nf::AMBIENT != 0;
             let parent = read.parent();
             let ambient_or_interface = ambient
@@ -164,7 +162,7 @@ impl CheckerState {
                         duplicate_function = true;
                     }
                 } else if let Some(previous) = previous {
-                    let previous_read = self.ast(previous)?.node(previous)?;
+                    let previous_read = self.node(previous)?;
                     if previous_read.parent() == parent
                         && previous_read.end() != read.pos()
                         && previous_read.flags() & nf::REPARSED == 0
@@ -195,12 +193,7 @@ impl CheckerState {
         if duplicate_function {
             for &declaration in &functions {
                 self.error_at(
-                    Some(
-                        self.ast(declaration)?
-                            .node(declaration)?
-                            .name()
-                            .unwrap_or(declaration),
-                    ),
+                    Some(self.node(declaration)?.name().unwrap_or(declaration)),
                     d::Duplicate_function_implementation,
                     vec![],
                 )?;
@@ -213,7 +206,7 @@ impl CheckerState {
         {
             let mut related = Vec::new();
             for &declaration in &declarations {
-                if self.ast(declaration)?.node(declaration)?.kind() == K::ClassDeclaration {
+                if self.node(declaration)?.kind() == K::ClassDeclaration {
                     related.push(std::sync::Arc::new(self.diagnostic_for_node(
                         Some(declaration),
                         d::Consider_adding_a_declare_modifier_to_this_class,
@@ -222,7 +215,7 @@ impl CheckerState {
                 }
             }
             for &declaration in &declarations {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 let diagnostic = match read.kind().known() {
                     Some(K::ClassDeclaration) => {
                         d::Class_declaration_cannot_implement_overload_list_for_0
@@ -242,7 +235,7 @@ impl CheckerState {
             }
         }
         if let Some(last) = last_nonambient {
-            let read = self.ast(last)?.node(last)?;
+            let read = self.node(last)?;
             if read.body().is_none()
                 && read.modifier_flags(self.ast(last)?)? & mf::ABSTRACT == 0
                 && read.question_token(self.ast(last)?)?.is_none()
@@ -260,7 +253,7 @@ impl CheckerState {
                     .question_token(self.ast(canonical)?)?
                     .is_some();
                 for &node in &declarations {
-                    let read = self.ast(node)?.node(node)?;
+                    let read = self.node(node)?;
                     if read.question_token(self.ast(node)?)?.is_some() != optional {
                         self.error_at(
                             read.name(),
@@ -302,9 +295,7 @@ impl CheckerState {
             .first()
             .ok_or(Error::MissingLink("canonical overload"))?;
         if let Some(implementation) = implementation {
-            if self.ast(implementation)?.node(implementation)?.parent()
-                == self.ast(first)?.node(first)?.parent()
-            {
+            if self.node(implementation)?.parent() == self.node(first)?.parent() {
                 return Ok(implementation);
             }
         }
@@ -341,7 +332,7 @@ impl CheckerState {
                 let flags = self.effective_declaration_flags(overload, DECLARATION_FLAGS)?;
                 let deviation = flags ^ canonical_flags;
                 let file_deviation = flags ^ file_flags;
-                let name = self.ast(overload)?.node(overload)?.name();
+                let name = self.node(overload)?.name();
                 let (location, diagnostic) = if file_deviation & mf::EXPORT != 0 {
                     (
                         name,
@@ -376,10 +367,10 @@ impl CheckerState {
         node: NodeId,
         constructor: bool,
     ) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read.name();
         if let Some(name) = name {
-            if !ts_ast::node_is_present(Some(&self.ast(name)?.node(name)?)) {
+            if !ts_ast::node_is_present(Some(&self.node(name)?)) {
                 return Ok(());
             }
         }
@@ -395,13 +386,13 @@ impl CheckerState {
             .and_then(|index| children.get(index + 1))
             .copied();
         if let Some(next) = next {
-            let read = self.ast(next)?.node(next)?;
+            let read = self.node(next)?;
             if read.pos() == end && read.kind() == kind {
                 let next_name = read.name();
                 let location = Some(next_name.unwrap_or(next));
                 let same_name = if let (Some(name), Some(next_name)) = (name, next_name) {
-                    let a = self.ast(name)?.node(name)?;
-                    let b = self.ast(next_name)?.node(next_name)?;
+                    let a = self.node(name)?;
+                    let b = self.node(next_name)?;
                     if a.kind() == K::ComputedPropertyName && b.kind() == K::ComputedPropertyName {
                         let a = self.check_computed_property_name(name)?;
                         let b = self.check_computed_property_name(next_name)?;
@@ -410,8 +401,7 @@ impl CheckerState {
                         || ts_ast::utilities::is_property_name_literal(&a)
                             && ts_ast::utilities::is_property_name_literal(&b)
                     {
-                        self.ast(name)?.node_text(name)?.as_bytes()
-                            == self.ast(next_name)?.node_text(next_name)?.as_bytes()
+                        self.node_text(name)?.as_bytes() == self.node_text(next_name)?.as_bytes()
                     } else {
                         false
                     }

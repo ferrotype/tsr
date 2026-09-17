@@ -181,13 +181,7 @@ impl CheckerState {
             return Ok(None);
         }
         let path = diagnostic.file.map_or(Ok(JsString::default()), |file| {
-            Ok::<_, Error>(
-                self.ast(file)?
-                    .source_file(file)?
-                    .parse_options()
-                    .path
-                    .clone(),
-            )
+            Ok::<_, Error>(self.source_file_read(file)?.parse_options().path.clone())
         })?;
         let factory = self.factory.view();
         let program = self.program.as_ref();
@@ -233,15 +227,7 @@ impl CheckerState {
         suggestion: bool,
     ) -> Result<Vec<&Diagnostic>, Error> {
         let path = file
-            .map(|file| {
-                Ok::<_, Error>(
-                    self.ast(file)?
-                        .source_file(file)?
-                        .parse_options()
-                        .path
-                        .clone(),
-                )
-            })
+            .map(|file| Ok::<_, Error>(self.source_file_read(file)?.parse_options().path.clone()))
             .transpose()?;
         let factory = self.factory.view();
         let program = self.program.as_ref();

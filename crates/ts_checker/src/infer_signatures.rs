@@ -99,9 +99,7 @@ impl CheckerState {
             arguments.push(self.inferred_type(context, index)?);
         }
         let javascript = match self.signatures.get(contextual)?.declaration {
-            Some(node) => {
-                self.ast(node)?.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
-            }
+            Some(node) => self.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0,
             None => false,
         };
         self.signature_instantiation(signature, &arguments, javascript)
@@ -139,7 +137,7 @@ impl CheckerState {
         if self.signatures.get(source)?.flags & sg::IS_NON_INFERRABLE == 0 {
             let saved = run.bivariant;
             let kind = match self.signatures.get(target)?.declaration {
-                Some(node) => self.ast(node)?.node(node)?.kind().known(),
+                Some(node) => self.node(node)?.kind().known(),
                 None => None,
             };
             run.bivariant |= matches!(

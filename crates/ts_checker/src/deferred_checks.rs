@@ -84,10 +84,10 @@ impl CheckerState {
         if self.deferred_checks.reported_properties.contains(&name) {
             return Ok(());
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let spelling = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
         let mut child = None;
-        if self.ast(name)?.node(name)?.kind() != ts_ast::SyntaxKind::PrivateIdentifier
+        if self.node(name)?.kind() != ts_ast::SyntaxKind::PrivateIdentifier
             && self.types.flags(containing)? & (tf::UNION | tf::PRIMITIVE) == tf::UNION
         {
             for &part in self.types.compound_types(containing)?.clone().iter() {
@@ -180,17 +180,14 @@ impl CheckerState {
         let properties = self.get_properties_of_type(containing)?;
         let mut names = Vec::new();
         for property in properties {
-            if let Some(parent) = self.ast(name)?.node(name)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind()
-                    == ts_ast::SyntaxKind::PropertyAccessExpression
-                {
+            if let Some(parent) = self.node(name)?.parent() {
+                if self.node(parent)?.kind() == ts_ast::SyntaxKind::PropertyAccessExpression {
                     let receiver = self
                         .ast(parent)?
                         .node(parent)?
                         .expression()
                         .ok_or(Error::MissingLink("property completion receiver"))?;
-                    let is_super = self.ast(receiver)?.node(receiver)?.kind()
-                        == ts_ast::SyntaxKind::SuperKeyword;
+                    let is_super = self.node(receiver)?.kind() == ts_ast::SyntaxKind::SuperKeyword;
                     if !self.is_access_property_accessible(
                         parent, is_super, false, containing, property,
                     )? {

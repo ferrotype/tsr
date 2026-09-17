@@ -72,10 +72,10 @@ pub(crate) struct EnumState {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkEnumMember
     pub(crate) fn check_enum_member(&mut self, member: NodeId) -> Result<(), Error> {
-        let read = self.ast(member)?.node(member)?;
+        let read = self.node(member)?;
         let name = read.name().ok_or(Error::MissingLink("enum member name"))?;
         let initializer = read.initializer();
-        if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+        if self.node(name)?.kind() == K::PrivateIdentifier {
             self.error_at(
                 Some(member),
                 messages::An_enum_member_cannot_be_named_with_a_private_identifier,
@@ -93,10 +93,7 @@ impl CheckerState {
         self.check_grammar_modifiers(declaration)?;
         self.check_collisions_for_declaration_name(declaration)?;
         self.check_exports_on_merged_declarations(declaration)?;
-        for member in self.source_list(
-            declaration,
-            self.ast(declaration)?.node(declaration)?.member_list(),
-        )? {
+        for member in self.source_list(declaration, self.node(declaration)?.member_list())? {
             self.check_source_element(member)?;
         }
         if self
@@ -105,7 +102,7 @@ impl CheckerState {
             .options()
             .erasable_syntax_only
             .is_true()
-            && self.ast(declaration)?.node(declaration)?.flags() & nf::AMBIENT == 0
+            && self.node(declaration)?.flags() & nf::AMBIENT == 0
         {
             self.error_at(
                 Some(declaration),
@@ -124,7 +121,7 @@ impl CheckerState {
         let is_const = ts_ast::utilities::is_enum_const(self.ast(declaration)?, declaration)?;
         let mut missing_initializer = false;
         for node in declarations.iter().copied().flatten() {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() != K::EnumDeclaration {
                 continue;
             }
@@ -140,7 +137,7 @@ impl CheckerState {
                 )?;
             }
             if let Some(&first) = members.first() {
-                let read = self.ast(first)?.node(first)?;
+                let read = self.node(first)?;
                 if read.initializer().is_none() {
                     if missing_initializer {
                         self.error_at(read.name(), messages::In_an_enum_with_multiple_declarations_only_one_declaration_can_omit_an_initializer_for_its_first_enum_element, vec![])?;
@@ -177,7 +174,7 @@ impl CheckerState {
                 .into_iter()
                 .flatten()
             {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if read.kind() != K::EnumDeclaration {
                     continue;
                 }
@@ -354,10 +351,7 @@ impl CheckerState {
         let result = (|| {
             let mut auto = Some(Number::new(0.0));
             let mut previous = None;
-            for member in self.source_list(
-                declaration,
-                self.ast(declaration)?.node(declaration)?.member_list(),
-            )? {
+            for member in self.source_list(declaration, self.node(declaration)?.member_list())? {
                 let result = self.compute_enum_member_value(member, auto, previous)?;
                 auto = match &result.value {
                     Some(EnumValue::Number(value)) => Some(Number::new(value.value() + 1.0)),
@@ -382,13 +376,13 @@ impl CheckerState {
         auto: Option<Number>,
         previous: Option<NodeId>,
     ) -> Result<EnumEvaluation, Error> {
-        let read = self.ast(member)?.node(member)?;
+        let read = self.node(member)?;
         let name = read.name().ok_or(Error::MissingLink("enum member name"))?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("enum member parent"))?;
         let initializer = read.initializer();
-        let name_read = self.ast(name)?.node(name)?;
+        let name_read = self.node(name)?;
         if name_read.kind() == K::ComputedPropertyName
             && ts_ast::has_dynamic_name(self.ast(member)?, Some(member))?
         {
@@ -408,7 +402,7 @@ impl CheckerState {
                 } else {
                     name
                 };
-                let text_read = self.ast(text_node)?.node_text(text_node)?;
+                let text_read = self.node_text(text_node)?;
                 let text = text_read.as_bytes();
                 !matches!(text, b"Infinity" | b"-Infinity" | b"NaN")
                     && ts_jsnum::from_string(text).to_string().as_bytes() == text
@@ -424,7 +418,7 @@ impl CheckerState {
         if initializer.is_some() {
             return self.compute_constant_enum_member_value(member);
         }
-        let ambient = self.ast(parent)?.node(parent)?.flags() & nf::AMBIENT != 0;
+        let ambient = self.node(parent)?.flags() & nf::AMBIENT != 0;
         if ambient && !ts_ast::utilities::is_enum_const(self.ast(parent)?, parent)? {
             return Ok(EnumEvaluation::default());
         }
@@ -438,7 +432,7 @@ impl CheckerState {
         };
         if self.enum_isolated_modules() {
             if let Some(previous) = previous {
-                if self.ast(previous)?.node(previous)?.initializer().is_some() {
+                if self.node(previous)?.initializer().is_some() {
                     let value = self.enum_member_value(previous)?;
                     if !matches!(value.value, Some(EnumValue::Number(_)))
                         || value.resolved_other_files
@@ -466,7 +460,7 @@ impl CheckerState {
         &mut self,
         member: NodeId,
     ) -> Result<EnumEvaluation, Error> {
-        let read = self.ast(member)?.node(member)?;
+        let read = self.node(member)?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("enum member parent"))?;
@@ -505,7 +499,7 @@ impl CheckerState {
                     .as_bytes()
                     .to_vec();
                 name.push(b'.');
-                name.extend_from_slice(self.ast(member_name)?.node_text(member_name)?.as_bytes());
+                name.extend_from_slice(self.node_text(member_name)?.as_bytes());
                 self.error_at(Some(initializer), messages::X_0_has_a_string_type_but_must_have_syntactically_recognizable_string_syntax_when_isolatedModules_is_enabled, vec![JsString::from_bytes(name)])?;
             }
         } else if is_const {
@@ -514,7 +508,7 @@ impl CheckerState {
                 messages::X_const_enum_member_initializers_must_be_constant_expressions,
                 vec![],
             )?;
-        } else if self.ast(parent)?.node(parent)?.flags() & nf::AMBIENT != 0 {
+        } else if self.node(parent)?.flags() & nf::AMBIENT != 0 {
             self.error_at(Some(initializer), messages::In_ambient_enum_declarations_member_initializer_must_be_constant_expression, vec![])?;
         } else {
             let ty = self.check_expression(initializer)?;
@@ -665,7 +659,7 @@ impl CheckerState {
 
     fn enum_member_declaration(&self, symbol: SymbolId) -> Result<NodeId, Error> {
         for node in self.symbol_declarations(symbol)?.iter().flatten() {
-            if self.ast(node)?.node(node)?.kind() == K::EnumMember {
+            if self.node(node)?.kind() == K::EnumMember {
                 return Ok(node);
             }
         }
@@ -745,11 +739,11 @@ impl CheckerState {
         node: NodeId,
         ty: TypeId,
     ) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("const enum use parent"))?;
-        let parent_read = self.ast(parent)?.node(parent)?;
+        let parent_read = self.node(parent)?;
         let kind = read.kind();
         let allowed = matches!(
             parent_read.kind().known(),
@@ -773,7 +767,7 @@ impl CheckerState {
         let mut check = isolated;
         if !check && verbatim && allowed {
             let first = ts_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
-            let name = self.ast(first)?.node_text(first)?.into_js_string();
+            let name = self.node_text(first)?.into_js_string();
             check = self
                 .resolve_name_ex(Some(node), name.as_bytes(), sf::ALIAS, None, false, true)?
                 .is_none();
@@ -793,14 +787,14 @@ impl CheckerState {
                 Some(declaration),
             )?
             .ok_or(Error::MissingLink("const enum declaration source"))?;
-            let file = self.ast(source)?.source_file(source)?;
+            let file = self.source_file_read(source)?;
             let redirect = self
                 .program()?
                 .host
                 .get_project_reference_from_output_dts(file.path())?;
             let preserved =
                 redirect.is_some_and(|redirect| redirect.options.should_preserve_const_enums());
-            if self.ast(declaration)?.node(declaration)?.flags() & nf::AMBIENT != 0
+            if self.node(declaration)?.flags() & nf::AMBIENT != 0
                 && !self.valid_type_only_alias_use_site(node)?
                 && !preserved
             {
@@ -821,16 +815,16 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:isInRightSideOfImportOrExportAssignment
     fn enum_import_or_export_assignment(&self, mut node: NodeId) -> Result<bool, Error> {
-        while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-            if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+        while let Some(parent) = self.node(node)?.parent() {
+            if self.node(parent)?.kind() != K::QualifiedName {
                 break;
             }
             node = parent;
         }
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         Ok(match read.kind().known() {
             Some(K::ImportEqualsDeclaration) => {
                 read.data_source()

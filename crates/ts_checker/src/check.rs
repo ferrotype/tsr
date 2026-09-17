@@ -61,7 +61,7 @@ impl CheckerState {
             // This pass depends on a completed type check, but its own failure
             // must not poison later requests that need only type checking.
             let result = (|| {
-                if !self.ast(source)?.source_file(source)?.is_declaration_file {
+                if !self.source_file_read(source)?.is_declaration_file {
                     let nodes = self
                         .query
                         .identifier_check_nodes
@@ -104,13 +104,11 @@ impl CheckerState {
             self.check_source_element(statement)?;
         }
         self.finish_deferred_function_bodies(source)?;
-        if ts_ast::utilities::is_external_or_common_js_module(
-            &self.ast(source)?.source_file(source)?,
-        ) {
+        if ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(source)?) {
             self.check_external_module_exports(source)?;
             self.register_for_unused_identifiers_check(source)?;
         }
-        if !self.ast(source)?.source_file(source)?.is_declaration_file {
+        if !self.source_file_read(source)?.is_declaration_file {
             self.check_unused_renamed_binding_elements()?;
         }
         self.check_deferred_diagnostics()?;
@@ -193,7 +191,7 @@ impl CheckerState {
             }
             Some(K::VariableStatement) => {
                 let grammar_failed = self.check_grammar_modifiers(node)?;
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let list = required(
                     read.data_source()
                         .as_variable_statement()
@@ -369,12 +367,12 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkInterfaceDeclaration
     fn check_type_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         if !self.check_grammar_modifiers(node)?
-            && self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration
+            && self.node(node)?.kind() == K::InterfaceDeclaration
         {
             self.check_interface_heritage_grammar(node)?;
         }
         self.check_type_parameters(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let interface = read.kind() == K::InterfaceDeclaration;
         let parent = required(read.parent(), "type declaration parent")?;
         let name = required(read.name(), "type declaration name")?;
@@ -389,7 +387,7 @@ impl CheckerState {
                 })],
             )?;
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),
             b"any"
@@ -423,16 +421,13 @@ impl CheckerState {
             self.check_interface_inheritance(name, symbol)?;
             self.check_object_duplicate_declarations(node, false)?;
             self.check_interface_heritage(node)?;
-            for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+            for member in self.source_list(node, self.node(node)?.member_list())? {
                 self.check_source_element(member)?;
             }
             self.check_class_or_interface_duplicate_indexes(node)?;
         } else {
-            let annotation = required(
-                self.ast(node)?.node(node)?.type_node(),
-                "type alias annotation",
-            )?;
-            if self.ast(annotation)?.node(annotation)?.kind() == K::IntrinsicKeyword {
+            let annotation = required(self.node(node)?.type_node(), "type alias annotation")?;
+            if self.node(annotation)?.kind() == K::IntrinsicKeyword {
                 // The `intrinsic` keyword is a leaf type node with no child nodes to check.
                 return Ok(());
             }
@@ -444,7 +439,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeLiteral
     fn check_object_type_members(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_object_duplicate_declarations(node, false)?;
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+        for member in self.source_list(node, self.node(node)?.member_list())? {
             self.check_source_element(member)?;
         }
         Ok(())
@@ -458,17 +453,16 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
     pub(crate) fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = required(read.name(), "variable/property name")?;
-        let name_kind = self.ast(name)?.node(name)?.kind();
+        let name_kind = self.node(name)?.kind();
         let property = read.kind() == K::PropertySignature;
         let binding = matches!(
             name_kind.known(),
             Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
         );
         if !property && name_kind != K::Identifier && !binding
-            || property
-                && !ts_ast::utilities::is_property_name_literal(&self.ast(name)?.node(name)?)
+            || property && !ts_ast::utilities::is_property_name_literal(&self.node(name)?)
         {
             return Err(Error::Unsupported(
                 "checkVariableLikeDeclaration: binding/computed/private name",
@@ -495,14 +489,14 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
     // Shared semantic tail after declaration-specific grammar and name checks.
     pub(crate) fn check_variable_initializer(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let annotation = read.type_node();
         let initializer = read.initializer();
         if let Some(annotation) = annotation {
             self.check_source_element(annotation)?;
         }
-        if let Some(name) = self.ast(node)?.node(node)?.name() {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+        if let Some(name) = self.node(node)?.name() {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 self.check_computed_property_name(name)?;
                 if let Some(initializer) = initializer {
                     self.check_expression_cached(initializer)?;
@@ -521,12 +515,12 @@ impl CheckerState {
         if self.symbol(symbol)?.value_declaration() != Some(node) {
             self.check_secondary_variable(node, symbol, target)?;
             if !matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::PropertyDeclaration | K::PropertySignature)
             ) {
                 self.check_exports_on_merged_declarations(node)?;
                 if matches!(
-                    self.ast(node)?.node(node)?.kind().known(),
+                    self.node(node)?.kind().known(),
                     Some(K::VariableDeclaration | K::BindingElement)
                 ) {
                     self.check_var_names_not_shadowed(node)?;
@@ -536,11 +530,11 @@ impl CheckerState {
             return Ok(());
         }
         if let Some(initializer) = initializer {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let for_in = if read.kind() == K::VariableDeclaration {
                 let list = required(read.parent(), "variable list")?;
-                match self.ast(list)?.node(list)?.parent() {
-                    Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::ForInStatement,
+                match self.node(list)?.parent() {
+                    Some(parent) => self.node(parent)?.kind() == K::ForInStatement,
                     None => false,
                 }
             } else {
@@ -572,12 +566,12 @@ impl CheckerState {
         }
         self.check_variable_declaration_flags(node, symbol, true)?;
         if !matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::PropertyDeclaration | K::PropertySignature)
         ) {
             self.check_exports_on_merged_declarations(node)?;
             if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::VariableDeclaration | K::BindingElement)
             ) {
                 self.check_var_names_not_shadowed(node)?;

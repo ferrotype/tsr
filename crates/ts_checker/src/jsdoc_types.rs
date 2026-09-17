@@ -6,7 +6,7 @@ use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getIntendedTypeFromJSDocTypeReference
     pub(crate) fn intended_jsdoc_type(&mut self, node: NodeId) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::JS_DOC == 0 || read.kind() != K::TypeReference {
             return Ok(None);
         }
@@ -16,10 +16,10 @@ impl CheckerState {
             .ok_or(ts_arena::Error::InvalidGraph)?
             .type_name()
             .ok_or(Error::MissingLink("documentation type name"))?;
-        if self.ast(name)?.node(name)?.kind() != K::Identifier {
+        if self.node(name)?.kind() != K::Identifier {
             return Ok(None);
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let arguments = self.source_list(node, read.type_argument_list())?;
         let builtin = match text.as_bytes() {
             b"String" => Some(self.builtins.string_type),
@@ -153,7 +153,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkJSDocType
     pub(crate) fn check_jsdoc_type(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE == 0 {
             if matches!(
                 read.kind().known(),
@@ -163,7 +163,7 @@ impl CheckerState {
                 let annotation = read
                     .type_node()
                     .ok_or(Error::MissingLink("JSDoc nullable type"))?;
-                let postfix = read.pos() == self.ast(annotation)?.node(annotation)?.pos();
+                let postfix = read.pos() == self.node(annotation)?.pos();
                 let mut ty = self.get_type_from_type_node(annotation)?;
                 if nullable && ty != self.builtins.never_type && ty != self.builtins.void_type {
                     ty =

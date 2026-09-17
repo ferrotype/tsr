@@ -189,7 +189,7 @@ impl NodeBuilder<'_> {
     }
     fn name_has_declaration_kind(&self, symbol: SymbolId, kind: K) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            if self.checker.ast(node)?.node(node)?.kind() == kind {
+            if self.checker.node(node)?.kind() == kind {
                 return Ok(true);
             }
         }
@@ -225,7 +225,7 @@ impl NodeBuilder<'_> {
             .collect();
         let mut file = None;
         for &declaration in &declarations {
-            if self.checker.ast(declaration)?.node(declaration)?.kind() == K::SourceFile {
+            if self.checker.node(declaration)?.kind() == K::SourceFile {
                 file = Some(declaration);
                 break;
             }
@@ -247,7 +247,7 @@ impl NodeBuilder<'_> {
                                     .iter()
                                     .flatten()
                                 {
-                                    if self.checker.ast(node)?.node(node)?.kind() == K::SourceFile {
+                                    if self.checker.node(node)?.kind() == K::SourceFile {
                                         file = Some(node);
                                         break;
                                     }
@@ -298,7 +298,7 @@ impl NodeBuilder<'_> {
             .module_source_file(symbol)?
             .ok_or(Error::MissingLink("module source file"))?;
         Ok(JsString::from_bytes(
-            self.checker.ast(source)?.source_file(source)?.file_name(),
+            self.checker.source_file_read(source)?.file_name(),
         ))
     }
 
@@ -454,7 +454,7 @@ impl NodeBuilder<'_> {
             let mut property = true;
             for node in declarations {
                 if !matches!(
-                    self.checker.ast(node)?.node(node)?.kind().known(),
+                    self.checker.node(node)?.kind().known(),
                     Some(
                         K::PropertyDeclaration
                             | K::MethodDeclaration
@@ -641,12 +641,10 @@ impl NodeBuilder<'_> {
 
     fn name_has_external_import_equals(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             if let Some(import) = read.data_source().as_import_equals_declaration() {
                 if let Some(reference) = import.module_reference() {
-                    if self.checker.ast(reference)?.node(reference)?.kind()
-                        == K::ExternalModuleReference
-                    {
+                    if self.checker.node(reference)?.kind() == K::ExternalModuleReference {
                         return Ok(true);
                     }
                 }
@@ -656,7 +654,7 @@ impl NodeBuilder<'_> {
     }
     fn name_has_namespace_reexport(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             if read.kind() == K::NamespaceExport {
                 let parent = read
                     .parent()

@@ -48,11 +48,9 @@ impl CheckerState {
             None => None,
         };
         if let Some(declaration) = declaration {
-            if ts_ast::utilities::is_class_like(&self.ast(declaration)?.node(declaration)?) {
-                let members = self.source_list(
-                    declaration,
-                    self.ast(declaration)?.node(declaration)?.member_list(),
-                )?;
+            if ts_ast::utilities::is_class_like(&self.node(declaration)?) {
+                let members =
+                    self.source_list(declaration, self.node(declaration)?.member_list())?;
                 for member in members {
                     // Only process instance properties against instance index signatures
                     // and static properties against static index signatures.
@@ -143,18 +141,16 @@ impl CheckerState {
             .transpose()?
             .flatten();
         if let Some(name) = name {
-            if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+            if self.node(name)?.kind() == K::PrivateIdentifier {
                 return Ok(());
             }
         }
         let computed = match (declaration, name) {
-            (Some(declaration), _)
-                if self.ast(declaration)?.node(declaration)?.kind() == K::BinaryExpression =>
-            {
+            (Some(declaration), _) if self.node(declaration)?.kind() == K::BinaryExpression => {
                 Some(declaration)
             }
             (Some(declaration), Some(name))
-                if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName =>
+                if self.node(name)?.kind() == K::ComputedPropertyName =>
             {
                 Some(declaration)
             }
@@ -257,7 +253,7 @@ impl CheckerState {
             .symbol
             .ok_or(Error::MissingLink("interface symbol"))?;
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
-            if self.ast(declaration)?.node(declaration)?.kind() == K::InterfaceDeclaration {
+            if self.node(declaration)?.kind() == K::InterfaceDeclaration {
                 return Ok(Some(declaration));
             }
         }
@@ -300,7 +296,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() != K::IndexSignature {
                 continue;
             }

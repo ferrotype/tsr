@@ -46,7 +46,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isSomeSymbolAssignedWorker
     fn some_binding_symbol_assigned_worker(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::Identifier {
             let parent = read
                 .parent()
@@ -58,7 +58,7 @@ impl CheckerState {
         }
         let elements = self.source_list(node, read.element_list())?;
         for element in elements {
-            if let Some(name) = self.ast(element)?.node(element)?.name() {
+            if let Some(name) = self.node(element)?.name() {
                 if self.some_binding_symbol_assigned_worker(name)? {
                     return Ok(true);
                 }
@@ -111,7 +111,7 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(id) = current {
             let view = self.ast(id)?;
             let read = view.node(id)?;
@@ -217,7 +217,7 @@ impl CheckerState {
             .last_assignment_pos;
         Ok(position == 0
             || match location {
-                Some(location) => position < self.ast(location)?.node(location)?.pos(),
+                Some(location) => position < self.node(location)?.pos(),
                 None => false,
             })
     }
@@ -249,7 +249,7 @@ impl CheckerState {
             }
             None => {}
         }
-        let mut parent = self.ast(root)?.node(root)?.parent();
+        let mut parent = self.node(root)?.parent();
         while let Some(function) = self.assignment_function(parent)? {
             match self.flow.assignments.roots.get(&function).copied() {
                 Some(MarkingStatus::Complete) => {
@@ -267,7 +267,7 @@ impl CheckerState {
                 }
                 None => {}
             }
-            parent = self.ast(function)?.node(function)?.parent();
+            parent = self.node(function)?.parent();
         }
         self.flow
             .assignments
@@ -394,11 +394,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.extendAssignmentPosition
     fn extend_assignment_position(&self, node: NodeId, declaration: NodeId) -> Result<i32, Error> {
-        let declaration_pos = self.ast(declaration)?.node(declaration)?.pos();
-        let mut position = self.ast(node)?.node(node)?.pos();
+        let declaration_pos = self.node(declaration)?.pos();
+        let mut position = self.node(node)?.pos();
         let mut current = Some(node);
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.pos() <= declaration_pos {
                 break;
             }

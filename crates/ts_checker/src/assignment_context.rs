@@ -8,7 +8,7 @@ impl CheckerState {
     // port: tsc/internal/ast/precedence.go:GetLeftmostExpression
     pub(crate) fn leftmost_context_expression(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let next = match read.kind().known() {
                 Some(K::PostfixUnaryExpression) => read
                     .data_source()
@@ -48,7 +48,7 @@ impl CheckerState {
         left: NodeId,
     ) -> Result<Option<TypeId>, Error> {
         if !matches!(
-            self.ast(left)?.node(left)?.kind().known(),
+            self.node(left)?.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
         ) {
             return self.get_type_of_expression(left).map(Some);
@@ -57,7 +57,7 @@ impl CheckerState {
             return self.get_type_of_expression(left).map(Some);
         };
         let declaration_symbol = self.raw_declaration_symbol(binary)?;
-        match self.ast(receiver)?.node(receiver)?.kind().known() {
+        match self.node(receiver)?.kind().known() {
             Some(K::Identifier) => {
                 let local = self.resolved_value_symbol(receiver)?;
                 let symbol = self.get_export_symbol_of_value_symbol_if_exported(local)?;
@@ -66,15 +66,15 @@ impl CheckerState {
                 }
                 if declaration_symbol.is_some() {
                     if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                        let read = self.ast(declaration)?.node(declaration)?;
+                        let read = self.node(declaration)?;
                         if read.kind() == K::VariableDeclaration {
                             if let Some(annotation) = read.type_node() {
-                                let read = self.ast(left)?.node(left)?;
+                                let read = self.node(left)?;
                                 if read.kind() == K::PropertyAccessExpression {
                                     let name = read
                                         .name()
                                         .ok_or(Error::MissingLink("contextual assignment name"))?;
-                                    let name = self.ast(name)?.node_text(name)?.into_js_string();
+                                    let name = self.node_text(name)?.into_js_string();
                                     let ty = self.get_type_from_type_node(annotation)?;
                                     return self
                                         .type_of_property_of_contextual_type(ty, name.as_bytes());
@@ -107,13 +107,13 @@ impl CheckerState {
             }
             Some(K::ThisKeyword) => {
                 let this_type = self.get_type_of_expression(receiver)?;
-                let read = self.ast(left)?.node(left)?;
+                let read = self.node(left)?;
                 let name = if read.kind() == K::PropertyAccessExpression {
                     let name = read
                         .name()
                         .ok_or(Error::MissingLink("this assignment name"))?;
-                    let text = self.ast(name)?.node_text(name)?.into_js_string();
-                    if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+                    let text = self.node_text(name)?.into_js_string();
+                    if self.node(name)?.kind() == K::PrivateIdentifier {
                         self.types
                             .get(this_type)?
                             .symbol
@@ -143,7 +143,7 @@ impl CheckerState {
                         self.constituent_property(this_type, name.as_bytes(), false)?
                     {
                         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                            let read = self.ast(declaration)?.node(declaration)?;
+                            let read = self.node(declaration)?;
                             if matches!(
                                 read.kind().known(),
                                 Some(K::PropertyDeclaration | K::PropertySignature)

@@ -84,7 +84,7 @@ impl CheckerState {
                     .flatten()
                 {
                     if matches!(
-                        self.ast(node)?.node(node)?.kind().known(),
+                        self.node(node)?.kind().known(),
                         Some(K::ClassDeclaration | K::InterfaceDeclaration)
                     ) {
                         self.report_circular_base_type(node, ty)?;
@@ -127,7 +127,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            if self.ast(node)?.node(node)?.kind() != K::InterfaceDeclaration {
+            if self.node(node)?.kind() != K::InterfaceDeclaration {
                 continue;
             }
             for base_node in self.interface_base_nodes(node)? {

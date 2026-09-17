@@ -40,7 +40,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<bool, Error> {
-        let await_expression = self.ast(node)?.node(node)?.kind() == K::AwaitExpression;
+        let await_expression = self.node(node)?.kind() == K::AwaitExpression;
         let mut has_error = false;
         let container = self.containing_function_or_static_block(node)?;
         let static_block = container
@@ -64,20 +64,20 @@ impl CheckerState {
                 vec![],
             )?;
             has_error = true;
-        } else if self.ast(node)?.node(node)?.flags() & nf::AWAIT_CONTEXT == 0 {
+        } else if self.node(node)?.flags() & nf::AWAIT_CONTEXT == 0 {
             let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("await source"))?;
-            let file = self.ast(source)?.source_file(source)?;
+            let file = self.source_file_read(source)?;
             if file.diagnostics().is_empty() {
                 let range = ts_scanner::get_range_of_token_at_position(
                     self.ast(source)?,
                     source,
-                    i64::from(self.ast(node)?.node(node)?.pos()),
+                    i64::from(self.node(node)?.pos()),
                 )?;
                 if ts_ast::is_in_top_level_context(self.ast(node)?, node)? {
                     let module = self.program()?.host.options().emit_module_kind();
                     let target = self.program()?.host.options().emit_script_target();
-                    let file = self.ast(source)?.source_file(source)?;
+                    let file = self.source_file_read(source)?;
                     let external = file.external_module_indicator.is_some()
                         || (module == M::COMMON_JS
                             || M::NODE16 <= module && module <= M::NODE_NEXT)
@@ -99,7 +99,7 @@ impl CheckerState {
                     let node_module =
                         matches!(module, M::NODE16 | M::NODE18 | M::NODE20 | M::NODE_NEXT);
                     let common_js = if node_module {
-                        let file = self.ast(source)?.source_file(source)?;
+                        let file = self.source_file_read(source)?;
                         self.program()?
                             .host
                             .get_source_file_meta_data(file.parse_options().file_name.as_bytes())?
@@ -138,7 +138,7 @@ impl CheckerState {
                         ts_ast::Diagnostic::new(Some(source), range, message, vec![]);
                     has_error = true;
                     if let Some(container) = container {
-                        let read = self.ast(container)?.node(container)?;
+                        let read = self.node(container)?;
                         if read.kind() != K::Constructor
                             && read.modifier_flags(self.ast(container)?)? & mf::ASYNC == 0
                         {

@@ -11,7 +11,7 @@ impl CheckerState {
         name: NodeId,
         module: SymbolId,
     ) -> Result<Option<SymbolId>, Error> {
-        let name = self.ast(name)?.node_text(name)?.into_js_string();
+        let name = self.node_text(name)?.into_js_string();
         let table = self.module_exports(module)?;
         let mut candidates = Vec::new();
         for (_, candidate) in self.module_table_entries(table)? {
@@ -71,18 +71,18 @@ impl CheckerState {
         }
         if self.query.global_types.contains_key("Object")
             && meaning & sf::TYPE != 0
-            && self.ast(name)?.node(name)?.kind() == K::QualifiedName
+            && self.node(name)?.kind() == K::QualifiedName
         {
             let mut containing = name;
-            while let Some(parent) = self.ast(containing)?.node(containing)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+            while let Some(parent) = self.node(containing)?.parent() {
+                if self.node(parent)?.kind() != K::QualifiedName {
                     break;
                 }
                 containing = parent;
             }
-            let parent = self.ast(containing)?.node(containing)?.parent();
+            let parent = self.node(containing)?.parent();
             let typeof_parent = match parent {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::TypeOfExpression,
+                Some(parent) => self.node(parent)?.kind() == K::TypeOfExpression,
                 None => false,
             };
             if !typeof_parent && self.qualified_name_as_value(containing)?.is_some() {
@@ -96,9 +96,9 @@ impl CheckerState {
             }
         }
         if meaning & sf::NAMESPACE != 0 {
-            if let Some(parent) = self.ast(name)?.node(name)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() == K::QualifiedName {
-                    let text = self.ast(right)?.node_text(right)?.into_js_string();
+            if let Some(parent) = self.node(name)?.parent() {
+                if self.node(parent)?.kind() == K::QualifiedName {
+                    let text = self.node_text(right)?.into_js_string();
                     let exports = self.module_exports_of_symbol(namespace)?;
                     if let Some(exported) =
                         self.lookup_symbol_resolving(exports, text.as_bytes(), sf::TYPE)?
@@ -111,7 +111,7 @@ impl CheckerState {
                             .and_then(|data| data.right())
                             .ok_or(Error::MissingLink("qualified name member"))?;
                         let text = self.symbol_to_string(self.get_merged_symbol(exported))?;
-                        let member_text = self.ast(member)?.node_text(member)?.into_js_string();
+                        let member_text = self.node_text(member)?.into_js_string();
                         self.error_at(Some(member), d::Cannot_access_0_1_because_0_is_a_type_but_not_a_namespace_Did_you_mean_to_retrieve_the_type_of_the_property_1_in_0_with_0_1, vec![text, member_text])?;
                         return Ok(());
                     }
@@ -127,7 +127,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.tryGetQualifiedNameAsValue
     fn qualified_name_as_value(&mut self, mut node: NodeId) -> Result<Option<SymbolId>, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::QualifiedName {
+        while self.node(node)?.kind() == K::QualifiedName {
             node = self
                 .ast(node)?
                 .node(node)?
@@ -136,14 +136,14 @@ impl CheckerState {
                 .and_then(|data| data.left())
                 .ok_or(Error::MissingLink("qualified name left"))?;
         }
-        let text = self.ast(node)?.node_text(node)?.into_js_string();
+        let text = self.node_text(node)?.into_js_string();
         let Some(mut symbol) =
             self.resolve_name(Some(node), text.as_bytes(), sf::VALUE, None, true)?
         else {
             return Ok(None);
         };
-        while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-            if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+        while let Some(parent) = self.node(node)?.parent() {
+            if self.node(parent)?.kind() != K::QualifiedName {
                 break;
             }
             let right = self
@@ -153,7 +153,7 @@ impl CheckerState {
                 .as_qualified_name()
                 .and_then(|data| data.right())
                 .ok_or(Error::MissingLink("qualified name right"))?;
-            let text = self.ast(right)?.node_text(right)?.into_js_string();
+            let text = self.node_text(right)?.into_js_string();
             let ty = self.get_type_of_symbol(symbol)?;
             let Some(property) = self.constituent_property(ty, text.as_bytes(), false)? else {
                 return Ok(None);

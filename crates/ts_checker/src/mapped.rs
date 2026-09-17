@@ -157,7 +157,7 @@ impl CheckerState {
             return Ok(parameter);
         }
         let node = self.mapped_declaration(ty)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parameter = read
             .data_source()
             .as_mapped_type_node()
@@ -190,7 +190,7 @@ impl CheckerState {
             return Ok(Some(name));
         }
         let node = self.mapped_declaration(ty)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(name) = read
             .data_source()
             .as_mapped_type_node()
@@ -210,7 +210,7 @@ impl CheckerState {
             return Ok(template);
         }
         let node = self.mapped_declaration(ty)?;
-        let template = if let Some(annotation) = self.ast(node)?.node(node)?.type_node() {
+        let template = if let Some(annotation) = self.node(node)?.type_node() {
             let annotation = self.get_type_from_type_node(annotation)?;
             let optional = self.mapped_modifiers(ty)? & INCLUDE_OPTIONAL != 0;
             let annotation = self.add_type_optionality(annotation, true, optional)?;
@@ -225,21 +225,21 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:getMappedTypeModifiers
     pub(crate) fn mapped_modifiers(&self, ty: TypeId) -> Result<u32, Error> {
         let node = self.mapped_declaration(ty)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_mapped_type_node()
             .ok_or(Error::MissingLink("mapped syntax"))?;
         let mut flags = 0;
         if let Some(token) = data.readonly_token() {
-            flags |= if self.ast(token)?.node(token)?.kind() == K::MinusToken {
+            flags |= if self.node(token)?.kind() == K::MinusToken {
                 EXCLUDE_READONLY
             } else {
                 INCLUDE_READONLY
             };
         }
         if let Some(token) = data.question_token() {
-            flags |= if self.ast(token)?.node(token)?.kind() == K::MinusToken {
+            flags |= if self.node(token)?.kind() == K::MinusToken {
                 EXCLUDE_OPTIONAL
             } else {
                 INCLUDE_OPTIONAL
@@ -251,14 +251,13 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getConstraintDeclarationForMappedType
     pub(crate) fn mapped_constraint_node(&self, ty: TypeId) -> Result<NodeId, Error> {
         let node = self.mapped_declaration(ty)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parameter = read
             .data_source()
             .as_mapped_type_node()
             .and_then(|data| data.type_parameter())
             .ok_or(Error::MissingLink("mapped parameter"))?;
-        self.ast(parameter)?
-            .node(parameter)?
+        self.node(parameter)?
             .data_source()
             .as_type_parameter_declaration()
             .and_then(|data| data.constraint())
@@ -1023,7 +1022,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkMappedType
     pub(crate) fn check_mapped_type(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_mapped_type_node()

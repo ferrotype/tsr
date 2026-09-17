@@ -78,7 +78,7 @@ impl CheckerState {
                 .into_iter()
                 .flatten()
             {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 let list = match read.kind().known() {
                     Some(
                         K::InterfaceDeclaration
@@ -192,7 +192,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:isLateBindableAST
     pub(crate) fn late_name(&self, declaration: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let name = if read.kind() == K::BinaryExpression {
             read.data_source()
                 .as_binary_expression()
@@ -201,7 +201,7 @@ impl CheckerState {
             read.name()
         };
         let Some(name) = name else { return Ok(None) };
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let expression = match read.kind().known() {
             Some(K::ComputedPropertyName) => read.expression(),
             Some(K::ElementAccessExpression) => read
@@ -221,7 +221,7 @@ impl CheckerState {
     }
 
     pub(crate) fn late_name_type(&mut self, name: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         if read.kind() == K::ComputedPropertyName {
             return self.check_computed_property_name(name);
         }
@@ -332,7 +332,7 @@ impl CheckerState {
                     name.clone()
                 };
                 for node in declarations.into_iter().chain(std::iter::once(declaration)) {
-                    let name = self.ast(node)?.node(node)?.name().unwrap_or(node);
+                    let name = self.node(node)?.name().unwrap_or(node);
                     self.error_at(
                         Some(name),
                         ts_diagnostics::Duplicate_identifier_0,
@@ -438,11 +438,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:isInvalidComputedPropertyName
     pub(crate) fn is_invalid_computed_property_name(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("computed property parent"))?;
-        let declaration = self.ast(parent)?.node(parent)?;
+        let declaration = self.node(parent)?;
         if matches!(
             declaration.kind().known(),
             Some(K::GetAccessor | K::SetAccessor)
@@ -453,7 +453,7 @@ impl CheckerState {
             .parent()
             .ok_or(Error::MissingLink("computed property container"))?;
         if !matches!(
-            self.ast(container)?.node(container)?.kind().known(),
+            self.node(container)?.kind().known(),
             Some(
                 K::TypeLiteral | K::ClassDeclaration | K::ClassExpression | K::InterfaceDeclaration
             )
@@ -463,14 +463,14 @@ impl CheckerState {
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("computed property expression"))?;
-        let expression_read = self.ast(expression)?.node(expression)?;
+        let expression_read = self.node(expression)?;
         let Some(binary) = expression_read.data_source().as_binary_expression() else {
             return Ok(false);
         };
         let operator = binary
             .operator_token()
             .ok_or(Error::MissingLink("computed property operator"))?;
-        Ok(self.ast(operator)?.node(operator)?.kind() == K::InKeyword)
+        Ok(self.node(operator)?.kind() == K::InKeyword)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkComputedPropertyName
@@ -511,7 +511,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getESSymbolLikeTypeForNode
     pub(crate) fn es_symbol_like_type_for_node(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let valid = match read.kind().known() {
             Some(K::PropertySignature) => modifiers & mf::READONLY != 0,
@@ -532,7 +532,7 @@ impl CheckerState {
                 let parent = read
                     .parent()
                     .ok_or(Error::MissingLink("unique symbol variable parent"))?;
-                let parent = self.ast(parent)?.node(parent)?;
+                let parent = self.node(parent)?;
                 name_identifier
                     && parent.kind() == K::VariableDeclarationList
                     && parent.flags() & nf::CONSTANT != 0

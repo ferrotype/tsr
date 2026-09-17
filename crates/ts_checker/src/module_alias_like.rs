@@ -7,11 +7,7 @@ use ts_core::ModuleKind;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isCommonJSRequire
     pub(crate) fn is_common_js_require(&mut self, node: NodeId) -> Result<bool, Error> {
-        if !ts_ast::utilities_middle::is_require_call(
-            self.ast(node)?,
-            &self.ast(node)?.node(node)?,
-            true,
-        )? {
+        if !ts_ast::utilities_middle::is_require_call(self.ast(node)?, &self.node(node)?, true)? {
             return Ok(false);
         }
         let expression = self
@@ -43,7 +39,7 @@ impl CheckerState {
             return Ok(false);
         };
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() == kind {
                 return Ok(read.flags() & ts_ast::node_flags::AMBIENT != 0);
             }
@@ -58,7 +54,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(namespace)?.value_declaration() else {
             return Ok(namespace);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if read.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE == 0
             || read.kind() != K::VariableDeclaration
             || self.program()?.host.options().module_resolution_kind()
@@ -68,10 +64,8 @@ impl CheckerState {
         }
         if let Some(initializer) = read.initializer() {
             if self.is_common_js_require(initializer)? {
-                let arguments = self.source_list(
-                    initializer,
-                    self.ast(initializer)?.node(initializer)?.argument_list(),
-                )?;
+                let arguments =
+                    self.source_list(initializer, self.node(initializer)?.argument_list())?;
                 let name = *arguments
                     .first()
                     .ok_or(Error::MissingLink("require module argument"))?;
@@ -88,7 +82,7 @@ impl CheckerState {
         &mut self,
         expression: NodeId,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if read.kind() == K::ClassExpression {
             let ty = self.check_expression_cached(expression)?;
             return Ok(self.types.get(ty)?.symbol);
@@ -119,10 +113,10 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<SymbolId>, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(None);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if let Some(binary) = read.data_source().as_binary_expression() {
             if binary.left() == Some(node)
                 && self
@@ -153,7 +147,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("namespace export parent"))?;
-        if !ts_ast::utilities::can_have_symbol(&self.ast(parent)?.node(parent)?) {
+        if !ts_ast::utilities::can_have_symbol(&self.node(parent)?) {
             return Ok(None);
         }
         let raw = self
@@ -177,17 +171,14 @@ impl CheckerState {
             .ok_or(Error::MissingLink("require declaration initializer"))?;
         if !ts_ast::utilities_middle::is_require_call(
             self.ast(initializer)?,
-            &self.ast(initializer)?.node(initializer)?,
+            &self.node(initializer)?,
             true,
         )? {
             return Err(Error::Unsupported(
                 "getTargetOfImportEqualsDeclaration: variable not initialized to require",
             ));
         }
-        let arguments = self.source_list(
-            initializer,
-            self.ast(initializer)?.node(initializer)?.argument_list(),
-        )?;
+        let arguments = self.source_list(initializer, self.node(initializer)?.argument_list())?;
         let specifier = *arguments
             .first()
             .ok_or(Error::MissingLink("require module argument"))?;

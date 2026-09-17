@@ -7,7 +7,7 @@ use ts_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkAssertion
     pub(crate) fn check_assertion_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("assertion expression"))?;
@@ -17,7 +17,7 @@ impl CheckerState {
         if read.kind() == K::TypeAssertionExpression {
             let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("assertion source"))?;
-            let file = self.ast(source)?.source_file(source)?;
+            let file = self.source_file_read(source)?;
             if file.file_name().ends_with(b".mts") || file.file_name().ends_with(b".cts") {
                 self.grammar_error_node(node,d::This_syntax_is_reserved_in_files_with_the_mts_or_cts_extension_Use_an_as_expression_instead,vec![])?;
             }
@@ -27,14 +27,14 @@ impl CheckerState {
                 .options()
                 .erasable_syntax_only
                 .is_true()
-                && self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0
+                && self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0
             {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let start = ts_scanner::skip_trivia(
-                    self.ast(source)?.source_file(source)?.text().as_bytes(),
+                    self.source_file_read(source)?.text().as_bytes(),
                     i64::from(read.pos()),
                 );
-                let end = i64::from(self.ast(expression)?.node(expression)?.pos());
+                let end = i64::from(self.node(expression)?.pos());
                 self.add_diagnostic(ts_ast::Diagnostic::new(
                     Some(source),
                     ts_core::TextRange::new(start, end),
@@ -47,7 +47,7 @@ impl CheckerState {
         self.check_source_element(annotation)?;
         if ts_ast::utilities_middle::is_const_type_reference(
             self.ast(annotation)?,
-            &self.ast(annotation)?.node(annotation)?,
+            &self.node(annotation)?,
         )? {
             if !self.valid_const_assertion_argument(expression)? {
                 self.error_at(Some(expression),d::A_const_assertion_can_only_be_applied_to_references_to_enum_members_or_string_number_boolean_array_or_object_literals,vec![])?;
@@ -77,7 +77,7 @@ impl CheckerState {
         if !self.is_error_type(target)? {
             let widened = self.widened_type(source)?;
             if !self.is_type_related_to(target, widened, RelationKind::Comparable)? {
-                let node = if self.ast(annotation)?.node(annotation)?.flags() & nf::REPARSED != 0 {
+                let node = if self.node(annotation)?.flags() & nf::REPARSED != 0 {
                     annotation
                 } else {
                     node
@@ -93,7 +93,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkSatisfiesExpression
     pub(crate) fn check_satisfies_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let annotation = read
             .type_node()
             .ok_or(Error::MissingLink("satisfies annotation"))?;

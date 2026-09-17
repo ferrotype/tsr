@@ -29,7 +29,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::IndexSignature {
                 let parameters = self.source_list(node, read.parameter_list())?;
                 let value_node = read.type_node();
@@ -144,7 +144,7 @@ impl CheckerState {
             if include {
                 types.push(self.get_type_of_symbol(property)?);
                 if let Some((declaration, name)) = self.first_declaration_name(property)? {
-                    if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+                    if self.node(name)?.kind() == K::ComputedPropertyName {
                         components.push(declaration);
                     }
                 }
@@ -181,7 +181,7 @@ impl CheckerState {
             return Ok(true);
         }
         if let Some((_, name)) = self.first_declaration_name(symbol)? {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 let ty = self.check_computed_property_name(name)?;
                 return self.type_assignable_to_kind(ty, tf::ES_SYMBOL);
             }
@@ -196,16 +196,15 @@ impl CheckerState {
             return Ok(true);
         }
         if let Some((_, name)) = self.first_declaration_name(symbol)? {
-            match self.ast(name)?.node(name)?.kind().known() {
+            match self.node(name)?.kind().known() {
                 Some(K::ComputedPropertyName) => {
                     let ty = self.check_computed_property_name(name)?;
                     return self.type_assignable_to_kind(ty, tf::NUMBER_LIKE);
                 }
                 Some(K::Identifier | K::NumericLiteral | K::StringLiteral) => {
-                    return Ok(crate::indexes::numeric_name(
-                        self.ast(name)?.node_text(name)?.as_bytes(),
+                    return Ok(
+                        crate::indexes::numeric_name(self.node_text(name)?.as_bytes()).is_some(),
                     )
-                    .is_some())
                 }
                 _ => {}
             }

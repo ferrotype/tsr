@@ -10,13 +10,13 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkClassDeclaration
     // port: tsc/internal/checker/checker.go:Checker.checkClassLikeDeclaration
     pub(crate) fn check_class_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let modifiers = read.modifier_flags(self.ast(node)?)?;
         let ambient = read.flags() & nf::AMBIENT != 0;
         let name = read.name();
         if name.is_none()
             && modifiers & mf::DEFAULT == 0
-            && self.ast(node)?.node(node)?.kind() == K::ClassDeclaration
+            && self.node(node)?.kind() == K::ClassDeclaration
         {
             self.grammar_error_first_token(
                 node,
@@ -27,8 +27,8 @@ impl CheckerState {
         if !self.check_class_heritage_grammar(node)? {
             self.check_grammar_type_parameter_list(node)?;
         }
-        for modifier in self.source_list(node, self.ast(node)?.node(node)?.modifiers())? {
-            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
+            if self.node(modifier)?.kind() == K::Decorator {
                 return Err(Error::Unsupported("checkClassLikeDeclaration: decorators"));
             }
         }
@@ -49,15 +49,15 @@ impl CheckerState {
         self.check_class_or_interface_type_parameters_identical(symbol)?;
         self.check_function_or_constructor_symbol(symbol)?;
         self.check_object_duplicate_declarations(node, true)?;
-        let members = self.source_list(node, self.ast(node)?.node(node)?.member_list())?;
+        let members = self.source_list(node, self.node(node)?.member_list())?;
         for &member in &members {
-            let member_read = self.ast(member)?.node(member)?;
+            let member_read = self.node(member)?;
             let flags = member_read.modifier_flags(self.ast(member)?)?;
             if !ambient
                 && !self.program()?.host.options().use_define_for_class_fields()
                 && flags & mf::STATIC != 0
             {
-                if let Some(member_name) = self.ast(member)?.node(member)?.name() {
+                if let Some(member_name) = self.node(member)?.name() {
                     let Some(text) = self.effective_property_name(member_name)? else {
                         continue;
                     };
@@ -73,10 +73,9 @@ impl CheckerState {
         }
         let bases = self.class_heritage_nodes(node, K::ExtendsKeyword)?;
         if let Some(&base_node) = bases.first() {
-            for argument in self.source_list(
-                base_node,
-                self.ast(base_node)?.node(base_node)?.type_argument_list(),
-            )? {
+            for argument in
+                self.source_list(base_node, self.node(base_node)?.type_argument_list())?
+            {
                 self.check_source_element(argument)?;
             }
             let resolved = self.interface_base_types(class)?;
@@ -107,16 +106,12 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("class extends expression"))?;
                 self.check_expression(expression)?;
                 if !self
-                    .source_list(
-                        base_node,
-                        self.ast(base_node)?.node(base_node)?.type_argument_list(),
-                    )?
+                    .source_list(base_node, self.node(base_node)?.type_argument_list())?
                     .is_empty()
                 {
-                    for argument in self.source_list(
-                        base_node,
-                        self.ast(base_node)?.node(base_node)?.type_argument_list(),
-                    )? {
+                    for argument in
+                        self.source_list(base_node, self.node(base_node)?.type_argument_list())?
+                    {
                         self.check_source_element(argument)?;
                     }
                     for signature in self.constructors_for_arguments(static_base, base_node)? {
@@ -192,14 +187,14 @@ impl CheckerState {
         }
         self.check_class_override_modifiers(node, class, with_this, static_type)?;
         for reference in self.class_heritage_nodes(node, K::ImplementsKeyword)? {
-            if self.ast(reference)?.node(reference)?.kind() == K::ExpressionWithTypeArguments {
+            if self.node(reference)?.kind() == K::ExpressionWithTypeArguments {
                 let expression = self
                     .ast(reference)?
                     .node(reference)?
                     .expression()
                     .ok_or(Error::MissingLink("class implements expression"))?;
                 if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
-                    || self.ast(expression)?.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
+                    || self.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
                 {
                     self.error_at(Some(expression), messages::A_class_can_only_implement_an_identifier_Slashqualified_name_with_optional_type_arguments, vec![])?;
                 }
@@ -228,7 +223,7 @@ impl CheckerState {
         self.check_source_index_constraints(class, node, false)?;
         self.check_source_index_constraints(static_type, node, true)?;
         self.check_class_property_initialization(node, &members)?;
-        if self.ast(node)?.node(node)?.kind() != K::ClassExpression {
+        if self.node(node)?.kind() != K::ClassExpression {
             for member in members {
                 self.check_source_element(member)?;
             }
@@ -244,7 +239,7 @@ impl CheckerState {
         base_node: NodeId,
         base: TypeId,
     ) -> Result<(), Error> {
-        if self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
+        if self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
             return Ok(());
         }
         // JS files carry lazily parsed JSDoc; the provider covers both forms.
@@ -261,7 +256,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("class JSDoc"))?
                 .tags();
             for tag in self.source_list(doc, tags)? {
-                let read = self.ast(tag)?.node(tag)?;
+                let read = self.node(tag)?;
                 if read.kind() != K::JSDocAugmentsTag {
                     continue;
                 }
@@ -302,9 +297,9 @@ impl CheckerState {
                     identifier(self, target_expression)?,
                 ) {
                     let args = vec![
-                        self.ast(tag_name)?.node_text(tag_name)?.into_js_string(),
-                        self.ast(source)?.node_text(source)?.into_js_string(),
-                        self.ast(target)?.node_text(target)?.into_js_string(),
+                        self.node_text(tag_name)?.into_js_string(),
+                        self.node_text(source)?.into_js_string(),
+                        self.node_text(target)?.into_js_string(),
                     ];
                     self.error_at(
                         Some(source),
@@ -354,7 +349,7 @@ impl CheckerState {
         message: &'static ts_diagnostics::Message,
     ) -> Result<(), Error> {
         let mut issued = false;
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+        for member in self.source_list(node, self.node(node)?.member_list())? {
             if ts_ast::utilities::is_static(self.ast(member)?, member)? {
                 continue;
             }
@@ -370,7 +365,7 @@ impl CheckerState {
             if let (Some(property), Some(inherited)) = (property, inherited) {
                 let source = self.get_type_of_symbol(property)?;
                 let target = self.get_type_of_symbol(inherited)?;
-                let name_node = self.ast(member)?.node(member)?.name().unwrap_or(member);
+                let name_node = self.node(member)?.name().unwrap_or(member);
                 let (related, diagnostic) = self.check_type_related_ex(
                     source,
                     target,
@@ -390,7 +385,7 @@ impl CheckerState {
             }
         }
         if !issued {
-            let location = self.ast(node)?.node(node)?.name().unwrap_or(node);
+            let location = self.node(node)?.name().unwrap_or(node);
             let (_, diagnostic) = self.check_type_related_ex(
                 ty,
                 base,
@@ -414,21 +409,19 @@ impl CheckerState {
         let options = self.program()?.host.options();
         if !self.options.strict_null_checks
             || !options.strict_option_value(options.strict_property_initialization)
-            || self.ast(node)?.node(node)?.flags() & nf::AMBIENT != 0
+            || self.node(node)?.flags() & nf::AMBIENT != 0
         {
             return Ok(());
         }
         let mut constructor = None;
         for &member in members {
-            if self.ast(member)?.node(member)?.kind() == K::Constructor
-                && self.ast(member)?.node(member)?.body().is_some()
-            {
+            if self.node(member)?.kind() == K::Constructor && self.node(member)?.body().is_some() {
                 constructor = Some(member);
                 break;
             }
         }
         for &member in members {
-            let read = self.ast(member)?.node(member)?;
+            let read = self.node(member)?;
             if read.kind() != K::PropertyDeclaration
                 || read.initializer().is_some()
                 || read.modifier_flags(self.ast(member)?)?
@@ -441,12 +434,12 @@ impl CheckerState {
                 .name()
                 .ok_or(Error::MissingLink("class property name"))?;
             if let Some(token) = read.postfix_token() {
-                if self.ast(token)?.node(token)?.kind() == K::ExclamationToken {
+                if self.node(token)?.kind() == K::ExclamationToken {
                     continue;
                 }
             }
             if !matches!(
-                self.ast(name)?.node(name)?.kind().known(),
+                self.node(name)?.kind().known(),
                 Some(K::Identifier | K::PrivateIdentifier | K::ComputedPropertyName)
             ) {
                 continue;
@@ -500,7 +493,7 @@ impl CheckerState {
             let mut relevant = Vec::new();
             for declaration in declarations.into_iter().flatten() {
                 if matches!(
-                    self.ast(declaration)?.node(declaration)?.kind().known(),
+                    self.node(declaration)?.kind().known(),
                     Some(K::ClassDeclaration | K::InterfaceDeclaration)
                 ) {
                     relevant.push(declaration);
@@ -516,12 +509,8 @@ impl CheckerState {
             let minimum = self.min_type_argument_count(&parameters)?;
             let mut identical = true;
             for &declaration in &relevant {
-                let sources = self.source_list(
-                    declaration,
-                    self.ast(declaration)?
-                        .node(declaration)?
-                        .type_parameter_list(),
-                )?;
+                let sources =
+                    self.source_list(declaration, self.node(declaration)?.type_parameter_list())?;
                 if sources.len() < minimum || sources.len() > parameters.len() {
                     identical = false;
                     break;
@@ -540,7 +529,7 @@ impl CheckerState {
                 let name = self.symbol_to_string(symbol)?;
                 for declaration in relevant {
                     self.error_at(
-                        self.ast(declaration)?.node(declaration)?.name(),
+                        self.node(declaration)?.name(),
                         messages::All_declarations_of_0_must_have_identical_type_parameters,
                         vec![name.clone()],
                     )?;

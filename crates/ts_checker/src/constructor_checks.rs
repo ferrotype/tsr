@@ -8,11 +8,11 @@ use ts_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkConstructorDeclaration
     pub(crate) fn check_constructor_super_calls(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(body) = read.body() else {
             return Ok(());
         };
-        if !ts_ast::node_is_present(Some(&self.ast(body)?.node(body)?)) {
+        if !ts_ast::node_is_present(Some(&self.node(body)?)) {
             return Ok(());
         }
         let class = read
@@ -45,9 +45,9 @@ impl CheckerState {
         }
         let mut requires_root = false;
         if !self.program()?.host.options().emit_standard_class_fields() {
-            let members = self.source_list(class, self.ast(class)?.node(class)?.member_list())?;
+            let members = self.source_list(class, self.node(class)?.member_list())?;
             for member in members {
-                let read = self.ast(member)?.node(member)?;
+                let read = self.node(member)?;
                 if ts_ast::utilities::is_private_identifier_class_element_declaration(
                     self.ast(member)?,
                     member,
@@ -79,12 +79,12 @@ impl CheckerState {
         }
         let parent = ts_ast::utilities::walk_up_parenthesized_expressions(
             self.ast(call)?,
-            self.ast(call)?.node(call)?.parent(),
+            self.node(call)?.parent(),
         )?;
         let root = match parent {
             Some(parent) => {
-                self.ast(parent)?.node(parent)?.kind() == K::ExpressionStatement
-                    && self.ast(parent)?.node(parent)?.parent() == Some(body)
+                self.node(parent)?.kind() == K::ExpressionStatement
+                    && self.node(parent)?.parent() == Some(body)
             }
             None => false,
         };
@@ -93,14 +93,14 @@ impl CheckerState {
             return Ok(());
         }
         let mut found = false;
-        for statement in self.source_list(body, self.ast(body)?.node(body)?.statement_list())? {
-            let read = self.ast(statement)?.node(statement)?;
+        for statement in self.source_list(body, self.node(body)?.statement_list())? {
+            let read = self.node(statement)?;
             if read.kind() == K::ExpressionStatement {
                 let mut expression = read
                     .expression()
                     .ok_or(Error::MissingLink("constructor statement expression"))?;
                 loop {
-                    let read = self.ast(expression)?.node(expression)?;
+                    let read = self.node(expression)?;
                     if !matches!(
                         read.kind().known(),
                         Some(
@@ -135,14 +135,14 @@ impl CheckerState {
     }
 
     fn constructor_super_call(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::CallExpression {
             return Ok(false);
         }
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("super-call expression"))?;
-        Ok(self.ast(expression)?.node(expression)?.kind() == K::SuperKeyword)
+        Ok(self.node(expression)?.kind() == K::SuperKeyword)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.findFirstSuperCall
@@ -152,7 +152,7 @@ impl CheckerState {
             if self.constructor_super_call(node)? {
                 return Ok(Some(node));
             }
-            if ts_ast::utilities::is_function_like(Some(&self.ast(node)?.node(node)?)) {
+            if ts_ast::utilities::is_function_like(Some(&self.node(node)?)) {
                 continue;
             }
             pending.extend(self.source_children(node)?.into_iter().rev());
@@ -164,7 +164,7 @@ impl CheckerState {
     fn immediately_references_super_or_this(&self, node: NodeId) -> Result<bool, Error> {
         let mut pending = vec![node];
         while let Some(node) = pending.pop() {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::SuperKeyword | K::ThisKeyword) => return Ok(true),
                 Some(
@@ -176,7 +176,7 @@ impl CheckerState {
                 Some(K::Block) => {
                     if let Some(parent) = read.parent() {
                         if matches!(
-                            self.ast(parent)?.node(parent)?.kind().known(),
+                            self.node(parent)?.kind().known(),
                             Some(
                                 K::Constructor
                                     | K::MethodDeclaration

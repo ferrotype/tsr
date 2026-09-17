@@ -329,8 +329,8 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let previous = self.symbol(symbol)?.value_declaration();
         let replace = if let Some(previous) = previous {
-            let old_kind = self.ast(previous)?.node(previous)?.kind();
-            let new_kind = self.ast(node)?.node(node)?.kind();
+            let old_kind = self.node(previous)?.kind();
+            let new_kind = self.node(node)?.kind();
             let assignment = |kind: ts_ast::NodeKind| {
                 matches!(
                     kind.known(),

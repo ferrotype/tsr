@@ -28,7 +28,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkExportDeclaration
     pub(crate) fn check_export_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let javascript = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let ambient = read.flags() & nf::AMBIENT != 0;
         let parent = required(read.parent(), "export parent")?;
@@ -58,11 +58,9 @@ impl CheckerState {
         }
         if type_only {
             if let Some(clause) = clause {
-                if self.ast(clause)?.node(clause)?.kind() == K::NamedExports {
-                    for element in
-                        self.source_list(clause, self.ast(clause)?.node(clause)?.element_list())?
-                    {
-                        if self.ast(element)?.node(element)?.is_type_only() {
+                if self.node(clause)?.kind() == K::NamedExports {
+                    for element in self.source_list(clause, self.node(clause)?.element_list())? {
+                        if self.node(element)?.is_type_only() {
                             self.grammar_error_first_token(element,d::The_type_modifier_cannot_be_used_on_a_named_export_when_export_type_is_used_on_its_export_statement,vec![])?;
                             break;
                         }
@@ -72,27 +70,20 @@ impl CheckerState {
         }
         if specifier.is_none() || self.check_external_import_or_export(node)? {
             if let Some(clause) = clause {
-                if self.ast(clause)?.node(clause)?.kind() == K::NamespaceExport {
+                if self.node(clause)?.kind() == K::NamespaceExport {
                     self.check_export_star(node, Some(clause), specifier)?;
                 } else {
-                    for element in
-                        self.source_list(clause, self.ast(clause)?.node(clause)?.element_list())?
-                    {
+                    for element in self.source_list(clause, self.node(clause)?.element_list())? {
                         self.check_export_specifier(element)?;
                     }
-                    let in_block = self.ast(parent)?.node(parent)?.kind() == K::ModuleBlock;
+                    let in_block = self.node(parent)?.kind() == K::ModuleBlock;
                     let external = in_block
                         && ts_ast::is_ambient_module(
                             self.ast(parent)?,
-                            required(
-                                self.ast(parent)?.node(parent)?.parent(),
-                                "export module parent",
-                            )?,
+                            required(self.node(parent)?.parent(), "export module parent")?,
                         )?;
                     let ambient_namespace = !external && in_block && specifier.is_none() && ambient;
-                    if self.ast(parent)?.node(parent)?.kind() != K::SourceFile
-                        && !external
-                        && !ambient_namespace
+                    if self.node(parent)?.kind() != K::SourceFile && !external && !ambient_namespace
                     {
                         self.error_at(
                             Some(node),
@@ -135,7 +126,7 @@ impl CheckerState {
             )?;
         } else if let Some(clause) = clause {
             self.check_source_alias_symbol(clause)?;
-            self.check_module_export_name(self.ast(clause)?.node(clause)?.name(), true)?;
+            self.check_module_export_name(self.node(clause)?.name(), true)?;
         }
         if self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS {
             self.check_external_emit_helpers(
@@ -153,7 +144,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkExportAssignment
     pub(crate) fn check_export_assignment(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = required(read.expression(), "export assignment expression")?;
         let export_equals = read
             .data_source()
@@ -199,8 +190,7 @@ impl CheckerState {
             )?;
             return Ok(());
         }
-        if !self.check_grammar_modifiers(node)? && self.ast(node)?.node(node)?.modifiers().is_some()
-        {
+        if !self.check_grammar_modifiers(node)? && self.node(node)?.modifiers().is_some() {
             self.grammar_error_first_token(
                 node,
                 d::An_export_assignment_cannot_have_modifiers,
@@ -215,7 +205,7 @@ impl CheckerState {
             && !ambient
             && verbatim
             && self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS;
-        if self.ast(expression)?.node(expression)?.kind() == K::Identifier {
+        if self.node(expression)?.kind() == K::Identifier {
             if let Some(symbol) =
                 self.resolve_entity_name_at(expression, sf::ALL, true, true, Some(node))?
             {
@@ -272,18 +262,12 @@ impl CheckerState {
             let (_, file) = self.module_source(node)?;
             self.error_at(Some(node),if file.as_bytes().ends_with(b".cts")||file.as_bytes().ends_with(b".cjs"){d::ECMAScript_imports_and_exports_cannot_be_written_in_a_CommonJS_file_under_verbatimModuleSyntax}else{d::ECMAScript_imports_and_exports_cannot_be_written_in_a_CommonJS_file_under_verbatimModuleSyntax_Adjust_the_type_field_in_the_nearest_package_json_to_make_this_file_an_ECMAScript_module_or_adjust_your_verbatimModuleSyntax_module_and_moduleResolution_settings_in_TypeScript},vec![])?;
         }
-        let mut container = required(
-            self.ast(node)?.node(node)?.parent(),
-            "export assignment container",
-        )?;
-        if self.ast(container)?.node(container)?.kind() != K::SourceFile {
-            container = required(
-                self.ast(container)?.node(container)?.parent(),
-                "export assignment module",
-            )?;
+        let mut container = required(self.node(node)?.parent(), "export assignment container")?;
+        if self.node(container)?.kind() != K::SourceFile {
+            container = required(self.node(container)?.parent(), "export assignment module")?;
         }
         self.check_external_module_exports(container)?;
-        if let Some(annotation) = self.ast(node)?.node(node)?.type_node() {
+        if let Some(annotation) = self.node(node)?.type_node() {
             let ty = self.get_type_from_type_node(annotation)?;
             self.check_assignable_at(expression_type, ty, expression)?;
         }
@@ -315,7 +299,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkExportSpecifier
     pub(crate) fn check_export_specifier(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_source_alias_symbol(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_export_specifier()
@@ -325,11 +309,8 @@ impl CheckerState {
         let type_only = data.is_type_only();
         let ambient = read.flags() & nf::AMBIENT != 0;
         let parent = required(read.parent(), "export list")?;
-        let declaration = required(
-            self.ast(parent)?.node(parent)?.parent(),
-            "export declaration",
-        )?;
-        let read = self.ast(declaration)?.node(declaration)?;
+        let declaration = required(self.node(parent)?.parent(), "export declaration")?;
+        let read = self.node(declaration)?;
         let declaration_data = read
             .data_source()
             .as_export_declaration()
@@ -354,7 +335,7 @@ impl CheckerState {
             return Ok(());
         }
         let exported_name = property.unwrap_or(name);
-        if self.ast(exported_name)?.node(exported_name)?.kind() == K::StringLiteral {
+        if self.node(exported_name)?.kind() == K::StringLiteral {
             return Ok(());
         }
         let text = self
@@ -447,7 +428,7 @@ impl CheckerState {
         let Some(name) = name else {
             return Ok(());
         };
-        if self.ast(name)?.node(name)?.kind() != K::StringLiteral {
+        if self.node(name)?.kind() != K::StringLiteral {
             return Ok(());
         }
         if !allow_string {
@@ -460,7 +441,7 @@ impl CheckerState {
                 ts_ast::utilities::get_source_file_of_node(self.ast(name)?, Some(name))?,
                 "export-name source",
             )?;
-            if !self.ast(source)?.source_file(source)?.is_declaration_file {
+            if !self.source_file_read(source)?.is_declaration_file {
                 self.grammar_error_node(name, d::String_literal_import_and_export_names_are_not_supported_when_the_module_flag_is_set_to_es2015_or_es2020, vec![])?;
             }
         }
@@ -468,7 +449,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkImportEqualsDeclaration
     pub(crate) fn check_import_equals_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let javascript = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let ambient = read.flags() & nf::AMBIENT != 0;
         let data = read
@@ -503,7 +484,7 @@ impl CheckerState {
                 vec![],
             )?;
         }
-        if self.ast(reference)?.node(reference)?.kind() == K::ExternalModuleReference {
+        if self.node(reference)?.kind() == K::ExternalModuleReference {
             if self.check_external_import_or_export(node)? {
                 self.check_import_binding(node)?;
                 if self
@@ -578,7 +559,7 @@ impl CheckerState {
         let symbol = self.get_merged_symbol(self.symbol(symbol)?.export_symbol().unwrap_or(symbol));
         let local_flags = self.symbol(symbol)?.flags();
         let target_flags = self.module_symbol_flags(target, false, false)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let export = read.kind() == K::ExportSpecifier;
         let ambient = read.flags() & nf::AMBIENT != 0;
         let type_only = self.local_type_only_alias_declaration(node)?.is_some();
@@ -629,7 +610,7 @@ impl CheckerState {
         name: NodeId,
         message: &'static d::Message,
     ) -> Result<(), Error> {
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),
             b"any"
@@ -669,7 +650,7 @@ impl CheckerState {
             .options()
             .verbatim_module_syntax
             .is_true()
-            || self.ast(node)?.node(node)?.flags() & nf::AMBIENT != 0
+            || self.node(node)?.flags() & nf::AMBIENT != 0
         {
             return Ok(());
         }
@@ -694,7 +675,7 @@ impl CheckerState {
             return Ok(());
         }
         let declaration = self.alias_declaration(symbol)?;
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if read.kind() == K::ImportEqualsDeclaration {
             let reference = required(
                 read.data_source()
@@ -703,7 +684,7 @@ impl CheckerState {
                     .module_reference(),
                 "referenced import alias target",
             )?;
-            if self.ast(reference)?.node(reference)?.kind() != K::ExternalModuleReference {
+            if self.node(reference)?.kind() != K::ExternalModuleReference {
                 let target = self.resolve_alias(symbol)?;
                 if self.symbol(target)?.flags() & sf::VALUE != 0 {
                     let first = ts_ast::utilities_middle::get_first_identifier(

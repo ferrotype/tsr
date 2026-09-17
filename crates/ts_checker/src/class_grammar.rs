@@ -63,7 +63,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarHeritageClause
     pub(crate) fn check_heritage_clause_grammar(&mut self, clause: NodeId) -> Result<bool, Error> {
-        let read = self.ast(clause)?.node(clause)?;
+        let read = self.node(clause)?;
         let data = read
             .data_source()
             .as_heritage_clause()
@@ -90,13 +90,13 @@ impl CheckerState {
             }
         }
         for node in self.source_list(clause, list)? {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::ExpressionWithTypeArguments && read.type_argument_list().is_some()
             {
                 let expression = read
                     .expression()
                     .ok_or(Error::MissingLink("heritage expression"))?;
-                if self.ast(expression)?.node(expression)?.kind() == K::ImportKeyword {
+                if self.node(expression)?.kind() == K::ImportKeyword {
                     return self.grammar_error_node(node,d::This_use_of_import_is_invalid_import_calls_can_be_written_but_they_must_have_parentheses_and_cannot_have_type_arguments,vec![]);
                 }
             }
@@ -113,7 +113,7 @@ impl CheckerState {
         let mut implements = false;
         if !self.check_grammar_modifiers(node)? {
             for clause in self.class_heritage_clauses(node)? {
-                let read = self.ast(clause)?.node(clause)?;
+                let read = self.node(clause)?;
                 let data = read
                     .data_source()
                     .as_heritage_clause()

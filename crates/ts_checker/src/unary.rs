@@ -34,7 +34,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkPrefixUnaryExpression
     // port: tsc/internal/checker/checker.go:Checker.checkPostfixUnaryExpression
     pub(crate) fn check_unary_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let prefix = read.kind() == K::PrefixUnaryExpression;
         let (operand, operator) = if prefix {
             let data = read
@@ -55,12 +55,11 @@ impl CheckerState {
             return Ok(ty);
         }
         if prefix {
-            let kind = self.ast(operand)?.node(operand)?.kind();
+            let kind = self.node(operand)?.kind();
             if kind == K::NumericLiteral
                 && matches!(operator.known(), Some(K::PlusToken | K::MinusToken))
             {
-                let n = ts_jsnum::from_string(self.ast(operand)?.node_text(operand)?.as_bytes())
-                    .value();
+                let n = ts_jsnum::from_string(self.node_text(operand)?.as_bytes()).value();
                 let literal = self.get_number_literal_type(ts_jsnum::Number::new(
                     if operator == K::MinusToken { -n } else { n },
                 ))?;
@@ -68,9 +67,7 @@ impl CheckerState {
             }
             if kind == K::BigIntLiteral && operator == K::MinusToken {
                 let n = ts_jsnum::PseudoBigInt::new(
-                    &ts_jsnum::parse_pseudo_big_int(
-                        self.ast(operand)?.node_text(operand)?.as_bytes(),
-                    ),
+                    &ts_jsnum::parse_pseudo_big_int(self.node_text(operand)?.as_bytes()),
                     true,
                 );
                 let literal = self.get_big_int_literal_type(n)?;

@@ -99,7 +99,7 @@ impl CheckerState {
                         .expression()
                         .ok_or(Error::MissingLink("class heritage expression"))?;
                     if !matches!(
-                        self.ast(expression)?.node(expression)?.kind().known(),
+                        self.node(expression)?.kind().known(),
                         Some(
                             ts_ast::SyntaxKind::Identifier
                                 | ts_ast::SyntaxKind::PropertyAccessExpression

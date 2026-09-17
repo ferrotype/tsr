@@ -62,11 +62,11 @@ impl NodeBuilder<'_> {
     ) -> Result<Option<SymbolId>, Error> {
         let mut node = Some(declaration);
         while let Some(current) = node {
-            let read = self.checker.ast(current)?.node(current)?;
+            let read = self.checker.node(current)?;
             if ts_ast::is_ambient_module(self.checker.ast(current)?, current)?
                 || read.kind() == K::SourceFile
                     && ts_ast::utilities::is_external_or_common_js_module(
-                        &self.checker.ast(current)?.source_file(current)?,
+                        &self.checker.source_file_read(current)?,
                     )
             {
                 return self.checker.get_symbol_of_declaration(current);
@@ -184,7 +184,7 @@ impl NodeBuilder<'_> {
             .collect();
         let mut result = vec![];
         for import in imports {
-            if ts_ast::utilities::node_is_synthesized(&self.checker.ast(import)?.node(import)?) {
+            if ts_ast::utilities::node_is_synthesized(&self.checker.node(import)?) {
                 continue;
             }
             if let Some(module) = self
@@ -257,12 +257,12 @@ impl NodeBuilder<'_> {
         else {
             return Ok(None);
         };
-        let read = self.checker.ast(declaration)?.node(declaration)?;
+        let read = self.checker.node(declaration)?;
         let kind = read.kind();
         let Some(parent) = read.parent() else {
             return Ok(None);
         };
-        let read = self.checker.ast(parent)?.node(parent)?;
+        let read = self.checker.node(parent)?;
         if read.kind() == K::VariableDeclaration
             && (kind == K::ObjectLiteralExpression && read.initializer() == Some(declaration)
                 || kind == K::TypeLiteral && read.type_node() == Some(declaration))
@@ -287,16 +287,16 @@ impl NodeBuilder<'_> {
             .collect();
         let mut candidates = vec![];
         for declaration in declarations {
-            let read = self.checker.ast(declaration)?.node(declaration)?;
+            let read = self.checker.node(declaration)?;
             let kind = read.kind();
             let Some(parent) = read.parent() else {
                 continue;
             };
             if !ts_ast::is_ambient_module(self.checker.ast(declaration)?, declaration)? {
-                let read = self.checker.ast(parent)?.node(parent)?;
+                let read = self.checker.node(parent)?;
                 let external = read.kind() == K::SourceFile
                     && ts_ast::utilities::is_external_or_common_js_module(
-                        &self.checker.ast(parent)?.source_file(parent)?,
+                        &self.checker.source_file_read(parent)?,
                     )
                     || read.kind() == K::ModuleDeclaration
                         && read

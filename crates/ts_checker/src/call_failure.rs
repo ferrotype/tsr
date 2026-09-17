@@ -266,7 +266,7 @@ impl CheckerState {
                         vec![],
                     );
                 }
-                if self.ast(state.node)?.node(state.node)?.kind() == K::BinaryExpression {
+                if self.node(state.node)?.kind() == K::BinaryExpression {
                     diagnostic=Diagnostic::chain(Some(Arc::new(diagnostic)),messages::The_left_hand_side_of_an_instanceof_expression_must_be_assignable_to_the_first_argument_of_the_right_hand_side_s_Symbol_hasInstance_method,vec![]);
                 }
                 if state.argument_errors.len() > 1 {
@@ -338,10 +338,10 @@ impl CheckerState {
             return Ok(());
         }
         for declaration in declarations {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if ts_ast::utilities::is_function_like(Some(&read)) {
                 if let Some(body) = read.body() {
-                    if self.ast(body)?.node(body)?.pos() != self.ast(body)?.node(body)?.end() {
+                    if self.node(body)?.pos() != self.node(body)?.end() {
                         let signature = self.signature_from_declaration(declaration)?;
                         let mut local = state.clone();
                         local.candidates = vec![signature];

@@ -8,7 +8,7 @@ use ts_jsstring::JsString;
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarVariableDeclaration
     pub(crate) fn check_grammar_variable(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_variable_declaration()
@@ -40,7 +40,7 @@ impl CheckerState {
             );
         }
         if !matches!(
-            self.ast(statement)?.node(statement)?.kind().known(),
+            self.node(statement)?.kind().known(),
             Some(K::ForInStatement | K::ForOfStatement)
         ) {
             if flags & nf::AMBIENT != 0 {
@@ -63,7 +63,7 @@ impl CheckerState {
             }
         }
         if let Some(exclamation) = exclamation {
-            if self.ast(statement)?.node(statement)?.kind() != K::VariableStatement
+            if self.node(statement)?.kind() != K::VariableStatement
                 || annotation.is_none()
                 || initializer.is_some()
                 || flags & nf::AMBIENT != 0
@@ -91,7 +91,7 @@ impl CheckerState {
             .host
             .get_emit_module_format_of_file(filename.as_bytes())?
             < ts_core::ModuleKind::SYSTEM
-            && self.ast(statement)?.node(statement)?.flags() & nf::AMBIENT == 0
+            && self.node(statement)?.flags() & nf::AMBIENT == 0
             && self
                 .ast(statement)?
                 .node(statement)?
@@ -110,8 +110,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarNameInLetOrConstDeclarations
     fn check_let_binding_name(&mut self, name: NodeId) -> Result<bool, Error> {
-        if self.ast(name)?.node(name)?.kind() == K::Identifier {
-            if self.ast(name)?.node_text(name)?.as_bytes() == b"let" {
+        if self.node(name)?.kind() == K::Identifier {
+            if self.node_text(name)?.as_bytes() == b"let" {
                 return self.grammar_error_node(
                     name,
                     d::X_let_is_not_allowed_to_be_used_as_a_name_in_let_or_const_declarations,
@@ -119,8 +119,8 @@ impl CheckerState {
                 );
             }
         } else {
-            for element in self.source_list(name, self.ast(name)?.node(name)?.element_list())? {
-                if let Some(name) = self.ast(element)?.node(element)?.name() {
+            for element in self.source_list(name, self.node(name)?.element_list())? {
+                if let Some(name) = self.node(element)?.name() {
                     self.check_let_binding_name(name)?;
                 }
             }
@@ -130,8 +130,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarForEsModuleMarkerInBindingName
     fn check_binding_export_marker(&mut self, name: NodeId) -> Result<bool, Error> {
-        if self.ast(name)?.node(name)?.kind() == K::Identifier {
-            if self.ast(name)?.node_text(name)?.as_bytes() == b"__esModule" {
+        if self.node(name)?.kind() == K::Identifier {
+            if self.node_text(name)?.as_bytes() == b"__esModule" {
                 return self.grammar_error_node_skipped_on_no_emit(
                     name,
                     d::Identifier_expected_esModule_is_reserved_as_an_exported_marker_when_transforming_ECMAScript_modules,
@@ -139,8 +139,8 @@ impl CheckerState {
                 );
             }
         } else {
-            for element in self.source_list(name, self.ast(name)?.node(name)?.element_list())? {
-                if let Some(name) = self.ast(element)?.node(element)?.name() {
+            for element in self.source_list(name, self.node(name)?.element_list())? {
+                if let Some(name) = self.node(element)?.name() {
                     return self.check_binding_export_marker(name);
                 }
             }
@@ -150,7 +150,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkAmbientInitializer
     pub(crate) fn check_ambient_initializer(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(initializer) = read.initializer() else {
             return Ok(false);
         };
@@ -181,7 +181,7 @@ impl CheckerState {
     }
 
     fn initializer_literal(&self, node: NodeId, other_literals: bool) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral) => {
                 Ok(true)
@@ -208,7 +208,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.isInitializerSimpleLiteralEnumReference
     fn initializer_enum_reference(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let eligible = if read.kind() == K::PropertyAccessExpression {
             true
         } else if let Some(data) = read.data_source().as_element_access_expression() {
@@ -235,21 +235,17 @@ impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarSourceFile
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementsForRequiredDeclareModifier
     pub(crate) fn check_grammar_source(&mut self, source: NodeId) -> Result<bool, Error> {
-        if self.ast(source)?.node(source)?.flags() & nf::AMBIENT == 0 {
+        if self.node(source)?.flags() & nf::AMBIENT == 0 {
             return Ok(false);
         }
         let statements: Vec<_> = self
             .ast(source)?
-            .node_slice(
-                self.ast(source)?
-                    .node(source)?
-                    .statements(self.ast(source)?)?,
-            )?
+            .node_slice(self.node(source)?.statements(self.ast(source)?)?)?
             .iter()
             .flatten()
             .collect();
         for node in statements {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if !ts_ast::is_declaration_node(&read) && read.kind() != K::VariableStatement {
                 continue;
             }

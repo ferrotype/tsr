@@ -18,14 +18,14 @@ impl CheckerState {
         mut expression: NodeId,
         location: Option<NodeId>,
     ) -> Result<EnumEvaluation, Error> {
-        while self.ast(expression)?.node(expression)?.kind() == K::ParenthesizedExpression {
+        while self.node(expression)?.kind() == K::ParenthesizedExpression {
             expression = self
                 .ast(expression)?
                 .node(expression)?
                 .expression()
                 .ok_or(Error::MissingLink("parenthesized enum expression"))?;
         }
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         let mut result = EnumEvaluation::default();
         match read.kind().known() {
             Some(K::PrefixUnaryExpression) => {
@@ -63,7 +63,7 @@ impl CheckerState {
                 let operator = data
                     .operator_token()
                     .ok_or(Error::MissingLink("enum binary operator"))?;
-                let operator = self.ast(operator)?.node(operator)?.kind();
+                let operator = self.node(operator)?.kind();
                 let left = self.evaluate_enum_expression(left, location)?;
                 let right = self.evaluate_enum_expression(right, location)?;
                 result.is_syntactically_string = (left.is_syntactically_string
@@ -110,15 +110,13 @@ impl CheckerState {
             }
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
                 result.value = Some(EnumValue::String(
-                    self.ast(expression)?
-                        .node_text(expression)?
-                        .into_js_string(),
+                    self.node_text(expression)?.into_js_string(),
                 ));
                 result.is_syntactically_string = true;
             }
             Some(K::NumericLiteral) => {
                 result.value = Some(EnumValue::Number(ts_jsnum::from_string(
-                    self.ast(expression)?.node_text(expression)?.as_bytes(),
+                    self.node_text(expression)?.as_bytes(),
                 )));
             }
             Some(K::TemplateExpression) => {
@@ -144,7 +142,7 @@ impl CheckerState {
         expression: NodeId,
         location: Option<NodeId>,
     ) -> Result<EnumEvaluation, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         let data = read
             .data_source()
             .as_template_expression()
@@ -153,13 +151,13 @@ impl CheckerState {
             .head()
             .ok_or(Error::MissingLink("enum template head"))?;
         let spans = self.source_list(expression, data.template_spans())?;
-        let mut text = self.ast(head)?.node_text(head)?.as_bytes().to_vec();
+        let mut text = self.node_text(head)?.as_bytes().to_vec();
         let mut result = EnumEvaluation {
             is_syntactically_string: true,
             ..Default::default()
         };
         for span in spans {
-            let read = self.ast(span)?.node(span)?;
+            let read = self.node(span)?;
             let data = read
                 .data_source()
                 .as_template_span()
@@ -179,7 +177,7 @@ impl CheckerState {
                 });
             };
             text.extend_from_slice(part.text().as_bytes());
-            text.extend_from_slice(self.ast(literal)?.node_text(literal)?.as_bytes());
+            text.extend_from_slice(self.node_text(literal)?.as_bytes());
             result.resolved_other_files |= value.resolved_other_files;
             result.has_external_references |= value.has_external_references;
         }
@@ -193,7 +191,7 @@ impl CheckerState {
         expression: NodeId,
         location: Option<NodeId>,
     ) -> Result<EnumEvaluation, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
             Some(K::Identifier | K::PropertyAccessExpression)
@@ -231,7 +229,7 @@ impl CheckerState {
             let declaration = self.symbol(symbol)?.value_declaration();
             if self.symbol(symbol)?.flags() & sf::VARIABLE != 0 {
                 if let Some(declaration) = declaration {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     if read.kind() == K::VariableDeclaration
                         && read.type_node().is_none()
                         && ts_ast::utilities::get_combined_node_flags(
@@ -280,13 +278,13 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("enum element argument"))?;
             if ts_ast::is_entity_name_expression(self.ast(root)?, root)?
                 && matches!(
-                    self.ast(argument)?.node(argument)?.kind().known(),
+                    self.node(argument)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                 )
             {
                 if let Some(root) = self.resolve_entity_name(root, sf::VALUE, true)? {
                     if self.symbol(root)?.flags() & sf::ENUM != 0 {
-                        let name = self.ast(argument)?.node_text(argument)?.into_js_string();
+                        let name = self.node_text(argument)?.into_js_string();
                         if let Some(member) =
                             self.member_symbol(self.symbol(root)?.exports(), name.as_bytes())?
                         {
@@ -333,9 +331,7 @@ impl CheckerState {
             });
         }
         let mut value = self.enum_member_value(declaration)?;
-        if self.ast(location)?.node(location)?.parent()
-            != self.ast(declaration)?.node(declaration)?.parent()
-        {
+        if self.node(location)?.parent() != self.node(declaration)?.parent() {
             value.has_external_references = true;
         }
         Ok(value)
@@ -359,16 +355,16 @@ impl CheckerState {
         if self.enum_source_file(declaration)? != self.enum_source_file(usage)? {
             return Ok(true);
         }
-        if self.ast(declaration)?.node(declaration)?.pos() > self.ast(usage)?.node(usage)?.pos() {
+        if self.node(declaration)?.pos() > self.node(usage)?.pos() {
             return Ok(false);
         }
-        if self.ast(declaration)?.node(declaration)?.kind() == K::VariableDeclaration {
+        if self.node(declaration)?.kind() == K::VariableDeclaration {
             let mut ancestor = Some(usage);
             while let Some(node) = ancestor {
                 if node == declaration {
                     return Ok(false);
                 }
-                ancestor = self.ast(node)?.node(node)?.parent();
+                ancestor = self.node(node)?.parent();
             }
         }
         Ok(true)

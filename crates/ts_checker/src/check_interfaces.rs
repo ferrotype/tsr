@@ -167,14 +167,14 @@ impl CheckerState {
 
     pub(crate) fn check_interface_heritage(&mut self, node: NodeId) -> Result<(), Error> {
         for heritage in self.interface_base_nodes(node)? {
-            if self.ast(heritage)?.node(heritage)?.kind() == K::ExpressionWithTypeArguments {
+            if self.node(heritage)?.kind() == K::ExpressionWithTypeArguments {
                 let expression = self
                     .ast(heritage)?
                     .node(heritage)?
                     .expression()
                     .ok_or(Error::MissingLink("interface extends expression"))?;
                 if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
-                    || self.ast(expression)?.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
+                    || self.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
                 {
                     self.error_at(Some(expression), messages::An_interface_can_only_extend_an_identifier_Slashqualified_name_with_optional_type_arguments, vec![])?;
                 }

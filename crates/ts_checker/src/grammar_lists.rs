@@ -69,15 +69,15 @@ impl CheckerState {
         if self.check_grammar_modifiers(node)? || self.check_grammar_type_parameter_list(node)? {
             return Ok(true);
         }
-        let list = self.ast(node)?.node(node)?.parameter_list();
+        let list = self.node(node)?.parameter_list();
         let parameters = self.source_list(node, list)?;
         if self.check_parameter_list_grammar(&parameters)? {
             return Ok(true);
         }
-        if self.ast(node)?.node(node)?.kind() == K::ArrowFunction {
+        if self.node(node)?.kind() == K::ArrowFunction {
             let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("arrow grammar source"))?;
-            if let Some(list) = self.ast(node)?.node(node)?.type_parameter_list() {
+            if let Some(list) = self.node(node)?.type_parameter_list() {
                 let parameters = self.source_list(node, Some(list))?;
                 let constraint = match parameters.first() {
                     Some(&first) => self
@@ -90,7 +90,7 @@ impl CheckerState {
                         .is_some(),
                     None => false,
                 };
-                let file = self.ast(source)?.source_file(source)?;
+                let file = self.source_file_read(source)?;
                 if parameters.len() <= 1
                     && !self.ast(node)?.list_has_trailing_comma(list)?
                     && !constraint
@@ -108,8 +108,8 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("arrow grammar"))?
                 .equals_greater_than_token()
                 .ok_or(Error::MissingLink("arrow token"))?;
-            let read = self.ast(token)?.node(token)?;
-            let file = self.ast(source)?.source_file(source)?;
+            let read = self.node(token)?;
+            let file = self.source_file_read(source)?;
             let bytes = file.text().as_bytes();
             let start =
                 usize::try_from(read.pos()).map_err(|_| Error::MissingLink("arrow start"))?;
@@ -135,7 +135,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarVariableDeclarationList
     pub(crate) fn check_grammar_variable_list(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let list = read
             .data_source()
             .as_variable_declaration_list()
@@ -154,7 +154,7 @@ impl CheckerState {
                 d::Variable_declaration_list_cannot_be_empty,
             );
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let flags = read.flags();
         let block_scope = flags & nf::BLOCK_SCOPED;
         if block_scope == nf::USING || block_scope == nf::AWAIT_USING {
@@ -164,7 +164,7 @@ impl CheckerState {
                 .node(node)?
                 .parent()
                 .ok_or(Error::MissingLink("variable list parent"))?;
-            let parent_read = self.ast(parent)?.node(parent)?;
+            let parent_read = self.node(parent)?;
             if parent_read.kind() == K::ForInStatement {
                 return self.grammar_error_node(
                     node,
@@ -192,7 +192,7 @@ impl CheckerState {
                     .parent()
                     .map(|grandparent| {
                         Ok::<_, Error>(matches!(
-                            self.ast(grandparent)?.node(grandparent)?.kind().known(),
+                            self.node(grandparent)?.kind().known(),
                             Some(K::CaseClause | K::DefaultClause)
                         ))
                     })
@@ -222,7 +222,7 @@ impl CheckerState {
         mut node: NodeId,
     ) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(
                     K::IfStatement
@@ -253,7 +253,7 @@ impl CheckerState {
             .parent()
             .ok_or(Error::MissingLink("variable statement parent"))?;
         if !self.container_allows_block_scoped_variable(parent)? {
-            let flags = self.ast(list)?.node(list)?.flags() & nf::BLOCK_SCOPED;
+            let flags = self.node(list)?.flags() & nf::BLOCK_SCOPED;
             let keyword = match flags {
                 nf::LET => Some(b"let".as_slice()),
                 nf::CONST => Some(b"const".as_slice()),

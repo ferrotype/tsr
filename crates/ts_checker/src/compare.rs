@@ -44,11 +44,7 @@ impl CheckerState {
             } else {
                 let first = self.declaration_slice(read.declarations())?.at(0);
                 match first {
-                    Some(first) => (
-                        0u8,
-                        self.node_file_index(first)?,
-                        self.ast(first)?.node(first)?.pos(),
-                    ),
+                    Some(first) => (0u8, self.node_file_index(first)?, self.node(first)?.pos()),
                     None => (1u8, 0, 0),
                 }
             };
@@ -480,7 +476,7 @@ impl CheckerState {
                     .ast(a)?
                     .node_text(a)?
                     .as_bytes()
-                    .cmp(self.ast(b)?.node_text(b)?.as_bytes()))
+                    .cmp(self.node_text(b)?.as_bytes()))
             }
         }
     }
@@ -547,11 +543,7 @@ impl CheckerState {
                 if f1 != f2 {
                     return Ok(f1.cmp(&f2));
                 }
-                Ok(self
-                    .ast(a)?
-                    .node(a)?
-                    .pos()
-                    .cmp(&self.ast(b)?.node(b)?.pos()))
+                Ok(self.ast(a)?.node(a)?.pos().cmp(&self.node(b)?.pos()))
             }
         }
     }

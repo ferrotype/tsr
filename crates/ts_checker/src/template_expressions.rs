@@ -7,7 +7,7 @@ use ts_ast::SyntaxKind as K;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTemplateExpression
     pub(crate) fn check_template_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_template_expression()
@@ -16,9 +16,9 @@ impl CheckerState {
         let spans = self.source_list(node, data.template_spans())?;
         let mut texts = Vec::with_capacity(spans.len() + 1);
         let mut types = Vec::with_capacity(spans.len());
-        texts.push(self.ast(head)?.node_text(head)?.into_js_string());
+        texts.push(self.node_text(head)?.into_js_string());
         for span in spans {
-            let read = self.ast(span)?.node(span)?;
+            let read = self.node(span)?;
             let data = read
                 .data_source()
                 .as_template_span()
@@ -33,7 +33,7 @@ impl CheckerState {
             if self.maybe_type_with_constraint(ty, tf::ES_SYMBOL_LIKE)? {
                 self.error_at(Some(expression),ts_diagnostics::Implicit_conversion_of_a_symbol_to_a_string_will_fail_at_runtime_Consider_wrapping_this_expression_in_String,vec![])?;
             }
-            texts.push(self.ast(literal)?.node_text(literal)?.into_js_string());
+            texts.push(self.node_text(literal)?.into_js_string());
             types.push(
                 if self.is_type_related_to(
                     ty,
@@ -46,7 +46,7 @@ impl CheckerState {
                 },
             );
         }
-        let parent = self.ast(node)?.node(node)?.parent();
+        let parent = self.node(node)?.parent();
         let tagged = parent
             .map(|parent| {
                 self.ast(parent)?
@@ -66,8 +66,8 @@ impl CheckerState {
         }
         let mut in_type_context = false;
         let mut location = node;
-        while let Some(parent) = self.ast(location)?.node(location)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        while let Some(parent) = self.node(location)?.parent() {
+            let read = self.node(parent)?;
             if read.kind() == K::ParenthesizedExpression {
                 location = parent;
                 continue;

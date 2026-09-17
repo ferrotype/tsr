@@ -26,9 +26,9 @@ impl CheckerState {
     // port: tsc/internal/ast/utilities.go:GetEnclosingBlockScopeContainer
     // port: tsc/internal/ast/utilities.go:IsBlockScope
     pub(crate) fn enclosing_emit_block_scope(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let parent = read.parent();
             let scoped = match read.kind().known() {
                 Some(
@@ -51,7 +51,7 @@ impl CheckerState {
                 ) => true,
                 Some(K::Block) => match parent {
                     Some(parent) => {
-                        let read = self.ast(parent)?.node(parent)?;
+                        let read = self.node(parent)?;
                         !ts_ast::utilities::is_function_like(Some(&read))
                             && read.kind() != K::ClassStaticBlockDeclaration
                     }
@@ -72,10 +72,10 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<(), Error> {
-        let Some(name) = self.ast(node)?.node(node)?.name() else {
+        let Some(name) = self.node(node)?.name() else {
             return Ok(());
         };
-        if self.ast(name)?.node(name)?.kind() != K::PrivateIdentifier
+        if self.node(name)?.kind() != K::PrivateIdentifier
             || !self.private_elements_need_transform()?
         {
             return Ok(());
@@ -101,10 +101,8 @@ impl CheckerState {
             .ok_or(Error::MissingLink("super expression parent"))?;
         let mut scope = self.enclosing_emit_block_scope(parent)?;
         while let Some(node) = scope {
-            if self.ast(node)?.node(node)?.kind() != K::SourceFile
-                || ts_ast::utilities::is_external_or_common_js_module(
-                    &self.ast(node)?.source_file(node)?,
-                )
+            if self.node(node)?.kind() != K::SourceFile
+                || ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(node)?)
             {
                 *self.emit_checks.node_flags.get_or_default(node) |=
                     nc::CONTAINS_SUPER_PROPERTY_IN_STATIC_INITIALIZER;
@@ -121,13 +119,11 @@ impl CheckerState {
         helpers: u32,
     ) -> Result<(), Error> {
         let options = self.program()?.host.options();
-        if !options.import_helpers.is_true()
-            || self.ast(location)?.node(location)?.flags() & nf::AMBIENT != 0
-        {
+        if !options.import_helpers.is_true() || self.node(location)?.flags() & nf::AMBIENT != 0 {
             return Ok(());
         }
         let (source, _) = self.module_source(location)?;
-        let read = self.ast(source)?.source_file(source)?;
+        let read = self.source_file_read(source)?;
         let module_kind = options.emit_module_kind();
         let effective = read.external_module_indicator.is_some()
             || (module_kind == ModuleKind::COMMON_JS
@@ -215,12 +211,12 @@ impl CheckerState {
         identifier: NodeId,
         name: &[u8],
     ) -> Result<bool, Error> {
-        if self.ast(identifier)?.node(identifier)?.kind() != K::Identifier
-            || self.ast(identifier)?.node_text(identifier)?.as_bytes() != name
+        if self.node(identifier)?.kind() != K::Identifier
+            || self.node_text(identifier)?.as_bytes() != name
         {
             return Ok(false);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if matches!(
             read.kind().known(),
             Some(
@@ -244,13 +240,13 @@ impl CheckerState {
             return Ok(false);
         }
         let root = ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
-        if self.ast(root)?.node(root)?.kind() == K::Parameter {
+        if self.node(root)?.kind() == K::Parameter {
             let parent = self
                 .ast(root)?
                 .node(root)?
                 .parent()
                 .ok_or(Error::MissingLink("parameter parent"))?;
-            let body = self.ast(parent)?.node(parent)?.body();
+            let body = self.node(parent)?.body();
             let read = body
                 .map(|node| self.ast(node)?.node(node).map_err(Error::from))
                 .transpose()?;
@@ -266,13 +262,13 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<(), Error> {
-        let Some(name) = self.ast(node)?.node(node)?.name() else {
+        let Some(name) = self.node(node)?.name() else {
             return Ok(());
         };
-        if self.ast(name)?.node(name)?.kind() != K::Identifier {
+        if self.node(name)?.kind() != K::Identifier {
             return Ok(());
         }
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         let class = matches!(kind.known(), Some(K::ClassDeclaration | K::ClassExpression));
         let module = kind == K::ModuleDeclaration;
         let instantiated = !module
@@ -281,9 +277,9 @@ impl CheckerState {
         let format = self.module_emit_format(node)?;
         let container = self.emit_declaration_container(node)?;
         let top_level_module = if let Some(container) = container {
-            self.ast(container)?.node(container)?.kind() == K::SourceFile
+            self.node(container)?.kind() == K::SourceFile
                 && ts_ast::utilities::is_external_or_common_js_module(
-                    &self.ast(container)?.source_file(container)?,
+                    &self.source_file_read(container)?,
                 )
         } else {
             false
@@ -308,7 +304,7 @@ impl CheckerState {
             && self.need_emit_collision_check(node, name, b"Promise")?
         {
             let container = container.ok_or(Error::MissingLink("Promise declaration container"))?;
-            if self.ast(container)?.node(container)?.flags() & nf::HAS_ASYNC_FUNCTIONS != 0 {
+            if self.node(container)?.flags() & nf::HAS_ASYNC_FUNCTIONS != 0 {
                 let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
                 self.emit_skipped_error(name,d::Duplicate_identifier_0_Compiler_reserves_name_1_in_top_level_scope_of_a_module_containing_async_functions,vec![text.clone(),text])?;
             }
@@ -329,9 +325,9 @@ impl CheckerState {
         }
         if class {
             self.check_module_reserved_type_name(name, d::Class_name_cannot_be_0)?;
-            if self.ast(node)?.node(node)?.flags() & nf::AMBIENT == 0
+            if self.node(node)?.flags() & nf::AMBIENT == 0
                 && format < ModuleKind::ES2015
-                && self.ast(name)?.node_text(name)?.as_bytes() == b"Object"
+                && self.node_text(name)?.as_bytes() == b"Object"
             {
                 self.error_at(
                     Some(name),
@@ -351,7 +347,7 @@ impl CheckerState {
         let root = ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
         let mut current = root;
         loop {
-            let read = self.ast(current)?.node(current)?;
+            let read = self.node(current)?;
             if !matches!(
                 read.kind().known(),
                 Some(
@@ -378,9 +374,9 @@ impl CheckerState {
                 & nc::CONTAINS_CLASS_WITH_PRIVATE_IDENTIFIERS
                 != 0
             {
-                if let Some(name) = self.ast(node)?.node(node)?.name() {
-                    if self.ast(name)?.node(name)?.kind() == K::Identifier {
-                        let text = self.ast(name)?.node_text(name)?.into_js_string();
+                if let Some(name) = self.node(node)?.name() {
+                    if self.node(name)?.kind() == K::Identifier {
+                        let text = self.node_text(name)?.into_js_string();
                         self.emit_skipped_error(
                             node,
                             d::Compiler_reserves_name_0_when_emitting_private_identifier_downlevel,
@@ -395,9 +391,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkReflectCollision
     pub(crate) fn check_reflect_collision(&mut self, node: NodeId) -> Result<(), Error> {
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         let scopes = if kind == K::ClassExpression {
-            self.source_list(node, self.ast(node)?.node(node)?.member_list())?
+            self.source_list(node, self.node(node)?.member_list())?
         } else if kind == K::FunctionExpression {
             vec![node]
         } else {
@@ -409,8 +405,8 @@ impl CheckerState {
                 != 0
         });
         if collision {
-            if let Some(name) = self.ast(node)?.node(node)?.name() {
-                if self.ast(name)?.node(name)?.kind() == K::Identifier {
+            if let Some(name) = self.node(node)?.name() {
+                if self.node(name)?.kind() == K::Identifier {
                     let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
                     self.emit_skipped_error(node,d::Duplicate_identifier_0_Compiler_reserves_name_1_when_emitting_super_references_in_static_initializers,vec![text,JsString::from_bytes(b"Reflect".as_slice())])?;
                 }
@@ -435,23 +431,19 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<JsString>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::ComputedPropertyName {
-            return Ok(Some(self.ast(node)?.node_text(node)?.into_js_string()));
+            return Ok(Some(self.node_text(node)?.into_js_string()));
         }
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("computed name expression"))?;
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral)
         ) {
-            return Ok(Some(
-                self.ast(expression)?
-                    .node_text(expression)?
-                    .into_js_string(),
-            ));
+            return Ok(Some(self.node_text(expression)?.into_js_string()));
         }
         if read.kind() == K::PrefixUnaryExpression {
             let data = read
@@ -461,13 +453,13 @@ impl CheckerState {
             let operator = data.operator();
             if let Some(operand) = data.operand() {
                 if matches!(operator.known(), Some(K::PlusToken | K::MinusToken))
-                    && self.ast(operand)?.node(operand)?.kind() == K::NumericLiteral
+                    && self.node(operand)?.kind() == K::NumericLiteral
                 {
                     let mut text = Vec::new();
                     if operator == K::MinusToken {
                         text.push(b'-');
                     }
-                    text.extend_from_slice(self.ast(operand)?.node_text(operand)?.as_bytes());
+                    text.extend_from_slice(self.node_text(operand)?.as_bytes());
                     return Ok(Some(JsString::from_bytes(text)));
                 }
             }

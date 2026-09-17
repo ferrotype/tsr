@@ -153,7 +153,7 @@ impl CheckerState {
         call: NodeId,
     ) -> Result<Option<NodeId>, Error> {
         let predicate = self.signatures.predicate(predicate)?;
-        let read = self.ast(call)?.node(call)?;
+        let read = self.node(call)?;
         if matches!(
             predicate.kind,
             TypePredicateKind::Identifier | TypePredicateKind::AssertsIdentifier
@@ -167,7 +167,7 @@ impl CheckerState {
             .expression()
             .ok_or(Error::MissingLink("predicate call expression"))?;
         let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
@@ -232,7 +232,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
-            let read = self.ast(expression)?.node(expression)?;
+            let read = self.node(expression)?;
             if read.kind() == K::FalseKeyword {
                 return Ok(self.builtins.unreachable_never_type);
             }
@@ -244,7 +244,7 @@ impl CheckerState {
                 let right = binary
                     .right()
                     .ok_or(Error::MissingLink("assertion right"))?;
-                match self.ast(operator)?.node(operator)?.kind().known() {
+                match self.node(operator)?.kind().known() {
                     Some(K::AmpersandAmpersandToken) => {
                         let left = self.narrow_flow_assertion(reference, declared, ty, left)?;
                         return self.narrow_flow_assertion(reference, declared, left, right);
@@ -270,8 +270,7 @@ impl CheckerState {
         assume: bool,
     ) -> Result<TypeId, Error> {
         if self.flow_has_matching_argument(call, reference)? {
-            let call_chain =
-                self.ast(call)?.node(call)?.flags() & ts_ast::node_flags::OPTIONAL_CHAIN != 0;
+            let call_chain = self.node(call)?.flags() & ts_ast::node_flags::OPTIONAL_CHAIN != 0;
             if assume || !call_chain {
                 if let Some(signature) = self.effects_signature(call)? {
                     if let Some(predicate) = self.type_predicate_of_signature(signature)? {
@@ -289,7 +288,7 @@ impl CheckerState {
         }
         if self.type_contains_missing(ty)?
             && matches!(
-                self.ast(reference)?.node(reference)?.kind().known(),
+                self.node(reference)?.kind().known(),
                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
             )
         {
@@ -298,7 +297,7 @@ impl CheckerState {
                 .node(call)?
                 .expression()
                 .ok_or(Error::MissingLink("flow call expression"))?;
-            let read = self.ast(callee)?.node(callee)?;
+            let read = self.node(callee)?;
             if read.kind() == K::PropertyAccessExpression {
                 let object = read
                     .expression()
@@ -310,21 +309,19 @@ impl CheckerState {
                     .expression()
                     .ok_or(Error::MissingLink("flow reference object"))?;
                 let object = self.reference_candidate(object)?;
-                let args = self.source_list(call, self.ast(call)?.node(call)?.argument_list())?;
+                let args = self.source_list(call, self.node(call)?.argument_list())?;
                 if self.matching_reference(target, object)?
-                    && self.ast(name)?.node(name)?.kind() == K::Identifier
-                    && self.ast(name)?.node_text(name)?.as_bytes() == b"hasOwnProperty"
+                    && self.node(name)?.kind() == K::Identifier
+                    && self.node_text(name)?.as_bytes() == b"hasOwnProperty"
                     && args.len() == 1
                 {
                     let argument = args[0];
                     if matches!(
-                        self.ast(argument)?.node(argument)?.kind().known(),
+                        self.node(argument)?.kind().known(),
                         Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                     ) {
                         if let Some(name) = self.flow_property_name(reference)? {
-                            if self.ast(argument)?.node_text(argument)?.as_bytes()
-                                == name.as_bytes()
-                            {
+                            if self.node_text(argument)?.as_bytes() == name.as_bytes() {
                                 return self.type_with_facts(
                                     ty,
                                     if assume {

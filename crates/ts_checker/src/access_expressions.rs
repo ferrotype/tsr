@@ -14,7 +14,7 @@ fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
 
 impl CheckerState {
     pub(crate) fn access_receiver(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.data_source().as_qualified_name() {
             Some(data) => data.left(),
             None => read.expression(),
@@ -24,7 +24,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkIndexedAccess
     // port: tsc/internal/checker/checker.go:Checker.checkElementAccessExpression
     pub(crate) fn check_element_access(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let chain = read.flags() & nf::OPTIONAL_CHAIN != 0;
         let left = required(read.expression(), "element receiver")?;
         let left_type = self.check_expression(left)?;
@@ -44,7 +44,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkElementAccessExpression
     fn element_access_worker(&mut self, node: NodeId, mut object: TypeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let index = required(
             read.data_source()
                 .as_element_access_expression()
@@ -70,7 +70,7 @@ impl CheckerState {
             .unwrap_or(false);
         if constant_enum
             && !matches!(
-                self.ast(index)?.node(index)?.kind().known(),
+                self.node(index)?.kind().known(),
                 Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
             )
         {
@@ -112,10 +112,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isForInVariableForNumericPropertyNames
     fn for_in_numeric_property_variable(&mut self, expression: NodeId) -> Result<bool, Error> {
         let mut node = expression;
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedExpression {
+        while self.node(node)?.kind() == K::ParenthesizedExpression {
             node = required(self.access_receiver(node)?, "index parentheses")?;
         }
-        if self.ast(node)?.node(node)?.kind() != K::Identifier {
+        if self.node(node)?.kind() != K::Identifier {
             return Ok(false);
         }
         let symbol = self.resolved_value_symbol(node)?;
@@ -123,9 +123,9 @@ impl CheckerState {
             return Ok(false);
         }
         let mut child = expression;
-        let mut parent = self.ast(expression)?.node(expression)?.parent();
+        let mut parent = self.node(expression)?.parent();
         while let Some(node) = parent {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::ForInStatement {
                 let data = read
                     .data_source()
@@ -134,7 +134,7 @@ impl CheckerState {
                 if data.statement() == Some(child) {
                     let initializer = required(data.initializer(), "for-in initializer")?;
                     let expression = required(data.expression(), "for-in expression")?;
-                    let read = self.ast(initializer)?.node(initializer)?;
+                    let read = self.node(initializer)?;
                     let variable = if read.kind() == K::VariableDeclarationList {
                         let declarations = self.source_list(
                             initializer,
@@ -145,12 +145,9 @@ impl CheckerState {
                         )?;
                         match declarations.first() {
                             Some(&declaration) => {
-                                let name = required(
-                                    self.ast(declaration)?.node(declaration)?.name(),
-                                    "for-in name",
-                                )?;
+                                let name = required(self.node(declaration)?.name(), "for-in name")?;
                                 if matches!(
-                                    self.ast(name)?.node(name)?.kind().known(),
+                                    self.node(name)?.kind().known(),
                                     Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                                 ) {
                                     None
@@ -178,7 +175,7 @@ impl CheckerState {
                 }
             }
             child = node;
-            parent = self.ast(node)?.node(node)?.parent();
+            parent = self.node(node)?.parent();
         }
         Ok(false)
     }
@@ -225,7 +222,7 @@ impl CheckerState {
             }
         }
         if valid {
-            if self.ast(node)?.node(node)?.kind() == K::ElementAccessExpression
+            if self.node(node)?.kind() == K::ElementAccessExpression
                 && self.assignment_target_kind(node)? != AssignmentKind::None
                 && self.types.object_flags(data.object_type)? & of::MAPPED != 0
                 && self.mapped_modifiers(data.object_type)? & crate::mapped::INCLUDE_READONLY != 0
@@ -277,8 +274,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isMethodAccessForCall
     pub(crate) fn access_is_call_target(&self, mut node: NodeId) -> Result<bool, Error> {
-        while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        while let Some(parent) = self.node(node)?.parent() {
+            let read = self.node(parent)?;
             if read.kind() == K::ParenthesizedExpression {
                 node = parent;
                 continue;
@@ -303,7 +300,7 @@ impl CheckerState {
         mode: u32,
         write_only: bool,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let chain = read.flags() & nf::OPTIONAL_CHAIN != 0;
         let (left, right) = match read.data_source().as_qualified_name() {
             Some(data) => (data.left(), data.right()),
@@ -346,8 +343,8 @@ impl CheckerState {
         let apparent = self.apparent_type(widened)?;
         let any = self.types.flags(apparent)? & tf::ANY != 0
             || apparent == self.builtins.silent_never_type;
-        let private = self.ast(right)?.node(right)?.kind() == K::PrivateIdentifier;
-        let name = self.ast(right)?.node_text(right)?.into_js_string();
+        let private = self.node(right)?.kind() == K::PrivateIdentifier;
+        let name = self.node_text(right)?.into_js_string();
         let property = if private {
             match self.private_access_property(node, left_type, apparent, right, assignment)? {
                 crate::private_access::PrivateAccessResult::Type(ty) => return Ok(ty),
@@ -357,13 +354,13 @@ impl CheckerState {
             if any {
                 // markPropertyAliasReferenced also runs for an unresolved alias:
                 // following `alias.member` must retain/check its import chain.
-                if self.ast(left)?.node(left)?.kind() == K::Identifier
-                    && self.ast(left)?.node_text(left)?.as_bytes() != b"this"
+                if self.node(left)?.kind() == K::Identifier
+                    && self.node_text(left)?.as_bytes() != b"this"
                 {
                     let mut ancestor = Some(node);
                     let mut import_reference = false;
                     while let Some(current) = ancestor {
-                        let read = self.ast(current)?.node(current)?;
+                        let read = self.node(current)?;
                         if read.kind() == K::ImportEqualsDeclaration {
                             import_reference = true;
                             break;
@@ -390,7 +387,7 @@ impl CheckerState {
                 });
             }
             let skip_augment = self.const_enum_object_type(apparent)?;
-            let qualified = self.ast(node)?.node(node)?.kind() == K::QualifiedName;
+            let qualified = self.node(node)?.kind() == K::QualifiedName;
             self.constituent_property_ex(apparent, name.as_bytes(), skip_augment, qualified)?
         };
         let ty = if let Some(property) = property {
@@ -400,7 +397,7 @@ impl CheckerState {
             *self.query.resolved_symbols.get_or_default(node) = Some(property);
             self.check_access_property_accessibility(
                 node,
-                self.ast(left)?.node(left)?.kind() == K::SuperKeyword,
+                self.node(left)?.kind() == K::SuperKeyword,
                 ts_ast::utilities::is_write_access(self.ast(node)?, node)?,
                 apparent,
                 property,
@@ -507,7 +504,7 @@ impl CheckerState {
                 .options()
                 .no_property_access_from_index_signature
                 .is_true()
-                && self.ast(node)?.node(node)?.kind() == K::PropertyAccessExpression
+                && self.node(node)?.kind() == K::PropertyAccessExpression
             {
                 self.error_at(
                     Some(right),
@@ -522,8 +519,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:isDeleteTarget
     pub(crate) fn access_is_delete_target(&self, mut node: NodeId) -> Result<bool, Error> {
-        while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        while let Some(parent) = self.node(node)?.parent() {
+            let read = self.node(parent)?;
             if read.kind() == K::ParenthesizedExpression {
                 node = parent;
                 continue;
@@ -569,7 +566,7 @@ impl CheckerState {
         if self.options.strict_null_checks {
             if let Some(property) = property {
                 if let Some(declaration) = self.symbol(property)?.value_declaration() {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     let options = self.program()?.host.options();
                     let left = self.access_receiver(node)?;
                     let is_this = left
@@ -601,14 +598,14 @@ impl CheckerState {
                         && without_initializer
                     {
                         let container = self.control_flow_container(node)?;
-                        assume = self.ast(container)?.node(container)?.kind() == K::Constructor
-                            && self.ast(container)?.node(container)?.parent() == read.parent()
+                        assume = self.node(container)?.kind() == K::Constructor
+                            && self.node(container)?.parent() == read.parent()
                             && read.flags() & nf::AMBIENT == 0;
                     } else if let Some(binary) = read.data_source().as_binary_expression() {
                         let left = binary
                             .left()
                             .ok_or(Error::MissingLink("assignment property left"))?;
-                        assume = self.ast(left)?.node(left)?.kind() == K::PropertyAccessExpression
+                        assume = self.node(left)?.kind() == K::PropertyAccessExpression
                             && self.control_flow_container(node)?
                                 == self.control_flow_container(declaration)?;
                     }
@@ -668,7 +665,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(property)?.value_declaration() else {
             return Ok(false);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         Ok(read.kind() == K::PropertyDeclaration
             && read.type_node().is_none()
             && read.initializer().is_none()
@@ -692,7 +689,7 @@ impl CheckerState {
                 Some(constructor)
             } else {
                 let is_this = match self.access_receiver(node)? {
-                    Some(left) => self.ast(left)?.node(left)?.kind() == K::ThisKeyword,
+                    Some(left) => self.node(left)?.kind() == K::ThisKeyword,
                     None => false,
                 };
                 if is_this && self.auto_typed_property(property)? {
@@ -723,13 +720,13 @@ impl CheckerState {
         let left = self.access_receiver(node)?;
         let mut receiver = left;
         while let Some(value) = receiver {
-            if self.ast(value)?.node(value)?.kind() != K::ParenthesizedExpression {
+            if self.node(value)?.kind() != K::ParenthesizedExpression {
                 break;
             }
-            receiver = self.ast(value)?.node(value)?.expression();
+            receiver = self.node(value)?.expression();
         }
         let receiver_symbol = match receiver {
-            Some(receiver) if self.ast(receiver)?.node(receiver)?.kind() == K::Identifier => {
+            Some(receiver) if self.node(receiver)?.kind() == K::Identifier => {
                 Some(self.resolved_value_symbol(receiver)?)
             }
             _ => None,
@@ -757,12 +754,12 @@ impl CheckerState {
                     .unwrap_or(false)
             {
                 let constructor = self.control_flow_container(node)?;
-                if self.ast(constructor)?.node(constructor)?.kind() != K::Constructor {
+                if self.node(constructor)?.kind() != K::Constructor {
                     return Ok(true);
                 }
                 if let Some(declaration) = self.symbol(property)?.value_declaration() {
-                    let read = self.ast(declaration)?.node(declaration)?;
-                    let class = self.ast(constructor)?.node(constructor)?.parent();
+                    let read = self.node(declaration)?;
+                    let class = self.node(constructor)?.parent();
                     let local_declaration =
                         read.parent() == class || read.parent() == Some(constructor);
                     let local_assignment = if read.kind() == K::BinaryExpression {
@@ -792,9 +789,7 @@ impl CheckerState {
                 receiver_symbol.ok_or(Error::MissingLink("namespace assignment receiver"))?;
             return self
                 .alias_declaration_or_none(symbol)?
-                .map(|declaration| {
-                    Ok(self.ast(declaration)?.node(declaration)?.kind() == K::NamespaceImport)
-                })
+                .map(|declaration| Ok(self.node(declaration)?.kind() == K::NamespaceImport))
                 .transpose()
                 .map(|value| value.unwrap_or(false));
         }

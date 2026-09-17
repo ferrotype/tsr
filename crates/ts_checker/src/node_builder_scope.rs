@@ -23,12 +23,12 @@ impl NodeBuilder<'_> {
     ) -> Result<bool, Error> {
         let mut location = enclosing;
         while let Some(node) = location {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             let kind = read.kind();
             let parent = read.parent();
             let global_source = kind == K::SourceFile
                 && !ts_ast::utilities::is_external_or_common_js_module(
-                    &self.checker.ast(node)?.source_file(node)?,
+                    &self.checker.source_file_read(node)?,
                 );
             let locals = self
                 .checker
@@ -42,9 +42,7 @@ impl NodeBuilder<'_> {
             }
             match kind.known() {
                 Some(K::SourceFile | K::ModuleDeclaration) if !global_source => {
-                    if self.checker.ast(node)?.node(node)?.flags() & ts_ast::node_flags::REPARSED
-                        != 0
-                    {
+                    if self.checker.node(node)?.flags() & ts_ast::node_flags::REPARSED != 0 {
                         return Err(Error::Unsupported(
                             "someSymbolTableInScope: reparsed module",
                         ));
@@ -74,8 +72,8 @@ impl NodeBuilder<'_> {
                         return Ok(true);
                     }
                     if kind == K::ClassExpression {
-                        if let Some(name) = self.checker.ast(node)?.node(node)?.name() {
-                            let name = self.checker.ast(name)?.node_text(name)?.into_js_string();
+                        if let Some(name) = self.checker.node(node)?.name() {
+                            let name = self.checker.node_text(name)?.into_js_string();
                             if !name.is_empty() {
                                 let table = NameTable {
                                     id: NameTableId::Locals(node),

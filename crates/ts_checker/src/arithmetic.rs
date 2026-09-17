@@ -15,7 +15,7 @@ impl CheckerState {
         mut a: TypeId,
         mut b: TypeId,
     ) -> Result<TypeId, Error> {
-        let operator = self.ast(token)?.node(token)?.kind();
+        let operator = self.node(token)?.kind();
         if a == self.builtins.silent_never_type || b == self.builtins.silent_never_type {
             return Ok(self.builtins.silent_never_type);
         }
@@ -140,13 +140,12 @@ impl CheckerState {
                                 ),
                             ],
                         )?;
-                        let mut container = self.ast(node)?.node(node)?.parent();
+                        let mut container = self.node(node)?.parent();
                         while let Some(parent) = container {
-                            if self.ast(parent)?.node(parent)?.kind() != K::ParenthesizedExpression
-                            {
+                            if self.node(parent)?.kind() != K::ParenthesizedExpression {
                                 break;
                             }
-                            container = self.ast(parent)?.node(parent)?.parent();
+                            container = self.node(parent)?.parent();
                         }
                         if container
                             .map(|n| {
@@ -221,8 +220,8 @@ impl CheckerState {
         if !ts_ast::is_assignment_operator(operator) {
             return Ok(());
         }
-        if let Some(parent) = self.ast(left)?.node(left)?.parent() {
-            if ts_ast::is_declaration_node(&self.ast(parent)?.node(parent)?)
+        if let Some(parent) = self.node(left)?.parent() {
+            if ts_ast::is_declaration_node(&self.node(parent)?)
                 && ts_ast::get_assignment_declaration_kind(self.ast(parent)?, parent)?
                     == ts_ast::JSDeclarationKind::ExportsProperty
             {
@@ -235,18 +234,16 @@ impl CheckerState {
                 }
             }
         }
-        if operator != K::EqualsToken
-            && self.ast(left)?.node(left)?.kind() == K::PropertyAccessExpression
-        {
+        if operator != K::EqualsToken && self.node(left)?.kind() == K::PropertyAccessExpression {
             a = self.check_property_access_ex(left, 0, true)?;
         }
         if self.check_reference_expression(left,d::The_left_hand_side_of_an_assignment_expression_must_be_a_variable_or_a_property_access,d::The_left_hand_side_of_an_assignment_expression_may_not_be_an_optional_property_access)? {
             let mut head=None;
-            if self.options.exact_optional_property_types && self.ast(left)?.node(left)?.kind()==K::PropertyAccessExpression && self.maybe_type_of_kind(b,tf::UNDEFINED)? {
-                let read=self.ast(left)?.node(left)?;
+            if self.options.exact_optional_property_types && self.node(left)?.kind()==K::PropertyAccessExpression && self.maybe_type_of_kind(b,tf::UNDEFINED)? {
+                let read=self.node(left)?;
                 let expression=read.expression().ok_or(Error::MissingLink("optional property receiver"))?;
                 let name=read.name().ok_or(Error::MissingLink("optional property name"))?;
-                let text=self.ast(name)?.node_text(name)?.into_js_string();
+                let text=self.node_text(name)?.into_js_string();
                 let receiver=self.get_type_of_expression(expression)?;
                 if let Some(target)=self.property_type(receiver,text.as_bytes())? {
                     if self.type_contains_missing(target)? {head=Some(d::Type_0_is_not_assignable_to_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_type_of_the_target);}

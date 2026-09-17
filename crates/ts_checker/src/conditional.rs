@@ -102,7 +102,7 @@ impl CheckerState {
         Ok(result)
     }
     fn conditional_nodes(&self, node: NodeId) -> Result<(NodeId, NodeId, NodeId, NodeId), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_conditional_type_node()
@@ -235,8 +235,7 @@ impl CheckerState {
                     if self.types.flags(false_type)? & tf::CONDITIONAL != 0 {
                         let new_root = self.types.conditional(false_type)?.root;
                         let definition = self.conditional_root(new_root)?;
-                        if self.ast(definition.node)?.node(definition.node)?.parent()
-                            == Some(root.node)
+                        if self.node(definition.node)?.parent() == Some(root.node)
                             && (!definition.distributive
                                 || definition.check_type == root.check_type)
                         {
@@ -437,14 +436,14 @@ impl CheckerState {
         )
     }
     fn simple_tuple_arity(&self, mut node: NodeId) -> Result<Option<usize>, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedType {
+        while self.node(node)?.kind() == K::ParenthesizedType {
             node = self
                 .ast(node)?
                 .node(node)?
                 .type_node()
                 .ok_or(Error::MissingLink("type parentheses"))?;
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::TupleType {
             return Ok(None);
         }

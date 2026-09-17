@@ -91,7 +91,7 @@ impl CheckerState {
         reference: NodeId,
         mutation: NodeId,
     ) -> Result<bool, Error> {
-        let read = self.ast(mutation)?.node(mutation)?;
+        let read = self.node(mutation)?;
         let access = if read.kind() == K::CallExpression {
             required(read.expression(), "array mutation callee")?
         } else {
@@ -103,10 +103,7 @@ impl CheckerState {
                 "array mutation left",
             )?
         };
-        let object = required(
-            self.ast(access)?.node(access)?.expression(),
-            "array mutation object",
-        )?;
+        let object = required(self.node(access)?.expression(), "array mutation object")?;
         let object = self.reference_candidate(object)?;
         self.matching_reference(reference, object)
     }
@@ -118,7 +115,7 @@ impl CheckerState {
         if self.types.object_flags(evolving)? & of::EVOLVING_ARRAY == 0 {
             return Ok(evolving);
         }
-        let read = self.ast(mutation)?.node(mutation)?;
+        let read = self.node(mutation)?;
         if read.kind() == K::CallExpression {
             for argument in self.source_list(mutation, read.argument_list())? {
                 evolving = self.add_evolving_array_element(evolving, argument)?;
@@ -131,8 +128,7 @@ impl CheckerState {
             let left = required(binary.left(), "array mutation left")?;
             let right = required(binary.right(), "array mutation right")?;
             let index = required(
-                self.ast(left)?
-                    .node(left)?
+                self.node(left)?
                     .data_source()
                     .as_element_access_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?
@@ -148,7 +144,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:Checker.isEmptyArrayAssignment
     pub(crate) fn empty_array_assignment(&self, target: NodeId) -> Result<bool, Error> {
-        let read = self.ast(target)?.node(target)?;
+        let read = self.node(target)?;
         let value = if read.kind() == K::VariableDeclaration {
             read.initializer()
         } else if read.kind() != K::BindingElement {
@@ -167,22 +163,22 @@ impl CheckerState {
         let Some(value) = value else {
             return Ok(false);
         };
-        let read = self.ast(value)?.node(value)?;
+        let read = self.node(value)?;
         Ok(read.kind() == K::ArrayLiteralExpression
             && self.source_list(value, read.element_list())?.is_empty())
     }
     // port: tsc/internal/checker/flow.go:Checker.getReferenceRoot
     fn flow_reference_root(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
-            let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+            let Some(parent) = self.node(node)?.parent() else {
                 return Ok(node);
             };
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             let keep = if read.kind() == K::ParenthesizedExpression {
                 true
             } else if let Some(binary) = read.data_source().as_binary_expression() {
                 let operator = required(binary.operator_token(), "reference root operator")?;
-                match self.ast(operator)?.node(operator)?.kind().known() {
+                match self.node(operator)?.kind().known() {
                     Some(K::EqualsToken) => binary.left() == Some(node),
                     Some(K::CommaToken) => binary.right() == Some(node),
                     _ => false,
@@ -199,21 +195,21 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.isEvolvingArrayOperationTarget
     pub(crate) fn evolving_array_operation_target(&mut self, node: NodeId) -> Result<bool, Error> {
         let root = self.flow_reference_root(node)?;
-        let Some(parent) = self.ast(root)?.node(root)?.parent() else {
+        let Some(parent) = self.node(root)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if read.kind() == K::PropertyAccessExpression {
             let name = required(read.name(), "evolving array property")?;
-            let text = self.ast(name)?.node_text(name)?;
+            let text = self.node_text(name)?;
             if text.as_bytes() == b"length" {
                 return Ok(true);
             }
-            if self.ast(name)?.node(name)?.kind() == K::Identifier
+            if self.node(name)?.kind() == K::Identifier
                 && matches!(text.as_bytes(), b"push" | b"unshift")
             {
                 if let Some(call) = read.parent() {
-                    return Ok(self.ast(call)?.node(call)?.kind() == K::CallExpression);
+                    return Ok(self.node(call)?.kind() == K::CallExpression);
                 }
             }
         } else if read.kind() == K::ElementAccessExpression && read.expression() == Some(root) {
@@ -227,11 +223,11 @@ impl CheckerState {
                     .argument_expression(),
                 "evolving array index",
             )?;
-            let read = self.ast(assignment)?.node(assignment)?;
+            let read = self.node(assignment)?;
             if let Some(binary) = read.data_source().as_binary_expression() {
                 let op = required(binary.operator_token(), "evolving array assignment")?;
                 if binary.left() == Some(parent)
-                    && self.ast(op)?.node(op)?.kind() == K::EqualsToken
+                    && self.node(op)?.kind() == K::EqualsToken
                     && !ts_ast::is_assignment_target(self.ast(assignment)?, assignment)?
                 {
                     let ty = self.get_type_of_expression(index)?;

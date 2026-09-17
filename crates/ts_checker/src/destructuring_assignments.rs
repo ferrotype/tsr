@@ -9,7 +9,7 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.hasDefaultValue
     pub(crate) fn assignment_has_default(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(K::BindingElement) => read.initializer().is_some(),
             Some(K::PropertyAssignment) => self.assignment_has_default(required(
@@ -30,7 +30,7 @@ impl CheckerState {
                         .operator_token(),
                     "assignment default operator",
                 )?;
-                self.ast(token)?.node(token)?.kind() == K::EqualsToken
+                self.node(token)?.kind() == K::EqualsToken
             }
             _ => false,
         })
@@ -44,7 +44,7 @@ impl CheckerState {
         right_is_this: bool,
     ) -> Result<TypeId, Error> {
         let mut target = node;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::ShorthandPropertyAssignment {
             target = required(read.name(), "assignment shorthand name")?;
             let initializer = read
@@ -64,13 +64,12 @@ impl CheckerState {
                 self.assignment_operator(target, initializer, K::EqualsToken.into(), left, right)?;
             }
         }
-        if self.ast(target)?.node(target)?.kind() == K::BinaryExpression
+        if self.node(target)?.kind() == K::BinaryExpression
             && self.assignment_has_default(target)?
         {
             self.check_expression_ex(target, mode)?;
             target = required(
-                self.ast(target)?
-                    .node(target)?
+                self.node(target)?
                     .data_source()
                     .as_binary_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?
@@ -81,7 +80,7 @@ impl CheckerState {
                 source = self.type_with_facts(source, facts::NE_UNDEFINED)?;
             }
         }
-        match self.ast(target)?.node(target)?.kind().known() {
+        match self.node(target)?.kind().known() {
             Some(K::ObjectLiteralExpression) => {
                 self.check_object_assignment(target, source, right_is_this)
             }
@@ -129,7 +128,7 @@ impl CheckerState {
         list: Option<ts_ast::NodeListId>,
         right_is_this: bool,
     ) -> Result<(), Error> {
-        let read = self.ast(property)?.node(property)?;
+        let read = self.node(property)?;
         match read.kind().known() {
             Some(K::PropertyAssignment | K::ShorthandPropertyAssignment) => {
                 let name = required(read.name(), "assignment property name")?;
@@ -138,7 +137,7 @@ impl CheckerState {
                 } else {
                     property
                 };
-                if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+                if self.node(name)?.kind() == K::PrivateIdentifier {
                     self.grammar_error_node(
                         name,
                         d::Private_identifiers_cannot_be_used_in_destructuring_patterns,
@@ -189,7 +188,7 @@ impl CheckerState {
                 }
                 let mut names = Vec::new();
                 for &other in properties {
-                    let read = self.ast(other)?.node(other)?;
+                    let read = self.node(other)?;
                     if read.kind() != K::SpreadAssignment {
                         names.push(required(read.name(), "non-rest assignment name")?);
                     }
@@ -240,7 +239,7 @@ impl CheckerState {
             Some(out)
         };
         for (index, &element) in elements.iter().enumerate() {
-            let spread = self.ast(element)?.node(element)?.kind() == K::SpreadElement;
+            let spread = self.node(element)?.kind() == K::SpreadElement;
             let element_type = if spread {
                 if in_bounds.is_none() {
                     in_bounds = Some(self.check_iterated_type_or_element_type(
@@ -281,7 +280,7 @@ impl CheckerState {
         elements: &[NodeId],
         list: Option<ts_ast::NodeListId>,
     ) -> Result<(), Error> {
-        let read = self.ast(element)?.node(element)?;
+        let read = self.node(element)?;
         if read.kind() == K::OmittedExpression {
             return Ok(());
         }
@@ -308,12 +307,11 @@ impl CheckerState {
             )?;
         } else {
             let target = required(read.expression(), "array assignment rest")?;
-            if self.ast(target)?.node(target)?.kind() == K::BinaryExpression
+            if self.node(target)?.kind() == K::BinaryExpression
                 && self.assignment_has_default(target)?
             {
                 let token = required(
-                    self.ast(target)?
-                        .node(target)?
+                    self.node(target)?
                         .data_source()
                         .as_binary_expression()
                         .ok_or(ts_arena::Error::InvalidGraph)?
@@ -359,7 +357,7 @@ impl CheckerState {
         mode: u32,
     ) -> Result<TypeId, Error> {
         let target_type = self.check_expression_ex(target, mode)?;
-        let parent = self.ast(target)?.node(target)?.parent();
+        let parent = self.node(target)?.parent();
         let spread = parent
             .map(|parent| {
                 self.ast(parent)?
@@ -394,7 +392,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.createSyntheticExpression
     fn synthetic_expression_at(&mut self, location: NodeId, ty: TypeId) -> Result<NodeId, Error> {
         self.retain_flow_source(location)?;
-        let read = self.ast(location)?.node(location)?;
+        let read = self.node(location)?;
         let range = read.range();
         let parent = read.parent();
         let node = self.new_synthetic_expression(ty, false, None)?;

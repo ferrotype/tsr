@@ -150,7 +150,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
@@ -599,9 +599,9 @@ impl CheckerState {
         };
         let mut suggest = self.awaited_type_of_promise(input)?.is_some();
         if !suggest && !allow_async {
-            if let Some(parent) = self.ast(node)?.node(node)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() == K::ForOfStatement
-                    && self.ast(parent)?.node(parent)?.expression() == Some(node)
+            if let Some(parent) = self.node(node)?.parent() {
+                if self.node(parent)?.kind() == K::ForOfStatement
+                    && self.node(parent)?.expression() == Some(node)
                 {
                     let global = self.iteration_global("AsyncIterable", 3)?;
                     if global != self.builtins.empty_generic_type {
@@ -715,7 +715,7 @@ impl CheckerState {
             let options = self.program()?.host.options();
             let module = options.emit_module_kind();
             let target = options.emit_script_target();
-            let file = self.ast(source)?.source_file(source)?;
+            let file = self.source_file_read(source)?;
             let external = file.external_module_indicator.is_some()
                 || (module == M::COMMON_JS || M::NODE16 <= module && module <= M::NODE_NEXT)
                     && file.common_js_module_indicator().is_some();
@@ -724,7 +724,7 @@ impl CheckerState {
             }
             let node_module = matches!(module, M::NODE16 | M::NODE18 | M::NODE20 | M::NODE_NEXT);
             let common_js = if node_module {
-                let file = self.ast(source)?.source_file(source)?;
+                let file = self.source_file_read(source)?;
                 self.program()?
                     .host
                     .get_source_file_meta_data(file.parse_options().file_name.as_bytes())?
@@ -748,9 +748,9 @@ impl CheckerState {
             Ok(false)
         } else {
             let mut diagnostic=self.diagnostic_for_node(Some(modifier),d::X_for_await_loops_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules,vec![])?;
-            let mut current = self.ast(node)?.node(node)?.parent();
+            let mut current = self.node(node)?.parent();
             while let Some(function) = current {
-                let read = self.ast(function)?.node(function)?;
+                let read = self.node(function)?;
                 if ts_ast::utilities::is_function_like(Some(&read)) {
                     if read.kind() != K::Constructor {
                         diagnostic.related_information.push(std::sync::Arc::new(
@@ -779,7 +779,7 @@ impl CheckerState {
         modifier: NodeId,
     ) -> Result<(), Error> {
         if let Some(container) = self.containing_function_or_static_block(node)? {
-            let read = self.ast(container)?.node(container)?;
+            let read = self.node(container)?;
             if read.kind() == K::ClassStaticBlockDeclaration {
                 self.grammar_error_node(
                     modifier,

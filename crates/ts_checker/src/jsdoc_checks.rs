@@ -34,7 +34,7 @@ impl CheckerState {
             .flatten()
             .collect();
         for comment in comments {
-            let read = self.ast(comment)?.node(comment)?;
+            let read = self.node(comment)?;
             if matches!(
                 read.kind().known(),
                 Some(K::JSDocLink | K::JSDocLinkCode | K::JSDocLinkPlain)
@@ -50,10 +50,10 @@ impl CheckerState {
         let Some(host) = ts_ast::utilities_tail::get_js_doc_host(self.ast(name)?, name)? else {
             return Ok(None);
         };
-        let read = self.ast(host)?.node(host)?;
+        let read = self.node(host)?;
         if read.kind() == K::PropertySignature {
             if let Some(ty) = read.type_node() {
-                if ts_ast::utilities::is_function_like(Some(&self.ast(ty)?.node(ty)?)) {
+                if ts_ast::utilities::is_function_like(Some(&self.node(ty)?)) {
                     return Ok(Some(ty));
                 }
             }
@@ -69,7 +69,7 @@ impl CheckerState {
         let Some(name) = name else {
             return Ok(None);
         };
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         if !matches!(read.kind().known(), Some(K::Identifier | K::QualifiedName)) {
             return Ok(None);
         }
@@ -83,7 +83,7 @@ impl CheckerState {
         )? {
             return Ok(Some(symbol));
         }
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let Some(data) = read.data_source().as_qualified_name() else {
             return Ok(None);
         };
@@ -105,7 +105,7 @@ impl CheckerState {
             Some(ty) => ty,
             None => self.get_declared_type_of_symbol(symbol)?,
         };
-        let text = self.ast(right)?.node_text(right)?.into_js_string();
+        let text = self.node_text(right)?.into_js_string();
         self.constituent_property(ty, text.as_bytes(), false)
     }
 
@@ -118,10 +118,10 @@ impl CheckerState {
         if let Some(symbol) = self.resolve_entity_name_at(name, meaning, true, true, location)? {
             return Ok(Some(symbol));
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
-        let mut parent = self.ast(name)?.node(name)?.parent();
+        let text = self.node_text(name)?.into_js_string();
+        let mut parent = self.node(name)?.parent();
         while let Some(container) = parent {
-            let read = self.ast(container)?.node(container)?;
+            let read = self.node(container)?;
             if matches!(
                 read.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression | K::InterfaceDeclaration)

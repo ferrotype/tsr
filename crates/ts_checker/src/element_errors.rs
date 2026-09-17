@@ -20,8 +20,8 @@ impl CheckerState {
             return Ok(false);
         }
         let mut reported = false;
-        for property in self.source_list(node, self.ast(node)?.node(node)?.property_list())? {
-            if self.ast(property)?.node(property)?.kind() == K::SpreadAssignment {
+        for property in self.source_list(node, self.node(node)?.property_list())? {
+            if self.node(property)?.kind() == K::SpreadAssignment {
                 continue;
             }
             let symbol = self
@@ -32,19 +32,19 @@ impl CheckerState {
             if self.types.flags(name_type)? & tf::NEVER != 0 {
                 continue;
             }
-            let read = self.ast(property)?.node(property)?;
+            let read = self.node(property)?;
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("elaborated property name"))?;
             let (next, message) = if read.kind() == K::PropertyAssignment {
                 let next = read.initializer();
-                let name_read = self.ast(name)?.node(name)?;
+                let name_read = self.node(name)?;
                 let computed = if name_read.kind() == K::ComputedPropertyName {
                     let expression = name_read
                         .expression()
                         .ok_or(Error::MissingLink("computed property expression"))?;
                     !matches!(
-                        self.ast(expression)?.node(expression)?.kind().known(),
+                        self.node(expression)?.kind().known(),
                         Some(
                             K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral
                         )
@@ -95,11 +95,11 @@ impl CheckerState {
         }
         let mut reported = false;
         for (index, element) in self
-            .source_list(node, self.ast(node)?.node(node)?.element_list())?
+            .source_list(node, self.node(node)?.element_list())?
             .into_iter()
             .enumerate()
         {
-            if self.ast(element)?.node(element)?.kind() == K::OmittedExpression {
+            if self.node(element)?.kind() == K::OmittedExpression {
                 continue;
             }
             if self.tuple_like_type(target)?
@@ -131,7 +131,7 @@ impl CheckerState {
         mut node: NodeId,
     ) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if !matches!(
                 read.kind().known(),
                 Some(K::ParenthesizedExpression | K::SatisfiesExpression)
@@ -337,7 +337,7 @@ impl CheckerState {
     fn elaboration_in_default_library(&self, node: NodeId) -> Result<bool, Error> {
         let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("elaboration declaration source"))?;
-        let source = self.ast(source)?.source_file(source)?;
+        let source = self.source_file_read(source)?;
         Ok(self
             .program()?
             .host

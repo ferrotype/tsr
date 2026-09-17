@@ -24,7 +24,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkImportCallExpression
     pub(crate) fn check_import_call_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
         self.check_grammar_import_call_expression(node)?;
-        let args = self.source_list(node, self.ast(node)?.node(node)?.argument_list())?;
+        let args = self.source_list(node, self.node(node)?.argument_list())?;
         let Some(&specifier) = args.first() else {
             return self.create_promise_return_type(node, self.builtins.any_type);
         };
@@ -64,11 +64,11 @@ impl CheckerState {
             let read = self.ast(args[1])?.node(args[1])?;
             if read.kind() == K::ObjectLiteralExpression {
                 for property in self.source_list(args[1], read.property_list())? {
-                    let read = self.ast(property)?.node(property)?;
+                    let read = self.node(property)?;
                     if read.kind() == K::PropertyAssignment {
                         if let Some(name) = read.name() {
-                            if self.ast(name)?.node(name)?.kind() == K::Identifier
-                                && self.ast(name)?.node_text(name)?.as_bytes() == b"assert"
+                            if self.node(name)?.kind() == K::Identifier
+                                && self.node_text(name)?.as_bytes() == b"assert"
                             {
                                 self.error_at(Some(name), d::Import_assertions_have_been_replaced_by_import_attributes_Use_with_instead_of_assert, vec![])?;
                                 break;
@@ -108,11 +108,11 @@ impl CheckerState {
             };
             return self.grammar_error_node(node, message, vec![]);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("import callee"))?;
-        if self.ast(expression)?.node(expression)?.kind() == K::MetaProperty {
+        if self.node(expression)?.kind() == K::MetaProperty {
             if kind != ModuleKind::ESNEXT && kind != ModuleKind::PRESERVE {
                 return self.grammar_error_node(node, d::Deferred_imports_are_only_supported_when_the_module_flag_is_set_to_esnext_or_preserve, vec![]);
             }
@@ -139,7 +139,7 @@ impl CheckerState {
             return self.grammar_error_node(node, d::Dynamic_imports_can_only_accept_a_module_specifier_and_an_optional_set_of_attributes_as_arguments, vec![]);
         }
         for argument in args {
-            if self.ast(argument)?.node(argument)?.kind() == K::SpreadElement {
+            if self.node(argument)?.kind() == K::SpreadElement {
                 return self.grammar_error_node(
                     argument,
                     d::Argument_of_dynamic_import_cannot_be_spread_element,

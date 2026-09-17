@@ -25,7 +25,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkClassExpressionDeferred
     pub(crate) fn check_class_expression_deferred(&mut self, node: NodeId) -> Result<(), Error> {
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+        for member in self.source_list(node, self.node(node)?.member_list())? {
             self.check_source_element(member)?;
         }
         self.register_for_unused_identifiers_check(node)
@@ -34,15 +34,15 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkClassExpressionExternalHelpers
     // port: tsc/internal/checker/checker.go:Checker.getFirstTransformableStaticClassElement
     fn check_class_expression_external_helpers(&mut self, node: NodeId) -> Result<(), Error> {
-        if self.ast(node)?.node(node)?.name().is_some() {
+        if self.node(node)?.name().is_some() {
             return Ok(());
         }
         // walkUpOuterExpressions(OEKAll): assignments and comma expressions are
         // not outer wrappers in this native operation.
-        let mut parent = self.ast(node)?.node(node)?.parent();
+        let mut parent = self.node(node)?.parent();
         while let Some(outer) = parent {
             if !matches!(
-                self.ast(outer)?.node(outer)?.kind().known(),
+                self.node(outer)?.kind().known(),
                 Some(
                     K::ParenthesizedExpression
                         | K::TypeAssertionExpression
@@ -55,14 +55,14 @@ impl CheckerState {
             ) {
                 break;
             }
-            parent = self.ast(outer)?.node(outer)?.parent();
+            parent = self.node(outer)?.parent();
         }
         let Some(parent) = parent else {
             return Ok(());
         };
         if !ts_ast::utilities_tail::is_named_evaluation_source(
             self.ast(parent)?,
-            &self.ast(parent)?.node(parent)?,
+            &self.node(parent)?,
         )? {
             return Ok(());
         }
@@ -73,8 +73,8 @@ impl CheckerState {
         }
         let transform_initializers = !self.program()?.host.options().emit_standard_class_fields();
         let mut location = None;
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
-            let read = self.ast(member)?.node(member)?;
+        for member in self.source_list(node, self.node(node)?.member_list())? {
+            let read = self.node(member)?;
             if read.kind() == K::ClassStaticBlockDeclaration
                 || read.modifier_flags(self.ast(member)?)? & mf::STATIC != 0
                     && (ts_ast::utilities::is_private_identifier_class_element_declaration(
@@ -93,13 +93,13 @@ impl CheckerState {
                 location,
                 crate::external_emit_helpers::SET_FUNCTION_NAME,
             )?;
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             if matches!(
                 read.kind().known(),
                 Some(K::PropertyAssignment | K::PropertyDeclaration | K::BindingElement)
             ) {
                 if let Some(name) = read.name() {
-                    if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+                    if self.node(name)?.kind() == K::ComputedPropertyName {
                         self.check_external_emit_helpers(
                             location,
                             crate::external_emit_helpers::PROP_KEY,
@@ -116,16 +116,16 @@ impl CheckerState {
         let mut container = ts_ast::get_this_container(self.ast(node)?, node, true, true)?;
         let mut captured = false;
         let mut computed = false;
-        if self.ast(container)?.node(container)?.kind() == K::Constructor {
+        if self.node(container)?.kind() == K::Constructor {
             self.check_this_before_super(node, container, d::X_super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class)?;
         }
         loop {
-            if self.ast(container)?.node(container)?.kind() == K::ArrowFunction {
+            if self.node(container)?.kind() == K::ArrowFunction {
                 container =
                     ts_ast::get_this_container(self.ast(container)?, container, false, !computed)?;
                 captured = true;
             }
-            if self.ast(container)?.node(container)?.kind() == K::ComputedPropertyName {
+            if self.node(container)?.kind() == K::ComputedPropertyName {
                 container =
                     ts_ast::get_this_container(self.ast(container)?, container, !captured, false)?;
                 computed = true;
@@ -141,7 +141,7 @@ impl CheckerState {
                 vec![],
             )?;
         } else {
-            match self.ast(container)?.node(container)?.kind().known() {
+            match self.node(container)?.kind().known() {
                 Some(K::ModuleDeclaration) => {
                     self.error_at(
                         Some(node),
@@ -175,7 +175,7 @@ impl CheckerState {
                     d::X_this_implicitly_has_type_any_because_it_does_not_have_a_type_annotation,
                     vec![],
                 )?;
-                if self.ast(container)?.node(container)?.kind() != K::SourceFile {
+                if self.node(container)?.kind() != K::SourceFile {
                     if let Some(outside) = self.try_this_type_at(container, true, None)? {
                         if outside != global {
                             let related = self.diagnostic_for_node(
@@ -205,17 +205,17 @@ impl CheckerState {
             Some(container) => container,
             None => ts_ast::get_this_container(self.ast(node)?, node, false, false)?,
         };
-        let read = self.ast(container)?.node(container)?;
+        let read = self.node(container)?;
         if ts_ast::utilities::is_function_like(Some(&read)) {
             let first = self
                 .source_list(container, read.parameter_list())?
                 .first()
                 .copied();
             let explicit = match first {
-                Some(parameter) => match self.ast(parameter)?.node(parameter)?.name() {
+                Some(parameter) => match self.node(parameter)?.name() {
                     Some(name) => {
-                        self.ast(name)?.node(name)?.kind() == K::Identifier
-                            && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+                        self.node(name)?.kind() == K::Identifier
+                            && self.node_text(name)?.as_bytes() == b"this"
                     }
                     None => false,
                 },
@@ -235,8 +235,8 @@ impl CheckerState {
                 }
             }
         }
-        if let Some(parent) = self.ast(container)?.node(container)?.parent() {
-            if ts_ast::utilities::is_class_like(&self.ast(parent)?.node(parent)?) {
+        if let Some(parent) = self.node(container)?.parent() {
+            if ts_ast::utilities::is_class_like(&self.node(parent)?) {
                 let symbol =
                     required(self.get_symbol_of_declaration(parent)?, "this class symbol")?;
                 let ty = if ts_ast::utilities::is_static(self.ast(container)?, container)? {
@@ -248,9 +248,8 @@ impl CheckerState {
                 return self.flow_type_of_this_reference(node, ty).map(Some);
             }
         }
-        if self.ast(container)?.node(container)?.kind() == K::SourceFile {
-            if ts_ast::utilities::is_external_module(&*self.ast(container)?.source_file(container)?)
-            {
+        if self.node(container)?.kind() == K::SourceFile {
+            if ts_ast::utilities::is_external_module(&*self.source_file_read(container)?) {
                 return Ok(Some(self.builtins.undefined_type));
             }
             if include_global {
@@ -267,7 +266,7 @@ impl CheckerState {
         &mut self,
         function: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let kind = read.kind();
         let javascript = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         if kind == K::ArrowFunction {
@@ -297,8 +296,8 @@ impl CheckerState {
         mut node: NodeId,
     ) -> Result<bool, Error> {
         let mut in_binding = false;
-        while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        while let Some(parent) = self.node(node)?.parent() {
+            let read = self.node(parent)?;
             if ts_ast::utilities::is_function_like(Some(&read)) {
                 break;
             }
@@ -319,7 +318,7 @@ impl CheckerState {
         node: NodeId,
         container: NodeId,
     ) -> Result<(), Error> {
-        let read = self.ast(container)?.node(container)?;
+        let read = self.node(container)?;
         if read.kind() != K::PropertyDeclaration
             || read.modifier_flags(self.ast(container)?)? & mf::STATIC == 0
             || !self
@@ -334,17 +333,14 @@ impl CheckerState {
         let Some(initializer) = read.initializer() else {
             return Ok(());
         };
-        let position = self.ast(node)?.node(node)?.pos();
-        let initial = self.ast(initializer)?.node(initializer)?;
+        let position = self.node(node)?.pos();
+        let initial = self.node(initializer)?;
         if position < initial.pos() || position > initial.end() {
             return Ok(());
         }
-        let class = required(
-            self.ast(container)?.node(container)?.parent(),
-            "static property class",
-        )?;
-        for modifier in self.source_list(class, self.ast(class)?.node(class)?.modifiers())? {
-            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+        let class = required(self.node(container)?.parent(), "static property class")?;
+        for modifier in self.source_list(class, self.node(class)?.modifiers())? {
+            if self.node(modifier)?.kind() == K::Decorator {
                 self.error_at(
                     Some(node),
                     d::Cannot_use_this_in_a_static_property_initializer_of_a_decorated_class,
@@ -373,10 +369,7 @@ impl CheckerState {
         constructor: NodeId,
         message: &'static d::Message,
     ) -> Result<(), Error> {
-        let class = required(
-            self.ast(constructor)?.node(constructor)?.parent(),
-            "constructor class",
-        )?;
+        let class = required(self.node(constructor)?.parent(), "constructor class")?;
         if !self
             .class_heritage_nodes(class, K::ExtendsKeyword)?
             .is_empty()
@@ -398,13 +391,13 @@ impl CheckerState {
         stop_functions: bool,
     ) -> Result<Option<NodeId>, Error> {
         loop {
-            let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+            let Some(parent) = self.node(node)?.parent() else {
                 return Ok(None);
             };
             node = parent;
-            match self.ast(node)?.node(node)?.kind().known() {
+            match self.node(node)?.kind().known() {
                 Some(K::ComputedPropertyName) => {
-                    node = required(self.ast(node)?.node(node)?.parent(), "computed name parent")?;
+                    node = required(self.node(node)?.parent(), "computed name parent")?;
                 }
                 Some(K::FunctionDeclaration | K::FunctionExpression | K::ArrowFunction)
                     if stop_functions =>
@@ -422,10 +415,9 @@ impl CheckerState {
                     | K::ClassStaticBlockDeclaration,
                 ) => return Ok(Some(node)),
                 Some(K::Decorator) => {
-                    let parent =
-                        required(self.ast(node)?.node(node)?.parent(), "decorator parent")?;
-                    let grand = self.ast(parent)?.node(parent)?.parent();
-                    if self.ast(parent)?.node(parent)?.kind() == K::Parameter
+                    let parent = required(self.node(node)?.parent(), "decorator parent")?;
+                    let grand = self.node(parent)?.parent();
+                    if self.node(parent)?.kind() == K::Parameter
                         && grand
                             .map(|grand| {
                                 self.ast(grand)?
@@ -437,8 +429,7 @@ impl CheckerState {
                             .unwrap_or(false)
                     {
                         node = required(grand, "decorated parameter owner")?;
-                    } else if ts_ast::utilities::is_class_element(&self.ast(parent)?.node(parent)?)
-                    {
+                    } else if ts_ast::utilities::is_class_element(&self.node(parent)?) {
                         node = parent;
                     }
                 }
@@ -449,17 +440,14 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkSuperExpression
     pub(crate) fn check_super_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let parent = required(
-            self.ast(node)?.node(node)?.parent(),
-            "super expression parent",
-        )?;
-        let read = self.ast(parent)?.node(parent)?;
+        let parent = required(self.node(node)?.parent(), "super expression parent")?;
+        let read = self.node(parent)?;
         let is_call = read.kind() == K::CallExpression && read.expression() == Some(node);
         let immediate = self.super_container(node, true)?;
         let mut container = immediate;
         if !is_call {
             while let Some(current) = container {
-                if self.ast(current)?.node(current)?.kind() != K::ArrowFunction {
+                if self.node(current)?.kind() != K::ArrowFunction {
                     break;
                 }
                 container = self.super_container(current, true)?;
@@ -467,14 +455,12 @@ impl CheckerState {
         }
         let legal = match container {
             None => false,
-            Some(container) if is_call => {
-                self.ast(container)?.node(container)?.kind() == K::Constructor
-            }
+            Some(container) if is_call => self.node(container)?.kind() == K::Constructor,
             Some(container) => {
-                let read = self.ast(container)?.node(container)?;
+                let read = self.node(container)?;
                 if let Some(parent) = read.parent() {
-                    if ts_ast::utilities::is_class_like(&self.ast(parent)?.node(parent)?)
-                        || self.ast(parent)?.node(parent)?.kind() == K::ObjectLiteralExpression
+                    if ts_ast::utilities::is_class_like(&self.node(parent)?)
+                        || self.node(parent)?.kind() == K::ObjectLiteralExpression
                     {
                         if ts_ast::utilities::is_static(self.ast(container)?, container)? {
                             matches!(
@@ -517,11 +503,11 @@ impl CheckerState {
                 if Some(at) == container {
                     break;
                 }
-                if self.ast(at)?.node(at)?.kind() == K::ComputedPropertyName {
+                if self.node(at)?.kind() == K::ComputedPropertyName {
                     computed = true;
                     break;
                 }
-                current = self.ast(at)?.node(at)?.parent();
+                current = self.node(at)?.parent();
             }
             let message = if computed {
                 d::X_super_cannot_be_referenced_in_a_computed_property_name
@@ -560,17 +546,14 @@ impl CheckerState {
         }
         let container = required(container, "legal super container")?;
         let immediate_constructor = match immediate {
-            Some(immediate) => self.ast(immediate)?.node(immediate)?.kind() == K::Constructor,
+            Some(immediate) => self.node(immediate)?.kind() == K::Constructor,
             None => false,
         };
         if !is_call && immediate_constructor {
             self.check_this_before_super(node, container, d::X_super_must_be_called_before_accessing_a_property_of_super_in_the_constructor_of_a_derived_class)?;
         }
-        let class = required(
-            self.ast(container)?.node(container)?.parent(),
-            "super class",
-        )?;
-        if self.ast(class)?.node(class)?.kind() == K::ObjectLiteralExpression {
+        let class = required(self.node(container)?.parent(), "super class")?;
+        if self.node(class)?.kind() == K::ObjectLiteralExpression {
             return Ok(self.builtins.any_type);
         }
         if self
@@ -597,7 +580,7 @@ impl CheckerState {
         let Some(&base) = bases.first() else {
             return Ok(self.builtins.error_type);
         };
-        if self.ast(container)?.node(container)?.kind() == K::Constructor
+        if self.node(container)?.kind() == K::Constructor
             && self.in_constructor_argument_initializer(node, container)?
         {
             self.error_at(
@@ -612,7 +595,7 @@ impl CheckerState {
                 && self.program()?.host.options().emit_script_target()
                     <= ts_core::ScriptTarget::ES2021
                 && matches!(
-                    self.ast(container)?.node(container)?.kind().known(),
+                    self.node(container)?.kind().known(),
                     Some(K::PropertyDeclaration | K::ClassStaticBlockDeclaration)
                 )
             {
@@ -634,7 +617,7 @@ impl CheckerState {
         constructor: NodeId,
     ) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if ts_ast::utilities::is_function_like(Some(&read)) {
                 return Ok(false);
             }

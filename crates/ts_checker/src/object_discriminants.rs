@@ -14,7 +14,7 @@ impl CheckerState {
         if let Some(&ty) = self.bindings.discriminated_contexts.get(&(node, context)) {
             return Ok(ty);
         }
-        let properties = self.source_list(node, self.ast(node)?.node(node)?.property_list())?;
+        let properties = self.source_list(node, self.node(node)?.property_list())?;
         let matching = self.matching_object_union_constituent(context, &properties)?;
         let ty = if let Some(ty) = matching {
             ty
@@ -25,7 +25,7 @@ impl CheckerState {
                     continue;
                 };
                 let name = self.symbol(symbol)?.name_to_owned();
-                let read = self.ast(property)?.node(property)?;
+                let read = self.node(property)?;
                 let expression = if read.kind() == K::PropertyAssignment {
                     let expression = read
                         .initializer()
@@ -84,7 +84,7 @@ impl CheckerState {
             return Ok(None);
         }
         for &property in properties {
-            if self.ast(property)?.node(property)?.kind() != K::PropertyAssignment {
+            if self.node(property)?.kind() != K::PropertyAssignment {
                 continue;
             }
             let Some(symbol) = self.raw_declaration_symbol(property)? else {
@@ -115,7 +115,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isPossiblyDiscriminantValue
     fn possible_object_discriminant(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::StringLiteral

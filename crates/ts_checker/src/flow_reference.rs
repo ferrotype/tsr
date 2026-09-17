@@ -17,17 +17,12 @@ impl CheckerState {
         Ok(result)
     }
     fn flow_this_type_query_worker(&self, mut node: NodeId) -> Result<bool, Error> {
-        if self.ast(node)?.node(node)?.kind() != K::Identifier
-            || self.ast(node)?.node_text(node)?.as_bytes() != b"this"
-        {
+        if self.node(node)?.kind() != K::Identifier || self.node_text(node)?.as_bytes() != b"this" {
             return Ok(false);
         }
         loop {
-            let parent = required(
-                self.ast(node)?.node(node)?.parent(),
-                "this type-query parent",
-            )?;
-            let read = self.ast(parent)?.node(parent)?;
+            let parent = required(self.node(node)?.parent(), "this type-query parent")?;
+            let read = self.node(parent)?;
             if let Some(qualified) = read.data_source().as_qualified_name() {
                 if qualified.left() == Some(node) {
                     node = parent;
@@ -59,11 +54,8 @@ impl CheckerState {
         mut source: NodeId,
         target: NodeId,
     ) -> Result<bool, Error> {
-        while self.ast(source)?.node(source)?.flags() & nf::OPTIONAL_CHAIN != 0 {
-            source = required(
-                self.ast(source)?.node(source)?.expression(),
-                "optional-chain expression",
-            )?;
+        while self.node(source)?.flags() & nf::OPTIONAL_CHAIN != 0 {
+            source = required(self.node(source)?.expression(), "optional-chain expression")?;
             if self.matching_reference(source, target)? {
                 return Ok(true);
             }
@@ -77,13 +69,10 @@ impl CheckerState {
         target: NodeId,
     ) -> Result<bool, Error> {
         while matches!(
-            self.ast(source)?.node(source)?.kind().known(),
+            self.node(source)?.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
         ) {
-            source = required(
-                self.ast(source)?.node(source)?.expression(),
-                "access expression",
-            )?;
+            source = required(self.node(source)?.expression(), "access expression")?;
             if self.matching_reference(source, target)? {
                 return Ok(true);
             }
@@ -96,7 +85,7 @@ impl CheckerState {
         call: NodeId,
         reference: NodeId,
     ) -> Result<bool, Error> {
-        let read = self.ast(call)?.node(call)?;
+        let read = self.node(call)?;
         let expression = required(read.expression(), "call expression")?;
         let args = self.source_list(call, read.argument_list())?;
         for arg in args {
@@ -107,7 +96,7 @@ impl CheckerState {
                 return Ok(true);
             }
         }
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if read.kind() == K::PropertyAccessExpression {
             let target = required(read.expression(), "call access object")?;
             return Ok(self.matching_reference(reference, target)?
@@ -119,7 +108,7 @@ impl CheckerState {
     pub(crate) fn constant_flow_reference(&mut self, node: NodeId) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             let (kind, expression, node_parent) = {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let kind = read.kind();
                 // `expression` exists only on access expressions; reading it on
                 // another kind is a payload error.
@@ -144,7 +133,7 @@ impl CheckerState {
                         return Ok(true);
                     }
                     Ok(match self.symbol(symbol)?.value_declaration() {
-                        Some(decl) => self.ast(decl)?.node(decl)?.kind() == K::FunctionExpression,
+                        Some(decl) => self.node(decl)?.kind() == K::FunctionExpression,
                         None => false,
                     })
                 }
@@ -161,11 +150,11 @@ impl CheckerState {
                 Some(K::ObjectBindingPattern | K::ArrayBindingPattern) => {
                     let parent = required(node_parent, "constant binding root")?;
                     let root = ts_ast::utilities::get_root_declaration(self.ast(parent)?, parent)?;
-                    let read = self.ast(root)?.node(root)?;
+                    let read = self.node(root)?;
                     let is_parameter = read.kind() == K::Parameter;
                     let is_variable = read.kind() == K::VariableDeclaration;
                     let is_catch = if let Some(parent) = read.parent() {
-                        self.ast(parent)?.node(parent)?.kind() == K::CatchClause
+                        self.node(parent)?.kind() == K::CatchClause
                     } else {
                         false
                     };
@@ -190,7 +179,7 @@ impl CheckerState {
         })
     }
     fn matching_reference_worker(&mut self, source: NodeId, target: NodeId) -> Result<bool, Error> {
-        let read = self.ast(target)?.node(target)?;
+        let read = self.node(target)?;
         let target_kind = read.kind();
         if matches!(
             target_kind.known(),
@@ -218,12 +207,12 @@ impl CheckerState {
                     || operator == K::CommaToken && self.matching_reference(source, right)?,
             );
         }
-        let read = self.ast(source)?.node(source)?;
+        let read = self.node(source)?;
         let kind = read.kind();
         match kind.known() {
             Some(K::MetaProperty) => {
                 let target_id = target;
-                let target = self.ast(target)?.node(target)?;
+                let target = self.node(target)?;
                 let Some(target_data) = target.data_source().as_meta_property() else {
                     return Ok(false);
                 };
@@ -273,7 +262,7 @@ impl CheckerState {
             Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
                 let base = required(read.expression(), "source property base")?;
                 if let Some(name) = self.flow_property_name(source)? {
-                    let target_read = self.ast(target)?.node(target)?;
+                    let target_read = self.node(target)?;
                     if matches!(
                         target_read.kind().known(),
                         Some(K::PropertyAccessExpression | K::ElementAccessExpression)
@@ -286,8 +275,8 @@ impl CheckerState {
                         }
                     }
                 }
-                let source_read = self.ast(source)?.node(source)?;
-                let target_read = self.ast(target)?.node(target)?;
+                let source_read = self.node(source)?;
+                let target_read = self.node(target)?;
                 if let (Some(source_data), Some(target_data)) = (
                     source_read.data_source().as_element_access_expression(),
                     target_read.data_source().as_element_access_expression(),
@@ -297,8 +286,8 @@ impl CheckerState {
                     let target_arg =
                         required(target_data.argument_expression(), "target element argument")?;
                     let target_base = required(target_read.expression(), "target element base")?;
-                    if self.ast(source_arg)?.node(source_arg)?.kind() == K::Identifier
-                        && self.ast(target_arg)?.node(target_arg)?.kind() == K::Identifier
+                    if self.node(source_arg)?.kind() == K::Identifier
+                        && self.node(target_arg)?.kind() == K::Identifier
                     {
                         let symbol = self.resolved_value_symbol(source_arg)?;
                         if symbol == self.resolved_value_symbol(target_arg)?
@@ -319,15 +308,14 @@ impl CheckerState {
                     .ok_or(ts_arena::Error::InvalidGraph)?;
                 let left = required(data.left(), "qualified left")?;
                 let right = required(data.right(), "qualified right")?;
-                let target_read = self.ast(target)?.node(target)?;
+                let target_read = self.node(target)?;
                 if matches!(
                     target_read.kind().known(),
                     Some(K::PropertyAccessExpression | K::ElementAccessExpression)
                 ) {
                     let target_base = required(target_read.expression(), "qualified target base")?;
                     if let Some(name) = self.flow_property_name(target)? {
-                        return Ok(self.ast(right)?.node_text(right)?.as_bytes()
-                            == name.as_bytes()
+                        return Ok(self.node_text(right)?.as_bytes() == name.as_bytes()
                             && self.matching_reference(left, target_base)?);
                     }
                 }
@@ -352,11 +340,11 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getAccessedPropertyName
     // port: tsc/internal/checker/flow.go:Checker.tryGetElementAccessExpressionName
     pub(crate) fn flow_property_name(&mut self, access: NodeId) -> Result<Option<JsString>, Error> {
-        let read = self.ast(access)?.node(access)?;
+        let read = self.node(access)?;
         match read.kind().known() {
             Some(K::PropertyAccessExpression) => {
                 let name = required(read.name(), "accessed property name")?;
-                Ok(Some(self.ast(name)?.node_text(name)?.into_js_string()))
+                Ok(Some(self.node_text(name)?.into_js_string()))
             }
             Some(K::ElementAccessExpression) => {
                 let data = read
@@ -364,14 +352,12 @@ impl CheckerState {
                     .as_element_access_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?;
                 let argument = required(data.argument_expression(), "element name argument")?;
-                let read = self.ast(argument)?.node(argument)?;
+                let read = self.node(argument)?;
                 if matches!(
                     read.kind().known(),
                     Some(K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral)
                 ) {
-                    return Ok(Some(
-                        self.ast(argument)?.node_text(argument)?.into_js_string(),
-                    ));
+                    return Ok(Some(self.node_text(argument)?.into_js_string()));
                 }
                 if ts_ast::is_entity_name_expression(self.ast(argument)?, argument)? {
                     let Some(symbol) = self.resolve_entity_name(argument, sf::VALUE, true)? else {
@@ -388,8 +374,7 @@ impl CheckerState {
             Some(K::BindingElement) => self.destructuring_property_name(access),
             Some(K::Parameter) => {
                 let parent = required(read.parent(), "parameter parent")?;
-                let parameters =
-                    self.source_list(parent, self.ast(parent)?.node(parent)?.parameter_list())?;
+                let parameters = self.source_list(parent, self.node(parent)?.parameter_list())?;
                 let index = parameters
                     .iter()
                     .position(|&p| p == access)
@@ -408,14 +393,14 @@ impl CheckerState {
         let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
             return Ok(None);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         if let Some(annotation) = read.type_node() {
             let ty = self.get_type_from_type_node(annotation)?;
             if let Some(name) = self.index_property_name(ty)? {
                 return Ok(Some(name));
             }
         }
-        let kind = self.ast(declaration)?.node(declaration)?.kind();
+        let kind = self.node(declaration)?.kind();
         let has_expression_initializer = matches!(
             kind.known(),
             Some(
@@ -431,7 +416,7 @@ impl CheckerState {
             && kind != K::BindingElement
             && self.name_declared_before_use(declaration, node)?
         {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if let Some(initializer) = read.initializer() {
                 let ty = self.get_type_of_expression(initializer)?;
                 return self.index_property_name(ty);

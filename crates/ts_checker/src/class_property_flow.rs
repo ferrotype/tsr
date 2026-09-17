@@ -28,7 +28,7 @@ impl CheckerState {
         end: i32,
     ) -> Result<bool, Error> {
         for &block in blocks {
-            let pos = self.ast(block)?.node(block)?.pos();
+            let pos = self.node(block)?.pos();
             if pos >= start && pos <= end {
                 let initial = self.get_union_type(&[ty, self.builtins.undefined_type])?;
                 let flow =
@@ -63,7 +63,7 @@ impl CheckerState {
         for &container in containers {
             let mut initial = self.builtins.undefined_type;
             if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 let options = self.program()?.host.options();
                 let auto = read.kind() == K::PropertyDeclaration
                     && read.type_node().is_none()
@@ -148,8 +148,7 @@ impl CheckerState {
         };
         self.retain_flow_source(container)?;
         let this = self.factory.new_keyword_expression(K::ThisKeyword.into());
-        let reference = if computed && self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName
-        {
+        let reference = if computed && self.node(name)?.kind() == K::ComputedPropertyName {
             let expression = self
                 .ast(name)?
                 .node(name)?

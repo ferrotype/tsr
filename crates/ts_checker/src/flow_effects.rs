@@ -21,7 +21,7 @@ impl CheckerState {
         call: NodeId,
         _signature: SignatureId,
     ) -> Result<(), Error> {
-        let expression = required(self.ast(call)?.node(call)?.expression(), "assertion callee")?;
+        let expression = required(self.node(call)?.expression(), "assertion callee")?;
         if !ts_ast::is_dotted_name(self.ast(expression)?, expression)? {
             self.error_at(Some(expression), ts_diagnostics::Assertions_require_the_call_target_to_be_an_identifier_or_qualified_name, vec![])?;
         } else if self.effects_signature(call)?.is_none() {
@@ -33,16 +33,16 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getExplicitThisType
     fn explicit_flow_this_type(&mut self, node: NodeId) -> Result<Option<TypeId>, Error> {
         let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
-        let read = self.ast(container)?.node(container)?;
+        let read = self.node(container)?;
         if ts_ast::utilities::is_function_like(Some(&read)) {
             let signature = self.signature_from_declaration(container)?;
             if let Some(parameter) = self.signatures.get(signature)?.this_parameter {
                 return self.explicit_type_of_symbol(parameter);
             }
         }
-        if let Some(class) = self.ast(container)?.node(container)?.parent() {
+        if let Some(class) = self.node(container)?.parent() {
             if matches!(
-                self.ast(class)?.node(class)?.kind().known(),
+                self.node(class)?.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression)
             ) {
                 let symbol = required(
@@ -73,7 +73,7 @@ impl CheckerState {
     }
 
     fn effects_signature_worker(&mut self, node: NodeId) -> Result<Option<SignatureId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parent = read.parent();
         let binary_right = read
             .data_source()
@@ -86,7 +86,7 @@ impl CheckerState {
         };
         let optional = read.flags() & nf::OPTIONAL_CHAIN != 0;
         let expression_statement = match parent {
-            Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::ExpressionStatement,
+            Some(parent) => self.node(parent)?.kind() == K::ExpressionStatement,
             None => false,
         };
         let func_type = if binary_right.is_some() {
@@ -95,7 +95,7 @@ impl CheckerState {
             self.symbol_has_instance_method_of_object_type(right_type)?
         } else if expression_statement {
             self.type_of_dotted_name(expression)?
-        } else if self.ast(expression)?.node(expression)?.kind() == K::SuperKeyword {
+        } else if self.node(expression)?.kind() == K::SuperKeyword {
             None
         } else {
             let ty = self.check_expression(expression)?;
@@ -165,7 +165,7 @@ impl CheckerState {
         node: NodeId,
         diagnostic: Option<usize>,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::IN_WITH_STATEMENT != 0 {
             return Ok(None);
         }
@@ -189,8 +189,8 @@ impl CheckerState {
                 else {
                     return Ok(None);
                 };
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
-                let name = if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+                let text = self.node_text(name)?.into_js_string();
+                let name = if self.node(name)?.kind() == K::PrivateIdentifier {
                     let Some(symbol) = self.types.get(ty)?.symbol else {
                         return Ok(None);
                     };
@@ -258,7 +258,7 @@ impl CheckerState {
                     }
                 }
                 if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     let explicit = if matches!(
                         read.kind().known(),
                         Some(
@@ -271,7 +271,7 @@ impl CheckerState {
                         read.type_node().is_some()
                     } else if let Some(binary) = read.data_source().as_binary_expression() {
                         let right = required(binary.right(), "expando function")?;
-                        let right = self.ast(right)?.node(right)?;
+                        let right = self.node(right)?;
                         ts_ast::utilities::is_function_like(Some(&right))
                             && right.type_node().is_some()
                     } else {
@@ -282,12 +282,10 @@ impl CheckerState {
                     }
                     if read.kind() == K::VariableDeclaration {
                         let list = required(read.parent(), "explicit declaration list")?;
-                        let statement = required(
-                            self.ast(list)?.node(list)?.parent(),
-                            "explicit declaration statement",
-                        )?;
-                        if self.ast(statement)?.node(statement)?.kind() == K::ForOfStatement {
-                            let read = self.ast(statement)?.node(statement)?;
+                        let statement =
+                            required(self.node(list)?.parent(), "explicit declaration statement")?;
+                        if self.node(statement)?.kind() == K::ForOfStatement {
+                            let read = self.node(statement)?;
                             let data = read
                                 .data_source()
                                 .as_for_in_or_of_statement()
@@ -332,7 +330,7 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.isFalseExpression
     pub(crate) fn false_flow_expression(&self, expression: NodeId) -> Result<bool, Error> {
         let node = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::FalseKeyword {
             return Ok(true);
         }
@@ -363,8 +361,7 @@ impl CheckerState {
                 && data.parameter_index >= 0
             {
                 let index = data.parameter_index as usize;
-                let arguments =
-                    self.source_list(call, self.ast(call)?.node(call)?.argument_list())?;
+                let arguments = self.source_list(call, self.node(call)?.argument_list())?;
                 if let Some(&argument) = arguments.get(index) {
                     if self.false_flow_expression(argument)? {
                         return Ok(true);

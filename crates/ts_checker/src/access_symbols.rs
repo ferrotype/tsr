@@ -87,14 +87,12 @@ impl CheckerState {
             )? {
                 let class = ts_ast::utilities::get_containing_class(view, declaration)?
                     .ok_or(Error::MissingLink("private property class"))?;
-                return Ok(
-                    self.ast(node)?.node(node)?.flags() & nf::OPTIONAL_CHAIN == 0
-                        && ts_ast::utilities::is_node_descendant_of(
-                            self.ast(node)?,
-                            Some(node),
-                            Some(class),
-                        )?,
-                );
+                return Ok(self.node(node)?.flags() & nf::OPTIONAL_CHAIN == 0
+                    && ts_ast::utilities::is_node_descendant_of(
+                        self.ast(node)?,
+                        Some(node),
+                        Some(class),
+                    )?);
             }
         }
         self.check_access_property_accessibility(
@@ -309,7 +307,7 @@ impl CheckerState {
         node: NodeId,
     ) -> Result<Option<TypeId>, Error> {
         let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
-        let read = self.ast(container)?.node(container)?;
+        let read = self.node(container)?;
         if !ts_ast::utilities::is_function_like(Some(&read)) {
             return Ok(None);
         }
@@ -318,7 +316,7 @@ impl CheckerState {
         let mut ty = None;
         if let Some(parameter) = parameter {
             if let Some(declaration) = self.symbol(parameter)?.value_declaration() {
-                if let Some(annotation) = self.ast(declaration)?.node(declaration)?.type_node() {
+                if let Some(annotation) = self.node(declaration)?.type_node() {
                     ty = Some(self.get_type_from_type_node(annotation)?);
                 }
             }
@@ -347,7 +345,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isNodeUsedDuringClassInitialization
     fn access_used_during_class_initialization(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::PropertyDeclaration
                 || read.kind() == K::Constructor && read.body().is_some()
             {
@@ -403,7 +401,7 @@ impl CheckerState {
         if flags & sf::CLASS_MEMBER == 0 {
             return Ok(());
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let private = read.modifier_flags(self.ast(declaration)?)? & mf::PRIVATE != 0
             || read
                 .name()
@@ -428,7 +426,7 @@ impl CheckerState {
         if self_access {
             let mut current = node;
             while let Some(node) = current {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 // FindAncestor(node, IsFunctionLikeDeclaration): signatures and function types pass.
                 if ts_ast::utilities::is_function_like_declaration(Some(&read)) {
                     if self.get_symbol_of_declaration(node)? == Some(property) {
@@ -456,10 +454,10 @@ impl CheckerState {
         };
         let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("property access source"))?;
-        if self.ast(source)?.source_file(source)?.is_declaration_file {
+        if self.source_file_read(source)?.is_declaration_file {
             return Ok(());
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let optional = read.kind() == K::PropertyDeclaration
             && read.modifier_flags(self.ast(declaration)?)? & mf::ACCESSOR == 0
             && read.question_token(self.ast(declaration)?)?.is_some();
@@ -511,7 +509,7 @@ impl CheckerState {
             && !ambient
             && !self.name_declared_before_use(declaration, right)?
         {
-            let parent = self.ast(node)?.node(node)?.parent();
+            let parent = self.node(node)?.parent();
             if !parent
                 .map(|parent| {
                     self.ast(parent)?
@@ -526,7 +524,7 @@ impl CheckerState {
             }
         }
         if let Some(message) = message {
-            let name = self.ast(right)?.node_text(right)?.into_js_string();
+            let name = self.node_text(right)?.into_js_string();
             let mut diagnostic =
                 self.diagnostic_for_node(Some(right), message, vec![name.clone()])?;
             diagnostic
@@ -544,13 +542,13 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isInPropertyInitializerOrClassStaticBlock
     fn access_in_property_initializer(&self, mut node: NodeId) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::PropertyDeclaration | K::ClassStaticBlockDeclaration) => return Ok(true),
                 Some(K::TypeQuery | K::JsxClosingElement | K::ArrowFunction) => return Ok(false),
                 Some(K::Block) => {
                     if let Some(parent) = read.parent() {
-                        let parent = self.ast(parent)?.node(parent)?;
+                        let parent = self.node(parent)?;
                         if ts_ast::utilities::is_function_like(Some(&parent))
                             && parent.kind() != K::ArrowFunction
                         {
