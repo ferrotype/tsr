@@ -279,9 +279,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:tryGetPropertyAccessOrIdentifierToString
     fn index_receiver_text(&self, node: NodeId) -> Result<Option<Vec<u8>>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::Identifier {
-            return Ok(Some(self.ast(node)?.node_text(node)?.as_bytes().to_vec()));
+            return Ok(Some(self.node_text(node)?.as_bytes().to_vec()));
         }
         if matches!(
             read.kind().known(),
@@ -299,7 +299,7 @@ impl CheckerState {
                     .as_element_access_expression()
                     .and_then(|data| data.argument_expression())
                     .ok_or(Error::MissingLink("suggestion index"))?;
-                if !ts_ast::utilities::is_property_name(&self.ast(name)?.node(name)?) {
+                if !ts_ast::utilities::is_property_name(&self.node(name)?) {
                     return Ok(None);
                 }
                 name
@@ -327,21 +327,21 @@ impl CheckerState {
                 .as_bytes()
                 .to_vec();
             text.push(b':');
-            text.extend(self.ast(name)?.node_text(name)?.as_bytes());
+            text.extend(self.node_text(name)?.as_bytes());
             return Ok(Some(text));
         }
         Ok(None)
     }
     // port: tsc/internal/ast/utilities.go:GetPropertyNameForPropertyNameNode
     pub(crate) fn index_property_name_node(&self, node: NodeId) -> Result<JsString, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::ComputedPropertyName {
-            return Ok(self.ast(node)?.node_text(node)?.into_js_string());
+            return Ok(self.node_text(node)?.into_js_string());
         }
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("computed property expression"))?;
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
             Some(
@@ -360,14 +360,14 @@ impl CheckerState {
             let operand = data
                 .operand()
                 .ok_or(Error::MissingLink("signed property operand"))?;
-            if self.ast(operand)?.node(operand)?.kind() == K::NumericLiteral
+            if self.node(operand)?.kind() == K::NumericLiteral
                 && matches!(data.operator().known(), Some(K::PlusToken | K::MinusToken))
             {
                 let mut text = Vec::new();
                 if data.operator() == K::MinusToken {
                     text.push(b'-');
                 }
-                text.extend(self.ast(operand)?.node_text(operand)?.as_bytes());
+                text.extend(self.node_text(operand)?.as_bytes());
                 return Ok(JsString::from_bytes(text));
             }
         }

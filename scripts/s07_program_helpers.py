@@ -7,6 +7,10 @@ from s06_protocol import canonical, exact_keys, sha256
 from s06_utilities import setup, invoke, test_inventory, test_result
 from s07_program_compare import ROOT
 
+# A cold optimized compiler build is not an individual helper observation.
+# Leave source checks, inventory listing and each test on their 300s budget.
+BUILD_TIMEOUT_SECONDS = 30 * 60
+
 CHECKS = [
     ['scripts/s07_semver.py'], ['scripts/s07_packagejson.py'],
     ['scripts/s07_option_declarations.py'], ['scripts/s07_program.py', '--check'],
@@ -61,27 +65,30 @@ def preflight(directory):
                 or group['tests'] != sorted(set(group['tests']))
                 or any(type(name) is not str or not name.startswith(group['prefix']) for name in group['tests'])):
             raise ValueError('invalid program helper test obligation')
-    packages = sorted({group['package'] for group in groups})
-    args = ['cargo', 'test', '--locked', '--release', '--all-targets', '--no-run', '--message-format=json']
-    for package in packages:
-        args += ['--package', package]
-    output = setup(args, ROOT, directory/'build')
     wanted = {(group['package'], group['target']) for group in groups}
     binaries = {}
-    for line in output.splitlines():
-        row = strict_json_loads(line)
-        if row.get('reason') != 'compiler-artifact' or row.get('profile',{}).get('test') is not True or not row.get('executable'):
-            continue
-        target = row['target']
-        if target['kind'] not in (['lib'], ['test']):
-            continue
-        package = Path(row['manifest_path']).parent.name
-        key = (package, 'lib' if target['kind'] == ['lib'] else target['name'])
-        if key not in wanted:
-            continue
-        if key in binaries:
-            raise ValueError('duplicate native program helper test binary')
-        binaries[key] = row['executable']
+    for package in sorted({package for package, _ in wanted}):
+        args = ['cargo', 'test', '--locked', '--release', '--no-run', '--message-format=json', '--package', package]
+        # Cargo target selectors apply across all selected packages. Build each
+        # package's exact targets so unrelated tests and benchmark examples are
+        # not linked and target names need not exist in every package.
+        for target in sorted(target for owner, target in wanted if owner == package):
+            args += ['--lib'] if target == 'lib' else ['--test', target]
+        output = setup(args, ROOT, directory/f'build-{package}', timeout=BUILD_TIMEOUT_SECONDS)
+        for line in output.splitlines():
+            row = strict_json_loads(line)
+            if row.get('reason') != 'compiler-artifact' or row.get('profile',{}).get('test') is not True or not row.get('executable'):
+                continue
+            target = row['target']
+            if target['kind'] not in (['lib'], ['test']):
+                continue
+            owner = Path(row['manifest_path']).parent.name
+            key = (owner, 'lib' if target['kind'] == ['lib'] else target['name'])
+            if key not in wanted:
+                continue
+            if key in binaries:
+                raise ValueError('duplicate native program helper test binary')
+            binaries[key] = row['executable']
     if set(binaries) != wanted:
         raise ValueError('missing native program helper test binary')
     inventories = {key: setup([binary,'--list','--format=terse'], ROOT, directory/('-'.join(key)+'-inventory')) for key,binary in binaries.items()}

@@ -57,7 +57,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkObjectLiteral
     pub(crate) fn check_object_literal(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let properties = self.source_list(node, self.ast(node)?.node(node)?.property_list())?;
+        let properties = self.source_list(node, self.node(node)?.property_list())?;
         let symbol = self.get_symbol_of_declaration(node)?;
         if properties.is_empty() {
             if let Some(symbol) = symbol {
@@ -65,7 +65,7 @@ impl CheckerState {
                     if !self.table(exports)?.is_empty() {
                         let result =
                             self.new_anonymous_type(Some(symbol), Some(exports), &[], &[], &[])?;
-                        let flags = self.ast(node)?.node(node)?.flags();
+                        let flags = self.node(node)?.flags();
                         if flags & nf::JAVA_SCRIPT_FILE != 0 && flags & nf::JSON_FILE == 0 {
                             self.types.get_mut(result)?.object_flags |= of::JS_LITERAL;
                         }
@@ -125,19 +125,19 @@ impl CheckerState {
         let mut all = SymbolTable::default();
         let mut spread = self.builtins.empty_object_type;
         for &declaration in properties {
-            if let Some(name) = self.ast(declaration)?.node(declaration)?.name() {
-                if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            if let Some(name) = self.node(declaration)?.name() {
+                if self.node(name)?.kind() == K::ComputedPropertyName {
                     self.check_computed_property_name(name)?;
                 }
             }
         }
         for &declaration in properties {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             let kind = read.kind();
             let name = read.name();
             let mut member = self.get_symbol_of_declaration(declaration)?;
             let computed = match name {
-                Some(name) if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName => {
+                Some(name) if self.node(name)?.kind() == K::ComputedPropertyName => {
                     Some(self.check_computed_property_name(name)?)
                 }
                 _ => None,
@@ -230,8 +230,7 @@ impl CheckerState {
                         .call_inference_at_node(node)?
                         .ok_or(Error::MissingLink("object inference context"))?;
                     let site = if kind == K::PropertyAssignment {
-                        self.ast(declaration)?
-                            .node(declaration)?
+                        self.node(declaration)?
                             .initializer()
                             .ok_or(Error::MissingLink("property initializer"))?
                     } else {
@@ -384,7 +383,7 @@ impl CheckerState {
         }
         let members = self.alloc_symbol_table(std::mem::take(&mut chunk.members));
         let result = self.new_anonymous_type(symbol, Some(members), &[], &[], &indices)?;
-        let flags = self.ast(node)?.node(node)?.flags();
+        let flags = self.node(node)?.flags();
         self.types.get_mut(result)?.object_flags |= chunk.flags
             | of::OBJECT_LITERAL
             | of::CONTAINS_OBJECT_OR_ARRAY_LITERAL
@@ -408,7 +407,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.hasDefaultValue
     fn object_member_has_default(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::BindingElement) => Ok(read.initializer().is_some()),
             Some(K::PropertyAssignment) => self.object_member_has_default(
@@ -457,14 +456,14 @@ impl CheckerState {
         node: NodeId,
         mode: u32,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read.name();
         let initializer = read
             .initializer()
             .ok_or(Error::MissingLink("property initializer"))?;
         let annotation = read.type_node();
         if let Some(name) = name {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 self.check_computed_property_name(name)?;
             }
         }
@@ -490,7 +489,7 @@ impl CheckerState {
         destructuring: bool,
         mode: u32,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let annotation = read.type_node();
         let initializer = read
             .data_source()
@@ -518,8 +517,8 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkObjectLiteralMethod
     pub(crate) fn check_object_literal_method(&mut self, node: NodeId) -> Result<TypeId, Error> {
         self.check_object_method_grammar(node)?;
-        if let Some(name) = self.ast(node)?.node(node)?.name() {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+        if let Some(name) = self.node(node)?.name() {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 self.check_computed_property_name(name)?;
             }
         }
@@ -566,10 +565,10 @@ impl CheckerState {
         let Some(ty) = self.apparent_contextual_expression_type(node)? else {
             return Ok(());
         };
-        for property in self.source_list(node, self.ast(node)?.node(node)?.property_list())? {
-            if let Some(name) = self.ast(property)?.node(property)?.name() {
-                if self.ast(name)?.node(name)?.kind() != K::ComputedPropertyName {
-                    let text = self.ast(name)?.node_text(name)?.into_js_string();
+        for property in self.source_list(node, self.node(node)?.property_list())? {
+            if let Some(name) = self.node(property)?.name() {
+                if self.node(name)?.kind() != K::ComputedPropertyName {
+                    let text = self.node_text(name)?.into_js_string();
                     // port: tsc/internal/checker/checker.go:Checker.checkDeprecatedProperty
                     if let Some(symbol) = self.constituent_property(ty, text.as_bytes(), false)? {
                         if !self.symbol_declarations(symbol)?.is_empty()

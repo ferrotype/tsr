@@ -20,7 +20,7 @@ impl CheckerState {
         function: NodeId,
         mode: u32,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let Some(body) = read.body() else {
             return Ok(self.builtins.error_type);
         };
@@ -28,7 +28,7 @@ impl CheckerState {
         if is_generator {
             return self.generator_return_type_from_body(function, body, mode, is_async);
         }
-        let mut return_type = if self.ast(body)?.node(body)?.kind() == K::Block {
+        let mut return_type = if self.node(body)?.kind() == K::Block {
             let (types, never_returning) =
                 self.aggregate_return_expression_types(function, body, mode)?;
             if never_returning {
@@ -156,10 +156,8 @@ impl CheckerState {
         ty: TypeId,
     ) -> Result<TypeId, Error> {
         let promise = self.create_promise_type(ty)?;
-        let import = crate::external_resolution::is_import_call(
-            self.ast(function)?,
-            &self.ast(function)?.node(function)?,
-        )?;
+        let import =
+            crate::external_resolution::is_import_call(self.ast(function)?, &self.node(function)?)?;
         if promise == self.builtins.unknown_type {
             self.error_at(Some(function), if import { ts_diagnostics::A_dynamic_import_call_returns_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option } else { ts_diagnostics::An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option }, vec![])?;
             return Ok(self.builtins.error_type);
@@ -223,16 +221,14 @@ impl CheckerState {
         let mut has_empty_return = self.function_has_implicit_return(function)?;
         let mut has_never_return = false;
         for statement in self.return_statements(body)? {
-            let Some(expression) = self.ast(statement)?.node(statement)?.expression() else {
+            let Some(expression) = self.node(statement)?.expression() else {
                 has_empty_return = true;
                 continue;
             };
             let mut expression = self.skip_return_parentheses(expression)?;
-            if asynchronous && self.ast(expression)?.node(expression)?.kind() == K::AwaitExpression
-            {
+            if asynchronous && self.node(expression)?.kind() == K::AwaitExpression {
                 expression = self.skip_return_parentheses(
-                    self.ast(expression)?
-                        .node(expression)?
+                    self.node(expression)?
                         .expression()
                         .ok_or(Error::MissingLink("awaited recursive return"))?,
                 )?;
@@ -276,7 +272,7 @@ impl CheckerState {
         let mut stack = vec![body];
         let mut returns = Vec::new();
         while let Some(node) = stack.pop() {
-            match self.ast(node)?.node(node)?.kind().known() {
+            match self.node(node)?.kind().known() {
                 Some(K::ReturnStatement) => returns.push(node),
                 Some(
                     K::CaseBlock
@@ -303,13 +299,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:mayReturnNever
     fn may_return_never(&self, function: NodeId) -> Result<bool, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         Ok(match read.kind().known() {
             Some(K::FunctionExpression | K::ArrowFunction) => true,
             Some(K::MethodDeclaration) => match read.parent() {
-                Some(parent) => {
-                    self.ast(parent)?.node(parent)?.kind() == K::ObjectLiteralExpression
-                }
+                Some(parent) => self.node(parent)?.kind() == K::ObjectLiteralExpression,
                 None => false,
             },
             _ => false,
@@ -347,7 +341,7 @@ impl CheckerState {
 
     fn skip_return_parentheses(&self, mut expression: NodeId) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(expression)?.node(expression)?;
+            let read = self.node(expression)?;
             if read.kind() != K::ParenthesizedExpression {
                 return Ok(expression);
             }
@@ -362,14 +356,14 @@ impl CheckerState {
         function: NodeId,
         expression: NodeId,
     ) -> Result<bool, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if read.kind() != K::CallExpression {
             return Ok(false);
         }
         let callee = read
             .expression()
             .ok_or(Error::MissingLink("return call target"))?;
-        if self.ast(callee)?.node(callee)?.kind() != K::Identifier {
+        if self.node(callee)?.kind() != K::Identifier {
             return Ok(false);
         }
         let callee_type = self.check_expression_cached(callee)?;
@@ -383,7 +377,7 @@ impl CheckerState {
         }
         if let Some(value) = self.symbol(function_symbol)?.value_declaration() {
             if matches!(
-                self.ast(value)?.node(value)?.kind().known(),
+                self.node(value)?.kind().known(),
                 Some(K::FunctionExpression | K::ArrowFunction)
             ) {
                 return self.constant_flow_reference(callee);
@@ -510,9 +504,9 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:GetContainingFunction
     pub(crate) fn containing_body_function(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if ts_ast::utilities::is_function_like(Some(&read)) {
                 return Ok(Some(node));
             }
@@ -526,7 +520,7 @@ impl CheckerState {
         &mut self,
         function: NodeId,
     ) -> Result<Option<SignatureId>, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let method = read.kind() == K::MethodDeclaration
             && read
                 .parent()
@@ -606,10 +600,7 @@ impl CheckerState {
         ty: TypeId,
     ) -> Result<Option<SignatureId>, Error> {
         let signatures = self.signatures_of_type(ty, false)?;
-        let parameters = self.source_list(
-            function,
-            self.ast(function)?.node(function)?.parameter_list(),
-        )?;
+        let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
         let mut minimum: isize = 0;
         for parameter in &parameters {
             let read = self.ast(*parameter)?.node(*parameter)?;
@@ -627,9 +618,9 @@ impl CheckerState {
             minimum += 1;
         }
         if let Some(&first) = parameters.first() {
-            if let Some(name) = self.ast(first)?.node(first)?.name() {
-                if self.ast(name)?.node(name)?.kind() == K::Identifier
-                    && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+            if let Some(name) = self.node(first)?.name() {
+                if self.node(name)?.kind() == K::Identifier
+                    && self.node_text(name)?.as_bytes() == b"this"
                 {
                     minimum -= 1;
                 }
@@ -688,7 +679,7 @@ impl CheckerState {
         &mut self,
         function: NodeId,
     ) -> Result<Option<TypePredicateId>, Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         if matches!(
             read.kind().known(),
             Some(K::Constructor | K::GetAccessor | K::SetAccessor)
@@ -701,7 +692,7 @@ impl CheckerState {
         if self.body_function_flags(function)? != (false, false) {
             return Ok(None);
         }
-        let expression = if self.ast(body)?.node(body)?.kind() == K::Block {
+        let expression = if self.node(body)?.kind() == K::Block {
             let returns = self.return_statements(body)?;
             if returns.len() != 1 || self.function_has_implicit_return(function)? {
                 return Ok(None);
@@ -727,16 +718,13 @@ impl CheckerState {
         if self.types.flags(return_type)? & tf::BOOLEAN == 0 {
             return Ok(None);
         }
-        let parameters = self.source_list(
-            function,
-            self.ast(function)?.node(function)?.parameter_list(),
-        )?;
+        let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
         for (index, parameter) in parameters.into_iter().enumerate() {
             let symbol = self
                 .get_symbol_of_declaration(parameter)?
                 .ok_or(Error::MissingLink("predicate parameter symbol"))?;
             let initial = self.get_type_of_symbol(symbol)?;
-            let read = self.ast(parameter)?.node(parameter)?;
+            let read = self.node(parameter)?;
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("predicate parameter name"))?;
@@ -747,7 +735,7 @@ impl CheckerState {
                 .dot_dot_dot_token()
                 .is_some();
             if self.types.flags(initial)? & tf::BOOLEAN != 0
-                || self.ast(name)?.node(name)?.kind() != K::Identifier
+                || self.node(name)?.kind() != K::Identifier
                 || self.is_symbol_assigned(symbol)?
                 || rest
             {
@@ -756,7 +744,7 @@ impl CheckerState {
             if let Some(ty) =
                 self.expression_refines_parameter(function, expression, name, initial)?
             {
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
+                let text = self.node_text(name)?.into_js_string();
                 return self
                     .signatures
                     .new_type_predicate(crate::signatures::TypePredicate {

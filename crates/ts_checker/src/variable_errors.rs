@@ -12,7 +12,7 @@ impl CheckerState {
         symbol: ts_arena::SymbolId,
     ) -> Result<TypeId, Error> {
         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.type_node().is_some() {
                 let name = self.symbol_to_string(symbol)?;
                 self.error_at(Some(declaration), ts_diagnostics::X_0_is_referenced_directly_or_indirectly_in_its_own_type_annotation, vec![name])?;
@@ -54,7 +54,7 @@ impl CheckerState {
             .strict_option_value(self.program()?.host.options().no_implicit_any);
         let widened = self.widened_type(ty)?;
         let display = self.type_to_string(widened, crate::type_display::DEFAULT_FLAGS)?;
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let kind = read.kind();
         let name = ts_ast::get_name_of_declaration(self.ast(declaration)?, Some(declaration))?;
         let spelling = ts_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
@@ -77,20 +77,18 @@ impl CheckerState {
                     .parent()
                     .ok_or(Error::MissingLink("implicit parameter parent"))?;
                 if let Some(name) = name {
-                    let read = self.ast(name)?.node(name)?;
+                    let read = self.node(name)?;
                     if read.kind() == K::Identifier
                         && matches!(
-                            self.ast(parent)?.node(parent)?.kind().known(),
+                            self.node(parent)?.kind().known(),
                             Some(K::CallSignature | K::MethodSignature | K::FunctionType)
                         )
                     {
-                        let parameters = self.source_list(
-                            parent,
-                            self.ast(parent)?.node(parent)?.parameter_list(),
-                        )?;
+                        let parameters =
+                            self.source_list(parent, self.node(parent)?.parameter_list())?;
                         if let Some(index) = parameters.iter().position(|&node| node == declaration)
                         {
-                            let text = self.ast(name)?.node_text(name)?.into_js_string();
+                            let text = self.node_text(name)?.into_js_string();
                             let keyword =
                                 ts_scanner::identifier_to_keyword_kind(&ts_ast::IdentifierData {
                                     text: text.clone(),
@@ -224,7 +222,7 @@ impl CheckerState {
                             .get_symbol_of_declaration(declaration)?
                             .ok_or(Error::MissingLink("widening property symbol"))?;
                         if let Some(value) = self.symbol(original)?.value_declaration() {
-                            if self.ast(value)?.node(value)?.parent() == owner {
+                            if self.node(value)?.parent() == owner {
                                 let name = self.symbol_to_string(property)?;
                                 let widened = self.widened_type(property_type)?;
                                 let display = self

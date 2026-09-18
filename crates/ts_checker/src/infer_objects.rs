@@ -133,10 +133,8 @@ impl CheckerState {
             let name = read.name_to_owned();
             if self.property_modifiers(property)? & ts_ast::modifier_flags::STATIC != 0 {
                 if let Some(node) = read.value_declaration() {
-                    if let Some(name) = self.ast(node)?.node(node)?.name() {
-                        if self.ast(name)?.node(name)?.kind()
-                            == ts_ast::SyntaxKind::PrivateIdentifier
-                        {
+                    if let Some(name) = self.node(node)?.name() {
+                        if self.node(name)?.kind() == ts_ast::SyntaxKind::PrivateIdentifier {
                             continue;
                         }
                     }

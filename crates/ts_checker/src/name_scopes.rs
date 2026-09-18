@@ -29,7 +29,7 @@ impl CheckerState {
             }
         }
         let declaration = declaration.ok_or(Error::MissingLink("block-scoped declaration"))?;
-        if self.ast(declaration)?.node(declaration)?.flags() & nf::AMBIENT != 0
+        if self.node(declaration)?.flags() & nf::AMBIENT != 0
             || self.name_declared_before_use(declaration, usage)?
         {
             return Ok(());
@@ -47,7 +47,7 @@ impl CheckerState {
         if let Some(message) = message {
             let name = ts_scanner::declaration_name_to_string(
                 self.ast(declaration)?,
-                self.ast(declaration)?.node(declaration)?.name(),
+                self.node(declaration)?.name(),
             )?;
             let mut diagnostic =
                 self.diagnostic_for_node(Some(usage), message, vec![name.clone()])?;
@@ -65,12 +65,12 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isInAmbientOrTypeNode
     pub(crate) fn in_ambient_or_type_node(&self, node: NodeId) -> Result<bool, Error> {
-        if self.ast(node)?.node(node)?.flags() & nf::AMBIENT != 0 {
+        if self.node(node)?.flags() & nf::AMBIENT != 0 {
             return Ok(true);
         }
         let mut ancestor = Some(node);
         while let Some(node) = ancestor {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -91,7 +91,7 @@ impl CheckerState {
     pub(crate) fn in_type_query(&self, node: NodeId) -> Result<bool, Error> {
         let mut ancestor = Some(node);
         while let Some(node) = ancestor {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::TypeQuery {
                 return Ok(true);
             }
@@ -114,13 +114,13 @@ impl CheckerState {
         let used_file = ast::get_source_file_of_node(self.ast(usage)?, Some(usage))?;
         let scope = self.declaration_block_scope(declaration)?;
         if declared_file != used_file
-            || self.ast(usage)?.node(usage)?.flags() & nf::JS_DOC != 0
+            || self.node(usage)?.flags() & nf::JS_DOC != 0
             || self.in_type_query(usage)?
             || self.in_ambient_or_type_node(usage)?
         {
             return Ok(true);
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let kind = read.kind();
         let property = kind == K::PropertyDeclaration;
         let property_without_initializer =
@@ -137,7 +137,7 @@ impl CheckerState {
             } else {
                 false
             };
-        if read.pos() <= self.ast(usage)?.node(usage)?.pos() && !property_without_initializer {
+        if read.pos() <= self.node(usage)?.pos() && !property_without_initializer {
             match kind.known() {
                 Some(K::BindingElement) => {
                     let view = self.ast(usage)?;
@@ -152,8 +152,7 @@ impl CheckerState {
                             K::BindingElement.into(),
                         )?;
                         return Ok(left != right
-                            || self.ast(declaration)?.node(declaration)?.pos()
-                                < self.ast(element)?.node(element)?.pos());
+                            || self.node(declaration)?.pos() < self.node(element)?.pos());
                     }
                     let root = ast::find_ancestor_kind(
                         self.ast(declaration)?,
@@ -172,7 +171,7 @@ impl CheckerState {
                         .node(parent)?
                         .parent()
                         .ok_or(Error::MissingLink("declaration statement"))?;
-                    let kind = self.ast(statement)?.node(statement)?.kind();
+                    let kind = self.node(statement)?.kind();
                     if matches!(
                         kind.known(),
                         Some(K::VariableStatement | K::ForStatement | K::ForOfStatement)
@@ -183,7 +182,7 @@ impl CheckerState {
                     if matches!(kind.known(), Some(K::ForInStatement | K::ForOfStatement))
                         && self.same_scope_descendant(
                             usage,
-                            self.ast(statement)?.node(statement)?.expression(),
+                            self.node(statement)?.expression(),
                             scope,
                         )?
                     {
@@ -222,8 +221,8 @@ impl CheckerState {
             }
             return Ok(true);
         }
-        if let Some(parent) = self.ast(usage)?.node(usage)?.parent() {
-            let read = self.ast(parent)?.node(parent)?;
+        if let Some(parent) = self.node(usage)?.parent() {
+            let read = self.node(parent)?;
             if read.kind() == K::ExportSpecifier
                 || read
                     .data_source()
@@ -243,7 +242,7 @@ impl CheckerState {
             return Ok(true);
         }
         if self.used_in_function_or_instance_property(usage, declaration, scope)? {
-            let parent = self.ast(declaration)?.node(declaration)?.parent();
+            let parent = self.node(declaration)?.parent();
             let parameter_property = parent
                 .map(|parent| {
                     ast::is_parameter_property_declaration(
@@ -269,9 +268,9 @@ impl CheckerState {
     // port: tsc/internal/ast/utilities.go:GetEnclosingBlockScopeContainer
     // port: tsc/internal/ast/utilities.go:IsBlockScope
     fn declaration_block_scope(&self, node: NodeId) -> Result<NodeId, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(
                     K::SourceFile
@@ -293,7 +292,7 @@ impl CheckerState {
                 ) => return Ok(node),
                 Some(K::Block) => {
                     let parent = read.parent().ok_or(Error::MissingLink("block parent"))?;
-                    let parent = self.ast(parent)?.node(parent)?;
+                    let parent = self.node(parent)?;
                     if !ast::is_function_like(Some(&parent))
                         && parent.kind() != K::ClassStaticBlockDeclaration
                     {
@@ -310,17 +309,17 @@ impl CheckerState {
         Ok(ast::get_containing_class(self.ast(node)?, node)?)
     }
     fn usage_is_this_property(&self, usage: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(usage)?.node(usage)?.parent() else {
+        let Some(parent) = self.node(usage)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if read.kind() != K::PropertyAccessExpression {
             return Ok(false);
         }
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("this property receiver"))?;
-        Ok(self.ast(expression)?.node(expression)?.kind() == K::ThisKeyword)
+        Ok(self.node(expression)?.kind() == K::ThisKeyword)
     }
     fn class_name_before_use(&self, declaration: NodeId, usage: NodeId) -> Result<bool, Error> {
         let legacy = self
@@ -334,9 +333,9 @@ impl CheckerState {
             if node == declaration {
                 return Ok(true);
             }
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if let Some(parent) = read.parent() {
-                let parent_read = self.ast(parent)?.node(parent)?;
+                let parent_read = self.node(parent)?;
                 let grandparent = parent_read.parent();
                 if read.kind() == K::ComputedPropertyName && grandparent == Some(declaration) {
                     return Ok(false);
@@ -367,7 +366,7 @@ impl CheckerState {
                             if current == node {
                                 return Ok(false);
                             }
-                            let read = self.ast(current)?.node(current)?;
+                            let read = self.node(current)?;
                             if ast::is_function_like(Some(&read))
                                 && ts_ast::get_immediately_invoked_function_expression(
                                     self.ast(current)?,
@@ -403,7 +402,7 @@ impl CheckerState {
             if node == parent {
                 return Ok(true);
             }
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if node == stop
                 || ast::is_function_like(Some(&read))
                     && (ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
@@ -424,7 +423,7 @@ impl CheckerState {
         usage: NodeId,
         stop_at_any: bool,
     ) -> Result<bool, Error> {
-        if self.ast(usage)?.node(usage)?.end() > self.ast(declaration)?.node(declaration)?.end() {
+        if self.node(usage)?.end() > self.node(declaration)?.end() {
             return Ok(false);
         }
         let mut ancestor = Some(usage);
@@ -432,14 +431,14 @@ impl CheckerState {
             if node == declaration {
                 break;
             }
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ArrowFunction) => return Ok(false),
                 Some(K::PropertyDeclaration) => {
                     if !stop_at_any {
                         return Ok(false);
                     }
-                    let declared = self.ast(declaration)?.node(declaration)?;
+                    let declared = self.node(declaration)?;
                     let parent = declared
                         .parent()
                         .ok_or(Error::MissingLink("property declaration parent"))?;
@@ -449,12 +448,12 @@ impl CheckerState {
                             self.ast(declaration)?,
                             declaration,
                             parent,
-                        )? && read.parent() == self.ast(parent)?.node(parent)?.parent());
+                        )? && read.parent() == self.node(parent)?.parent());
                 }
                 Some(K::Block) => {
                     if let Some(parent) = read.parent() {
                         if matches!(
-                            self.ast(parent)?.node(parent)?.kind().known(),
+                            self.node(parent)?.kind().known(),
                             Some(K::MethodDeclaration | K::GetAccessor | K::SetAccessor)
                         ) {
                             return Ok(false);
@@ -480,7 +479,7 @@ impl CheckerState {
             if node == scope {
                 return Ok(false);
             }
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if ast::is_function_like(Some(&read))
                 && ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
                     .is_none()
@@ -488,16 +487,15 @@ impl CheckerState {
                 return Ok(true);
             }
             if read.kind() == K::ClassStaticBlockDeclaration {
-                return Ok(self.ast(declaration)?.node(declaration)?.pos()
-                    < self.ast(usage)?.node(usage)?.pos());
+                return Ok(self.node(declaration)?.pos() < self.node(usage)?.pos());
             }
             let parent = read.parent();
             if let Some(parent) = parent {
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if read.kind() == K::PropertyDeclaration && read.initializer() == Some(node) {
                     if read.modifier_flags(self.ast(parent)?)? & ts_ast::modifier_flags::STATIC != 0
                     {
-                        let declared = self.ast(declaration)?.node(declaration)?;
+                        let declared = self.node(declaration)?;
                         if declared.kind() == K::MethodDeclaration {
                             return Ok(true);
                         }
@@ -512,48 +510,44 @@ impl CheckerState {
                                 .parent()
                                 .ok_or(Error::MissingLink("static property class"))?;
                             if matches!(
-                                self.ast(name)?.node(name)?.kind().known(),
+                                self.node(name)?.kind().known(),
                                 Some(K::Identifier | K::PrivateIdentifier)
                             ) {
                                 let symbol = self
                                     .get_symbol_of_declaration(declaration)?
                                     .ok_or(Error::MissingLink("static property symbol"))?;
                                 let ty = self.get_type_of_symbol(symbol)?;
-                                let blocks = self
-                                    .source_list(
-                                        class,
-                                        self.ast(class)?.node(class)?.member_list(),
-                                    )?
-                                    .into_iter()
-                                    .filter_map(|member| {
-                                        match self
-                                            .ast(member)
-                                            .and_then(|view| view.node(member).map_err(Error::from))
-                                        {
-                                            Ok(read)
-                                                if read.kind()
-                                                    == K::ClassStaticBlockDeclaration =>
-                                            {
-                                                Some(Ok(member))
+                                let blocks =
+                                    self.source_list(class, self.node(class)?.member_list())?
+                                        .into_iter()
+                                        .filter_map(|member| {
+                                            match self.ast(member).and_then(|view| {
+                                                view.node(member).map_err(Error::from)
+                                            }) {
+                                                Ok(read)
+                                                    if read.kind()
+                                                        == K::ClassStaticBlockDeclaration =>
+                                                {
+                                                    Some(Ok(member))
+                                                }
+                                                Ok(_) => None,
+                                                Err(error) => Some(Err(error)),
                                             }
-                                            Ok(_) => None,
-                                            Err(error) => Some(Err(error)),
-                                        }
-                                    })
-                                    .collect::<Result<Vec<_>, Error>>()?;
+                                        })
+                                        .collect::<Result<Vec<_>, Error>>()?;
                                 if self.property_initialized_in_static_blocks(
                                     name,
                                     ty,
                                     &blocks,
-                                    self.ast(class)?.node(class)?.pos(),
-                                    self.ast(node)?.node(node)?.pos(),
+                                    self.node(class)?.pos(),
+                                    self.node(node)?.pos(),
                                 )? {
                                     return Ok(true);
                                 }
                             }
                         }
                     } else {
-                        let declared = self.ast(declaration)?.node(declaration)?;
+                        let declared = self.node(declaration)?;
                         let instance = declared.kind() == K::PropertyDeclaration
                             && declared.modifier_flags(self.ast(declaration)?)?
                                 & ts_ast::modifier_flags::STATIC
@@ -566,10 +560,10 @@ impl CheckerState {
                         }
                     }
                 }
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if read.kind() == K::Decorator && read.expression() == Some(node) {
                     let decorated = read.parent().ok_or(Error::MissingLink("decorated node"))?;
-                    let decorated = self.ast(decorated)?.node(decorated)?;
+                    let decorated = self.node(decorated)?;
                     if matches!(
                         decorated.kind().known(),
                         Some(K::Parameter | K::MethodDeclaration)

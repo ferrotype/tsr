@@ -145,7 +145,7 @@ impl CheckerState {
         };
         match object {
             Some(object) => {
-                let name = self.ast(node)?.node_text(node)?.into_js_string();
+                let name = self.node_text(node)?.into_js_string();
                 self.constituent_property(object, name.as_bytes(), false)
             }
             None => Ok(None),
@@ -154,7 +154,7 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:TryGetClassImplementingOrExtendingHeritageClauseElement
     fn heritage_class(&self, node: NodeId) -> Result<Option<(NodeId, bool)>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if !matches!(
             read.kind().known(),
             Some(K::ExpressionWithTypeArguments | K::TypeReference)
@@ -164,7 +164,7 @@ impl CheckerState {
         let Some(parent) = read.parent() else {
             return Ok(None);
         };
-        let parent = self.ast(parent)?.node(parent)?;
+        let parent = self.node(parent)?;
         if parent.kind() != K::HeritageClause {
             return Ok(None);
         }
@@ -172,7 +172,7 @@ impl CheckerState {
             return Ok(None);
         };
         if !matches!(
-            self.ast(class)?.node(class)?.kind().known(),
+            self.node(class)?.kind().known(),
             Some(K::ClassDeclaration | K::ClassExpression)
         ) {
             return Ok(None);
@@ -193,11 +193,9 @@ impl CheckerState {
     }
 
     fn type_of_location_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::SourceFile
-            && !ts_ast::utilities::is_external_or_common_js_module(
-                &self.ast(node)?.source_file(node)?,
-            )
+            && !ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(node)?)
             || read.flags() & nf::IN_WITH_STATEMENT != 0
         {
             return Ok(self.builtins.error_type);
@@ -246,9 +244,7 @@ impl CheckerState {
         }
         if kind == K::Identifier {
             if let Some(parent) = parent {
-                if self.is_type_declaration(parent)?
-                    && self.ast(parent)?.node(parent)?.name() == Some(node)
-                {
+                if self.is_type_declaration(parent)? && self.node(parent)?.name() == Some(node) {
                     return match self.get_symbol_at_location(node)? {
                         Some(symbol) => self.get_declared_type_of_symbol(symbol),
                         None => Ok(self.builtins.error_type),
@@ -261,7 +257,7 @@ impl CheckerState {
                 .type_for_variable_like_raw(node, true, 0 /* CheckModeNormal */)?
                 .unwrap_or(self.builtins.error_type));
         }
-        if ts_ast::is_declaration(&self.ast(node)?.node(node)?) {
+        if ts_ast::is_declaration(&self.node(node)?) {
             return match self.get_symbol_of_declaration(node)? {
                 Some(symbol) => self.get_type_of_symbol(symbol),
                 None => Ok(self.builtins.error_type),
@@ -273,7 +269,7 @@ impl CheckerState {
                 None => Ok(self.builtins.error_type),
             };
         }
-        if ts_ast::utilities::is_binding_pattern(&self.ast(node)?.node(node)?) {
+        if ts_ast::utilities::is_binding_pattern(&self.node(node)?) {
             let parent = parent.ok_or(Error::MissingLink("binding pattern parent"))?;
             return Ok(self
                 .type_for_variable_like_raw(parent, true, 0 /* CheckModeNormal */)?

@@ -141,7 +141,7 @@ impl CheckerState {
         let signatures = members.signatures.clone().unwrap_or_else(|| [].into());
         let calls = members.call_signature_count as usize;
         let indexes = members.index_infos.clone().unwrap_or_else(|| [].into());
-        let mut table = SymbolTable::new();
+        let mut table = SymbolTable::default();
         for mut property in self.get_properties_of_type(ty)? {
             let original = self.get_type_of_symbol(property)?;
             let updated = self.regular_object_literal_type(original)?;

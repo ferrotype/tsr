@@ -647,7 +647,7 @@ impl Live {
             row.insert("alias_symbol_name_hex".into(), Value::Null);
             row.insert("alias_args".into(), json!([]));
         }
-        let payload = match record.kind {
+        let payload = match record.kind() {
             TypeKind::Intrinsic => {
                 row.insert(
                     "name_hex".into(),
@@ -732,7 +732,7 @@ impl Live {
                     row.insert("combined_flags".into(), json!(tuple.combined_flags));
                     row.insert("readonly".into(), json!(tuple.readonly));
                 }
-                match record.kind {
+                match record.kind() {
                     TypeKind::Anonymous => "anonymous",
                     TypeKind::Reference => "reference",
                     TypeKind::Interface => "interface",
@@ -859,10 +859,7 @@ mod tests {
         assert_eq!(roots[10]["type"], roots[2]["id"]);
         let census = &observation["census"];
         assert!(census["type_storage_bytes"].as_u64().unwrap() > 0);
-        assert_eq!(
-            census["unavailable"],
-            json!(["checker_ast", "display_ast", "display_emit"])
-        );
+        assert_eq!(census["unavailable"], json!([]));
         assert!(
             census["types"]["reachable"].as_u64().unwrap()
                 <= census["types"]["created"].as_u64().unwrap()

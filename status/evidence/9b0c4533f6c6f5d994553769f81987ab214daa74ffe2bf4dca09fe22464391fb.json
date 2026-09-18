@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run_id": "relater",
+  "recorded_at": 1789673219,
+  "context": {
+    "revision": "b32d1f1881a2047653ff4e5aa7ef517b838e4da1",
+    "source_sha256": "bf62ff14599ab4aaf1f825e40474fd7c2328c8058a25359fedb7958eaf7ed1c4",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "580da4bf24946136335c7f275f4258e9f17733ea94c9bfb4934374a1359fb3d7",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s08/relater-fixtures.json": "77a0ec2aebca2d37790308b59de85fd0f3b299cf5c7b9c29c9ebd34b5298a301",
+    "data/s08/supplemental-observations.json.xz": "f066fbde457a96da5c5c6bcc81166670bb910d0e3fde915ed5d14c24ff325d7d",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "tools/s08/contracts/relations.json": "9906e2033653b4e503f606721651d88e3f3814f9fc3438f8c8ee15c53dfae2bf",
+    "tools/s08/results/p0-contracts/native.tar.xz": "1a7a959a8e6ffb261bc46bb503427befae041200980a4304a543dfe7b20338b6"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_relater.py",
+    "producer"
+  ],
+  "target": "host",
+  "config": "S08 relater comparison (data/s08/relater-fixtures.json): consume one explicitly captured measurement at target/s08/relater on the designated quiet host; parity of the production ID relater and the isolated reference prototype against the frozen Go observations over all 21 fixtures and five modes precedes measurement; setup and relation intervals separate; 1 warmup + 7 alternating fresh-process samples per implementation for the normal and allocation executables; ratios reference/ID with max/min > 1.10 flagged; strict parity requires exact diagnostic payloads and lazy work; current reference pre-resolves the graph, so its partial behavior agreement is separate and comparison ratios remain unavailable even with equal group inventories",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\":{\"parity\":0.0,\"parity_id\":1.0,\"parity_reference\":0.0,\"reference_behavior_agreement\":0.8095238095238095,\"reference_unsupported_groups\":20}}\n",
+  "stderr": "{\"report\": {\"capture_sha256\": \"afc547964af8ade99cc177312085a8096b134d8bd3e2fbead81b014a75ac00ce\", \"metrics\": {\"parity\": 0.0, \"parity_id\": 1.0, \"parity_reference\": 0.0, \"reference_behavior_agreement\": 0.8095238095238095, \"reference_unsupported_groups\": 20}, \"modes\": {\"alloc\": {\"relation_ns\": {\"id\": {\"coefficient_of_variation\": 0.1032893547510627, \"max_over_min\": 1.3163044988351393, \"median\": 78276125, \"samples\": [70619330, 68121456, 68372214, 82451665, 89668579, 85037711, 78276125], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.14117955804376256, \"max_over_min\": 1.43955966049415, \"median\": 4213130, \"samples\": [3678958, 3509630, 3441708, 4213130, 4311127, 4954544, 4916914], \"unstable\": true}}, \"relation_ns_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}, \"relation_requested_bytes\": {\"id\": [88060295, 88060295, 88060295, 88060295, 88060295, 88060295, 88060295], \"reference\": [13373370, 13373370, 13373370, 13373370, 13373370, 13373370, 13373370]}, \"relation_requested_bytes_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}, \"retained_bytes\": {\"id\": [1292056038, 1292056038, 1292056038, 1292056038, 1292056038, 1292056038, 1292056038], \"reference\": [1331953112, 1331953112, 1331953112, 1331953112, 1331953112, 1331953112, 1331953112]}, \"retained_bytes_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}, \"setup_ns\": {\"id\": {\"coefficient_of_variation\": 0.09594963874281755, \"max_over_min\": 1.2704260992327274, \"median\": 2133222671, \"samples\": [1883511330, 1765983918, 1750702378, 2192894204, 2168983698, 2224137993, 2133222671], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.061692283508616684, \"max_over_min\": 1.1743434218646105, \"median\": 6646349125, \"samples\": [6249423456, 6379584337, 6511184253, 6646349125, 7293313625, 7338969326, 7129966876], \"unstable\": true}}, \"setup_ns_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}, \"setup_requested_bytes\": {\"id\": [3551528920, 3551528920, 3551528920, 3551528920, 3551528920, 3551528920, 3551528920], \"reference\": [3694954065, 3694954065, 3694954065, 3694954065, 3694954065, 3694954065, 3694954065]}, \"setup_requested_bytes_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}}, \"normal\": {\"relation_ns\": {\"id\": {\"coefficient_of_variation\": 0.0734491465488314, \"max_over_min\": 1.2380888817049058, \"median\": 68114714, \"samples\": [66914288, 67958255, 67811376, 82845836, 68114714, 69076914, 71949121], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.05474046147469304, \"max_over_min\": 1.1436781339370419, \"median\": 3318620, \"samples\": [3208033, 3194919, 3653959, 3283829, 3318620, 3607746, 3593831], \"unstable\": true}}, \"relation_ns_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}, \"setup_ns\": {\"id\": {\"coefficient_of_variation\": 0.04071828232604288, \"max_over_min\": 1.1346363876157037, \"median\": 1627403628, \"samples\": [1606811799, 1595411254, 1652655712, 1627403628, 1625139119, 1810211662, 1668045918], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.03800487299181037, \"max_over_min\": 1.0899362646695356, \"median\": 6154705539, \"samples\": [6016222199, 6022960175, 6490994498, 6025553043, 6154705539, 6557298751, 6529176129], \"unstable\": false}}, \"setup_ns_ratio\": {\"unavailable\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\"}}}, \"pin\": \"1f70213d4922b434345f639b441681e470c7cfc1\", \"smoke\": false, \"source_stable\": true, \"sources_sha256\": \"4b03bea243272c97b32b7cca31fa2d107277ce9d80a6b3594a070b6694584493\", \"unavailable\": {\"comparison_protocol\": \"reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\", \"fixed_work\": \"executed groups differ: id [(105, 0)] reference [(85, 20)]; the reference covers fewer fixtures\"}, \"version\": 1}}\nrun.relater.comparison_protocol unavailable: reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent\nrun.relater.fixed_work unavailable: executed groups differ: id [(105, 0)] reference [(85, 20)]; the reference covers fewer fixtures\n",
+  "stdout_sha256": "f938749911ee80ffbd2d39744375e8f9b410a0f8d1f7671e8d5e4dc5e1225411",
+  "stderr_sha256": "69747ba0b441c45248a4f999594dd3fd8f83fab98cb1c0dbdb1894dd439e74e6",
+  "valid_capture": true
+}

@@ -163,7 +163,7 @@ impl<'scope> LocalBind<'scope, '_> {
         BindSymbol::from_slot(id.slot())
     }
     pub fn new_table(&mut self) -> BindTable<'scope> {
-        let id = self.result.tables.alloc(SymbolTable::new());
+        let id = self.result.tables.alloc(SymbolTable::default());
         BindTable::from_slot(id.slot())
     }
     pub fn new_flow(

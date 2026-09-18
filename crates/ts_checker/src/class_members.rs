@@ -18,7 +18,7 @@ impl CheckerState {
         let base = self.class_base_constructor_type(class)?;
         let mut base_index = None;
         if self.types.flags(base)? & (tf::OBJECT | tf::INTERSECTION | tf::TYPE_VARIABLE) != 0 {
-            let mut inherited = SymbolTable::new();
+            let mut inherited = SymbolTable::default();
             if let Some(members) = members {
                 for (name, symbol) in self.table(members)? {
                     inherited.insert(JsString::from_bytes(name), symbol);

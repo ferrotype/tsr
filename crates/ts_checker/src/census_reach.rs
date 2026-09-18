@@ -20,7 +20,6 @@ enum Edge {
 struct Work {
     pending: Vec<Edge>,
     seen: HashSet<Edge>,
-    types: usize,
 }
 impl Work {
     fn types(&mut self, values: impl IntoIterator<Item = TypeId>) {
@@ -50,6 +49,10 @@ impl Work {
 
 impl CheckerState {
     pub(crate) fn reachable_types(&self, roots: &[TypeId]) -> Result<usize, Error> {
+        Ok(self.reachable_type_ids(roots)?.len())
+    }
+
+    pub(crate) fn reachable_type_ids(&self, roots: &[TypeId]) -> Result<HashSet<TypeId>, Error> {
         let mut work = Work::default();
         for name in crate::BUILTIN_TYPE_NAMES {
             work.types(self.builtins.type_by_name(name));
@@ -235,7 +238,6 @@ impl CheckerState {
             match edge {
                 Edge::Type(ty) => {
                     self.census_type_edges(ty, &mut work)?;
-                    work.types += 1;
                 }
                 Edge::Signature(id) => {
                     let signature = self.signatures.get(id)?;
@@ -307,7 +309,14 @@ impl CheckerState {
                 }
             }
         }
-        Ok(work.types)
+        Ok(work
+            .seen
+            .into_iter()
+            .filter_map(|edge| match edge {
+                Edge::Type(id) => Some(id),
+                _ => None,
+            })
+            .collect())
     }
 
     fn census_type_edges(&self, ty: TypeId, work: &mut Work) -> Result<(), Error> {
@@ -315,7 +324,7 @@ impl CheckerState {
         if let Some(alias) = record.alias {
             work.types(self.types.alias(alias)?.type_arguments.iter().copied());
         }
-        match record.kind {
+        match record.kind() {
             TypeKind::Anonymous
             | TypeKind::EvolvingArray
             | TypeKind::Reference
@@ -325,7 +334,7 @@ impl CheckerState {
             | TypeKind::ReverseMapped
             | TypeKind::InstantiationExpression => {
                 let object = self.types.object(ty)?;
-                if record.kind == TypeKind::EvolvingArray {
+                if record.kind() == TypeKind::EvolvingArray {
                     let evolving = self.types.evolving_array(ty)?;
                     work.types([evolving.element_type]);
                     work.types(evolving.final_array_type);
@@ -337,7 +346,7 @@ impl CheckerState {
                     work.types(map.values().copied());
                 }
                 if matches!(
-                    record.kind,
+                    record.kind(),
                     TypeKind::Reference | TypeKind::Interface | TypeKind::Tuple
                 ) {
                     work.types(
@@ -348,7 +357,7 @@ impl CheckerState {
                             .flat_map(|types| types.iter().copied()),
                     );
                 }
-                if matches!(record.kind, TypeKind::Interface | TypeKind::Tuple) {
+                if matches!(record.kind(), TypeKind::Interface | TypeKind::Tuple) {
                     let interface = self.types.interface(ty)?;
                     work.types(
                         interface
@@ -380,7 +389,7 @@ impl CheckerState {
                         work.types([info.key_type, info.value_type]);
                     }
                 }
-                if record.kind == TypeKind::Mapped {
+                if record.kind() == TypeKind::Mapped {
                     let data = self.types.mapped(ty)?;
                     for id in [
                         data.type_parameter,
@@ -393,7 +402,7 @@ impl CheckerState {
                         work.types(id);
                     }
                 }
-                if record.kind == TypeKind::ReverseMapped {
+                if record.kind() == TypeKind::ReverseMapped {
                     let data = self.types.reverse_mapped(ty)?;
                     for id in [data.source, data.mapped_type, data.constraint_type] {
                         work.types(id);

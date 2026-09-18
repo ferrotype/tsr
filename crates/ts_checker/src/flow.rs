@@ -16,6 +16,9 @@ pub(crate) struct FlowAnalysis {
     pub(crate) disabled: bool,
     pub(crate) invocation_count: u64,
     pub(crate) reachable: crate::types::Map<FlowId, bool>,
+    /// `isThisInTypeQuery` per identifier: the flow walk asks it for the
+    /// reference on every matching-reference check.
+    pub(crate) this_type_queries: crate::types::Map<NodeId, bool>,
     // Upstream's lastFlowNode cache also covers unshared straight-line flows.
     last_reachable: Option<(FlowId, bool)>,
     post_super: crate::types::Map<FlowId, bool>,
@@ -75,8 +78,7 @@ impl CheckerState {
             .map_or(owner, |&(source, _)| source);
         Ok(self
             .program()?
-            .bound(owner)?
-            .result()
+            .bind_result(owner)?
             .flows()
             .get(flow)?
             .to_owned())
@@ -103,7 +105,7 @@ impl CheckerState {
             .synthetic
             .get(&owner)
             .map_or(owner, |&(source, _)| source);
-        let lists = self.program()?.bound(owner)?.result().flow_lists();
+        let lists = self.program()?.bind_result(owner)?.flow_lists();
         let mut result = Vec::new();
         while let Some(id) = list {
             let item = lists.get(id)?;
@@ -141,20 +143,26 @@ impl CheckerState {
         reduced: &mut Vec<ts_ast::FlowReduceLabelData>,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let mut shared = Vec::new();
+            // Every node passed on the way to the answer has the answer's
+            // reachability (a pass-through node is reachable exactly when its
+            // antecedent is), so all of them are memoized, not only the shared
+            // ones upstream caches. Nodes under temporary reduce-label
+            // antecedents stay uncached, as upstream. Without this, a chain of
+            // n assignments costs n walks of length n per reference query.
+            let mut passed = Vec::new();
             let result = loop {
                 if let Some((last, result)) = self.flow.last_reachable {
                     if last == flow {
                         break result;
                     }
                 }
-                let node = self.flow_node(owner, flow)?;
-                if node.flags & ff::SHARED != 0 && reduced.is_empty() {
+                if reduced.is_empty() {
                     if let Some(&result) = self.flow.reachable.get(&flow) {
                         break result;
                     }
-                    shared.push(flow);
+                    passed.push(flow);
                 }
+                let node = self.flow_node(owner, flow)?;
                 if node.flags & (ff::ASSIGNMENT | ff::CONDITION | ff::ARRAY_MUTATION) != 0 {
                     flow = required(node.antecedent, "reachable antecedent")?;
                 } else if node.flags & ff::BRANCH_LABEL != 0 {
@@ -217,7 +225,7 @@ impl CheckerState {
                     break node.flags & ff::UNREACHABLE == 0;
                 }
             };
-            for flow in shared {
+            for flow in passed {
                 self.flow.reachable.insert(flow, result);
             }
             Ok(result)
@@ -262,11 +270,9 @@ impl CheckerState {
                 let Some(FlowData::Ast(call)) = node.node else {
                     return Err(ts_arena::Error::InvalidGraph.into());
                 };
-                let expression = required(
-                    self.ast(call)?.node(call)?.expression(),
-                    "post-super call expression",
-                )?;
-                if self.ast(expression)?.node(expression)?.kind() == K::SuperKeyword {
+                let expression =
+                    required(self.node(call)?.expression(), "post-super call expression")?;
+                if self.node(expression)?.kind() == K::SuperKeyword {
                     return Ok(true);
                 }
                 flow = required(node.antecedent, "post-super call antecedent")?;
@@ -378,8 +384,8 @@ impl CheckerState {
         if result == self.builtins.unreachable_never_type {
             return Ok(declared);
         }
-        if let Some(parent) = self.ast(reference)?.node(reference)?.parent() {
-            if self.ast(parent)?.node(parent)?.kind() == K::NonNullExpression
+        if let Some(parent) = self.node(reference)?.parent() {
+            if self.node(parent)?.kind() == K::NonNullExpression
                 && self.types.flags(result)? & tf::NEVER == 0
             {
                 let non_null = self.type_with_facts(result, facts::NE_UNDEFINED_OR_NULL)?;
@@ -403,8 +409,8 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         let mut antecedent = self.node_flow(expression)?;
         if antecedent.is_none() {
-            if let Some(parent) = self.ast(expression)?.node(expression)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() == K::ReturnStatement {
+            if let Some(parent) = self.node(expression)?.parent() {
+                if self.node(parent)?.kind() == K::ReturnStatement {
                     antecedent = self.node_flow(parent)?;
                 }
             }
@@ -511,14 +517,14 @@ impl CheckerState {
                         if !self.reachable_flow(query.flow_owner, flow)? {
                             return Ok(FlowType::complete(self.builtins.unreachable_never_type));
                         }
-                        let read = self.ast(target)?.node(target)?;
+                        let read = self.node(target)?;
                         if read.kind() == K::VariableDeclaration
                             && (ts_ast::utilities::is_in_js_file(Some(&read))
                                 || ts_ast::utilities::is_var_const_like(self.ast(target)?, target)?)
                         {
                             if let Some(initializer) = read.initializer() {
                                 if matches!(
-                                    self.ast(initializer)?.node(initializer)?.kind().known(),
+                                    self.node(initializer)?.kind().known(),
                                     Some(K::FunctionExpression | K::ArrowFunction)
                                 ) {
                                     flow =
@@ -529,11 +535,11 @@ impl CheckerState {
                         }
                         FlowType::complete(query.declared)
                     } else {
-                        if self.ast(target)?.node(target)?.kind() == K::VariableDeclaration {
-                            let declaration = self.ast(target)?.node(target)?;
+                        if self.node(target)?.kind() == K::VariableDeclaration {
+                            let declaration = self.node(target)?;
                             if let Some(list) = declaration.parent() {
-                                if let Some(parent) = self.ast(list)?.node(list)?.parent() {
-                                    let statement = self.ast(parent)?.node(parent)?;
+                                if let Some(parent) = self.node(list)?.parent() {
+                                    let statement = self.node(parent)?;
                                     if statement.kind() == K::ForInStatement {
                                         let expr =
                                             required(statement.expression(), "for-in expression")?;
@@ -664,14 +670,14 @@ impl CheckerState {
                     result?
                 } else if node.flags & ff::START != 0 {
                     if let Some(FlowData::Ast(container)) = node.node {
-                        let kind = self.ast(query.reference)?.node(query.reference)?.kind();
+                        let kind = self.node(query.reference)?.kind();
                         if Some(container) != query.container
                             && !matches!(
                                 kind.known(),
                                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
                             )
                             && !(kind == K::ThisKeyword
-                                && self.ast(container)?.node(container)?.kind() != K::ArrowFunction)
+                                && self.node(container)?.kind() != K::ArrowFunction)
                         {
                             flow = required(self.node_flow(container)?, "outer container flow")?;
                             continue;
@@ -728,10 +734,8 @@ impl CheckerState {
                                 } else if predicate.kind
                                     == crate::TypePredicateKind::AssertsIdentifier
                                 {
-                                    let args = self.source_list(
-                                        call,
-                                        self.ast(call)?.node(call)?.argument_list(),
-                                    )?;
+                                    let args =
+                                        self.source_list(call, self.node(call)?.argument_list())?;
                                     match usize::try_from(predicate.parameter_index)
                                         .ok()
                                         .and_then(|index| args.get(index).copied())
@@ -949,7 +953,7 @@ impl CheckerState {
         query: &FlowQuery,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let read = self.ast(reference)?.node(reference)?;
+            let read = self.node(reference)?;
             match read.kind().known() {
                 Some(K::NonNullExpression | K::ParenthesizedExpression) => self
                     .write_flow_reference_key(
@@ -988,7 +992,7 @@ impl CheckerState {
                         return Ok(false);
                     }
                     builder.write_byte(b'.');
-                    builder.write_string(self.ast(right)?.node_text(right)?.as_bytes());
+                    builder.write_string(self.node_text(right)?.as_bytes());
                     Ok(true)
                 }
                 Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
@@ -1006,7 +1010,7 @@ impl CheckerState {
                         return Ok(true);
                     }
                     if let Some(argument) = argument {
-                        if self.ast(argument)?.node(argument)?.kind() == K::Identifier {
+                        if self.node(argument)?.kind() == K::Identifier {
                             let symbol = self.resolved_value_symbol(argument)?;
                             if self.is_constant_flow_variable(symbol)?
                                 || self.is_parameter_or_mutable_local_variable(symbol)?
@@ -1151,6 +1155,12 @@ impl CheckerState {
 #[cfg(any(test, feature = "storage-pilot"))]
 impl FlowAnalysis {
     pub(crate) fn census(&self, charge: &mut impl FnMut(&str, usize, usize, usize)) {
+        charge(
+            "thisTypeQueries",
+            self.this_type_queries.len(),
+            self.this_type_queries.allocation_size(),
+            0,
+        );
         charge(
             "evolvingArrayTypes",
             self.evolving.len(),

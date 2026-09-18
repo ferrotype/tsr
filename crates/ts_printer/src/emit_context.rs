@@ -3,7 +3,7 @@
 //! table lock is held while invoking factory or checker code.
 
 use crate::EmitFlags;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::sync::{
     atomic::{AtomicU32, Ordering},
     Arc, Mutex, MutexGuard,
@@ -63,11 +63,11 @@ pub struct SynthesizedComment {
 
 #[derive(Debug, Default)]
 struct SideTables {
-    emit_flags: HashMap<NodeId, EmitFlags>,
-    original: HashMap<NodeId, NodeId>,
-    comment_ranges: HashMap<NodeId, ts_core::TextRange>,
-    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>>,
-    auto_generate: HashMap<NodeId, AutoGenerateInfo>,
+    emit_flags: HashMap<NodeId, EmitFlags, ts_arena::hash::FastState>,
+    original: HashMap<NodeId, NodeId, ts_arena::hash::FastState>,
+    comment_ranges: HashMap<NodeId, ts_core::TextRange, ts_arena::hash::FastState>,
+    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, ts_arena::hash::FastState>,
+    auto_generate: HashMap<NodeId, AutoGenerateInfo, ts_arena::hash::FastState>,
 }
 impl SideTables {
     fn set_original(&mut self, node: NodeId, original: NodeId) {
@@ -136,8 +136,48 @@ impl EmitContext {
         Ok(())
     }
 
-    /// Occupied side-table entries. This is not an allocation-byte measurement:
-    /// the standard maps retain capacity and comments/names own variable text.
+    /// Structural bytes of the side tables: table allocations and comment
+    /// list capacities.
+    pub fn structural_bytes(&self) -> usize {
+        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+    }
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> usize {
+        let tables = self.tables();
+        let header = census.allocation(
+            Arc::as_ptr(&self.tables) as usize,
+            16 + size_of::<Mutex<SideTables>>(),
+        );
+        if header == 0 {
+            return 0;
+        }
+        let text_bytes = tables
+            .leading_comments
+            .values()
+            .flatten()
+            .map(|comment| census.text(comment.text.backing_bytes()))
+            .sum::<usize>()
+            + tables
+                .auto_generate
+                .values()
+                .map(|info| {
+                    census.text(info.prefix.backing_bytes())
+                        + census.text(info.suffix.backing_bytes())
+                })
+                .sum::<usize>();
+        header
+            + text_bytes
+            + tables.emit_flags.allocation_size()
+            + tables.original.allocation_size()
+            + tables.comment_ranges.allocation_size()
+            + tables.leading_comments.allocation_size()
+            + tables
+                .leading_comments
+                .values()
+                .map(|comments| comments.capacity() * size_of::<SynthesizedComment>())
+                .sum::<usize>()
+            + tables.auto_generate.allocation_size()
+    }
+
     pub fn metadata_entries(&self) -> usize {
         let tables = self.tables();
         tables.emit_flags.len()
@@ -423,6 +463,37 @@ impl FactoryHooks for EmitHooks {
 mod tests {
     use super::*;
     use ts_ast::AstBuilder;
+    #[test]
+    fn census_charges_shared_comment_and_generated_name_text_once() {
+        let counters = ts_arena::Counters::new();
+        let mut ast = AstBuilder::new(
+            ts_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
+            &counters,
+        );
+        let mut emit = EmitContext::new();
+        let text = JsString::from_bytes(b"shared comment and prefix".as_slice());
+        let node = emit.new_unique_name_ex(
+            &mut ast,
+            JsString::from_bytes(b"name".as_slice()),
+            AutoGenerateOptions {
+                prefix: text.clone(),
+                suffix: text.clone(),
+                ..AutoGenerateOptions::default()
+            },
+        );
+        emit.add_synthetic_leading_comment(
+            node,
+            ts_ast::SyntaxKind::SingleLineCommentTrivia,
+            text.clone(),
+            false,
+        );
+        let all = emit.structural_bytes();
+        let mut census = ts_arena::StorageCensus::default();
+        let text_bytes = census.text(text.backing_bytes());
+        assert_eq!(emit.structural_bytes_with(&mut census), all - text_bytes);
+        assert_eq!(emit.clone().structural_bytes_with(&mut census), 0);
+    }
+
     #[test]
     fn generated_name_identity_survives_clone_and_update_hooks() {
         let counters = ts_arena::Counters::new();

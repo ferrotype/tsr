@@ -122,7 +122,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getArrayElementTypeNode
     pub(crate) fn array_element_type_node(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::ParenthesizedType) => self.array_element_type_node(
                 read.type_node()
@@ -158,7 +158,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTupleElementInfo
     // port: tsc/internal/checker/checker.go:Checker.getTupleElementFlags
     pub(crate) fn tuple_element_info(&self, node: NodeId) -> Result<TupleElementInfo, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let named = read.kind() == K::NamedTupleMember;
         let flags = if read.kind() == K::OptionalType
             || named && read.question_token(self.ast(node)?)?.is_some()
@@ -189,7 +189,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromArrayOrTupleTypeNode
     pub(crate) fn source_array_or_tuple_type(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let readonly = match read.parent() {
             Some(parent) => self
                 .ast(parent)?
@@ -248,7 +248,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromRestTypeNode
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromOptionalTypeNode
     pub(crate) fn source_tuple_element_type(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let mut annotation = read
             .type_node()
             .ok_or(Error::MissingLink("tuple element type"))?;

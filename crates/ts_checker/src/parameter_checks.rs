@@ -8,7 +8,7 @@ use ts_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:Checker.isOptionalParameter
     pub(crate) fn is_optional_parameter(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::Parameter {
             return Ok(false);
         }
@@ -28,10 +28,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("optional parameter parent"))?;
         if initializer {
             let signature = self.signature_from_declaration(function)?;
-            let parameters = self.source_list(
-                function,
-                self.ast(function)?.node(function)?.parameter_list(),
-            )?;
+            let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
             let index = parameters
                 .iter()
                 .position(|&parameter| parameter == node)
@@ -41,10 +38,7 @@ impl CheckerState {
         if let Some(call) =
             ts_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
         {
-            let parameters = self.source_list(
-                function,
-                self.ast(function)?.node(function)?.parameter_list(),
-            )?;
+            let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
             let index = parameters
                 .iter()
                 .position(|&parameter| parameter == node)
@@ -65,18 +59,18 @@ impl CheckerState {
     pub(crate) fn check_parameter(&mut self, parameter: NodeId) -> Result<(), Error> {
         self.check_grammar_modifiers(parameter)?;
         self.check_binding_variable(parameter)?;
-        let read = self.ast(parameter)?.node(parameter)?;
+        let read = self.node(parameter)?;
         let function = self
             .containing_body_function(parameter)?
             .ok_or(Error::MissingLink("parameter containing function"))?;
-        let function_read = self.ast(function)?.node(function)?;
+        let function_read = self.node(function)?;
         let kind = function_read.kind();
         let body = function_read.body();
         let parameters = self.source_list(function, function_read.parameter_list())?;
         let name = read.name().ok_or(Error::MissingLink("parameter name"))?;
-        let identifier = self.ast(name)?.node(name)?.kind() == K::Identifier;
+        let identifier = self.node(name)?.kind() == K::Identifier;
         let name_text = if identifier {
-            self.ast(name)?.node_text(name)?.into_js_string()
+            self.node_text(name)?.into_js_string()
         } else {
             JsString::from_bytes(b"".as_slice())
         };
@@ -97,7 +91,7 @@ impl CheckerState {
                 .options()
                 .erasable_syntax_only
                 .is_true()
-                && self.ast(parameter)?.node(parameter)?.flags() & nf::JAVA_SCRIPT_FILE == 0
+                && self.node(parameter)?.flags() & nf::JAVA_SCRIPT_FILE == 0
             {
                 self.error_at(
                     Some(parameter),
@@ -196,11 +190,11 @@ impl CheckerState {
         &mut self,
         parameter: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(parameter)?.node(parameter)?;
+        let read = self.node(parameter)?;
         let function = read
             .parent()
             .ok_or(Error::MissingLink("contextual parameter function"))?;
-        let function_read = self.ast(function)?.node(function)?;
+        let function_read = self.node(function)?;
         let function_kind = function_read.kind();
         let is_method = function_kind == K::MethodDeclaration
             && function_read
@@ -247,10 +241,10 @@ impl CheckerState {
             return Ok(None);
         };
         let first_this = match parameters.first().copied() {
-            Some(first) => match self.ast(first)?.node(first)?.name() {
+            Some(first) => match self.node(first)?.name() {
                 Some(name) => {
-                    self.ast(name)?.node(name)?.kind() == K::Identifier
-                        && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+                    self.node(name)?.kind() == K::Identifier
+                        && self.node_text(name)?.as_bytes() == b"this"
                 }
                 None => false,
             },

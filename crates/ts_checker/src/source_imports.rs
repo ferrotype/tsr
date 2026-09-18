@@ -9,7 +9,7 @@ use ts_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkImportDeclaration
     pub(crate) fn check_import_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let javascript = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let modifiers = read.modifiers();
         let data = read
@@ -41,7 +41,7 @@ impl CheckerState {
         if self.check_external_import_or_export(node)? {
             if let Some(clause) = clause {
                 if !self.check_grammar_import_clause(clause)? {
-                    let read = self.ast(clause)?.node(clause)?;
+                    let read = self.node(clause)?;
                     let data = read
                         .data_source()
                         .as_import_clause()
@@ -55,7 +55,7 @@ impl CheckerState {
                         self.check_import_binding(clause)?;
                     }
                     if let Some(named) = named {
-                        if self.ast(named)?.node(named)?.kind() == K::NamespaceImport {
+                        if self.node(named)?.kind() == K::NamespaceImport {
                             self.check_import_binding(named)?;
                             if self.module_emit_format(node)? == ModuleKind::COMMON_JS {
                                 needs_star = true;
@@ -67,10 +67,9 @@ impl CheckerState {
                         } else {
                             resolved = self.resolve_external_module_name(node, specifier, false)?;
                             if resolved.is_some() {
-                                for binding in self.source_list(
-                                    named,
-                                    self.ast(named)?.node(named)?.element_list(),
-                                )? {
+                                for binding in
+                                    self.source_list(named, self.node(named)?.element_list())?
+                                {
                                     self.check_import_binding(binding)?;
                                 }
                             }
@@ -121,7 +120,7 @@ impl CheckerState {
         let Some(name) = self.module_specifier(node)? else {
             return Ok(false);
         };
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         if read.pos() == read.end() {
             return Ok(false);
         }
@@ -134,7 +133,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("external declaration parent"))?;
-        let parent_read = self.ast(parent)?.node(parent)?;
+        let parent_read = self.node(parent)?;
         let ambient = parent_read.kind() == K::ModuleBlock
             && if let Some(module) = parent_read.parent() {
                 ts_ast::is_ambient_module(self.ast(module)?, module)?
@@ -144,7 +143,7 @@ impl CheckerState {
         if parent_read.kind() != K::SourceFile && !ambient {
             self.error_at(
                 Some(name),
-                if self.ast(node)?.node(node)?.kind() == K::ExportDeclaration {
+                if self.node(node)?.kind() == K::ExportDeclaration {
                     d::Export_declarations_are_not_permitted_in_a_namespace
                 } else {
                     d::Import_declarations_in_a_namespace_cannot_reference_a_module
@@ -154,13 +153,13 @@ impl CheckerState {
             return Ok(false);
         }
         if ambient
-            && ts_module::is_relative(self.ast(name)?.node_text(name)?.as_bytes())
+            && ts_module::is_relative(self.node_text(name)?.as_bytes())
             && !self.top_level_module_augmentation(node)?
         {
             self.error_at(Some(node),d::Import_or_export_declaration_in_an_ambient_module_declaration_cannot_reference_module_through_relative_module_name,vec![])?;
             return Ok(false);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let attributes = match read.kind().known() {
             Some(K::ImportDeclaration) => read
                 .data_source()
@@ -181,10 +180,10 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/utilities.go:isTopLevelInExternalModuleAugmentation
     pub(crate) fn top_level_module_augmentation(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if read.kind() != K::ModuleBlock {
             return Ok(false);
         }
@@ -199,7 +198,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::ImportDeclaration
             && read
                 .data_source()
@@ -215,20 +214,20 @@ impl CheckerState {
                 & ts_binder::ContainerFlags::IS_CONTAINER
                 != 0
             {
-                if self.ast(current)?.node(current)?.kind() == K::SourceFile {
+                if self.node(current)?.kind() == K::SourceFile {
                     if let Some(name) = self.module_specifier(node)? {
                         self.resolve_external_module_name(node, name, false)?;
                     }
                 }
                 return Ok(());
             }
-            parent = self.ast(current)?.node(current)?.parent();
+            parent = self.node(current)?.parent();
         }
         Ok(())
     }
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarImportClause
     fn check_grammar_import_clause(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let jsdoc = read.flags() & nf::JS_DOC != 0;
         let data = read
             .data_source()
@@ -242,11 +241,11 @@ impl CheckerState {
                 return self.grammar_error_node(node,d::A_type_only_import_can_specify_a_default_import_or_named_bindings_but_not_both,vec![]);
             }
             if let Some(bindings) = bindings {
-                if self.ast(bindings)?.node(bindings)?.kind() == K::NamedImports {
-                    for element in self
-                        .source_list(bindings, self.ast(bindings)?.node(bindings)?.element_list())?
+                if self.node(bindings)?.kind() == K::NamedImports {
+                    for element in
+                        self.source_list(bindings, self.node(bindings)?.element_list())?
                     {
-                        if self.ast(element)?.node(element)?.is_type_only() {
+                        if self.node(element)?.is_type_only() {
                             return self.grammar_error_first_token(element,d::The_type_modifier_cannot_be_used_on_a_named_import_when_import_type_is_used_on_its_import_statement,vec![]);
                         }
                     }
@@ -261,7 +260,7 @@ impl CheckerState {
                 );
             }
             if let Some(bindings) = bindings {
-                if self.ast(bindings)?.node(bindings)?.kind() == K::NamedImports {
+                if self.node(bindings)?.kind() == K::NamedImports {
                     return self.grammar_error_node(
                         node,
                         d::Named_imports_are_not_allowed_in_a_deferred_import,
@@ -280,7 +279,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkImportBinding
     pub(crate) fn check_import_binding(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read
             .name()
             .ok_or(Error::MissingLink("import binding name"))?;
@@ -288,7 +287,7 @@ impl CheckerState {
         self.check_module_name_collision(node, name)?;
         self.check_source_alias_symbol(node)?;
         if import {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let property = read.property_name();
             self.check_module_export_name(property, true)?;
             if self

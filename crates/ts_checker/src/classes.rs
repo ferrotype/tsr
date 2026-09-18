@@ -13,7 +13,7 @@ impl CheckerState {
     pub(crate) fn class_declaration(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         for node in self.symbol_declarations(symbol)?.iter().flatten() {
             if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression)
             ) {
                 return Ok(Some(node));
@@ -23,7 +23,7 @@ impl CheckerState {
     }
 
     pub(crate) fn class_heritage_clauses(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let clauses = if let Some(data) = read.data_source().as_class_declaration() {
             data.heritage_clauses()
         } else if let Some(data) = read.data_source().as_class_expression() {
@@ -40,7 +40,7 @@ impl CheckerState {
         token: K,
     ) -> Result<Vec<NodeId>, Error> {
         for clause in self.class_heritage_clauses(node)? {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             let data = read
                 .data_source()
                 .as_heritage_clause()
@@ -368,7 +368,7 @@ impl CheckerState {
         if let Some(&constructor) = constructors.first() {
             return self.return_type_of_signature(constructor);
         }
-        let expression = self.ast(base_node)?.node(base_node)?.expression();
+        let expression = self.node(base_node)?.expression();
         self.error_at(
             expression,
             messages::No_base_constructor_has_the_specified_number_of_type_arguments,
@@ -383,7 +383,7 @@ impl CheckerState {
         ty: TypeId,
         node: NodeId,
     ) -> Result<Vec<SignatureId>, Error> {
-        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+        let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         let mut signatures = Vec::new();
         for signature in self.signatures_of_type(ty, true)? {
             let parameters = self
@@ -407,13 +407,13 @@ impl CheckerState {
         ty: TypeId,
         node: NodeId,
     ) -> Result<Vec<SignatureId>, Error> {
-        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+        let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         let mut signatures = self.constructors_for_arguments(ty, node)?;
         let mut arguments = Vec::with_capacity(nodes.len());
         for node in nodes {
             arguments.push(self.get_type_from_type_node(node)?);
         }
-        let javascript = self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
+        let javascript = self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
         for signature in &mut signatures {
             if self
                 .signatures
@@ -443,8 +443,7 @@ impl CheckerState {
         let declaration = self.class_declaration(symbol)?;
         let abstract_class = declaration
             .map(|node| {
-                self.ast(node)?
-                    .node(node)?
+                self.node(node)?
                     .modifier_flags(self.ast(node)?)
                     .map_err(Error::from)
             })
@@ -469,14 +468,11 @@ impl CheckerState {
             .class_base_type_node(class)?
             .ok_or(Error::MissingLink("derived constructor base node"))?;
         let mut arguments = Vec::new();
-        for node in self.source_list(
-            base_node,
-            self.ast(base_node)?.node(base_node)?.type_argument_list(),
-        )? {
+        for node in self.source_list(base_node, self.node(base_node)?.type_argument_list())? {
             arguments.push(self.get_type_from_type_node(node)?);
         }
         let javascript = match declaration {
-            Some(node) => self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0,
+            Some(node) => self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0,
             None => false,
         };
         let mut result = Vec::new();

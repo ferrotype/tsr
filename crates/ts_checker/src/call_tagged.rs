@@ -11,7 +11,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_tagged_template_expression()
@@ -59,9 +59,9 @@ impl CheckerState {
             return self.resolve_untyped_call(node);
         }
         if calls.is_empty() {
-            let parent = self.ast(node)?.node(node)?.parent();
+            let parent = self.node(node)?.parent();
             let array_parent = match parent {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::ArrayLiteralExpression,
+                Some(parent) => self.node(parent)?.kind() == K::ArrayLiteralExpression,
                 None => false,
             };
             if array_parent {
@@ -105,7 +105,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getEffectiveCallArguments
     pub(crate) fn tagged_template_arguments(&mut self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let template = read
             .data_source()
             .as_tagged_template_expression()
@@ -120,7 +120,7 @@ impl CheckerState {
             ty
         };
         let mut result = vec![self.synthetic_call_argument(template, strings, false, None)?];
-        if self.ast(template)?.node(template)?.kind() == K::TemplateExpression {
+        if self.node(template)?.kind() == K::TemplateExpression {
             let spans = self
                 .ast(template)?
                 .node(template)?
@@ -130,8 +130,7 @@ impl CheckerState {
                 .template_spans();
             for span in self.source_list(template, spans)? {
                 result.push(
-                    self.ast(span)?
-                        .node(span)?
+                    self.node(span)?
                         .expression()
                         .ok_or(Error::MissingLink("template span expression"))?,
                 );
@@ -149,7 +148,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("tagged template"))?
             .template()
             .ok_or(Error::MissingLink("tagged template literal"))?;
-        let read = self.ast(template)?.node(template)?;
+        let read = self.node(template)?;
         if read.kind() != K::TemplateExpression {
             return Ok(ts_ast::utilities_middle::is_unterminated_literal(&read));
         }
@@ -170,7 +169,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("template final span"))?
             .literal()
             .ok_or(Error::MissingLink("template final literal"))?;
-        let read = self.ast(literal)?.node(literal)?;
+        let read = self.node(literal)?;
         Ok(ts_ast::node_is_missing(Some(&read))
             || ts_ast::utilities_middle::is_unterminated_literal(&read))
     }

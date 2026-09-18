@@ -53,7 +53,7 @@ impl CheckerState {
         locals: SymbolTable,
         signature_kind: Option<&'static str>,
     ) -> Result<NodeId, Error> {
-        self.ast(parent)?.node(parent)?;
+        self.node(parent)?;
         if !matches!(kind, K::Block | K::ModuleDeclaration)
             || kind == K::Block && (name.is_some() || symbol.is_some())
             || kind == K::ModuleDeclaration && (name.is_none() || signature_kind.is_some())
@@ -147,7 +147,7 @@ mod tests {
             [(name.clone(), Some(inner))].into(),
             Some("params"),
         )?;
-        assert_eq!(state.ast(child)?.node(child)?.parent(), Some(scope));
+        assert_eq!(state.node(child)?.parent(), Some(scope));
         assert_eq!(
             state.synthetic_scopes.signature_kinds.get(&child),
             Some(&"params")

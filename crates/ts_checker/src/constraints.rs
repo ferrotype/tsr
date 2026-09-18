@@ -159,7 +159,7 @@ impl CheckerState {
             if self.types.flags(constraint)? & tf::ANY != 0
                 && constraint != self.builtins.error_type
             {
-                let parent = self.ast(node)?.node(node)?.parent();
+                let parent = self.node(node)?.parent();
                 let grandparent = parent
                     .map(|parent| {
                         self.ast(parent)?
@@ -170,7 +170,7 @@ impl CheckerState {
                     .transpose()?
                     .flatten();
                 let mapped = match grandparent {
-                    Some(node) => self.ast(node)?.node(node)?.kind() == K::MappedType,
+                    Some(node) => self.node(node)?.kind() == K::MappedType,
                     None => false,
                 };
                 constraint = if mapped {

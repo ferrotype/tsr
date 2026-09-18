@@ -5,6 +5,11 @@ Plan: section 5 (expected benefits); section 9, Phase 0 experiments table, rows 
 Sprint: S07, item S07-4
 Amends: PLAN.md experiments table (E5, E6); `status/experiments.toml` criteria `E5.peak_rss`, `E5.allocated_bytes`, `E6.one_thread`, `E6.eight_threads`
 
+Subsequent decision: [ADR 0022](0022-checker-type-footprint-threshold.md)
+(2026-09-18) raises the S08 per-type footprint limit from 0.80 to 0.85.
+The four parse/bind limits decided here are unchanged. References below to an
+unchanged per-type limit describe the decision as accepted on 2026-09-10.
+
 ## Context
 
 Section 5 of the plan expected 30 to 50 percent lower peak memory than Go and called CPU gains of 1.2 to 2 times "plausible from data layout but not guaranteed". The Phase 0 experiments table turned those expectations into thresholds: peak RSS and bytes allocated for parse and bind at most 0.7 of Go, and wall time at one and eight threads at most Go's. S07 measures them on the pinned VS Code workload (13,094 files, 161,740,237 bytes, 19,593,488 nodes) with the producers registered in `status/runs.toml`.

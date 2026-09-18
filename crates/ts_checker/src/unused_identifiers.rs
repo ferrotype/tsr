@@ -65,7 +65,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkUnusedIdentifiers
     pub(crate) fn check_unused_identifiers(&mut self, nodes: Vec<NodeId>) -> Result<(), Error> {
         for node in nodes {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ClassDeclaration | K::ClassExpression) => {
                     self.check_unused_class_members(node)?;
@@ -128,14 +128,14 @@ impl CheckerState {
         diagnostic: Diagnostic,
     ) -> Result<(), Error> {
         loop {
-            let read = self.ast(location)?.node(location)?;
+            let read = self.node(location)?;
             if read.kind() == K::BindingElement || self.is_binding_pattern(location)? {
                 location = required(read.parent(), "binding element parent")?;
             } else {
                 break;
             }
         }
-        let kind = if self.ast(location)?.node(location)?.kind() == K::Parameter {
+        let kind = if self.node(location)?.kind() == K::Parameter {
             UnusedKind::Parameter
         } else {
             UnusedKind::Local
@@ -150,7 +150,7 @@ impl CheckerState {
         kind: UnusedKind,
         mut diagnostic: Diagnostic,
     ) -> Result<(), Error> {
-        let flags = self.ast(location)?.node(location)?.flags();
+        let flags = self.node(location)?.flags();
         if flags & (nf::AMBIENT | nf::THIS_NODE_OR_ANY_SUB_NODES_HAS_ERROR) != 0 {
             return Ok(());
         }
@@ -174,8 +174,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkUnusedClassMembers
     fn check_unused_class_members(&mut self, node: NodeId) -> Result<(), Error> {
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
-            let read = self.ast(member)?.node(member)?;
+        for member in self.source_list(node, self.node(node)?.member_list())? {
+            let read = self.node(member)?;
             match read.kind().known() {
                 Some(
                     K::MethodDeclaration | K::PropertyDeclaration | K::GetAccessor | K::SetAccessor,
@@ -193,9 +193,7 @@ impl CheckerState {
                     let private = read.modifier_flags(self.ast(member)?)? & mf::PRIVATE != 0
                         || name
                             .map(|name| {
-                                Ok::<_, Error>(
-                                    self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier,
-                                )
+                                Ok::<_, Error>(self.node(name)?.kind() == K::PrivateIdentifier)
                             })
                             .transpose()?
                             .unwrap_or(false);
@@ -227,7 +225,7 @@ impl CheckerState {
                         {
                             let text = self.ast_symbol_name(symbol)?;
                             let diagnostic = self.diagnostic_for_node(
-                                self.ast(parameter)?.node(parameter)?.name(),
+                                self.node(parameter)?.name(),
                                 d::Property_0_is_declared_but_its_value_is_never_read,
                                 vec![text],
                             )?;
@@ -337,7 +335,7 @@ impl CheckerState {
             }
         }
         for declaration in variable_parents {
-            if self.ast(declaration)?.node(declaration)?.kind() == K::VariableDeclarationList {
+            if self.node(declaration)?.kind() == K::VariableDeclarationList {
                 self.report_unused_variables(declaration)?;
             } else {
                 self.report_unused_parameters(declaration)?;
@@ -356,13 +354,13 @@ impl CheckerState {
         } else {
             d::X_0_is_declared_but_its_value_is_never_read
         };
-        let target = self.ast(node)?.node(node)?.name().unwrap_or(node);
+        let target = self.node(node)?.name().unwrap_or(node);
         let diagnostic = self.diagnostic_for_node(Some(target), message, vec![name])?;
         self.report_unused(node, UnusedKind::Local, diagnostic)
     }
 
     fn variable_list_declarations(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let list = read
             .data_source()
             .as_variable_declaration_list()
@@ -385,13 +383,13 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.reportUnusedParameters
     fn report_unused_parameters(&mut self, node: NodeId) -> Result<(), Error> {
-        let parameters = self.source_list(node, self.ast(node)?.node(node)?.parameter_list())?;
+        let parameters = self.source_list(node, self.node(node)?.parameter_list())?;
         self.report_unused_variable_declarations(&parameters)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.reportUnusedBindingElements
     fn report_unused_binding_elements(&mut self, node: NodeId) -> Result<(), Error> {
-        let declarations = self.source_list(node, self.ast(node)?.node(node)?.element_list())?;
+        let declarations = self.source_list(node, self.node(node)?.element_list())?;
         if declarations.len() > 1 && self.all_unreferenced_variable_declarations(&declarations)? {
             let diagnostic = self.diagnostic_for_node(
                 Some(node),
@@ -424,7 +422,7 @@ impl CheckerState {
             if self.is_binding_pattern(name)? {
                 self.report_unused_binding_elements(name)?;
             } else if self.is_unreferenced_variable_declaration(declaration)? {
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
+                let text = self.node_text(name)?.into_js_string();
                 let diagnostic = self.diagnostic_for_node(
                     Some(name),
                     d::X_0_is_declared_but_its_value_is_never_read,
@@ -542,8 +540,8 @@ impl CheckerState {
             self.report_unused(node, UnusedKind::Local, diagnostic)
         } else {
             for &unused in unuseds {
-                let name = required(self.ast(unused)?.node(unused)?.name(), "import name")?;
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
+                let name = required(self.node(unused)?.name(), "import name")?;
+                let text = self.node_text(name)?.into_js_string();
                 self.report_unused_local(unused, text)?;
             }
             Ok(())
@@ -582,16 +580,15 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkUnusedInferTypeParameter
     fn check_unused_infer_type_parameter(&mut self, node: NodeId) -> Result<(), Error> {
         let parameter = required(
-            self.ast(node)?
-                .node(node)?
+            self.node(node)?
                 .data_source()
                 .as_infer_type_node()
                 .and_then(|data| data.type_parameter()),
             "infer type parameter",
         )?;
         if self.is_unreferenced_type_parameter(parameter)? {
-            let name = required(self.ast(parameter)?.node(parameter)?.name(), "infer name")?;
-            let text = self.ast(name)?.node_text(name)?.into_js_string();
+            let name = required(self.node(parameter)?.name(), "infer name")?;
+            let text = self.node_text(name)?.into_js_string();
             let diagnostic = self.diagnostic_for_node(
                 Some(name),
                 d::X_0_is_declared_but_never_used,
@@ -637,11 +634,8 @@ impl CheckerState {
         } else {
             for parameter in parameters {
                 if self.is_unreferenced_type_parameter(parameter)? {
-                    let name = required(
-                        self.ast(parameter)?.node(parameter)?.name(),
-                        "type parameter name",
-                    )?;
-                    let text = self.ast(name)?.node_text(name)?.into_js_string();
+                    let name = required(self.node(parameter)?.name(), "type parameter name")?;
+                    let text = self.node_text(name)?.into_js_string();
                     let diagnostic = self.diagnostic_for_node(
                         Some(parameter),
                         d::X_0_is_declared_but_never_used,
@@ -687,9 +681,7 @@ impl CheckerState {
         };
         let symbol = self.get_merged_symbol(raw);
         Ok(self.reference_kinds(symbol) & sf::TYPE_PARAMETER == 0
-            && !self.is_identifier_that_starts_with_underscore(
-                self.ast(parameter)?.node(parameter)?.name(),
-            )?)
+            && !self.is_identifier_that_starts_with_underscore(self.node(parameter)?.name())?)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkUnusedRenamedBindingElements

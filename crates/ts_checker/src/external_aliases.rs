@@ -10,7 +10,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
             return Ok(false);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         Ok(read.kind() == K::ModuleDeclaration && read.body().is_none())
     }
     pub(crate) fn mark_module_alias_type_only(
@@ -37,7 +37,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let kind = read.kind();
         let specifier = match self.require_module_specifier(node)? {
             Some(specifier) => specifier,
@@ -86,12 +86,12 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let root = if self.ast(node)?.node(node)?.kind() == K::BindingElement {
+        let root = if self.node(node)?.kind() == K::BindingElement {
             ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?
         } else {
             node
         };
-        let read = self.ast(root)?.node(root)?;
+        let read = self.node(root)?;
         if read.kind() != K::VariableDeclaration
             || !ts_ast::utilities::is_in_js_file(Some(&read))
             || read.type_node().is_some()
@@ -104,7 +104,7 @@ impl CheckerState {
         let Some(list) = read.parent() else {
             return Ok(None);
         };
-        let Some(statement) = self.ast(list)?.node(list)?.parent() else {
+        let Some(statement) = self.node(list)?.parent() else {
             return Ok(None);
         };
         let view = self.ast(statement)?;
@@ -115,10 +115,7 @@ impl CheckerState {
         if !ts_ast::utilities_middle::is_require_call(view, &view.node(initializer)?, true)? {
             return Ok(None);
         }
-        let arguments = self.source_list(
-            initializer,
-            self.ast(initializer)?.node(initializer)?.argument_list(),
-        )?;
+        let arguments = self.source_list(initializer, self.node(initializer)?.argument_list())?;
         Ok(arguments.first().copied())
     }
     // port: tsc/internal/checker/checker.go:Checker.getExportOfModule
@@ -172,7 +169,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            if self.ast(node)?.node(node)?.kind() == K::SourceFile {
+            if self.node(node)?.kind() == K::SourceFile {
                 return Ok(Some(node));
             }
         }
@@ -207,7 +204,7 @@ impl CheckerState {
         let Some(file) = self.module_source_declaration(module)? else {
             return Ok(false);
         };
-        let state = self.ast(file)?.source_file(file)?;
+        let state = self.source_file_read(file)?;
         Ok(ts_ast::utilities::is_json_source_file(&state)
             || state.file_name().ends_with(b".d.json.ts"))
     }
@@ -247,7 +244,7 @@ impl CheckerState {
                     return Ok(false);
                 }
                 if target_mode == ModuleKind::NONE
-                    && self.ast(file)?.source_file(file)?.is_declaration_file
+                    && self.source_file_read(file)?.is_declaration_file
                     && (self
                         .program()?
                         .host
@@ -266,7 +263,7 @@ impl CheckerState {
             }
         }
         if match file {
-            Some(file) => self.ast(file)?.source_file(file)?.is_declaration_file,
+            Some(file) => self.source_file_read(file)?.is_declaration_file,
             None => true,
         } {
             if let Some(default) = self.module_export_by_name(module, names::DEFAULT, None, true)? {
@@ -286,12 +283,12 @@ impl CheckerState {
                 .is_none());
         }
         let file = file.ok_or(Error::MissingLink("synthetic module file"))?;
-        if self.ast(file)?.node(file)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE == 0 {
+        if self.node(file)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE == 0 {
             return Ok(self
                 .member_symbol(self.symbol(module)?.exports(), names::EXPORT_EQUALS)?
                 .is_some());
         }
-        let indicator = self.ast(file)?.source_file(file)?.external_module_indicator;
+        let indicator = self.source_file_read(file)?.external_module_indicator;
         Ok((indicator.is_none() || indicator == Some(file))
             && self
                 .module_export_by_name(module, b"__esModule", None, dont_resolve_alias)?
@@ -299,7 +296,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/utilities.go:isSyntacticDefault
     fn syntactic_module_default(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::ExportAssignment {
             return Ok(!read
                 .data_source()
@@ -372,13 +369,13 @@ impl CheckerState {
             return self.resolve_module_symbol(resolved, dont_resolve_alias);
         }
         if default.is_none() {
-            if self.ast(node)?.node(node)?.kind() == K::ImportClause {
+            if self.node(node)?.kind() == K::ImportClause {
                 let name = self
                     .ast(node)?
                     .node(node)?
                     .name()
                     .ok_or(Error::MissingLink("default import name"))?;
-                let name_text = self.ast(name)?.node_text(name)?.into_js_string();
+                let name_text = self.node_text(name)?.into_js_string();
                 let module_text = self.symbol_to_string(module)?;
                 if self
                     .member_symbol(self.symbol(module)?.exports(), name_text.as_bytes())?
@@ -403,7 +400,7 @@ impl CheckerState {
                     }
                 }
             } else {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let name = read
                     .property_name()
                     .or(read.name())
@@ -444,12 +441,12 @@ impl CheckerState {
             .node(specifier)?
             .parent()
             .ok_or(Error::MissingLink("module reference parent"))?;
-        let namespace_import = if self.ast(parent)?.node(parent)?.kind() == K::ImportDeclaration {
+        let namespace_import = if self.node(parent)?.kind() == K::ImportDeclaration {
             ts_ast::utilities_middle::get_namespace_declaration_node(self.ast(parent)?, parent)?
         } else {
             None
         };
-        let import_call = self.ast(parent)?.node(parent)?.kind() == K::CallExpression;
+        let import_call = self.node(parent)?.kind() == K::CallExpression;
         if namespace_import.is_some() || import_call {
             let ty = self.get_type_of_symbol(symbol)?;
             if let Some(default_only) =
@@ -526,16 +523,16 @@ impl CheckerState {
         specifier: NodeId,
         dont_resolve_alias: bool,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read
             .property_name()
             .or(read.name())
             .ok_or(Error::MissingLink("import/export member name"))?;
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         if !matches!(read.kind().known(), Some(K::Identifier | K::StringLiteral)) {
             return Ok(None);
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         if text.is_empty() && read.kind() != K::StringLiteral {
             return Ok(None);
         }
@@ -559,7 +556,7 @@ impl CheckerState {
                 .symbol(target)?
                 .value_declaration()
                 .ok_or(Error::MissingLink("module variable declaration"))?;
-            match self.ast(declaration)?.node(declaration)?.type_node() {
+            match self.node(declaration)?.type_node() {
                 Some(annotation) => {
                     let ty = self.get_type_from_type_node(annotation)?;
                     self.constituent_property(ty, text.as_bytes(), false)?
@@ -584,7 +581,7 @@ impl CheckerState {
             _ => None,
         };
         let specifier_node = matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::ImportSpecifier | K::ExportSpecifier)
         );
         if specifier_node
@@ -614,9 +611,9 @@ impl CheckerState {
             return Ok(());
         }
         let module_name = self.fully_qualified_name(module, Some(node))?;
-        let name_text = self.ast(name)?.node_text(name)?.into_js_string();
+        let name_text = self.node_text(name)?.into_js_string();
         let declaration_name = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
-        if self.ast(name)?.node(name)?.kind() == K::Identifier {
+        if self.node(name)?.kind() == K::Identifier {
             let suggestion = self.suggested_module_member(name, target)?;
             if let Some(suggestion) = suggestion {
                 let display = self.symbol_to_string(suggestion)?;
@@ -667,8 +664,7 @@ impl CheckerState {
                                 d::X_0_can_only_be_imported_by_using_a_default_import,
                                 vec![declaration_name],
                             )?;
-                        } else if self.ast(name)?.node(name)?.flags()
-                            & ts_ast::node_flags::JAVA_SCRIPT_FILE
+                        } else if self.node(name)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE
                             != 0
                         {
                             self.error_at(Some(name),d::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import,vec![declaration_name])?;
@@ -818,7 +814,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() != K::ExportDeclaration {
                 continue;
             }

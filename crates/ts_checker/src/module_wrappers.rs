@@ -74,7 +74,7 @@ impl CheckerState {
             .resolve_module_symbol(Some(symbol), false)?
             .ok_or(Error::MissingLink("module default alias target"))?;
         self.module_aliases.targets.insert(default, Ok(target));
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         members.insert(JsString::from_bytes(names::DEFAULT), Some(default));
         if anonymous.is_none() {
             if let Some(original) = original {
@@ -132,16 +132,7 @@ impl CheckerState {
         &mut self,
         table: Option<ts_ast::SymbolTableId>,
     ) -> Result<Option<ts_ast::SymbolTableId>, Error> {
-        table
-            .map(|table| {
-                let copied = self
-                    .table(table)?
-                    .iter()
-                    .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
-                    .collect();
-                Ok(self.alloc_symbol_table(copied))
-            })
-            .transpose()
+        self.clone_symbol_table(table)
     }
     // port: tsc/internal/checker/checker.go:Checker.invocationErrorRecovery
     pub(crate) fn module_invocation_error_related(
@@ -155,7 +146,7 @@ impl CheckerState {
         let Some(&(target, import)) = self.module_aliases.export_types.get(&symbol) else {
             return Ok(None);
         };
-        if self.ast(import)?.node(import)?.kind() == ts_ast::SyntaxKind::CallExpression {
+        if self.node(import)?.kind() == ts_ast::SyntaxKind::CallExpression {
             return Ok(None);
         }
         let ty = self.get_type_of_symbol(target)?;

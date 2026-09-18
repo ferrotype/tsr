@@ -44,7 +44,7 @@ impl CheckerState {
         }
         let declaration = self.signatures.get(signature)?.declaration;
         let (constructor, symbol) = if let Some(declaration) = declaration {
-            let kind = self.ast(declaration)?.node(declaration)?.kind();
+            let kind = self.node(declaration)?.kind();
             (
                 matches!(
                     kind.known(),
@@ -101,9 +101,9 @@ impl CheckerState {
         } else if let Some(composite) = composite {
             self.compound_type_predicate(&composite.signatures, composite.is_union)?
         } else if let Some(declaration) = declaration {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             match read.type_node() {
-                Some(node) if self.ast(node)?.node(node)?.kind() == K::TypePredicate => {
+                Some(node) if self.node(node)?.kind() == K::TypePredicate => {
                     Some(self.predicate_from_node(node, signature)?)
                 }
                 None if read.body().is_some() => {
@@ -146,7 +146,7 @@ impl CheckerState {
         signature: SignatureId,
     ) -> Result<crate::TypePredicateId, Error> {
         use crate::TypePredicateKind as Kind;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_type_predicate_node()
@@ -154,13 +154,13 @@ impl CheckerState {
         let name = data
             .parameter_name()
             .ok_or(Error::MissingLink("predicate name"))?;
-        let this = self.ast(name)?.node(name)?.kind() == K::ThisType;
+        let this = self.node(name)?.kind() == K::ThisType;
         let asserts = data.asserts_modifier().is_some();
         let annotation = data.r#type();
         let text = if this {
             ts_ast::JsString::default()
         } else {
-            self.ast(name)?.node_text(name)?.into_js_string()
+            self.node_text(name)?.into_js_string()
         };
         let mut parameter_index = if this { 0 } else { -1 };
         if !this {
@@ -211,13 +211,13 @@ impl CheckerState {
             let Some(declaration) = declaration else {
                 continue;
             };
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if !ts_ast::utilities::is_function_like(Some(&read)) {
                 continue;
             }
             if index > 0 && read.body().is_some() {
                 if let Some(previous) = declarations[index - 1] {
-                    let previous = self.ast(previous)?.node(previous)?;
+                    let previous = self.node(previous)?;
                     if read.parent() == previous.parent()
                         && read.kind() == previous.kind()
                         && (read.pos() == previous.end() || previous.flags() & nf::REPARSED != 0)
@@ -243,7 +243,7 @@ impl CheckerState {
         if let Some(Some(signature)) = self.query.source_signatures.try_get(node) {
             return Ok(*signature);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let construct = matches!(
             read.kind().known(),
             Some(K::Constructor | K::ConstructorType | K::ConstructSignature)
@@ -258,8 +258,7 @@ impl CheckerState {
         };
         if abstract_node
             .map(|node| {
-                self.ast(node)?
-                    .node(node)?
+                self.node(node)?
                     .modifier_flags(self.ast(node)?)
                     .map_err(Error::from)
             })
@@ -287,7 +286,7 @@ impl CheckerState {
         {
             let mut untyped = true;
             for &parameter in &nodes {
-                if self.ast(parameter)?.node(parameter)?.type_node().is_some() {
+                if self.node(parameter)?.type_node().is_some() {
                     untyped = false;
                     break;
                 }
@@ -309,7 +308,7 @@ impl CheckerState {
                     .node(parameter)?
                     .name()
                     .ok_or(Error::MissingLink("parameter property name"))?;
-                if self.ast(name)?.node(name)?.kind() == K::Identifier {
+                if self.node(name)?.kind() == K::Identifier {
                     let text = ts_ast::JsString::from_bytes(self.symbol(symbol)?.name_bytes());
                     symbol = self
                         .resolve_name(
@@ -322,14 +321,14 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("parameter property local symbol"))?;
                 }
             }
-            let read = self.ast(parameter)?.node(parameter)?;
+            let read = self.node(parameter)?;
             if index == 0 && self.symbol(symbol)?.name_bytes() == b"this" {
                 this_parameter = Some(symbol);
             } else {
                 parameters.push(symbol);
             }
             if let Some(annotation) = read.type_node() {
-                if self.ast(annotation)?.node(annotation)?.kind() == K::LiteralType {
+                if self.node(annotation)?.kind() == K::LiteralType {
                     flags |= sg::HAS_LITERAL_TYPES;
                 }
             }
@@ -350,7 +349,7 @@ impl CheckerState {
                 minimum = parameters.len();
             }
         }
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         if this_parameter.is_none() && matches!(kind.known(), Some(K::GetAccessor | K::SetAccessor))
         {
             let bindable = if !ts_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
@@ -380,7 +379,7 @@ impl CheckerState {
                 }
             }
         }
-        let type_parameters = if self.ast(node)?.node(node)?.kind() == K::Constructor {
+        let type_parameters = if self.node(node)?.kind() == K::Constructor {
             let class = self.constructor_class_type(node)?;
             let data = self.types.interface(class)?;
             data.type_parameters()[data.outer_type_parameter_count as usize..]
@@ -454,9 +453,9 @@ impl CheckerState {
             if let Some(ty) = self.return_type_from_annotation(node)? {
                 return Ok(ty);
             }
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if let Some(body) = read.body() {
-                if !ts_ast::node_is_missing(Some(&self.ast(body)?.node(body)?)) {
+                if !ts_ast::node_is_missing(Some(&self.node(body)?)) {
                     return self.return_type_from_body(node);
                 }
             }
@@ -475,7 +474,7 @@ impl CheckerState {
         let mut ty = result?;
         if !complete {
             if let Some(node) = declaration {
-                let annotation = self.ast(node)?.node(node)?.type_node();
+                let annotation = self.node(node)?.type_node();
                 let options = self.program()?.host.options();
                 let no_implicit_any = options.strict_option_value(options.no_implicit_any);
                 if let Some(annotation) = annotation {
@@ -521,7 +520,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::Constructor {
             return self.constructor_class_type(node).map(Some);
         }
@@ -626,7 +625,7 @@ impl CheckerState {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSignatureOfFullSignatureType
     pub(crate) fn full_signature_type_node(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE == 0 {
             return Ok(None);
         }
@@ -668,10 +667,7 @@ impl CheckerState {
         let Some(signature) = self.signature_of_full_signature(function)? else {
             return Ok(None);
         };
-        let parameters = self.source_list(
-            function,
-            self.ast(function)?.node(function)?.parameter_list(),
-        )?;
+        let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
         let index = parameters
             .iter()
             .position(|&node| node == parameter)
@@ -710,18 +706,18 @@ impl CheckerState {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getAccessorThisParameter
     pub(crate) fn accessor_this_parameter(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let count = if read.kind() == K::GetAccessor { 1 } else { 2 };
         let parameters = self.source_list(node, read.parameter_list())?;
         if parameters.len() != count {
             return Ok(None);
         }
         let parameter = parameters[0];
-        let Some(name) = self.ast(parameter)?.node(parameter)?.name() else {
+        let Some(name) = self.node(parameter)?.name() else {
             return Ok(None);
         };
-        Ok((self.ast(name)?.node(name)?.kind() == K::Identifier
-            && self.ast(name)?.node_text(name)?.as_bytes() == b"this")
+        Ok((self.node(name)?.kind() == K::Identifier
+            && self.node_text(name)?.as_bytes() == b"this")
             .then_some(parameter))
     }
 }

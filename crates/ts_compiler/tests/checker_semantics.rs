@@ -4075,6 +4075,32 @@ fn reported_relation_failures_are_not_elaborated_twice() {
     assert_eq!(missing.related_information.len(), 1);
 }
 
+#[test]
+fn binding_pattern_display_preserves_trailing_commas() {
+    // Pinned native display witnesses: declarationEmitDestructuring5 and
+    // arrayBindingPatternOmittedExpressions. Binding-name cloning uses the
+    // plain visitor, unlike annotation reuse's nonlocal position reset.
+    for (text, expected) in [
+        (
+            "interface Arg { a: number } const f = ({ a, }: Arg) => a;",
+            "({ a, }: Arg) => number",
+        ),
+        (
+            "const f = ([, z, ,]: [any, any, any?]) => {};",
+            "([, z, ,]: [any, any, any?]) => void",
+        ),
+        (
+            "interface Arg { a: number } const f = ({ a }: Arg) => a;",
+            "({ a }: Arg) => number",
+        ),
+    ] {
+        assert_eq!(
+            variable_type_display(text.as_bytes(), options(), b"f"),
+            expected
+        );
+    }
+}
+
 /// The displayed type of the top-level `const`/`let` named `name` in `/main.ts`.
 fn variable_type_display(text: &[u8], options: CompilerOptions, name: &[u8]) -> String {
     let (owner, program, _) = fixture(text, options);
@@ -4156,5 +4182,234 @@ fn negative_numeric_string_property_names_display_as_string_literals() {
     assert_eq!(
         variable_type_display(text, options(), b"t7"),
         "{ \"-1\": number; }"
+    );
+}
+
+#[test]
+fn nongeneric_type_display_does_not_resolve_iterable_globals() {
+    // The pin checks iterable defaults only inside len(typeArguments) > 0.
+    // Keep these globals unqueried so accidental resolution is observable.
+    let text = b"class C {}
+interface Iterable<T, R = any, N = any> {}
+interface IterableIterator<T, R = any, N = any> {}
+interface AsyncIterable<T, R = any, N = any> {}
+interface AsyncIterableIterator<T, R = any, N = any> {}";
+    let (owner, program, _) = fixture(text, options());
+    let name = declaration_name(&program, declarations(&program)[0]);
+    let mut op = owner.operation().unwrap();
+    let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+    let ty = op.get_declared_type_of_symbol(symbol).unwrap();
+    let before = op.type_count();
+    assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"C");
+    assert_eq!(
+        op.type_count(),
+        before,
+        "display must not initialize unrelated iterable types"
+    );
+    // A reference with an implicit this argument is different: Go has a
+    // non-nil empty TypeParameters slice and still runs the four probes.
+    let reference = op.type_reference(ty, &[ty]).unwrap();
+    let before = op.type_count();
+    assert_eq!(op.type_to_string(reference, 0).unwrap().as_bytes(), b"C");
+    assert_eq!(op.type_count(), before + 20);
+}
+
+#[test]
+fn missing_property_checks_promised_type_before_suggestions() {
+    // Native probe at the pin: TS2339 at all three accesses, with TS2773
+    // related information only when the promised value actually has the name.
+    let text = b"interface Promise<T> { then(onfulfilled: (value: T) => unknown): unknown; }\ndeclare let value: Promise<{ foo: number }>;\nvalue.foo;\nvalue.bar;\ndeclare let inert: {then: number}; inert.foo;";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    let diagnostics = op.semantic_diagnostics(source).unwrap();
+    assert_eq!(diagnostics.len(), 3);
+    for (diagnostic, (pos, end, related)) in diagnostics.iter().zip([
+        (127, 130, vec![2773]),
+        (138, 141, vec![]),
+        (184, 187, vec![]),
+    ]) {
+        assert_eq!(diagnostic.code, 2339);
+        assert_eq!((diagnostic.loc.pos(), diagnostic.loc.end()), (pos, end));
+        assert_eq!(
+            diagnostic
+                .related_information
+                .iter()
+                .map(|d| d.code)
+                .collect::<Vec<_>>(),
+            related
+        );
+    }
+    let before = op.type_count();
+    assert_eq!(op.semantic_diagnostics(source).unwrap(), diagnostics);
+    assert_eq!(op.type_count(), before);
+}
+
+#[test]
+fn relation_error_initializes_symbol_wrapper_in_upstream_order() {
+    // Native check leaves Symbol unresolved for the valid assignment, but
+    // resolves it in error elaboration even though the target is string.
+    for (text, expected_errors, resolve_delta) in [
+        (
+            b"declare function f(): void; let s: string = f;".as_slice(),
+            1,
+            0,
+        ),
+        (b"declare function f(): void; let s = f;".as_slice(), 0, 1),
+    ] {
+        let (owner, program, _) = fixture_files(
+            b"/main.ts",
+            &[(b"/main.ts", text), (b"/lib.d.ts", b"interface Symbol {}")],
+            options(),
+        );
+        let source = program.file(b"/main.ts").unwrap().source();
+        let library = program.file(b"/lib.d.ts").unwrap();
+        let view = library.bound().view().ast();
+        let declaration = view
+            .node_slice(
+                view.node(library.source())
+                    .unwrap()
+                    .statements(view)
+                    .unwrap(),
+            )
+            .unwrap()
+            .iter()
+            .flatten()
+            .next()
+            .unwrap();
+        let name = view.node(declaration).unwrap().name().unwrap();
+        let mut op = owner.operation().unwrap();
+        let diagnostics = op.semantic_diagnostics(source).unwrap();
+        assert_eq!(diagnostics.len(), expected_errors);
+        if let Some(diagnostic) = diagnostics.first() {
+            assert_eq!(diagnostic.code, 2322);
+        }
+        let before = op.type_count();
+        let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
+        op.get_declared_type_of_symbol(symbol).unwrap();
+        assert_eq!(op.type_count(), before + resolve_delta);
+    }
+}
+
+#[test]
+fn ordinary_tuple_context_skips_const_mutability_relation() {
+    // The readonly tuple is inferred through a generic call. Go does not run
+    // the const-only mutability relation for this ordinary array literal.
+    // Native check creates 115 types; the eager relation creates 118.
+    let text = b"interface Array<T> { length: number; [n: number]: T; push(...items: T[]): number; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T; }\ndeclare function consume<K extends object | symbol, V>(value: readonly (readonly [K, V])[]): void;\ndeclare const s: symbol;\nconsume([[s, false]]);";
+    let (owner, source) = checker(text, options());
+    let mut op = owner.operation().unwrap();
+    assert!(op.semantic_diagnostics(source).unwrap().is_empty());
+    assert_eq!(op.type_count(), 115);
+}
+
+const REVIEW_PROMISE_LIBRARY: &[u8] = b"interface PromiseLike<T> { then<TResult>(onfulfilled: (value: T) => TResult): PromiseLike<TResult>; } interface Promise<T> extends PromiseLike<T> {} interface PromiseConstructor { new<T>(executor: (resolve: (value: T | PromiseLike<T>) => void) => void): Promise<T>; } declare var Promise: PromiseConstructor;";
+
+#[test]
+fn promise_resolve_arity_in_typescript_includes_the_void_hint() {
+    // Native getArgumentArityError: TS2794 for resolve, ordinary TS2554 otherwise.
+    let (owner, program, _) = fixture_files(
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"new Promise<number>(resolve => { resolve(); });\ndeclare function ordinary(value: number): void; ordinary();"),
+            (b"/lib.d.ts", REVIEW_PROMISE_LIBRARY),
+        ],
+        options(),
+    );
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(program.file(b"/main.ts").unwrap().source())
+        .unwrap();
+    assert_eq!(
+        diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>(),
+        [(2794, 33, 40), (2554, 96, 104)]
+    );
+    for diagnostic in diagnostics {
+        assert_eq!(
+            diagnostic.message_args,
+            [
+                JsString::from_bytes(b"1".as_slice()),
+                JsString::from_bytes(b"0".as_slice())
+            ]
+        );
+        assert_eq!(
+            diagnostic
+                .related_information
+                .iter()
+                .map(|d| d.code)
+                .collect::<Vec<_>>(),
+            [6210]
+        );
+    }
+}
+
+#[test]
+fn dynamic_imports_check_emitted_typescript_extensions() {
+    for allow_ts in [false, true] {
+        let (owner, program, _) = fixture_files(
+            b"/main.ts",
+            &[
+                (b"/main.ts", b"import(\"./a.ts\"); import(\"./b.d.ts\");"),
+                (b"/a.ts", b"export const a = 1;"),
+                (b"/b.d.ts", b"export declare const b: number;"),
+                (b"/lib.d.ts", REVIEW_PROMISE_LIBRARY),
+            ],
+            CompilerOptions {
+                allow_importing_ts_extensions: if allow_ts {
+                    Tristate::TRUE
+                } else {
+                    Tristate::FALSE
+                },
+                ..options()
+            },
+        );
+        let diagnostics = owner
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(program.file(b"/main.ts").unwrap().source())
+            .unwrap();
+        let observed = diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>();
+        // Declaration files are never emittable, even when .ts imports are allowed.
+        assert_eq!(
+            observed,
+            if allow_ts {
+                vec![(2846, 25, 35)]
+            } else {
+                vec![(5097, 7, 15), (2846, 25, 35)]
+            }
+        );
+        assert_eq!(
+            diagnostics.last().unwrap().message_args,
+            [JsString::from_bytes(if allow_ts {
+                b"./b.ts".as_slice()
+            } else {
+                b"./b.js".as_slice()
+            })]
+        );
+    }
+}
+
+#[test]
+fn index_keys_distinguish_generic_types_and_branded_primitives() {
+    let (owner, source) = checker(b"type A<T> = { [key: keyof T]: number };\ntype B<T> = { [key: T]: number };\ntype Key = string & { __brand: true };\ntype C = { [key: Key]: number };\ntype D = { [key: { __brand: true }]: number };", options());
+    let diagnostics = owner
+        .operation()
+        .unwrap()
+        .semantic_diagnostics(source)
+        .unwrap();
+    // Pinned grammar: generic keys get TS1337, concrete branded strings are
+    // valid, and a nonprimitive object key still gets TS1268.
+    assert_eq!(
+        diagnostics
+            .iter()
+            .map(|d| (d.code, d.loc.pos(), d.loc.end()))
+            .collect::<Vec<_>>(),
+        [(1337, 15, 18), (1337, 55, 58), (1268, 158, 161)]
     );
 }

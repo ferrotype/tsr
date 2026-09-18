@@ -27,7 +27,7 @@ impl NodeBuilder<'_> {
                 is_signature_return,
             } => {
                 let node = *expression;
-                let parent = self.checker.ast(node)?.node(node)?.parent();
+                let parent = self.checker.node(node)?.parent();
                 if !error_nodes.is_empty() {
                     for &node in error_nodes {
                         self.report(Event::InferenceFallback(node));
@@ -54,14 +54,14 @@ impl NodeBuilder<'_> {
                     return self.pseudo_return_node(node);
                 }
                 if let Some(parent) = parent {
-                    let read = self.checker.ast(parent)?.node(parent)?;
+                    let read = self.checker.node(parent)?;
                     if read.kind() == K::ReturnStatement {
                         let function = self
                             .checker
                             .containing_body_function(node)?
                             .ok_or(Error::MissingLink("pseudo return container"))?;
                         if matches!(
-                            self.checker.ast(function)?.node(function)?.kind().known(),
+                            self.checker.node(function)?.kind().known(),
                             Some(K::GetAccessor | K::SetAccessor)
                         ) {
                             return self.serialize_declaration_type(
@@ -320,10 +320,7 @@ impl NodeBuilder<'_> {
                             };
                             // Comment range metadata is attached only when the
                             // original declaration is in this enclosing file.
-                            b.pseudo_comment_range(
-                                node,
-                                b.checker.ast(element.name)?.node(element.name)?.parent(),
-                            )?;
+                            b.pseudo_comment_range(node, b.checker.node(element.name)?.parent())?;
                             Ok(node)
                         };
                         let node = if let Some(signature) = element.signature() {
@@ -405,7 +402,7 @@ impl NodeBuilder<'_> {
         let node =
             self.ast
                 .new_parameter_declaration(None, rest, Some(name), question, Some(ty), None);
-        if self.checker.ast(parent)?.node(parent)?.kind() == K::Parameter {
+        if self.checker.node(parent)?.kind() == K::Parameter {
             self.pseudo_comment_range(node, Some(parent))?;
         }
         Ok(node)
@@ -429,7 +426,7 @@ impl NodeBuilder<'_> {
             )?
         {
             self.emit
-                .set_comment_range(node, self.checker.ast(original)?.node(original)?.range());
+                .set_comment_range(node, self.checker.node(original)?.range());
         }
         Ok(())
     }

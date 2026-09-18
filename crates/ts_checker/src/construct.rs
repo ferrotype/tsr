@@ -301,12 +301,15 @@ impl CheckerState {
         let Some(members) = members else {
             return Ok(None);
         };
-        let table: Vec<_> = self
+        // Reserved names are a property of the bytes alone, so the table is
+        // read once and no name is copied out of it; Go's loop reads the map
+        // keys in place the same way.
+        let candidates: Vec<SymbolId> = self
             .table(members)?
-            .into_iter()
-            .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
+            .iter()
+            .filter_map(|(name, symbol)| symbol.filter(|_| !is_reserved_member_name(name)))
             .collect();
-        if table.is_empty() {
+        if self.table(members)?.is_empty() {
             return Ok(None);
         }
         let container_is_class_like = match container {
@@ -316,39 +319,30 @@ impl CheckerState {
             }
             None => false,
         };
-        let mut result = Vec::with_capacity(table.len());
-        let mut contained_count = 0;
-        if container_is_class_like {
-            for (id, symbol) in &table {
-                let symbol = *symbol;
-                let Some(symbol) = symbol else { continue };
-                if self.is_named_member(symbol, id.as_bytes())?
-                    && self.is_declaration_contained_by(
-                        symbol,
-                        container.expect("class-like container"),
-                    )?
-                {
-                    result.push(symbol);
-                }
+        // The container's declaration ranges do not change per member.
+        let container_ranges = if container_is_class_like {
+            self.declaration_ranges(container.expect("class-like container"))?
+        } else {
+            Vec::new()
+        };
+        let mut contained = Vec::new();
+        let mut others = Vec::with_capacity(candidates.len());
+        for symbol in candidates {
+            if !self.symbol_is_value(symbol)? {
+                continue;
             }
-            contained_count = result.len();
-        }
-        for (id, symbol) in &table {
-            let symbol = *symbol;
-            let Some(symbol) = symbol else { continue };
-            if self.is_named_member(symbol, id.as_bytes())?
-                && (!container_is_class_like
-                    || !self.is_declaration_contained_by(
-                        symbol,
-                        container.expect("class-like container"),
-                    )?)
+            if container_is_class_like
+                && self.value_declaration_within(symbol, &container_ranges)?
             {
-                result.push(symbol);
+                contained.push(symbol);
+            } else {
+                others.push(symbol);
             }
         }
-        self.sort_symbols(&mut result[..contained_count])?;
-        self.sort_symbols(&mut result[contained_count..])?;
-        Ok(Some(Arc::from(result)))
+        self.sort_symbols(&mut contained)?;
+        self.sort_symbols(&mut others)?;
+        contained.extend(others);
+        Ok(Some(Arc::from(contained)))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isNamedMember
@@ -375,23 +369,32 @@ impl CheckerState {
                     != 0)
     }
 
+    /// The `(pos, end)` of each of `symbol`'s declarations.
+    fn declaration_ranges(&self, symbol: SymbolId) -> Result<Vec<(i32, i32)>, Error> {
+        let mut ranges = Vec::new();
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
+            let node = self.node(declaration)?;
+            ranges.push((node.pos(), node.end()));
+        }
+        Ok(ranges)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.isDeclarationContainedBy
-    fn is_declaration_contained_by(
+    /// Whether `symbol`'s value declaration lies inside one of the container
+    /// declaration `ranges` (source compares ranges, without a same-file test).
+    fn value_declaration_within(
         &self,
         symbol: SymbolId,
-        container: SymbolId,
+        ranges: &[(i32, i32)],
     ) -> Result<bool, Error> {
-        if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            let node = self.ast(declaration)?.node(declaration)?;
-            for declaration in self.symbol_declarations(container)?.iter().flatten() {
-                let containing = self.ast(declaration)?.node(declaration)?;
-                // Source compares ranges, without an extra same-file condition.
-                if node.pos() >= containing.pos() && node.end() <= containing.end() {
-                    return Ok(true);
-                }
-            }
-        }
-        Ok(false)
+        let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
+            return Ok(false);
+        };
+        let node = self.node(declaration)?;
+        let (pos, end) = (node.pos(), node.end());
+        Ok(ranges
+            .iter()
+            .any(|&(start, stop)| pos >= start && end <= stop))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.newTypeParameter
@@ -718,7 +721,7 @@ impl CheckerState {
     }
 
     pub(crate) fn kind(&self, t: TypeId) -> Result<TypeKind, Error> {
-        Ok(self.types.get(t)?.kind)
+        Ok(self.types.get(t)?.kind())
     }
 }
 

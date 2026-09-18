@@ -93,7 +93,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<TypeList, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE != 0 {
             if let Some(signature) = self.signature_of_full_signature(node)? {
                 return Ok(self
@@ -104,7 +104,7 @@ impl CheckerState {
                     .unwrap_or_default());
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let nodes = self.source_list(node, read.type_parameter_list())?;
         let mut result = Vec::with_capacity(nodes.len());
         for node in nodes {
@@ -129,7 +129,7 @@ impl CheckerState {
         let mut result = Vec::new();
         for node in declarations.into_iter().flatten() {
             if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(
                     K::InterfaceDeclaration
                         | K::ClassDeclaration
@@ -155,9 +155,9 @@ impl CheckerState {
         include_this: bool,
     ) -> Result<TypeList, Error> {
         let mut ancestors = Vec::new();
-        let mut parent = self.ast(node)?.node(node)?.parent();
+        let mut parent = self.node(node)?.parent();
         while let Some(node) = parent {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -185,7 +185,7 @@ impl CheckerState {
         }
         let mut result = Vec::new();
         for node in ancestors.into_iter().rev() {
-            let kind = self.ast(node)?.node(node)?.kind();
+            let kind = self.node(node)?.kind();
             if kind == K::MappedType {
                 let ty = self.source_mapped_type(node)?;
                 result.push(self.mapped_parameter(ty)?);
@@ -224,7 +224,7 @@ impl CheckerState {
             return Ok(None);
         };
         for node in self.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if let Some(parameter) = read.data_source().as_type_parameter_declaration() {
                 if let Some(default) = parameter.default_type() {
                     return Ok(Some(default));

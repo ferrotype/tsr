@@ -1,5 +1,7 @@
 """Acceptance cannot be manufactured by shrinking, skipping or waiving failures."""
 import copy
+import contextlib
+import io
 from pathlib import Path
 import sys
 import tempfile
@@ -11,6 +13,47 @@ import s08_e2 as e2
 import s08_e2_contract as c
 import s08_e2_obligations as obligations
 import test_s08_p5_corpus as p5_tests
+
+
+class CaptureProvenance(unittest.TestCase):
+    def test_oracle_and_cargo_files_participate_in_staleness_check(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            names = ('tools/s08/oracle/families/census.go', '.cargo/config.toml')
+            for name in names:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('original')
+            with patch.object(e2, 'ROOT', root), patch.object(e2.corpus, 'sources', side_effect=dict):
+                original = e2.sources()
+                self.assertEqual(set(original), set(names))
+                for name in names:
+                    with self.subTest(name=name):
+                        (root / name).write_text('changed')
+                        with patch.object(e2.p4, 'read', return_value={'build': {'sources': original}}):
+                            with self.assertRaisesRegex(ValueError, 'stale sources'):
+                                e2.verify(root)
+                        (root / name).write_text('original')
+
+    def test_equal_metrics_keep_distinct_authenticated_capture_identities(self):
+        reports = []
+        identities = []
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'corpus').mkdir()
+            for capture in ('a' * 64, 'b' * 64):
+                verified = {'metrics': {'types_parity': 1}, 'capture_sha256': capture,
+                            'obligations_sha256': 'c' * 64, 'divergences_sha256': 'd' * 64}
+                stderr = io.StringIO()
+                with patch.object(e2, 'DEFAULT', root), patch.object(e2, 'verify', return_value=verified), \
+                        patch('s07_producers.e2', return_value={'metrics': {'frozen_subset': True}}), \
+                        contextlib.redirect_stderr(stderr):
+                    reports.append(e2.producer())
+                identity = e2.p4.strict_json_loads(stderr.getvalue().removeprefix('E2 verified capture: '))
+                self.assertEqual(identity, {key: value for key, value in verified.items() if key != 'metrics'})
+                identities.append(identity)
+        self.assertEqual(reports[0], reports[1])
+        self.assertNotEqual(identities[0], identities[1])
 
 
 class Acceptance(unittest.TestCase):

@@ -11,7 +11,7 @@ use ts_diagnostics as d;
 
 impl CheckerState {
     pub(crate) fn import_attributes(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read.data_source();
         Ok(match read.kind().known() {
             Some(K::ImportDeclaration | K::JSImportDeclaration) => {
@@ -46,7 +46,7 @@ impl CheckerState {
                 .ok_or(ts_arena::Error::InvalidGraph)?
                 .value()
                 .ok_or(ts_arena::Error::InvalidGraph)?;
-            if self.ast(value)?.node(value)?.kind() != K::StringLiteral {
+            if self.node(value)?.kind() != K::StringLiteral {
                 has_error = true;
                 self.error_at(
                     Some(value),
@@ -69,15 +69,15 @@ impl CheckerState {
             sf::OBJECT_LITERAL,
             JsString::from_bytes(names::IMPORT_ATTRIBUTES),
         )?;
-        let mut members = SymbolTable::new();
+        let mut members = SymbolTable::default();
         for attribute in self.import_attribute_nodes(node)? {
-            let read = self.ast(attribute)?.node(attribute)?;
+            let read = self.node(attribute)?;
             let data = read
                 .as_import_attribute()
                 .ok_or(ts_arena::Error::InvalidGraph)?;
             let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
             let value = data.value().ok_or(ts_arena::Error::InvalidGraph)?;
-            let name = self.ast(name)?.node_text(name)?.into_js_string();
+            let name = self.node_text(name)?.into_js_string();
             let member = self.new_symbol(sf::PROPERTY, name.clone())?;
             let ty = self.check_expression_cached(value)?;
             let ty = self.get_regular_type_of_literal_type(ty)?;
@@ -96,7 +96,7 @@ impl CheckerState {
         node: Option<NodeId>,
     ) -> Result<Option<TypeId>, Error> {
         let Some(node) = node else { return Ok(None) };
-        let ty = if self.ast(node)?.node(node)?.kind() == K::ImportAttributes {
+        let ty = if self.node(node)?.kind() == K::ImportAttributes {
             self.import_attributes_expression_type(node)?
         } else {
             self.check_expression_cached(node)?
@@ -108,10 +108,10 @@ impl CheckerState {
         &mut self,
         specifier: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let Some(parent) = self.ast(specifier)?.node(specifier)?.parent() else {
+        let Some(parent) = self.node(specifier)?.parent() else {
             return Ok(None);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         match read.kind().known() {
             Some(K::ImportDeclaration | K::JSImportDeclaration | K::ExportDeclaration) => {
                 self.type_from_import_attributes(self.import_attributes(parent)?)
@@ -120,7 +120,7 @@ impl CheckerState {
                 let Some(import) = read.parent() else {
                     return Ok(None);
                 };
-                if self.ast(import)?.node(import)?.kind() == K::ImportType {
+                if self.node(import)?.kind() == K::ImportType {
                     self.type_from_import_attributes(self.import_attributes(import)?)
                 } else {
                     Ok(None)
@@ -158,12 +158,11 @@ impl CheckerState {
             let target = self.nullable_type(global, tf::UNDEFINED)?;
             self.check_assignable_at(ty, target, node)?;
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let type_only = match read.kind().known() {
             Some(K::ImportDeclaration | K::JSImportDeclaration) => {
                 if let Some(clause) = read.as_import_declaration().and_then(|n| n.import_clause()) {
-                    self.ast(clause)?
-                        .node(clause)?
+                    self.node(clause)?
                         .as_import_clause()
                         .is_some_and(|n| n.phase_modifier() == K::TypeKeyword)
                 } else {
@@ -242,19 +241,19 @@ impl CheckerState {
             return Ok(false);
         };
         for attribute in self.import_attribute_nodes(attributes)? {
-            let read = self.ast(attribute)?.node(attribute)?;
+            let read = self.node(attribute)?;
             let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
             let value = read
                 .as_import_attribute()
                 .ok_or(ts_arena::Error::InvalidGraph)?
                 .value()
                 .ok_or(ts_arena::Error::InvalidGraph)?;
-            if self.ast(name)?.node_text(name)?.as_bytes() == b"type"
+            if self.node_text(name)?.as_bytes() == b"type"
                 && matches!(
-                    self.ast(value)?.node(value)?.kind().known(),
+                    self.node(value)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                 )
-                && self.ast(value)?.node_text(value)?.as_bytes() == b"json"
+                && self.node_text(value)?.as_bytes() == b"json"
             {
                 return Ok(true);
             }
@@ -276,10 +275,10 @@ impl CheckerState {
             .collect::<Vec<_>>();
         let mut ty = self.builtins.empty_object_type;
         for declaration in declarations {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.kind() == K::ModuleDeclaration {
                 if let Some(name) = read.name() {
-                    if self.ast(name)?.node(name)?.kind() == K::StringLiteral {
+                    if self.node(name)?.kind() == K::StringLiteral {
                         if let Some(attributes) = self.import_attributes(declaration)? {
                             ty = self.get_type_from_type_node(attributes)?;
                         }
@@ -304,11 +303,8 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarImportAttributesType
     fn check_grammar_import_attributes_type(&mut self, attributes: NodeId) -> Result<bool, Error> {
-        for member in self.source_list(
-            attributes,
-            self.ast(attributes)?.node(attributes)?.member_list(),
-        )? {
-            let read = self.ast(member)?.node(member)?;
+        for member in self.source_list(attributes, self.node(attributes)?.member_list())? {
+            let read = self.node(member)?;
             if read.kind() != K::PropertySignature {
                 return self.grammar_error_node(
                     member,
@@ -332,7 +328,7 @@ impl CheckerState {
             }
             let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
             if !matches!(
-                self.ast(name)?.node(name)?.kind().known(),
+                self.node(name)?.kind().known(),
                 Some(K::Identifier | K::StringLiteral | K::NoSubstitutionTemplateLiteral)
             ) {
                 return self.grammar_error_node(
@@ -341,7 +337,7 @@ impl CheckerState {
                     vec![],
                 );
             }
-            let text = self.ast(name)?.node_text(name)?.into_js_string();
+            let text = self.node_text(name)?.into_js_string();
             if text.as_bytes() == b"resolution-mode" {
                 return self.grammar_error_node(
                     name,
@@ -356,7 +352,7 @@ impl CheckerState {
                 .and_then(|n| n.literal());
             let valid = if let Some(literal) = literal {
                 matches!(
-                    self.ast(literal)?.node(literal)?.kind().known(),
+                    self.node(literal)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                 )
             } else {

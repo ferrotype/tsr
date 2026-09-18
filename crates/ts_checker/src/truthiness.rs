@@ -29,7 +29,7 @@ impl CheckerState {
         node = self.truthy_skip_parentheses(node)?;
         loop {
             self.known_truthy_type(node, ty, body)?;
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let Some(data) = read.data_source().as_binary_expression() else {
                 break;
             };
@@ -59,8 +59,7 @@ impl CheckerState {
             location,
         )? {
             let right = required(
-                self.ast(location)?
-                    .node(location)?
+                self.node(location)?
                     .data_source()
                     .as_binary_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?
@@ -83,7 +82,7 @@ impl CheckerState {
         } else {
             self.check_expression(location)?
         };
-        let read = self.ast(location)?.node(location)?;
+        let read = self.node(location)?;
         let property = read.kind() == K::PropertyAccessExpression;
         let receiver = if property { read.expression() } else { None };
         if self.types.flags(ty)? & tf::ENUM_LITERAL != 0 && property {
@@ -118,7 +117,7 @@ impl CheckerState {
         let cast = if let Some(receiver) = receiver {
             let receiver = self.truthy_skip_parentheses(receiver)?;
             matches!(
-                self.ast(receiver)?.node(receiver)?.kind().known(),
+                self.node(receiver)?.kind().known(),
                 Some(K::AsExpression | K::TypeAssertionExpression)
             )
         } else {
@@ -132,7 +131,7 @@ impl CheckerState {
         if !callable && !promise {
             return Ok(());
         }
-        let read = self.ast(location)?.node(location)?;
+        let read = self.node(location)?;
         let tested_node = if read.kind() == K::Identifier {
             Some(location)
         } else if property {
@@ -149,8 +148,8 @@ impl CheckerState {
         }
         let mut used = false;
         if let Some(symbol) = symbol {
-            if let Some(parent) = self.ast(condition)?.node(condition)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() == K::BinaryExpression {
+            if let Some(parent) = self.node(condition)?.parent() {
+                if self.node(parent)?.kind() == K::BinaryExpression {
                     used = self.symbol_used_binary_chain(parent, symbol)?;
                 }
             }
@@ -189,11 +188,8 @@ impl CheckerState {
         Ok(())
     }
     fn truthy_skip_parentheses(&self, mut node: NodeId) -> Result<NodeId, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedExpression {
-            node = required(
-                self.ast(node)?.node(node)?.expression(),
-                "truthy parentheses",
-            )?;
+        while self.node(node)?.kind() == K::ParenthesizedExpression {
+            node = required(self.node(node)?.expression(), "truthy parentheses")?;
         }
         Ok(node)
     }
@@ -204,7 +200,7 @@ impl CheckerState {
         symbol: SymbolId,
     ) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let Some(data) = read.data_source().as_binary_expression() else {
                 return Ok(false);
             };
@@ -220,7 +216,7 @@ impl CheckerState {
             let parent = read.parent();
             let mut stack: Vec<_> = self.source_children(right)?.into_iter().rev().collect();
             while let Some(child) = stack.pop() {
-                if self.ast(child)?.node(child)?.kind() == K::Identifier
+                if self.node(child)?.kind() == K::Identifier
                     && self.get_symbol_at_location(child)? == Some(symbol)
                 {
                     return Ok(true);
@@ -242,9 +238,9 @@ impl CheckerState {
         tested: NodeId,
         symbol: SymbolId,
     ) -> Result<bool, Error> {
-        let read = self.ast(tested)?.node(tested)?;
+        let read = self.node(tested)?;
         let tested_parent = read.parent();
-        let simple = self.ast(condition)?.node(condition)?.kind() == K::Identifier
+        let simple = self.node(condition)?.kind() == K::Identifier
             || read.kind() == K::Identifier
                 && tested_parent
                     .map(|p| {
@@ -257,13 +253,13 @@ impl CheckerState {
                     .unwrap_or(false);
         let mut stack: Vec<_> = self.source_children(body)?.into_iter().rev().collect();
         while let Some(child) = stack.pop() {
-            if self.ast(child)?.node(child)?.kind() == K::Identifier
+            if self.node(child)?.kind() == K::Identifier
                 && self.get_symbol_at_location(child)? == Some(symbol)
             {
                 if simple {
                     return Ok(true);
                 }
-                if self.same_truthy_target(tested_parent, self.ast(child)?.node(child)?.parent())? {
+                if self.same_truthy_target(tested_parent, self.node(child)?.parent())? {
                     return Ok(true);
                 }
             }
@@ -278,8 +274,8 @@ impl CheckerState {
         mut child: Option<NodeId>,
     ) -> Result<bool, Error> {
         while let (Some(a), Some(b)) = (tested, child) {
-            let ar = self.ast(a)?.node(a)?;
-            let br = self.ast(b)?.node(b)?;
+            let ar = self.node(a)?;
+            let br = self.node(b)?;
             let ak = ar.kind();
             let bk = br.kind();
             if ak == K::Identifier && bk == K::Identifier
@@ -296,8 +292,8 @@ impl CheckerState {
             } else if !(ak == K::CallExpression && bk == K::CallExpression) {
                 return Ok(false);
             }
-            tested = self.ast(a)?.node(a)?.expression();
-            child = self.ast(b)?.node(b)?.expression();
+            tested = self.node(a)?.expression();
+            child = self.node(b)?.expression();
         }
         Ok(false)
     }

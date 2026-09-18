@@ -9,7 +9,7 @@ use ts_core::ModuleKind;
 use ts_diagnostics as d;
 impl CheckerState {
     pub(crate) fn alias_property_name(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(
             if matches!(
                 read.kind().known(),
@@ -30,7 +30,7 @@ impl CheckerState {
         target_flags: u32,
         type_only: bool,
     ) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE == 0 || target_flags & sf::VALUE != 0 || type_only {
             return Ok(false);
         }
@@ -50,7 +50,7 @@ impl CheckerState {
                 .node_binding(source)?
                 .and_then(|binding| binding.symbol);
             if let Some(source_symbol) = source_symbol {
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
+                let text = self.node_text(name)?.into_js_string();
                 if self.member_symbol(self.symbol(source_symbol)?.exports(), text.as_bytes())?
                     == Some(target)
                 {
@@ -60,9 +60,7 @@ impl CheckerState {
                         .into_iter()
                         .flatten()
                     {
-                        if ts_ast::is_js_type_alias_declaration(
-                            &self.ast(declaration)?.node(declaration)?,
-                        ) {
+                        if ts_ast::is_js_type_alias_declaration(&self.node(declaration)?) {
                             if let Some(diagnostic) = diagnostic {
                                 let text = self.symbol(target)?.name_to_owned();
                                 let related = self.diagnostic_for_node(
@@ -78,20 +76,20 @@ impl CheckerState {
                 }
             }
         } else {
-            let text = if self.ast(name)?.node(name)?.kind() == K::Identifier {
-                self.ast(name)?.node_text(name)?.into_js_string()
+            let text = if self.node(name)?.kind() == K::Identifier {
+                self.node_text(name)?.into_js_string()
             } else {
                 self.symbol(symbol)?.name_to_owned()
             };
             let specifier = self.module_specifier(node)?;
             let specifier = match specifier {
-                Some(specifier) => self.ast(specifier)?.node_text(specifier)?.into_js_string(),
+                Some(specifier) => self.node_text(specifier)?.into_js_string(),
                 None => JsString::from_bytes(b"...".as_slice()),
             };
             let mut import = b"import(\"".to_vec();
             import.extend_from_slice(specifier.as_bytes());
             import.extend_from_slice(b"\")");
-            if self.ast(node)?.node(node)?.kind() == K::ImportSpecifier {
+            if self.node(node)?.kind() == K::ImportSpecifier {
                 import.push(b'.');
                 import.extend_from_slice(text.as_bytes());
             }
@@ -108,7 +106,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         if let (Some(diagnostic), Some(declaration)) = (diagnostic, declaration) {
             let export = matches!(
-                self.ast(declaration)?.node(declaration)?.kind().known(),
+                self.node(declaration)?.kind().known(),
                 Some(K::ExportSpecifier | K::ExportDeclaration | K::NamespaceExport)
             );
             let related = self.diagnostic_for_node(
@@ -132,7 +130,7 @@ impl CheckerState {
         target: SymbolId,
         target_flags: u32,
     ) -> Result<(), Error> {
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         let verbatim = self
             .program()?
             .host
@@ -145,7 +143,7 @@ impl CheckerState {
             let name = self
                 .alias_property_name(node)?
                 .ok_or(Error::MissingLink("isolated alias name"))?;
-            let name = self.ast(name)?.node_text(name)?.into_js_string();
+            let name = self.node_text(name)?.into_js_string();
             match kind.known() {
                 Some(K::ImportClause | K::ImportSpecifier | K::ImportEqualsDeclaration) => {
                     if verbatim {
@@ -157,8 +155,7 @@ impl CheckerState {
                                 .as_import_equals_declaration()
                                 .and_then(|data| data.module_reference())
                                 .ok_or(Error::MissingLink("import alias reference"))?;
-                            self.ast(reference)?.node(reference)?.kind()
-                                != K::ExternalModuleReference
+                            self.node(reference)?.kind() != K::ExternalModuleReference
                         } else {
                             false
                         };
@@ -218,7 +215,7 @@ impl CheckerState {
         let format = self.module_emit_format(node)?;
         if verbatim
             && kind != K::ImportEqualsDeclaration
-            && self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0
+            && self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0
             && format == ModuleKind::COMMON_JS
         {
             let (_, file) = self.module_source(node)?;
@@ -259,7 +256,7 @@ impl CheckerState {
                 .program()?
                 .host
                 .get_project_reference_from_output_dts(path.as_bytes())?;
-            if self.ast(declaration)?.node(declaration)?.flags() & nf::AMBIENT != 0
+            if self.node(declaration)?.flags() & nf::AMBIENT != 0
                 && redirect.is_none_or(|redirect| !redirect.options.should_preserve_const_enums())
             {
                 let flag = self.module_isolated_flag_name();

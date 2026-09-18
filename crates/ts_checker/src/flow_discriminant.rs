@@ -44,7 +44,7 @@ impl CheckerState {
         reference: NodeId,
         expr: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let kind = self.ast(reference)?.node(reference)?.kind();
+        let kind = self.node(reference)?.kind();
         let pseudo = matches!(
             kind.known(),
             Some(
@@ -57,7 +57,7 @@ impl CheckerState {
             self.ast(reference)?,
             Some(reference),
         )?;
-        let read = self.ast(expr)?.node(expr)?;
+        let read = self.node(expr)?;
         if pseudo {
             if read.kind() == K::Identifier {
                 let mut symbol = self.resolved_value_symbol(expr)?;
@@ -65,7 +65,7 @@ impl CheckerState {
                     symbol = self.symbol(symbol)?.export_symbol().unwrap_or(symbol);
                 }
                 if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     let rest = match read.kind().known() {
                         Some(K::BindingElement) => read
                             .data_source()
@@ -101,7 +101,7 @@ impl CheckerState {
                     if let Some(initializer) =
                         self.candidate_discriminant_initializer(declaration)?
                     {
-                        let read = self.ast(initializer)?.node(initializer)?;
+                        let read = self.node(initializer)?;
                         if matches!(
                             read.kind().known(),
                             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
@@ -113,18 +113,18 @@ impl CheckerState {
                             }
                         }
                     }
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     if read.kind() == K::BindingElement && read.initializer().is_none() {
                         let pattern = required(read.parent(), "discriminant binding pattern")?;
                         let variable = required(
-                            self.ast(pattern)?.node(pattern)?.parent(),
+                            self.node(pattern)?.parent(),
                             "discriminant binding variable",
                         )?;
                         if let Some(initializer) =
                             self.candidate_discriminant_initializer(variable)?
                         {
                             if matches!(
-                                self.ast(initializer)?.node(initializer)?.kind().known(),
+                                self.node(initializer)?.kind().known(),
                                 Some(
                                     K::Identifier
                                         | K::PropertyAccessExpression
@@ -143,7 +143,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/flow.go:getCandidateVariableDeclarationInitializer
     fn candidate_discriminant_initializer(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::VariableDeclaration && read.type_node().is_none() {
             if let Some(initializer) = read.initializer() {
                 return Ok(Some(ts_ast::skip_parentheses(
@@ -165,14 +165,14 @@ impl CheckerState {
         let Some(name) = self.flow_property_name(access)? else {
             return Ok(ty);
         };
-        let read = self.ast(access)?.node(access)?;
+        let read = self.node(access)?;
         let optional_chain = read.flags() & nf::OPTIONAL_CHAIN != 0;
         let nonnull = if matches!(
             read.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
         ) {
             match read.expression() {
-                Some(expr) => self.ast(expr)?.node(expr)?.kind() == K::NonNullExpression,
+                Some(expr) => self.node(expr)?.kind() == K::NonNullExpression,
                 None => false,
             }
         } else {

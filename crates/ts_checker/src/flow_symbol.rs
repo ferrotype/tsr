@@ -19,7 +19,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
             return Ok(ty);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let kind = read.kind();
         if !matches!(kind.known(), Some(K::BindingElement | K::Parameter)) {
             return Ok(ty);
@@ -31,13 +31,13 @@ impl CheckerState {
             && initializer.is_none()
             && !self.binding_is_rest(declaration)?
             && self
-                .source_list(parent, self.ast(parent)?.node(parent)?.element_list())?
+                .source_list(parent, self.node(parent)?.element_list())?
                 .len()
                 >= 2
         {
             let root =
                 ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
-            if let Some(initializer) = self.ast(root)?.node(root)?.initializer() {
+            if let Some(initializer) = self.node(root)?.initializer() {
                 if ts_ast::utilities::is_node_descendant_of(
                     self.ast(location)?,
                     Some(location),
@@ -48,17 +48,15 @@ impl CheckerState {
                     return Ok(ty);
                 }
             }
-            let read = self.ast(root)?.node(root)?;
+            let read = self.node(root)?;
             let parameter = read.kind() == K::Parameter;
             let constant = read.kind() == K::VariableDeclaration
                 && ts_ast::utilities::get_combined_node_flags(self.ast(root)?, root)?
                     & nf::CONSTANT
                     != 0;
             if constant || parameter {
-                let binding_parent = required(
-                    self.ast(parent)?.node(parent)?.parent(),
-                    "narrowed binding parent",
-                )?;
+                let binding_parent =
+                    required(self.node(parent)?.parent(), "narrowed binding parent")?;
                 if self.flow.symbol_narrowing_parents.insert(binding_parent) {
                     // Only parent resolution is guarded: the native flow walk
                     // intentionally permits reentrant correlated narrowing.
@@ -100,9 +98,8 @@ impl CheckerState {
             && initializer.is_none()
             && !self.binding_is_rest(declaration)?
         {
-            let parameters =
-                self.source_list(parent, self.ast(parent)?.node(parent)?.parameter_list())?;
-            let kind = self.ast(parent)?.node(parent)?.kind();
+            let parameters = self.source_list(parent, self.node(parent)?.parameter_list())?;
+            let kind = self.node(parent)?.kind();
             let object_method = kind == K::MethodDeclaration
                 && self
                     .ast(parent)?
@@ -159,15 +156,12 @@ impl CheckerState {
                                         .position(|&parameter| parameter == declaration)
                                         .ok_or(ts_arena::Error::InvalidGraph)?;
                                     let this_parameter = match parameters.first().copied() {
-                                        Some(parameter) => {
-                                            match self.ast(parameter)?.node(parameter)?.name() {
-                                                Some(name) => {
-                                                    self.ast(name)?.node_text(name)?.as_bytes()
-                                                        == b"this"
-                                                }
-                                                None => false,
+                                        Some(parameter) => match self.node(parameter)?.name() {
+                                            Some(name) => {
+                                                self.node_text(name)?.as_bytes() == b"this"
                                             }
-                                        }
+                                            None => false,
+                                        },
                                         None => false,
                                     };
                                     let index = isize::try_from(position)

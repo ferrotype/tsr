@@ -216,12 +216,11 @@ impl CheckerState {
             .intra_expression_sites
             .clone();
         for (node, ty) in sites {
-            let contextual =
-                if self.ast(node)?.node(node)?.kind() == ts_ast::SyntaxKind::MethodDeclaration {
-                    self.contextual_property_type_with_flags(node, 2)?
-                } else {
-                    self.contextual_expression_type_ex(node, 2)?
-                };
+            let contextual = if self.node(node)?.kind() == ts_ast::SyntaxKind::MethodDeclaration {
+                self.contextual_property_type_with_flags(node, 2)?
+            } else {
+                self.contextual_expression_type_ex(node, 2)?
+            };
             if let Some(contextual) = contextual {
                 self.infer_types(context, ty, contextual, priority::NONE, false)?;
             }

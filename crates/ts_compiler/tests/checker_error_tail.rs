@@ -17,15 +17,20 @@ fn remaining_error_tail_matches_native_diagnostics() {
     let mut mismatches = Vec::new();
     for (request, expected) in requests.iter().zip(expected) {
         assert_eq!(request["id"], expected["id"]);
-        let actual = executor::observe(request, |program, _, _, diagnostics| {
-            let sorted = program
-                .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
-                .unwrap();
-            executor::BaselineResults {
-                type_symbols: serde_json::json!({"state":"not_requested"}),
-                errors: executor::diagnostics::phase(program, &sorted),
-            }
-        });
+        let actual = executor::observe(
+            request,
+            &mut ts_compiler::FileCache::new(),
+            &mut executor::NoHooks,
+            |program, _, _, diagnostics, _| {
+                let sorted = program
+                    .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
+                    .unwrap();
+                executor::BaselineResults {
+                    type_symbols: serde_json::json!({"state":"not_requested"}),
+                    errors: executor::diagnostics::phase(program, &sorted),
+                }
+            },
+        );
         assert_eq!(
             actual["load"]["state"], "executed",
             "{}: load failed",

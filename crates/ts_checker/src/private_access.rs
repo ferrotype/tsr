@@ -35,12 +35,12 @@ impl CheckerState {
                 )?;
             }
         }
-        let name = self.ast(right)?.node_text(right)?.into_js_string();
+        let name = self.node_text(right)?.into_js_string();
         let lexical = self.lookup_private_identifier_declaration(name.as_bytes(), right)?;
         if assignment != AssignmentKind::None {
             if let Some(symbol) = lexical {
                 if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                    if self.ast(declaration)?.node(declaration)?.kind() == K::MethodDeclaration {
+                    if self.node(declaration)?.kind() == K::MethodDeclaration {
                         self.grammar_error_node(
                             right,
                             d::Cannot_assign_to_private_method_0_Private_methods_are_not_writable,
@@ -83,7 +83,7 @@ impl CheckerState {
             }
             if let Some(class) = self.private_containing_class(right)? {
                 if self.is_plain_js_node(class)? {
-                    let text = self.ast(right)?.node_text(right)?.into_js_string();
+                    let text = self.node_text(right)?.into_js_string();
                     self.grammar_error_node(
                         right,
                         d::Private_field_0_must_be_declared_in_an_enclosing_class,
@@ -109,9 +109,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:getContainingClassExcludingClassDecorators
     pub(crate) fn private_containing_class(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(ancestor) = current {
-            let read = self.ast(ancestor)?.node(ancestor)?;
+            let read = self.node(ancestor)?;
             if matches!(
                 read.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression)
@@ -123,7 +123,7 @@ impl CheckerState {
                     .parent()
                     .ok_or(Error::MissingLink("decorator parent"))?;
                 if matches!(
-                    self.ast(parent)?.node(parent)?.kind().known(),
+                    self.node(parent)?.kind().known(),
                     Some(K::ClassDeclaration | K::ClassExpression)
                 ) {
                     return Ok(ts_ast::utilities::get_containing_class(
@@ -175,13 +175,13 @@ impl CheckerState {
         right: NodeId,
         lexical: Option<SymbolId>,
     ) -> Result<bool, Error> {
-        let spelling = self.ast(right)?.node_text(right)?.into_js_string();
+        let spelling = self.node_text(right)?.into_js_string();
         let mut property = None;
         for candidate in self.get_properties_of_type(ty)? {
             if let Some(declaration) = self.symbol(candidate)?.value_declaration() {
-                if let Some(name) = self.ast(declaration)?.node(declaration)?.name() {
-                    if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier
-                        && self.ast(name)?.node_text(name)?.as_bytes() == spelling.as_bytes()
+                if let Some(name) = self.node(declaration)?.name() {
+                    if self.node(name)?.kind() == K::PrivateIdentifier
+                        && self.node_text(name)?.as_bytes() == spelling.as_bytes()
                     {
                         property = Some(candidate);
                         break;
@@ -213,7 +213,7 @@ impl CheckerState {
                         shadows = true;
                         break;
                     }
-                    ancestor = self.ast(node)?.node(node)?.parent();
+                    ancestor = self.node(node)?.parent();
                 }
                 if shadows {
                     let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
@@ -247,7 +247,7 @@ impl CheckerState {
         if let Some(symbol) = self.query.resolved_symbols.try_get(node).copied().flatten() {
             return Ok(Some(symbol));
         }
-        let name = self.ast(node)?.node_text(node)?.into_js_string();
+        let name = self.node_text(node)?.into_js_string();
         let symbol = self.lookup_private_identifier_declaration(name.as_bytes(), node)?;
         *self.query.resolved_symbols.get_or_default(node) = symbol;
         Ok(symbol)
@@ -284,7 +284,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("private expression parent"))?;
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if read.kind() != K::ForInStatement {
             if !self.expression_node(node)? {
                 return self.grammar_error_node(node,d::Private_identifiers_are_only_allowed_in_class_bodies_and_may_only_be_used_as_part_of_a_class_member_declaration_property_access_or_on_the_left_hand_side_of_an_in_expression,vec![]);
@@ -293,12 +293,12 @@ impl CheckerState {
                 let token = data
                     .operator_token()
                     .ok_or(Error::MissingLink("private expression operator"))?;
-                self.ast(token)?.node(token)?.kind() == K::InKeyword
+                self.node(token)?.kind() == K::InKeyword
             } else {
                 false
             };
             if self.private_identifier_expression_symbol(node)?.is_none() && !in_operation {
-                let name = self.ast(node)?.node_text(node)?.into_js_string();
+                let name = self.node_text(node)?.into_js_string();
                 return self.grammar_error_node(node, d::Cannot_find_name_0, vec![name]);
             }
         }

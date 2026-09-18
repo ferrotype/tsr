@@ -124,9 +124,9 @@ impl CheckerState {
                 self.ast(declaration)?,
                 declaration,
             )?;
-            if let Some(parent) = self.ast(declaration)?.node(declaration)?.parent() {
+            if let Some(parent) = self.node(declaration)?.parent() {
                 in_class |= matches!(
-                    self.ast(parent)?.node(parent)?.kind().known(),
+                    self.node(parent)?.kind().known(),
                     Some(K::ClassDeclaration | K::ClassExpression)
                 );
             }
@@ -198,7 +198,7 @@ impl CheckerState {
             let mut declaration = value;
             if read.flags() & sf::GET_ACCESSOR != 0 {
                 for node in self.symbol_declarations(symbol)?.iter().flatten() {
-                    if self.ast(node)?.node(node)?.kind() == K::GetAccessor {
+                    if self.node(node)?.kind() == K::GetAccessor {
                         declaration = node;
                         break;
                     }

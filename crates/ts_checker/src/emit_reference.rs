@@ -152,10 +152,10 @@ impl CheckerState {
     ) -> Result<Option<NodeId>, Error> {
         // getResolvedSymbolOrNil creates the native symbol-node link even when
         // the cached value is nil. Preserve that before sharing the host read.
-        self.ast(node)?.node(node)?;
+        self.node(node)?;
         let cached = *self.query.resolved_symbols.get_or_default(node);
         let name = if !member && cached.is_none() {
-            let name = self.ast(node)?.node_text(node)?.into_js_string();
+            let name = self.node_text(node)?.into_js_string();
             let symbol = self.resolve_name_ex(
                 Some(node),
                 name.as_bytes(),
@@ -208,7 +208,7 @@ impl CheckerState {
         if !self.emit_parse_node(node)? {
             return Ok(JsString::default());
         }
-        if self.ast(node)?.node(node)?.kind() != K::ElementAccessExpression {
+        if self.node(node)?.kind() != K::ElementAccessExpression {
             return Err(Error::MissingLink("element access emit callback"));
         }
         Ok(self.flow_property_name(node)?.unwrap_or_default())
@@ -222,7 +222,7 @@ impl CheckerState {
         name: JsString,
         parent: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        self.ast(parent)?.node(parent)?;
+        self.node(parent)?;
         if parent.arena() != self.factory.id().arena() {
             self.retain_flow_source(parent)?;
         }
@@ -272,22 +272,22 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::PropertyAccessExpression {
             return Ok(false);
         }
         let name = read
             .name()
             .ok_or(Error::MissingLink("global Symbol property name"))?;
-        if self.ast(name)?.node(name)?.kind() != K::Identifier {
+        if self.node(name)?.kind() != K::Identifier {
             return Ok(false);
         }
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("global Symbol receiver"))?;
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if read.kind() == K::Identifier {
-            if self.ast(expression)?.node_text(expression)?.as_bytes() != b"Symbol" {
+            if self.node_text(expression)?.as_bytes() != b"Symbol" {
                 return Ok(false);
             }
             let resolved = self.resolved_value_symbol(expression)?;
@@ -304,9 +304,9 @@ impl CheckerState {
         let receiver = read
             .expression()
             .ok_or(Error::MissingLink("globalThis Symbol receiver"))?;
-        if self.ast(receiver)?.node(receiver)?.kind() != K::Identifier
-            || self.ast(receiver)?.node_text(receiver)?.as_bytes() != b"globalThis"
-            || self.ast(name)?.node_text(name)?.as_bytes() != b"Symbol"
+        if self.node(receiver)?.kind() != K::Identifier
+            || self.node_text(receiver)?.as_bytes() != b"globalThis"
+            || self.node_text(name)?.as_bytes() != b"Symbol"
         {
             return Ok(false);
         }

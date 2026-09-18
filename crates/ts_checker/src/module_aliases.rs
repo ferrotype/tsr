@@ -273,7 +273,7 @@ impl CheckerState {
             // Internal import-equals reports an illegal `import type` modifier
             // but does not mark that declaration as type-only. Native marking
             // belongs to the external import/export target resolvers.
-            if self.ast(declaration)?.node(declaration)?.kind() != K::ImportEqualsDeclaration
+            if self.node(declaration)?.kind() != K::ImportEqualsDeclaration
                 && self
                     .local_type_only_alias_declaration(declaration)?
                     .is_some()
@@ -332,7 +332,7 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::ImportEqualsDeclaration) => Ok(read
                 .data_source()
@@ -348,11 +348,10 @@ impl CheckerState {
                 let parent = read
                     .parent()
                     .ok_or(Error::MissingLink("type-only import parent"))?;
-                let clause = if self.ast(parent)?.node(parent)?.kind() == K::ImportClause {
+                let clause = if self.node(parent)?.kind() == K::ImportClause {
                     parent
                 } else {
-                    self.ast(parent)?
-                        .node(parent)?
+                    self.node(parent)?
                         .parent()
                         .ok_or(Error::MissingLink("type-only import clause"))?
                 };
@@ -422,7 +421,7 @@ impl CheckerState {
                 None
             };
             if let Some(declaration) = declaration {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 let export = matches!(
                     read.kind().known(),
                     Some(K::ExportSpecifier | K::ExportDeclaration)
@@ -433,7 +432,7 @@ impl CheckerState {
                     let name = read
                         .name()
                         .ok_or(Error::MissingLink("type-only import target name"))?;
-                    self.ast(name)?.node_text(name)?.into_js_string()
+                    self.node_text(name)?.into_js_string()
                 };
                 if let Some(diagnostic) = self.error_at(Some(reference), if export {
                     ts_diagnostics::An_import_alias_cannot_reference_a_declaration_that_was_exported_using_export_type
@@ -449,7 +448,7 @@ impl CheckerState {
                 }
                 return Ok(());
             }
-            let read = self.ast(name)?.node(name)?;
+            let read = self.node(name)?;
             if read.kind() == K::Identifier {
                 return Ok(());
             }
@@ -468,9 +467,9 @@ impl CheckerState {
         // A binding element is an alias only when its root declaration is
         // initialized to `require`; upstream routes both through the import
         // specifier path. Decide that before borrowing the node view.
-        let binding_require = self.ast(node)?.node(node)?.kind() == K::BindingElement
+        let binding_require = self.node(node)?.kind() == K::BindingElement
             && self.require_module_specifier(node)?.is_some();
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::ImportClause | K::NamespaceImport | K::NamespaceExport | K::ImportSpecifier,
@@ -484,10 +483,10 @@ impl CheckerState {
                     .ok_or(ts_arena::Error::InvalidGraph)?
                     .module_reference()
                     .ok_or(Error::MissingLink("import alias reference"))?;
-                if self.ast(reference)?.node(reference)?.kind() == K::ExternalModuleReference {
+                if self.node(reference)?.kind() == K::ExternalModuleReference {
                     return self.target_of_external_alias(node);
                 }
-                let meaning = if self.ast(reference)?.node(reference)?.kind() == K::Identifier {
+                let meaning = if self.node(reference)?.kind() == K::Identifier {
                     sf::NAMESPACE
                 } else {
                     sf::VALUE | sf::TYPE | sf::NAMESPACE
@@ -514,7 +513,7 @@ impl CheckerState {
                     .node(parent)?
                     .parent()
                     .ok_or(Error::MissingLink("export declaration"))?;
-                let declaration_read = self.ast(declaration)?.node(declaration)?;
+                let declaration_read = self.node(declaration)?;
                 let declaration_data = declaration_read
                     .data_source()
                     .as_export_declaration()
@@ -523,7 +522,7 @@ impl CheckerState {
                     return self.target_of_external_alias(node);
                 }
                 let declaration_type_only = declaration_data.is_type_only();
-                let target = if self.ast(name)?.node(name)?.kind() == K::StringLiteral {
+                let target = if self.node(name)?.kind() == K::StringLiteral {
                     None
                 } else {
                     self.resolve_entity_name_ex(
@@ -640,16 +639,14 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("module container"))?;
-        if self.ast(container)?.node(container)?.kind() != K::SourceFile {
+        if self.node(container)?.kind() != K::SourceFile {
             container = self
                 .ast(container)?
                 .node(container)?
                 .parent()
                 .ok_or(Error::MissingLink("module declaration container"))?;
         }
-        Ok(
-            self.ast(container)?.node(container)?.kind() == K::ModuleDeclaration
-                && !ts_ast::is_ambient_module(self.ast(container)?, container)?,
-        )
+        Ok(self.node(container)?.kind() == K::ModuleDeclaration
+            && !ts_ast::is_ambient_module(self.ast(container)?, container)?)
     }
 }

@@ -28,16 +28,16 @@ impl CheckerState {
         expression: NodeId,
         assume: bool,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         let optionality = if let Some(parent) = read.parent() {
-            let parent = self.ast(parent)?.node(parent)?;
+            let parent = self.node(parent)?;
             let coalescing = if let Some(binary) = parent.data_source().as_binary_expression() {
                 let op = binary
                     .operator_token()
                     .ok_or(Error::MissingLink("coalescing operator"))?;
                 binary.left() == Some(expression)
                     && matches!(
-                        self.ast(op)?.node(op)?.kind().known(),
+                        self.node(op)?.kind().known(),
                         Some(K::QuestionQuestionToken | K::QuestionQuestionEqualsToken)
                     )
             } else {
@@ -84,7 +84,7 @@ impl CheckerState {
                     let symbol = self.resolved_value_symbol(expression)?;
                     if self.is_constant_flow_variable(symbol)? {
                         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                            let read = self.ast(declaration)?.node(declaration)?;
+                            let read = self.node(declaration)?;
                             if read.kind() == K::VariableDeclaration && read.type_node().is_none() {
                                 if let Some(initializer) = read.initializer() {
                                     if self.constant_flow_reference(reference)? {
@@ -138,7 +138,7 @@ impl CheckerState {
                 let op = data
                     .operator_token()
                     .ok_or(Error::MissingLink("binary operator"))?;
-                let operator = self.ast(op)?.node(op)?.kind();
+                let operator = self.node(op)?.kind();
                 match operator.known() {
                     Some(
                         K::EqualsEqualsToken
@@ -149,10 +149,10 @@ impl CheckerState {
                         for (candidate, value) in [(left, right), (right, left)] {
                             let candidate = self.reference_candidate(candidate)?;
                             let value = self.reference_candidate(value)?;
-                            let read = self.ast(candidate)?.node(candidate)?;
+                            let read = self.node(candidate)?;
                             if read.kind() == K::TypeOfExpression
                                 && matches!(
-                                    self.ast(value)?.node(value)?.kind().known(),
+                                    self.node(value)?.kind().known(),
                                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                                 )
                             {
@@ -160,7 +160,7 @@ impl CheckerState {
                                     read.expression()
                                         .ok_or(Error::MissingLink("typeof operand"))?,
                                 )?;
-                                let text = self.ast(value)?.node_text(value)?.into_js_string();
+                                let text = self.node_text(value)?.into_js_string();
                                 let equal = assume
                                     != matches!(
                                         operator.known(),
@@ -220,14 +220,13 @@ impl CheckerState {
                         }
                         for (expr, value) in [(left, right), (right, left)] {
                             if matches!(
-                                self.ast(value)?.node(value)?.kind().known(),
+                                self.node(value)?.kind().known(),
                                 Some(K::TrueKeyword | K::FalseKeyword)
                             ) && !matches!(
-                                self.ast(expr)?.node(expr)?.kind().known(),
+                                self.node(expr)?.kind().known(),
                                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
                             ) {
-                                let boolean =
-                                    self.ast(value)?.node(value)?.kind() == K::TrueKeyword;
+                                let boolean = self.node(value)?.kind() == K::TrueKeyword;
                                 let equal = !matches!(
                                     operator.known(),
                                     Some(
@@ -242,7 +241,7 @@ impl CheckerState {
                                     (assume != boolean) != equal,
                                 );
                             }
-                            if self.ast(value)?.node(value)?.kind() == K::Identifier
+                            if self.node(value)?.kind() == K::Identifier
                                 && self.matching_constructor_reference(reference, expr)?
                             {
                                 return self.narrow_flow_constructor(ty, operator, value, assume);
@@ -276,13 +275,13 @@ impl CheckerState {
                         return self.narrow_flow_truthiness(reference, declared, ty, left, assume);
                     }
                     Some(K::InKeyword) => {
-                        if self.ast(left)?.node(left)?.kind() == K::PrivateIdentifier {
+                        if self.node(left)?.kind() == K::PrivateIdentifier {
                             return self.narrow_flow_private_in(reference, ty, left, right, assume);
                         }
                         let target = self.reference_candidate(right)?;
                         if self.type_contains_missing(ty)?
                             && matches!(
-                                self.ast(reference)?.node(reference)?.kind().known(),
+                                self.node(reference)?.kind().known(),
                                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
                             )
                         {
@@ -466,7 +465,7 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getReferenceCandidate
     pub(crate) fn reference_candidate(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() == K::ParenthesizedExpression {
                 node = read
                     .expression()
@@ -477,7 +476,7 @@ impl CheckerState {
                 let op = binary
                     .operator_token()
                     .ok_or(Error::MissingLink("reference operator"))?;
-                let next = match self.ast(op)?.node(op)?.kind().known() {
+                let next = match self.node(op)?.kind().known() {
                     Some(
                         K::EqualsToken
                         | K::BarBarEqualsToken

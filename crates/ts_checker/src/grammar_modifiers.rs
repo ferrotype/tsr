@@ -84,15 +84,14 @@ impl CheckerState {
     }
 
     fn grammar_is_this_parameter(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::Parameter {
             return Ok(false);
         }
         let Some(name) = read.name() else {
             return Ok(false);
         };
-        Ok(self.ast(name)?.node(name)?.kind() == K::Identifier
-            && self.ast(name)?.node_text(name)?.as_bytes() == b"this")
+        Ok(self.node(name)?.kind() == K::Identifier && self.node_text(name)?.as_bytes() == b"this")
     }
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalModifier
@@ -101,7 +100,7 @@ impl CheckerState {
         node: NodeId,
         modifiers: &[NodeId],
     ) -> Result<Option<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let first = modifiers
             .iter()
             .copied()
@@ -150,7 +149,7 @@ impl CheckerState {
             _ => {
                 let parent = read.parent().ok_or(Error::MissingLink("modifier parent"))?;
                 if matches!(
-                    self.ast(parent)?.node(parent)?.kind().known(),
+                    self.node(parent)?.kind().known(),
                     Some(K::ModuleBlock | K::SourceFile)
                 ) {
                     return Ok(None);
@@ -168,8 +167,7 @@ impl CheckerState {
                             .ok_or(Error::MissingLink("variable statement"))?
                             .declaration_list()
                             .ok_or(Error::MissingLink("declaration list"))?;
-                        (self.ast(list)?.node(list)?.flags() & nf::USING != 0)
-                            .then_some(K::AwaitKeyword)
+                        (self.node(list)?.flags() & nf::USING != 0).then_some(K::AwaitKeyword)
                     }
                     Some(K::EnumDeclaration) => Some(K::ConstKeyword),
                     _ => {
@@ -178,7 +176,7 @@ impl CheckerState {
                         ))
                     }
                 };
-                let first_kind = self.ast(first)?.node(first)?.kind();
+                let first_kind = self.node(first)?.kind();
                 Ok(if allowed.is_some_and(|allowed| first_kind == allowed) {
                     None
                 } else {
@@ -190,7 +188,7 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:NodeCanBeDecorated
     fn grammar_can_decorate(&self, node: NodeId, legacy: bool) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if legacy
             && read
                 .name()
@@ -209,7 +207,7 @@ impl CheckerState {
         let Some(parent) = parent else {
             return Ok(read.kind() == K::ClassDeclaration);
         };
-        let parent_read = self.ast(parent)?.node(parent)?;
+        let parent_read = self.node(parent)?;
         let class_parent = if legacy {
             parent_read.kind() == K::ClassDeclaration
         } else {
@@ -252,7 +250,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarModifiers
     pub(crate) fn check_grammar_modifiers(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let modifiers = self.source_list(node, read.modifiers())?;
         if modifiers.is_empty() {
             return Ok(false);
@@ -283,7 +281,7 @@ impl CheckerState {
             )
         ) {
             for &modifier in &modifiers {
-                if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+                if self.node(modifier)?.kind() == K::Decorator {
                     return self.grammar_error_first_token(
                         modifier,
                         d::Decorators_are_not_valid_here,
@@ -307,8 +305,8 @@ impl CheckerState {
             );
         }
         let parent = read.parent().ok_or(Error::MissingLink("modifier parent"))?;
-        let parent_kind = self.ast(parent)?.node(parent)?.kind();
-        let parent_flags = self.ast(parent)?.node(parent)?.flags();
+        let parent_kind = self.node(parent)?.kind();
+        let parent_flags = self.node(parent)?.flags();
         let private_name = ts_ast::utilities::is_private_identifier_class_element_declaration(
             self.ast(node)?,
             node,
@@ -320,7 +318,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("variable statement"))?
                 .declaration_list()
                 .ok_or(Error::MissingLink("declaration list"))?;
-            self.ast(list)?.node(list)?.flags() & nf::BLOCK_SCOPED
+            self.node(list)?.flags() & nf::BLOCK_SCOPED
         } else {
             0
         };
@@ -342,7 +340,7 @@ impl CheckerState {
         let mut leading_decorators = false;
         macro_rules! fail { ($at:expr, $message:ident $(, $arg:expr)* $(,)?) => { return self.grammar_error_node($at, d::$message, vec![$(JsString::from_bytes($arg.as_bytes())),*]) }; }
         for modifier in modifiers {
-            let modifier_read = self.ast(modifier)?.node(modifier)?;
+            let modifier_read = self.node(modifier)?;
             let mk = modifier_read.kind();
             let reparsed = modifier_read.flags() & nf::REPARSED != 0;
             let text = mk
@@ -396,7 +394,7 @@ impl CheckerState {
                         K::GetAccessor
                     };
                     if let Some(other) = self.declaration_of_kind(symbol, other_kind)? {
-                        if self.ast(other)?.node(other)?.pos() < self.ast(node)?.node(node)?.pos()
+                        if self.node(other)?.pos() < self.node(node)?.pos()
                             && self.has_grammar_decorator(other)?
                         {
                             return self.grammar_error_first_token(node, d::Decorators_cannot_be_applied_to_multiple_get_Slashset_accessors_of_the_same_name, vec![]);
@@ -635,7 +633,7 @@ impl CheckerState {
                         .options()
                         .verbatim_module_syntax
                         .is_true()
-                        && self.ast(node)?.node(node)?.flags() & nf::AMBIENT == 0
+                        && self.node(node)?.flags() & nf::AMBIENT == 0
                         && !matches!(
                             kind.known(),
                             Some(
@@ -646,7 +644,7 @@ impl CheckerState {
                         )
                         && parent_kind == K::SourceFile
                     {
-                        let file = self.ast(parent)?.source_file(parent)?;
+                        let file = self.source_file_read(parent)?;
                         if self
                             .program()?
                             .host
@@ -692,12 +690,11 @@ impl CheckerState {
                     let container = if parent_kind == K::SourceFile {
                         parent
                     } else {
-                        self.ast(parent)?
-                            .node(parent)?
+                        self.node(parent)?
                             .parent()
                             .ok_or(Error::MissingLink("default export container"))?
                     };
-                    if self.ast(container)?.node(container)?.kind() == K::ModuleDeclaration
+                    if self.node(container)?.kind() == K::ModuleDeclaration
                         && !ts_ast::is_ambient_module(self.ast(container)?, container)?
                     {
                         fail!(
@@ -965,10 +962,10 @@ impl CheckerState {
             );
         }
         if kind == K::Parameter && flags & mf::PARAMETER_PROPERTY_MODIFIER != 0 {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if let Some(name) = read.name() {
                 if matches!(
-                    self.ast(name)?.node(name)?.kind().known(),
+                    self.node(name)?.kind().known(),
                     Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                 ) {
                     fail!(
@@ -1012,8 +1009,8 @@ impl CheckerState {
     }
 
     fn has_grammar_decorator(&self, node: NodeId) -> Result<bool, Error> {
-        for modifier in self.source_list(node, self.ast(node)?.node(node)?.modifiers())? {
-            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
+            if self.node(modifier)?.kind() == K::Decorator {
                 return Ok(true);
             }
         }

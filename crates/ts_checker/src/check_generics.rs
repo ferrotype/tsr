@@ -9,11 +9,11 @@ use ts_ast::SyntaxKind as K;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameters
     pub(crate) fn check_type_parameters(&mut self, node: NodeId) -> Result<(), Error> {
-        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_parameter_list())?;
+        let nodes = self.source_list(node, self.node(node)?.type_parameter_list())?;
         let mut seen_default = false;
         for (index, &parameter) in nodes.iter().enumerate() {
             self.check_type_parameter(parameter)?;
-            let read = self.ast(parameter)?.node(parameter)?;
+            let read = self.node(parameter)?;
             let default = read
                 .data_source()
                 .as_type_parameter_declaration()
@@ -39,7 +39,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParametersNotReferenced
     fn check_default_references(&mut self, node: NodeId, later: &[NodeId]) -> Result<(), Error> {
-        if self.ast(node)?.node(node)?.kind() == K::TypeReference {
+        if self.node(node)?.kind() == K::TypeReference {
             let ty = self.source_type_reference(node)?;
             if self.types.flags(ty)? & tf::TYPE_PARAMETER != 0 {
                 for &parameter in later {
@@ -59,7 +59,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameter
     pub(crate) fn check_type_parameter(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_grammar_modifiers(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_type_parameter_declaration()
@@ -105,7 +105,7 @@ impl CheckerState {
             .node(node)?
             .name()
             .ok_or(Error::MissingLink("type parameter name"))?;
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),
             b"any"
@@ -138,7 +138,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("type parameter parent"))?;
-        let kind = self.ast(parent)?.node(parent)?.kind();
+        let kind = self.node(parent)?.kind();
         if !matches!(
             kind.known(),
             Some(
@@ -218,12 +218,12 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeArgumentConstraints
     pub(crate) fn check_type_reference_node(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_grammar_type_arguments(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == ts_ast::SyntaxKind::TypeReference
             && read.flags() & ts_ast::node_flags::JS_DOC == 0
         {
             if let (Some(name), Some(arguments)) = (read.name(), read.type_argument_list()) {
-                let end = self.ast(name)?.node(name)?.end();
+                let end = self.node(name)?.end();
                 let list = self.ast(node)?.list(arguments)?;
                 if i64::from(end) != list.loc().pos() {
                     let view = self.ast(node)?;
@@ -240,7 +240,7 @@ impl CheckerState {
                 }
             }
         }
-        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+        let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         for &node in &nodes {
             self.check_source_element(node)?;
         }
@@ -262,7 +262,7 @@ impl CheckerState {
         node: NodeId,
         parameters: &[TypeId],
     ) -> Result<bool, Error> {
-        let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+        let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         let mut arguments = None;
         let mut mapper = None;
         let mut valid = true;

@@ -15,6 +15,10 @@ pub struct PositionMap {
 }
 
 impl PositionMap {
+    /// Reserved backing storage; the record itself belongs to its file owner.
+    pub fn structural_bytes(&self) -> usize {
+        self.entries.capacity() * std::mem::size_of::<PositionMapEntry>()
+    }
     /// port: tsc/internal/ast/positionmap.go:ComputePositionMap
     pub fn new(text: &[u8]) -> Self {
         let mut entries = Vec::new();

@@ -431,14 +431,14 @@ impl CheckerState {
         if !self.emit_parse_node(node)? {
             return Ok(false);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if matches!(read.kind().known(), Some(K::GetAccessor | K::SetAccessor)) {
             return Ok(false);
         }
         let Some(body) = read.body() else {
             return Ok(false);
         };
-        if !ts_ast::node_is_present(Some(&self.ast(body)?.node(body)?)) {
+        if !ts_ast::node_is_present(Some(&self.node(body)?)) {
             return Ok(false);
         }
         let symbol = self.get_symbol_of_declaration(node)?;
@@ -451,8 +451,7 @@ impl CheckerState {
                 return Ok(false);
             }
             if let Some(declaration) = self.signatures.get(signature)?.declaration {
-                return Ok(declaration != node
-                    && self.ast(declaration)?.node(declaration)?.flags() & nf::JS_DOC == 0);
+                return Ok(declaration != node && self.node(declaration)?.flags() & nf::JS_DOC == 0);
             }
         }
         Ok(false)
@@ -495,7 +494,7 @@ impl CheckerState {
         if !self.emit_parse_node(node)? {
             return Ok(false);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::PropertyDeclaration | K::PropertySignature | K::JSDocPropertyTag) => {
                 let symbol = match symbol {
@@ -541,9 +540,9 @@ impl CheckerState {
                     mf::PARAMETER_PROPERTY_MODIFIER,
                 )?;
                 let enclosing_function = match enclosing {
-                    Some(n) => ts_ast::utilities::is_function_like_declaration(Some(
-                        &self.ast(n)?.node(n)?,
-                    )),
+                    Some(n) => {
+                        ts_ast::utilities::is_function_like_declaration(Some(&self.node(n)?))
+                    }
                     None => false,
                 };
                 let requires = (!optional && initialized && (!property || enclosing_function))
@@ -584,9 +583,8 @@ impl CheckerState {
         }
         for property in self.emit_container_function_properties(node)? {
             if let Some(value) = self.symbol(property)?.value_declaration() {
-                if ts_ast::utilities_tail::is_expando_property_declaration(Some(
-                    &self.ast(value)?.node(value)?,
-                )) {
+                if ts_ast::utilities_tail::is_expando_property_declaration(Some(&self.node(value)?))
+                {
                     return Ok(true);
                 }
             }
@@ -604,10 +602,10 @@ impl CheckerState {
         if !self.emit_parse_node(node)? {
             return Ok(None);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let specifier = if read.kind() == K::ModuleDeclaration {
             match read.name() {
-                Some(name) if self.ast(name)?.node(name)?.kind() == K::StringLiteral => Some(name),
+                Some(name) if self.node(name)?.kind() == K::StringLiteral => Some(name),
                 _ => None,
             }
         } else {
@@ -623,7 +621,7 @@ impl CheckerState {
             return Ok(None);
         };
         for node in self.symbol_declarations(symbol)?.iter().flatten() {
-            if self.ast(node)?.node(node)?.kind() == K::SourceFile {
+            if self.node(node)?.kind() == K::SourceFile {
                 return Ok(Some(node));
             }
         }

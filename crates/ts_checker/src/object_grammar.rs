@@ -8,7 +8,7 @@ use ts_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarComputedPropertyName
     fn check_object_computed_grammar(&mut self, node: NodeId) -> Result<(), Error> {
-        if self.ast(node)?.node(node)?.kind() != K::ComputedPropertyName {
+        if self.node(node)?.kind() != K::ComputedPropertyName {
             return Ok(());
         }
         let expression = self
@@ -16,7 +16,7 @@ impl CheckerState {
             .node(node)?
             .expression()
             .ok_or(Error::MissingLink("computed expression"))?;
-        if self.ast(expression)?.node(expression)?.kind() == K::BinaryExpression {
+        if self.node(expression)?.kind() == K::BinaryExpression {
             let operator = self
                 .ast(expression)?
                 .node(expression)?
@@ -25,7 +25,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("computed binary"))?
                 .operator_token()
                 .ok_or(Error::MissingLink("computed operator"))?;
-            if self.ast(operator)?.node(operator)?.kind() == K::CommaToken {
+            if self.node(operator)?.kind() == K::CommaToken {
                 self.grammar_error_node(
                     expression,
                     d::A_comma_expression_is_not_allowed_in_a_computed_property_name,
@@ -42,8 +42,8 @@ impl CheckerState {
         destructuring: bool,
     ) -> Result<(), Error> {
         let mut seen = Map::default();
-        for property in self.source_list(node, self.ast(node)?.node(node)?.property_list())? {
-            let read = self.ast(property)?.node(property)?;
+        for property in self.source_list(node, self.node(node)?.property_list())? {
+            let read = self.node(property)?;
             let kind = read.kind();
             if kind == K::SpreadAssignment {
                 if destructuring {
@@ -51,7 +51,7 @@ impl CheckerState {
                         .expression()
                         .ok_or(Error::MissingLink("spread expression"))?;
                     let mut inner = expression;
-                    while self.ast(inner)?.node(inner)?.kind() == K::ParenthesizedExpression {
+                    while self.node(inner)?.kind() == K::ParenthesizedExpression {
                         inner = self
                             .ast(inner)?
                             .node(inner)?
@@ -59,7 +59,7 @@ impl CheckerState {
                             .ok_or(Error::MissingLink("spread parentheses"))?;
                     }
                     if matches!(
-                        self.ast(inner)?.node(inner)?.kind().known(),
+                        self.node(inner)?.kind().known(),
                         Some(K::ArrayLiteralExpression | K::ObjectLiteralExpression)
                     ) {
                         self.grammar_error_node(
@@ -95,17 +95,15 @@ impl CheckerState {
                     self.grammar_error_first_token(last,d::Did_you_mean_to_use_a_Colon_An_can_only_follow_a_property_name_when_the_containing_object_literal_is_part_of_a_destructuring_pattern,vec![])?;
                 }
             }
-            if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier {
+            if self.node(name)?.kind() == K::PrivateIdentifier {
                 self.grammar_error_node(
                     name,
                     d::Private_identifiers_are_not_allowed_outside_class_bodies,
                     vec![],
                 )?;
             }
-            for modifier in
-                self.source_list(property, self.ast(property)?.node(property)?.modifiers())?
-            {
-                let kind_mod = self.ast(modifier)?.node(modifier)?.kind();
+            for modifier in self.source_list(property, self.node(property)?.modifiers())? {
+                let kind_mod = self.node(modifier)?.kind();
                 if kind_mod != K::Decorator
                     && (kind_mod != K::AsyncKeyword || kind != K::MethodDeclaration)
                 {
@@ -119,7 +117,7 @@ impl CheckerState {
             }
             let meaning = match kind.known() {
                 Some(K::PropertyAssignment | K::ShorthandPropertyAssignment) => {
-                    let read = self.ast(property)?.node(property)?;
+                    let read = self.node(property)?;
                     let optional = read.question_token(self.ast(property)?)?;
                     if let Some(token) = read.postfix_token().filter(|&token| {
                         self.ast(token)
@@ -143,10 +141,10 @@ impl CheckerState {
                             vec![],
                         )?;
                     }
-                    if self.ast(name)?.node(name)?.kind() == K::NumericLiteral {
+                    if self.node(name)?.kind() == K::NumericLiteral {
                         self.check_grammar_numeric_literal(name)?;
                     }
-                    if self.ast(name)?.node(name)?.kind() == K::BigIntLiteral {
+                    if self.node(name)?.kind() == K::BigIntLiteral {
                         self.error_at(
                             Some(name),
                             d::A_bigint_literal_cannot_be_used_as_a_property_name,
@@ -167,7 +165,7 @@ impl CheckerState {
             if destructuring {
                 continue;
             }
-            let effective = if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            let effective = if self.node(name)?.kind() == K::ComputedPropertyName {
                 let expression = self
                     .ast(name)?
                     .node(name)?
@@ -175,8 +173,8 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("computed name"))?;
                 let ty = self.get_type_of_expression(expression)?;
                 self.index_property_name(ty)?
-            } else if ts_ast::utilities::is_property_name_literal(&self.ast(name)?.node(name)?) {
-                Some(self.ast(name)?.node_text(name)?.into_js_string())
+            } else if ts_ast::utilities::is_property_name_literal(&self.node(name)?) {
+                Some(self.node_text(name)?.into_js_string())
             } else {
                 None
             };
@@ -221,7 +219,7 @@ impl CheckerState {
         if self.check_grammar_function_like(node)? {
             return Ok(());
         }
-        let modifiers = self.source_list(node, self.ast(node)?.node(node)?.modifiers())?;
+        let modifiers = self.source_list(node, self.node(node)?.modifiers())?;
         if !(modifiers.is_empty()
             || modifiers.len() == 1
                 && self.ast(modifiers[0])?.node(modifiers[0])?.kind() == K::AsyncKeyword)
@@ -229,7 +227,7 @@ impl CheckerState {
             self.grammar_error_first_token(node, d::Modifiers_cannot_appear_here, vec![])?;
             return Ok(());
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if let Some(token) = read.question_token(self.ast(node)?)? {
             self.grammar_error_node(
                 token,
@@ -263,7 +261,7 @@ impl CheckerState {
                 .diagnostics()
                 .is_empty()
             {
-                let end = self.ast(node)?.node(node)?.end();
+                let end = self.node(node)?.end();
                 self.add_diagnostic(ts_ast::Diagnostic::new(
                     Some(source),
                     ts_core::TextRange::new(i64::from(end) - 1, i64::from(end)),

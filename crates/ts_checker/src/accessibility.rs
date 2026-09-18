@@ -68,8 +68,7 @@ impl CheckerState {
                         meaning,
                     )?,
                     error_module_name: builder.checker.symbol_to_string(external)?,
-                    error_node: (builder.checker.ast(enclosing)?.node(enclosing)?.flags()
-                        & nf::JAVA_SCRIPT_FILE
+                    error_node: (builder.checker.node(enclosing)?.flags() & nf::JAVA_SCRIPT_FILE
                         != 0)
                         .then_some(enclosing),
                     ..ResultInfo::accessible()
@@ -89,11 +88,11 @@ impl CheckerState {
 
     // port: tsc/internal/checker/emitresolver.go:getMeaningOfEntityNameReference
     pub(crate) fn emit_entity_meaning(&self, node: NodeId) -> Result<u32, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(parent) = read.parent() else {
             return Ok(sf::TYPE);
         };
-        let p = self.ast(parent)?.node(parent)?;
+        let p = self.node(parent)?;
         let kind = p.kind();
         let predicate_parameter = p
             .data_source()
@@ -147,7 +146,7 @@ impl CheckerState {
         }
         let meaning = self.emit_entity_meaning(node)?;
         let first = ts_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
-        let name = self.ast(first)?.node_text(first)?.into_js_string();
+        let name = self.node_text(first)?.into_js_string();
         let symbol = self.resolve_name(Some(enclosing), name.as_bytes(), meaning, None, false)?;
         if let Some(symbol) = symbol {
             if self.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0 && meaning & sf::TYPE != 0 {

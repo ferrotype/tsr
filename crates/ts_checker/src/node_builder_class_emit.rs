@@ -73,11 +73,11 @@ impl NodeBuilder<'_> {
                 nonlocal_function = true;
             } else {
                 for declaration in declarations.into_iter().flatten() {
-                    let read = self.checker.ast(declaration)?.node(declaration)?;
+                    let read = self.checker.node(declaration)?;
                     let Some(parent) = read.parent() else {
                         continue;
                     };
-                    let parent_kind = self.checker.ast(parent)?.node(parent)?.kind();
+                    let parent_kind = self.checker.node(parent)?.kind();
                     if matches!(parent_kind.known(), Some(K::SourceFile | K::ModuleBlock)) {
                         nonlocal_function = true;
                         break;
@@ -101,7 +101,7 @@ impl NodeBuilder<'_> {
                                 .transpose()?
                                 .flatten();
                             if !match node {
-                                Some(id) => self.checker.ast(id)?.node(id)?.kind() == kind,
+                                Some(id) => self.checker.node(id)?.kind() == kind,
                                 None => false,
                             } {
                                 matches = false;
@@ -121,7 +121,7 @@ impl NodeBuilder<'_> {
                                 .flatten();
                             if match container {
                                 Some(id) => matches!(
-                                    self.checker.ast(id)?.node(id)?.kind().known(),
+                                    self.checker.node(id)?.kind().known(),
                                     Some(K::SourceFile | K::ModuleBlock)
                                 ),
                                 None => false,
@@ -140,7 +140,7 @@ impl NodeBuilder<'_> {
         }
         if function_expression {
             if let Some(declaration) = self.checker.symbol(symbol)?.value_declaration() {
-                if let Some(parent) = self.checker.ast(declaration)?.node(declaration)?.parent() {
+                if let Some(parent) = self.checker.node(declaration)?.parent() {
                     if Some(parent) != self.enclosing {
                         // A binding-pattern declaration has no symbol; upstream then
                         // carries a nil symbol, which is trivially accessible.
@@ -177,12 +177,8 @@ impl NodeBuilder<'_> {
         if flags & sf::CLASS != 0 && self.checker.class_base_type_variable(symbol)?.is_none() {
             let expand = if self.flags & nf::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL != 0 {
                 match value {
-                    Some(value)
-                        if ts_ast::utilities::is_class_like(
-                            &self.checker.ast(value)?.node(value)?,
-                        ) =>
-                    {
-                        self.checker.ast(value)?.node(value)?.kind() != K::ClassDeclaration
+                    Some(value) if ts_ast::utilities::is_class_like(&self.checker.node(value)?) => {
+                        self.checker.node(value)?.kind() != K::ClassDeclaration
                             || self
                                 .checker
                                 .emit_symbol_accessible(
@@ -224,9 +220,9 @@ impl NodeBuilder<'_> {
         else {
             return Ok(None);
         };
-        let mut node = self.checker.ast(declaration)?.node(declaration)?.parent();
+        let mut node = self.checker.node(declaration)?.parent();
         while let Some(id) = node {
-            let read = self.checker.ast(id)?.node(id)?;
+            let read = self.checker.node(id)?;
             if read.kind() != K::ParenthesizedType {
                 return if read.kind() == K::TypeAliasDeclaration {
                     self.checker.get_symbol_of_declaration(id)
@@ -247,7 +243,7 @@ impl NodeBuilder<'_> {
         };
         if record.object_flags & of::INSTANTIATION_EXPRESSION_TYPE != 0 {
             if let Some(existing) = self.checker.types.instantiation_expression(ty)?.node {
-                if self.checker.ast(existing)?.node(existing)?.kind() == K::TypeQuery
+                if self.checker.node(existing)?.kind() == K::TypeQuery
                     && self.checker.get_type_from_type_node(existing)? == ty
                 {
                     if self.visited.contains(&ty) {
@@ -317,7 +313,7 @@ impl NodeBuilder<'_> {
             return Ok(false);
         };
         Ok(
-            ts_ast::utilities::is_class_like(&self.checker.ast(declaration)?.node(declaration)?)
+            ts_ast::utilities::is_class_like(&self.checker.node(declaration)?)
                 && !self.value_symbol_accessible(symbol)?,
         )
     }

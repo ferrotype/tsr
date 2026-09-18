@@ -7,15 +7,15 @@ use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
 impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsValidTypeOnlyAliasUseSite
     pub(crate) fn valid_type_only_alias_use_site(&self, node: NodeId) -> Result<bool, Error> {
-        if self.ast(node)?.node(node)?.flags() & (nf::AMBIENT | nf::JS_DOC) != 0
+        if self.node(node)?.flags() & (nf::AMBIENT | nf::JS_DOC) != 0
             || ts_ast::is_part_of_type_query(self.ast(node)?, node)?
         {
             return Ok(true);
         }
-        if self.ast(node)?.node(node)?.kind() == K::Identifier {
-            let mut parent = self.ast(node)?.node(node)?.parent();
+        if self.node(node)?.kind() == K::Identifier {
+            let mut parent = self.node(node)?.parent();
             while let Some(id) = parent {
-                let read = self.ast(id)?.node(id)?;
+                let read = self.node(id)?;
                 if !matches!(
                     read.kind().known(),
                     Some(K::PropertyAccessExpression | K::ExpressionWithTypeArguments)
@@ -25,7 +25,7 @@ impl CheckerState {
                 parent = read.parent();
             }
             if let Some(parent) = parent {
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if read.kind() == K::HeritageClause {
                     let clause = read
                         .data_source()
@@ -33,7 +33,7 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("type-only heritage"))?;
                     let owner = read.parent().ok_or(Error::MissingLink("heritage owner"))?;
                     if clause.token() == K::ImplementsKeyword
-                        || self.ast(owner)?.node(owner)?.kind() == K::InterfaceDeclaration
+                        || self.node(owner)?.kind() == K::InterfaceDeclaration
                     {
                         return Ok(true);
                     }
@@ -42,21 +42,21 @@ impl CheckerState {
         }
         let mut current = node;
         while matches!(
-            self.ast(current)?.node(current)?.kind().known(),
+            self.node(current)?.kind().known(),
             Some(K::Identifier | K::PropertyAccessExpression)
         ) {
-            let Some(parent) = self.ast(current)?.node(current)?.parent() else {
+            let Some(parent) = self.node(current)?.parent() else {
                 break;
             };
             current = parent;
         }
-        if self.ast(current)?.node(current)?.kind() == K::ComputedPropertyName {
+        if self.node(current)?.kind() == K::ComputedPropertyName {
             let member = self
                 .ast(current)?
                 .node(current)?
                 .parent()
                 .ok_or(Error::MissingLink("computed member"))?;
-            let read = self.ast(member)?.node(member)?;
+            let read = self.node(member)?;
             if read.modifier_flags(self.ast(member)?)? & mf::ABSTRACT != 0 {
                 return Ok(true);
             }
@@ -64,17 +64,17 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("computed member owner"))?;
             if matches!(
-                self.ast(owner)?.node(owner)?.kind().known(),
+                self.node(owner)?.kind().known(),
                 Some(K::InterfaceDeclaration | K::TypeLiteral)
             ) {
                 return Ok(true);
             }
         }
-        let shorthand = if self.ast(node)?.node(node)?.kind() == K::Identifier {
-            match self.ast(node)?.node(node)?.parent() {
+        let shorthand = if self.node(node)?.kind() == K::Identifier {
+            match self.node(node)?.parent() {
                 Some(parent) => {
-                    self.ast(parent)?.node(parent)?.kind() == K::ShorthandPropertyAssignment
-                        && self.ast(parent)?.node(parent)?.name() == Some(node)
+                    self.node(parent)?.kind() == K::ShorthandPropertyAssignment
+                        && self.node(parent)?.name() == Some(node)
                 }
                 None => false,
             }
@@ -86,7 +86,7 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:IsExpressionNode
     pub(crate) fn expression_node(&self, mut node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(
                 K::SuperKeyword
@@ -127,19 +127,19 @@ impl CheckerState {
             ) => true,
             Some(K::MetaProperty) => {
                 if let Some(parent) = read.parent() {
-                    let parent_read = self.ast(parent)?.node(parent)?;
+                    let parent_read = self.node(parent)?;
                     if parent_read.kind() == K::CallExpression {
                         let expression = parent_read
                             .expression()
                             .ok_or(Error::MissingLink("import call"))?;
-                        let expr_read = self.ast(expression)?.node(expression)?;
+                        let expr_read = self.node(expression)?;
                         let import_call = expr_read.kind() == K::ImportKeyword
                             || if let Some(data) = expr_read.data_source().as_meta_property() {
                                 if data.keyword_token() == K::ImportKeyword {
                                     let name = data
                                         .name()
                                         .ok_or(Error::MissingLink("import meta name"))?;
-                                    self.ast(name)?.node_text(name)?.as_bytes() == b"defer"
+                                    self.node_text(name)?.as_bytes() == b"defer"
                                 } else {
                                     false
                                 }
@@ -155,12 +155,12 @@ impl CheckerState {
                 }
             }
             Some(K::ExpressionWithTypeArguments) => match read.parent() {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() != K::HeritageClause,
+                Some(parent) => self.node(parent)?.kind() != K::HeritageClause,
                 None => true,
             },
             Some(K::QualifiedName) => {
-                while let Some(parent) = self.ast(node)?.node(node)?.parent() {
-                    if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+                while let Some(parent) = self.node(node)?.parent() {
+                    if self.node(parent)?.kind() != K::QualifiedName {
                         break;
                     }
                     node = parent;
@@ -169,13 +169,12 @@ impl CheckerState {
             }
             Some(K::PrivateIdentifier) => {
                 if let Some(parent) = read.parent() {
-                    let parent_read = self.ast(parent)?.node(parent)?;
+                    let parent_read = self.node(parent)?;
                     if let Some(data) = parent_read.data_source().as_binary_expression() {
                         let token = data
                             .operator_token()
                             .ok_or(Error::MissingLink("private-name operator"))?;
-                        data.left() == Some(node)
-                            && self.ast(token)?.node(token)?.kind() == K::InKeyword
+                        data.left() == Some(node) && self.node(token)?.kind() == K::InKeyword
                     } else {
                         false
                     }
@@ -198,10 +197,10 @@ impl CheckerState {
     }
 
     fn type_only_name_expression_context(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         Ok(match read.kind().known() {
             Some(
                 K::TypeQuery
@@ -219,10 +218,10 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:IsInExpressionContext
     pub(crate) fn in_expression_context(&self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         Ok(match read.kind().known() {
             Some(
                 K::VariableDeclaration
@@ -256,7 +255,7 @@ impl CheckerState {
                     .as_for_statement()
                     .ok_or(Error::MissingLink("expression-context for"))?;
                 data.initializer() == Some(node)
-                    && self.ast(node)?.node(node)?.kind() != K::VariableDeclarationList
+                    && self.node(node)?.kind() != K::VariableDeclarationList
                     || data.condition() == Some(node)
                     || data.incrementor() == Some(node)
             }
@@ -266,7 +265,7 @@ impl CheckerState {
                     .as_for_in_or_of_statement()
                     .ok_or(Error::MissingLink("expression-context for-in/of"))?;
                 data.initializer() == Some(node)
-                    && self.ast(node)?.node(node)?.kind() != K::VariableDeclarationList
+                    && self.node(node)?.kind() != K::VariableDeclarationList
                     || data.expression() == Some(node)
             }
             Some(K::Decorator | K::JsxExpression | K::JsxSpreadAttribute | K::SpreadAssignment) => {

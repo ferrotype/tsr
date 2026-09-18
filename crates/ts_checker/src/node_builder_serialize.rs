@@ -47,7 +47,7 @@ impl NodeBuilder<'_> {
                 None => match declaration {
                     Some(decl)
                         if ts_ast::utilities_middle::is_variable_like(
-                            &self.checker.ast(decl)?.node(decl)?,
+                            &self.checker.node(decl)?,
                         ) =>
                     {
                         self.checker
@@ -87,7 +87,7 @@ impl NodeBuilder<'_> {
         };
         let mut requires_undefined = false;
         if let Some(decl) = declaration {
-            let kind = self.checker.ast(decl)?.node(decl)?.kind();
+            let kind = self.checker.node(decl)?.kind();
             if matches!(
                 kind.known(),
                 Some(K::Parameter | K::PropertySignature | K::PropertyDeclaration)
@@ -137,7 +137,7 @@ impl NodeBuilder<'_> {
             }
             let eligible = match declaration {
                 Some(decl) => {
-                    let read = self.checker.ast(decl)?.node(decl)?;
+                    let read = self.checker.node(decl)?;
                     matches!(read.kind().known(), Some(K::GetAccessor | K::SetAccessor))
                         || ts_ast::utilities_tail::has_inferred_type(&read)
                             && read.flags() & node_flags::SYNTHESIZED == 0
@@ -151,7 +151,7 @@ impl NodeBuilder<'_> {
                 let previous = symbol.and_then(|s| self.enclosing_symbol_types.insert(s, ty));
                 let attempt = (|| {
                     let accessor = matches!(
-                        self.checker.ast(decl)?.node(decl)?.kind().known(),
+                        self.checker.node(decl)?.kind().known(),
                         Some(K::GetAccessor | K::SetAccessor)
                     );
                     let pc = self.checker.pseudo_checker();
@@ -161,7 +161,7 @@ impl NodeBuilder<'_> {
                         pc.get_type_of_declaration(self.checker, decl)?
                     };
                     if matches!(pseudo.as_ref(), P::NoResult { .. })
-                        && self.checker.ast(decl)?.node(decl)?.kind() == K::BinaryExpression
+                        && self.checker.node(decl)?.kind() == K::BinaryExpression
                     {
                         if let Some(symbol) = symbol {
                             let declarations: Vec<_> = self
@@ -171,7 +171,7 @@ impl NodeBuilder<'_> {
                                 .flatten()
                                 .collect();
                             for node in declarations {
-                                let read = self.checker.ast(node)?.node(node)?;
+                                let read = self.checker.node(node)?;
                                 if read.type_node().is_some()
                                     && !matches!(
                                         read.kind().known(),
@@ -185,7 +185,7 @@ impl NodeBuilder<'_> {
                         }
                     }
                     let report = !self.suppress_inference_fallback;
-                    let kind = self.checker.ast(decl)?.node(decl)?.kind();
+                    let kind = self.checker.node(decl)?.kind();
                     let optional = !requires_undefined
                         && matches!(
                             kind.known(),
@@ -285,8 +285,7 @@ impl NodeBuilder<'_> {
         let result = (|| {
             let declaration = self.checker.signatures.get(signature)?.declaration;
             let original = if let Some(decl) = declaration {
-                (self.checker.ast(decl)?.node(decl)?.flags() & node_flags::SYNTHESIZED == 0)
-                    .then_some(decl)
+                (self.checker.node(decl)?.flags() & node_flags::SYNTHESIZED == 0).then_some(decl)
             } else {
                 None
             };

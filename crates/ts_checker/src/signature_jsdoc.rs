@@ -23,7 +23,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/jsdoc.go:getAllJSDocTags
     pub(crate) fn all_signature_jsdoc_tags(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        if self.ast(node)?.node(node)?.flags() & nf::JS_DOC != 0 {
+        if self.node(node)?.flags() & nf::JS_DOC != 0 {
             return Ok(Vec::new());
         }
         let mut current = Some(node);
@@ -52,15 +52,15 @@ impl CheckerState {
     pub(crate) fn check_unmatched_jsdoc_parameters(&mut self, node: NodeId) -> Result<(), Error> {
         let mut documented = Vec::new();
         for tag in self.all_signature_jsdoc_tags(node)? {
-            let read = self.ast(tag)?.node(tag)?;
+            let read = self.node(tag)?;
             if read.kind() != K::JSDocParameterTag {
                 continue;
             }
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("documentation parameter name"))?;
-            if self.ast(name)?.node(name)?.kind() == K::Identifier
-                && self.ast(name)?.node_text(name)?.as_bytes().is_empty()
+            if self.node(name)?.kind() == K::Identifier
+                && self.node_text(name)?.as_bytes().is_empty()
             {
                 continue;
             }
@@ -69,11 +69,11 @@ impl CheckerState {
         if documented.is_empty() {
             return Ok(());
         }
-        let js = self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
+        let js = self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let mut names = Set::default();
         let mut excluded = Set::default();
         for (index, parameter) in self
-            .source_list(node, self.ast(node)?.node(node)?.parameter_list())?
+            .source_list(node, self.node(node)?.parameter_list())?
             .into_iter()
             .enumerate()
         {
@@ -82,11 +82,11 @@ impl CheckerState {
                 .node(parameter)?
                 .name()
                 .ok_or(Error::MissingLink("signature parameter name"))?;
-            if self.ast(name)?.node(name)?.kind() == K::Identifier {
-                names.insert(self.ast(name)?.node_text(name)?.into_js_string());
+            if self.node(name)?.kind() == K::Identifier {
+                names.insert(self.node_text(name)?.into_js_string());
             }
             if matches!(
-                self.ast(name)?.node(name)?.kind().known(),
+                self.node(name)?.kind().known(),
                 Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
             ) {
                 excluded.insert(index);
@@ -98,7 +98,7 @@ impl CheckerState {
             }
             let index = documented.len() - 1;
             let last = documented[index];
-            let read = self.ast(last)?.node(last)?;
+            let read = self.node(last)?;
             let data = read
                 .data_source()
                 .as_js_doc_parameter_or_property_tag()
@@ -106,17 +106,17 @@ impl CheckerState {
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("last documentation parameter name"))?;
-            if self.ast(name)?.node(name)?.kind() != K::Identifier {
+            if self.node(name)?.kind() != K::Identifier {
                 return Ok(());
             }
-            let text = self.ast(name)?.node_text(name)?.into_js_string();
+            let text = self.node_text(name)?.into_js_string();
             if excluded.contains(&index) || names.contains(&text) {
                 return Ok(());
             }
             let Some(expression) = data.type_expression() else {
                 return Ok(());
             };
-            let Some(annotation) = self.ast(expression)?.node(expression)?.type_node() else {
+            let Some(annotation) = self.node(expression)?.type_node() else {
                 return Ok(());
             };
             let ty = self.get_type_from_type_node(annotation)?;
@@ -126,7 +126,7 @@ impl CheckerState {
             return Ok(());
         }
         for (index, tag) in documented.into_iter().enumerate() {
-            let read = self.ast(tag)?.node(tag)?;
+            let read = self.node(tag)?;
             let data = read
                 .data_source()
                 .as_js_doc_parameter_or_property_tag()
@@ -135,10 +135,9 @@ impl CheckerState {
                 .name()
                 .ok_or(Error::MissingLink("documentation parameter name"))?;
             let name_first = data.is_name_first();
-            let kind = self.ast(name)?.node(name)?.kind();
+            let kind = self.node(name)?.kind();
             if excluded.contains(&index)
-                || kind == K::Identifier
-                    && names.contains(&self.ast(name)?.node_text(name)?.into_js_string())
+                || kind == K::Identifier && names.contains(&self.node_text(name)?.into_js_string())
             {
                 continue;
             }
@@ -161,7 +160,7 @@ impl CheckerState {
                     )?;
                 }
             } else if !name_first {
-                let text = self.ast(name)?.node_text(name)?.into_js_string();
+                let text = self.node_text(name)?.into_js_string();
                 let diagnostic = self.diagnostic_for_node(
                     Some(name),
                     d::JSDoc_param_tag_has_name_0_but_there_is_no_parameter_with_that_name,
@@ -179,7 +178,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.containsArgumentsReference
     pub(crate) fn contains_arguments_reference(&mut self, node: NodeId) -> Result<bool, Error> {
-        let Some(body) = self.ast(node)?.node(node)?.body() else {
+        let Some(body) = self.node(node)?.body() else {
             return Ok(false);
         };
         if let Some(&value) = self.body_checks.arguments_referenced.get(&node) {
@@ -188,10 +187,10 @@ impl CheckerState {
         let mut pending = vec![body];
         let mut result = false;
         while let Some(node) = pending.pop() {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::Identifier) => {
-                    if self.ast(node)?.node_text(node)?.as_bytes() == b"arguments"
+                    if self.node_text(node)?.as_bytes() == b"arguments"
                         && self.resolved_value_symbol(node)? == self.builtins.arguments_symbol
                     {
                         result = true;
@@ -203,7 +202,7 @@ impl CheckerState {
                     K::PropertyDeclaration | K::MethodDeclaration | K::GetAccessor | K::SetAccessor,
                 ) => {
                     if let Some(name) = read.name() {
-                        if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+                        if self.node(name)?.kind() == K::ComputedPropertyName {
                             pending.push(name);
                             continue;
                         }
@@ -276,7 +275,7 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("deprecated documentation"))?
                     .tags();
                 for tag in self.source_list(doc, list)? {
-                    if self.ast(tag)?.node(tag)?.kind() == K::JSDocDeprecatedTag {
+                    if self.node(tag)?.kind() == K::JSDocDeprecatedTag {
                         return Ok(Some(tag));
                     }
                 }
@@ -294,7 +293,7 @@ impl CheckerState {
         }
         let mut current = Some(node);
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.flags() & nf::POSSIBLY_CONTAINS_DEPRECATED_TAG != 0 {
                 return Ok(self.direct_deprecated_tag(node)?.is_some());
             }
@@ -345,7 +344,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getDeprecatedSuggestionNode
     pub(crate) fn deprecated_suggestion_node(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(
                     K::ParenthesizedExpression
@@ -402,10 +401,10 @@ impl CheckerState {
     fn invoked_name_text(&self, mut node: NodeId) -> Result<ts_ast::JsString, Error> {
         let mut suffixes: Vec<Vec<u8>> = Vec::new();
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::Identifier) => {
-                    let mut bytes = self.ast(node)?.node_text(node)?.as_bytes().to_vec();
+                    let mut bytes = self.node_text(node)?.as_bytes().to_vec();
                     for name in suffixes.into_iter().rev() {
                         bytes.push(b'.');
                         bytes.extend_from_slice(&name);
@@ -425,7 +424,7 @@ impl CheckerState {
                         .as_element_access_expression()
                         .and_then(|data| data.argument_expression())
                         .ok_or(Error::MissingLink("invoked element"))?;
-                    let name = self.ast(argument)?.node(argument)?;
+                    let name = self.node(argument)?;
                     if !ts_ast::utilities::is_property_name(&name) {
                         return Ok(ts_ast::JsString::default());
                     }
@@ -444,7 +443,7 @@ impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
     // Identifier and property-access cases have already returned in the caller.
     fn arguments_type_part(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let kind = read.kind();
         if kind.raw() >= K::TypePredicate as i16 && kind.raw() <= K::ImportType as i16 {
             return Ok(true);
@@ -464,13 +463,13 @@ impl CheckerState {
                 | K::NeverKeyword,
             ) => Ok(true),
             Some(K::VoidKeyword) => match read.parent() {
-                Some(parent) => Ok(self.ast(parent)?.node(parent)?.kind() != K::VoidExpression),
+                Some(parent) => Ok(self.node(parent)?.kind() != K::VoidExpression),
                 None => Err(Error::MissingLink("void keyword parent")),
             },
             Some(K::ExpressionWithTypeArguments) => self.arguments_type_heritage(node),
             Some(K::TypeParameter) => match read.parent() {
                 Some(parent) => Ok(matches!(
-                    self.ast(parent)?.node(parent)?.kind().known(),
+                    self.node(parent)?.kind().known(),
                     Some(K::MappedType | K::InferType)
                 )),
                 None => Err(Error::MissingLink("type parameter parent")),
@@ -486,7 +485,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("type part parent"))?;
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         let kind = read.kind();
         if kind == K::TypeQuery {
             return Ok(false);
@@ -540,7 +539,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("type expression parent"))?;
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if matches!(
             read.kind().known(),
             Some(K::JSDocImplementsTag | K::JSDocAugmentsTag)
@@ -552,7 +551,7 @@ impl CheckerState {
         }
         let owner = read.parent().ok_or(Error::MissingLink("heritage owner"))?;
         Ok(!matches!(
-            self.ast(owner)?.node(owner)?.kind().known(),
+            self.node(owner)?.kind().known(),
             Some(K::ClassDeclaration | K::ClassExpression)
         ) || read
             .data_source()

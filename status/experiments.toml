@@ -322,7 +322,7 @@ unit = "scanner token bytes, literal value bytes and rescans match Go; checker-c
 
 [E5]
 title = "Memory"
-nature = "Measured for parse/bind and the checker subset's per-type footprint; full checking remains extrapolated. Parse/bind thresholds re-based by ADR 0021 (2026-09-10) from 0.7"
+nature = "Measured for parse/bind and the checker subset's per-type footprint; full checking remains extrapolated. Parse/bind thresholds re-based by ADR 0021 (2026-09-10) from 0.7; per-type footprint re-based by owner decision ADR 0022 (2026-09-18) from 0.8"
 
 [[E5.criteria]]
 id = "peak_rss"
@@ -342,7 +342,7 @@ unit = "Rust / Go bytes allocated for the same parse/bind workload"
 id = "type_footprint"
 metric = "run.e5.type_footprint_ratio"
 op = "<="
-threshold = 0.8
+threshold = 0.85
 unit = "Rust / Go per-type footprint on the frozen checker subset"
 
 [E6]

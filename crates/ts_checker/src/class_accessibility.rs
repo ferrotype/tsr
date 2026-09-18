@@ -16,7 +16,7 @@ impl CheckerState {
             let Some(declaration) = self.signatures.get(signature)?.declaration else {
                 continue;
             };
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             let modifiers = read.modifier_flags(self.ast(declaration)?)? & mask;
             if modifiers == 0 || read.kind() != K::Constructor {
                 continue;
@@ -40,13 +40,12 @@ impl CheckerState {
                     let containing_symbol = self
                         .get_symbol_of_declaration(containing)?
                         .ok_or(Error::MissingLink("containing class symbol"))?;
-                    let containing_type =
-                        if self.ast(containing)?.node(containing)?.kind() == K::ClassExpression {
-                            let ty = self.check_class_expression(containing)?;
-                            self.get_regular_type_of_literal_type(ty)?
-                        } else {
-                            self.get_declared_type_of_symbol(containing_symbol)?
-                        };
+                    let containing_type = if self.node(containing)?.kind() == K::ClassExpression {
+                        let ty = self.check_class_expression(containing)?;
+                        self.get_regular_type_of_literal_type(ty)?
+                    } else {
+                        self.get_declared_type_of_symbol(containing_symbol)?
+                    };
                     if self.type_has_protected_accessible_base(symbol, containing_type)? {
                         continue;
                     }

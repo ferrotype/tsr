@@ -11,14 +11,12 @@ impl CheckerState {
         &mut self,
         mut name: NodeId,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let parent = required(read.parent(), "name query parent")?;
-        if self.ast(parent)?.node(parent)?.name() == Some(name)
-            && ts_ast::is_declaration(&self.ast(parent)?.node(parent)?)
-        {
+        if self.node(parent)?.name() == Some(name) && ts_ast::is_declaration(&self.node(parent)?) {
             return self.get_symbol_of_declaration(parent);
         }
-        if self.ast(parent)?.node(parent)?.kind() == K::ExportAssignment
+        if self.node(parent)?.kind() == K::ExportAssignment
             && ts_ast::is_entity_name_expression(self.ast(name)?, name)?
         {
             if let Some(symbol) = self.resolve_entity_name(
@@ -32,19 +30,18 @@ impl CheckerState {
             }
         } else {
             let mut top = name;
-            while let Some(parent) = self.ast(top)?.node(top)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+            while let Some(parent) = self.node(top)?.parent() {
+                if self.node(parent)?.kind() != K::QualifiedName {
                     break;
                 }
                 top = parent;
             }
-            if let Some(import) = self.ast(top)?.node(top)?.parent() {
-                if self.ast(import)?.node(import)?.kind() == K::ImportEqualsDeclaration {
-                    if self.ast(name)?.node(name)?.kind()==K::Identifier && ts_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(self.ast(name)?,name)? {name=required(self.ast(name)?.node(name)?.parent(),"import name parent")?;}
-                    let parent =
-                        required(self.ast(name)?.node(name)?.parent(), "import name parent")?;
-                    let meaning = if self.ast(name)?.node(name)?.kind() == K::Identifier
-                        || self.ast(parent)?.node(parent)?.kind() == K::QualifiedName
+            if let Some(import) = self.node(top)?.parent() {
+                if self.node(import)?.kind() == K::ImportEqualsDeclaration {
+                    if self.node(name)?.kind()==K::Identifier && ts_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(self.ast(name)?,name)? {name=required(self.node(name)?.parent(),"import name parent")?;}
+                    let parent = required(self.node(name)?.parent(), "import name parent")?;
+                    let meaning = if self.node(name)?.kind() == K::Identifier
+                        || self.node(parent)?.kind() == K::QualifiedName
                     {
                         sf::NAMESPACE
                     } else {
@@ -52,7 +49,7 @@ impl CheckerState {
                     };
                     return self.resolve_entity_name_ex(name, meaning, false, true);
                 }
-                if self.ast(import)?.node(import)?.kind() == K::ImportType {
+                if self.node(import)?.kind() == K::ImportType {
                     self.get_type_from_type_node(import)?;
                     return Ok(self
                         .query
@@ -68,20 +65,20 @@ impl CheckerState {
             self.ast(name)?,
             name,
         )? {
-            name = required(self.ast(name)?.node(name)?.parent(), "right name parent")?;
+            name = required(self.node(name)?.parent(), "right name parent")?;
         }
         let mut top = name;
-        while let Some(parent) = self.ast(top)?.node(top)?.parent() {
+        while let Some(parent) = self.node(top)?.parent() {
             if !matches!(
-                self.ast(parent)?.node(parent)?.kind().known(),
+                self.node(parent)?.kind().known(),
                 Some(K::QualifiedName | K::PropertyAccessExpression)
             ) {
                 break;
             }
             top = parent;
         }
-        if let Some(parent) = self.ast(top)?.node(top)?.parent() {
-            let parent_read = self.ast(parent)?.node(parent)?;
+        if let Some(parent) = self.node(top)?.parent() {
+            let parent_read = self.node(parent)?;
             let heritage = parent_read
                 .parent()
                 .map(|ancestor| {
@@ -95,10 +92,9 @@ impl CheckerState {
             if parent_read.kind() == K::ExpressionWithTypeArguments
                 || parent_read.kind() == K::TypeReference && heritage
             {
-                let own_parent =
-                    required(self.ast(name)?.node(name)?.parent(), "heritage name parent")?;
+                let own_parent = required(self.node(name)?.parent(), "heritage name parent")?;
                 let direct = matches!(
-                    self.ast(own_parent)?.node(own_parent)?.kind().known(),
+                    self.node(own_parent)?.kind().known(),
                     Some(K::ExpressionWithTypeArguments | K::TypeReference)
                 );
                 let mut meaning = if direct {
@@ -111,8 +107,7 @@ impl CheckerState {
                     sf::NAMESPACE
                 };
                 if direct
-                    && self.ast(own_parent)?.node(own_parent)?.kind()
-                        == K::ExpressionWithTypeArguments
+                    && self.node(own_parent)?.kind() == K::ExpressionWithTypeArguments
                     && !self.is_type_heritage_expression(own_parent)?
                 {
                     meaning |= sf::VALUE;
@@ -127,7 +122,7 @@ impl CheckerState {
             }
         }
         if self.expression_node(name)? {
-            let read = self.ast(name)?.node(name)?;
+            let read = self.node(name)?;
             if ts_ast::node_is_missing(Some(&read)) {
                 return Ok(None);
             }
@@ -159,10 +154,10 @@ impl CheckerState {
                         .is_none()
                         && property
                     {
-                        let read = self.ast(name)?.node(name)?;
+                        let read = self.node(name)?;
                         let key_node = required(read.name(), "queried property name")?;
                         let receiver = required(read.expression(), "queried property receiver")?;
-                        if self.ast(key_node)?.node(key_node)?.kind() != K::PrivateIdentifier {
+                        if self.node(key_node)?.kind() != K::PrivateIdentifier {
                             let ty = self.check_expression_cached(receiver)?;
                             let key = self.literal_type_from_property_name(key_node)?;
                             let symbol = self.applicable_index_symbol(ty, key)?;
@@ -179,16 +174,16 @@ impl CheckerState {
             }
         } else {
             let mut top = name;
-            while let Some(parent) = self.ast(top)?.node(top)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() != K::QualifiedName {
+            while let Some(parent) = self.node(top)?.parent() {
+                if self.node(parent)?.kind() != K::QualifiedName {
                     break;
                 }
                 top = parent;
             }
-            let parent = required(self.ast(name)?.node(name)?.parent(), "type name parent")?;
-            let top_parent = required(self.ast(top)?.node(top)?.parent(), "type name top parent")?;
-            if self.ast(top_parent)?.node(top_parent)?.kind() == K::TypeReference {
-                let meaning = if self.ast(parent)?.node(parent)?.kind() == K::TypeReference {
+            let parent = required(self.node(name)?.parent(), "type name parent")?;
+            let top_parent = required(self.node(top)?.parent(), "type name top parent")?;
+            if self.node(top_parent)?.kind() == K::TypeReference {
+                let meaning = if self.node(parent)?.kind() == K::TypeReference {
                     sf::TYPE
                 } else {
                     sf::NAMESPACE
@@ -215,7 +210,7 @@ impl CheckerState {
                 }
                 return self.unresolved_symbol_for_name(name).map(Some);
             }
-            if self.ast(parent)?.node(parent)?.kind() == K::TypePredicate {
+            if self.node(parent)?.kind() == K::TypePredicate {
                 return self.resolve_entity_name(name, sf::FUNCTION_SCOPED_VARIABLE, true);
             }
             Ok(None)
@@ -271,7 +266,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.getUnresolvedSymbolForEntityName
     pub(crate) fn unresolved_symbol_for_name(&mut self, name: NodeId) -> Result<SymbolId, Error> {
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let (identifier, left) = match read.kind().known() {
             Some(K::QualifiedName) => {
                 let data = read

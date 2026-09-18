@@ -56,7 +56,8 @@ pub(crate) struct CallState {
 impl CallState {
     pub(crate) fn census(&self, census: &mut crate::census::Census) {
         census.map("call_resolution", &self.resolved);
-        census.map("optional_call_signatures", &self.optional_signatures);
+        // Go keeps the optional-call clones in `cachedSignatures`; same family here.
+        census.map("signature_caches", &self.optional_signatures);
         census.map("instantiation_expression", &self.instantiation_expressions);
         census.vec_capacity("call_resolution", &self.contexts, self.contexts.capacity());
         census.vec_capacity(
@@ -210,15 +211,15 @@ impl CheckerState {
             return Ok(self.builtins.silent_never_type);
         }
         self.check_deprecated_signature(signature, node)?;
-        if let Some(expression) = self.ast(node)?.node(node)?.expression() {
-            if self.ast(expression)?.node(expression)?.kind() == K::SuperKeyword {
+        if let Some(expression) = self.node(node)?.expression() {
+            if self.node(expression)?.kind() == K::SuperKeyword {
                 return Ok(self.builtins.void_type);
             }
         }
-        if self.ast(node)?.node(node)?.kind() == K::NewExpression {
+        if self.node(node)?.kind() == K::NewExpression {
             if let Some(declaration) = self.signatures.get(signature)?.declaration {
                 if !matches!(
-                    self.ast(declaration)?.node(declaration)?.kind().known(),
+                    self.node(declaration)?.kind().known(),
                     Some(K::Constructor | K::ConstructSignature | K::ConstructorType)
                 ) {
                     let options = self.program()?.host.options();
@@ -229,10 +230,10 @@ impl CheckerState {
                 }
             }
         }
-        if self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0
+        if self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0
             && self.is_common_js_require(node)?
         {
-            let arguments = self.source_list(node, self.ast(node)?.node(node)?.argument_list())?;
+            let arguments = self.source_list(node, self.node(node)?.argument_list())?;
             return self.external_module_type_by_literal(arguments[0]);
         }
         let ty = self.return_type_of_signature(signature)?;
@@ -244,7 +245,7 @@ impl CheckerState {
                 .node(node)?
                 .parent()
                 .ok_or(Error::MissingLink("Symbol call parent"))?;
-            while self.ast(parent)?.node(parent)?.kind() == K::ParenthesizedExpression {
+            while self.node(parent)?.kind() == K::ParenthesizedExpression {
                 parent = self
                     .ast(parent)?
                     .node(parent)?
@@ -253,13 +254,13 @@ impl CheckerState {
             }
             return self.es_symbol_like_type_for_node(parent);
         }
-        if self.ast(node)?.node(node)?.kind() == K::CallExpression
-            && self.ast(node)?.node(node)?.question_dot_token().is_none()
+        if self.node(node)?.kind() == K::CallExpression
+            && self.node(node)?.question_dot_token().is_none()
             && self.types.flags(ty)? & tf::VOID != 0
         {
-            let parent = self.ast(node)?.node(node)?.parent();
+            let parent = self.node(node)?.parent();
             let expression_statement = match parent {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() == K::ExpressionStatement,
+                Some(parent) => self.node(parent)?.kind() == K::ExpressionStatement,
                 None => false,
             };
             if expression_statement && self.type_predicate_of_signature(signature)?.is_some() {
@@ -271,7 +272,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isSymbolOrSymbolForCall
     pub(crate) fn is_symbol_or_symbol_for_call(&mut self, node: NodeId) -> Result<bool, Error> {
-        if self.ast(node)?.node(node)?.kind() != K::CallExpression {
+        if self.node(node)?.kind() != K::CallExpression {
             return Ok(false);
         }
         let mut left = self
@@ -279,13 +280,13 @@ impl CheckerState {
             .node(node)?
             .expression()
             .ok_or(Error::MissingLink("Symbol call expression"))?;
-        if self.ast(left)?.node(left)?.kind() == K::PropertyAccessExpression {
+        if self.node(left)?.kind() == K::PropertyAccessExpression {
             let name = self
                 .ast(left)?
                 .node(left)?
                 .name()
                 .ok_or(Error::MissingLink("Symbol property name"))?;
-            if self.ast(name)?.node_text(name)?.as_bytes() == b"for" {
+            if self.node_text(name)?.as_bytes() == b"for" {
                 left = self
                     .ast(left)?
                     .node(left)?
@@ -293,8 +294,7 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("Symbol for receiver"))?;
             }
         }
-        if self.ast(left)?.node(left)?.kind() != K::Identifier
-            || self.ast(left)?.node_text(left)?.as_bytes() != b"Symbol"
+        if self.node(left)?.kind() != K::Identifier || self.node_text(left)?.as_bytes() != b"Symbol"
         {
             return Ok(false);
         }
@@ -323,7 +323,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.resolveCallExpression
     fn resolve_call_expression(&mut self, node: NodeId) -> Result<SignatureId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::NewExpression {
             return self.resolve_new_expression(node);
         }
@@ -337,12 +337,10 @@ impl CheckerState {
             return Err(Error::Unsupported("resolveSignature: decorator/JSX"));
         }
         let expression = read.expression().ok_or(Error::MissingLink("call target"))?;
-        if self.ast(expression)?.node(expression)?.kind() == K::SuperKeyword {
+        if self.node(expression)?.kind() == K::SuperKeyword {
             let ty = self.check_super_expression(expression)?;
             if self.types.flags(ty)? & tf::ANY != 0 {
-                for argument in
-                    self.source_list(node, self.ast(node)?.node(node)?.argument_list())?
-                {
+                for argument in self.source_list(node, self.node(node)?.argument_list())? {
                     self.check_expression(argument)?;
                 }
                 return Ok(self.builtins.any_signature);
@@ -361,12 +359,12 @@ impl CheckerState {
             }
             return self.resolve_untyped_call(node);
         }
-        if self.ast(expression)?.node(expression)?.kind() == K::ImportKeyword {
+        if self.node(expression)?.kind() == K::ImportKeyword {
             return self.resolve_untyped_call(node);
         }
         let mut ty = self.check_expression(expression)?;
         let mut call_chain_flags = 0;
-        if self.ast(node)?.node(node)?.flags() & nf::OPTIONAL_CHAIN != 0 {
+        if self.node(node)?.flags() & nf::OPTIONAL_CHAIN != 0 {
             let non_optional = self.optional_expression_type(ty, expression)?;
             if non_optional != ty {
                 call_chain_flags =
@@ -392,7 +390,7 @@ impl CheckerState {
         let untyped =
             self.is_untyped_function_call(ty, apparent, signatures.len(), constructors.len())?;
         if untyped {
-            if self.ast(node)?.node(node)?.type_argument_list().is_some() {
+            if self.node(node)?.type_argument_list().is_some() {
                 self.error_at(
                     Some(node),
                     messages::Untyped_function_calls_may_not_accept_type_arguments,
@@ -416,9 +414,7 @@ impl CheckerState {
             self.resolve_untyped_call(node)?;
             return Ok(self.builtins.unknown_signature);
         }
-        if self.expression_mode & 8 != 0
-            && self.ast(node)?.node(node)?.type_argument_list().is_none()
-        {
+        if self.expression_mode & 8 != 0 && self.node(node)?.type_argument_list().is_none() {
             for &signature in &signatures {
                 if self
                     .signatures
@@ -463,7 +459,7 @@ impl CheckerState {
             return Ok(self.builtins.unknown_signature);
         }
         if self.types.flags(ty)? & tf::ANY != 0 {
-            if self.ast(node)?.node(node)?.type_argument_list().is_some() {
+            if self.node(node)?.type_argument_list().is_some() {
                 self.error_at(
                     Some(node),
                     messages::Untyped_function_calls_may_not_accept_type_arguments,
@@ -521,7 +517,7 @@ impl CheckerState {
                     .into_iter()
                     .flatten()
                 {
-                    let read = self.ast(declaration)?.node(declaration)?;
+                    let read = self.node(declaration)?;
                     if matches!(
                         read.kind().known(),
                         Some(K::ClassDeclaration | K::ClassExpression)
@@ -574,10 +570,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.resolveUntypedCall
     pub(crate) fn resolve_untyped_call(&mut self, node: NodeId) -> Result<SignatureId, Error> {
-        if self.ast(node)?.node(node)?.kind() != K::BinaryExpression {
-            for argument in
-                self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?
-            {
+        if self.node(node)?.kind() != K::BinaryExpression {
+            for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
                 self.check_source_element(argument)?;
             }
         }
@@ -604,7 +598,7 @@ impl CheckerState {
             let (symbol, parent) = match declaration {
                 Some(declaration) => (
                     self.get_symbol_of_declaration(declaration)?,
-                    self.ast(declaration)?.node(declaration)?.parent(),
+                    self.node(declaration)?.parent(),
                 ),
                 None => (None, None),
             };
@@ -674,10 +668,10 @@ impl CheckerState {
         signatures: &[SignatureId],
         call_chain_flags: u32,
     ) -> Result<SignatureId, Error> {
-        let type_arguments = if self.ast(node)?.node(node)?.kind() == K::BinaryExpression {
+        let type_arguments = if self.node(node)?.kind() == K::BinaryExpression {
             Vec::new()
         } else {
-            self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?
+            self.source_list(node, self.node(node)?.type_argument_list())?
         };
         for &argument in &type_arguments {
             self.check_source_element(argument)?;
@@ -771,12 +765,11 @@ impl CheckerState {
                 *candidate
             } else {
                 let type_arguments = if type_arguments.is_empty() {
-                    let flags =
-                        if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
-                            crate::inference::ANY_DEFAULT
-                        } else {
-                            0
-                        };
+                    let flags = if ts_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
+                        crate::inference::ANY_DEFAULT
+                    } else {
+                        0
+                    };
                     let context =
                         self.new_inference_context(&parameters, Some(*candidate), flags)?;
                     inference = Some(context);

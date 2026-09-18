@@ -99,7 +99,7 @@ impl NodeBuilder<'_> {
         for (&argument, info) in arguments.iter().zip(infos.iter()) {
             element_types.push(self.without_missing(argument, info.flags & ef::OPTIONAL != 0)?);
         }
-        let element_nodes = self.type_nodes(&element_types)?;
+        let element_nodes = self.type_nodes(&element_types, false)?;
         let mut nodes = Vec::new();
         for (mut node, info) in element_nodes.into_iter().zip(infos.iter()) {
             if info.flags & ef::REST != 0 {
@@ -148,13 +148,24 @@ impl NodeBuilder<'_> {
         ty: TypeId,
         arguments: &[TypeId],
     ) -> Result<usize, Error> {
+        // Native performs the global-identity probes only for a nonempty
+        // argument list with declared type parameters. Those probes can
+        // initialize otherwise untouched global types.
+        if arguments.is_empty() {
+            return Ok(0);
+        }
         let target = self.checker.types.target(ty)?;
-        let parameters = self
-            .checker
-            .types
-            .interface(target)?
-            .type_parameters()
-            .to_vec();
+        let interface = self.checker.types.interface(target)?;
+        // TypeParameters() is non-nil even when it contains only an implicit
+        // this parameter (and therefore returns an empty slice in Go).
+        if interface
+            .all_type_parameters
+            .as_ref()
+            .is_none_or(|all| all.is_empty())
+        {
+            return Ok(0);
+        }
+        let parameters = interface.type_parameters().to_vec();
         let mut count = parameters.len().min(arguments.len());
         // The pin elides trailing defaults only for these four global identities,
         // not arbitrary interfaces or a same-spelled declaration in another scope.
@@ -173,7 +184,7 @@ impl NodeBuilder<'_> {
         }
         if elide {
             let explicit = if let Some(node) = self.checker.types.type_reference(ty)?.node {
-                let read = self.checker.ast(node)?.node(node)?;
+                let read = self.checker.node(node)?;
                 read.kind() == K::TypeReference
                     && self
                         .checker
@@ -273,7 +284,7 @@ impl NodeBuilder<'_> {
         let mut optional = value.check_flags() & check_flags::OPTIONAL_PARAMETER != 0;
         let declaration = value.value_declaration();
         if let Some(node) = value.value_declaration() {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             if let Some(name) = read.name() {
                 source_name = Some(name);
             }
@@ -447,10 +458,10 @@ impl NodeBuilder<'_> {
         let Some(enclosing) = self.enclosing else {
             return Ok(false);
         };
-        let Some(name) = self.checker.ast(declaration)?.node(declaration)?.name() else {
+        let Some(name) = self.checker.node(declaration)?.name() else {
             return Ok(false);
         };
-        let read = self.checker.ast(name)?.node(name)?;
+        let read = self.checker.node(name)?;
         if read.kind() != K::ComputedPropertyName {
             return Ok(false);
         }
@@ -503,7 +514,7 @@ impl NodeBuilder<'_> {
                 let mut results = Vec::new();
                 let mut bailed = false;
                 for component in selected {
-                    let read = self.checker.ast(component)?.node(component)?;
+                    let read = self.checker.node(component)?;
                     let range = read.range();
                     let name = read
                         .name()
@@ -651,8 +662,8 @@ impl NodeBuilder<'_> {
         if !self.reuse_late_bindable_name(name)? {
             return Ok(());
         }
-        let read = self.checker.ast(name)?.node(name)?;
-        if self.checker.ast(declaration)?.node(declaration)?.kind() == K::BinaryExpression {
+        let read = self.checker.node(name)?;
+        if self.checker.node(declaration)?.kind() == K::BinaryExpression {
             if let Some(access) = read.data_source().as_element_access_expression() {
                 if let Some(argument) = access.argument_expression() {
                     if ts_ast::is_property_access_entity_name_expression(
@@ -692,7 +703,7 @@ impl NodeBuilder<'_> {
                     .collect();
                 let mut property = None;
                 for &node in &declarations {
-                    if self.checker.ast(node)?.node(node)?.kind() == K::PropertyDeclaration {
+                    if self.checker.node(node)?.kind() == K::PropertyDeclaration {
                         property = Some(node);
                         break;
                     }
@@ -717,7 +728,7 @@ impl NodeBuilder<'_> {
                     for kind in [K::GetAccessor, K::SetAccessor] {
                         let mut declaration = None;
                         for &node in &declarations {
-                            if self.checker.ast(node)?.node(node)?.kind() == kind {
+                            if self.checker.node(node)?.kind() == kind {
                                 declaration = Some(node);
                                 break;
                             }
@@ -865,7 +876,7 @@ impl NodeBuilder<'_> {
     pub(super) fn mapped_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         use crate::type_flags as tf;
         let declaration = self.checker.mapped_declaration(ty)?;
-        let read = self.checker.ast(declaration)?.node(declaration)?;
+        let read = self.checker.node(declaration)?;
         let data = read
             .data_source()
             .as_mapped_type_node()

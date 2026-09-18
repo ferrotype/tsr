@@ -95,11 +95,11 @@ impl NodeBuilder<'_> {
                                 .collect();
                             let mut binding = false;
                             for decl in declarations {
-                                let read = self.checker.ast(decl)?.node(decl)?;
+                                let read = self.checker.node(decl)?;
                                 if read.kind() == K::Parameter {
                                     if let Some(name) = read.name() {
                                         if matches!(
-                                            self.checker.ast(name)?.node(name)?.kind().known(),
+                                            self.checker.node(name)?.kind().known(),
                                             Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                                         ) {
                                             self.add_binding_scope_names(name, &mut locals)?;
@@ -172,7 +172,7 @@ impl NodeBuilder<'_> {
         let enclosing = self
             .enclosing
             .ok_or(Error::MissingLink("serialization enclosing scope"))?;
-        let parent = self.checker.ast(enclosing)?.node(enclosing)?.parent();
+        let parent = self.checker.node(enclosing)?.parent();
         let scope = [Some(enclosing), parent]
             .into_iter()
             .flatten()
@@ -212,9 +212,9 @@ impl NodeBuilder<'_> {
         loop {
             // Preserve the pinned walk's return after its first element, including
             // an omitted element. This is not a general binding-pattern traversal.
-            let list = self.checker.ast(pattern)?.node(pattern)?.element_list();
+            let list = self.checker.node(pattern)?.element_list();
             if let Some(element) = self.checker.source_list(pattern, list)?.first().copied() {
-                let read = self.checker.ast(element)?.node(element)?;
+                let read = self.checker.node(element)?;
                 if read.kind() == K::OmittedExpression {
                     return Ok(());
                 }
@@ -223,7 +223,7 @@ impl NodeBuilder<'_> {
                 }
                 if let Some(name) = read.name() {
                     if matches!(
-                        self.checker.ast(name)?.node(name)?.kind().known(),
+                        self.checker.node(name)?.kind().known(),
                         Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                     ) {
                         pattern = name;
@@ -260,7 +260,7 @@ impl NodeBuilder<'_> {
         }
         if let Some(symbol) = symbol {
             if let Some(decl) = self.checker.symbol_declarations(symbol)?.first().flatten() {
-                let read = self.checker.ast(decl)?.node(decl)?;
+                let read = self.checker.node(decl)?;
                 if read.kind() == K::TypeParameter {
                     if let Some(name) = read.name() {
                         node = self.set_reused_text_range(node, name)?;

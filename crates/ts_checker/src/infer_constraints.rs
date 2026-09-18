@@ -18,23 +18,23 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let Some(infer) = self.ast(declaration)?.node(declaration)?.parent() else {
+            let Some(infer) = self.node(declaration)?.parent() else {
                 continue;
             };
-            if self.ast(infer)?.node(infer)?.kind() != K::InferType {
+            if self.node(infer)?.kind() != K::InferType {
                 continue;
             }
             let mut child = infer;
-            let mut parent = self.ast(child)?.node(child)?.parent();
+            let mut parent = self.node(child)?.parent();
             while let Some(node) = parent {
-                if self.ast(node)?.node(node)?.kind() != K::ParenthesizedType {
+                if self.node(node)?.kind() != K::ParenthesizedType {
                     break;
                 }
                 child = node;
-                parent = self.ast(node)?.node(node)?.parent();
+                parent = self.node(node)?.parent();
             }
             let Some(parent) = parent else { continue };
-            let read = self.ast(parent)?.node(parent)?;
+            let read = self.node(parent)?;
             let kind = read.kind();
             if kind == K::TypeReference && !omit_references {
                 let referenced = self.get_type_from_type_node(parent)?;
@@ -60,7 +60,7 @@ impl CheckerState {
                     continue;
                 };
                 let arguments =
-                    self.source_list(parent, self.ast(parent)?.node(parent)?.type_argument_list())?;
+                    self.source_list(parent, self.node(parent)?.type_argument_list())?;
                 if let Some(index) = arguments
                     .iter()
                     .position(|&node| node == child)
@@ -96,7 +96,7 @@ impl CheckerState {
                 inferences.push(self.builtins.string_type);
             } else if kind == K::TypeParameter {
                 if let Some(node) = read.parent() {
-                    if self.ast(node)?.node(node)?.kind() == K::MappedType {
+                    if self.node(node)?.kind() == K::MappedType {
                         inferences.push(self.builtins.string_number_symbol_type);
                     }
                 }
@@ -104,7 +104,7 @@ impl CheckerState {
                 let Some(mut template) = read.type_node() else {
                     continue;
                 };
-                while self.ast(template)?.node(template)?.kind() == K::ParenthesizedType {
+                while self.node(template)?.kind() == K::ParenthesizedType {
                     template = self
                         .ast(template)?
                         .node(template)?
@@ -117,7 +117,7 @@ impl CheckerState {
                 let Some(conditional) = read.parent() else {
                     continue;
                 };
-                let conditional_read = self.ast(conditional)?.node(conditional)?;
+                let conditional_read = self.node(conditional)?;
                 let Some(data) = conditional_read.data_source().as_conditional_type_node() else {
                     continue;
                 };
@@ -127,10 +127,10 @@ impl CheckerState {
                 let check = data
                     .check_type()
                     .ok_or(Error::MissingLink("conditional check"))?;
-                if self.ast(check)?.node(check)?.kind() != K::MappedType {
+                if self.node(check)?.kind() != K::MappedType {
                     continue;
                 }
-                let Some(template) = self.ast(check)?.node(check)?.type_node() else {
+                let Some(template) = self.node(check)?.type_node() else {
                     continue;
                 };
                 let template = self.get_type_from_type_node(template)?;

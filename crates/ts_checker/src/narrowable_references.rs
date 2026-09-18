@@ -66,10 +66,10 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isConstraintPosition
     fn reference_constraint_position(&mut self, ty: TypeId, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         match read.kind().known() {
             Some(K::PropertyAccessExpression | K::QualifiedName) => Ok(true),
             Some(K::CallExpression | K::NewExpression) => Ok(read.expression() == Some(node)),
@@ -96,7 +96,7 @@ impl CheckerState {
         node: NodeId,
         mode: u32,
     ) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if !matches!(
             read.kind().known(),
             Some(K::Identifier | K::PropertyAccessExpression | K::ElementAccessExpression)
@@ -104,7 +104,7 @@ impl CheckerState {
             return Ok(false);
         }
         if let Some(parent) = read.parent() {
-            let parent = self.ast(parent)?.node(parent)?;
+            let parent = self.node(parent)?;
             if matches!(
                 parent.kind().known(),
                 Some(K::JsxOpeningElement | K::JsxSelfClosingElement)

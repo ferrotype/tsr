@@ -122,7 +122,7 @@ def program():
     from s07_verify_compare import capture as capture_verification
     def production_inputs():
         values = input_fingerprints()
-        for pattern in ("scripts/s07_program*.py", "scripts/s07_verify*.py", "scripts/s07_config*.py",
+        for pattern in ("scripts/s06_utilities.py", "scripts/s07_program*.py", "scripts/s07_verify*.py", "scripts/s07_config*.py",
                         "scripts/s07_subset*.py", "scripts/s07_operations.py", "scripts/s07_operation_validation.py", "scripts/s07_producers.py",
                         "tools/s07/program/*", "tools/s07/verify-options/*", "tools/s07/config/*"):
             values.update((str(path.relative_to(ROOT)), digest(path)) for path in ROOT.glob(pattern) if path.is_file())
@@ -157,9 +157,16 @@ def program():
     return {"metrics":metrics}
 
 def bindworkload():
-    command([sys.executable, "scripts/s07_benchmark_graph.py", "capture"], cwd=ROOT)
+    from s07_benchmark_graph import current_capture
     path = ROOT / "target/s07-bindworkload/report.json"
-    report = strict_json_loads(path.read_bytes())
+    try:
+        report = current_capture(path)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+        print(f"S07 bindworkload: no reusable current graph capture ({error}); capturing", file=sys.stderr)
+        command([sys.executable, "scripts/s07_benchmark_graph.py", "capture"], cwd=ROOT)
+        report = strict_json_loads(path.read_bytes())
+    else:
+        print("S07 bindworkload: reusing validated current graph capture", file=sys.stderr)
     if report.get("diagnostic_subset") is not False or report.get("source_stable") is not True:
         raise ValueError("graph capture is diagnostic or source-unstable")
     print(json.dumps(report, sort_keys=True), file=sys.stderr)
@@ -180,6 +187,16 @@ def performance(operation):
             value = report["summaries"][workers][field]
             for statistic in ("go_median", "rust_median", "ratio", "samples_per_runtime", "go_relative_mad", "rust_relative_mad"):
                 metrics[f"workers_{workers}_{field}_{statistic}"] = value[statistic]
+    if operation == "e5":
+        # The checker per-type footprint (data/s08/type-footprint.json) is measured by the
+        # S08 checkerbench allocation executable at the retained checkpoint of every
+        # acceptance variant; without a current full capture it stays unavailable.
+        from s08_checkerbench import footprint_metric
+        footprint = footprint_metric()
+        if footprint is None:
+            print("run.e5.type_footprint_ratio unavailable: no current full S08 checkerbench capture (docs/S08-P7.md)", file=sys.stderr)
+        else:
+            metrics["type_footprint_ratio"] = footprint
     return {"metrics": metrics}
 
 

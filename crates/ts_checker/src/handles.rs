@@ -222,7 +222,7 @@ impl Operation<'_> {
             return Err(Error::MissingLink("relation observer already installed"));
         }
         if let Some(node) = error_node {
-            state.ast(node)?.node(node)?;
+            state.node(node)?;
         }
         state.relations.observer = Some(Vec::new());
         let result = state.check_type_related_ex(source, target, mode, error_node, None);
@@ -463,6 +463,15 @@ impl Operation<'_> {
             .builtins
             .type_by_name(name)
             .map(|id| self.type_ref(id))
+    }
+
+    /// The structural storage census of this checker with `roots` as the
+    /// retained results (`data/s08/type-footprint.json`). Read-only: no
+    /// resolution, links or caches are created.
+    #[cfg(feature = "storage-pilot")]
+    pub fn census(&self, roots: &[TypeRef]) -> Result<serde_json::Value, Error> {
+        let roots = self.check_types(roots)?;
+        self.state().census(&roots)
     }
 
     /// `Checker.TypeCount`.
@@ -866,5 +875,139 @@ impl Operation<'_> {
         }
         self.lease().validate_identity(owner.identity().id())?;
         Ok(())
+    }
+}
+
+/// One signature's shape for the S08 relater prototype's translation
+/// (`docs/S08-P7.md`): the prototype constructs its own graph from these
+/// read-only shapes and never delegates a relation to this checker.
+#[cfg(feature = "relation-probe")]
+#[derive(Clone, Debug)]
+pub struct SignatureShape {
+    pub parameters: Vec<TypeRef>,
+    pub min_argument_count: usize,
+    pub has_rest_parameter: bool,
+    pub type_parameters: usize,
+    pub this_type: Option<TypeRef>,
+    pub return_type: TypeRef,
+    pub is_abstract: bool,
+    /// Raw `SyntaxKind` of the declaration, when there is one.
+    pub declaration_kind: Option<i16>,
+}
+
+/// A literal type's value, for the same translation.
+#[cfg(feature = "relation-probe")]
+#[derive(Clone, Debug, PartialEq)]
+pub enum LiteralShape {
+    String(Vec<u8>),
+    Number(f64),
+    Boolean(bool),
+    BigInt { negative: bool, digits: Vec<u8> },
+    Unknown,
+}
+
+#[cfg(feature = "relation-probe")]
+impl Operation<'_> {
+    /// Resolved index signatures as (key type, value type, readonly).
+    pub fn index_infos(&mut self, t: TypeRef) -> Result<Vec<(TypeRef, TypeRef, bool)>, Error> {
+        let id = self.check_type(t)?;
+        let infos = self.state_mut().index_infos_of_type(id)?;
+        let state = self.state();
+        let mut result = Vec::with_capacity(infos.len());
+        for info in infos {
+            let info = state.signatures.index_info(info)?;
+            result.push((
+                self.type_ref(info.key_type),
+                self.type_ref(info.value_type),
+                info.is_readonly,
+            ));
+        }
+        Ok(result)
+    }
+
+    /// Resolved call (or construct) signatures in upstream order.
+    pub fn signatures_of_type(
+        &mut self,
+        t: TypeRef,
+        construct: bool,
+    ) -> Result<Vec<SignatureRef>, Error> {
+        let id = self.check_type(t)?;
+        Ok(self
+            .state_mut()
+            .signatures_of_type(id, construct)?
+            .into_iter()
+            .map(|id| self.signature_ref(id))
+            .collect())
+    }
+
+    pub fn signature_shape(&mut self, s: SignatureRef) -> Result<SignatureShape, Error> {
+        let id = self.check_signature(s)?;
+        let (parameters, this_parameter, flags, type_parameters, declaration) = {
+            let sig = self.state().signatures.get(id)?;
+            (
+                sig.parameters.as_deref().unwrap_or(&[]).to_vec(),
+                sig.this_parameter,
+                sig.flags,
+                sig.type_parameters.as_ref().map_or(0, |list| list.len()),
+                sig.declaration,
+            )
+        };
+        let mut parameter_types = Vec::with_capacity(parameters.len());
+        for parameter in parameters {
+            let ty = self.state_mut().type_of_parameter(parameter)?;
+            parameter_types.push(self.type_ref(ty));
+        }
+        let this_type = match this_parameter {
+            Some(symbol) => {
+                let ty = self.state_mut().get_type_of_symbol(symbol)?;
+                Some(self.type_ref(ty))
+            }
+            None => None,
+        };
+        let return_type = self.state_mut().return_type_of_signature(id)?;
+        let min_argument_count = self.state_mut().min_argument_count(id)?;
+        let declaration_kind = match declaration {
+            Some(node) => Some(self.state().ast(node)?.node(node)?.kind().raw()),
+            None => None,
+        };
+        Ok(SignatureShape {
+            parameters: parameter_types,
+            min_argument_count,
+            has_rest_parameter: flags & crate::signature_flags::HAS_REST_PARAMETER != 0,
+            type_parameters,
+            this_type,
+            return_type: self.type_ref(return_type),
+            is_abstract: flags & crate::signature_flags::ABSTRACT != 0,
+            declaration_kind,
+        })
+    }
+
+    /// A literal type's value and whether this is the fresh form.
+    pub fn literal_shape(&self, t: TypeRef) -> Result<(LiteralShape, bool), Error> {
+        let id = self.check_type(t)?;
+        let state = self.state();
+        let data = state.types.literal(id)?;
+        let value = match &data.value {
+            crate::LiteralValue::String(text) => LiteralShape::String(text.as_bytes().to_vec()),
+            crate::LiteralValue::Number(value) => LiteralShape::Number(value.value()),
+            crate::LiteralValue::Boolean(value) => LiteralShape::Boolean(*value),
+            crate::LiteralValue::BigInt(value) => LiteralShape::BigInt {
+                negative: value.negative,
+                digits: value.base10_value.clone(),
+            },
+            crate::LiteralValue::ComputedEnum => LiteralShape::Unknown,
+        };
+        Ok((value, state.is_fresh_literal_type(id)?))
+    }
+
+    pub fn is_readonly_symbol(&mut self, symbol: SymbolRef) -> Result<bool, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        self.state_mut().is_readonly_symbol(symbol)
+    }
+
+    /// The alias symbol a type displays through, if any.
+    pub fn alias_symbol(&self, t: TypeRef) -> Result<Option<SymbolId>, Error> {
+        let id = self.check_type(t)?;
+        Ok(self.state().types.alias_of(id)?.map(|alias| alias.symbol))
     }
 }

@@ -20,12 +20,12 @@ impl CheckerState {
                 bytes.push(b'.');
                 continue;
             };
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::ThisKeyword) => bytes.extend_from_slice(b"this"),
                 Some(K::Identifier | K::PrivateIdentifier) => {
                     let text = if read.pos() < 0 {
-                        self.ast(node)?.node_text(node)?.into_js_string()
+                        self.node_text(node)?.into_js_string()
                     } else {
                         ts_scanner::get_text_of_node(self.ast(node)?, node)?
                     };
@@ -109,7 +109,7 @@ impl CheckerState {
         } else {
             JsString::default()
         };
-        let kind = self.ast(node)?.node(node)?.kind();
+        let kind = self.node(node)?.kind();
         let named = !text.is_empty() && text.len() < 100;
         let (message, args) = if kind == K::NullKeyword
             || named && kind == K::Identifier && text.as_bytes() == b"undefined"

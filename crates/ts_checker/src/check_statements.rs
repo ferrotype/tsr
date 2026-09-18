@@ -12,7 +12,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkWhileStatement
     pub(crate) fn check_loop_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_statement_ambient_context(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = required(read.expression(), "loop condition")?;
         let statement = required(read.statement(), "loop statement")?;
         if read.kind() == K::DoStatement {
@@ -27,7 +27,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkForStatement
     pub(crate) fn check_for_statement(&mut self, node: NodeId) -> Result<(), Error> {
         let ambient = self.check_statement_ambient_context(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_for_statement()
@@ -37,7 +37,7 @@ impl CheckerState {
         let incrementor = data.incrementor();
         let statement = required(data.statement(), "for body")?;
         if let Some(initializer) = initializer {
-            if self.ast(initializer)?.node(initializer)?.kind() == K::VariableDeclarationList {
+            if self.node(initializer)?.kind() == K::VariableDeclarationList {
                 if !ambient {
                     self.check_grammar_variable_list(initializer)?;
                 }
@@ -60,7 +60,7 @@ impl CheckerState {
         if self.check_statement_ambient_context(node)? {
             return Ok(true);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let for_in = read.kind() == K::ForInStatement;
         let data = read
             .data_source()
@@ -76,8 +76,8 @@ impl CheckerState {
         }
         if !for_in
             && !await_context
-            && self.ast(initializer)?.node(initializer)?.kind() == K::Identifier
-            && self.ast(initializer)?.node_text(initializer)?.as_bytes() == b"async"
+            && self.node(initializer)?.kind() == K::Identifier
+            && self.node_text(initializer)?.as_bytes() == b"async"
         {
             self.grammar_error_node(
                 initializer,
@@ -86,13 +86,12 @@ impl CheckerState {
             )?;
             return Ok(false);
         }
-        if self.ast(initializer)?.node(initializer)?.kind() == K::VariableDeclarationList
+        if self.node(initializer)?.kind() == K::VariableDeclarationList
             && !self.check_grammar_variable_list(initializer)?
         {
             let declarations = self.source_list(
                 initializer,
-                self.ast(initializer)?
-                    .node(initializer)?
+                self.node(initializer)?
                     .data_source()
                     .as_variable_declaration_list()
                     .ok_or(ts_arena::Error::InvalidGraph)?
@@ -110,7 +109,7 @@ impl CheckerState {
                 );
             }
             if let Some(&declaration) = declarations.first() {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if read.initializer().is_some() {
                     return self.grammar_error_node(required(read.name(),"iteration variable name")?,if for_in{d::The_variable_declaration_of_a_for_in_statement_cannot_have_an_initializer}else{d::The_variable_declaration_of_a_for_of_statement_cannot_have_an_initializer},vec![]);
                 }
@@ -132,7 +131,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkForInStatement
     pub(crate) fn check_for_in_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_grammar_for_in_or_of(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
@@ -142,23 +141,19 @@ impl CheckerState {
         let statement = required(data.statement(), "for-in body")?;
         let right = self.check_expression(expression)?;
         let right = self.non_nullable_type_if_needed(right)?;
-        if self.ast(initializer)?.node(initializer)?.kind() == K::VariableDeclarationList {
+        if self.node(initializer)?.kind() == K::VariableDeclarationList {
             let declarations = self.source_list(
                 initializer,
-                self.ast(initializer)?
-                    .node(initializer)?
+                self.node(initializer)?
                     .data_source()
                     .as_variable_declaration_list()
                     .ok_or(ts_arena::Error::InvalidGraph)?
                     .declarations(),
             )?;
             if let Some(&declaration) = declarations.first() {
-                let name = required(
-                    self.ast(declaration)?.node(declaration)?.name(),
-                    "for-in binding",
-                )?;
+                let name = required(self.node(declaration)?.name(), "for-in binding")?;
                 if matches!(
-                    self.ast(name)?.node(name)?.kind().known(),
+                    self.node(name)?.kind().known(),
                     Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                 ) {
                     self.error_at(Some(name),d::The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern,vec![])?;
@@ -168,7 +163,7 @@ impl CheckerState {
         } else {
             let left = self.check_expression(initializer)?;
             if matches!(
-                self.ast(initializer)?.node(initializer)?.kind().known(),
+                self.node(initializer)?.kind().known(),
                 Some(K::ArrayLiteralExpression | K::ObjectLiteralExpression)
             ) {
                 self.error_at(
@@ -242,7 +237,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkForOfStatement
     pub(crate) fn check_for_of_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_grammar_for_in_or_of(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
@@ -253,12 +248,12 @@ impl CheckerState {
         if let Some(modifier) = await_modifier {
             self.check_for_await_container(node, modifier)?;
         }
-        if self.ast(initializer)?.node(initializer)?.kind() == K::VariableDeclarationList {
+        if self.node(initializer)?.kind() == K::VariableDeclarationList {
             self.check_source_element(initializer)?;
         } else {
             let iterated = self.check_right_hand_side_of_for_of(node)?;
             if matches!(
-                self.ast(initializer)?.node(initializer)?.kind().known(),
+                self.node(initializer)?.kind().known(),
                 Some(K::ArrayLiteralExpression | K::ObjectLiteralExpression)
             ) {
                 self.check_destructuring_assignment(initializer, iterated, 0, false)?;
@@ -284,7 +279,7 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         let mut node = expression;
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -319,20 +314,15 @@ impl CheckerState {
         if self.check_statement_ambient_context(node)? {
             return Ok(());
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let is_continue = read.kind() == K::ContinueStatement;
         let label = read.label();
         let label = label
-            .map(|label| {
-                self.ast(label)?
-                    .node_text(label)
-                    .map(ts_ast::NodeText::into_js_string)
-                    .map_err(Error::from)
-            })
+            .map(|label| self.node_text(label).map(ts_ast::NodeText::into_js_string))
             .transpose()?;
         let mut current = Some(node);
         while let Some(id) = current {
-            let read = self.ast(id)?.node(id)?;
+            let read = self.node(id)?;
             if ts_ast::utilities::is_function_like(Some(&read))
                 || read.kind() == K::ClassStaticBlockDeclaration
             {
@@ -345,7 +335,7 @@ impl CheckerState {
             }
             if read.kind() == K::LabeledStatement {
                 let current_label = required(read.label(), "jump target label")?;
-                let current_text = self.ast(current_label)?.node_text(current_label)?;
+                let current_text = self.node_text(current_label)?;
                 if label
                     .as_ref()
                     .is_some_and(|label| current_text.as_bytes() == label.as_bytes())
@@ -361,7 +351,7 @@ impl CheckerState {
             {
                 return Ok(());
             }
-            current = self.ast(id)?.node(id)?.parent();
+            current = self.node(id)?.parent();
         }
         let message = match (is_continue, label.is_some()) {
             (false,true) => d::A_break_statement_can_only_jump_to_a_label_of_an_enclosing_statement,
@@ -374,7 +364,7 @@ impl CheckerState {
     }
     fn iteration_statement(&self, mut node: NodeId, labels: bool) -> Result<bool, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if labels && read.kind() == K::LabeledStatement {
                 node = required(read.statement(), "labeled iteration")?;
                 continue;
@@ -394,14 +384,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkSwitchStatement
     pub(crate) fn check_switch_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_statement_ambient_context(node)?;
-        let expression = required(
-            self.ast(node)?.node(node)?.expression(),
-            "switch expression",
-        )?;
+        let expression = required(self.node(node)?.expression(), "switch expression")?;
         let expression_type = self.check_expression(expression)?;
         let block = required(
-            self.ast(node)?
-                .node(node)?
+            self.node(node)?
                 .data_source()
                 .as_switch_statement()
                 .ok_or(ts_arena::Error::InvalidGraph)?
@@ -410,8 +396,7 @@ impl CheckerState {
         )?;
         let clauses = self.source_list(
             block,
-            self.ast(block)?
-                .node(block)?
+            self.node(block)?
                 .data_source()
                 .as_case_block()
                 .ok_or(ts_arena::Error::InvalidGraph)?
@@ -420,7 +405,7 @@ impl CheckerState {
         let mut default_seen = false;
         let mut duplicate_reported = false;
         for clause in clauses {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             if read.kind() == K::DefaultClause && !duplicate_reported {
                 if default_seen {
                     self.grammar_error_node(
@@ -433,11 +418,8 @@ impl CheckerState {
                     default_seen = true;
                 }
             }
-            if self.ast(clause)?.node(clause)?.kind() == K::CaseClause {
-                let expression = required(
-                    self.ast(clause)?.node(clause)?.expression(),
-                    "case expression",
-                )?;
+            if self.node(clause)?.kind() == K::CaseClause {
+                let expression = required(self.node(clause)?.expression(), "case expression")?;
                 let case_type = self.check_expression(expression)?;
                 if self.types.flags(case_type)? & tf::NULLABLE == 0
                     && !self.is_type_related_to(
@@ -489,30 +471,29 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkLabeledStatement
     pub(crate) fn check_labeled_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let label = required(read.label(), "statement label")?;
         let statement = required(read.statement(), "labeled statement")?;
-        let text = self.ast(label)?.node_text(label)?.into_js_string();
+        let text = self.node_text(label)?.into_js_string();
         if !self.check_statement_ambient_context(node)? {
-            let mut current = self.ast(node)?.node(node)?.parent();
+            let mut current = self.node(node)?.parent();
             while let Some(id) = current {
-                let read = self.ast(id)?.node(id)?;
+                let read = self.node(id)?;
                 if ts_ast::utilities::is_function_like(Some(&read)) {
                     break;
                 }
                 if read.kind() == K::LabeledStatement {
                     let name = required(read.label(), "enclosing label")?;
-                    if self.ast(name)?.node_text(name)?.as_bytes() == text.as_bytes() {
+                    if self.node_text(name)?.as_bytes() == text.as_bytes() {
                         self.grammar_error_node(label, d::Duplicate_label_0, vec![text.clone()])?;
                         break;
                     }
                 }
-                current = self.ast(id)?.node(id)?.parent();
+                current = self.node(id)?.parent();
             }
         }
         let setting = self.program()?.host.options().allow_unused_labels;
-        if self.ast(label)?.node(label)?.flags() & nf::UNREACHABLE != 0 && setting != Tristate::TRUE
-        {
+        if self.node(label)?.flags() & nf::UNREACHABLE != 0 && setting != Tristate::TRUE {
             let diagnostic = self.diagnostic_for_node(Some(label), d::Unused_label, vec![])?;
             if setting == Tristate::FALSE {
                 self.add_diagnostic(diagnostic)?;
@@ -525,7 +506,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkWithStatement
     pub(crate) fn check_with_statement(&mut self, node: NodeId) -> Result<(), Error> {
         if !self.check_statement_ambient_context(node)?
-            && self.ast(node)?.node(node)?.flags() & nf::AWAIT_CONTEXT != 0
+            && self.node(node)?.flags() & nf::AWAIT_CONTEXT != 0
         {
             self.grammar_error_first_token(
                 node,
@@ -533,7 +514,7 @@ impl CheckerState {
                 vec![],
             )?;
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let expression = required(read.expression(), "with expression")?;
         let statement = required(read.statement(), "with statement")?;
         self.check_expression(expression)?;
@@ -554,7 +535,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTryStatement
     pub(crate) fn check_try_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_statement_ambient_context(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_try_statement()
@@ -573,7 +554,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkCatchClause
     pub(crate) fn check_catch_clause(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_catch_clause()
@@ -584,7 +565,7 @@ impl CheckerState {
             // Catch bindings have their own grammar below. In particular,
             // destructuring here does not require a variable initializer.
             self.check_variable_like(declaration)?;
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if let Some(annotation) = read.type_node() {
                 let ty = self.get_type_from_type_node(annotation)?;
                 if self.types.flags(ty)? & tf::ANY_OR_UNKNOWN == 0 {

@@ -14,7 +14,7 @@ impl CheckerState {
         if !ts_ast::is_dynamic_name(self.ast(name)?, name)? {
             return Ok(false);
         }
-        let read = self.ast(name)?.node(name)?;
+        let read = self.node(name)?;
         let expression = if read.kind() == K::ComputedPropertyName {
             read.expression()
         } else {
@@ -88,15 +88,13 @@ impl CheckerState {
             }
         }
         let static_base = self.class_base_constructor_type(ty)?;
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
+        for member in self.source_list(node, self.node(node)?.member_list())? {
             if ts_ast::utilities::has_syntactic_modifier(self.ast(member)?, member, mf::AMBIENT)? {
                 continue;
             }
-            let members = if self.ast(member)?.node(member)?.kind() == K::Constructor {
+            let members = if self.node(member)?.kind() == K::Constructor {
                 let mut parameters = vec![];
-                for parameter in
-                    self.source_list(member, self.ast(member)?.node(member)?.parameter_list())?
-                {
+                for parameter in self.source_list(member, self.node(member)?.parameter_list())? {
                     if ts_ast::utilities::is_parameter_property_declaration(
                         self.ast(parameter)?,
                         parameter,
@@ -146,10 +144,10 @@ impl CheckerState {
         let is_abstract = modifiers & mf::ABSTRACT != 0;
         let is_static = modifiers & mf::STATIC != 0;
         let parameter = view.node(member)?.kind() == K::Parameter;
-        let javascript = self.ast(node)?.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
+        let javascript = self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
         if has_override {
             if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if ts_ast::utilities::is_class_element(&read) {
                     if let Some(name) = read.name() {
                         if self.non_bindable_dynamic_name(name)? {
@@ -206,7 +204,7 @@ impl CheckerState {
                 self.error_at(Some(member), message, args)?;
                 return Ok(());
             }
-            let ambient = self.ast(node)?.node(node)?.flags() & nf::AMBIENT != 0;
+            let ambient = self.node(node)?.flags() & nf::AMBIENT != 0;
             if let Some(original) = original.filter(|_| own.is_some() && implicit && !ambient) {
                 let declarations = self.symbol_declarations(original)?.to_vec();
                 if !declarations.is_empty() {
@@ -387,7 +385,7 @@ impl CheckerState {
                     let mut uninitialized = None;
                     let mut ambient = false;
                     for declaration in declarations.into_iter().flatten() {
-                        let read = self.ast(declaration)?.node(declaration)?;
+                        let read = self.node(declaration)?;
                         ambient |= read.flags() & nf::AMBIENT != 0;
                         if uninitialized.is_none()
                             && read.kind() == K::PropertyDeclaration
@@ -402,17 +400,17 @@ impl CheckerState {
                     }) {
                         let mut constructor = None;
                         if let Some(class) = class {
-                            for member in self
-                                .source_list(class, self.ast(class)?.node(class)?.member_list())?
+                            for member in
+                                self.source_list(class, self.node(class)?.member_list())?
                             {
-                                let read = self.ast(member)?.node(member)?;
+                                let read = self.node(member)?;
                                 if read.kind() == K::Constructor && read.body().is_some() {
                                     constructor = Some(member);
                                     break;
                                 }
                             }
                         }
-                        let read = self.ast(uninitialized)?.node(uninitialized)?;
+                        let read = self.node(uninitialized)?;
                         let name = read
                             .name()
                             .ok_or(Error::MissingLink("override property name"))?;
@@ -426,7 +424,7 @@ impl CheckerState {
                             .unwrap_or(false);
                         let initialized = if !exclamation
                             && self.options.strict_null_checks
-                            && self.ast(name)?.node(name)?.kind() == K::Identifier
+                            && self.node(name)?.kind() == K::Identifier
                         {
                             match constructor {
                                 Some(constructor) => {

@@ -73,13 +73,13 @@ impl CheckerState {
         };
         let mut non_simple = Vec::new();
         for parameter in self.source_list(function, view.node(function)?.parameter_list())? {
-            let read = self.ast(parameter)?.node(parameter)?;
+            let read = self.node(parameter)?;
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("strict parameter name"))?;
             if read.initializer().is_some()
                 || matches!(
-                    self.ast(name)?.node(name)?.kind().known(),
+                    self.node(name)?.kind().known(),
                     Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                 )
                 || read
@@ -135,17 +135,17 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkFunctionDeclaration
     // port: tsc/internal/checker/checker.go:Checker.checkFunctionOrMethodDeclaration
     pub(crate) fn check_function_declaration(&mut self, function: NodeId) -> Result<(), Error> {
-        if self.ast(function)?.node(function)?.kind() == K::Constructor {
+        if self.node(function)?.kind() == K::Constructor {
             return self.check_constructor_body(function);
         }
         if matches!(
-            self.ast(function)?.node(function)?.kind().known(),
+            self.node(function)?.kind().known(),
             Some(K::MethodDeclaration | K::MethodSignature)
         ) {
             self.check_source_method_grammar(function)?;
         }
         self.check_signature_syntax(function)?;
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let body = read.body();
         let annotation = read.type_node();
         let kind = read.kind();
@@ -156,7 +156,7 @@ impl CheckerState {
             return Err(Error::MissingLink("function or method declaration"));
         }
         if let Some(name) = read.name() {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 self.check_computed_property_name(name)?;
             }
         }
@@ -178,7 +178,7 @@ impl CheckerState {
                 .node_binding(function)?
                 .and_then(|binding| binding.local_symbol)
                 .unwrap_or(symbol);
-            if self.ast(function)?.node(function)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
+            if self.node(function)?.flags() & nf::JAVA_SCRIPT_FILE == 0 {
                 self.check_function_or_constructor_symbol(local)?;
             }
             if self.symbol(symbol)?.parent().is_some() {
@@ -193,10 +193,10 @@ impl CheckerState {
         self.check_full_signature_arity(function)?;
         let body_missing = match body {
             None => true,
-            Some(body) => ts_ast::node_is_missing(Some(&self.ast(body)?.node(body)?)),
+            Some(body) => ts_ast::node_is_missing(Some(&self.node(body)?)),
         };
         if annotation.is_none() && body_missing {
-            let read = self.ast(function)?.node(function)?;
+            let read = self.node(function)?;
             let private_ambient = self.binding_private_ambient(function)?;
             if !private_ambient
                 && self
@@ -218,7 +218,7 @@ impl CheckerState {
             self.check_grammar_generator(function)?;
             self.check_function_name_collision_boundary(function)?;
         } else {
-            let read = self.ast(function)?.node(function)?;
+            let read = self.node(function)?;
             if kind == K::MethodDeclaration
                 && read.modifier_flags(self.ast(function)?)? & ts_ast::modifier_flags::ABSTRACT != 0
                 && body.is_some()
@@ -232,9 +232,9 @@ impl CheckerState {
                 )?;
             }
             // Private named methods are only allowed in class declarations.
-            let read = self.ast(function)?.node(function)?;
+            let read = self.node(function)?;
             if let Some(name) = read.name() {
-                if self.ast(name)?.node(name)?.kind() == K::PrivateIdentifier
+                if self.node(name)?.kind() == K::PrivateIdentifier
                     && ts_ast::utilities::get_containing_class(self.ast(function)?, function)?
                         .is_none()
                 {
@@ -253,7 +253,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkConstructorDeclaration
     fn check_constructor_body(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_signature_syntax(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let parameters = read.type_parameter_list();
         let annotation = read.type_node();
         let body = read.body();
@@ -321,7 +321,7 @@ impl CheckerState {
         self.defer_checker_node(function)?;
         self.check_function_name_collision_boundary(function)?;
         if self.expression_mode & 4 != 0 && self.expression_is_context_sensitive(function)? {
-            if self.ast(function)?.node(function)?.type_node().is_none()
+            if self.node(function)?.type_node().is_none()
                 && !self.body_has_context_sensitive_parameters(function)?
             {
                 if let Some(context) = self.contextual_body_signature(function)? {
@@ -354,7 +354,7 @@ impl CheckerState {
             return Ok(self.builtins.any_function_type);
         }
         if !self.check_grammar_function_like(function)?
-            && self.ast(function)?.node(function)?.kind() == K::FunctionExpression
+            && self.node(function)?.kind() == K::FunctionExpression
         {
             self.check_grammar_generator(function)?;
         }
@@ -384,7 +384,7 @@ impl CheckerState {
     }
 
     fn check_function_expression_context(&mut self, function: NodeId) -> Result<(), Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         if !matches!(
             read.kind().known(),
             Some(K::FunctionExpression | K::ArrowFunction | K::MethodDeclaration)
@@ -438,10 +438,7 @@ impl CheckerState {
                 }
             }
         } else if let Some(context) = contextual {
-            let parameters = self.source_list(
-                function,
-                self.ast(function)?.node(function)?.parameter_list(),
-            )?;
+            let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
             if self
                 .ast(function)?
                 .node(function)?
@@ -494,7 +491,7 @@ impl CheckerState {
                 .symbol(parameter)?
                 .value_declaration()
                 .ok_or(Error::MissingLink("annotated inference parameter"))?;
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if let Some(annotation) = read.type_node() {
                 let optional = read.question_token(self.ast(declaration)?)?.is_some();
                 let source = self.get_type_from_type_node(annotation)?;
@@ -512,7 +509,7 @@ impl CheckerState {
             }
         }
         if let Some(declaration) = data.declaration {
-            if let Some(annotation) = self.ast(declaration)?.node(declaration)?.type_node() {
+            if let Some(annotation) = self.node(declaration)?.type_node() {
                 let source = self.get_type_from_type_node(annotation)?;
                 let target = self.return_type_of_signature(context)?;
                 self.infer_types(
@@ -529,22 +526,22 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:HasContextSensitiveParameters
     fn body_has_context_sensitive_parameters(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.type_parameter_list().is_some() {
             return Ok(false);
         }
         let parameters = self.source_list(node, read.parameter_list())?;
         for &parameter in &parameters {
-            if self.ast(parameter)?.node(parameter)?.type_node().is_none() {
+            if self.node(parameter)?.type_node().is_none() {
                 return Ok(true);
             }
         }
         if read.kind() != K::ArrowFunction {
             let first_this = match parameters.first().copied() {
-                Some(parameter) => match self.ast(parameter)?.node(parameter)?.name() {
+                Some(parameter) => match self.node(parameter)?.name() {
                     Some(name) => {
-                        self.ast(name)?.node(name)?.kind() == K::Identifier
-                            && self.ast(name)?.node_text(name)?.as_bytes() == b"this"
+                        self.node(name)?.kind() == K::Identifier
+                            && self.node_text(name)?.as_bytes() == b"this"
                     }
                     None => false,
                 },
@@ -559,7 +556,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isContextSensitive
     pub(crate) fn expression_is_context_sensitive(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::FunctionExpression
@@ -572,13 +569,11 @@ impl CheckerState {
                 }
                 if read.type_parameter_list().is_none() && read.type_node().is_none() {
                     if let Some(body) = read.body() {
-                        if self.ast(body)?.node(body)?.kind() != K::Block {
+                        if self.node(body)?.kind() != K::Block {
                             return self.expression_is_context_sensitive(body);
                         }
                         for statement in self.return_statements(body)? {
-                            if let Some(expression) =
-                                self.ast(statement)?.node(statement)?.expression()
-                            {
+                            if let Some(expression) = self.node(statement)?.expression() {
                                 if self.expression_is_context_sensitive(expression)? {
                                     return Ok(true);
                                 }
@@ -589,7 +584,7 @@ impl CheckerState {
                 if read.type_node().is_none() && self.body_function_flags(node)?.1 {
                     if let Some(body) = read.body() {
                         for yielded in self.yield_expressions(body)? {
-                            if let Some(operand) = self.ast(yielded)?.node(yielded)?.expression() {
+                            if let Some(operand) = self.node(yielded)?.expression() {
                                 if self.expression_is_context_sensitive(operand)? {
                                     return Ok(true);
                                 }
@@ -636,7 +631,7 @@ impl CheckerState {
                     .operator_token()
                     .ok_or(Error::MissingLink("context binary operator"))?;
                 if matches!(
-                    self.ast(operator)?.node(operator)?.kind().known(),
+                    self.node(operator)?.kind().known(),
                     Some(K::BarBarToken | K::QuestionQuestionToken)
                 ) {
                     return Ok(self.expression_is_context_sensitive(
@@ -712,7 +707,7 @@ impl CheckerState {
                 .symbol(parameter)?
                 .value_declaration()
                 .ok_or(Error::MissingLink("contextual body parameter declaration"))?;
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if read.type_node().is_none() {
                 let initializer = read.initializer();
                 let mut contextual = self.parameter_type_at(context, index)?;
@@ -770,7 +765,7 @@ impl CheckerState {
         }
         let declaration = self.symbol(parameter)?.value_declaration();
         let optional = if let Some(declaration) = declaration {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             let name = read
                 .name()
                 .ok_or(Error::MissingLink("assigned parameter name"))?;
@@ -795,7 +790,7 @@ impl CheckerState {
             .get_or_default(parameter)
             .resolved_type = Some(ty);
         if let Some(declaration) = declaration {
-            if let Some(name) = self.ast(declaration)?.node(declaration)?.name() {
+            if let Some(name) = self.node(declaration)?.name() {
                 if self.is_binding_pattern(name)? {
                     let ty = if ty == self.builtins.unknown_type {
                         let ty = self.type_from_binding_pattern(name, false, false)?;
@@ -827,23 +822,23 @@ impl CheckerState {
             let saved = self.current_node.replace(node);
             self.instantiation.count = 0;
             let result = if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::CallExpression | K::NewExpression | K::BinaryExpression)
             ) {
                 self.resolve_untyped_call(node).map(|_| ())
-            } else if self.ast(node)?.node(node)?.kind() == K::ObjectLiteralExpression {
+            } else if self.node(node)?.kind() == K::ObjectLiteralExpression {
                 self.check_object_contextual_deprecations(node)
             } else if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::GetAccessor | K::SetAccessor)
             ) {
                 self.check_class_accessor(node)
-            } else if self.ast(node)?.node(node)?.kind() == K::TypeParameter {
+            } else if self.node(node)?.kind() == K::TypeParameter {
                 self.check_type_parameter_deferred(node)
-            } else if self.ast(node)?.node(node)?.kind() == K::ClassExpression {
+            } else if self.node(node)?.kind() == K::ClassExpression {
                 self.check_class_expression_deferred(node)
             } else if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::AsExpression | K::TypeAssertionExpression)
             ) {
                 self.check_assertion_deferred(node)
@@ -860,7 +855,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkFunctionExpressionOrObjectLiteralMethodDeferred
     fn check_function_expression_body(&mut self, function: NodeId) -> Result<(), Error> {
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let annotation = read.type_node();
         let body = read.body();
         let return_type = annotation
@@ -872,7 +867,7 @@ impl CheckerState {
             let signature = self.signature_from_declaration(function)?;
             self.return_type_of_signature(signature)?;
         }
-        if self.ast(body)?.node(body)?.kind() == K::Block {
+        if self.node(body)?.kind() == K::Block {
             self.check_source_element(body)
         } else {
             let ty = self.check_expression(body)?;
@@ -905,16 +900,14 @@ impl CheckerState {
                 return Ok(());
             }
         }
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let Some(body) = read.body() else {
             return Ok(());
         };
-        if self.ast(body)?.node(body)?.kind() != K::Block
-            || !self.function_has_implicit_return(function)?
-        {
+        if self.node(body)?.kind() != K::Block || !self.function_has_implicit_return(function)? {
             return Ok(());
         }
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let explicit = read.flags() & nf::HAS_EXPLICIT_RETURN != 0;
         let error_node = read.type_node().unwrap_or(function);
         let diagnostic = if let Some(ty) = annotation {
@@ -969,7 +962,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkReturnStatement
     pub(crate) fn check_return_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        let expression = self.ast(node)?.node(node)?.expression();
+        let expression = self.node(node)?.expression();
         let expr_type = expression
             .map(|node| self.check_expression_cached(node))
             .transpose()?
@@ -985,7 +978,7 @@ impl CheckerState {
             )?;
             return Ok(());
         };
-        if self.ast(function)?.node(function)?.kind() == K::ClassStaticBlockDeclaration {
+        if self.node(function)?.kind() == K::ClassStaticBlockDeclaration {
             self.grammar_error_first_token(
                 node,
                 messages::A_return_statement_cannot_be_used_inside_a_class_static_block,
@@ -995,7 +988,7 @@ impl CheckerState {
         }
         let signature = self.signature_from_declaration(function)?;
         let return_type = self.return_type_of_signature(signature)?;
-        let read = self.ast(function)?.node(function)?;
+        let read = self.node(function)?;
         let kind = read.kind();
         let annotated = self.return_type_from_annotation(function)?.is_some();
         if self.options.strict_null_checks
@@ -1057,14 +1050,14 @@ impl CheckerState {
     ) -> Result<(), Error> {
         if let Some(expression) = expression {
             let mut unwrapped = expression;
-            while self.ast(unwrapped)?.node(unwrapped)?.kind() == K::ParenthesizedExpression {
+            while self.node(unwrapped)?.kind() == K::ParenthesizedExpression {
                 unwrapped = self
                     .ast(unwrapped)?
                     .node(unwrapped)?
                     .expression()
                     .ok_or(Error::MissingLink("return parentheses"))?;
             }
-            let read = self.ast(unwrapped)?.node(unwrapped)?;
+            let read = self.node(unwrapped)?;
             if let Some(conditional) = read.data_source().as_conditional_expression() {
                 let yes = conditional
                     .when_true()
@@ -1101,12 +1094,11 @@ impl CheckerState {
         let expression = expression
             .map(|expression| self.effective_expression_check_node(expression))
             .transpose()?;
-        let location =
-            if self.ast(node)?.node(node)?.kind() == K::ReturnStatement && !in_conditional {
-                node
-            } else {
-                expression.unwrap_or(node)
-            };
+        let location = if self.node(node)?.kind() == K::ReturnStatement && !in_conditional {
+            node
+        } else {
+            expression.unwrap_or(node)
+        };
         self.check_expression_related_with_elaboration(
             expression_type,
             return_type,
@@ -1122,9 +1114,9 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let mut current = self.ast(node)?.node(node)?.parent();
+        let mut current = self.node(node)?.parent();
         while let Some(node) = current {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if ts_ast::utilities::is_function_like(Some(&read))
                 || read.kind() == K::ClassStaticBlockDeclaration
             {
@@ -1137,7 +1129,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkBlock
     pub(crate) fn check_block_statement(&mut self, block: NodeId) -> Result<(), Error> {
-        if self.ast(block)?.node(block)?.kind() == K::Block {
+        if self.node(block)?.kind() == K::Block {
             self.check_statement_ambient_context(block)?;
         }
         let view = self.ast(block)?;
@@ -1174,7 +1166,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkIfStatement
     pub(crate) fn check_if_statement(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_statement_ambient_context(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_if_statement()
@@ -1187,7 +1179,7 @@ impl CheckerState {
         let ty = self.check_truthiness_expression(expression)?;
         self.check_known_truthy_guard(expression, ty, Some(then_statement))?;
         self.check_source_element(then_statement)?;
-        if self.ast(then_statement)?.node(then_statement)?.kind() == K::EmptyStatement {
+        if self.node(then_statement)?.kind() == K::EmptyStatement {
             self.error_at(
                 Some(then_statement),
                 messages::The_body_of_an_if_statement_cannot_be_the_empty_statement,
@@ -1208,7 +1200,7 @@ impl CheckerState {
             .expression()
             .ok_or(Error::MissingLink("throw expression"))?;
         if !self.check_statement_ambient_context(node)? {
-            let read = self.ast(expression)?.node(expression)?;
+            let read = self.node(expression)?;
             if read.kind() == K::Identifier
                 && self
                     .ast(expression)?
@@ -1239,14 +1231,14 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarStatementInAmbientContext
     pub(crate) fn check_statement_ambient_context(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::AMBIENT == 0 {
             return Ok(false);
         }
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("ambient statement parent"))?;
-        let parent_read = self.ast(parent)?.node(parent)?;
+        let parent_read = self.node(parent)?;
         let (key, diagnostic) = if !self.body_checks.ambient_reported.contains_key(&node)
             && ts_ast::utilities::is_function_like(Some(&parent_read))
         {
@@ -1288,14 +1280,14 @@ impl CheckerState {
         if self.check_grammar_function_like(node)? || self.check_grammar_generator(node)? {
             return Ok(());
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = read
             .name()
             .ok_or(Error::MissingLink("source method name"))?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("source method parent"))?;
-        let parent_kind = self.ast(parent)?.node(parent)?.kind();
+        let parent_kind = self.node(parent)?.kind();
         let ambient = read.flags() & nf::AMBIENT != 0;
         let no_body = read.body().is_none();
         let dynamic_error = match parent_kind.known() {
@@ -1318,8 +1310,8 @@ impl CheckerState {
             .as_method_declaration()
             .is_some_and(|data| data.asterisk_token().is_some());
         if generator
-            && self.ast(name)?.node(name)?.kind() == K::Identifier
-            && self.ast(name)?.node_text(name)?.as_bytes() == b"constructor"
+            && self.node(name)?.kind() == K::Identifier
+            && self.node_text(name)?.as_bytes() == b"constructor"
         {
             self.error_at(
                 Some(name),

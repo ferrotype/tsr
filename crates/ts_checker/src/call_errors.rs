@@ -51,11 +51,10 @@ impl CheckerState {
             Some(awaited) => !self.signatures_of_type(awaited, construct)?.is_empty(),
             None => false,
         };
-        let target = if self.ast(node)?.node(node)?.kind() == K::CallExpression
-            && self.ast(expression)?.node(expression)?.kind() == K::PropertyAccessExpression
+        let target = if self.node(node)?.kind() == K::CallExpression
+            && self.node(expression)?.kind() == K::PropertyAccessExpression
         {
-            self.ast(expression)?
-                .node(expression)?
+            self.node(expression)?
                 .name()
                 .ok_or(Error::MissingLink("invocation property name"))?
         } else {
@@ -121,9 +120,9 @@ impl CheckerState {
         } else {
             diagnostic = Some(self.diagnostic_for_node(Some(target), no_signatures, vec![text])?);
         }
-        let getter = if self.ast(node)?.node(node)?.kind() == K::CallExpression
+        let getter = if self.node(node)?.kind() == K::CallExpression
             && self
-                .source_list(node, self.ast(node)?.node(node)?.argument_list())?
+                .source_list(node, self.node(node)?.argument_list())?
                 .is_empty()
         {
             match self
@@ -164,9 +163,9 @@ impl CheckerState {
                     vec![],
                 )?));
         }
-        if self.ast(node)?.node(node)?.kind() == K::CallExpression
+        if self.node(node)?.kind() == K::CallExpression
             && self
-                .source_list(node, self.ast(node)?.node(node)?.argument_list())?
+                .source_list(node, self.node(node)?.argument_list())?
                 .len()
                 == 1
         {
@@ -303,7 +302,7 @@ impl CheckerState {
                 }
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::ParenthesizedExpression | K::JsxExpression) => {
                 let inner = read
@@ -336,7 +335,7 @@ impl CheckerState {
                     .right()
                     .ok_or(Error::MissingLink("elaborated binary right"))?;
                 if matches!(
-                    self.ast(operator)?.node(operator)?.kind().known(),
+                    self.node(operator)?.kind().known(),
                     Some(K::EqualsToken | K::CommaToken)
                 ) {
                     self.elaborate_call_error(right, source, target, relation, head, output)
@@ -377,15 +376,15 @@ impl CheckerState {
         relation: RelationKind,
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let body = read
             .body()
             .ok_or(Error::MissingLink("elaborated arrow body"))?;
-        if self.ast(body)?.node(body)?.kind() == K::Block {
+        if self.node(body)?.kind() == K::Block {
             return Ok(false);
         }
         for parameter in self.source_list(node, read.parameter_list())? {
-            if self.ast(parameter)?.node(parameter)?.type_node().is_some() {
+            if self.node(parameter)?.type_node().is_some() {
                 return Ok(false);
             }
         }

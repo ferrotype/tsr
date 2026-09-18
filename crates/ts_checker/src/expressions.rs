@@ -12,13 +12,10 @@ fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isNullOrUndefined
     pub(crate) fn null_or_undefined_expression(&mut self, mut node: NodeId) -> Result<bool, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedExpression {
-            node = required(
-                self.ast(node)?.node(node)?.expression(),
-                "nullish parentheses",
-            )?;
+        while self.node(node)?.kind() == K::ParenthesizedExpression {
+            node = required(self.node(node)?.expression(), "nullish parentheses")?;
         }
-        match self.ast(node)?.node(node)?.kind().known() {
+        match self.node(node)?.kind().known() {
             Some(K::NullKeyword) => Ok(true),
             Some(K::Identifier) => {
                 Ok(self.resolved_value_symbol(node)? == self.builtins.undefined_symbol)
@@ -68,13 +65,13 @@ impl CheckerState {
         node: NodeId,
     ) -> Result<Option<TypeId>, Error> {
         let mut expression = node;
-        while self.ast(expression)?.node(expression)?.kind() == K::ParenthesizedExpression {
+        while self.node(expression)?.kind() == K::ParenthesizedExpression {
             expression = required(
-                self.ast(expression)?.node(expression)?.expression(),
+                self.node(expression)?.expression(),
                 "quick parenthesized expression",
             )?;
         }
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if read.kind() == K::AwaitExpression {
             let operand = required(read.expression(), "quick await operand")?;
             return match self.quick_type_of_expression(operand)? {
@@ -90,13 +87,11 @@ impl CheckerState {
             let optional_chain = read.flags() & nf::OPTIONAL_CHAIN != 0;
             let callee = required(read.expression(), "quick call callee")?;
             if !construct
-                && (matches!(
-                    self.ast(callee)?.node(callee)?.kind().known(),
-                    Some(K::SuperKeyword)
-                ) || crate::external_resolution::is_import_call(self.ast(expression)?, &read)?
+                && (matches!(self.node(callee)?.kind().known(), Some(K::SuperKeyword))
+                    || crate::external_resolution::is_import_call(self.ast(expression)?, &read)?
                     || ts_ast::utilities_middle::is_require_call(
                         self.ast(expression)?,
-                        &self.ast(expression)?.node(expression)?,
+                        &self.node(expression)?,
                         true,
                     )?
                     || self.is_symbol_or_symbol_for_call(expression)?)
@@ -150,13 +145,13 @@ impl CheckerState {
             let annotation = required(read.type_node(), "assertion type")?;
             if ts_ast::utilities_middle::is_const_type_reference(
                 self.ast(annotation)?,
-                &self.ast(annotation)?.node(annotation)?,
+                &self.node(annotation)?,
             )? {
                 return Ok(None);
             }
             return self.get_type_from_type_node(annotation).map(Some);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if ts_ast::utilities::is_literal_expression(&read)
             || matches!(read.kind().known(), Some(K::TrueKeyword | K::FalseKeyword))
         {
@@ -171,11 +166,11 @@ impl CheckerState {
         if let Some(Some(symbol)) = self.query.resolved_symbols.try_get(node) {
             return Ok(*symbol);
         }
-        let missing = ts_ast::node_is_missing(Some(&self.ast(node)?.node(node)?));
+        let missing = ts_ast::node_is_missing(Some(&self.node(node)?));
         let symbol = if missing {
             None
         } else {
-            let name = self.ast(node)?.node_text(node)?.into_js_string();
+            let name = self.node_text(node)?.into_js_string();
             let message = self.cannot_find_name_diagnostic(node)?;
             let write_only = ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?;
             self.resolve_name(
@@ -248,7 +243,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSyntacticTruthySemantics
     fn syntactic_truthiness(&mut self, mut node: NodeId) -> Result<u8, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -264,10 +259,10 @@ impl CheckerState {
                 break;
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(K::NumericLiteral) => {
-                if matches!(self.ast(node)?.node_text(node)?.as_bytes(), b"0" | b"1") {
+                if matches!(self.node_text(node)?.as_bytes(), b"0" | b"1") {
                     3
                 } else {
                     1
@@ -286,7 +281,7 @@ impl CheckerState {
             ) => 1,
             Some(K::VoidExpression | K::NullKeyword) => 2,
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
-                if self.ast(node)?.node_text(node)?.as_bytes().is_empty() {
+                if self.node_text(node)?.as_bytes().is_empty() {
                     2
                 } else {
                     1
@@ -319,7 +314,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkConditionalExpression
     pub(crate) fn check_conditional_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_conditional_expression()
@@ -337,7 +332,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkBinaryLikeExpression
     pub(crate) fn check_binary_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let data = read
             .data_source()
             .as_binary_expression()
@@ -345,11 +340,11 @@ impl CheckerState {
         let left = required(data.left(), "binary left")?;
         let right = required(data.right(), "binary right")?;
         let op = required(data.operator_token(), "binary operator")?;
-        let operator = self.ast(op)?.node(op)?.kind();
+        let operator = self.node(op)?.kind();
         let mode = self.expression_mode;
         if operator == K::EqualsToken
             && matches!(
-                self.ast(left)?.node(left)?.kind().known(),
+                self.node(left)?.kind().known(),
                 Some(K::ObjectLiteralExpression | K::ArrayLiteralExpression)
             )
         {
@@ -358,7 +353,7 @@ impl CheckerState {
                 left,
                 source,
                 mode,
-                self.ast(right)?.node(right)?.kind() == K::ThisKeyword,
+                self.node(right)?.kind() == K::ThisKeyword,
             );
         }
         let a = self.check_expression_ex(left, mode)?;
@@ -401,9 +396,7 @@ impl CheckerState {
                 if self.object_literal_equality_operand(left)?
                     || self.object_literal_equality_operand(right)?
                 {
-                    let js = self.ast(left)?.node(left)?.flags()
-                        & ts_ast::node_flags::JAVA_SCRIPT_FILE
-                        != 0;
+                    let js = self.node(left)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0;
                     if !js
                         || matches!(
                             operator.known(),

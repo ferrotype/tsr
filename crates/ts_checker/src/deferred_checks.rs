@@ -84,10 +84,10 @@ impl CheckerState {
         if self.deferred_checks.reported_properties.contains(&name) {
             return Ok(());
         }
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let spelling = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
         let mut child = None;
-        if self.ast(name)?.node(name)?.kind() != ts_ast::SyntaxKind::PrivateIdentifier
+        if self.node(name)?.kind() != ts_ast::SyntaxKind::PrivateIdentifier
             && self.types.flags(containing)? & (tf::UNION | tf::PRIMITIVE) == tf::UNION
         {
             for &part in self.types.compound_types(containing)?.clone().iter() {
@@ -109,7 +109,6 @@ impl CheckerState {
                 }
             }
         }
-        let apparent = self.reduced_apparent_type(containing)?;
         if self.index_type_has_static_property(text.as_bytes(), containing)? {
             let display = self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
             let mut qualified = display.as_bytes().to_vec();
@@ -126,13 +125,31 @@ impl CheckerState {
             self.deferred_checks.reported_properties.insert(name);
             return Ok(());
         }
-        if self
-            .constituent_property(apparent, b"then", false)?
-            .is_some()
-        {
-            return Err(Error::Unsupported(
-                "reportNonexistentProperty: promised type",
-            ));
+        if let Some(promised) = self.get_promised_type_of_promise(containing)? {
+            if self
+                .constituent_property(promised, text.as_bytes(), false)?
+                .is_some()
+            {
+                let display =
+                    self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
+                let message = ts_diagnostics::Property_0_does_not_exist_on_type_1;
+                let args = vec![spelling, display];
+                let mut diagnostic = if child.is_some() {
+                    ts_ast::Diagnostic::chain(child, message, args)
+                } else {
+                    self.diagnostic_for_node(Some(name), message, args)?
+                };
+                diagnostic.related_information.push(std::sync::Arc::new(
+                    self.diagnostic_for_node(
+                        Some(name),
+                        ts_diagnostics::Did_you_forget_to_use_await,
+                        vec![],
+                    )?,
+                ));
+                self.add_diagnostic(diagnostic)?;
+                self.deferred_checks.reported_properties.insert(name);
+                return Ok(());
+            }
         }
         // port: tsc/internal/checker/checker.go:Checker.getSuggestedLibForNonExistentProperty
         let unreduced_apparent = self.apparent_type(containing)?;
@@ -163,17 +180,14 @@ impl CheckerState {
         let properties = self.get_properties_of_type(containing)?;
         let mut names = Vec::new();
         for property in properties {
-            if let Some(parent) = self.ast(name)?.node(name)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind()
-                    == ts_ast::SyntaxKind::PropertyAccessExpression
-                {
+            if let Some(parent) = self.node(name)?.parent() {
+                if self.node(parent)?.kind() == ts_ast::SyntaxKind::PropertyAccessExpression {
                     let receiver = self
                         .ast(parent)?
                         .node(parent)?
                         .expression()
                         .ok_or(Error::MissingLink("property completion receiver"))?;
-                    let is_super = self.ast(receiver)?.node(receiver)?.kind()
-                        == ts_ast::SyntaxKind::SuperKeyword;
+                    let is_super = self.node(receiver)?.kind() == ts_ast::SyntaxKind::SuperKeyword;
                     if !self.is_access_property_accessible(
                         parent, is_super, false, containing, property,
                     )? {

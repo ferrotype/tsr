@@ -29,7 +29,7 @@ impl CheckerState {
     }
 
     pub(crate) fn emit_parse_node(&self, node: NodeId) -> Result<bool, Error> {
-        Ok(self.ast(node)?.node(node)?.flags() & nf::SYNTHESIZED == 0)
+        Ok(self.node(node)?.flags() & nf::SYNTHESIZED == 0)
     }
 
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.isDeclarationVisible
@@ -55,7 +55,7 @@ impl CheckerState {
         let parent = read.parent();
         match read.kind().known() {
             Some(K::JSDocCallbackTag | K::JSDocTypedefTag) => match self.emit_parent(node, 3)? {
-                Some(n) => Ok(self.ast(n)?.node(n)?.kind() == K::SourceFile),
+                Some(n) => Ok(self.node(n)?.kind() == K::SourceFile),
                 None => Ok(false),
             },
             Some(K::BindingElement) => self.emit_declaration_visible(self.emit_parent(node, 2)?),
@@ -137,7 +137,7 @@ impl CheckerState {
                 let Some(declaration) = self.emit_parent(node, 2)? else {
                     return Ok(false);
                 };
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if read.kind() == K::ExportDeclaration
                     && read
                         .data_source()
@@ -200,7 +200,7 @@ impl CheckerState {
             let mut stack = self.source_children(source)?;
             stack.reverse();
             while let Some(node) = stack.pop() {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 let mark = match read.kind().known() {
                     Some(K::BinaryExpression) if self.emit_common_js_exports(node)? => read
                         .data_source()
@@ -214,8 +214,8 @@ impl CheckerState {
                     _ => None,
                 };
                 if let Some(mark) = mark {
-                    if self.ast(node)?.node(node)?.kind() == K::ExportSpecifier
-                        || self.ast(mark)?.node(mark)?.kind() == K::Identifier
+                    if self.node(node)?.kind() == K::ExportSpecifier
+                        || self.node(mark)?.kind() == K::Identifier
                     {
                         self.emit_mark_linked_aliases(mark)?;
                     }
@@ -237,13 +237,13 @@ impl CheckerState {
             return Ok(());
         };
         let meaning = sf::VALUE | sf::TYPE | sf::NAMESPACE | sf::ALIAS;
-        let mut symbol = if self.ast(node)?.node(node)?.kind() != K::StringLiteral
-            && (self.ast(parent)?.node(parent)?.kind() == K::ExportAssignment
+        let mut symbol = if self.node(node)?.kind() != K::StringLiteral
+            && (self.node(parent)?.kind() == K::ExportAssignment
                 || self.emit_common_js_exports(parent)?)
         {
-            let name = self.ast(node)?.node_text(node)?.into_js_string();
+            let name = self.node_text(node)?.into_js_string();
             self.resolve_name(Some(node), name.as_bytes(), meaning, None, false)?
-        } else if self.ast(parent)?.node(parent)?.kind() == K::ExportSpecifier {
+        } else if self.node(parent)?.kind() == K::ExportSpecifier {
             // The normal alias resolver also marks type-only aliases. Resolve its
             // result here, because this native call requests dontResolveAlias=false.
             match self.target_of_alias_declaration(parent)? {
@@ -266,17 +266,15 @@ impl CheckerState {
                 .collect();
             for declaration in declarations {
                 *self.emit.visible.get_or_default(declaration) = Some(true);
-                let read = self.ast(declaration)?.node(declaration)?;
+                let read = self.node(declaration)?;
                 if let Some(data) = read.data_source().as_import_equals_declaration() {
                     if let Some(reference) = data.module_reference() {
-                        if self.ast(reference)?.node(reference)?.kind()
-                            != K::ExternalModuleReference
-                        {
+                        if self.node(reference)?.kind() != K::ExternalModuleReference {
                             let first = ts_ast::utilities_middle::get_first_identifier(
                                 self.ast(reference)?,
                                 reference,
                             )?;
-                            let name = self.ast(first)?.node_text(first)?.into_js_string();
+                            let name = self.node_text(first)?.into_js_string();
                             symbol = self.resolve_name(
                                 Some(declaration),
                                 name.as_bytes(),
@@ -294,7 +292,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:getAnyImportSyntax
     fn emit_any_import_syntax(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let levels = match self.ast(node)?.node(node)?.kind().known() {
+        let levels = match self.node(node)?.kind().known() {
             Some(K::ImportEqualsDeclaration) => 0,
             Some(K::ImportClause) => 1,
             Some(K::NamespaceImport) => 2,
@@ -320,7 +318,7 @@ impl CheckerState {
         let declarations: Vec<_> = self.symbol_declarations(symbol)?.iter().flatten().collect();
         let mut aliases = crate::types::Map::default();
         for declaration in declarations {
-            let kind = self.ast(declaration)?.node(declaration)?.kind();
+            let kind = self.node(declaration)?.kind();
             if kind == K::Identifier || self.emit_declaration_visible(Some(declaration))? {
                 continue;
             }
@@ -332,7 +330,7 @@ impl CheckerState {
             }
             if statement.is_none() && kind == K::VariableDeclaration {
                 if let Some(variable) = self.emit_parent(declaration, 2)? {
-                    if self.ast(variable)?.node(variable)?.kind() == K::VariableStatement
+                    if self.node(variable)?.kind() == K::VariableStatement
                         && self.emit_unexported_in_visible_parent(variable)?
                     {
                         statement = Some(variable);
@@ -341,7 +339,7 @@ impl CheckerState {
             }
             if statement.is_none()
                 && ts_ast::utilities_middle::is_late_visibility_painted_statement(
-                    &self.ast(declaration)?.node(declaration)?,
+                    &self.node(declaration)?,
                 )
                 && self.emit_unexported_in_visible_parent(declaration)?
             {
@@ -350,14 +348,14 @@ impl CheckerState {
             if statement.is_none() && kind == K::BindingElement {
                 let flags = self.symbol(symbol)?.flags();
                 if flags & sf::ALIAS != 0
-                    && self.ast(declaration)?.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0
+                    && self.node(declaration)?.flags() & nf::JAVA_SCRIPT_FILE != 0
                 {
                     if let (Some(variable), Some(container)) = (
                         self.emit_parent(declaration, 2)?,
                         self.emit_parent(declaration, 4)?,
                     ) {
-                        if self.ast(variable)?.node(variable)?.kind() == K::VariableDeclaration
-                            && self.ast(container)?.node(container)?.kind() == K::VariableStatement
+                        if self.node(variable)?.kind() == K::VariableDeclaration
+                            && self.node(container)?.kind() == K::VariableStatement
                             && self.emit_unexported_in_visible_parent(container)?
                         {
                             statement = Some(container);
@@ -370,13 +368,13 @@ impl CheckerState {
                         declaration,
                     )?
                     .ok_or(Error::MissingLink("binding declaration root"))?;
-                    if self.ast(root)?.node(root)?.kind() == K::Parameter {
+                    if self.node(root)?.kind() == K::Parameter {
                         return Ok(None);
                     }
                     let Some(variable) = self.emit_parent(root, 2)? else {
                         return Ok(None);
                     };
-                    if self.ast(variable)?.node(variable)?.kind() != K::VariableStatement {
+                    if self.node(variable)?.kind() != K::VariableStatement {
                         return Ok(None);
                     }
                     if ts_ast::utilities::has_syntactic_modifier(

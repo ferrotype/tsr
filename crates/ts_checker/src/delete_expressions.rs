@@ -16,7 +16,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("delete operand"))?;
         self.check_expression(operand)?;
         let expression = ts_ast::skip_parentheses(self.ast(operand)?, operand)?;
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if !ts_ast::utilities::is_access_expression(&read) {
             self.error_at(
                 Some(expression),
@@ -31,7 +31,7 @@ impl CheckerState {
                 .as_property_access_expression()
                 .and_then(|access| access.name())
                 .ok_or(Error::MissingLink("property access name"))?;
-            if ts_ast::is_private_identifier(&self.ast(name)?.node(name)?) {
+            if ts_ast::is_private_identifier(&self.node(name)?) {
                 self.error_at(
                     Some(expression),
                     d::The_operand_of_a_delete_operator_cannot_be_a_private_identifier,

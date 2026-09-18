@@ -279,7 +279,7 @@ impl CheckerState {
             .type_parameters
             .clone()
             .unwrap_or_else(|| [].into());
-        let flags = if ts_ast::utilities::is_in_js_file(Some(&self.ast(node)?.node(node)?)) {
+        let flags = if ts_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
             crate::inference::ANY_DEFAULT
         } else {
             0
@@ -303,7 +303,7 @@ impl CheckerState {
             .clone()
             .unwrap_or_else(|| [].into());
         if !matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::Decorator | K::BinaryExpression)
         ) {
             let mut skip_patterns = true;
@@ -409,7 +409,7 @@ impl CheckerState {
             }
         }
         for (index, &argument) in args[..arg_count].iter().enumerate() {
-            let read = self.ast(argument)?.node(argument)?;
+            let read = self.node(argument)?;
             if read.kind() == K::OmittedExpression {
                 continue;
             }
@@ -481,13 +481,13 @@ impl CheckerState {
         mode: u32,
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let skip_this = read.kind() == K::NewExpression
             || read.kind() == K::CallExpression
                 && match read.expression() {
                     Some(expression) => ts_ast::utilities_tail::is_super_property(
                         self.ast(expression)?,
-                        &self.ast(expression)?.node(expression)?,
+                        &self.node(expression)?,
                     )?,
                     None => false,
                 };
@@ -515,7 +515,7 @@ impl CheckerState {
             None => args.len(),
         };
         for (index, &argument) in args[..arg_count].iter().enumerate() {
-            if self.ast(argument)?.node(argument)?.kind() == K::OmittedExpression {
+            if self.node(argument)?.kind() == K::OmittedExpression {
                 continue;
             }
             let target = self
@@ -596,10 +596,10 @@ impl CheckerState {
         match self.call_this_argument_node(node)? {
             Some(receiver) => {
                 let ty = self.check_expression(receiver)?;
-                let Some(parent) = self.ast(receiver)?.node(receiver)?.parent() else {
+                let Some(parent) = self.node(receiver)?.parent() else {
                     return Ok(ty);
                 };
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if ts_ast::utilities::is_optional_chain_root(&read) {
                     self.non_nullable_type(ty)
                 } else if read.flags() & ts_ast::node_flags::OPTIONAL_CHAIN != 0 {
@@ -613,7 +613,7 @@ impl CheckerState {
     }
 
     fn call_this_argument_node(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        if self.ast(node)?.node(node)?.kind() == K::BinaryExpression {
+        if self.node(node)?.kind() == K::BinaryExpression {
             let right = self
                 .ast(node)?
                 .node(node)?
@@ -625,7 +625,7 @@ impl CheckerState {
             return Ok(Some(right));
         }
         if !matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::CallExpression | K::TaggedTemplateExpression)
         ) {
             return Ok(None);
@@ -634,7 +634,7 @@ impl CheckerState {
             ts_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
                 .ok_or(Error::MissingLink("this invoked expression"))?;
         loop {
-            let read = self.ast(expression)?.node(expression)?;
+            let read = self.node(expression)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -654,7 +654,7 @@ impl CheckerState {
                 break;
             }
         }
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
@@ -717,10 +717,16 @@ impl CheckerState {
             minimum.to_string()
         };
         let between = minimum < args.len() && args.len() < maximum;
+        let void_promise_error = !rest
+            && count == "1"
+            && args.is_empty()
+            && self.is_promise_resolve_arity_error(node)?;
         let message = if between {
             messages::No_overload_expects_0_arguments_but_overloads_do_exist_that_expect_either_1_or_2_arguments
         } else if rest {
             messages::Expected_at_least_0_arguments_but_got_1
+        } else if void_promise_error {
+            messages::Expected_0_arguments_but_got_1_Did_you_forget_to_include_void_in_your_type_argument_to_Promise
         } else {
             messages::Expected_0_arguments_but_got_1
         };
@@ -746,13 +752,13 @@ impl CheckerState {
                 JsString::from_bytes(args.len().to_string().as_bytes()),
             ]
         };
-        let error_node = if self.ast(node)?.node(node)?.kind() == K::CallExpression {
+        let error_node = if self.node(node)?.kind() == K::CallExpression {
             let target = self
                 .ast(node)?
                 .node(node)?
                 .expression()
                 .ok_or(Error::MissingLink("arity call target"))?;
-            let read = self.ast(target)?.node(target)?;
+            let read = self.node(target)?;
             if read.kind() == K::PropertyAccessExpression {
                 read.name()
                     .ok_or(Error::MissingLink("arity property name"))?
@@ -762,12 +768,8 @@ impl CheckerState {
         } else {
             node
         };
-        let void_promise_error = !rest
-            && count == "1"
-            && args.is_empty()
-            && self.is_promise_resolve_arity_error(node)?;
         if void_promise_error
-            && self.ast(node)?.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
+            && self.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
         {
             self.error_at(Some(error_node), messages::Expected_1_argument_but_got_0_new_Promise_needs_a_JSDoc_hint_to_produce_a_resolve_that_can_be_called_without_arguments, vec![])?;
             return Ok(());
@@ -784,8 +786,8 @@ impl CheckerState {
             let last = *args
                 .last()
                 .ok_or(Error::MissingLink("arity last argument"))?;
-            let mut start = i64::from(self.ast(first_extra)?.node(first_extra)?.pos());
-            let mut end = i64::from(self.ast(last)?.node(last)?.end());
+            let mut start = i64::from(self.node(first_extra)?.pos());
+            let mut end = i64::from(self.node(last)?.end());
             if end == start {
                 end += 1;
             }
@@ -798,24 +800,22 @@ impl CheckerState {
                 diagnostic_args,
             )
         };
-        if self.ast(node)?.node(node)?.kind() == K::BinaryExpression {
+        if self.node(node)?.kind() == K::BinaryExpression {
             diagnostic = Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), messages::The_left_hand_side_of_an_instanceof_expression_must_be_assignable_to_the_first_argument_of_the_right_hand_side_s_Symbol_hasInstance_method, vec![]);
         }
         if args.len() < minimum {
             if let Some(declaration) = self.signatures.get(signature)?.declaration {
-                let parameters = self.source_list(
-                    declaration,
-                    self.ast(declaration)?.node(declaration)?.parameter_list(),
-                )?;
+                let parameters =
+                    self.source_list(declaration, self.node(declaration)?.parameter_list())?;
                 let index = args.len()
                     + usize::from(self.signatures.get(signature)?.this_parameter.is_some());
                 if let Some(&parameter) = parameters.get(index) {
-                    let read = self.ast(parameter)?.node(parameter)?;
+                    let read = self.node(parameter)?;
                     let name = read
                         .name()
                         .ok_or(Error::MissingLink("missing argument parameter name"))?;
                     let pattern = matches!(
-                        self.ast(name)?.node(name)?.kind().known(),
+                        self.node(name)?.kind().known(),
                         Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
                     );
                     let rest = read
@@ -827,7 +827,7 @@ impl CheckerState {
                     let arguments = if pattern {
                         vec![]
                     } else {
-                        vec![self.ast(name)?.node_text(name)?.into_js_string()]
+                        vec![self.node_text(name)?.into_js_string()]
                     };
                     let related = self.diagnostic_for_node(
                         Some(parameter),
@@ -852,17 +852,17 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isPromiseResolveArityError
     fn is_promise_resolve_arity_error(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() != K::CallExpression {
             return Ok(false);
         }
         let callee = read
             .expression()
             .ok_or(Error::MissingLink("call expression callee"))?;
-        if self.ast(callee)?.node(callee)?.kind() != K::Identifier {
+        if self.node(callee)?.kind() != K::Identifier {
             return Ok(false);
         }
-        let text = self.ast(callee)?.node_text(callee)?.into_js_string();
+        let text = self.node_text(callee)?.into_js_string();
         let Some(symbol) = self.resolve_name(
             Some(callee),
             text.as_bytes(),

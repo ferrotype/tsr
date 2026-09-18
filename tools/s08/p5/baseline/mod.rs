@@ -3,6 +3,10 @@
 //! query list. Types are walked before symbols on the same checker operation.
 mod classify;
 mod decorate;
+/// Checkerbench phase clocks (display sites); shared with the executor's hooks.
+#[cfg(feature = "s08-phase-timer")]
+#[path = "../../p7/instrument.rs"]
+pub mod instrument;
 mod query;
 
 use serde_json::{json, Value};
@@ -13,6 +17,17 @@ use ts_checker::{Operation, TypeRef};
 use ts_compiler::Program;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+/// Excludes observer/decoration work from the caller's measurement interval.
+pub trait Timing {
+    fn pause(&mut self) {}
+    fn resume(&mut self) {}
+}
+// Some shared harness binaries only use generate_with_timing.
+#[allow(dead_code)]
+struct NoTiming;
+impl Timing for NoTiming {}
+
 struct Row {
     line: usize,
     source_text: Vec<u8>,
@@ -136,11 +151,36 @@ fn nodes(program: &Program, root: NodeId) -> Result<Vec<NodeId>> {
 
 /// Kept outside the checker operation so a panicking unwind retires the owner
 /// while retaining the last query and all completed observations.
-#[derive(Default)]
 pub struct Trace {
     pub queries: Vec<Value>,
     pub active: Value,
     pub collect_type_strings: bool,
+    /// Inventory runs record every query as JSON; the checkerbench child only
+    /// counts operations so JSON transport stays out of its checker interval.
+    pub record_queries: bool,
+    pub counts: std::collections::BTreeMap<&'static str, u64>,
+    /// Retain every `GetTypeAtLocation` result as a root of the retained
+    /// checkpoint (`data/s08/type-footprint.json`, roots).
+    pub retain_types: bool,
+    pub retained_types: Vec<TypeRef>,
+}
+impl Default for Trace {
+    fn default() -> Self {
+        Self {
+            queries: Vec::new(),
+            active: Value::Null,
+            collect_type_strings: false,
+            record_queries: true,
+            counts: std::collections::BTreeMap::new(),
+            retain_types: false,
+            retained_types: Vec::new(),
+        }
+    }
+}
+impl Trace {
+    pub(crate) fn count(&mut self, operation: &'static str) {
+        *self.counts.entry(operation).or_insert(0) += 1;
+    }
 }
 
 struct Walker<'a, 'operation> {
@@ -148,6 +188,7 @@ struct Walker<'a, 'operation> {
     op: &'a mut Operation<'operation>,
     had_errors: bool,
     trace: &'a mut Trace,
+    timing: &'a mut dyn Timing,
     type_strings: Vec<(Value, TypeRef)>,
 }
 impl Walker<'_, '_> {
@@ -168,7 +209,9 @@ impl Walker<'_, '_> {
             for id in nodes(self.program, source)? {
                 let view = ast(self.program, id)?;
                 let node = view.node(id)?;
-                self.trace.active = self.stamp(source, id, "ClassifyNode")?;
+                if self.trace.record_queries {
+                    self.trace.active = self.stamp(source, id, "ClassifyNode")?;
+                }
                 let selected = self.op.is_expression_node(id)?
                     || node.kind() == K::Identifier
                     || classify::declaration_name(view, id)?
@@ -191,19 +234,28 @@ impl Walker<'_, '_> {
             if symbols && rows.iter().any(|row| row.display.is_empty()) {
                 break;
             }
-            output.extend_from_slice(&decorate::file(input.name, input.content, &rows)?);
+            self.timing.pause();
+            let decorated = decorate::file(input.name, input.content, &rows);
+            output.extend_from_slice(&decorated?);
+            self.timing.resume();
         }
+        self.timing.pause();
         if output.is_empty() {
-            return Ok(json!({"state":"no_content"}));
+            let result = json!({"state":"no_content"});
+            self.timing.resume();
+            return Ok(result);
         }
         let mut full = b"//// [".to_vec();
         full.extend_from_slice(header);
         full.extend_from_slice(b"] ////\r\n\r\n");
         full.extend_from_slice(&output);
-        Ok(json!({"state":"content","text_hex":hex(&full)}))
+        let result = json!({"state":"content","text_hex":hex(&full)});
+        self.timing.resume();
+        Ok(result)
     }
 }
 
+#[allow(dead_code)] // Untimed entry point used by the P5 display harness.
 pub fn generate(
     program: &Program,
     op: &mut Operation<'_>,
@@ -212,11 +264,24 @@ pub fn generate(
     had_errors: bool,
     trace: &mut Trace,
 ) -> Value {
+    generate_with_timing(program, op, files, header, had_errors, trace, &mut NoTiming)
+}
+
+pub fn generate_with_timing(
+    program: &Program,
+    op: &mut Operation<'_>,
+    files: &[InputFile<'_>],
+    header: &[u8],
+    had_errors: bool,
+    trace: &mut Trace,
+    timing: &mut dyn Timing,
+) -> Value {
     let mut walker = Walker {
         program,
         op,
         had_errors,
         trace,
+        timing,
         type_strings: Vec::new(),
     };
     let result = (|| {
@@ -224,18 +289,29 @@ pub fn generate(
         let symbols = walker.baseline(files, header, true)?;
         Ok::<_, Box<dyn std::error::Error>>((types, symbols))
     })();
-    match result {
+    walker.timing.pause();
+    let result = match result {
         Ok((types, symbols)) => {
             let mut result = json!({"state":"executed","types":types,"symbols":symbols,"queries":walker.trace.queries});
             if walker.trace.collect_type_strings {
                 let display = (|| -> Result<Vec<Value>> {
                     let mut rows = Vec::new();
                     for (mut row, typ) in walker.type_strings {
-                        walker.trace.active = row.clone();
-                        let text = walker.op.type_to_string(typ,
-                            ts_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
-                                | ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE)?;
-                        row["text_hex"] = json!(hex(text.as_bytes()));
+                        if walker.trace.record_queries {
+                            walker.trace.active = row.clone();
+                        } else {
+                            walker.trace.count("TypeToString");
+                        }
+                        walker.timing.resume();
+                        let text = {
+                            #[cfg(feature = "s08-phase-timer")]
+                            let _display = instrument::Display::begin();
+                            walker.op.type_to_string(typ,
+                                ts_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
+                                    | ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE)
+                        };
+                        walker.timing.pause();
+                        row["text_hex"] = json!(hex(text?.as_bytes()));
                         rows.push(row);
                     }
                     Ok(rows)
@@ -247,10 +323,15 @@ pub fn generate(
                     }
                 };
             }
+            if !walker.trace.record_queries {
+                result["counts"] = json!(walker.trace.counts);
+            }
             result
         }
         Err(error) => {
             json!({"state":"failed","class":"walker_error","reason":error.to_string(),"active_query":walker.trace.active,"queries":walker.trace.queries})
         }
-    }
+    };
+    walker.timing.resume();
+    result
 }

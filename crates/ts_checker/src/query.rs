@@ -17,6 +17,10 @@ pub(crate) struct QueryState {
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    /// `symbolTableAliasCache`: alias symbols of the globals and exports tables,
+    /// shared by every display query of this checker.
+    pub symbol_table_aliases:
+        crate::types::Map<crate::node_builder::names::NameTableId, Vec<SymbolId>>,
     /// `deferredGlobalImportMetaExpressionType`: the synthetic `ImportMetaExpression`.
     pub import_meta_expression_type: Option<TypeId>,
     pub global_type_aliases: crate::types::Map<(&'static str, usize, bool), Option<SymbolId>>,
@@ -61,7 +65,7 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsTypeDeclaration
     pub(crate) fn is_type_declaration(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(
                 K::TypeParameter
@@ -74,11 +78,8 @@ impl CheckerState {
             Some(K::ImportClause) => read.is_type_only(),
             Some(K::ImportSpecifier | K::ExportSpecifier) => {
                 let parent = required(read.parent(), "specifier parent")?;
-                let grandparent = required(
-                    self.ast(parent)?.node(parent)?.parent(),
-                    "specifier grandparent",
-                )?;
-                self.ast(grandparent)?.node(grandparent)?.is_type_only()
+                let grandparent = required(self.node(parent)?.parent(), "specifier grandparent")?;
+                self.node(grandparent)?.is_type_only()
             }
             _ => false,
         })
@@ -101,12 +102,12 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::IN_WITH_STATEMENT != 0 {
             return Ok(None);
         }
         if read.kind() == K::SourceFile {
-            let source = self.ast(node)?.source_file(node)?;
+            let source = self.source_file_read(node)?;
             return if ts_ast::utilities::is_external_or_common_js_module(&source) {
                 self.get_symbol_of_declaration(node)
             } else {
@@ -114,7 +115,7 @@ impl CheckerState {
             };
         }
         if let Some(parent) = read.parent() {
-            let parent_read = self.ast(parent)?.node(parent)?;
+            let parent_read = self.node(parent)?;
             if crate::query_location::declaration_or_import_name(self.ast(node)?, node)? {
                 if matches!(
                     parent_read.kind().known(),
@@ -135,7 +136,7 @@ impl CheckerState {
                 )
             {
                 if let Some(declaration) = parent_read.parent() {
-                    if ts_ast::is_declaration(&self.ast(declaration)?.node(declaration)?) {
+                    if ts_ast::is_declaration(&self.node(declaration)?) {
                         return self.get_symbol_of_declaration(declaration);
                     }
                 }
@@ -143,12 +144,12 @@ impl CheckerState {
         }
         if read.kind() == K::Identifier {
             if let Some(parent) = read.parent() {
-                let binding = self.ast(parent)?.node(parent)?;
+                let binding = self.node(parent)?;
                 if binding.kind() == K::BindingElement && binding.property_name() == Some(node) {
                     if let Some(pattern) = binding.parent() {
-                        if self.ast(pattern)?.node(pattern)?.kind() == K::ObjectBindingPattern {
+                        if self.node(pattern)?.kind() == K::ObjectBindingPattern {
                             let ty = self.get_type_at_location(pattern)?;
-                            let name = self.ast(node)?.node_text(node)?.into_js_string();
+                            let name = self.node_text(node)?.into_js_string();
                             if let Some(property) =
                                 self.constituent_property(ty, name.as_bytes(), false)?
                             {
@@ -159,13 +160,13 @@ impl CheckerState {
                 }
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::Identifier {
             if let Some(parent) = read.parent() {
-                let parent_read = self.ast(parent)?.node(parent)?;
+                let parent_read = self.node(parent)?;
                 if parent_read.kind() == K::MetaProperty && parent_read.name() == Some(node) {
                     let (keyword, _) = self.meta_property_parts(parent)?;
-                    let text = self.ast(node)?.node_text(node)?;
+                    let text = self.node_text(node)?;
                     if keyword == K::NewKeyword && text.as_bytes() == b"target" {
                         let ty = self.check_new_target_meta_property(parent)?;
                         return Ok(self.types.get(ty)?.symbol);
@@ -202,8 +203,7 @@ impl CheckerState {
             }
             Some(K::ThisKeyword | K::Identifier) => {
                 let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
-                if ts_ast::utilities::is_function_like(Some(&self.ast(container)?.node(container)?))
-                {
+                if ts_ast::utilities::is_function_like(Some(&self.node(container)?)) {
                     let signature = self.signature_from_declaration(container)?;
                     if let Some(this_parameter) = self.signatures.get(signature)?.this_parameter {
                         return Ok(Some(this_parameter));
@@ -227,10 +227,8 @@ impl CheckerState {
             Some(K::ConstructorKeyword) => {
                 // constructor keyword for an overload, should take us to the definition if it exist
                 match read.parent() {
-                    Some(constructor)
-                        if self.ast(constructor)?.node(constructor)?.kind() == K::Constructor =>
-                    {
-                        match self.ast(constructor)?.node(constructor)?.parent() {
+                    Some(constructor) if self.node(constructor)?.kind() == K::Constructor => {
+                        match self.node(constructor)?.parent() {
                             Some(class) => self.raw_declaration_symbol(class),
                             None => Ok(None),
                         }
@@ -248,7 +246,7 @@ impl CheckerState {
                 None => Ok(None),
             },
             Some(K::ExportKeyword) => match read.parent() {
-                Some(parent) if self.ast(parent)?.node(parent)?.kind() == K::ExportAssignment => {
+                Some(parent) if self.node(parent)?.kind() == K::ExportAssignment => {
                     self.raw_declaration_symbol(parent)
                 }
                 _ => Ok(None),
@@ -260,13 +258,13 @@ impl CheckerState {
                 let Some(parent) = read.parent() else {
                     return Ok(None);
                 };
-                let parent_read = self.ast(parent)?.node(parent)?;
+                let parent_read = self.node(parent)?;
                 if parent_read.kind() != K::MetaProperty {
                     return Ok(None);
                 }
                 if read.kind() == K::ImportKeyword {
                     if let Some(name) = parent_read.name() {
-                        if self.ast(name)?.node_text(name)?.as_bytes() == b"defer" {
+                        if self.node_text(name)?.as_bytes() == b"defer" {
                             return Ok(None);
                         }
                     }
@@ -278,7 +276,7 @@ impl CheckerState {
                 let Some(parent) = read.parent() else {
                     return Ok(None);
                 };
-                let parent_read = self.ast(parent)?.node(parent)?;
+                let parent_read = self.node(parent)?;
                 let Some(right) = parent_read
                     .data_source()
                     .as_binary_expression()
@@ -301,8 +299,7 @@ impl CheckerState {
                     .and_then(|data| data.argument())
                     .map(|argument| {
                         Ok::<_, Error>(
-                            self.ast(argument)?
-                                .node(argument)?
+                            self.node(argument)?
                                 .data_source()
                                 .as_literal_type_node()
                                 .and_then(|data| data.literal()),
@@ -311,9 +308,7 @@ impl CheckerState {
                     .transpose()?
                     .flatten();
                 match literal {
-                    Some(literal)
-                        if self.ast(literal)?.node(literal)?.kind() == K::StringLiteral =>
-                    {
+                    Some(literal) if self.node(literal)?.kind() == K::StringLiteral => {
                         self.get_symbol_at_location(literal)
                     }
                     _ => Ok(None),
@@ -450,7 +445,7 @@ impl CheckerState {
         // `@callback` declares a JS type alias.
         for node in declarations.into_iter().flatten() {
             if matches!(
-                self.ast(node)?.node(node)?.kind().known(),
+                self.node(node)?.kind().known(),
                 Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
             ) {
                 declaration = Some(node);
@@ -458,7 +453,7 @@ impl CheckerState {
             }
         }
         let declaration = required(declaration, "type alias declaration")?;
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let type_node = required(read.type_node(), "type alias annotation")?;
         if !self.push_source_resolution(symbol, TypeSystemPropertyName::DeclaredType) {
             return Ok(self.builtins.error_type);
@@ -515,7 +510,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromTypeNodeWorker
     fn get_type_from_type_node_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let builtin = match read.kind().known() {
             Some(K::AnyKeyword | K::JSDocAllType) => Some(self.builtins.any_type),
             Some(K::UnknownKeyword) => Some(self.builtins.unknown_type),
@@ -579,7 +574,7 @@ impl CheckerState {
                         .literal(),
                     "literal type",
                 )?;
-                if self.ast(literal)?.node(literal)?.kind() == K::NullKeyword {
+                if self.node(literal)?.kind() == K::NullKeyword {
                     return Ok(self.builtins.null_type);
                 }
                 let ty = self.check_expression(literal)?;
@@ -640,8 +635,8 @@ impl CheckerState {
                 let mut declaration = read
                     .parent()
                     .ok_or(Error::MissingLink("unique type parent"))?;
-                if self.ast(argument)?.node(argument)?.kind() == K::SymbolKeyword {
-                    while self.ast(declaration)?.node(declaration)?.kind() == K::ParenthesizedType {
+                if self.node(argument)?.kind() == K::SymbolKeyword {
+                    while self.node(declaration)?.kind() == K::ParenthesizedType {
                         declaration = self
                             .ast(declaration)?
                             .node(declaration)?
@@ -690,9 +685,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getAliasForTypeNode
     pub(crate) fn alias_for_type_node(&mut self, node: NodeId) -> Result<Option<TypeAlias>, Error> {
-        let mut parent = self.ast(node)?.node(node)?.parent();
+        let mut parent = self.node(node)?.parent();
         while let Some(current) = parent {
-            let read = self.ast(current)?.node(current)?;
+            let read = self.node(current)?;
             if read.kind() == K::ParenthesizedType
                 || read
                     .data_source()
@@ -818,20 +813,20 @@ impl CheckerState {
     }
 
     fn check_expression_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let ty = match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
-                let text = self.ast(node)?.node_text(node)?;
+                let text = self.node_text(node)?;
                 self.get_string_literal_type(JsString::from_bytes(text.as_bytes()))?
             }
             Some(K::NumericLiteral) => {
                 self.check_grammar_numeric_literal(node)?;
-                let text = self.ast(node)?.node_text(node)?;
+                let text = self.node_text(node)?;
                 self.get_number_literal_type(ts_jsnum::from_string(text.as_bytes()))?
             }
             Some(K::BigIntLiteral) => {
                 self.check_grammar_big_int_literal(node)?;
-                let text = self.ast(node)?.node_text(node)?;
+                let text = self.node_text(node)?;
                 self.get_big_int_literal_type(ts_jsnum::PseudoBigInt::new(
                     &ts_jsnum::parse_pseudo_big_int(text.as_bytes()),
                     false,
@@ -1076,18 +1071,14 @@ impl CheckerState {
             return Ok(self.builtins.any_type);
         }
         let declaration = required(read.value_declaration(), "value declaration")?;
-        if self.ast(declaration)?.node(declaration)?.kind() == K::SourceFile {
-            let source = self.ast(declaration)?.source_file(declaration)?;
+        if self.node(declaration)?.kind() == K::SourceFile {
+            let source = self.source_file_read(declaration)?;
             if source.script_kind == ts_core::ScriptKind::JSON {
-                let statements = self.source_list(
-                    declaration,
-                    self.ast(declaration)?.node(declaration)?.statement_list(),
-                )?;
+                let statements =
+                    self.source_list(declaration, self.node(declaration)?.statement_list())?;
                 let ty = if let Some(&statement) = statements.first() {
-                    let expression = required(
-                        self.ast(statement)?.node(statement)?.expression(),
-                        "JSON root expression",
-                    )?;
+                    let expression =
+                        required(self.node(statement)?.expression(), "JSON root expression")?;
                     let ty = self.check_expression(expression)?;
                     let ty = self.widen_literal_type(ty)?;
                     self.widened_type(ty)?
@@ -1115,21 +1106,19 @@ impl CheckerState {
                     let members = self.symbol(symbol)?.members();
                     self.new_anonymous_type(Some(symbol), members, &[], &[], &[])
                 }
-            } else if self.ast(declaration)?.node(declaration)?.kind() == K::PropertyAssignment {
+            } else if self.node(declaration)?.kind() == K::PropertyAssignment {
                 self.check_object_property_assignment(declaration, 0)
-            } else if self.ast(declaration)?.node(declaration)?.kind()
-                == K::ShorthandPropertyAssignment
-            {
+            } else if self.node(declaration)?.kind() == K::ShorthandPropertyAssignment {
                 self.check_shorthand_property_assignment(declaration, true, 0)
-            } else if self.ast(declaration)?.node(declaration)?.kind() == K::MethodDeclaration {
+            } else if self.node(declaration)?.kind() == K::MethodDeclaration {
                 self.check_object_literal_method(declaration)
             } else if matches!(
-                self.ast(declaration)?.node(declaration)?.kind().known(),
+                self.node(declaration)?.kind().known(),
                 Some(K::BinaryExpression | K::CallExpression)
             ) {
                 self.widened_assignment_declaration_type(symbol)
-            } else if self.ast(declaration)?.node(declaration)?.kind() == K::ExportAssignment {
-                let read = self.ast(declaration)?.node(declaration)?;
+            } else if self.node(declaration)?.kind() == K::ExportAssignment {
+                let read = self.node(declaration)?;
                 if let Some(annotation) = read.type_node() {
                     self.get_type_from_type_node(annotation)
                 } else {

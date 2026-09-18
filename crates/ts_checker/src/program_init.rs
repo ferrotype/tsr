@@ -9,6 +9,26 @@ impl CheckerState {
         let globals = self.builtins.globals.ok_or(Error::MissingLink("globals"))?;
         let mut augmentations = Vec::new();
         let mut ambient_modules = Vec::new();
+        // The globals table ends close to the largest global file's locals
+        // (the lib files mostly redeclare the same names), so reserving that
+        // many entries up front lands on the capacity the table would grow to
+        // anyway and spares the growth rehashes while it fills.
+        let mut largest_locals = 0;
+        for index in 0..self.program()?.host.source_file_count() {
+            let file = self.program()?.host.source_file(index);
+            let view = file.view();
+            if ast::is_external_or_common_js_module(&view.source_file()?) {
+                continue;
+            }
+            if let Some(locals) = view
+                .node_binding(file.source())?
+                .and_then(|binding| binding.locals)
+            {
+                largest_locals = largest_locals.max(self.table(locals)?.len());
+            }
+        }
+        self.tables.get_mut(globals)?.reserve(largest_locals);
+        self.tables.reserve_names(largest_locals);
         for index in 0..self.program()?.host.source_file_count() {
             let file = self.program()?.host.source_file(index);
             let view = file.view();
@@ -70,7 +90,7 @@ impl CheckerState {
                 .node(name)?
                 .parent()
                 .ok_or(Error::MissingLink("augmentation parent"))?;
-            if ast::is_global_scope_augmentation(&self.ast(declaration)?.node(declaration)?) {
+            if ast::is_global_scope_augmentation(&self.node(declaration)?) {
                 self.merge_global_augmentation(declaration)?;
             }
         }
@@ -145,7 +165,7 @@ impl CheckerState {
                 .node(name)?
                 .parent()
                 .ok_or(Error::MissingLink("augmentation parent"))?;
-            if !ast::is_global_scope_augmentation(&self.ast(declaration)?.node(declaration)?) {
+            if !ast::is_global_scope_augmentation(&self.node(declaration)?) {
                 self.merge_external_module_augmentation(declaration)?;
             }
         }
@@ -249,7 +269,7 @@ impl CheckerState {
     fn global_type_declaration(&self, symbol: SymbolId) -> Result<Option<ts_arena::NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             if matches!(
-                self.ast(declaration)?.node(declaration)?.kind().known(),
+                self.node(declaration)?.kind().known(),
                 Some(
                     K::ClassDeclaration
                         | K::InterfaceDeclaration

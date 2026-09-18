@@ -18,7 +18,7 @@ impl CheckerState {
         if a == self.builtins.silent_never_type || b == self.builtins.silent_never_type {
             return Ok(self.builtins.silent_never_type);
         }
-        if self.ast(left)?.node(left)?.kind() == K::PrivateIdentifier {
+        if self.node(left)?.kind() == K::PrivateIdentifier {
             self.check_private_in_operand(left, b)?;
         } else {
             let checked = self.check_non_null_type(a, left)?;
@@ -58,8 +58,8 @@ impl CheckerState {
         left: NodeId,
         right: NodeId,
     ) -> Result<(), Error> {
-        let parent = required(self.ast(left)?.node(left)?.parent(), "coalescing parent")?;
-        let grandparent = self.ast(parent)?.node(parent)?.parent();
+        let parent = required(self.node(left)?.parent(), "coalescing parent")?;
+        let grandparent = self.node(parent)?.parent();
         let grand = grandparent
             .map(|node| {
                 self.ast(node)?
@@ -71,29 +71,28 @@ impl CheckerState {
             .unwrap_or(false);
         if grand {
             let node = grandparent.unwrap();
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             let data = read
                 .data_source()
                 .as_binary_expression()
                 .ok_or(ts_arena::Error::InvalidGraph)?;
             let operand = required(data.left(), "coalescing enclosing left")?;
             let operator = required(data.operator_token(), "coalescing enclosing operator")?;
-            if self.ast(operand)?.node(operand)?.kind() == K::BinaryExpression
-                && self.ast(operator)?.node(operator)?.kind() == K::BarBarToken
+            if self.node(operand)?.kind() == K::BinaryExpression
+                && self.node(operator)?.kind() == K::BarBarToken
             {
                 self.nullish_mixing_error(operand, b"??", b"||")?;
             }
-        } else if self.ast(left)?.node(left)?.kind() == K::BinaryExpression {
+        } else if self.node(left)?.kind() == K::BinaryExpression {
             let token = required(
-                self.ast(left)?
-                    .node(left)?
+                self.node(left)?
                     .data_source()
                     .as_binary_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?
                     .operator_token(),
                 "left coalescing operator",
             )?;
-            let token = self.ast(token)?.node(token)?.kind();
+            let token = self.node(token)?.kind();
             if matches!(
                 token.known(),
                 Some(K::BarBarToken | K::AmpersandAmpersandToken)
@@ -108,17 +107,16 @@ impl CheckerState {
                     b"??",
                 )?;
             }
-        } else if self.ast(right)?.node(right)?.kind() == K::BinaryExpression {
+        } else if self.node(right)?.kind() == K::BinaryExpression {
             let token = required(
-                self.ast(right)?
-                    .node(right)?
+                self.node(right)?
                     .data_source()
                     .as_binary_expression()
                     .ok_or(ts_arena::Error::InvalidGraph)?
                     .operator_token(),
                 "right coalescing operator",
             )?;
-            if self.ast(token)?.node(token)?.kind() == K::AmpersandAmpersandToken {
+            if self.node(token)?.kind() == K::AmpersandAmpersandToken {
                 self.nullish_mixing_error(right, b"??", b"&&")?;
             }
         }
@@ -148,7 +146,7 @@ impl CheckerState {
     }
     fn skip_operator_outer(&self, mut node: NodeId) -> Result<NodeId, Error> {
         loop {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if matches!(
                 read.kind().known(),
                 Some(
@@ -169,7 +167,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSyntacticNullishnessSemantics
     fn syntactic_nullishness(&mut self, node: NodeId) -> Result<u8, Error> {
         let node = self.skip_operator_outer(node)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(
                 K::AwaitExpression
@@ -190,7 +188,7 @@ impl CheckerState {
                 let left = required(data.left(), "nullish left")?;
                 let right = required(data.right(), "nullish right")?;
                 let token = required(data.operator_token(), "nullish operator")?;
-                match self.ast(token)?.node(token)?.kind().known() {
+                match self.node(token)?.kind().known() {
                     Some(
                         K::BarBarToken
                         | K::BarBarEqualsToken
@@ -263,13 +261,10 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isSideEffectFree
     fn side_effect_free(&self, mut node: NodeId) -> Result<bool, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedExpression {
-            node = required(
-                self.ast(node)?.node(node)?.expression(),
-                "side effect parentheses",
-            )?;
+        while self.node(node)?.kind() == K::ParenthesizedExpression {
+            node = required(self.node(node)?.expression(), "side effect parentheses")?;
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(match read.kind().known() {
             Some(
                 K::Identifier
@@ -327,32 +322,31 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isIndirectCall
     fn indirect_call(&self, left: NodeId, right: NodeId) -> Result<bool, Error> {
-        let read = self.ast(left)?.node(left)?;
-        if read.kind() != K::NumericLiteral || self.ast(left)?.node_text(left)?.as_bytes() != b"0" {
+        let read = self.node(left)?;
+        if read.kind() != K::NumericLiteral || self.node_text(left)?.as_bytes() != b"0" {
             return Ok(false);
         }
         let binary = required(read.parent(), "indirect binary")?;
-        let Some(parent) = self.ast(binary)?.node(binary)?.parent() else {
+        let Some(parent) = self.node(binary)?.parent() else {
             return Ok(false);
         };
-        if self.ast(parent)?.node(parent)?.kind() != K::ParenthesizedExpression {
+        if self.node(parent)?.kind() != K::ParenthesizedExpression {
             return Ok(false);
         }
-        let Some(call) = self.ast(parent)?.node(parent)?.parent() else {
+        let Some(call) = self.node(parent)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(call)?.node(call)?;
+        let read = self.node(call)?;
         if !(read.kind() == K::CallExpression && read.expression() == Some(parent)
             || read.kind() == K::TaggedTemplateExpression)
         {
             return Ok(false);
         }
-        let read = self.ast(right)?.node(right)?;
+        let read = self.node(right)?;
         Ok(matches!(
             read.kind().known(),
             Some(K::PropertyAccessExpression | K::ElementAccessExpression)
-        ) || read.kind() == K::Identifier
-            && self.ast(right)?.node_text(right)?.as_bytes() == b"eval")
+        ) || read.kind() == K::Identifier && self.node_text(right)?.as_bytes() == b"eval")
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkNaNEquality
@@ -386,11 +380,8 @@ impl CheckerState {
         }
         let location = if left_nan { right } else { left };
         let mut expression = location;
-        while self.ast(expression)?.node(expression)?.kind() == K::ParenthesizedExpression {
-            expression = required(
-                self.ast(expression)?.node(expression)?.expression(),
-                "NaN parentheses",
-            )?;
+        while self.node(expression)?.kind() == K::ParenthesizedExpression {
+            expression = required(self.node(expression)?.expression(), "NaN parentheses")?;
         }
         let name = if ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             self.entity_name_text(expression)?
@@ -416,12 +407,10 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isGlobalNaN
     fn global_nan_expression(&mut self, mut node: NodeId) -> Result<bool, Error> {
-        while self.ast(node)?.node(node)?.kind() == K::ParenthesizedExpression {
-            node = required(self.ast(node)?.node(node)?.expression(), "NaN parentheses")?;
+        while self.node(node)?.kind() == K::ParenthesizedExpression {
+            node = required(self.node(node)?.expression(), "NaN parentheses")?;
         }
-        if self.ast(node)?.node(node)?.kind() != K::Identifier
-            || self.ast(node)?.node_text(node)?.as_bytes() != b"NaN"
-        {
+        if self.node(node)?.kind() != K::Identifier || self.node_text(node)?.as_bytes() != b"NaN" {
             return Ok(false);
         }
         let global =
@@ -431,7 +420,7 @@ impl CheckerState {
     // port: tsc/internal/checker/utilities.go:isLiteralExpressionOfObject
     pub(crate) fn object_literal_equality_operand(&self, node: NodeId) -> Result<bool, Error> {
         Ok(matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(
                 K::ObjectLiteralExpression
                     | K::ArrayLiteralExpression

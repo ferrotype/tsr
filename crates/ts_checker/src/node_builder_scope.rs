@@ -4,7 +4,7 @@ use super::{NameTable, NameTableId};
 use crate::node_builder::NodeBuilder;
 use crate::Error;
 use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
+use ts_ast::{symbol_flags as sf, SymbolTableId, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     fn name_table(id: NameTableId, table: Option<SymbolTableId>) -> NameTable {
@@ -23,12 +23,12 @@ impl NodeBuilder<'_> {
     ) -> Result<bool, Error> {
         let mut location = enclosing;
         while let Some(node) = location {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             let kind = read.kind();
             let parent = read.parent();
             let global_source = kind == K::SourceFile
                 && !ts_ast::utilities::is_external_or_common_js_module(
-                    &self.checker.ast(node)?.source_file(node)?,
+                    &self.checker.source_file_read(node)?,
                 );
             let locals = self
                 .checker
@@ -42,9 +42,7 @@ impl NodeBuilder<'_> {
             }
             match kind.known() {
                 Some(K::SourceFile | K::ModuleDeclaration) if !global_source => {
-                    if self.checker.ast(node)?.node(node)?.flags() & ts_ast::node_flags::REPARSED
-                        != 0
-                    {
+                    if self.checker.node(node)?.flags() & ts_ast::node_flags::REPARSED != 0 {
                         return Err(Error::Unsupported(
                             "someSymbolTableInScope: reparsed module",
                         ));
@@ -70,14 +68,12 @@ impl NodeBuilder<'_> {
                         NameTableId::Members(symbol),
                         self.checker.symbol(symbol)?.members(),
                     );
-                    if !self.name_table_entries(&table)?.is_empty()
-                        && callback(self, table, Some(node))?
-                    {
+                    if self.name_table_has_symbols(&table)? && callback(self, table, Some(node))? {
                         return Ok(true);
                     }
                     if kind == K::ClassExpression {
-                        if let Some(name) = self.checker.ast(node)?.node(node)?.name() {
-                            let name = self.checker.ast(name)?.node_text(name)?.into_js_string();
+                        if let Some(name) = self.checker.node(node)?.name() {
+                            let name = self.checker.node_text(name)?.into_js_string();
                             if !name.is_empty() {
                                 let table = NameTable {
                                     id: NameTableId::Locals(node),
@@ -127,25 +123,48 @@ impl NodeBuilder<'_> {
         Ok(value)
     }
 
-    pub(super) fn name_table_entries(
-        &self,
-        table: &NameTable,
-    ) -> Result<Vec<(JsString, SymbolId)>, Error> {
-        if let Some(value) = &table.singleton {
-            return Ok(vec![value.clone()]);
+    /// Whether a name table has any symbol (a members table counts only its
+    /// type members), without listing them.
+    pub(super) fn name_table_has_symbols(&self, table: &NameTable) -> Result<bool, Error> {
+        if table.singleton.is_some() {
+            return Ok(true);
         }
         let Some(id) = table.table else {
-            return Ok(vec![]);
+            return Ok(false);
         };
-        let mut result = Vec::new();
-        for (name, value) in self.checker.table(id)? {
+        for (_, value) in self.checker.table(id)? {
             if let Some(value) = value {
                 if matches!(table.id, NameTableId::Members(_))
                     && self.checker.symbol(value)?.flags() & (sf::TYPE & !sf::ASSIGNMENT) == 0
                 {
                     continue;
                 }
-                result.push((JsString::from_bytes(name), value));
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// The symbols of a name table in table order (a members table keeps only
+    /// its type members). No caller needs the names, and copying every name of
+    /// the globals table per lookup was most of the display path's allocation.
+    pub(super) fn name_table_symbols(&self, table: &NameTable) -> Result<Vec<SymbolId>, Error> {
+        if let Some((_, value)) = &table.singleton {
+            return Ok(vec![*value]);
+        }
+        let Some(id) = table.table else {
+            return Ok(vec![]);
+        };
+        let read = self.checker.table(id)?;
+        let mut result = Vec::with_capacity(read.len());
+        for (_, value) in read {
+            if let Some(value) = value {
+                if matches!(table.id, NameTableId::Members(_))
+                    && self.checker.symbol(value)?.flags() & (sf::TYPE & !sf::ASSIGNMENT) == 0
+                {
+                    continue;
+                }
+                result.push(value);
             }
         }
         Ok(result)

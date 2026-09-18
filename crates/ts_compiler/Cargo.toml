@@ -8,6 +8,11 @@ publish.workspace = true
 
 [features]
 relation-probe = ["ts_checker/relation-probe"]
+# S08 P7 measurement executables (`data/s08/checker-workload.json`): the normal
+# timing binary has neither; phase timing adds nested exclusive clocks;
+# allocation adds the counting allocator wrapper.
+s08-phase-timer = []
+s08-allocation = ["ts_checker/storage-pilot"]
 
 [[example]]
 name = "p3_relations"
@@ -16,6 +21,14 @@ required-features = ["relation-probe"]
 [[example]]
 name = "p3_comparators"
 required-features = ["relation-probe"]
+
+[[example]]
+name = "p7_relater"
+required-features = ["relation-probe"]
+
+[[example]]
+name = "p7_census"
+required-features = ["s08-allocation"]
 
 [dependencies]
 stacker = "=0.1.25"
@@ -44,3 +57,6 @@ serde = { version = "1", features = ["derive"] }
 ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
 serde_json = "1"
 sha2 = "0.10"
+mimalloc = "=0.1.48"
+cap = { version = "=0.1.2", features = ["stats"] }
+s08_relater_prototype = { version = "0.1.0", path = "../../tools/s08/relater-prototype" }

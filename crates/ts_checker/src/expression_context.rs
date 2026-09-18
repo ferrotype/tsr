@@ -32,7 +32,7 @@ impl CheckerState {
         node: NodeId,
         context_flags: u32,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::IN_WITH_STATEMENT != 0 {
             return Ok(None);
         }
@@ -52,11 +52,11 @@ impl CheckerState {
                 return self.get_type_from_type_node(annotation).map(Some);
             }
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let Some(parent) = read.parent() else {
             return Ok(None);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         match read.kind().known() {
             Some(
                 K::VariableDeclaration
@@ -82,14 +82,14 @@ impl CheckerState {
                         return Ok(Some(ty));
                     }
                 }
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if read.kind() == K::PropertyDeclaration
                     && read.modifier_flags(self.ast(parent)?)? & ts_ast::modifier_flags::STATIC != 0
                 {
                     let class = read
                         .parent()
                         .ok_or(Error::MissingLink("static property class"))?;
-                    if self.ast(class)?.node(class)?.kind() == K::ClassExpression {
+                    if self.node(class)?.kind() == K::ClassExpression {
                         if let Some(context) =
                             self.contextual_expression_type_ex(class, context_flags)?
                         {
@@ -102,9 +102,9 @@ impl CheckerState {
                         }
                     }
                 }
-                let read = self.ast(parent)?.node(parent)?;
+                let read = self.node(parent)?;
                 if let Some(name) = read.name() {
-                    let name = self.ast(name)?.node(name)?;
+                    let name = self.node(name)?;
                     if context_flags & 8 == 0
                         && matches!(
                             name.kind().known(),
@@ -170,8 +170,8 @@ impl CheckerState {
             }
             Some(K::TemplateSpan) => {
                 let template = read.parent().ok_or(Error::MissingLink("template parent"))?;
-                if let Some(parent) = self.ast(template)?.node(template)?.parent() {
-                    if self.ast(parent)?.node(parent)?.kind() == K::TaggedTemplateExpression {
+                if let Some(parent) = self.node(template)?.parent() {
+                    if self.node(parent)?.kind() == K::TaggedTemplateExpression {
                         let args = self.effective_call_arguments(parent)?;
                         let Some(index) = args.iter().position(|&argument| argument == node) else {
                             return Ok(None);
@@ -223,7 +223,7 @@ impl CheckerState {
                 let token = data
                     .operator_token()
                     .ok_or(Error::MissingLink("binary operator"))?;
-                match self.ast(token)?.node(token)?.kind().known() {
+                match self.node(token)?.kind().known() {
                     Some(
                         K::EqualsToken
                         | K::AmpersandAmpersandEqualsToken
@@ -231,7 +231,7 @@ impl CheckerState {
                         | K::QuestionQuestionEqualsToken,
                     ) if right == Some(node) => {
                         let root = self.leftmost_context_expression(left)?;
-                        if self.ast(root)?.node(root)?.kind() == K::Identifier {
+                        if self.node(root)?.kind() == K::Identifier {
                             let symbol = self.resolved_value_symbol(root)?;
                             if self.symbol(symbol)?.flags() & sf::MODULE_EXPORTS != 0 {
                                 return Ok(None);
@@ -299,7 +299,7 @@ impl CheckerState {
         node: NodeId,
         context_flags: u32,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let object_method = read.kind() == K::MethodDeclaration
             && read
                 .parent()
@@ -338,7 +338,7 @@ impl CheckerState {
             )?
             .ok_or(Error::MissingLink("apparent contextual type"))?;
         if self.types.flags(ty)? & tf::UNION != 0
-            && self.ast(node)?.node(node)?.kind() == K::ObjectLiteralExpression
+            && self.node(node)?.kind() == K::ObjectLiteralExpression
         {
             return self.discriminate_object_context(node, ty).map(Some);
         }
@@ -347,7 +347,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isValidConstAssertionArgument
     pub(crate) fn valid_const_assertion_argument(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::StringLiteral
@@ -371,7 +371,7 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("const prefix"))?;
                 let operand = data.operand().ok_or(Error::MissingLink("const operand"))?;
                 let operator = data.operator();
-                let kind = self.ast(operand)?.node(operand)?.kind();
+                let kind = self.node(operand)?.kind();
                 Ok(operator == K::MinusToken
                     && matches!(kind.known(), Some(K::NumericLiteral | K::BigIntLiteral))
                     || operator == K::PlusToken && kind == K::NumericLiteral)
@@ -380,7 +380,7 @@ impl CheckerState {
                 let mut expression = read
                     .expression()
                     .ok_or(Error::MissingLink("const access"))?;
-                while self.ast(expression)?.node(expression)?.kind() == K::ParenthesizedExpression {
+                while self.node(expression)?.kind() == K::ParenthesizedExpression {
                     expression = self
                         .ast(expression)?
                         .node(expression)?
@@ -405,10 +405,10 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isConstContext
     pub(crate) fn is_const_context(&mut self, node: NodeId) -> Result<bool, Error> {
-        let Some(parent) = self.ast(node)?.node(node)?.parent() else {
+        let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         if ts_ast::utilities_middle::is_const_assertion(self.ast(parent)?, &read)? {
             return Ok(true);
         }
@@ -422,7 +422,7 @@ impl CheckerState {
                 }
             }
         }
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         match read.kind().known() {
             Some(K::ParenthesizedExpression | K::ArrayLiteralExpression | K::SpreadElement) => {
                 self.is_const_context(parent)
@@ -446,7 +446,7 @@ impl CheckerState {
             return self.get_regular_type_of_literal_type(ty);
         }
         if matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::AsExpression | K::TypeAssertionExpression)
         ) {
             return Ok(ty);
@@ -494,7 +494,7 @@ impl CheckerState {
             .node(node)?
             .name()
             .ok_or(Error::MissingLink("import attribute name"))?;
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let global = self.global_import_attributes_type()?;
         self.type_of_property_of_contextual_type(global, text.as_bytes())
     }

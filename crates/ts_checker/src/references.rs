@@ -22,7 +22,7 @@ impl CheckerState {
             let declarations = self.symbol_declarations(symbol)?.to_vec();
             let mut declaration = None;
             for node in declarations.into_iter().flatten() {
-                if self.ast(node)?.node(node)?.kind() == K::InterfaceDeclaration {
+                if self.node(node)?.kind() == K::InterfaceDeclaration {
                     declaration = Some(node);
                     break;
                 }
@@ -107,14 +107,14 @@ impl CheckerState {
     }
 
     pub(crate) fn interface_base_nodes(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let clauses = read
             .data_source()
             .as_interface_declaration()
             .ok_or(Error::MissingLink("interface payload"))?
             .heritage_clauses();
         for clause in self.source_list(node, clauses)? {
-            let read = self.ast(clause)?.node(clause)?;
+            let read = self.node(clause)?;
             let clause_data = read
                 .data_source()
                 .as_heritage_clause()
@@ -136,7 +136,7 @@ impl CheckerState {
             .into_iter()
             .flatten()
         {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             if read.kind() != K::InterfaceDeclaration {
                 continue;
             }
@@ -165,7 +165,7 @@ impl CheckerState {
         node: NodeId,
         ignore_errors: bool,
     ) -> Result<Option<SymbolId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::ImportType {
             self.type_from_import_node(node)?;
             return Ok(self.query.resolved_symbols.try_get(node).copied().flatten());
@@ -188,7 +188,7 @@ impl CheckerState {
         node: NodeId,
         ignore_errors: bool,
     ) -> Result<SymbolId, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let name = match read.kind().known() {
             Some(K::TypeReference) => read
                 .data_source()
@@ -235,7 +235,7 @@ impl CheckerState {
         if self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0
             && self.symbol(symbol)?.check_flags() & ts_ast::check_flags::UNRESOLVED != 0
         {
-            let nodes = self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+            let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
             let arguments = nodes
                 .into_iter()
                 .map(|node| self.get_type_from_type_node(node))
@@ -257,8 +257,7 @@ impl CheckerState {
         }
         let ty = self.get_declared_type_of_symbol(symbol)?;
         let flags = self.symbol(symbol)?.flags();
-        let argument_nodes =
-            self.source_list(node, self.ast(node)?.node(node)?.type_argument_list())?;
+        let argument_nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         if flags & (sf::CLASS | sf::INTERFACE) != 0 {
             let interface = self.types.interface(ty)?;
             let outer_count = interface.outer_type_parameter_count as usize;
@@ -268,7 +267,7 @@ impl CheckerState {
                 if !self.check_class_reference_arity(node, ty, &argument_nodes, &parameters)? {
                     return Ok(self.builtins.error_type);
                 }
-                if self.ast(node)?.node(node)?.kind() == K::TypeReference
+                if self.node(node)?.kind() == K::TypeReference
                     && self.is_deferred_type_reference_node(
                         node,
                         argument_nodes.len() != parameters.len(),
@@ -330,7 +329,7 @@ impl CheckerState {
         parameters: &[TypeId],
     ) -> Result<bool, Error> {
         let minimum = self.min_type_argument_count(parameters)?;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let is_js = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let options = self.program()?.host.options();
         if is_js && !options.strict_option_value(options.no_implicit_any)
@@ -342,7 +341,7 @@ impl CheckerState {
         let missing_augments = is_js
             && read.kind() == K::ExpressionWithTypeArguments
             && match parent {
-                Some(parent) => self.ast(parent)?.node(parent)?.kind() != K::JSDocAugmentsTag,
+                Some(parent) => self.node(parent)?.kind() != K::JSDocAugmentsTag,
                 None => true,
             };
         let message = if missing_augments {
@@ -407,7 +406,7 @@ impl CheckerState {
         node: NodeId,
         parameters: &[TypeId],
     ) -> Result<TypeList, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let in_js = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
         let nodes = self.source_list(node, read.type_argument_list())?;
         let mut arguments = Vec::with_capacity(nodes.len());
@@ -432,7 +431,7 @@ impl CheckerState {
         if defaults {
             return Ok(true);
         }
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         let nodes = if read.kind() == K::TypeReference {
             self.source_list(node, read.type_argument_list())?
         } else if read.kind() == K::ArrayType {
@@ -454,9 +453,9 @@ impl CheckerState {
     }
 
     fn is_resolved_by_type_alias(&self, node: NodeId) -> Result<bool, Error> {
-        let mut parent = self.ast(node)?.node(node)?.parent();
+        let mut parent = self.node(node)?.parent();
         while let Some(node) = parent {
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration) => return Ok(true),
                 Some(
@@ -478,7 +477,7 @@ impl CheckerState {
     }
 
     fn may_resolve_type_alias(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::TypeReference) => {
                 let symbol = self.resolve_type_reference_symbol(node, false)?;
@@ -487,7 +486,7 @@ impl CheckerState {
             Some(K::TypeQuery) => Ok(true),
             Some(K::RestType) => {
                 let node = read.type_node().ok_or(Error::MissingLink("rest type"))?;
-                if self.ast(node)?.node(node)?.kind() != K::ArrayType {
+                if self.node(node)?.kind() != K::ArrayType {
                     return Ok(true);
                 }
                 let element = self
@@ -575,7 +574,7 @@ impl CheckerState {
             let Some(node) = node else {
                 return Ok([].into());
             };
-            let read = self.ast(node)?.node(node)?;
+            let read = self.node(node)?;
             match read.kind().known() {
                 Some(K::TypeReference) => {
                     let local = self.effective_type_arguments(node, &parameters[outer_count..])?;

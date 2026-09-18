@@ -253,6 +253,8 @@ pub mod storage_families;
 pub mod storage_pilot;
 
 pub use flags::*;
+#[cfg(feature = "relation-probe")]
+pub use handles::{LiteralShape, SignatureShape};
 pub use handles::{
     MemberSpec, NodeRef, RetainedNode, RetainedSignature, RetainedSymbol, RetainedType,
     RetainedTypeList, SignatureRef, SymbolRef, TypeNodeBuilder, TypeRef,

@@ -51,7 +51,7 @@ impl CheckerState {
             let mut node = None;
             if write {
                 for declaration in self.symbol_declarations(property)?.iter().flatten() {
-                    if self.ast(declaration)?.node(declaration)?.kind() == K::SetAccessor {
+                    if self.node(declaration)?.kind() == K::SetAccessor {
                         node = Some(declaration);
                         break;
                     }
@@ -59,7 +59,7 @@ impl CheckerState {
             }
             if node.is_none() && read.flags() & sf::GET_ACCESSOR != 0 {
                 for declaration in self.symbol_declarations(property)?.iter().flatten() {
-                    if self.ast(declaration)?.node(declaration)?.kind() == K::GetAccessor {
+                    if self.node(declaration)?.kind() == K::GetAccessor {
                         node = Some(declaration);
                         break;
                     }

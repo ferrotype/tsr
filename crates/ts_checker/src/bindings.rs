@@ -27,7 +27,7 @@ impl CheckerState {
         &mut self,
         declaration: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let name = read
             .property_name()
             .or(read.name())
@@ -35,14 +35,14 @@ impl CheckerState {
         if self.is_binding_pattern(name)? {
             return Ok(None);
         }
-        if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+        if self.node(name)?.kind() == K::ComputedPropertyName {
             let expression = self
                 .ast(name)?
                 .node(name)?
                 .expression()
                 .ok_or(Error::MissingLink("computed binding name"))?;
             if !matches!(
-                self.ast(expression)?.node(expression)?.kind().known(),
+                self.node(expression)?.kind().known(),
                 Some(K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral)
             ) {
                 return Ok(None);
@@ -56,7 +56,7 @@ impl CheckerState {
             .node(pattern)?
             .parent()
             .ok_or(Error::MissingLink("binding context parent"))?;
-        let read = self.ast(parent)?.node(parent)?;
+        let read = self.node(parent)?;
         let mut ty = if let Some(annotation) = read.type_node() {
             Some(self.get_type_from_type_node(annotation)?)
         } else if read.kind() == K::Parameter {
@@ -67,8 +67,8 @@ impl CheckerState {
             None
         };
         if ty.is_none()
-            && self.ast(parent)?.node(parent)?.kind() != K::BindingElement
-            && self.ast(parent)?.node(parent)?.initializer().is_some()
+            && self.node(parent)?.kind() != K::BindingElement
+            && self.node(parent)?.initializer().is_some()
         {
             let mode = if self.binding_is_rest(declaration)? {
                 32
@@ -80,9 +80,8 @@ impl CheckerState {
         let Some(ty) = ty else {
             return Ok(None);
         };
-        if self.ast(pattern)?.node(pattern)?.kind() == K::ArrayBindingPattern {
-            let elements =
-                self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?;
+        if self.node(pattern)?.kind() == K::ArrayBindingPattern {
+            let elements = self.source_list(pattern, self.node(pattern)?.element_list())?;
             let Some(index) = elements.iter().position(|&node| node == declaration) else {
                 return Ok(None);
             };
@@ -106,10 +105,8 @@ impl CheckerState {
         pattern: NodeId,
     ) -> Result<TypeId, Error> {
         let mut missing = Vec::new();
-        for element in
-            self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?
-        {
-            let read = self.ast(element)?.node(element)?;
+        for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
+            let read = self.node(element)?;
             if read.initializer().is_some() {
                 let name = read
                     .property_name()
@@ -134,7 +131,7 @@ impl CheckerState {
             members.insert(self.symbol(property)?.name_to_owned(), Some(property));
         }
         for element in missing {
-            let read = self.ast(element)?.node(element)?;
+            let read = self.node(element)?;
             let name = read
                 .property_name()
                 .or(read.name())
@@ -162,8 +159,7 @@ impl CheckerState {
         ty: TypeId,
         pattern: NodeId,
     ) -> Result<TypeId, Error> {
-        let elements =
-            self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?;
+        let elements = self.source_list(pattern, self.node(pattern)?.element_list())?;
         let tuple = self.types.tuple(self.types.target(ty)?)?;
         let readonly = tuple.readonly;
         let mut infos = tuple.element_infos.to_vec();
@@ -178,7 +174,7 @@ impl CheckerState {
             if index + 1 == elements.len() && self.binding_is_rest(element)? {
                 continue;
             }
-            let read = self.ast(element)?.node(element)?;
+            let read = self.node(element)?;
             let omitted = read.kind() == K::OmittedExpression;
             let default = read.initializer().is_some();
             types.push(if !omitted && default {
@@ -199,13 +195,13 @@ impl CheckerState {
 
     pub(crate) fn is_binding_pattern(&self, node: NodeId) -> Result<bool, Error> {
         Ok(matches!(
-            self.ast(node)?.node(node)?.kind().known(),
+            self.node(node)?.kind().known(),
             Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
         ))
     }
 
     pub(crate) fn binding_is_rest(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(
             if let Some(data) = read.data_source().as_binding_element() {
                 data.dot_dot_dot_token().is_some()
@@ -222,7 +218,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<TypeId, Error> {
-        match self.ast(node)?.node(node)?.kind().known() {
+        match self.node(node)?.kind().known() {
             Some(K::PrivateIdentifier) => Ok(self.builtins.never_type),
             Some(K::NumericLiteral) => {
                 let ty = self.check_expression(node)?;
@@ -233,11 +229,11 @@ impl CheckerState {
                 self.get_regular_type_of_literal_type(ty)
             }
             Some(K::Identifier | K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
-                let text = self.ast(node)?.node_text(node)?.into_js_string();
+                let text = self.node_text(node)?.into_js_string();
                 self.get_string_literal_type(text)
             }
             _ => {
-                if ts_ast::utilities::is_expression_kind(self.ast(node)?.node(node)?.kind()) {
+                if ts_ast::utilities::is_expression_kind(self.node(node)?.kind()) {
                     let ty = self.check_expression(node)?;
                     self.get_regular_type_of_literal_type(ty)
                 } else {
@@ -312,7 +308,7 @@ impl CheckerState {
         if self.types.flags(parent_type)? & tf::ANY != 0 {
             return Ok(parent_type);
         }
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         let pattern = read.parent().ok_or(Error::MissingLink("binding pattern"))?;
         let parent = self
             .ast(pattern)?
@@ -322,14 +318,14 @@ impl CheckerState {
         let ambient = read.flags() & nf::AMBIENT != 0;
         let initializer = read.initializer();
         let rest = self.binding_is_rest(declaration)?;
-        let parent_initializer = self.ast(parent)?.node(parent)?.initializer();
+        let parent_initializer = self.node(parent)?.initializer();
         let root = self.root_binding_declaration(declaration)?;
-        let parameter = self.ast(root)?.node(root)?.kind() == K::Parameter;
+        let parameter = self.node(root)?.kind() == K::Parameter;
         if self.options.strict_null_checks && ambient && parameter {
             parent_type = self.non_nullable_type(parent_type)?;
         } else if self.options.strict_null_checks {
             if let Some(initializer) = parent_initializer {
-                let initialized = self.get_type_of_expression(initializer)?;
+                let initialized = self.type_of_initializer(initializer)?;
                 if self.type_facts(initialized, facts::EQ_UNDEFINED)? == 0 {
                     parent_type = self.type_with_facts(parent_type, facts::NE_UNDEFINED)?;
                 }
@@ -341,7 +337,7 @@ impl CheckerState {
             } else {
                 0
             };
-        let mut ty = match self.ast(pattern)?.node(pattern)?.kind().known() {
+        let mut ty = match self.node(pattern)?.kind().known() {
             Some(K::ObjectBindingPattern) => {
                 if rest {
                     parent_type = self.get_reduced_type(parent_type)?;
@@ -356,11 +352,9 @@ impl CheckerState {
                         return Ok(self.builtins.error_type);
                     }
                     let mut properties = Vec::new();
-                    for element in
-                        self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?
-                    {
+                    for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
                         if !self.binding_is_rest(element)? {
-                            let read = self.ast(element)?.node(element)?;
+                            let read = self.node(element)?;
                             properties.push(
                                 read.property_name()
                                     .or(read.name())
@@ -375,7 +369,7 @@ impl CheckerState {
                         .ast(declaration)?
                         .node(declaration)?
                         .property_name()
-                        .or(self.ast(declaration)?.node(declaration)?.name())
+                        .or(self.node(declaration)?.name())
                         .ok_or(Error::MissingLink("binding property name"))?;
                     let index = self.literal_type_from_property_name(name)?;
                     let declared =
@@ -397,8 +391,7 @@ impl CheckerState {
                     self.builtins.undefined_type,
                     Some(pattern),
                 )?;
-                let elements =
-                    self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?;
+                let elements = self.source_list(pattern, self.node(pattern)?.element_list())?;
                 let index = elements
                     .iter()
                     .position(|&node| node == declaration)
@@ -433,7 +426,7 @@ impl CheckerState {
                 } else if self.is_array_like_type(parent_type)? {
                     let index =
                         self.get_number_literal_type(ts_jsnum::Number::new(index as f64))?;
-                    let name = self.ast(declaration)?.node(declaration)?.name();
+                    let name = self.node(declaration)?.name();
                     let declared = self
                         .indexed_access_or_undefined(parent_type, index, access, name, None)?
                         .unwrap_or(self.builtins.error_type);
@@ -447,7 +440,7 @@ impl CheckerState {
         if initializer.is_none() {
             return Ok(ty);
         }
-        if self.ast(root)?.node(root)?.type_node().is_some() {
+        if self.node(root)?.type_node().is_some() {
             if self.options.strict_null_checks {
                 let initial = self.check_declaration_initializer(declaration, 0, None)?;
                 if self.type_facts(initial, facts::IS_UNDEFINED)? == 0 {
@@ -468,7 +461,7 @@ impl CheckerState {
         &self,
         mut declaration: NodeId,
     ) -> Result<NodeId, Error> {
-        while self.ast(declaration)?.node(declaration)?.kind() == K::BindingElement
+        while self.node(declaration)?.kind() == K::BindingElement
             || self.is_binding_pattern(declaration)?
         {
             declaration = self
@@ -513,6 +506,18 @@ impl CheckerState {
         self.type_with_facts(ty, facts::NE_UNDEFINED)
     }
 
+    /// The cached type of an initializer when the variable's type was inferred
+    /// from it; otherwise computed now without caching, so transient types are
+    /// reflected. Re-checking the initializer here once per binding element
+    /// cloned the pattern's contextual type each time.
+    // port: tsc/internal/checker/flow.go:Checker.getTypeOfInitializer
+    pub(crate) fn type_of_initializer(&mut self, node: NodeId) -> Result<TypeId, Error> {
+        if let Some(Some(ty)) = self.query.type_nodes.try_get(node) {
+            return Ok(*ty);
+        }
+        self.get_type_of_expression(node)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromBindingPattern
     pub(crate) fn type_from_binding_pattern(
         &mut self,
@@ -523,7 +528,7 @@ impl CheckerState {
         if include_pattern {
             self.bindings.contextual_patterns.push(pattern);
         }
-        let result = if self.ast(pattern)?.node(pattern)?.kind() == K::ObjectBindingPattern {
+        let result = if self.node(pattern)?.kind() == K::ObjectBindingPattern {
             self.type_from_object_binding_pattern(pattern, include_pattern, report)
         } else {
             self.type_from_array_binding_pattern(pattern, include_pattern, report)
@@ -544,9 +549,7 @@ impl CheckerState {
         let mut members = SymbolTable::default();
         let mut string_index = None;
         let mut flags = of::OBJECT_LITERAL | of::CONTAINS_OBJECT_OR_ARRAY_LITERAL;
-        for element in
-            self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?
-        {
+        for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
             if self.binding_is_rest(element)? {
                 string_index = Some(self.signatures.new_index_info(
                     self.builtins.string_type,
@@ -557,7 +560,7 @@ impl CheckerState {
                 )?);
                 continue;
             }
-            let read = self.ast(element)?.node(element)?;
+            let read = self.node(element)?;
             let optional = read.initializer().is_some();
             let name = read
                 .property_name()
@@ -593,8 +596,7 @@ impl CheckerState {
         include_pattern: bool,
         report: bool,
     ) -> Result<TypeId, Error> {
-        let elements =
-            self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?;
+        let elements = self.source_list(pattern, self.node(pattern)?.element_list())?;
         let rest = match elements.last().copied() {
             Some(last) if self.binding_is_rest(last)? => Some(last),
             _ => None,
@@ -612,7 +614,7 @@ impl CheckerState {
         }
         let mut minimum = 0;
         for (i, &element) in elements.iter().enumerate() {
-            let read = self.ast(element)?.node(element)?;
+            let read = self.node(element)?;
             if Some(element) != rest && read.name().is_some() && read.initializer().is_none() {
                 minimum = i + 1;
             }
@@ -620,7 +622,7 @@ impl CheckerState {
         let mut types = Vec::with_capacity(elements.len());
         let mut infos = Vec::with_capacity(elements.len());
         for (i, &element) in elements.iter().enumerate() {
-            types.push(if self.ast(element)?.node(element)?.name().is_none() {
+            types.push(if self.node(element)?.name().is_none() {
                 self.builtins.any_type
             } else {
                 self.type_from_binding_element(element, include_pattern, report)?
@@ -666,7 +668,7 @@ impl CheckerState {
         include_pattern: bool,
         report: bool,
     ) -> Result<TypeId, Error> {
-        let read = self.ast(element)?.node(element)?;
+        let read = self.node(element)?;
         let initializer = read.initializer();
         let name = read
             .name()
@@ -698,14 +700,14 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.declarationBelongsToPrivateAmbientMember
     pub(crate) fn binding_private_ambient(&self, declaration: NodeId) -> Result<bool, Error> {
         let mut root = self.root_binding_declaration(declaration)?;
-        if self.ast(root)?.node(root)?.kind() == K::Parameter {
+        if self.node(root)?.kind() == K::Parameter {
             root = self
                 .ast(root)?
                 .node(root)?
                 .parent()
                 .ok_or(Error::MissingLink("private ambient function"))?;
         }
-        let read = self.ast(root)?.node(root)?;
+        let read = self.node(root)?;
         Ok(read.flags() & nf::AMBIENT != 0
             && (read.modifier_flags(self.ast(root)?)? & ts_ast::modifier_flags::PRIVATE != 0
                 || ts_ast::utilities::is_private_identifier_class_element_declaration(
@@ -720,12 +722,10 @@ impl CheckerState {
         pattern: NodeId,
         parent_type: TypeId,
     ) -> Result<(), Error> {
-        for element in
-            self.source_list(pattern, self.ast(pattern)?.node(pattern)?.element_list())?
-        {
-            if let Some(name) = self.ast(element)?.node(element)?.name() {
+        for element in self.source_list(pattern, self.node(pattern)?.element_list())? {
+            if let Some(name) = self.node(element)?.name() {
                 let ty = self.binding_element_type_from_parent(element, parent_type, false)?;
-                if self.ast(name)?.node(name)?.kind() == K::Identifier {
+                if self.node(name)?.kind() == K::Identifier {
                     let symbol = self
                         .get_symbol_of_declaration(element)?
                         .ok_or(Error::MissingLink("assigned binding symbol"))?;

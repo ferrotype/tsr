@@ -191,7 +191,7 @@ impl CheckerState {
         reference: NodeId,
         expression: NodeId,
     ) -> Result<bool, Error> {
-        let read = self.ast(expression)?.node(expression)?;
+        let read = self.node(expression)?;
         let property = if read.kind() == K::PropertyAccessExpression {
             read.name()
         } else if read.kind() == K::ElementAccessExpression {
@@ -202,7 +202,7 @@ impl CheckerState {
             match argument {
                 Some(argument)
                     if matches!(
-                        self.ast(argument)?.node(argument)?.kind().known(),
+                        self.node(argument)?.kind().known(),
                         Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
                     ) =>
                 {
@@ -216,7 +216,7 @@ impl CheckerState {
         let Some(property) = property else {
             return Ok(false);
         };
-        if self.ast(property)?.node_text(property)?.as_bytes() != b"constructor" {
+        if self.node_text(property)?.as_bytes() != b"constructor" {
             return Ok(false);
         }
         let object = read

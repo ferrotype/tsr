@@ -76,12 +76,12 @@ impl CheckerState {
         // Shared source rules precede the operator result. Calls/enum guards are
         // a separate source check; unresolved dependencies remain explicit.
         if ts_ast::utilities::is_logical_or_coalescing_binary_operator(operator) {
-            let mut parent = match self.ast(left)?.node(left)?.parent() {
-                Some(parent) => self.ast(parent)?.node(parent)?.parent(),
+            let mut parent = match self.node(left)?.parent() {
+                Some(parent) => self.node(parent)?.parent(),
                 None => None,
             };
             while let Some(node) = parent {
-                if self.ast(node)?.node(node)?.kind() != K::ParenthesizedExpression
+                if self.node(node)?.kind() != K::ParenthesizedExpression
                     && !ts_ast::utilities::is_logical_or_coalescing_binary_expression(
                         self.ast(node)?,
                         node,
@@ -89,7 +89,7 @@ impl CheckerState {
                 {
                     break;
                 }
-                parent = self.ast(node)?.node(node)?.parent();
+                parent = self.node(node)?.parent();
             }
             if operator == K::AmpersandAmpersandToken
                 || parent
@@ -103,7 +103,7 @@ impl CheckerState {
                     .unwrap_or(false)
             {
                 let body = match parent {
-                    Some(node) if self.ast(node)?.node(node)?.kind() == K::IfStatement => self
+                    Some(node) if self.node(node)?.kind() == K::IfStatement => self
                         .ast(node)?
                         .node(node)?
                         .data_source()

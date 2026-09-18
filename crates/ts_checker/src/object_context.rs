@@ -225,7 +225,7 @@ impl CheckerState {
         element: NodeId,
         flags: u32,
     ) -> Result<Option<TypeId>, Error> {
-        let read = self.ast(element)?.node(element)?;
+        let read = self.node(element)?;
         if read.kind() != K::MethodDeclaration {
             if let Some(annotation) = read.type_node() {
                 return self.get_type_from_type_node(annotation).map(Some);
@@ -237,7 +237,7 @@ impl CheckerState {
         let Some(context) = self.apparent_contextual_expression_type_ex(object, flags)? else {
             return Ok(None);
         };
-        let name = self.ast(element)?.node(element)?.name();
+        let name = self.node(element)?.name();
         let dynamic = ts_ast::has_dynamic_name(self.ast(element)?, Some(element))?;
         let late = if dynamic {
             match self.late_name(element)? {
@@ -262,7 +262,7 @@ impl CheckerState {
             return self.contextual_property_type_ex(context, text.as_bytes(), key);
         }
         if let Some(name) = name {
-            if self.ast(name)?.node(name)?.kind() == K::ComputedPropertyName {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
                 let expression = self
                     .ast(name)?
                     .node(name)?

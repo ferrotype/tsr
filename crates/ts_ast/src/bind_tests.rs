@@ -282,7 +282,7 @@ fn exclusive_inline_bindings_preserve_presence_ids_and_shape_changes() {
                 symbol_flags::FUNCTION,
                 JsString::from_bytes(b"function".as_slice()),
             ));
-            let locals = builder.tables_mut().alloc(SymbolTable::new());
+            let locals = builder.tables_mut().alloc(SymbolTable::default());
             builder.set_node_symbol(function, Some(symbol))?;
             builder.set_node_local_symbol(function, Some(symbol))?;
             builder.set_node_locals(function, Some(locals))?;

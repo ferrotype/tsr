@@ -41,7 +41,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:isSpreadArgument
     pub(crate) fn is_spread_argument(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         Ok(read.kind() == K::SpreadElement
             || read.kind() == K::SyntheticExpression
                 && read
@@ -73,7 +73,7 @@ impl CheckerState {
         if let Some(label) = label {
             self.retain_flow_source(label)?;
         }
-        let range = self.ast(parent)?.node(parent)?.range();
+        let range = self.node(parent)?.range();
         let node = self.new_synthetic_expression(ty, spread, label)?;
         self.factory.set_node_range(node, range);
         self.factory.set_node_parent(node, Some(parent));
@@ -82,7 +82,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getEffectiveCallArguments
     pub(crate) fn effective_call_arguments(&mut self, node: NodeId) -> Result<Vec<NodeId>, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.kind() == K::TaggedTemplateExpression {
             return self.tagged_template_arguments(node);
         }
@@ -100,7 +100,7 @@ impl CheckerState {
         };
         let mut expanded = args[..start].to_vec();
         for &argument in &args[start..] {
-            let spread = if self.ast(argument)?.node(argument)?.kind() == K::SpreadElement {
+            let spread = if self.node(argument)?.kind() == K::SpreadElement {
                 let operand = self
                     .ast(argument)?
                     .node(argument)?
@@ -159,13 +159,11 @@ impl CheckerState {
         if count > 0 && start >= count - 1 {
             let argument = args[count - 1];
             if self.is_spread_argument(argument)? {
-                let synthetic =
-                    self.ast(argument)?.node(argument)?.kind() == K::SyntheticExpression;
+                let synthetic = self.node(argument)?.kind() == K::SyntheticExpression;
                 let operand = if synthetic {
                     argument
                 } else {
-                    self.ast(argument)?
-                        .node(argument)?
+                    self.node(argument)?
                         .expression()
                         .ok_or(Error::MissingLink("last spread operand"))?
                 };
@@ -198,13 +196,12 @@ impl CheckerState {
             .enumerate()
         {
             let index = start + offset;
-            let synthetic = self.ast(argument)?.node(argument)?.kind() == K::SyntheticExpression;
+            let synthetic = self.node(argument)?.kind() == K::SyntheticExpression;
             let (ty, flags) = if self.is_spread_argument(argument)? {
                 let operand = if synthetic {
                     argument
                 } else {
-                    self.ast(argument)?
-                        .node(argument)?
+                    self.node(argument)?
                         .expression()
                         .ok_or(Error::MissingLink("spread argument operand"))?
                 };
@@ -257,8 +254,7 @@ impl CheckerState {
                 )
             };
             let label = if synthetic {
-                self.ast(argument)?
-                    .node(argument)?
+                self.node(argument)?
                     .data_source()
                     .as_synthetic_expression()
                     .ok_or(Error::MissingLink("synthetic tuple label"))?

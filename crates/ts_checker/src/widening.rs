@@ -197,7 +197,7 @@ impl CheckerState {
                 return Ok(cached);
             }
         }
-        let mut members = ts_ast::SymbolTable::new();
+        let mut members = ts_ast::SymbolTable::default();
         for property in self.get_properties_of_type(ty)? {
             let name = self.symbol(property)?.name_to_owned();
             let widened = if self.symbol(property)?.flags() & sf::PROPERTY != 0 {

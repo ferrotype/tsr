@@ -1190,6 +1190,31 @@ fn validate_data(
     data.validate_references(node, list, raw, text)
 }
 
+impl AstBuilder {
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        self.storage
+            .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
+    }
+    /// Structural storage of this builder's arenas and stores: known bytes and
+    /// the count of entries whose allocation extent is not exposed.
+    pub fn structural_bytes(&self) -> (usize, usize) {
+        self.storage
+            .structural_bytes(crate::compact::CoreStore::structural_bytes)
+    }
+}
+
+impl AstFile {
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        self.0
+            .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
+    }
+    /// Structural storage of the published file(s) behind this handle.
+    pub fn structural_bytes(&self) -> (usize, usize) {
+        self.0
+            .structural_bytes(crate::compact::CoreStore::structural_bytes)
+    }
+}
+
 #[cfg(test)]
 mod validation_proof_tests {
     use super::*;

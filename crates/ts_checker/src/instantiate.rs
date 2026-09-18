@@ -91,7 +91,7 @@ impl CheckerState {
             return Ok(false);
         }
         for declaration in self.symbol_declarations(alias.symbol)?.iter().flatten() {
-            let read = self.ast(declaration)?.node(declaration)?;
+            let read = self.node(declaration)?;
             if !matches!(
                 read.kind().known(),
                 Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
@@ -100,7 +100,7 @@ impl CheckerState {
             }
             let mut parent = read.parent();
             while let Some(node) = parent {
-                let read = self.ast(node)?.node(node)?;
+                let read = self.node(node)?;
                 match read.kind().known() {
                     Some(K::SourceFile) => return Ok(true),
                     Some(K::ModuleDeclaration) => parent = read.parent(),
@@ -395,7 +395,7 @@ impl CheckerState {
         let Some(declaration) = declarations.first().flatten() else {
             return Ok(false);
         };
-        let read = self.ast(declaration)?.node(declaration)?;
+        let read = self.node(declaration)?;
         match read.kind().known() {
             Some(K::Parameter | K::PropertyDeclaration | K::PropertySignature) => {
                 self.is_thisless_variable(declaration)
@@ -421,7 +421,7 @@ impl CheckerState {
                     }
                 }
                 for parameter in self.source_list(declaration, read.type_parameter_list())? {
-                    let read = self.ast(parameter)?.node(parameter)?;
+                    let read = self.node(parameter)?;
                     let constraint = read
                         .data_source()
                         .as_type_parameter_declaration()
@@ -441,7 +441,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:isThislessVariableLikeDeclaration
     fn is_thisless_variable(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.type_node() {
             Some(annotation) => self.is_thisless_type_node(annotation),
             None => Ok(read.initializer().is_none()),
@@ -450,7 +450,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:isThislessType
     fn is_thisless_type_node(&self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(
                 K::AnyKeyword
@@ -704,13 +704,13 @@ impl CheckerState {
             .first()
             .flatten()
             .ok_or(Error::MissingLink("type parameter declaration"))?;
-        let container = self.ast(declaration)?.node(declaration)?.parent();
+        let container = self.node(declaration)?.parent();
         let mut ancestor = Some(node);
         while ancestor != container {
             let Some(current) = ancestor else {
                 return Ok(true);
             };
-            let read = self.ast(current)?.node(current)?;
+            let read = self.node(current)?;
             if read.kind() == K::Block {
                 return Ok(true);
             }
@@ -721,7 +721,7 @@ impl CheckerState {
                     }
                 }
             }
-            ancestor = self.ast(current)?.node(current)?.parent();
+            ancestor = self.node(current)?.parent();
         }
         self.contains_type_parameter_reference(parameter, node)
     }
@@ -732,7 +732,7 @@ impl CheckerState {
         node: ts_arena::NodeId,
     ) -> Result<bool, Error> {
         let is_this = self.types.type_parameter(parameter)?.is_this_type;
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         match read.kind().known() {
             Some(K::ThisType) => return Ok(is_this),
             Some(K::TypeReference) if !is_this && read.type_argument_list().is_none() => {
@@ -765,7 +765,7 @@ impl CheckerState {
                         .first()
                         .flatten()
                         .ok_or(Error::MissingLink("type parameter declaration"))?;
-                    let declaration_read = self.ast(declaration)?.node(declaration)?;
+                    let declaration_read = self.node(declaration)?;
                     let scope = if declaration_read.kind() == K::TypeParameter {
                         // Type parameter is a regular type parameter, e.g. foo<T>
                         declaration_read.parent()

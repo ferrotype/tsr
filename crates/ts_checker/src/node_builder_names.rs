@@ -18,7 +18,7 @@ mod containers;
 mod scope;
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
-pub(super) enum NameTableId {
+pub(crate) enum NameTableId {
     Locals(NodeId),
     Exports(SymbolId),
     Members(SymbolId),
@@ -41,7 +41,6 @@ struct NameQuery {
 #[derive(Default)]
 pub(super) struct NameAccess {
     chains: Map<(SymbolId, bool, Option<NodeId>, u32), Vec<SymbolId>>,
-    aliases: Map<NameTableId, Vec<SymbolId>>,
     visited: Set<(SymbolId, NameTableId)>,
     extended: Map<SymbolId, Vec<SymbolId>>,
     extended_by_file: Map<(SymbolId, NodeId), Vec<SymbolId>>,
@@ -190,7 +189,7 @@ impl NodeBuilder<'_> {
     }
     fn name_has_declaration_kind(&self, symbol: SymbolId, kind: K) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            if self.checker.ast(node)?.node(node)?.kind() == kind {
+            if self.checker.node(node)?.kind() == kind {
                 return Ok(true);
             }
         }
@@ -226,7 +225,7 @@ impl NodeBuilder<'_> {
             .collect();
         let mut file = None;
         for &declaration in &declarations {
-            if self.checker.ast(declaration)?.node(declaration)?.kind() == K::SourceFile {
+            if self.checker.node(declaration)?.kind() == K::SourceFile {
                 file = Some(declaration);
                 break;
             }
@@ -248,7 +247,7 @@ impl NodeBuilder<'_> {
                                     .iter()
                                     .flatten()
                                 {
-                                    if self.checker.ast(node)?.node(node)?.kind() == K::SourceFile {
+                                    if self.checker.node(node)?.kind() == K::SourceFile {
                                         file = Some(node);
                                         break;
                                     }
@@ -299,7 +298,7 @@ impl NodeBuilder<'_> {
             .module_source_file(symbol)?
             .ok_or(Error::MissingLink("module source file"))?;
         Ok(JsString::from_bytes(
-            self.checker.ast(source)?.source_file(source)?.file_name(),
+            self.checker.source_file_read(source)?.file_name(),
         ))
     }
 
@@ -455,7 +454,7 @@ impl NodeBuilder<'_> {
             let mut property = true;
             for node in declarations {
                 if !matches!(
-                    self.checker.ast(node)?.node(node)?.kind().known(),
+                    self.checker.node(node)?.kind().known(),
                     Some(
                         K::PropertyDeclaration
                             | K::MethodDeclaration
@@ -512,20 +511,43 @@ impl NodeBuilder<'_> {
         if matches!(table.id, NameTableId::Members(_)) {
             return Ok(vec![]);
         }
-        let cached = !matches!(table.id, NameTableId::Locals(_));
+        // Alias lists live on the checker (Go's symbolTableAliasCache) for the
+        // globals and exports tables and, beyond upstream's rule, for any locals
+        // table the binder owns: those are immutable once bound, and a module
+        // with n exported members otherwise scans n locals for each of its n
+        // display queries. Checker-owned locals (synthetic serialization scopes)
+        // stay uncached because they change while a scope is open.
+        let cached = match table.id {
+            NameTableId::Globals | NameTableId::Exports(_) | NameTableId::ResolvedExports(_) => {
+                true
+            }
+            NameTableId::Locals(_) => table
+                .table
+                .is_some_and(|id| id.arena() != self.checker.tables.id()),
+            NameTableId::Members(_) => false,
+        };
         if cached {
-            if let Some(values) = self.name_access.aliases.get(&table.id) {
+            if let Some(values) = self.checker.query.symbol_table_aliases.get(&table.id) {
                 return Ok(values.clone());
             }
         }
         let mut aliases = vec![];
-        for (_, symbol) in self.name_table_entries(table)? {
-            if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
-                aliases.push(symbol);
+        if let Some((_, value)) = &table.singleton {
+            if self.checker.symbol(*value)?.flags() & sf::ALIAS != 0 {
+                aliases.push(*value);
+            }
+        } else if let Some(id) = table.table {
+            for symbol in self.checker.table(id)?.symbols().flatten() {
+                if self.checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
+                    aliases.push(symbol);
+                }
             }
         }
         if cached {
-            self.name_access.aliases.insert(table.id, aliases.clone());
+            self.checker
+                .query
+                .symbol_table_aliases
+                .insert(table.id, aliases.clone());
         }
         Ok(aliases)
     }
@@ -619,12 +641,10 @@ impl NodeBuilder<'_> {
 
     fn name_has_external_import_equals(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             if let Some(import) = read.data_source().as_import_equals_declaration() {
                 if let Some(reference) = import.module_reference() {
-                    if self.checker.ast(reference)?.node(reference)?.kind()
-                        == K::ExternalModuleReference
-                    {
+                    if self.checker.node(reference)?.kind() == K::ExternalModuleReference {
                         return Ok(true);
                     }
                 }
@@ -634,7 +654,7 @@ impl NodeBuilder<'_> {
     }
     fn name_has_namespace_reexport(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.ast(node)?.node(node)?;
+            let read = self.checker.node(node)?;
             if read.kind() == K::NamespaceExport {
                 let parent = read
                     .parent()

@@ -19,7 +19,7 @@ impl CheckerState {
         let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("unreachable source"))?;
         let mut end = node;
-        if let Some(parent) = self.ast(node)?.node(node)?.parent() {
+        if let Some(parent) = self.node(node)?.parent() {
             let view = self.ast(parent)?;
             let read = view.node(parent)?;
             if read.can_have_statements() {
@@ -41,12 +41,10 @@ impl CheckerState {
                 }
             }
         }
-        let file = self.ast(source)?.source_file(source)?;
-        let start = ts_scanner::skip_trivia(
-            file.text().as_bytes(),
-            i64::from(self.ast(node)?.node(node)?.pos()),
-        );
-        let end = i64::from(self.ast(end)?.node(end)?.end());
+        let file = self.source_file_read(source)?;
+        let start =
+            ts_scanner::skip_trivia(file.text().as_bytes(), i64::from(self.node(node)?.pos()));
+        let end = i64::from(self.node(end)?.end());
         let mut diagnostic = ts_ast::Diagnostic::new(
             Some(source),
             ts_core::TextRange::new(start, end),
@@ -63,7 +61,7 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.isSourceElementUnreachable
     fn source_element_unreachable(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
+        let read = self.node(node)?;
         if read.flags() & nf::UNREACHABLE != 0 {
             let preserve = self.program()?.host.options().should_preserve_const_enums();
             return match read.kind().known() {

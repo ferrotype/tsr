@@ -1,7 +1,7 @@
 //! Text words select a source suffix or a reusable source/owned exception slot.
 use super::FieldKey;
 use crate::JsString;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::ops::Range;
 use ts_jsstring::SourceText;
 
@@ -65,7 +65,7 @@ pub(super) struct TextPool {
     entries: Vec<TextEntry>,
     free: Vec<u32>,
     // Cooked/foreign values and exhausted pool words retain their original Arc.
-    owned: HashMap<FieldKey, JsString>,
+    owned: HashMap<FieldKey, JsString, ts_arena::hash::FastState>,
 }
 
 fn raw_range(word: u32, end: i32, source: &SourceText) -> Range<usize> {
@@ -244,9 +244,65 @@ impl TextPool {
     }
 }
 
+impl TextPool {
+    /// Entry and free-list capacities, the owned-text table and the owned
+    /// strings' backings (source-backed entries alias the file text).
+    #[cfg(test)]
+    pub(super) fn structural_bytes(&self) -> usize {
+        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+    }
+    pub(super) fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> usize {
+        self.entries.capacity() * size_of::<TextEntry>()
+            + self.free.capacity() * size_of::<u32>()
+            + self.owned.allocation_size()
+            + self
+                .owned
+                .values()
+                .map(|text| census.text(text.backing_bytes()))
+                .sum::<usize>()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn census_shares_text_identity_across_pools_and_type_storage() {
+        let source = SourceText::from_loaded_bytes(b"".as_slice());
+        let text = JsString::from_bytes(b"shared across display generations".as_slice());
+        let mut one = TextPool::default();
+        let mut two = TextPool::default();
+        one.insert(FieldKey::new(3, 0, 0), text.clone(), -1, &source);
+        two.insert(FieldKey::new(3, 0, 0), text.clone(), -1, &source);
+        let mut census = ts_arena::StorageCensus::default();
+        let first = one.structural_bytes_with(&mut census);
+        let second = two.structural_bytes_with(&mut census);
+        assert_eq!(
+            first - second,
+            ts_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
+        );
+        let mut prior = std::collections::HashSet::new();
+        prior.insert(text.backing_bytes().as_ptr() as usize);
+        let mut census = ts_arena::StorageCensus::new(prior);
+        assert_eq!(one.structural_bytes_with(&mut census), second);
+    }
+
+    #[test]
+    fn census_counts_shared_owned_text_backing_once() {
+        let source = SourceText::from_loaded_bytes(b"".as_slice());
+        let mut pool = TextPool::default();
+        let text = JsString::from_bytes(b"shared synthetic text".as_slice());
+        pool.insert(FieldKey::new(3, 0, 0), text.clone(), -1, &source);
+        pool.insert(FieldKey::new(3, 1, 0), text.clone(), -1, &source);
+        let containers = pool.entries.capacity() * size_of::<TextEntry>()
+            + pool.free.capacity() * size_of::<u32>()
+            + pool.owned.allocation_size();
+        assert_eq!(
+            pool.structural_bytes() - containers,
+            ts_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
+        );
+    }
 
     #[test]
     fn final_ranges_release_temporary_text_and_reuse_exception_slots() {

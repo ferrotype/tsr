@@ -103,23 +103,26 @@ impl SignatureStore {
         min_argument_count: i32,
     ) -> Result<SignatureId, Error> {
         let id = SignatureId::next(0, self.signatures.len())?;
-        self.signatures.push(Signature {
-            flags,
-            min_argument_count,
-            resolved_min_argument_count: -1,
-            declaration,
-            type_parameters,
-            parameters,
-            this_parameter,
-            resolved_return_type,
-            resolved_type_predicate,
-            target: None,
-            composite: None,
-            mapper: None,
-            erased: None,
-            base: None,
-            isolated_signature_type: None,
-        });
+        ts_arena::growth::push_frugal(
+            &mut self.signatures,
+            Signature {
+                flags,
+                min_argument_count,
+                resolved_min_argument_count: -1,
+                declaration,
+                type_parameters,
+                parameters,
+                this_parameter,
+                resolved_return_type,
+                resolved_type_predicate,
+                target: None,
+                composite: None,
+                mapper: None,
+                erased: None,
+                base: None,
+                isolated_signature_type: None,
+            },
+        );
         Ok(id)
     }
 
@@ -133,14 +136,17 @@ impl SignatureStore {
         components: Option<Arc<[NodeId]>>,
     ) -> Result<IndexInfoId, Error> {
         let id = IndexInfoId::next(0, self.index_infos.len())?;
-        self.index_infos.push(IndexInfo {
-            key_type,
-            value_type,
-            is_readonly,
-            declaration,
-            index_symbol: None,
-            components,
-        });
+        ts_arena::growth::push_frugal(
+            &mut self.index_infos,
+            IndexInfo {
+                key_type,
+                value_type,
+                is_readonly,
+                declaration,
+                index_symbol: None,
+                components,
+            },
+        );
         Ok(id)
     }
 
@@ -149,7 +155,7 @@ impl SignatureStore {
         predicate: TypePredicate,
     ) -> Result<TypePredicateId, Error> {
         let id = TypePredicateId::next(0, self.predicates.len())?;
-        self.predicates.push(predicate);
+        ts_arena::growth::push_frugal(&mut self.predicates, predicate);
         Ok(id)
     }
 

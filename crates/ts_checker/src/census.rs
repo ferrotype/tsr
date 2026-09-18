@@ -13,7 +13,7 @@ use crate::{CheckerState, LiteralValue, TypeId};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::sync::Arc;
-use ts_ast::JsString;
+use ts_ast::{JsString, SymbolTableId};
 
 /// `Arc<[T]>` and `Arc<[u8]>` allocations carry the strong and weak counts.
 const ARC_HEADER: usize = 16;
@@ -35,25 +35,68 @@ pub(crate) struct Census {
     /// Allocations already charged, by address.
     seen: HashSet<usize>,
     unavailable: Vec<&'static str>,
+    /// Source text backings of the program's files, by allocation address:
+    /// bound inputs, never checker storage. A checker string that aliases one
+    /// is reported here instead of in its family.
+    bound_inputs: BTreeMap<usize, usize>,
+    bound_backings_referenced: HashSet<usize>,
+    bound_references: usize,
+    /// Member tables of reached types, in walk order: type-owned member backing
+    /// takes precedence over the `symbol_tables` bucket.
+    member_tables: Vec<(&'static str, SymbolTableId)>,
+    binder_table_references: usize,
 }
 
 impl Census {
+    /// A type's member table, charged to the type family once all types are walked.
+    pub(crate) fn member_table(&mut self, family: &'static str, table: Option<SymbolTableId>) {
+        if let Some(id) = table {
+            self.member_tables.push((family, id));
+        }
+    }
     pub(crate) fn add(&mut self, family: &'static str, count: usize, bytes: usize) {
         let entry = self.families.entry(family).or_default();
         entry.count += count;
         entry.bytes += bytes;
     }
 
+    /// Name a family whose allocation extent this census could not measure.
+    pub(crate) fn mark_unavailable(&mut self, family: &'static str) {
+        if !self.unavailable.contains(&family) {
+            self.unavailable.push(family);
+        }
+    }
+
+    /// Register one bound-input backing (a program file's text).
+    pub(crate) fn bound_input(&mut self, backing: &[u8]) {
+        self.bound_inputs
+            .insert(backing.as_ptr() as usize, backing.len());
+    }
+
     pub(crate) fn list<T>(&mut self, family: &'static str, list: &Arc<[T]>) {
         if self.seen.insert(list.as_ptr() as usize) {
-            self.add(family, 0, ARC_HEADER + list.len() * size_of::<T>());
+            self.add(
+                family,
+                0,
+                ts_arena::StorageCensus::arc_slice_bytes::<T>(list.len()),
+            );
         }
     }
 
     pub(crate) fn text(&mut self, family: &'static str, text: &JsString) {
         let backing = text.backing_bytes();
-        if self.seen.insert(backing.as_ptr() as usize) {
-            self.add(family, 0, ARC_HEADER + backing.len());
+        let address = backing.as_ptr() as usize;
+        if self.bound_inputs.contains_key(&address) {
+            self.bound_references += 1;
+            self.bound_backings_referenced.insert(address);
+            return;
+        }
+        if self.seen.insert(address) {
+            self.add(
+                family,
+                0,
+                ts_arena::StorageCensus::arc_slice_bytes::<u8>(backing.len()),
+            );
         }
     }
 
@@ -69,10 +112,22 @@ impl Census {
             .map(|(_, family)| family.bytes)
             .sum();
         let total: usize = self.families.values().map(|family| family.bytes).sum();
+        let bound_bytes: usize = self.bound_inputs.values().sum();
+        let referenced_bytes: usize = self
+            .bound_backings_referenced
+            .iter()
+            .filter_map(|address| self.bound_inputs.get(address))
+            .sum();
         json!({
             "families": self.families.iter().map(|(name, family)| {
                 (name.to_string(), json!({"count": family.count, "bytes": family.bytes}))
             }).collect::<serde_json::Map<String, Value>>(),
+            // Retained source backing is bound input, reported beside the
+            // checker families and charged to none of them.
+            "bound_inputs": {"backings": self.bound_inputs.len(), "bytes": bound_bytes,
+                "referenced_backings": self.bound_backings_referenced.len(),
+                "referenced_bytes": referenced_bytes, "references": self.bound_references,
+                             "binder_table_references": self.binder_table_references},
             "type_storage_bytes": type_storage,
             "checker_bytes": total,
             "types": {"created": created, "reachable": reachable, "unreachable_occupied": created - reachable},
@@ -185,6 +240,31 @@ pub(crate) const TYPE_FAMILIES: &[&str] = &[
 ];
 
 #[test]
+fn shared_lists_and_bound_texts_are_charged_once_or_not_at_all() {
+    let list: Arc<[u32]> = Arc::from(vec![1, 2, 3]);
+    let mut census = Census::default();
+    census.list("type_lists", &list);
+    census.list("union", &list.clone());
+    assert_eq!(census.families["type_lists"].bytes, 32);
+    assert!(!census.families.contains_key("union"));
+    // A checker string that aliases a program file's text is bound input.
+    let file = JsString::from_bytes(b"export const x = 'inside';".to_vec());
+    census.bound_input(file.backing_bytes());
+    census.text("symbols", &file.slice(13..14).unwrap());
+    census.text("literal", &file.slice(17..25).unwrap());
+    assert!(!census.families.contains_key("symbols"));
+    assert!(!census.families.contains_key("literal"));
+    assert_eq!(census.bound_references, 2);
+    assert_eq!(census.bound_backings_referenced.len(), 1);
+    let report = census.finish(&["type_lists"], 0, 0);
+    assert_eq!(report["checker_bytes"], json!(32));
+    assert_eq!(
+        report["bound_inputs"]["referenced_bytes"],
+        json!(file.len())
+    );
+}
+
+#[test]
 fn sliced_text_charges_its_full_shared_backing_once() {
     let text = JsString::from_bytes(vec![b'x'; 4096]);
     let mut census = Census::default();
@@ -201,6 +281,15 @@ impl CheckerState {
         for &family in ALL_FAMILIES {
             census.add(family, 0, 0);
         }
+        if let Some(program) = &self.program {
+            for index in 0..program.host.source_file_count() {
+                let file = program.host.source_file(index);
+                census.bound_input(file.view().source_file()?.text().backing_bytes());
+            }
+        }
+        // Inline record-store and cache headers live in the checker state;
+        // their backing allocations are charged separately below.
+        census.add("query_links", 0, size_of::<Self>());
         let tables = self.types.tables();
         census.vec_capacity("type_records", tables.records, tables.records.capacity());
         census.vec_capacity("intrinsic", tables.intrinsics, tables.intrinsics.capacity());
@@ -253,14 +342,16 @@ impl CheckerState {
                 census.add(
                     "tuple",
                     0,
-                    ARC_HEADER + data.element_infos.len() * size_of::<crate::TupleElementInfo>(),
+                    ts_arena::StorageCensus::arc_slice_bytes::<crate::TupleElementInfo>(
+                        data.element_infos.len(),
+                    ),
                 );
             }
         }
         census.vec_capacity("union", tables.unions, tables.unions.capacity());
         for data in tables.unions {
             census.list("type_lists", &data.types);
-            Self::census_union_common(&mut census, &data.common);
+            Self::census_union_common(&mut census, "union", &data.common);
             if let Some(name) = &data.key_property_name {
                 census.text("union", name);
             }
@@ -279,7 +370,7 @@ impl CheckerState {
         );
         for data in tables.intersections {
             census.list("type_lists", &data.types);
-            Self::census_union_common(&mut census, &data.common);
+            Self::census_union_common(&mut census, "intersection", &data.common);
         }
         census.vec_capacity(
             "type_parameter",
@@ -297,7 +388,7 @@ impl CheckerState {
                 census.add(
                     "template_literal",
                     0,
-                    ARC_HEADER + data.texts.len() * size_of::<JsString>(),
+                    ts_arena::StorageCensus::arc_slice_bytes::<JsString>(data.texts.len()),
                 );
             }
             for text in data.texts.iter() {
@@ -352,10 +443,27 @@ impl CheckerState {
         for (_, symbol) in self.symbols.iter() {
             census.text("symbols", &symbol.name);
         }
+        // Member tables owned by reached types are type storage (type-owned member
+        // backing has precedence over other checker buckets); the checker's other
+        // tables, the table directory and the shared name pool stay in `symbol_tables`.
+        let mut attributed = 0;
+        let mut attributed_tables = HashSet::new();
+        for (family, id) in std::mem::take(&mut census.member_tables) {
+            if !attributed_tables.insert(id) {
+                continue;
+            }
+            match self.tables.table_structural_bytes(id) {
+                Some(bytes) => {
+                    attributed += bytes;
+                    census.add(family, 0, bytes);
+                }
+                None => census.binder_table_references += 1,
+            }
+        }
         census.add(
             "symbol_tables",
             self.tables.table_count(),
-            self.tables.structural_bytes(),
+            self.tables.structural_bytes() - attributed,
         );
         let (signature_capacity, index_info_capacity, predicate_capacity) =
             self.signatures.capacities();
@@ -419,21 +527,85 @@ impl CheckerState {
             self.synthetic_expression_types.len(),
             self.synthetic_expression_types.allocation_size(),
         );
-        // The checker's synthetic AST arena has no byte accounting yet; its node
-        // count is reported and the family is named as unavailable.
+        // The checker's synthetic AST: reserved arena pages, payload rows,
+        // edges, texts and directories of `Checker.factory`.
+        let mut storage = ts_arena::StorageCensus::new(std::mem::take(&mut census.seen));
+        if let Some(program) = &self.program {
+            for index in 0..program.host.source_file_count() {
+                let file = program.host.source_file(index);
+                storage.exclude_owner(file.source().arena());
+                storage.exclude_text(file.view().source_file()?.text().backing_bytes());
+            }
+        }
+        let (known, unmeasured) = self.factory.structural_bytes_with(&mut storage);
         census.add(
             "checker_ast",
             usize::try_from(self.factory.node_count()).unwrap_or(0),
-            0,
+            known,
         );
-        census.unavailable.push("checker_ast");
+        if unmeasured != 0 {
+            census.unavailable.push("checker_ast");
+        }
 
-        self.display_builder.census(&mut census);
-        census.unavailable.extend(["display_ast", "display_emit"]);
+        self.display_builder.census(&mut census, &mut storage);
+        census.seen = storage.into_allocations();
 
         let created = self.types.len();
         let reachable = self.reachable_types(roots)?;
-        Ok(census.finish(TYPE_FAMILIES, created, reachable))
+        let mut report = census.finish(TYPE_FAMILIES, created, reachable);
+        if std::env::var_os("S08_CENSUS_INVENTORY").is_some() {
+            // Both inventories enumerate reachable types, not every occupied record.
+            let mut names = Vec::with_capacity(reachable);
+            for id in self.reachable_type_ids(roots)? {
+                let mut label = self.inventory_label(id)?;
+                let record = *self.types.get(id)?;
+                if matches!(
+                    record.kind(),
+                    crate::types::TypeKind::Reference | crate::types::TypeKind::Anonymous
+                ) {
+                    label += &format!("{{flags={:#x}", record.object_flags);
+                    if self.bindings.pattern_for_type.contains_key(&id) {
+                        label += ",pattern";
+                    }
+                    label += "}";
+                }
+                if record.kind() == crate::types::TypeKind::Reference {
+                    let target = self.inventory_label(self.types.target(id)?)?;
+                    let mut args = Vec::new();
+                    if let Some(list) = &self.types.type_reference(id)?.resolved_type_arguments {
+                        for &arg in list.iter() {
+                            args.push(self.inventory_label(arg)?);
+                        }
+                    }
+                    label += &format!("->{target}[{}]", args.join(","));
+                }
+                names.push(label);
+            }
+            names.sort();
+            report["inventory"] = json!(names);
+        }
+        Ok(report)
+    }
+
+    /// kind:name, with a literal type's value in place of a name (diagnosis only).
+    #[cfg(any(test, feature = "storage-pilot"))]
+    fn inventory_label(&self, id: TypeId) -> Result<String, crate::Error> {
+        let record = self.types.get(id)?;
+        let name = match record.symbol {
+            Some(symbol) => String::from_utf8_lossy(self.symbol(symbol)?.name_bytes()).into_owned(),
+            None => String::new(),
+        };
+        let name = match record.kind() {
+            crate::types::TypeKind::Literal => match &self.types.literal(id)?.value {
+                LiteralValue::String(text) => String::from_utf8_lossy(text.as_bytes()).into_owned(),
+                other => format!("{other:?}"),
+            },
+            crate::types::TypeKind::Intrinsic => {
+                String::from_utf8_lossy(self.types.intrinsic(id)?.name.as_bytes()).into_owned()
+            }
+            _ => name,
+        };
+        Ok(format!("{:?}:{name}", record.kind()))
     }
 
     fn census_structured(
@@ -441,6 +613,7 @@ impl CheckerState {
         family: &'static str,
         data: &crate::StructuredMembers,
     ) {
+        census.member_table(family, data.members);
         if let Some(list) = &data.properties {
             census.list(family, list);
         }
@@ -475,6 +648,7 @@ impl CheckerState {
 
     fn census_interface(census: &mut Census, family: &'static str, data: &crate::InterfaceData) {
         Self::census_reference(census, family, &data.reference);
+        census.member_table(family, data.declared_members);
         for list in [&data.all_type_parameters, &data.resolved_base_types]
             .into_iter()
             .flatten()
@@ -495,10 +669,14 @@ impl CheckerState {
         }
     }
 
-    fn census_union_common(census: &mut Census, data: &crate::UnionOrIntersectionMembers) {
-        Self::census_structured(census, "union", &data.structured);
+    fn census_union_common(
+        census: &mut Census,
+        family: &'static str,
+        data: &crate::UnionOrIntersectionMembers,
+    ) {
+        Self::census_structured(census, family, &data.structured);
         if let Some(list) = &data.resolved_properties {
-            census.list("union", list);
+            census.list(family, list);
         }
     }
 

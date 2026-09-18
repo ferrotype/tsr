@@ -14,6 +14,10 @@ use ts_printer::{
     emit_resolver::{DeclarationTrackerEvent as Event, SymbolAccessibility},
 };
 
+#[cfg(test)]
+#[path = "node_builder_reuse_tests.rs"]
+mod tests;
+
 // Source: tsc/internal/checker/nodecopy.go:recoveryBoundary
 pub(super) struct RecoveryBoundary {
     had_error: bool,
@@ -163,7 +167,7 @@ impl NodeBuilder<'_> {
         node: NodeId,
         no_mapped_types: bool,
     ) -> Result<Option<TypeId>, Error> {
-        if self.checker.ast(node)?.node(node)?.parent().is_none() {
+        if self.checker.node(node)?.parent().is_none() {
             return Ok(Some(self.checker.builtins.error_type));
         }
         let original = self.checker.get_type_from_type_node(node)?;
@@ -171,7 +175,7 @@ impl NodeBuilder<'_> {
         Ok((!no_mapped_types || original == ty).then_some(ty))
     }
     fn reused_symbol_from_type_node(&mut self, node: NodeId) -> Result<Option<SymbolId>, Error> {
-        if self.checker.ast(node)?.node(node)?.parent().is_none() {
+        if self.checker.node(node)?.parent().is_none() {
             return Ok(None);
         }
         self.checker.get_type_from_type_node(node)?;
@@ -193,7 +197,7 @@ impl NodeBuilder<'_> {
             return Ok(false);
         }
         if self.checker.types.object_flags(ty)? & of::REFERENCE == 0
-            || self.checker.ast(node)?.node(node)?.kind() != K::TypeReference
+            || self.checker.node(node)?.kind() != K::TypeReference
         {
             return Ok(true);
         }
@@ -214,10 +218,7 @@ impl NodeBuilder<'_> {
         let min = self.checker.min_type_argument_count(&parameters)?;
         let count = self
             .checker
-            .source_list(
-                node,
-                self.checker.ast(node)?.node(node)?.type_argument_list(),
-            )?
+            .source_list(node, self.checker.node(node)?.type_argument_list())?
             .len();
         Ok(count >= min)
     }
@@ -259,7 +260,7 @@ impl NodeBuilder<'_> {
         } else if let Some(host) = host.or(self.enclosing) {
             ts_ast::utilities_middle::has_question_token(
                 self.checker.ast(host)?,
-                &self.checker.ast(host)?.node(host)?,
+                &self.checker.node(host)?,
             )? && self
                 .checker
                 .type_with_facts(ty, crate::type_facts::NE_UNDEFINED)?
@@ -432,7 +433,20 @@ impl NodeBuilder<'_> {
         for child in children {
             replacements.insert(child, Some(self.clone_binding_name_native(child)?));
         }
-        let mut result = self.reuse_replace_children(node, &replacements)?;
+        // Go's cloneBindingNameVisitor has no nodecopy hooks. Preserve list
+        // ranges here: they carry trailing commas even without a local context.
+        let mut result = {
+            let visit = |_: &mut NodeVisitor<'_>, node: Option<NodeId>| {
+                node.and_then(|n| replacements.get(&n).copied().unwrap_or(Some(n)))
+            };
+            NodeVisitor::new(
+                Some(&visit),
+                Some(&mut self.ast),
+                NodeVisitorHooks::default(),
+            )
+            .visit_each_child(Some(node))
+            .ok_or(Error::MissingLink("binding name parent node"))?
+        };
         if self.ast.view().node(result)?.kind() == K::BindingElement {
             let d = self
                 .ast
@@ -527,13 +541,15 @@ impl NodeBuilder<'_> {
                 return visited;
             }
             let result = visited?;
-            // NodeVisitor.VisitNodes keeps the input list's Loc even for nonlocal
-            // nodes; only the nodes themselves get synthetic positions.
+            // nodecopy's VisitNodes hook overrides the visitor's preserved range
+            // for nonlocal lists. Clone an unchanged header before resetting it.
             let result = if visited == list {
                 v.factory_mut().clone_list_header(result)
             } else {
                 result
             };
+            v.factory_mut()
+                .set_list_location(result, ts_core::TextRange::new(-1, -1));
             Some(result)
         };
         let mut visitor = NodeVisitor::new(
@@ -635,7 +651,7 @@ impl NodeBuilder<'_> {
         }
     }
     pub(super) fn reuse_late_bindable_name(&mut self, node: NodeId) -> Result<bool, Error> {
-        let read = self.checker.ast(node)?.node(node)?;
+        let read = self.checker.node(node)?;
         let expression = match read.kind().known() {
             Some(K::ComputedPropertyName) => read.expression(),
             Some(K::ElementAccessExpression) => read
@@ -669,7 +685,7 @@ impl NodeBuilder<'_> {
     }
     pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
         let first = ts_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
-        let text = self.checker.ast(first)?.node_text(first)?.into_js_string();
+        let text = self.checker.node_text(first)?.into_js_string();
         let symbol = self.checker.resolve_name(
             self.enclosing,
             text.as_bytes(),
@@ -721,7 +737,7 @@ impl NodeBuilder<'_> {
             let result = if let Some(result) = result {
                 result
             } else {
-                let text = self.checker.ast(node)?.node_text(node)?.into_js_string();
+                let text = self.checker.node_text(node)?.into_js_string();
                 let result = self.ast.new_identifier(text);
                 self.id_to_symbol.insert(result, symbol);
                 result
@@ -787,7 +803,7 @@ impl NodeBuilder<'_> {
             return Ok((true, self.set_reused_text_range(cloned, node)?));
         }
         let meaning = self.checker.emit_entity_meaning(node)?;
-        if self.checker.ast(leftmost)?.node_text(leftmost)?.as_bytes() == b"this" {
+        if self.checker.node_text(leftmost)?.as_bytes() == b"this" {
             let container =
                 ts_ast::get_this_container(self.checker.ast(leftmost)?, leftmost, false, false)?;
             let symbol = self.checker.get_symbol_of_declaration(container)?;
@@ -858,8 +874,7 @@ impl NodeBuilder<'_> {
                     if ts_ast::utilities::is_part_of_parameter_declaration(
                         self.checker.ast(declaration)?,
                         declaration,
-                    )? || self.checker.ast(declaration)?.node(declaration)?.kind()
-                        == K::JSDocParameterTag
+                    )? || self.checker.node(declaration)?.kind() == K::JSDocParameterTag
                     {
                         return Ok((
                             false,
@@ -927,7 +942,7 @@ impl NodeBuilder<'_> {
     }
     fn reuse_simple_type(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let mut inner = node;
-        while self.checker.ast(inner)?.node(inner)?.kind() == K::ParenthesizedExpression {
+        while self.checker.node(inner)?.kind() == K::ParenthesizedExpression {
             inner = self
                 .checker
                 .ast(inner)?
@@ -935,7 +950,7 @@ impl NodeBuilder<'_> {
                 .expression()
                 .ok_or(Error::MissingLink("parenthesized reusable expression"))?;
         }
-        let kind = self.checker.ast(inner)?.node(inner)?.kind();
+        let kind = self.checker.node(inner)?.kind();
         match kind.known() {
             Some(K::TypeReference) => self.reuse_type_reference(inner),
             Some(K::TypeQuery) => self.reuse_type_query(inner),
@@ -957,7 +972,7 @@ impl NodeBuilder<'_> {
     fn reuse_type_reference(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         if ts_ast::utilities_middle::is_const_type_reference(
             self.checker.ast(node)?,
-            &self.checker.ast(node)?.node(node)?,
+            &self.checker.node(node)?,
         )? {
             return Ok(None);
         }
@@ -1075,7 +1090,7 @@ impl NodeBuilder<'_> {
             return Ok(Some(node));
         }
         let state = self.reuse_start_scope()?;
-        let read = self.checker.ast(node)?.node(node)?;
+        let read = self.checker.node(node)?;
         let function = ts_ast::utilities::is_function_like(Some(&read));
         let result = if function {
             let signature = self.checker.signature_from_declaration(node)?;
@@ -1116,8 +1131,8 @@ impl NodeBuilder<'_> {
             .map(|r| self.set_reused_text_range(r, node))
             .transpose()?;
         if self.reuse_had_error() {
-            if ts_ast::utilities::is_type_node(&self.checker.ast(node)?.node(node)?)
-                && self.checker.ast(node)?.node(node)?.kind() != K::TypePredicate
+            if ts_ast::utilities::is_type_node(&self.checker.node(node)?)
+                && self.checker.node(node)?.kind() != K::TypePredicate
             {
                 self.reuse_end_scope(state)?;
                 let ty = self
@@ -1131,7 +1146,7 @@ impl NodeBuilder<'_> {
         Ok(result)
     }
     fn reuse_visit_worker(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let read = self.checker.ast(node)?.node(node)?;
+        let read = self.checker.node(node)?;
         let kind = read.kind();
         match kind.known() {
             Some(K::JSDocTypeExpression | K::JSDocNonNullableType) => {
@@ -1171,8 +1186,8 @@ impl NodeBuilder<'_> {
                 .as_type_reference_node()
                 .and_then(|d| d.type_name())
                 .ok_or(Error::MissingLink("reused reference name"))?;
-            if self.checker.ast(name)?.node(name)?.kind() == K::Identifier
-                && self.checker.ast(name)?.node_text(name)?.is_empty()
+            if self.checker.node(name)?.kind() == K::Identifier
+                && self.checker.node_text(name)?.is_empty()
             {
                 let replacement = self.ast.new_keyword_type_node(K::AnyKeyword.into());
                 self.emit.set_original(replacement, node);
@@ -1229,7 +1244,7 @@ impl NodeBuilder<'_> {
                 .r#type
                 .ok_or(Error::MissingLink("reused type operator operand"))?;
             if data.operator == K::UniqueKeyword
-                && self.checker.ast(inner)?.node(inner)?.kind() == K::SymbolKeyword
+                && self.checker.node(inner)?.kind() == K::SymbolKeyword
             {
                 let mut enclosing = self.enclosing;
                 while let Some(enc) = enclosing {
@@ -1241,7 +1256,7 @@ impl NodeBuilder<'_> {
                     {
                         break;
                     }
-                    enclosing = self.checker.ast(enc)?.node(enc)?.parent();
+                    enclosing = self.checker.node(enc)?.parent();
                 }
                 let mut current = Some(node);
                 let mut same = false;
@@ -1250,7 +1265,7 @@ impl NodeBuilder<'_> {
                         same = true;
                         break;
                     }
-                    current = self.checker.ast(n)?.node(n)?.parent();
+                    current = self.checker.node(n)?.parent();
                 }
                 if !same {
                     self.reuse_mark_error()?;
@@ -1268,9 +1283,9 @@ impl NodeBuilder<'_> {
         if kind == K::ImportType && self.reuse_is_literal_import_type(node)? {
             return self.reuse_import_type(node);
         }
-        let read = self.checker.ast(node)?.node(node)?;
+        let read = self.checker.node(node)?;
         if let Some(name) = read.name() {
-            if self.checker.ast(name)?.node(name)?.kind() == K::ComputedPropertyName
+            if self.checker.node(name)?.kind() == K::ComputedPropertyName
                 && !self.reuse_late_bindable_name(name)?
             {
                 if !ts_ast::has_dynamic_name(self.checker.ast(node)?, Some(node))? {
@@ -1296,7 +1311,7 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        let read = self.checker.ast(node)?.node(node)?;
+        let read = self.checker.node(node)?;
         if (ts_ast::utilities::is_function_like(Some(&read)) && read.type_node().is_none())
             || matches!(
                 kind.known(),
@@ -1369,7 +1384,7 @@ impl NodeBuilder<'_> {
             let name = data
                 .parameter_name
                 .ok_or(Error::MissingLink("reused predicate parameter"))?;
-            let name = if self.checker.ast(name)?.node(name)?.kind() == K::Identifier {
+            let name = if self.checker.node(name)?.kind() == K::Identifier {
                 let (error, name) = self.reuse_track_entity(name, None)?;
                 if error {
                     self.reuse_mark_error()?;
@@ -1461,7 +1476,7 @@ impl NodeBuilder<'_> {
             .collect();
         let mut members = Vec::new();
         for tag in tags {
-            let read = self.checker.ast(tag)?.node(tag)?;
+            let read = self.checker.node(tag)?;
             if !matches!(
                 read.kind().known(),
                 Some(K::JSDocPropertyTag | K::JSDocParameterTag)
@@ -1476,7 +1491,7 @@ impl NodeBuilder<'_> {
             let mut name = data
                 .name
                 .ok_or(Error::MissingLink("documentation property name"))?;
-            if self.checker.ast(name)?.node(name)?.kind() != K::Identifier {
+            if self.checker.node(name)?.kind() != K::Identifier {
                 name = self
                     .checker
                     .ast(name)?

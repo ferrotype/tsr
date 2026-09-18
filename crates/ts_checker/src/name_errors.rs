@@ -10,7 +10,7 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<&'static d::Message, Error> {
-        let text = self.ast(node)?.node_text(node)?;
+        let text = self.node_text(node)?;
         let wildcard = self.program()?.host.options().uses_wildcard_types();
         Ok(match text.as_bytes() {
             b"document" | b"console" => d::Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_include_dom,
@@ -20,7 +20,7 @@ impl CheckerState {
             b"Bun" => if wildcard { d::Cannot_find_name_0_Do_you_need_to_install_type_definitions_for_Bun_Try_npm_i_save_dev_types_Slashbun } else { d::Cannot_find_name_0_Do_you_need_to_install_type_definitions_for_Bun_Try_npm_i_save_dev_types_Slashbun_and_then_add_bun_to_the_types_field_in_your_tsconfig },
             b"Map" | b"Set" | b"Promise" | b"ast.Symbol" | b"WeakMap" | b"WeakSet" | b"Iterator" | b"AsyncIterator" | b"SharedArrayBuffer" | b"Atomics" | b"AsyncIterable" | b"AsyncIterableIterator" | b"AsyncGenerator" | b"AsyncGeneratorFunction" | b"BigInt" | b"Reflect" | b"BigInt64Array" | b"BigUint64Array" => d::Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later,
             _ => {
-                let parent = self.ast(node)?.node(node)?.parent();
+                let parent = self.node(node)?.parent();
                 let kind = parent.map(|parent| self.ast(parent)?.node(parent).map(|node|node.kind()).map_err(Error::from)).transpose()?;
                 if text.as_bytes() == b"await" && kind == Some(K::CallExpression.into()) { d::Cannot_find_name_0_Did_you_mean_to_write_this_in_an_async_function }
                 else if kind == Some(K::ShorthandPropertyAssignment.into()) { d::No_value_exists_in_scope_for_the_shorthand_property_0_Either_declare_one_or_provide_an_initializer }
@@ -41,11 +41,11 @@ impl CheckerState {
                 return Ok(());
             }
         }
-        let read = self.ast(property)?.node(property)?;
+        let read = self.node(property)?;
         let property_name = read.name();
         let in_type = if let (Some(location), Some(annotation)) = (location, read.type_node()) {
-            let range = self.ast(annotation)?.node(annotation)?;
-            let pos = self.ast(location)?.node(location)?.pos();
+            let range = self.node(annotation)?;
+            let pos = self.node(location)?.pos();
             range.pos() <= pos && pos <= range.end()
         } else {
             false
@@ -65,7 +65,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let candidate = self.late_bound_symbol(result)?;
         let candidate = self.get_merged_symbol(candidate);
-        let name = self.ast(declaration)?.node(declaration)?.name();
+        let name = self.node(declaration)?.name();
         let name = ts_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
         if Some(candidate) == self.get_symbol_of_declaration(declaration)? {
             self.error_at(
@@ -74,8 +74,7 @@ impl CheckerState {
                 vec![name],
             )?;
         } else if let Some(value) = self.symbol(candidate)?.value_declaration() {
-            if self.ast(value)?.node(value)?.pos() > self.ast(declaration)?.node(declaration)?.pos()
-            {
+            if self.node(value)?.pos() > self.node(declaration)?.pos() {
                 let root =
                     ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
                 let parent = self
@@ -116,14 +115,14 @@ impl CheckerState {
         message: &'static d::Message,
     ) -> Result<(), Error> {
         if let Some(location) = location {
-            if let Some(parent) = self.ast(location)?.node(location)?.parent() {
-                if self.ast(parent)?.node(parent)?.kind() == K::JSDocLink {
+            if let Some(parent) = self.node(location)?.parent() {
+                if self.node(parent)?.kind() == K::JSDocLink {
                     return Ok(());
                 }
-                if name == b"const" && self.ast(parent)?.node(parent)?.kind() == K::TypeReference {
-                    if let Some(assertion) = self.ast(parent)?.node(parent)?.parent() {
+                if name == b"const" && self.node(parent)?.kind() == K::TypeReference {
+                    if let Some(assertion) = self.node(parent)?.parent() {
                         if matches!(
-                            self.ast(assertion)?.node(assertion)?.kind().known(),
+                            self.node(assertion)?.kind().known(),
                             Some(K::AsExpression | K::TypeAssertionExpression)
                         ) {
                             return Ok(());
@@ -138,8 +137,8 @@ impl CheckerState {
             }
         }
         let declaration = if let Some(location) = location {
-            if self.ast(location)?.node(location)?.kind() == K::Identifier
-                && self.ast(location)?.node_text(location)?.as_bytes() == name
+            if self.node(location)?.kind() == K::Identifier
+                && self.node_text(location)?.as_bytes() == name
             {
                 ts_scanner::declaration_name_to_string(self.ast(location)?, Some(location))?
             } else {
@@ -160,9 +159,7 @@ impl CheckerState {
             let value = self.symbol(suggestion)?.value_declaration();
             let global = if let Some(value) = value {
                 ts_ast::is_ambient_module(self.ast(value)?, value)?
-                    && ts_ast::utilities::is_global_scope_augmentation(
-                        &self.ast(value)?.node(value)?,
-                    )
+                    && ts_ast::utilities::is_global_scope_augmentation(&self.node(value)?)
             } else {
                 false
             };
@@ -199,18 +196,18 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.checkAndReportErrorForMissingPrefix
     fn missing_name_prefix(&mut self, node: NodeId, name: &[u8]) -> Result<bool, Error> {
-        let read = self.ast(node)?.node(node)?;
-        if read.kind() != K::Identifier || self.ast(node)?.node_text(node)?.as_bytes() != name {
+        let read = self.node(node)?;
+        if read.kind() != K::Identifier || self.node_text(node)?.as_bytes() != name {
             return Ok(false);
         }
         if let Some(parent) = read.parent() {
-            if self.ast(parent)?.node(parent)?.kind() == K::TypeReference {
+            if self.node(parent)?.kind() == K::TypeReference {
                 return Ok(false);
             }
         }
         let mut current = Some(node);
         while let Some(id) = current {
-            let read = self.ast(id)?.node(id)?;
+            let read = self.node(id)?;
             if read.kind() == K::TypeQuery {
                 return Ok(false);
             }
@@ -224,9 +221,9 @@ impl CheckerState {
         }
         let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
         let mut location = container;
-        while let Some(parent) = self.ast(location)?.node(location)?.parent() {
+        while let Some(parent) = self.node(location)?.parent() {
             if matches!(
-                self.ast(parent)?.node(parent)?.kind().known(),
+                self.node(parent)?.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression)
             ) {
                 let Some(symbol) = self.get_symbol_of_declaration(parent)? else {
@@ -282,7 +279,7 @@ impl CheckerState {
         // The native extending-interface check precedes the other meanings.
         let mut current = node;
         loop {
-            let read = self.ast(current)?.node(current)?;
+            let read = self.node(current)?;
             match read.kind().known() {
                 Some(K::Identifier | K::QualifiedName | K::PropertyAccessExpression) => {
                     if let Some(parent) = read.parent() {
@@ -319,7 +316,7 @@ impl CheckerState {
             }
             break;
         }
-        let parent = self.ast(node)?.node(node)?.parent();
+        let parent = self.node(node)?.parent();
         let primitive = matches!(
             name,
             b"any" | b"string" | b"number" | b"boolean" | b"never" | b"unknown"
@@ -329,7 +326,7 @@ impl CheckerState {
                 self.resolve_name(Some(node), name, sf::TYPE & !sf::NAMESPACE, None, false)?;
             if let Some(symbol) = self.resolve_module_symbol(symbol, false)? {
                 if let Some(parent) = parent {
-                    if self.ast(parent)?.node(parent)?.kind() == K::QualifiedName {
+                    if self.node(parent)?.kind() == K::QualifiedName {
                         let right = self
                             .ast(parent)?
                             .node(parent)?
@@ -337,7 +334,7 @@ impl CheckerState {
                             .as_qualified_name()
                             .and_then(|d| d.right())
                             .ok_or(Error::MissingLink("type namespace right"))?;
-                        let prop = self.ast(right)?.node_text(right)?.into_js_string();
+                        let prop = self.node_text(right)?.into_js_string();
                         let ty = self.get_declared_type_of_symbol(symbol)?;
                         if self
                             .constituent_property(ty, prop.as_bytes(), false)?
@@ -425,9 +422,9 @@ impl CheckerState {
                 let mut args = vec![JsString::from_bytes(name)];
                 if primitive {
                     if let Some(parent) = parent {
-                        if let Some(grand) = self.ast(parent)?.node(parent)?.parent() {
-                            if self.ast(grand)?.node(grand)?.kind() == K::HeritageClause {
-                                let clause = self.ast(grand)?.node(grand)?;
+                        if let Some(grand) = self.node(parent)?.parent() {
+                            if self.node(grand)?.kind() == K::HeritageClause {
+                                let clause = self.node(grand)?;
                                 let kind = clause
                                     .data_source()
                                     .as_heritage_clause()
@@ -436,8 +433,7 @@ impl CheckerState {
                                 let owner = clause
                                     .parent()
                                     .ok_or(Error::MissingLink("heritage owner"))?;
-                                message = if self.ast(owner)?.node(owner)?.kind()
-                                    == K::InterfaceDeclaration
+                                message = if self.node(owner)?.kind() == K::InterfaceDeclaration
                                     && kind == K::ExtendsKeyword
                                 {
                                     d::An_interface_cannot_extend_a_primitive_type_like_0_It_can_only_extend_other_named_object_types
@@ -515,7 +511,7 @@ impl CheckerState {
             }
             suggestion_is_class = self.symbol(suggestion)?.flags() & sf::CLASS != 0;
             if let Some(value) = self.symbol(suggestion)?.value_declaration() {
-                let read = self.ast(value)?.node(value)?;
+                let read = self.node(value)?;
                 if ts_ast::utilities::is_class_like(&read) {
                     suggestion_has_no_extends_or_decorators = !self
                         .class_heritage_nodes(value, K::ExtendsKeyword)?
@@ -557,8 +553,8 @@ impl CheckerState {
         if self.has_decorators(class)? {
             return Ok(true);
         }
-        for member in self.source_list(class, self.ast(class)?.node(class)?.member_list())? {
-            let read = self.ast(member)?.node(member)?;
+        for member in self.source_list(class, self.node(class)?.member_list())? {
+            let read = self.node(member)?;
             if read.kind() == K::Constructor && read.body().is_some() {
                 for parameter in self.source_list(member, read.parameter_list())? {
                     if self.has_decorators(parameter)? {
@@ -572,8 +568,8 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:HasDecorators
     fn has_decorators(&self, node: NodeId) -> Result<bool, Error> {
-        for modifier in self.source_list(node, self.ast(node)?.node(node)?.modifiers())? {
-            if self.ast(modifier)?.node(modifier)?.kind() == K::Decorator {
+        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
+            if self.node(modifier)?.kind() == K::Decorator {
                 return Ok(true);
             }
         }

@@ -1,4 +1,5 @@
 //! Structural property and index-signature comparisons.
+use crate::symbols::NameBuf;
 use crate::{
     object_flags as of,
     relater::{Relater, RelationKind, BOTH, SOURCE},
@@ -208,7 +209,7 @@ impl Relater<'_> {
             if require_optional
                 || read.flags() & sf::OPTIONAL == 0 && read.check_flags() & cf::PARTIAL == 0
             {
-                let name = read.name_to_owned();
+                let name = NameBuf::new(read.name_bytes());
                 if self
                     .checker
                     .constituent_property(source, name.as_bytes(), false)?
@@ -223,8 +224,11 @@ impl Relater<'_> {
         }
         if self.checker.types.get(target)?.object_flags & of::OBJECT_LITERAL != 0 {
             for property in self.checker.get_properties_of_type(source)? {
-                let name = self.checker.symbol(property)?.name_to_owned();
-                if excluded.contains(&name) {
+                let name = NameBuf::new(self.checker.symbol(property)?.name_bytes());
+                if excluded
+                    .iter()
+                    .any(|excluded| excluded.as_bytes() == name.as_bytes())
+                {
                     continue;
                 }
                 if self
@@ -244,8 +248,11 @@ impl Relater<'_> {
             {
                 continue;
             }
-            let name = read.name_to_owned();
-            if excluded.contains(&name) {
+            let name = NameBuf::new(read.name_bytes());
+            if excluded
+                .iter()
+                .any(|excluded| excluded.as_bytes() == name.as_bytes())
+            {
                 continue;
             }
             if let Some(source_property) =
@@ -441,7 +448,7 @@ impl Relater<'_> {
         }
         let mut result = tr::TRUE;
         for property in sources {
-            let name = self.checker.symbol(property)?.name_to_owned();
+            let name = NameBuf::new(self.checker.symbol(property)?.name_bytes());
             let Some(other) = self
                 .checker
                 .constituent_property(target, name.as_bytes(), true)?

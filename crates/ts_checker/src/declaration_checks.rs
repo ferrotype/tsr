@@ -24,7 +24,7 @@ impl CheckerState {
             .node(node)?
             .name()
             .ok_or(Error::MissingLink("var name"))?;
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        let text = self.node_text(name)?.into_js_string();
         let Some(local) =
             self.resolve_name(Some(node), text.as_bytes(), sf::VARIABLE, None, false)?
         else {
@@ -45,12 +45,12 @@ impl CheckerState {
         let mut current = Some(declaration);
         let mut container = None;
         while let Some(ancestor) = current {
-            let read = self.ast(ancestor)?.node(ancestor)?;
+            let read = self.node(ancestor)?;
             if read.kind() == K::VariableDeclarationList {
                 let statement = read
                     .parent()
                     .ok_or(Error::MissingLink("shadowed declaration statement"))?;
-                let read = self.ast(statement)?.node(statement)?;
+                let read = self.node(statement)?;
                 if read.kind() == K::VariableStatement {
                     container = read.parent();
                 }
@@ -61,13 +61,13 @@ impl CheckerState {
         let shared_scope = match container {
             None => false,
             Some(container) => {
-                let read = self.ast(container)?.node(container)?;
+                let read = self.node(container)?;
                 match read.kind().known() {
                     Some(K::ModuleBlock | K::ModuleDeclaration | K::SourceFile) => true,
                     Some(K::Block) => match read.parent() {
-                        Some(parent) => ts_ast::utilities::is_function_like(Some(
-                            &self.ast(parent)?.node(parent)?,
-                        )),
+                        Some(parent) => {
+                            ts_ast::utilities::is_function_like(Some(&self.node(parent)?))
+                        }
                         None => false,
                     },
                     _ => false,
@@ -86,13 +86,13 @@ impl CheckerState {
         node: NodeId,
         check_private: bool,
     ) -> Result<(), Error> {
-        let members = self.source_list(node, self.ast(node)?.node(node)?.member_list())?;
+        let members = self.source_list(node, self.node(node)?.member_list())?;
         let mut instance = crate::types::Map::default();
         let mut static_names = crate::types::Map::default();
         let mut private = crate::types::Map::default();
-        let ambient = self.ast(node)?.node(node)?.flags() & ts_ast::node_flags::AMBIENT != 0;
+        let ambient = self.node(node)?.flags() & ts_ast::node_flags::AMBIENT != 0;
         for member in members {
-            let read = self.ast(member)?.node(member)?;
+            let read = self.node(member)?;
             if read.kind() == K::Constructor {
                 let parameters = self.source_list(member, read.parameter_list())?;
                 for parameter in parameters {
@@ -135,7 +135,7 @@ impl CheckerState {
                             .get_symbol_of_declaration(node)?
                             .ok_or(Error::MissingLink("duplicate owner"))?;
                         let owner = self.symbol_to_string(owner)?;
-                        self.error_at(self.ast(member)?.node(member)?.name(),d::Static_property_0_conflicts_with_built_in_property_Function_0_of_constructor_function_1,vec![name,owner])?;
+                        self.error_at(self.node(member)?.name(),d::Static_property_0_conflicts_with_built_in_property_Function_0_of_constructor_function_1,vec![name,owner])?;
                     }
                 }
             }
@@ -217,11 +217,9 @@ impl CheckerState {
         static_filter: Option<bool>,
         message: &'static d::Message,
     ) -> Result<(), Error> {
-        for member in self.source_list(node, self.ast(node)?.node(node)?.member_list())? {
-            if self.ast(member)?.node(member)?.kind() == K::Constructor {
-                for parameter in
-                    self.source_list(member, self.ast(member)?.node(member)?.parameter_list())?
-                {
+        for member in self.source_list(node, self.node(node)?.member_list())? {
+            if self.node(member)?.kind() == K::Constructor {
+                for parameter in self.source_list(member, self.node(member)?.parameter_list())? {
                     if !ts_ast::utilities::is_parameter_property_declaration(
                         self.ast(parameter)?,
                         parameter,
@@ -249,8 +247,7 @@ impl CheckerState {
                 if self.symbol(symbol)?.name_bytes() == name.as_bytes()
                     && static_filter
                         .map(|is_static| {
-                            self.ast(member)?
-                                .node(member)?
+                            self.node(member)?
                                 .modifier_flags(self.ast(member)?)
                                 .map(|flags| (flags & mf::STATIC != 0) == is_static)
                                 .map_err(Error::from)
@@ -259,11 +256,7 @@ impl CheckerState {
                         .unwrap_or(true)
                 {
                     let display = self.symbol_to_string(symbol)?;
-                    self.error_at(
-                        self.ast(member)?.node(member)?.name(),
-                        message,
-                        vec![display],
-                    )?;
+                    self.error_at(self.node(member)?.name(), message, vec![display])?;
                 }
             }
         }
@@ -271,8 +264,8 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:Checker.areDeclarationFlagsIdentical
     fn declaration_flags_identical(&self, left: NodeId, right: NodeId) -> Result<bool, Error> {
-        let a = self.ast(left)?.node(left)?;
-        let b = self.ast(right)?.node(right)?;
+        let a = self.node(left)?;
+        let b = self.node(right)?;
         if a.kind() == K::Parameter && b.kind() == K::VariableDeclaration
             || a.kind() == K::VariableDeclaration && b.kind() == K::Parameter
         {
@@ -303,9 +296,7 @@ impl CheckerState {
                 .flatten()
             {
                 if declaration != node
-                    && ts_ast::utilities_middle::is_variable_like(
-                        &self.ast(declaration)?.node(declaration)?,
-                    )
+                    && ts_ast::utilities_middle::is_variable_like(&self.node(declaration)?)
                     && !self.declaration_flags_identical(declaration, node)?
                 {
                     mismatch = true;
@@ -316,7 +307,7 @@ impl CheckerState {
             mismatch = !self.declaration_flags_identical(node, first)?;
         }
         if mismatch {
-            let name = self.ast(node)?.node(node)?.name();
+            let name = self.node(node)?.name();
             let text = ts_scanner::declaration_name_to_string(self.ast(node)?, name)?;
             self.error_at(
                 name,
@@ -357,7 +348,7 @@ impl CheckerState {
             let first = self.symbol(symbol)?.value_declaration();
             self.error_subsequent_declaration(first, primary_type, node, declared)?;
         }
-        if let Some(initializer) = self.ast(node)?.node(node)?.initializer() {
+        if let Some(initializer) = self.node(node)?.initializer() {
             let source = self.check_expression_cached(initializer)?;
             self.check_expression_related_with_elaboration(
                 source,
@@ -378,7 +369,7 @@ impl CheckerState {
         next: NodeId,
         next_type: TypeId,
     ) -> Result<(), Error> {
-        let read = self.ast(next)?.node(next)?;
+        let read = self.node(next)?;
         let name = read.name();
         let property = matches!(
             read.kind().known(),

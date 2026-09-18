@@ -68,7 +68,7 @@ The additional frozen artifacts are:
 | `dependency-audit.json` | All 675 S07 obligation IDs, 134 interface members, source homes and 77 reviewed static boundary sites |
 | `query-contract.json` | 1,438,509 ordered acceptance actions projected from the authenticated existing archive; derived schedule stays under `target/` |
 | `supplemental-observations.json.xz`, `supplemental-report.json` | Original native relations/state, diagnostics, comparator residuals and printer bytes |
-| `type-footprint.json` | Exact census membership, logical type denominator and shared-allocation attribution; 0.80 unchanged |
+| `type-footprint.json` | Exact census membership, logical type denominator and shared-allocation attribution; maximum 0.85 under [ADR 0022](../../docs/adr/0022-checker-type-footprint-threshold.md), amended from 0.80 |
 | `checker-workload.json` | Fixed acceptance work, lifecycle, phase/allocator endpoints and sampling |
 | `relater-fixtures.json` | Declared setup and first/repeated relation workload classes, including cold lazy work and primitive shortcuts, plus the reference/ID comparison protocol |
 | `ownership-fixtures.json` | Rust design/recursion scenarios, pending production execution; P2 suppression debt |

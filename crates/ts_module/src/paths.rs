@@ -15,7 +15,7 @@ impl Resolver {
         extensions: u8,
         esm: bool,
     ) -> Result<Option<ResolvedModule>, Error> {
-        if !path_is_relative(name) && self.options.paths.as_ref().is_some_and(|p| !p.is_empty()) {
+        if !path::is_relative(name) && self.options.paths.as_ref().is_some_and(|p| !p.is_empty()) {
             trace!(self,diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0,name);
             // Retain only while the recursive loader borrows self mutably; the
             // option vectors remain borrowed and are never copied per candidate.
@@ -199,9 +199,6 @@ impl Resolver {
         );
         Ok(None)
     }
-}
-fn path_is_relative(name: &[u8]) -> bool {
-    name == b"." || name == b".." || name.starts_with(b"./") || name.starts_with(b"../")
 }
 fn replace_first(pattern: &[u8], replacement: &[u8]) -> Vec<u8> {
     if let Some(index) = pattern.iter().position(|&b| b == b'*') {

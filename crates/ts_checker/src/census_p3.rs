@@ -163,6 +163,10 @@ impl CheckerState {
         census.set("query_links", &query.index_constraints_checked);
         census.set("query_links", &query.accessor_pairs_checked);
         census.map("query_links", &query.context_free_types);
+        census.map("query_links", &query.symbol_table_aliases);
+        for aliases in query.symbol_table_aliases.values() {
+            census.vec_capacity("query_links", aliases, aliases.capacity());
+        }
         census.map("type_caches", &query.array_literal_types);
         census.map("type_caches", &query.widened_types);
         census.map("query_links", &query.assertion_types);
