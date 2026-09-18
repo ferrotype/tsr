@@ -209,3 +209,46 @@ fn formatting_on_enter_touches_the_previous_line_and_the_current_one() {
         ]
     );
 }
+
+#[test]
+fn deep_document_descent_grows_a_small_caller_stack() {
+    const DEPTH: usize = 2_048;
+    std::thread::Builder::new()
+        .stack_size(512 * 1024)
+        .spawn(|| {
+            let text = format!("{}x{};", "(".repeat(DEPTH), ")".repeat(DEPTH));
+            let context = crate::FormatContext::new(FormatCodeSettings::default(), b"\n");
+            with_file(text.as_bytes(), |file| {
+                crate::recursion::take_growths();
+                assert!(crate::format_document(file, &context).unwrap().is_empty());
+                assert!(crate::recursion::take_growths() > 0);
+            });
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+#[test]
+fn deep_completion_descent_grows_a_small_caller_stack() {
+    const DEPTH: usize = 12_000;
+    std::thread::Builder::new()
+        .stack_size(512 * 1024)
+        .spawn(|| {
+            let text = format!("{}x", "!".repeat(DEPTH));
+            with_file(text.as_bytes(), |file| {
+                let statements = file
+                    .node(file.source)
+                    .unwrap()
+                    .statements(file.view)
+                    .unwrap();
+                let statement = file.view.node_slice(statements).unwrap().get(0).unwrap();
+                crate::recursion::take_growths();
+                assert!(crate::lsutil::is_completed_node(file, statement).unwrap());
+                assert!(crate::recursion::take_growths() > 0);
+            });
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}

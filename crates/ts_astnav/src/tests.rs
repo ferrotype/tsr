@@ -121,3 +121,36 @@ fn an_identifier_in_a_nodes_trivia_is_the_pinned_assertion() {
     assert!(failures.iter().all(|message| message
         == "did not expect KindPropertyAccessExpression to have KindIdentifier in its trivia"));
 }
+
+#[test]
+fn deep_preceding_and_rightmost_searches_fit_a_small_caller_stack() {
+    const DEPTH: usize = 12_000;
+    let parenthesized = format!("{}x{};", "(".repeat(DEPTH), ")".repeat(DEPTH));
+    let unary = format!("{}x", "!".repeat(DEPTH));
+    let (file, root) = parse(b"/a.ts", parenthesized.as_bytes(), ts_core::ScriptKind::TS);
+    let (unary_file, unary_root) = parse(b"/b.ts", unary.as_bytes(), ts_core::ScriptKind::TS);
+    std::thread::Builder::new()
+        .stack_size(512 * 1024)
+        .spawn(move || {
+            let mut provider = ts_parser::ParserJsDocProvider::default();
+            let mut nav = Navigator::new(file.view(), root, &mut provider);
+            let expected = Some((K::Identifier, DEPTH as i32, DEPTH as i32 + 1));
+            assert_eq!(
+                describe(&file, nav.find_preceding_token(DEPTH as i64 + 1).unwrap()),
+                expected
+            );
+            let mut nav = Navigator::new(unary_file.view(), unary_root, &mut provider);
+            // At EOF this follows the rightmost valid child all the way down
+            // the prefix chain, rather than returning a trailing punctuation.
+            assert_eq!(
+                describe(
+                    &unary_file,
+                    nav.find_preceding_token(DEPTH as i64 + 1).unwrap()
+                ),
+                expected
+            );
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}

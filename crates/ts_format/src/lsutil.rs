@@ -373,6 +373,13 @@ pub(crate) fn is_completed_node(
     file: &mut FormatFile<'_, '_>,
     node: Option<NodeId>,
 ) -> Result<bool, Error> {
+    crate::recursion::guarded(|| is_completed_node_worker(file, node))
+}
+
+fn is_completed_node_worker(
+    file: &mut FormatFile<'_, '_>,
+    node: Option<NodeId>,
+) -> Result<bool, Error> {
     let Some(node) = node else {
         return Ok(false);
     };

@@ -565,6 +565,7 @@ dependencies = [
 name = "ts_format"
 version = "0.1.0"
 dependencies = [
+ "stacker",
  "ts_arena",
  "ts_ast",
  "ts_astnav",

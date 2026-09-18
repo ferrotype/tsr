@@ -475,116 +475,128 @@ impl<'a, 'p> Navigator<'a, 'p> {
 
     fn find_preceding(
         &mut self,
-        n: NodeId,
+        mut n: NodeId,
         position: i64,
         exclude_jsdoc: bool,
     ) -> Result<Option<NodeId>, Error> {
-        {
-            let node = self.node(n)?;
-            if utilities_middle::is_non_whitespace_token(&node) && node.kind() != K::EndOfFile {
-                return Ok(Some(n));
-            }
-        }
-        // `found` is the leftmost child that contains the position; `previous`
-        // is the last child visited before it.
-        let mut found: Option<NodeId> = None;
-        let mut previous: Option<NodeId> = None;
-        for visit in self.visits(n)? {
-            match visit {
-                Visit::Node(node) => {
-                    if self.reparsed(node)? || found.is_some() {
-                        continue;
-                    }
-                    let previous_end = match previous {
-                        Some(previous) => Some(self.end(previous)?),
-                        None => None,
-                    };
-                    if position < self.end(node)? && previous_end.is_none_or(|end| end <= position)
-                    {
-                        found = Some(node);
-                    } else {
-                        previous = Some(node);
-                    }
+        // Upstream tail-recurses into one child; retain its visitation and
+        // scanner order without consuming one native frame per ancestor.
+        loop {
+            {
+                let node = self.node(n)?;
+                if utilities_middle::is_non_whitespace_token(&node) && node.kind() != K::EndOfFile {
+                    return Ok(Some(n));
                 }
-                Visit::List(list) => {
-                    if found.is_some() {
-                        continue;
-                    }
-                    let nodes = self.list_nodes(list)?;
-                    if nodes.is_empty() {
-                        continue;
-                    }
-                    let (index, matched) = binary_search_unique(nodes.len(), |middle| {
-                        // A reparsed JSDoc node ends before the node it is for.
-                        if self.reparsed(nodes[middle])? {
-                            return Ok(LESS_THAN);
+            }
+            // `found` is the leftmost child that contains the position; `previous`
+            // is the last child visited before it.
+            let mut found: Option<NodeId> = None;
+            let mut previous: Option<NodeId> = None;
+            for visit in self.visits(n)? {
+                match visit {
+                    Visit::Node(node) => {
+                        if self.reparsed(node)? || found.is_some() {
+                            continue;
                         }
-                        if position < self.end(nodes[middle])? {
-                            if middle == 0 || position >= self.end(nodes[middle - 1])? {
-                                return Ok(EQUAL_TO);
+                        let previous_end = match previous {
+                            Some(previous) => Some(self.end(previous)?),
+                            None => None,
+                        };
+                        if position < self.end(node)?
+                            && previous_end.is_none_or(|end| end <= position)
+                        {
+                            found = Some(node);
+                        } else {
+                            previous = Some(node);
+                        }
+                    }
+                    Visit::List(list) => {
+                        if found.is_some() {
+                            continue;
+                        }
+                        let nodes = self.list_nodes(list)?;
+                        if nodes.is_empty() {
+                            continue;
+                        }
+                        let (index, matched) = binary_search_unique(nodes.len(), |middle| {
+                            // A reparsed JSDoc node ends before the node it is for.
+                            if self.reparsed(nodes[middle])? {
+                                return Ok(LESS_THAN);
                             }
-                            return Ok(GREATER_THAN);
+                            if position < self.end(nodes[middle])? {
+                                if middle == 0 || position >= self.end(nodes[middle - 1])? {
+                                    return Ok(EQUAL_TO);
+                                }
+                                return Ok(GREATER_THAN);
+                            }
+                            Ok(LESS_THAN)
+                        })?;
+                        if matched {
+                            found = Some(nodes[index]);
                         }
-                        Ok(LESS_THAN)
-                    })?;
-                    if matched {
-                        found = Some(nodes[index]);
-                    }
-                    let lookup = if matched {
-                        index as isize - 1
-                    } else {
-                        nodes.len() as isize - 1
-                    };
-                    let mut at = lookup;
-                    while at >= 0 {
-                        if !self.reparsed(nodes[at as usize])? && previous.is_none() {
-                            previous = Some(nodes[at as usize]);
+                        let lookup = if matched {
+                            index as isize - 1
+                        } else {
+                            nodes.len() as isize - 1
+                        };
+                        let mut at = lookup;
+                        while at >= 0 {
+                            if !self.reparsed(nodes[at as usize])? && previous.is_none() {
+                                previous = Some(nodes[at as usize]);
+                            }
+                            at -= 1;
                         }
-                        at -= 1;
                     }
                 }
             }
-        }
 
-        if let Some(found) = found {
-            // A node's tokens span [start of node, node.end). Either the
-            // position precedes the child's tokens, so the answer is in a
-            // previous child or in the tokens between, or it is inside them.
-            let start = self.get_start_of_node(found, !exclude_jsdoc)?;
-            let look_in_previous = start >= position || !self.is_valid_preceding_node(found)?;
-            if !look_in_previous {
-                return self.find_preceding(found, position, exclude_jsdoc);
-            }
-            let found_pos = self.pos(found)?;
-            if position >= found_pos {
-                // JSDoc that precedes the found child.
-                let mut doc = None;
-                for &candidate in self.jsdoc_of(n)?.iter().rev() {
-                    if self.pos(candidate)? >= found_pos {
-                        doc = Some(candidate);
-                        break;
-                    }
+            if let Some(found) = found {
+                // A node's tokens span [start of node, node.end). Either the
+                // position precedes the child's tokens, so the answer is in a
+                // previous child or in the tokens between, or it is inside them.
+                let start = self.get_start_of_node(found, !exclude_jsdoc)?;
+                let look_in_previous = start >= position || !self.is_valid_preceding_node(found)?;
+                if !look_in_previous {
+                    n = found;
+                    continue;
                 }
-                if let Some(doc) = doc {
-                    let doc_end = self.end(doc)?;
-                    if !exclude_jsdoc && position < doc_end {
-                        return self.find_preceding(doc, position, exclude_jsdoc);
+                let found_pos = self.pos(found)?;
+                if position >= found_pos {
+                    // JSDoc that precedes the found child.
+                    let mut doc = None;
+                    for &candidate in self.jsdoc_of(n)?.iter().rev() {
+                        if self.pos(candidate)? >= found_pos {
+                            doc = Some(candidate);
+                            break;
+                        }
                     }
-                    return self.find_rightmost_valid_token(doc_end, n, position, exclude_jsdoc);
+                    if let Some(doc) = doc {
+                        let doc_end = self.end(doc)?;
+                        if !exclude_jsdoc && position < doc_end {
+                            n = doc;
+                            continue;
+                        }
+                        return self.find_rightmost_valid_token(
+                            doc_end,
+                            n,
+                            position,
+                            exclude_jsdoc,
+                        );
+                    }
+                    return self.find_rightmost_valid_token(found_pos, n, -1, exclude_jsdoc);
                 }
-                return self.find_rightmost_valid_token(found_pos, n, -1, exclude_jsdoc);
+                // The answer is in the tokens between two visited children.
+                return self.find_rightmost_valid_token(found_pos, n, position, exclude_jsdoc);
             }
-            // The answer is in the tokens between two visited children.
-            return self.find_rightmost_valid_token(found_pos, n, position, exclude_jsdoc);
-        }
 
-        // Either the position is at the end of the file, or the wanted token is
-        // among the trailing tokens of this node that no child covers.
-        let end = self.end(n)?;
-        if position >= end {
-            self.find_rightmost_valid_token(end, n, -1, exclude_jsdoc)
-        } else {
-            self.find_rightmost_valid_token(end, n, position, exclude_jsdoc)
+            // Either the position is at the end of the file, or the wanted token is
+            // among the trailing tokens of this node that no child covers.
+            let end = self.end(n)?;
+            return if position >= end {
+                self.find_rightmost_valid_token(end, n, -1, exclude_jsdoc)
+            } else {
+                self.find_rightmost_valid_token(end, n, position, exclude_jsdoc)
+            };
         }
     }
 
@@ -637,89 +649,108 @@ impl<'a, 'p> Navigator<'a, 'p> {
 
     fn rightmost(
         &mut self,
-        n: Option<NodeId>,
+        mut current: Option<NodeId>,
         mut end_pos: i64,
         containing: NodeId,
         position: i64,
         exclude_jsdoc: bool,
     ) -> Result<Option<NodeId>, Error> {
-        let Some(n) = n else {
-            return Ok(None);
-        };
-        if utilities_middle::is_non_whitespace_token(&self.node(n)?) {
-            return Ok(Some(n));
-        }
-        let mut rightmost_valid: Option<NodeId> = None;
-        // Nodes after the last valid node.
-        let mut rightmost_visited: Vec<NodeId> = Vec::new();
-        let mut has_children = false;
-        for visit in self.visits(n)? {
-            match visit {
-                Visit::Node(node) => {
-                    if self.reparsed(node)? {
-                        continue;
-                    }
-                    has_children = true;
-                    if !self.should_visit(node, end_pos, position, exclude_jsdoc)? {
-                        continue;
-                    }
-                    rightmost_visited.push(node);
-                    if self.is_valid_preceding_node(node)? {
-                        rightmost_valid = Some(node);
-                        rightmost_visited.clear();
-                    }
-                }
-                Visit::List(list) => {
-                    let nodes = self.list_nodes(list)?;
-                    if nodes.is_empty() {
-                        continue;
-                    }
-                    has_children = true;
-                    let (index, _) = binary_search_unique(nodes.len(), |middle| {
-                        Ok(if self.end(nodes[middle])? > end_pos {
-                            GREATER_THAN
-                        } else {
-                            LESS_THAN
-                        })
-                    })?;
-                    let mut valid_index: isize = -1;
-                    let mut at = index as isize - 1;
-                    while at >= 0 {
-                        let candidate = nodes[at as usize];
-                        if self.should_visit(candidate, end_pos, position, exclude_jsdoc)?
-                            && self.is_valid_preceding_node(candidate)?
-                        {
-                            valid_index = at;
-                            rightmost_valid = Some(candidate);
-                            break;
+        loop {
+            let Some(n) = current else {
+                return Ok(None);
+            };
+            if utilities_middle::is_non_whitespace_token(&self.node(n)?) {
+                return Ok(Some(n));
+            }
+            let mut rightmost_valid: Option<NodeId> = None;
+            // Nodes after the last valid node.
+            let mut rightmost_visited: Vec<NodeId> = Vec::new();
+            let mut has_children = false;
+            for visit in self.visits(n)? {
+                match visit {
+                    Visit::Node(node) => {
+                        if self.reparsed(node)? {
+                            continue;
                         }
-                        at -= 1;
+                        has_children = true;
+                        if !self.should_visit(node, end_pos, position, exclude_jsdoc)? {
+                            continue;
+                        }
+                        rightmost_visited.push(node);
+                        if self.is_valid_preceding_node(node)? {
+                            rightmost_valid = Some(node);
+                            rightmost_visited.clear();
+                        }
                     }
-                    for &candidate in &nodes[(valid_index + 1) as usize..index] {
-                        if self.should_visit(candidate, end_pos, position, exclude_jsdoc)? {
-                            rightmost_visited.push(candidate);
+                    Visit::List(list) => {
+                        let nodes = self.list_nodes(list)?;
+                        if nodes.is_empty() {
+                            continue;
+                        }
+                        has_children = true;
+                        let (index, _) = binary_search_unique(nodes.len(), |middle| {
+                            Ok(if self.end(nodes[middle])? > end_pos {
+                                GREATER_THAN
+                            } else {
+                                LESS_THAN
+                            })
+                        })?;
+                        let mut valid_index: isize = -1;
+                        let mut at = index as isize - 1;
+                        while at >= 0 {
+                            let candidate = nodes[at as usize];
+                            if self.should_visit(candidate, end_pos, position, exclude_jsdoc)?
+                                && self.is_valid_preceding_node(candidate)?
+                            {
+                                valid_index = at;
+                                rightmost_valid = Some(candidate);
+                                break;
+                            }
+                            at -= 1;
+                        }
+                        for &candidate in &nodes[(valid_index + 1) as usize..index] {
+                            if self.should_visit(candidate, end_pos, position, exclude_jsdoc)? {
+                                rightmost_visited.push(candidate);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // The answer is a token of the rightmost valid node, or one of the
-        // tokens after it that no child covers, or this childless node itself.
-        // JSDoc nodes do not have trivia tokens as children.
-        if !self.should_skip_child(n)? {
-            let mut start_pos = match rightmost_valid {
-                Some(valid) => self.end(valid)?,
-                None => self.pos(n)?,
-            };
-            let jsx_child = utilities::is_jsx_child(&self.node(n)?);
-            let view = self.view;
-            let file = view.source_file(self.source)?;
-            let mut scanner = ts_scanner::get_scanner_for_source_file(&file, start_pos);
-            let mut tokens: Vec<NodeId> = Vec::new();
-            for &visited in &rightmost_visited {
-                // Trailing tokens that occur before this node.
-                let limit = self.pos(visited)?.min(position);
+            // The answer is a token of the rightmost valid node, or one of the
+            // tokens after it that no child covers, or this childless node itself.
+            // JSDoc nodes do not have trivia tokens as children.
+            if !self.should_skip_child(n)? {
+                let mut start_pos = match rightmost_valid {
+                    Some(valid) => self.end(valid)?,
+                    None => self.pos(n)?,
+                };
+                let jsx_child = utilities::is_jsx_child(&self.node(n)?);
+                let view = self.view;
+                let file = view.source_file(self.source)?;
+                let mut scanner = ts_scanner::get_scanner_for_source_file(&file, start_pos);
+                let mut tokens: Vec<NodeId> = Vec::new();
+                for &visited in &rightmost_visited {
+                    // Trailing tokens that occur before this node.
+                    let limit = self.pos(visited)?.min(position);
+                    while start_pos < limit {
+                        let token = scan_navigation_token(&mut scanner, jsx_child);
+                        if scanner.token_start() >= limit {
+                            break;
+                        }
+                        let (full_start, token_end) =
+                            (scanner.token_full_start(), scanner.token_end());
+                        start_pos = token_end;
+                        let flags = scanner.token_flags();
+                        tokens.push(self.token(token, full_start, token_end, n, flags)?);
+                        scanner.scan();
+                    }
+                    start_pos = self.end(visited)?;
+                    scanner.reset_pos(start_pos);
+                    scanner.scan();
+                }
+                // Trailing tokens after the last visited node.
+                let limit = end_pos.min(position);
                 while start_pos < limit {
                     let token = scan_navigation_token(&mut scanner, jsx_child);
                     if scanner.token_start() >= limit {
@@ -731,43 +762,21 @@ impl<'a, 'p> Navigator<'a, 'p> {
                     tokens.push(self.token(token, full_start, token_end, n, flags)?);
                     scanner.scan();
                 }
-                start_pos = self.end(visited)?;
-                scanner.reset_pos(start_pos);
-                scanner.scan();
-            }
-            // Trailing tokens after the last visited node.
-            let limit = end_pos.min(position);
-            while start_pos < limit {
-                let token = scan_navigation_token(&mut scanner, jsx_child);
-                if scanner.token_start() >= limit {
-                    break;
-                }
-                let (full_start, token_end) = (scanner.token_full_start(), scanner.token_end());
-                start_pos = token_end;
-                let flags = scanner.token_flags();
-                tokens.push(self.token(token, full_start, token_end, n, flags)?);
-                scanner.scan();
-            }
-            for &token in tokens.iter().rev() {
-                if !utilities_middle::is_whitespace_only_jsx_text(&self.node(token)?) {
-                    return Ok(Some(token));
+                for &token in tokens.iter().rev() {
+                    if !utilities_middle::is_whitespace_only_jsx_text(&self.node(token)?) {
+                        return Ok(Some(token));
+                    }
                 }
             }
-        }
 
-        if !has_children {
-            return Ok((n != containing).then_some(n));
+            if !has_children {
+                return Ok((n != containing).then_some(n));
+            }
+            if let Some(valid) = rightmost_valid {
+                end_pos = self.end(valid)?;
+            }
+            current = rightmost_valid;
         }
-        if let Some(valid) = rightmost_valid {
-            end_pos = self.end(valid)?;
-        }
-        self.rightmost(
-            rightmost_valid,
-            end_pos,
-            containing,
-            position,
-            exclude_jsdoc,
-        )
     }
 
     // port: tsc/internal/astnav/tokens.go:FindNextToken

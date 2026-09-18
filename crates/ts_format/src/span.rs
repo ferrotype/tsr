@@ -925,6 +925,27 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
         indentation: i64,
         delta: i64,
     ) -> Result<(), Error> {
+        crate::recursion::guarded(|| {
+            self.process_node_worker(
+                node,
+                context_node,
+                node_start_line,
+                undecorated_node_start_line,
+                indentation,
+                delta,
+            )
+        })
+    }
+
+    fn process_node_worker(
+        &mut self,
+        node: NodeId,
+        context_node: Option<NodeId>,
+        node_start_line: i64,
+        undecorated_node_start_line: i64,
+        indentation: i64,
+        delta: i64,
+    ) -> Result<(), Error> {
         let range = with_token_start(self.file(), node)?;
         if !overlaps(self.original_range, range) {
             return Ok(());

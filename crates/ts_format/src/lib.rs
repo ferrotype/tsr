@@ -10,6 +10,7 @@ mod api;
 mod context;
 mod indent;
 mod lsutil;
+mod recursion;
 mod rule;
 mod rulecontext;
 mod rules;

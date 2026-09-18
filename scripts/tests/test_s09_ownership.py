@@ -2,7 +2,10 @@ import copy
 from contextlib import redirect_stderr
 import io
 from pathlib import Path
+import re
+import subprocess
 import sys
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -10,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from s09_ownership import CRITERIA, MODES, OWNERSHIP_SUITES, RETENTION, SUITES, measure, publish_metrics, validate_manifest
 import s09_format
 import s09_printing
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def inventory():
@@ -289,6 +294,19 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_manifest(manifest)
 
+    def test_ci_rejects_each_s09_suite_failure_in_every_mode(self):
+        workflow = (ROOT / ".github/workflows/status.yml").read_text()
+        required = re.findall(r"'run\.e3\.(\w+) == true'", workflow)
+        for suite in SUITES:
+            for mode in MODES:
+                modes = copy.deepcopy(self.modes)
+                modes[mode][suite] = False
+                report = {"metrics": {}}
+                publish_metrics(report, modes, self.arena, self.manifest)
+                with self.subTest(suite=suite, mode=mode):
+                    self.assertTrue(any(report["metrics"].get(name) is False for name in required),
+                                    "CI must reject the producer's valid failing result")
+
     def test_missing_or_untyped_measurements_cannot_claim_success(self):
         for mode in MODES:
             changed = copy.deepcopy(self.modes)
@@ -314,6 +332,54 @@ class CheckerOwnershipProducer(unittest.TestCase):
             del changed_arena[mode]
             with self.assertRaises(ValueError):
                 publish_metrics({"metrics": {}}, self.modes, changed_arena, self.manifest)
+
+
+class OwnershipInputsAndCI(unittest.TestCase):
+    def test_e3_fingerprints_the_test_packages_dependency_closure_and_insertion_inputs(self):
+        runs = tomllib.loads((ROOT / "status/runs.toml").read_text())
+
+        def tracked(*patterns):
+            return set(subprocess.check_output(
+                ["git", "ls-files", "-z", "--", *patterns], cwd=ROOT
+            ).decode().rstrip("\0").split("\0")) - {""}
+
+        covered = tracked(*(f":(top,glob){pattern}" for pattern in runs["e3"]["sources"]))
+        suite_manifests = {(ROOT / "crates" / package / "Cargo.toml").resolve()
+                           for package, _ in SUITES.values()}
+        pending = list(suite_manifests)
+        visited = set()
+        required = set()
+        while pending:
+            manifest = pending.pop().resolve()
+            if manifest in visited:
+                continue
+            visited.add(manifest)
+            required |= tracked(str(manifest.parent.relative_to(ROOT)))
+            package = tomllib.loads(manifest.read_text())
+            scopes = [package, *package.get("target", {}).values()]
+            # Cargo builds dev dependencies only for the selected test
+            # packages, not for every library in their dependency graph.
+            sections = ["dependencies", "build-dependencies"]
+            if manifest in suite_manifests:
+                sections.append("dev-dependencies")
+            for scope in scopes:
+                for section in sections:
+                    for dependency in scope.get(section, {}).values():
+                        if isinstance(dependency, dict) and "path" in dependency:
+                            pending.append(manifest.parent / dependency["path"] / "Cargo.toml")
+        required |= tracked("tools/s09/format_oracle")
+        required |= {"scripts/s09_format.py", "data/s09/insertion-cases.json",
+                     "data/s09/insertion-observations.json"}
+        self.assertFalse(required - covered, f"unfingerprinted E3 inputs: {sorted(required - covered)}")
+
+    def test_ci_runs_navigation_and_formatter_regressions_in_both_profiles(self):
+        workflow = (ROOT / ".github/workflows/status.yml").read_text()
+        commands = [line.strip() for line in workflow.splitlines() if "cargo test " in line]
+        for package in ("ts_astnav", "ts_format"):
+            for release in (False, True):
+                with self.subTest(package=package, release=release):
+                    self.assertTrue(any(f"-p {package} " in line and
+                                        ("--release" in line) == release for line in commands))
 
 
 if __name__ == "__main__":
