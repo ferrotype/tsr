@@ -170,6 +170,34 @@ fn navigation(view: AstView<'_>, source: NodeId, length: usize, detail: bool) ->
     stream.result()
 }
 
+/// The edit list is the observation. Whether it applies is a second fact: some
+/// settings make the pinned formatter emit overlapping edits.
+fn document(
+    view: AstView<'_>,
+    root: NodeId,
+    edits: &[ts_core::TextChange],
+    detail: bool,
+) -> Result<Value, String> {
+    let mut stream = Stream::new(detail);
+    for edit in edits {
+        stream.row(&format!(
+            "E|{}|{}|{}",
+            edit.range.pos(),
+            edit.range.end(),
+            hex(&edit.new_text)
+        ));
+    }
+    let Value::Object(mut out) = stream.result() else {
+        unreachable!("a stream result is an object");
+    };
+    let state = view.source_file(root).map_err(|e| format!("{e:?}"))?;
+    match ts_core::apply_bulk_edits(state.text().as_bytes(), edits) {
+        Ok(text) => out.insert("text_sha256".into(), json!(hex(&Sha256::digest(&text)))),
+        Err(error) => out.insert("text_panic".into(), json!(error.to_string())),
+    };
+    Ok(Value::Object(out))
+}
+
 fn observe(request: &Value) -> Result<Value, String> {
     let field = |name: &str| request.get(name).ok_or_else(|| format!("missing {name}"));
     let text = |name: &str| {
@@ -232,6 +260,66 @@ fn observe(request: &Value) -> Result<Value, String> {
         match op {
             "nav" => {
                 out.insert("nav".into(), navigation(view, root, length, detail));
+            }
+            "entry" => {
+                let mut result = Map::new();
+                let positions = positions(length);
+                for name in ["default", "dense", "terse"] {
+                    let mut stream = Stream::new(detail);
+                    let mut provider = ts_parser::ParserJsDocProvider::default();
+                    let mut format_file = ts_format::FormatFile {
+                        view,
+                        source: root,
+                        jsdoc: &mut provider,
+                    };
+                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    let new_line = settings.editor.new_line_character.clone();
+                    let context = ts_format::FormatContext::new(settings, &new_line);
+                    ts_format::probe::entry(&mut format_file, &context, &positions, &mut |row| {
+                        stream.row(row);
+                    });
+                    result.insert(name.into(), stream.result());
+                }
+                out.insert("entry".into(), Value::Object(result));
+            }
+            "format" => {
+                let mut result = Map::new();
+                for name in ["default", "tabs", "two", "dense", "terse"] {
+                    let mut provider = ts_parser::ParserJsDocProvider::default();
+                    let mut format_file = ts_format::FormatFile {
+                        view,
+                        source: root,
+                        jsdoc: &mut provider,
+                    };
+                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    let new_line = settings.editor.new_line_character.clone();
+                    let context = ts_format::FormatContext::new(settings, &new_line);
+                    let answer = match ts_format::format_document(&mut format_file, &context) {
+                        Ok(edits) => document(view, root, &edits, detail)?,
+                        Err(error) => json!({"panic": error.to_string()}),
+                    };
+                    result.insert(name.into(), answer);
+                }
+                out.insert("format".into(), Value::Object(result));
+            }
+            "indent" => {
+                let mut result = Map::new();
+                let positions = positions(length);
+                for name in ["default", "tabs", "two"] {
+                    let mut stream = Stream::new(detail);
+                    let mut provider = ts_parser::ParserJsDocProvider::default();
+                    let mut format_file = ts_format::FormatFile {
+                        view,
+                        source: root,
+                        jsdoc: &mut provider,
+                    };
+                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    ts_format::probe::indent(&mut format_file, &settings, &positions, &mut |row| {
+                        stream.row(row);
+                    });
+                    result.insert(name.into(), stream.result());
+                }
+                out.insert("indent".into(), Value::Object(result));
             }
             "rules" => {
                 let mut result = Map::new();

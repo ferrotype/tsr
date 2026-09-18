@@ -29,16 +29,17 @@ ORACLE = ROOT / "tools/s09/format_oracle/main.go"
 BRIDGE = ROOT / "tools/s09/format_oracle/format_bridge.go"
 PROBES = ROOT / "data/s09/format-probes.json"
 EXPORT_PATHS = ("tsc/go.mod", "tsc/go.sum", "tsc/internal")
-OPS = ("nav", "indent", "format", "position", "insert", "scan", "rules")
+OPS = ("nav", "indent", "format", "position", "insert", "scan", "rules", "entry")
 # Facts about the implementation rather than about an input. They are asked once,
 # with the first input of the inventory as the carrier.
 GLOBAL_OPS = ("rulesmap",)
 INDENT_VARIANTS = ("default", "tabs", "two")
 INSERT_VARIANTS = ("default", "tabs")
 FORMAT_VARIANTS = ("default", "tabs", "two", "dense", "terse")
+ENTRY_VARIANTS = ("default", "dense", "terse")
 # Operations that answer with one stream, and those that answer per settings variant.
 SINGLE = ("nav", "position", "scan", "rulesmap")
-VARIANTS = {"indent": INDENT_VARIANTS, "format": FORMAT_VARIANTS, "insert": INSERT_VARIANTS, "rules": FORMAT_VARIANTS}
+VARIANTS = {"indent": INDENT_VARIANTS, "format": FORMAT_VARIANTS, "insert": INSERT_VARIANTS, "rules": FORMAT_VARIANTS, "entry": ENTRY_VARIANTS}
 REQUEST_FIELDS = ("source_hex", "filename", "path", "script_kind", "jsx", "force")
 VERSION = 1
 

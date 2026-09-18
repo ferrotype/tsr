@@ -99,9 +99,7 @@ pub fn get_line_start_position_for_position(
     position: i64,
     file: &FormatFile<'_, '_>,
 ) -> Result<i64, Error> {
-    let line = file.line_of(position)?;
-    let state = file.view.source_file(file.source)?;
-    Ok(i64::from(state.ecma_line_map()[line as usize]))
+    file.line_start(file.line_of(position)?)
 }
 
 /// Checking the kind makes sure the token was typed in the expected context,

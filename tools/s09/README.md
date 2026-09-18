@@ -64,6 +64,15 @@ Operations, with the call shapes the formatter itself uses:
 - `format`: the `FormatDocument` edit list under `default`, `tabs`, `two`,
   `dense` and `terse`. The last two flip the rule options away from their
   defaults, including semicolon insertion and removal.
+- `entry`: the other entry points, under `default`, `dense` and `terse`:
+  `FormatOnEnter` at the first 64 line starts, `FormatSelection` between every
+  sixteenth navigation offset and the next, and `FormatOnSemicolon`,
+  `FormatOnOpeningCurly` and `FormatOnClosingCurly` after the first 24
+  occurrences of their character. A character inside a string or a comment is a
+  legitimate request: the entry point decides there is nothing to format. Each
+  row carries the whole edit list. This probe stands in for the fourslash
+  recording the plan first sketched: it reaches the same five entry points over
+  the whole inventory rather than over some two hundred recorded calls.
 - `position`: each of the first four statements is encoded to protocol bytes and
   decoded into a fresh tree, as an API request carries it, then passed to
   `PrintAndPositionNode`. Rows are the wire digest, the printed text, and the

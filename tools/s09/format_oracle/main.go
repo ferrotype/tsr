@@ -237,6 +237,67 @@ func indentation(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detai
 	return s.result()
 }
 
+// edits is one edit list on one row.
+func edits(list []core.TextChange) string {
+	parts := make([]string, 0, len(list))
+	for _, edit := range list {
+		parts = append(parts, strconv.Itoa(edit.Pos())+","+strconv.Itoa(edit.End())+","+hex.EncodeToString([]byte(edit.NewText)))
+	}
+	return strings.Join(parts, ";")
+}
+
+const (
+	maxEnterLines = 64
+	maxTriggers   = 24
+)
+
+// entries exercises the entry points other than FormatDocument: on Enter at the
+// first line starts, a selection between sampled positions, and the three
+// typed-character entry points after the first occurrences of their character.
+// A character inside a string or comment is a legitimate request: the entry
+// point itself decides that there is nothing to format.
+func entries(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detail bool) map[string]any {
+	ctx := format.WithFormatCodeSettings(context.Background(), settings, settings.NewLineCharacter)
+	s := newStream(detail)
+	for index, start := range scanner.GetECMALineStarts(file) {
+		if index >= maxEnterLines {
+			break
+		}
+		p := int(start)
+		s.row("N|" + strconv.Itoa(p) + "|" + call(func() string { return edits(format.FormatOnEnter(ctx, file, p)) }))
+	}
+	sampled := positions(len(file.Text()))
+	for index := 0; index < len(sampled); index += 16 {
+		p, q := sampled[index], len(file.Text())
+		if index+16 < len(sampled) {
+			q = sampled[index+16]
+		}
+		s.row("S|" + strconv.Itoa(p) + "|" + strconv.Itoa(q) + "|" + call(func() string { return edits(format.FormatSelection(ctx, file, p, q)) }))
+	}
+	triggers := []struct {
+		character byte
+		name      string
+		run       func(position int) []core.TextChange
+	}{
+		{';', "M", func(p int) []core.TextChange { return format.FormatOnSemicolon(ctx, file, p) }},
+		{'{', "O", func(p int) []core.TextChange { return format.FormatOnOpeningCurly(ctx, file, p) }},
+		{'}', "C", func(p int) []core.TextChange { return format.FormatOnClosingCurly(ctx, file, p) }},
+	}
+	text := file.Text()
+	for _, trigger := range triggers {
+		seen := 0
+		for index := 0; index < len(text) && seen < maxTriggers; index++ {
+			if text[index] != trigger.character {
+				continue
+			}
+			seen++
+			p := index + 1
+			s.row(trigger.name + "|" + strconv.Itoa(p) + "|" + call(func() string { return edits(trigger.run(p)) }))
+		}
+	}
+	return s.result()
+}
+
 func document(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detail bool) map[string]any {
 	ctx := format.WithFormatCodeSettings(context.Background(), settings, settings.NewLineCharacter)
 	edits := format.FormatDocument(ctx, file)
@@ -428,6 +489,14 @@ func observe(r request) map[string]any {
 				guarded(result, v.name, func() any { return document(file, v.settings, r.Detail) })
 			}
 			out["format"] = result
+		case "entry":
+			result := map[string]any{}
+			for _, v := range variants() {
+				if v.name == "default" || v.name == "dense" || v.name == "terse" {
+					guarded(result, v.name, func() any { return entries(file, v.settings, r.Detail) })
+				}
+			}
+			out["entry"] = result
 		case "position":
 			guarded(out, "position", func() any { return positioned(file, r.Detail) })
 		case "rules":

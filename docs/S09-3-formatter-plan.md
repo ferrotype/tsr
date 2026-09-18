@@ -130,8 +130,9 @@ freezes the inventory digest, the operation and variant contract and the digest
 of the whole native stream. And the denominator is the S06 parser inventory
 reduced to its 16,120 distinct parser inputs. Positioned printing and insertion
 are corpus-wide probes too, over each file's leading statements, rather than a
-handful of fixtures. Still to do under F0: the fourslash recording, before F6,
-and the scanner and rule probes when F3 and F4 start.
+handful of fixtures. The scanner and rule probes were added when F3 and F4
+started. The fourslash recording was replaced by the corpus-wide `entry` probe
+(see F6).
 
 The original sketch: a Go overlay beside
 `tools/s09/printing_test.go`, run with Go 1.27.1 and `GOTOOLCHAIN=local`, that
@@ -228,9 +229,44 @@ call: `GetFirstToken`, `GetLastToken`, `GetLastChild` and
 **F5. Smart indenter.** `indent.go`. Exit: every indentation probe matches in
 all three settings variants.
 
+Done. `compare --ops indent` reports 16,120 of 16,120 at the first complete run.
+Ignoring whether a list indents its children makes 1,340 of the first 3,000
+inputs differ, so the check can fail. Disabling the restoration of a call
+argument's true start line changes nothing in those 3,000: that path needs an
+argument on the callee's line under a parent that would add a level, which is
+rare, so the probe says little about it. The indenter pulled in
+`PositionBelongsToNode` and `IsCompletedNode` from the language-service
+helpers. One upstream quirk is kept: when it measures leading whitespace a tab
+advances the column by `tabSize + column % tabSize`, not to the next tab stop,
+while the span worker's own `characterToColumn` uses the tab stop.
+
 **F6. Span worker and entry points.** `span.go` and `api.go`. Exit: every
-`FormatDocument` edit list and every fourslash-derived case matches, byte for
-byte and edit for edit.
+`FormatDocument` edit list and every case of the other entry points matches,
+byte for byte and edit for edit.
+
+Done. `compare --ops format` reports 16,120 of 16,120 under all five settings at
+the first complete run, including the 1,529 inputs whose edit lists overlap and
+cannot be applied, with the same failure text. The other five entry points are
+held by a new corpus-wide probe, `entry`, instead of the fourslash recording
+sketched in F0: `FormatOnEnter` at the first 64 line starts, `FormatSelection`
+between sampled offsets, and the three typed-character entry points after the
+first 24 occurrences of their character, under three settings. That is
+1,896,084 rows over the whole inventory against some two hundred recorded
+calls, and it reaches partial ranges, which the document probe cannot.
+`compare --ops entry` reports 16,120 of 16,120 at the first complete run.
+
+Mutations, over the whole inventory: applying the rules in forward order makes
+1,680 inputs differ; dropping the trailing edit at the end of the range, 14,253;
+dropping the line-break adjustment of `FormatOnEnter`, 154; dropping the
+fallback of the scan start to the enclosing node, 14. Processing a modifier
+list as a list instead of modifier by modifier, which is how upstream's visitor
+treats it, changes nothing: for modifiers the two paths compute the same
+indentation, so that choice follows the source and is not observable.
+
+Upstream shares dynamic indenters by pointer and mutates them when a rule adds
+or removes a line; here they live in a vector owned by the worker and are named
+by index. The visit order is `VisitEachChild`'s, exposed from `ts_astnav`. The
+temporary `allow(dead_code)` is gone.
 
 **F7. API and ownership.** `ts_api` gains insertion formatting beside printing.
 The request owns the decoded tree, the positioned clone, the synthetic source

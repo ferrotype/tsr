@@ -236,3 +236,129 @@ pub fn rules_map(row: &mut dyn FnMut(&str)) {
         }
     }
 }
+
+/// The indentation at every line start, with and without the close-brace
+/// assumption, and at every eighth of the given positions.
+pub fn indent(
+    file: &mut FormatFile<'_, '_>,
+    options: &crate::FormatCodeSettings,
+    positions: &[i64],
+    row: &mut dyn FnMut(&str),
+) {
+    let answer = |file: &mut FormatFile<'_, '_>, position: i64, assume: bool| {
+        match crate::indent::get_indentation(file, position, options, assume) {
+            Ok(value) => value.to_string(),
+            Err(error) => format!("!{error}"),
+        }
+    };
+    let line_starts: Vec<i64> = match file.view.source_file(file.source) {
+        Ok(state) => state
+            .ecma_line_map()
+            .iter()
+            .map(|&p| i64::from(p))
+            .collect(),
+        Err(error) => {
+            row(&format!("L|!{error:?}"));
+            Vec::new()
+        }
+    };
+    for position in line_starts {
+        for assume in [false, true] {
+            let text = answer(file, position, assume);
+            row(&format!("L|{position}|{}|{text}", u8::from(assume)));
+        }
+    }
+    for &position in positions.iter().step_by(8) {
+        let text = answer(file, position, false);
+        row(&format!("I|{position}|{text}"));
+    }
+}
+
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+    bytes.iter().fold(String::new(), |mut out, byte| {
+        let _ = write!(out, "{byte:02x}");
+        out
+    })
+}
+
+fn edits(list: Result<Vec<ts_core::TextChange>, Error>) -> String {
+    match list {
+        Ok(list) => list
+            .iter()
+            .map(|edit| {
+                format!(
+                    "{},{},{}",
+                    edit.range.pos(),
+                    edit.range.end(),
+                    hex(&edit.new_text)
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(";"),
+        Err(error) => format!("!{error}"),
+    }
+}
+
+const MAX_ENTER_LINES: usize = 64;
+const MAX_TRIGGERS: usize = 24;
+
+/// The entry points other than `format_document`: on Enter at the first line
+/// starts, a selection between sampled positions, and the three
+/// typed-character entry points after the first occurrences of their character.
+pub fn entry(
+    file: &mut FormatFile<'_, '_>,
+    context: &crate::FormatContext,
+    positions: &[i64],
+    row: &mut dyn FnMut(&str),
+) {
+    let (line_starts, text): (Vec<i64>, Vec<u8>) = match file.view.source_file(file.source) {
+        Ok(state) => (
+            state
+                .ecma_line_map()
+                .iter()
+                .map(|&p| i64::from(p))
+                .collect(),
+            state.text().as_bytes().to_vec(),
+        ),
+        Err(error) => {
+            row(&format!("N|!{error:?}"));
+            return;
+        }
+    };
+    for &position in line_starts.iter().take(MAX_ENTER_LINES) {
+        let answer = edits(crate::format_on_enter(file, context, position));
+        row(&format!("N|{position}|{answer}"));
+    }
+    for index in (0..positions.len()).step_by(16) {
+        let start = positions[index];
+        let end = positions
+            .get(index + 16)
+            .copied()
+            .unwrap_or(text.len() as i64);
+        let answer = edits(crate::format_selection(file, context, start, end));
+        row(&format!("S|{start}|{end}|{answer}"));
+    }
+    type Run = fn(
+        &mut FormatFile<'_, '_>,
+        &crate::FormatContext,
+        i64,
+    ) -> Result<Vec<ts_core::TextChange>, Error>;
+    let triggers: [(u8, &str, Run); 3] = [
+        (b';', "M", crate::format_on_semicolon),
+        (b'{', "O", crate::format_on_opening_curly),
+        (b'}', "C", crate::format_on_closing_curly),
+    ];
+    for (character, name, run) in triggers {
+        let found = text
+            .iter()
+            .enumerate()
+            .filter(|&(_, &byte)| byte == character)
+            .take(MAX_TRIGGERS);
+        for (index, _) in found {
+            let position = index as i64 + 1;
+            let answer = edits(run(file, context, position));
+            row(&format!("{name}|{position}|{answer}"));
+        }
+    }
+}

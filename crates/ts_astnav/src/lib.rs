@@ -55,8 +55,8 @@ pub enum ChildVisit {
 }
 
 /// One hook call of upstream's visitor: a node (or token) child, or a list.
-#[derive(Clone, Copy)]
-enum Visit {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Visit {
     Node(NodeId),
     List(NodeListId),
 }
@@ -91,6 +91,36 @@ fn kind_name(kind: NodeKind) -> String {
         Some(kind) => format!("Kind{kind:?}"),
         None => format!("Kind({})", kind.raw()),
     }
+}
+
+/// The hook calls of `node.VisitEachChild`, in order: a node, or a list that
+/// upstream hands to `VisitNodes` or `VisitModifiers`.
+pub fn visit_each_child(view: AstView<'_>, id: NodeId) -> Result<Vec<Visit>, Error> {
+    let node = view.node(id)?;
+    let visits = if let Some(tag) = node.data_source().as_js_doc_parameter_or_property_tag() {
+        // `VisitEachChild` and `ForEachChild` disagree for this one kind.
+        // `ForEachChild` follows `IsNameFirst`; `VisitEachChild`, which
+        // the searches here and the formatter use, always visits the name before the type
+        // (ast.go:visitEachChild_JSDocParameterOrPropertyTag).
+        [tag.tag_name(), tag.name(), tag.type_expression()]
+            .into_iter()
+            .flatten()
+            .map(Visit::Node)
+            .chain(tag.comment().map(Visit::List))
+            .collect()
+    } else {
+        let mut collect = Collect {
+            view,
+            out: Vec::new(),
+            error: None,
+        };
+        let _ = node.for_each_child(&mut collect);
+        if let Some(error) = collect.error {
+            return Err(error.into());
+        }
+        collect.out
+    };
+    Ok(visits)
 }
 
 pub struct Navigator<'a, 'p> {
@@ -188,30 +218,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
     /// The hook calls of `node.VisitEachChild` under upstream's visitor, which
     /// skips the comment of a JSDoc node whose comment is a single node.
     fn child_visits(&self, id: NodeId) -> Result<Vec<Visit>, Error> {
-        let node = self.node(id)?;
-        let visits = if let Some(tag) = node.data_source().as_js_doc_parameter_or_property_tag() {
-            // `VisitEachChild` and `ForEachChild` disagree for this one kind.
-            // `ForEachChild` follows `IsNameFirst`; `VisitEachChild`, which
-            // these searches use, always visits the name before the type
-            // (ast.go:visitEachChild_JSDocParameterOrPropertyTag).
-            [tag.tag_name(), tag.name(), tag.type_expression()]
-                .into_iter()
-                .flatten()
-                .map(Visit::Node)
-                .chain(tag.comment().map(Visit::List))
-                .collect()
-        } else {
-            let mut collect = Collect {
-                view: self.view,
-                out: Vec::new(),
-                error: None,
-            };
-            let _ = node.for_each_child(&mut collect);
-            if let Some(error) = collect.error {
-                return Err(error.into());
-            }
-            collect.out
-        };
+        let visits = visit_each_child(self.view, id)?;
         let mut out = Vec::with_capacity(visits.len());
         for visit in visits {
             let skipped = match visit {
