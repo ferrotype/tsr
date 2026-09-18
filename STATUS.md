@@ -183,10 +183,10 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 | E2: Checker slice | checker_throughput | `run.checkerbench.throughput_ratio > 0` measured Rust/Go checker throughput on the frozen query workload; positive finite measurement, not a speed target | missing | pending |
 | E2: Checker slice | checker_allocated_bytes | `run.checkerbench.allocated_bytes_ratio >= 0` measured Rust/Go bytes allocated during the fixed checker query phase, with raw samples and a positive Go denominator | missing | pending |
 | E2: Checker slice | checker_retained_bytes | `run.checkerbench.retained_bytes_ratio >= 0` measured Rust/Go retained bytes with the declared checker/result roots alive after the fixed query phase, with raw samples and a positive Go denominator | missing | pending |
-| E2: Checker slice | relater_prototype_parity | `run.relater.parity == 1` ID-based and arena-reference/interior-mutability relaters both match the pinned oracle over every frozen prototype case; no skipped cases | missing | pending |
-| E2: Checker slice | relater_throughput | `run.relater.throughput_ratio > 0` measured arena-reference/ID-based relater throughput on identical frozen cases; positive finite measurement, not a speed target | missing | pending |
-| E2: Checker slice | relater_allocated_bytes | `run.relater.allocated_bytes_ratio >= 0` measured arena-reference/ID-based relater allocations with raw samples and positive baseline bytes; required comparison, not a performance target | missing | pending |
-| E2: Checker slice | relater_retained_bytes | `run.relater.retained_bytes_ratio >= 0` measured arena-reference/ID-based retained bytes at the same declared live-root checkpoint; required comparison with positive baseline bytes | missing | pending |
+| E2: Checker slice | relater_prototype_parity | `run.relater.parity == 1` ID-based and arena-reference/interior-mutability relaters both match the pinned oracle over every frozen prototype case; no skipped cases | 1 | pass |
+| E2: Checker slice | relater_throughput | `run.relater.throughput_ratio > 0` measured arena-reference/ID-based relater throughput on identical frozen cases; positive finite measurement, not a speed target | 0.7839100288715761 | pass |
+| E2: Checker slice | relater_allocated_bytes | `run.relater.allocated_bytes_ratio >= 0` measured arena-reference/ID-based relater allocations with raw samples and positive baseline bytes; required comparison, not a performance target | 1.6110460792801111 | pass |
+| E2: Checker slice | relater_retained_bytes | `run.relater.retained_bytes_ratio >= 0` measured arena-reference/ID-based retained bytes at the same declared live-root checkpoint; required comparison with positive baseline bytes | 2.437409636562528 | pass |
 | E3: Ownership | shared_bound_file | `run.e3.shared_bound_file == true` two programs share a bound file; surviving queries pass after either program drops | missing | pending |
 | E3: Ownership | retained_snapshot_edit | `run.e3.retained_snapshot_edit == true` old and new snapshots answer correctly across an edit | missing | pending |
 | E3: Ownership | independent_checker_merges | `run.e3.independent_checker_merges == true` two checkers independently merge declarations over shared files | missing | pending |
@@ -265,7 +265,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | gen | stale: source, pin, command or inputs changed | [result](status/evidence/e45ec2dd03cc8a61ea3b84138edcd4ca7c38ca7bae07a0f8bc99596239bbafdb.json) |
 | oracle | stale: source, pin, command or inputs changed | [result](status/evidence/2b71ff1a3286440f59befb780814481acab1716b24cf2cce4194322b4f957e3c.json) |
 | program | stale: source, pin, command or inputs changed | [result](status/evidence/00814e46d2db7d3bb7ae9928a9812d8050484cb15fc01a3a4705144ab76dad05.json) |
-| relater | stale: source, pin, command or inputs changed | [result](status/evidence/9b0c4533f6c6f5d994553769f81987ab214daa74ffe2bf4dca09fe22464391fb.json) |
+| relater | current | [result](status/evidence/117d428fe897b74f5e6c8ee3f9636e7f197144d100bdad809eec0c9a78fa7841.json) |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/519c36d88600c6257ecdae96e00698f6ca4639c48e233fab391d999a12ec2fae.json) |
 | selftest | stale: source, pin, command or inputs changed | [result](status/evidence/163b27a666508309962f8759af73fef3723355bfa25c881af2d48c7f6321e79e.json) |
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/eed06f93dd2b7cfbe5bb3ce817fd670b5e4de87de7585d2dd8792be9fd674060.json) |
@@ -486,7 +486,7 @@ Items:
 - [ ] S08-7 Per-type footprint on the subset, Rust against Go
 - [ ] S08-8 E4 integration through production literal-type construction and original-source versus regenerated literal printing, including WTF-8 and malformed input
 - [ ] S08-9 Measure checker throughput, bytes allocated and retained bytes against the pinned Go checker on a fixed query workload; retain raw samples and configuration with the evidence, separate from parse-and-bind results
-- [ ] S08-10 Prototype the arena-reference/interior-mutability relater (ADR 0008), require parity on the frozen relater fixtures, and compare throughput, allocations and retained bytes with the id-and-&mut-self implementation on those same fixtures
+- [x] S08-10 Prototype the arena-reference/interior-mutability relater (ADR 0008), require parity on the frozen relater fixtures, and compare throughput, allocations and retained bytes with the id-and-&mut-self implementation on those same fixtures
 
 ### S09 Ownership and registry harness (open)
 
