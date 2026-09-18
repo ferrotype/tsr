@@ -56,6 +56,27 @@ on top: 20 references to `PreserveSourceNewlines`, the six emit hooks
 (`OnBefore`/`OnAfter` for node, node list and token) and
 `TerminateUnterminatedLiterals`.
 
+**Correction, found when F2 started.** The first version of this plan called the
+Rust printer "about two thirds of Go's" from a line count. That was wrong in the
+way that matters: the Rust printer does not print statements at all. Its
+fallthrough is the named refusal `statements, declarations and JSDoc nodes`. It
+covers type nodes, type members and the expressions the node builder needs.
+Measured function by function against `printer.go`:
+
+| | functions | Go lines |
+| --- | --- | --- |
+| `emit*` functions in Go | 286 | 4,364 |
+| with a Rust counterpart by name | 105 | 1,648 |
+| without | 181 | 2,716 |
+
+The missing 2,716 lines split into statements 496, declarations 624, JSX 195 and
+other 1,392. "Other" includes comment and source-map emission, which positioned
+printing does not need because it passes no source file, so the part F2 really
+needs is about 1,900 to 2,200 lines. Insertion formatting exists to insert
+statements and declarations, so there is no way around it: pulling the formatter
+forward also pulls the statement printer forward from Phase 3. The whole port is
+therefore about 8,000 Go lines, not 6,000.
+
 What the format package calls outside itself: from `astnav`,
 `FindPrecedingToken(Ex)`, `GetTokenAtPosition`, `FindNextToken`,
 `FindChildOfKind`, `GetStartOfNode`; from `scanner`, the ECMA line helpers
@@ -140,7 +161,11 @@ the printing fixture does, so stale observations cannot certify new code.
 **F1. `ts_astnav`.** The five entry points and what they need. Exit: every
 navigation probe matches.
 
-**F2. Positioned printing.** The six emit hooks; `PreserveSourceNewlines`, which
+**F2. Positioned printing.** First the statement, declaration and JSX
+printer described in the correction above, which is the bulk of this step and is
+proved the same way: the `position` probe prints each file's leading statements,
+so its text rows are a printer parity check over the corpus. Then the six emit
+hooks; `PreserveSourceNewlines`, which
 needs the three missing line-terminator helpers and removes the named boundary;
 `TerminateUnterminatedLiterals`; `ChangeTrackerWriter` with its last-non-trivia
 position rule; `AssignPositionsToNode`; `CreateSyntheticSourceFile`. Exit: text
@@ -194,10 +219,10 @@ in `status/experiments.toml`, which is the owner's call; this plan adds none.
 
 ## 7. Risks
 
-- **Printer coverage.** The insertion path prints arbitrary decoded nodes, and
-  the Rust printer is about two thirds of Go's. Nodes behind the named
-  boundaries (decorators, accessor bodies, generated names) will refuse. F0
-  records which native cases hit a boundary, so the gap is a number.
+- **Printer coverage.** The insertion path prints arbitrary decoded statements,
+  and the Rust printer prints none; see the correction in section 2. After F2
+  the remaining named boundaries (decorators, accessor bodies, generated names)
+  still refuse, and the `position` probe turns that into a count.
 - **`PreserveSourceNewlines`** changes list emission and line-break decisions
   across the printer, so F2 can disturb S08 display parity. The S08 printing
   and display suites run after every F2 change.
@@ -214,9 +239,11 @@ in `status/experiments.toml`, which is the owner's call; this plan adds none.
 
 ## 8. Order of work
 
-F0 first, because it fixes every denominator. Then F1 and F2, which unblock
-nothing in each other and can interleave. Then F3, F4, F5, F6 in that order,
-since each consumes the previous. F7 last. S09-5 can close once F7's metric is
+F0 first, because it fixes every denominator. F1 next: the rule predicates, the
+indenter and the span worker all call into navigation. Then F3, F4, F5, F6 in
+that order, since each consumes the previous. None of those touches the printer.
+F2 is independent of all of them and, after the correction in section 2, the
+largest single step; it is needed by F7 only. F7 last. S09-5 can close once F7's metric is
 true and the E3 evidence is refreshed.
 
 ## 9. Decisions this plan assumes
