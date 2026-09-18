@@ -976,6 +976,14 @@ impl AstTransaction<'_, '_> {
         let header = Self::stage_node(self.storage, node);
         self.storage.push(header)
     }
+    /// A token's header and payload, staged by the token cache under the lazy
+    /// arena's publication lock.
+    pub(crate) fn stage_token(
+        storage: &mut StorageTransaction<'_, StoredNode>,
+        node: Node,
+    ) -> StoredNode {
+        Self::stage_node(storage, node)
+    }
     fn stage_node(storage: &mut StorageTransaction<'_, StoredNode>, node: Node) -> StoredNode {
         let mut header = StoredNode::fallback(&node, 0);
         let aux = storage.push_aux(AstStorageData::FallbackNode(Arc::new(node)));

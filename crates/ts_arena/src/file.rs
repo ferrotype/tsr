@@ -761,16 +761,26 @@ impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
         kind: u32,
         initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
     ) -> Result<StorageRead<'a, N>, Error> {
+        let id = self.try_token_prepared_id(key, kind, initialize)?;
+        self.node(id)
+    }
+    /// The id form of [`Self::try_token_prepared`], for a caller that resolves
+    /// the token through a typed view of its own.
+    pub fn try_token_prepared_id(
+        self,
+        key: crate::TokenKey,
+        kind: u32,
+        initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
+    ) -> Result<NodeId, Error> {
         let selected = self.for_node_owner(key.parent)?;
         let parent = selected.node(key.parent)?;
-        let id = selected.owner.lazy.token_prepared(
+        selected.owner.lazy.token_prepared(
             key,
             kind,
             parent.storage_reparsed(),
             selected.owner,
             initialize,
-        )?;
-        self.node(id)
+        )
     }
 }
 #[cfg(test)]
