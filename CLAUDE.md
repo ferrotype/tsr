@@ -61,6 +61,11 @@ request and replace `source_hex`; `scripts/s08_relater.py` reads requests only
 from the frozen inventory, so ad-hoc programs are a development check and never
 evidence.
 
+## Branch names
+
+Name a branch after the work, for example `s09-ownership`. Do not prefix it with
+`claude/` or any other agent name.
+
 ## Things to ask about first
 
 - `cargo xtask run <id>` and `cargo xtask status --record` rewrite tracked
