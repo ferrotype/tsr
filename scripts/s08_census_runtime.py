@@ -9,6 +9,8 @@ from pathlib import Path
 from s04_common import command
 from s08_oracle import ROOT, canonical
 
+OBSERVER_SOURCES = ('runtime_allocations.go', 'runtime_bridge.go')
+
 
 def runtime_overlay(directory, replace, upstream, env):
     version = command(['go', 'version'], cwd=ROOT, env=env).decode().strip()
@@ -31,14 +33,17 @@ def runtime_overlay(directory, replace, upstream, env):
         target.write_text(patched)
         replace[str(source)] = str(target)
         manifest[name] = {'sha256': hashlib.sha256(original.encode()).hexdigest(), 'entry_points': count}
-    for name, virtual in [
-        ('runtime_allocations.go', goroot / 'src/runtime/s08_allocations.go'),
-        ('runtime_bridge.go', upstream / 'tsc/internal/checker/s08_runtime_bridge.go'),
-    ]:
+    observer_hashes = {}
+    virtuals = (goroot / 'src/runtime/s08_allocations.go',
+                upstream / 'tsc/internal/checker/s08_runtime_bridge.go')
+    for name, virtual in zip(OBSERVER_SOURCES, virtuals, strict=True):
         source = ROOT / 'tools/s08/oracle/families' / name
         target = destination / name
-        target.write_bytes(source.read_bytes())
+        raw = source.read_bytes()
+        target.write_bytes(raw)
+        observer_hashes[name] = hashlib.sha256(raw).hexdigest()
         if virtual.exists():
             raise ValueError(f'census overlay would replace {virtual}')
         replace[str(virtual)] = str(target)
     (destination / 'sdk.json').write_bytes(canonical(manifest) + b'\n')
+    return observer_hashes

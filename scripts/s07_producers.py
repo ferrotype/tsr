@@ -157,9 +157,16 @@ def program():
     return {"metrics":metrics}
 
 def bindworkload():
-    command([sys.executable, "scripts/s07_benchmark_graph.py", "capture"], cwd=ROOT)
+    from s07_benchmark_graph import current_capture
     path = ROOT / "target/s07-bindworkload/report.json"
-    report = strict_json_loads(path.read_bytes())
+    try:
+        report = current_capture(path)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+        print(f"S07 bindworkload: no reusable current graph capture ({error}); capturing", file=sys.stderr)
+        command([sys.executable, "scripts/s07_benchmark_graph.py", "capture"], cwd=ROOT)
+        report = strict_json_loads(path.read_bytes())
+    else:
+        print("S07 bindworkload: reusing validated current graph capture", file=sys.stderr)
     if report.get("diagnostic_subset") is not False or report.get("source_stable") is not True:
         raise ValueError("graph capture is diagnostic or source-unstable")
     print(json.dumps(report, sort_keys=True), file=sys.stderr)

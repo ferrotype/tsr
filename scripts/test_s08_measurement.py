@@ -121,7 +121,17 @@ class CheckerCapture(unittest.TestCase):
         (self.root / 'runtime-overlay').mkdir()
         sdk = self.root / 'runtime-overlay/sdk.json'
         sdk.write_text('{}')
-        build['binaries']['go-alloc'].update(runtime_observer='requested-allocation-provenance-v1', sdk_sha256=measurement.file_digest(sdk))
+        observer_sources = self.root / 'tools/s08/oracle/families'
+        observer_sources.mkdir(parents=True)
+        observer_hashes = {}
+        for name in checker.OBSERVER_SOURCES:
+            raw = ('fixture ' + name).encode()
+            (observer_sources / name).write_bytes(raw)
+            (self.root / 'runtime-overlay' / name).write_bytes(raw)
+            observer_hashes[name] = digest(raw)
+        build['binaries']['go-alloc'].update(runtime_observer='requested-allocation-provenance-v1',
+                                            sdk_sha256=measurement.file_digest(sdk),
+                                            observer_sources_sha256=observer_hashes)
         (self.root / 'build.json').write_bytes(canonical(build))
         self.capture = {
             'version': 2, 'pin': self.plan['pin'], 'host': {}, 'smoke': None,
@@ -386,6 +396,34 @@ class CheckerCapture(unittest.TestCase):
         (self.root / 'runtime-overlay/sdk.json').write_text('{"changed": true}')
         with self.assertRaisesRegex(ValueError, 'artifact changed'):
             checker.report(self.root)
+
+    def test_runtime_observer_sources_are_authenticated_independently_of_globs(self):
+        # sources() is fixed at {} by this fixture: neither edited copy may
+        # escape detection even if the broad fingerprint misses these files.
+        for directory in ('runtime-overlay', 'tools/s08/oracle/families'):
+            for name in checker.OBSERVER_SOURCES:
+                with self.subTest(directory=directory, name=name):
+                    path = self.root / directory / name
+                    original = path.read_bytes()
+                    path.write_bytes(original + b'changed')
+                    try:
+                        with self.assertRaisesRegex(ValueError, 'artifact changed'):
+                            checker.report(self.root)
+                    finally:
+                        path.write_bytes(original)
+
+    def test_incomplete_observer_source_inventory_is_rejected(self):
+        path = self.root / 'build.json'
+        original = measurement.strict_json_loads(path.read_bytes())
+        for hashes in (None, {}, {'runtime_allocations.go': 'a' * 64}):
+            with self.subTest(hashes=hashes):
+                build = copy.deepcopy(original)
+                build['binaries']['go-alloc']['observer_sources_sha256'] = hashes
+                path.write_bytes(canonical(build))
+                self.capture['build_sha256'] = measurement.file_digest(path)
+                self.save()
+                with self.assertRaisesRegex(ValueError, 'observer source inventory'):
+                    checker.report(self.root)
 
     def test_missing_allocation_binary_is_rejected(self):
         path = self.root / 'build.json'

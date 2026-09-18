@@ -30,7 +30,7 @@ from s08_oracle import ROOT, canonical, digest
 from s08_p4 import canonical as request_canonical
 import s08_baselines
 import s08_measurement as measurement
-from s08_census_runtime import runtime_overlay
+from s08_census_runtime import OBSERVER_SOURCES, runtime_overlay
 from s08_e2_contract import inventory
 
 DEFAULT = ROOT / "target/s08/checkerbench"
@@ -51,8 +51,8 @@ def method():
 def sources():
     """Every input the measurement depends on, so a report can be tied to exact source bytes."""
     result = {}
-    patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**",
-                "tools/s08/p4/**", "tools/s08/p5/**", "tools/s08/p7/**", "tools/s08/oracle/**",
+    patterns = ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**/*",
+                "tools/s08/p4/**/*", "tools/s08/p5/**/*", "tools/s08/p7/**/*", "tools/s08/oracle/**/*",
                 "tools/s07/program/*.rs", "tools/s07/config/host.rs",
                 "scripts/s08_checkerbench.py", "scripts/s08_census_runtime.py", "scripts/s08_measurement.py", "scripts/s08_e2_contract.py", "scripts/s08_p4.py", "scripts/s08_p5_corpus.py", "scripts/s08_manifest.py", "scripts/s07_acceptance.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py",
                 "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py", "scripts/s07_subset.py",
@@ -203,7 +203,7 @@ def build(directory, modes=None):
     binaries["go"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
                       "go": command(["go", "version"], cwd=ROOT, env=go_env).decode().strip()}
     allocation_overlay = strict_json_loads(overlay.read_bytes())["Replace"]
-    runtime_overlay(directory, allocation_overlay, upstream, go_env)
+    observer_hashes = runtime_overlay(directory, allocation_overlay, upstream, go_env)
     allocation_overlay_path = directory / "allocation-overlay.json"
     allocation_overlay_path.write_bytes(canonical({"Replace": allocation_overlay}) + b"\n")
     target = bin_dir / "go-checkerbench-alloc.test"
@@ -211,7 +211,9 @@ def build(directory, modes=None):
     command(args, cwd=upstream / "tsc", env=go_env)
     binaries["go-alloc"] = {"path": str(target), "sha256": digest(target.read_bytes()), "command": args,
                             "runtime_observer": "requested-allocation-provenance-v1",
+                            "observer_sources_sha256": observer_hashes,
                             "sdk_sha256": digest((directory / "runtime-overlay/sdk.json").read_bytes())}
+    verify_runtime_observer(directory, binaries["go-alloc"])
     verified_upstream()
     if sources() != initial_sources:
         raise ValueError("measurement sources changed during build")
@@ -387,15 +389,26 @@ def verify_sample(directory, run, inputs, ids, identity=None):
     return observed
 
 
+def verify_runtime_observer(directory, observer):
+    if observer.get('runtime_observer') != 'requested-allocation-provenance-v1':
+        raise ValueError('allocation provenance observer missing')
+    hashes = observer.get('observer_sources_sha256')
+    if not isinstance(hashes, dict) or set(hashes) != set(OBSERVER_SOURCES):
+        raise ValueError('allocation observer source inventory differs')
+    for name, expected in hashes.items():
+        # Authenticate both the bytes compiled through the overlay and their
+        # current source, independently of the broader capture fingerprint.
+        measurement.authenticated(directory / 'runtime-overlay' / name, expected)
+        measurement.authenticated(ROOT / 'tools/s08/oracle/families' / name, expected)
+    measurement.authenticated(directory / 'runtime-overlay/sdk.json', observer['sdk_sha256'])
+
+
 def verify_capture(directory, capture_report):
     plan = method()
     build = measurement.build_record(directory, capture_report, sources(), METHOD)
     if set(build['binaries']) != {'go', 'go-alloc', *(f'rust-{mode}' for mode in MODES)}:
         raise ValueError('measurement executable inventory differs')
-    observer = build['binaries']['go-alloc']
-    if observer.get('runtime_observer') != 'requested-allocation-provenance-v1':
-        raise ValueError('allocation provenance observer missing')
-    measurement.authenticated(directory / 'runtime-overlay/sdk.json', observer['sdk_sha256'])
+    verify_runtime_observer(directory, build['binaries']['go-alloc'])
     if capture_report['pin'] != plan['pin'] or capture_report['footprint_sha256'] != measurement.file_digest(FOOTPRINT):
         raise ValueError('measurement pin or footprint contract differs')
     measurement.roster(capture_report, plan, MODES, 'runtime')

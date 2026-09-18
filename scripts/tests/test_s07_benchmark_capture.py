@@ -5,6 +5,7 @@ prerequisite validator and artifact hashing run against temporary receipts.
 """
 import copy
 from contextlib import ExitStack
+import io
 import json
 from pathlib import Path
 import sys
@@ -17,6 +18,7 @@ import s07_benchmark_graph as graph
 import s07_benchmark_graph_tests as fixtures
 import s07_benchmark_measure as measure
 import s07_benchmark_report as consumer
+import s07_producers as producers
 
 
 class CaptureArtifacts(unittest.TestCase):
@@ -42,7 +44,8 @@ class CaptureArtifacts(unittest.TestCase):
         self.report = copy.deepcopy(fixtures.PrerequisiteTests.report)
         identities = {"oracle": measure.sha(self.go.read_bytes()), "rust": measure.sha(self.rust.read_bytes())}
         self.report.update(binary_sha256=identities, binary_sha256_after=identities)
-        self.graph_path = self.directory / "graph.json"
+        self.graph_path = self.directory / "target/s07-bindworkload/report.json"
+        self.graph_path.parent.mkdir(parents=True)
         self.destination = self.directory / "capture"
         self.write_graph()
         self.stack.enter_context(patch.object(measure, "CACHE", self.directory))
@@ -64,6 +67,10 @@ class CaptureArtifacts(unittest.TestCase):
         self.stack.enter_context(patch.object(measure, "ratio_summary", return_value={"needs_more": False}))
         self.stack.enter_context(patch.object(measure, "aggregate", return_value={}))
         self.stack.enter_context(patch.object(measure, "metrics_from_summaries", return_value={}))
+        self.stack.enter_context(patch.object(graph, "CACHE", self.directory))
+        self.stack.enter_context(patch.object(graph, "source_fingerprint", side_effect=lambda: copy.deepcopy(self.source)))
+        self.stack.enter_context(patch.object(graph, "cargo_configuration", side_effect=lambda: copy.deepcopy(self.configuration)))
+        self.stack.enter_context(patch.object(producers, "ROOT", self.directory))
 
     def write_graph(self):
         self.graph_path.write_text(json.dumps(self.report))
@@ -83,6 +90,64 @@ class CaptureArtifacts(unittest.TestCase):
         self.assertEqual(report["binaries"]["rust"], self.report["binary_sha256"]["rust"])
         self.assertEqual(report["graph_report_sha256"], measure.sha(self.graph_path.read_bytes()))
         self.assertEqual(report["allocation_preflight"], {"calibrated": True})
+
+    def test_bindworkload_after_measurement_preserves_exact_graph_and_binaries(self):
+        benchmark = self.capture()
+        before = self.graph_path.read_bytes()
+        paths = (self.go, self.rust, self.allocation)
+        binaries = [path.read_bytes() for path in paths]
+        with patch.object(producers, 'command', side_effect=AssertionError('unnecessary recapture')) as command, \
+                patch('sys.stderr', io.StringIO()):
+            result = producers.bindworkload()
+        command.assert_not_called()
+        self.assertEqual(result['metrics'], {'parity': 1, 'files': 13094, 'worker_modes': 2})
+        self.assertEqual(self.graph_path.read_bytes(), before)
+        self.assertEqual(benchmark['graph_report_sha256'], measure.sha(self.graph_path.read_bytes()))
+        self.assertEqual([path.read_bytes() for path in paths], binaries)
+
+    def test_bindworkload_recaptures_missing_stale_or_incomplete_graphs(self):
+        original = self.graph_path.read_bytes()
+        mutations = {
+            'missing': lambda: self.graph_path.unlink(),
+            'malformed': lambda: self.graph_path.write_text('{'),
+            'source': lambda: self.source.update(sha256='0' * 64),
+            'configuration': lambda: self.configuration.clear(),
+            'go_binary': lambda: self.go.write_bytes(b'changed'),
+            'rust_binary': lambda: self.rust.write_bytes(b'changed'),
+            'missing_binary': lambda: self.rust.unlink(),
+            'incomplete': lambda: self.report['runs'][1]['results'].pop(),
+            'failed': lambda: self.report['runs'][0]['results'][0].update(equal=False),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name):
+                self.source = copy.deepcopy(fixtures.PrerequisiteTests.source)
+                self.configuration = copy.deepcopy(fixtures.PrerequisiteTests.configuration)
+                self.report = json.loads(original)
+                self.go.write_bytes(self.go.name.encode())
+                self.rust.write_bytes(self.rust.name.encode())
+                self.write_graph()
+                mutate()
+                if name in ('incomplete', 'failed'):
+                    self.write_graph()
+
+                def recapture(*args, **kwargs):
+                    # A complete failed measurement must remain a false gate,
+                    # not be replaced with the previous passing report.
+                    refreshed = json.loads(original)
+                    refreshed['parity'] = 0.9
+                    self.graph_path.write_text(json.dumps(refreshed))
+
+                with patch.object(producers, 'command', side_effect=recapture) as command, \
+                        patch('sys.stderr', io.StringIO()):
+                    result = producers.bindworkload()
+                command.assert_called_once_with(
+                    [sys.executable, 'scripts/s07_benchmark_graph.py', 'capture'], cwd=self.directory)
+                self.assertEqual(result['metrics']['parity'], 0.9)
+
+    def test_graph_reuse_rejects_source_changes_during_validation(self):
+        with patch.object(graph, 'source_fingerprint', side_effect=[self.source, {}]):
+            with self.assertRaisesRegex(ValueError, 'changed during reuse validation'):
+                graph.current_capture(self.graph_path)
 
     def test_stale_source_configuration_or_artifact_rejects_before_builds(self):
         for name in ("source", "configuration", "missing_configuration", "normal", "go", "missing_normal"):
