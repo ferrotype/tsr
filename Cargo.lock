@@ -606,7 +606,13 @@ name = "ts_project"
 version = "0.1.0"
 dependencies = [
  "ts_arena",
+ "ts_ast",
  "ts_checker",
+ "ts_compiler",
+ "ts_core",
+ "ts_jsstring",
+ "ts_tsoptions",
+ "ts_vfs",
 ]
 
 [[package]]

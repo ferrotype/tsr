@@ -55,7 +55,28 @@
       ],
       "filter": "printing::scratch_checks::",
       "package": "ts_api"
+    },
+    "results": {
+      "package": "ts_project",
+      "filter": "retention::results::",
+      "cases": [
+        "retention::results::final_result_drop_releases_checker_and_program_storage",
+        "retention::results::idle_slot_replacement_never_rebinds_retained_results",
+        "retention::results::retained_access_reacquires_the_exact_owners_permit",
+        "retention::results::retained_results_outlive_lease_release_with_exact_identity",
+        "retention::results::retirement_rejects_retained_access_while_storage_stays_live"
+      ]
+    },
+    "ast": {
+      "package": "ts_project",
+      "filter": "retention::ast::",
+      "cases": [
+        "retention::ast::another_checker_rejects_typed_ast_links",
+        "retention::ast::checker_context_drop_cannot_free_retained_ast_storage",
+        "retention::ast::signature_declaration_survives_builder_release",
+        "retention::ast::synthetic_expression_resolves_type_and_file_parent_after_lease_release"
+      ]
     }
   },
-  "version": 2
+  "version": 3
 }

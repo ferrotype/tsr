@@ -60,7 +60,7 @@ def program_manifest():
 
 
 def checker_manifest():
-    return {"version": 2, "suites": {
+    return {"version": 3, "suites": {
         name: {"package": package, "filter": prefix, "cases": [prefix + "generation_boundary"]}
         for name, (package, prefix) in ownership.s09_ownership.SUITES.items()
     }}

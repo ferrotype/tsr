@@ -7,12 +7,12 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s09_ownership import CRITERIA, MODES, OWNERSHIP_SUITES, SUITES, measure, publish_metrics, validate_manifest
+from s09_ownership import CRITERIA, MODES, OWNERSHIP_SUITES, RETENTION, SUITES, measure, publish_metrics, validate_manifest
 import s09_printing
 
 
 def inventory():
-    return {"version": 2, "suites": {
+    return {"version": 3, "suites": {
         name: {"package": package, "filter": prefix,
                "cases": [prefix + "commit_before_retirement", prefix + "retirement_before_commit"]}
         for name, (package, prefix) in SUITES.items()
@@ -52,8 +52,8 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.subTest(error=type(error).__name__), redirect_stderr(io.StringIO()):
                 outcomes = measure(Path("synthetic-root"), invoke, ["cargo"], [], {}, self.manifest, "debug")
             self.verify_frozen.assert_called_once_with(root=Path("synthetic-root"))
-            self.assertEqual(outcomes, {"generation": True, "pool": True, "registry": True, "scratch": False})
-            self.assertEqual(calls, [SUITES[name] for name in OWNERSHIP_SUITES])
+            self.assertEqual(outcomes, {**{name: True for name in SUITES}, "scratch": False})
+            self.assertEqual(calls, [SUITES[name] for name in SUITES if name != "scratch"])
             modes = {**self.modes, "debug": outcomes}
             report = {"metrics": {}}
             publish_metrics(report, modes, self.arena, self.manifest)
@@ -73,7 +73,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
                 changed["suites"][name][key] = value
                 with self.assertRaisesRegex(ValueError, "changed scope"):
                     validate_manifest(changed)
-        for version in (True, 0, 1, "2"):
+        for version in (True, 0, 1, 2, "3"):
             with self.assertRaises(ValueError):
                 validate_manifest({**self.manifest, "version": version})
 
@@ -96,7 +96,8 @@ class CheckerOwnershipProducer(unittest.TestCase):
                              if suite["package"] == package and suite["filter"] in args)
                 calls.append(package)
                 cases = suite["cases"]
-                if package != "ts_project":
+                # One defective suite; its package also hosts the retention suites.
+                if (package, suite["filter"]) != SUITES["pool"]:
                     return suite_output(cases)
                 if defect == "exit_failure":
                     raise RuntimeError("project test assertion")
@@ -112,8 +113,8 @@ class CheckerOwnershipProducer(unittest.TestCase):
 
             with self.subTest(defect=defect), redirect_stderr(io.StringIO()):
                 result = measure(Path("."), invoke, ["cargo"], [], {}, self.manifest, "debug")
-            self.assertEqual(result, {"generation": True, "pool": False, "registry": True, "scratch": True})
-            self.assertEqual(calls, ["ts_arena", "ts_project", "ts_api", "ts_api"])
+            self.assertEqual(result, {**{name: True for name in SUITES}, "pool": False})
+            self.assertEqual(calls, [package for package, _ in SUITES.values()])
 
     def test_every_suite_runs_with_each_modes_actual_instrumentation(self):
         variants = (("debug", ["cargo"], []), ("release", ["cargo"], ["--release"]),
@@ -134,7 +135,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with redirect_stderr(io.StringIO()):
                 result = measure(Path("."), invoke, prefix, options, {"mode": mode}, self.manifest, mode)
             self.assertEqual(result, self.modes[mode])
-        self.assertEqual(len(calls), 16)
+        self.assertEqual(len(calls), len(SUITES) * len(variants))
         with self.assertRaises(ValueError):
             measure(Path("."), invoke, ["cargo"], [], {}, self.manifest, "unknown")
 
@@ -199,9 +200,51 @@ class CheckerOwnershipProducer(unittest.TestCase):
         publish_metrics(report, self.modes, self.arena, self.manifest)
         self.assertTrue(all(report["metrics"][criterion] for criterion in CRITERIA))
         self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
-        for unavailable in ("independent_checker_merges", "checker_ast_retention", "api_scratch_disposal",
+        for unavailable in ("independent_checker_merges", "builder_cache_retention", "api_scratch_disposal",
                             "live_owner_delta", "live_allocation_delta", "miri", "address_sanitizer"):
             self.assertNotIn(unavailable, report["metrics"])
+
+    def test_each_retention_criterion_is_one_suite_in_every_mode_and_scored_apart_from_s09_4(self):
+        report = {"metrics": {}}
+        publish_metrics(report, self.modes, self.arena, self.manifest)
+        self.assertEqual(set(RETENTION), {"checker_result_retention", "checker_ast_retention"})
+        self.assertTrue(all(report["metrics"][criterion] for criterion in RETENTION))
+        self.assertEqual(report["metrics"]["checker_retention_tests"], 4)
+        for criterion, suite in RETENTION.items():
+            other = next(name for name in RETENTION if name != criterion)
+            for mode in MODES:
+                changed = copy.deepcopy(self.modes)
+                changed[mode][suite] = False
+                report = {"metrics": {}}
+                publish_metrics(report, changed, self.arena, self.manifest)
+                with self.subTest(criterion=criterion, mode=mode):
+                    self.assertFalse(report["metrics"][criterion])
+                    self.assertFalse(report["metrics"][f"{criterion}_{mode}"])
+                    self.assertTrue(report["metrics"][other], "the sibling criterion keeps its own outcome")
+                    self.assertTrue(all(report["metrics"][name] for name in CRITERIA), "and so does S09-4")
+                    self.assertEqual(report["metrics"]["checker_retention_tests"], 2)
+                    self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
+        # A pool or registry failure is S09-4's to report; the retention suites
+        # ran and passed, so their criteria are not falsified by association.
+        for suite in OWNERSHIP_SUITES:
+            changed = copy.deepcopy(self.modes)
+            changed["release"][suite] = False
+            report = {"metrics": {}}
+            publish_metrics(report, changed, self.arena, self.manifest)
+            self.assertFalse(report["metrics"]["shared_pool_panic_retirement"])
+            self.assertTrue(all(report["metrics"][criterion] for criterion in RETENTION))
+
+    def test_a_missing_retention_suite_cannot_claim_success(self):
+        for suite in RETENTION.values():
+            for mode in MODES:
+                changed = copy.deepcopy(self.modes)
+                del changed[mode][suite]
+                with self.assertRaises(ValueError):
+                    publish_metrics({"metrics": {}}, changed, self.arena, self.manifest)
+            manifest = copy.deepcopy(self.manifest)
+            del manifest["suites"][suite]
+            with self.assertRaises(ValueError):
+                validate_manifest(manifest)
 
     def test_missing_or_untyped_measurements_cannot_claim_success(self):
         for mode in MODES:

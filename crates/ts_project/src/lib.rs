@@ -239,4 +239,6 @@ impl Snapshot {
 }
 
 #[cfg(test)]
+mod retention;
+#[cfg(test)]
 mod tests;

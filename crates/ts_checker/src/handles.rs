@@ -775,6 +775,35 @@ impl Operation<'_> {
         Ok(self.node_ref(node))
     }
 
+    /// `createSyntheticExpression` through its port in `call_spread.rs`: a
+    /// checker-created expression whose parent and range come from a node of
+    /// the checker's program. The parent stays an id into a retained file; a
+    /// node this checker's file set does not hold is rejected before anything
+    /// is created.
+    pub fn synthetic_expression_at(
+        &mut self,
+        parent: NodeId,
+        t: TypeRef,
+        is_spread: bool,
+    ) -> Result<NodeRef, Error> {
+        let id = self.check_type(t)?;
+        let node = self
+            .state_mut()
+            .synthetic_call_argument(parent, id, is_spread, None)?;
+        Ok(self.node_ref(node))
+    }
+
+    /// The parent of a checker-created node and its kind, resolved through the
+    /// checker's own arena or through its retained file set.
+    pub fn node_parent(&self, node: NodeRef) -> Result<Option<(NodeId, NodeKind)>, Error> {
+        let id = self.check_node(node)?;
+        let Some(parent) = self.state().factory.view().node(id)?.parent() else {
+            return Ok(None);
+        };
+        let kind = self.state().node(parent)?.kind();
+        Ok(Some((parent, kind)))
+    }
+
     /// The type a synthetic expression embeds.
     pub fn synthetic_expression_type(&self, node: NodeRef) -> Result<TypeRef, Error> {
         let id = self.check_node(node)?;
@@ -817,6 +846,25 @@ impl Operation<'_> {
     pub fn import_symbol(&self, retained: &RetainedSymbol) -> Result<SymbolId, Error> {
         self.check_import(&retained.owner)?;
         self.check_symbol(retained.id)
+    }
+
+    /// Retains a symbol this checker returned from a query. It may live in a
+    /// bound file rather than in the checker's own arena; the owner retains
+    /// that file set, so the result keeps the file alive too.
+    pub fn retain_symbol_ref(&self, symbol: SymbolRef) -> Result<RetainedSymbol, Error> {
+        let id = self.check_symbol_ref(symbol)?;
+        Ok(RetainedSymbol {
+            owner: self.owner().clone(),
+            id,
+        })
+    }
+
+    /// The exact-checker reference of a retained symbol, for the queries that
+    /// take one. Another checker's operation rejects it before any read, even
+    /// when both checkers share the bound file the symbol lives in.
+    pub fn import_symbol_ref(&self, retained: &RetainedSymbol) -> Result<SymbolRef, Error> {
+        self.check_import(&retained.owner)?;
+        self.symbol_ref(retained.id)
     }
 
     pub fn retain_signature(&self, s: SignatureRef) -> Result<RetainedSignature, Error> {

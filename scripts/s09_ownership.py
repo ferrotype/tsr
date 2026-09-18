@@ -1,6 +1,6 @@
-"""Exact production generation, registry and request-print scratch tests.
+"""Exact production generation, registry, retention and request-print scratch tests.
 
-These two S09-4 criteria do not complete E3, certify checker algorithms or
+The S09-4 and S09-1 criteria do not complete E3, certify checker algorithms or
 extend the arena example's allocation counters to checker storage. The scoped
 decode/print scratch observation is informational; full S09-3 remains pending.
 """
@@ -19,8 +19,13 @@ SUITES = {
     "pool": ("ts_project", "tests::"),
     "registry": ("ts_api", "tests::"),
     "scratch": ("ts_api", "printing::scratch_checks::"),
+    "results": ("ts_project", "retention::results::"),
+    "ast": ("ts_project", "retention::ast::"),
 }
 OWNERSHIP_SUITES = ("generation", "pool", "registry")
+# S09-1: each criterion is one suite over a program-backed pool. They are
+# scored apart from S09-4, so a regression names the contract it broke.
+RETENTION = {"checker_result_retention": "results", "checker_ast_retention": "ast"}
 MODES = {"debug", "release", "miri", "address_sanitizer"}
 CRITERIA = ("shared_pool_panic_retirement", "release_boundaries")
 
@@ -32,7 +37,7 @@ def load_cases(root):
 
 def validate_manifest(manifest):
     if (type(manifest) is not dict or set(manifest) != {"version", "suites"}
-            or type(manifest["version"]) is not int or manifest["version"] != 2
+            or type(manifest["version"]) is not int or manifest["version"] != 3
             or type(manifest["suites"]) is not dict
             or set(manifest["suites"]) != set(SUITES)):
         raise ValueError("invalid S09 ownership inventory")
@@ -94,13 +99,18 @@ def publish_metrics(report, modes, arena_modes, manifest):
         metrics[f"shared_pool_panic_retirement_{mode}"] = ownership_passed
         metrics[f"release_boundaries_{mode}"] = ownership_passed and arena_modes[mode]
         metrics[f"api_print_scratch_disposal_{mode}"] = outcomes["scratch"]
-    for criterion in CRITERIA:
+        for criterion, name in RETENTION.items():
+            metrics[f"{criterion}_{mode}"] = outcomes[name]
+    for criterion in (*CRITERIA, *RETENTION):
         metrics[criterion] = all(metrics[f"{criterion}_{mode}"] for mode in MODES)
     # Count a suite only after every inventoried test has a validated passing
     # observation in every mode. This is not a heap or live-owner measurement.
     metrics["checker_ownership_tests"] = sum(
         len(suite["cases"]) for name, suite in manifest["suites"].items()
         if name in OWNERSHIP_SUITES and all(outcomes[name] for outcomes in modes.values()))
+    metrics["checker_retention_tests"] = sum(
+        len(manifest["suites"][name]["cases"]) for name in RETENTION.values()
+        if all(outcomes[name] for outcomes in modes.values()))
     metrics["api_print_scratch_disposal"] = all(outcomes["scratch"] for outcomes in modes.values())
     metrics["api_print_scratch_tests"] = (
         len(manifest["suites"]["scratch"]["cases"]) if metrics["api_print_scratch_disposal"] else 0)
