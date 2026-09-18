@@ -30,12 +30,12 @@ impl Session<'_, '_> {
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitArgument
-    fn emit_argument(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(super) fn emit_argument(&mut self, node: NodeId) -> Result<(), Error> {
         self.emit_expression(node, op::SPREAD)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitCallee
-    fn emit_callee(&mut self, callee: NodeId, parent: NodeId) -> Result<(), Error> {
+    pub(super) fn emit_callee(&mut self, callee: NodeId, parent: NodeId) -> Result<(), Error> {
         if self.emit_flags(parent) & ef::INDIRECT_CALL != 0 {
             self.write_punctuation(b"(");
             self.writer.write_literal(b"0");
@@ -64,6 +64,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitCallExpression
     pub(super) fn emit_call_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        self.enter_node(node);
         let read = self.node(node)?;
         let call = read
             .data_source()
@@ -83,11 +84,13 @@ impl Session<'_, '_> {
             node,
             arguments,
             lf::CALL_EXPRESSION_ARGUMENTS,
-        )
+        )?;
+        self.exit_node(node);
+        Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.writeLinesAndIndent
-    fn write_lines_and_indent(&mut self, count: i64, space: bool) {
+    pub(super) fn write_lines_and_indent(&mut self, count: i64, space: bool) {
         if count > 0 {
             self.increase_indent();
             self.write_line_repeat(count);
@@ -98,6 +101,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitParenthesizedExpression
     pub(super) fn emit_parenthesized_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        self.enter_node(node);
         let read = self.node(node)?;
         let expression = read
             .data_source()
@@ -129,6 +133,7 @@ impl Session<'_, '_> {
             WriteKind::Punctuation,
             node,
         );
+        self.exit_node(node);
         Ok(())
     }
 
@@ -219,6 +224,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitBinaryExpression
     pub(super) fn emit_binary_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        self.enter_node(node);
         let (left, operator, right) = self.binary_parts(node)?;
         let (mut left_prec, mut right_prec) =
             self.binary_operand_precedences(left, operator, right)?;
@@ -259,6 +265,7 @@ impl Session<'_, '_> {
         self.emit_expression(right, right_prec)?;
         self.decrease_indent_if(after > 0);
         self.decrease_indent_if(before > 0);
+        self.exit_node(node);
         Ok(())
     }
 }

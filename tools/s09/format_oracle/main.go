@@ -43,7 +43,8 @@ const (
 	maxRequest      = 64 << 20
 	// At most this many evenly spaced probe positions per file, plus the end.
 	maxPositions = 512
-	// The leading statements of a file that are encoded, decoded and printed.
+	// The leading statements of a file the insertion probe takes. The position
+	// probe takes every statement.
 	maxStatements = 4
 )
 
@@ -344,18 +345,23 @@ func decoded(s *stream, file *ast.SourceFile, index int) *ast.Node {
 	return root
 }
 
-func statements(file *ast.SourceFile) int {
+// statements is how many leading statements a probe takes; a limit below one
+// takes them all.
+func statements(file *ast.SourceFile, limit int) int {
 	if file.Statements == nil {
 		return 0
 	}
-	return min(len(file.Statements.Nodes), maxStatements)
+	if limit < 1 {
+		return len(file.Statements.Nodes)
+	}
+	return min(len(file.Statements.Nodes), limit)
 }
 
 // positioned is printer.PrintAndPositionNode as the insertion handler calls it:
 // the printed text, then every node of the positioned clone in child order.
 func positioned(file *ast.SourceFile, detail bool) map[string]any {
 	s := newStream(detail)
-	for index := range statements(file) {
+	for index := range statements(file, 0) {
 		at := strconv.Itoa(index)
 		root := decoded(s, file, index)
 		if root == nil {
@@ -416,7 +422,7 @@ func targets(file *ast.SourceFile) []int {
 // request decoding, with the target offset already in bytes.
 func insertion(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detail bool) map[string]any {
 	s := newStream(detail)
-	for index := range statements(file) {
+	for index := range statements(file, maxStatements) {
 		root := decoded(s, file, index)
 		if root == nil {
 			continue

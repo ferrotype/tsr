@@ -231,11 +231,13 @@ impl<'a> Decoder<'a> {
             .list(list)
             .expect("decoded list owner")
             .to_owned();
-        Some(
-            self.factory
-                .new_list(list.loc(), list.nodes())
-                .expect("decoded modifier owner"),
-        )
+        // A modifier list carries the flags of its modifiers, which
+        // `NewModifierList` computes.
+        let modifiers = ts_ast::RuntimeFactory::new_modifier_list(&mut self.factory, list.nodes());
+        self.factory
+            .set_list_location(modifiers, list.loc())
+            .expect("decoded modifier owner");
+        Some(modifiers)
     }
     // port: tsc/internal/api/encoder/decoder.go:newChildIter
     // port: tsc/internal/api/encoder/decoder.go:childIterator.nextIf

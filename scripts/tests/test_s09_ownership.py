@@ -8,11 +8,12 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from s09_ownership import CRITERIA, MODES, OWNERSHIP_SUITES, RETENTION, SUITES, measure, publish_metrics, validate_manifest
+import s09_format
 import s09_printing
 
 
 def inventory():
-    return {"version": 3, "suites": {
+    return {"version": 4, "suites": {
         name: {"package": package, "filter": prefix,
                "cases": [prefix + "commit_before_retirement", prefix + "retirement_before_commit"]}
         for name, (package, prefix) in SUITES.items()
@@ -35,6 +36,9 @@ class CheckerOwnershipProducer(unittest.TestCase):
         verifier = patch.object(s09_printing, "verify_frozen", return_value=None)
         self.verify_frozen = verifier.start()
         self.addCleanup(verifier.stop)
+        insertion = patch.object(s09_format, "verify_insertion_frozen", return_value=None)
+        self.verify_insertion = insertion.start()
+        self.addCleanup(insertion.stop)
 
     def test_stale_or_missing_printing_fixture_blocks_scratch_before_cargo_only(self):
         for error in (ValueError("stale request hash"), OSError("missing native observation")):
@@ -163,12 +167,48 @@ class CheckerOwnershipProducer(unittest.TestCase):
             self.assertFalse(report["metrics"][f"api_print_scratch_disposal_{mode}"])
             self.assertEqual(report["metrics"]["api_print_scratch_tests"], 0)
             self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
-            self.assertNotIn("api_scratch_disposal", report["metrics"])
+            # Printing is half of S09-3, so the criterion fails with it.
+            self.assertFalse(report["metrics"]["api_scratch_disposal"])
+            self.assertFalse(report["metrics"][f"api_scratch_disposal_{mode}"])
+            self.assertEqual(report["metrics"]["api_scratch_tests"], 0)
         report = {"metrics": {}}
         publish_metrics(report, self.modes, self.arena, self.manifest)
         self.assertTrue(report["metrics"]["api_print_scratch_disposal"])
         self.assertEqual(report["metrics"]["api_print_scratch_tests"], 2)
-        self.assertNotIn("api_scratch_disposal", report["metrics"])
+        self.assertTrue(report["metrics"]["api_scratch_disposal"])
+        self.assertEqual(report["metrics"]["api_scratch_tests"], 4)
+
+    def test_s09_3_needs_insertion_formatting_in_every_mode_and_leaves_printing_and_s09_4_alone(self):
+        for mode in MODES:
+            changed = copy.deepcopy(self.modes)
+            changed[mode]["insertion"] = False
+            report = {"metrics": {}}
+            publish_metrics(report, changed, self.arena, self.manifest)
+            self.assertFalse(report["metrics"]["api_scratch_disposal"])
+            self.assertFalse(report["metrics"][f"api_scratch_disposal_{mode}"])
+            self.assertEqual(report["metrics"]["api_scratch_tests"], 0)
+            self.assertTrue(report["metrics"]["api_print_scratch_disposal"])
+            self.assertTrue(all(report["metrics"][criterion] for criterion in CRITERIA))
+
+    def test_stale_or_missing_insertion_fixture_blocks_that_suite_before_cargo_only(self):
+        for error in (ValueError("stale insertion rows"), OSError("missing native rows")):
+            calls = []
+            self.verify_insertion.reset_mock()
+            self.verify_insertion.side_effect = error
+
+            def invoke(root, args, env):
+                package = args[args.index("--package") + 1]
+                suite = next(suite for suite in self.manifest["suites"].values()
+                             if suite["package"] == package and suite["filter"] in args)
+                calls.append((package, suite["filter"]))
+                return suite_output(suite["cases"])
+
+            with self.subTest(error=type(error).__name__), redirect_stderr(io.StringIO()):
+                outcomes = measure(Path("synthetic-root"), invoke, ["cargo"], [], {}, self.manifest, "debug")
+            self.verify_insertion.assert_called_once_with(root=Path("synthetic-root"))
+            self.assertEqual(outcomes, {**{name: True for name in SUITES}, "insertion": False})
+            self.assertEqual(calls, [SUITES[name] for name in SUITES if name != "insertion"])
+        self.verify_insertion.side_effect = None
 
     def test_registry_and_scratch_filters_execute_disjoint_cases_in_the_same_package(self):
         cases_by_package = {}
@@ -201,7 +241,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
         publish_metrics(report, self.modes, self.arena, self.manifest)
         self.assertTrue(all(report["metrics"][criterion] for criterion in CRITERIA))
         self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
-        for unavailable in ("independent_checker_merges", "api_scratch_disposal",
+        for unavailable in ("independent_checker_merges",
                             "live_owner_delta", "live_allocation_delta", "miri", "address_sanitizer"):
             self.assertNotIn(unavailable, report["metrics"])
 

@@ -58,6 +58,9 @@ func s09Tree(f *ast.NodeFactory, request s09PrintCase) (*ast.Node, error) {
 		})), nil
 	case "expression-statement":
 		return f.NewExpressionStatement(f.NewIdentifier(request.Text)), nil
+	case "js-import-declaration":
+		// A statement kind the pinned printer has no case for.
+		return f.NewJSImportDeclaration(nil, nil, f.NewStringLiteral(request.Text, 0), nil), nil
 	default:
 		return nil, fmt.Errorf("unrecognized fixture tree %q", request.Tree)
 	}

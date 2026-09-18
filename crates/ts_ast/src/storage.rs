@@ -242,6 +242,11 @@ impl AstBuilder {
     }
     /// Copy borrowed edges after validating every ID. An empty input receives
     /// an allocated-empty backing identity, just like the consuming constructor.
+    /// See `StorageBuilder::adopt_source`: the text of a file constructed in a
+    /// storage that was built without any.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        self.storage.adopt_source(source)
+    }
     pub fn node_slice_from_slice(&mut self, nodes: &[Option<NodeId>]) -> Result<NodeSlice, Error> {
         for &id in nodes.iter().flatten() {
             self.view().node(id)?;

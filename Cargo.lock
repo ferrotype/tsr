@@ -243,13 +243,16 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "sha2",
+ "ts_api",
  "ts_arena",
  "ts_ast",
  "ts_astnav",
  "ts_core",
+ "ts_encoder",
  "ts_format",
  "ts_jsstring",
  "ts_parser",
+ "ts_printer",
 ]
 
 [[package]]
@@ -393,8 +396,13 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "ts_arena",
+ "ts_ast",
  "ts_checker",
+ "ts_core",
  "ts_encoder",
+ "ts_format",
+ "ts_jsstring",
+ "ts_parser",
  "ts_printer",
  "ts_project",
 ]

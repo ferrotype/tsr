@@ -61,6 +61,26 @@ request and replace `source_hex`; `scripts/s08_relater.py` reads requests only
 from the frozen inventory, so ad-hoc programs are a development check and never
 evidence.
 
+## Comparing the formatter and printer with Go
+
+`scripts/s09_format.py compare` builds a native Go oracle and the Rust harness,
+sends both the same requests, one per distinct parser input of the frozen
+inventory (16,120), and reports how many agree on every requested operation.
+Point `--output` at a scratch directory; it needs go on PATH.
+
+```sh
+python3 scripts/s09_format.py compare --ops position,insert,format,entry --output "$SCRATCH/fmt"   # about 2 minutes
+python3 scripts/s09_format.py compare --ops indent --output "$SCRATCH/fmt"                          # about 6 minutes
+python3 scripts/s09_format.py compare --ops nav --limit 2000 --output "$SCRATCH/fmt"                # a diagnostic subset
+```
+
+Disagreeing inputs land in `failures.ndjson` with both observations. Changing
+`tools/s09/format_oracle/*.go` or the script makes `data/s09/format-probes.json`
+stale: `freeze` rewrites it and `verify` must reproduce it, about ten minutes
+each. `fixtures --freeze` rewrites the insertion rows the `ts_api` tests read.
+A comparison that reports full parity on its first run has to be mutation
+checked before it is believed.
+
 ## Branch names
 
 Name a branch after the work, for example `s09-ownership`. Do not prefix it with

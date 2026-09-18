@@ -28,18 +28,21 @@ def validate_request(request, pin):
     for case in cases:
         if ("tree" in case) == ("wire_hex" in case):
             raise ValueError("printing request requires exactly one tree or wire payload")
-        if case["rust_expected"] not in ("text", "unsupported", "decode_error", "panic"):
+        if case["rust_expected"] not in ("text", "unsupported", "decode_error", "panic", "error"):
             raise ValueError("unrecognized Rust boundary classification")
         for key, value in case["options"].items():
             if key not in OPTIONS or type(value) is not bool:
                 raise ValueError("invalid API printing option")
         if (case["rust_expected"] == "unsupported") != ("rust_unsupported" in case):
             raise ValueError("unsupported request requires its exact Rust reason")
-        if (case["rust_expected"] == "panic") != ("expected_panic" in case):
+        # "error": the pinned printer panics and Rust returns the same text as an error.
+        natively_panics = case["rust_expected"] in ("panic", "error")
+        if natively_panics != ("expected_panic" in case):
             raise ValueError("panic request requires its native contract message")
-        if (case["rust_expected"] == "panic") != ("panic_class" in case):
+        if natively_panics != ("panic_class" in case):
             raise ValueError("panic request requires its narrow class")
-        if "panic_class" in case and case["panic_class"] not in ("nil-root", "synthetic-expression"):
+        if "panic_class" in case and case["panic_class"] not in ("nil-root", "synthetic-expression",
+                                                                 "unhandled-statement"):
             raise ValueError("unknown native panic class")
     return cases
 
@@ -60,7 +63,7 @@ def validate_rows(cases, rows):
             allowed.add("rust_unsupported")
         if set(row) != allowed or set(row["options"]) != set(OPTIONS):
             raise ValueError(f"{row['name']} has missing or unknown observation fields")
-        if case["rust_expected"] == "panic":
+        if case["rust_expected"] in ("panic", "error"):
             if row.get("panic") != case["expected_panic"]:
                 raise ValueError(f"wrong native panic in {row['name']}: {row.get('panic')}")
             if row.get("panic_class") != case["panic_class"]:
@@ -78,7 +81,7 @@ def validate_rows(cases, rows):
             raise ValueError(f"{row['name']} observed another wire payload")
         if row.get("rust_unsupported") != case.get("rust_unsupported"):
             raise ValueError(f"{row['name']} observed another Rust boundary classification")
-        if case["rust_expected"] != "panic" and "panic_class" in row:
+        if case["rust_expected"] not in ("panic", "error") and "panic_class" in row:
             raise ValueError(f"unexpected panic class in {row['name']}")
         for key in OPTIONS:
             if row["options"].get(key) is not case["options"].get(key, False):

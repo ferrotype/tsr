@@ -66,6 +66,16 @@ impl TextWriter {
         writer
     }
 
+    /// The change tracker's writer keeps an indent size of zero, which
+    /// `new` would replace with the default; only a negative one is replaced.
+    pub(crate) fn with_indent_size(new_line: &[u8], indent_size: isize) -> Self {
+        let mut writer = Self::new(new_line, indent_size);
+        if indent_size == 0 {
+            writer.indent_size = 0;
+        }
+        writer
+    }
+
     // port: tsc/internal/printer/textwriter.go:textWriter.Grow
     pub fn grow(&mut self, additional: usize) {
         self.builder.reserve(additional);

@@ -60,7 +60,7 @@ def program_manifest():
 
 
 def checker_manifest():
-    return {"version": 3, "suites": {
+    return {"version": 4, "suites": {
         name: {"package": package, "filter": prefix, "cases": [prefix + "generation_boundary"]}
         for name, (package, prefix) in ownership.s09_ownership.SUITES.items()
     }}
@@ -109,6 +109,9 @@ class OwnershipProducerTests(unittest.TestCase):
         verifier = patch.object(ownership.s09_ownership.s09_printing, "verify_frozen", return_value=None)
         self.verify_frozen = verifier.start()
         self.addCleanup(verifier.stop)
+        insertion = patch.object(ownership.s09_ownership.s09_format, "verify_insertion_frozen", return_value=None)
+        self.verify_insertion = insertion.start()
+        self.addCleanup(insertion.stop)
 
     def test_stale_print_fixture_cannot_publish_scratch_or_instrumentation_success(self):
         calls = []
@@ -127,9 +130,11 @@ class OwnershipProducerTests(unittest.TestCase):
         self.assertFalse(any("printing::scratch_checks::" in args for args in calls))
         self.assertTrue(report["metrics"]["shared_pool_panic_retirement"])
         self.assertTrue(report["metrics"]["release_boundaries"])
-        for metric in ("api_print_scratch_disposal", "miri", "address_sanitizer"):
+        for metric in ("api_print_scratch_disposal", "api_scratch_disposal", "miri", "address_sanitizer"):
             self.assertFalse(report["metrics"][metric])
-        self.assertNotIn("api_scratch_disposal", report["metrics"])
+        # The insertion half was verified and run; the printing half fails the criterion.
+        self.assertEqual(self.verify_insertion.call_count, 4)
+        self.assertTrue(any("formatting::scratch_checks::" in args for args in calls))
 
     def test_missing_registry_case_blocks_s09_and_instrumentation_without_hiding_other_modes(self):
         for mode in ("debug", "release", "miri", "address_sanitizer"):
@@ -175,7 +180,9 @@ class OwnershipProducerTests(unittest.TestCase):
                 self.assertEqual(report["metrics"]["checker_ownership_tests"], 3)
                 self.assertEqual(report["metrics"]["miri"], mode != "miri")
                 self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
-                self.assertNotIn("api_scratch_disposal", report["metrics"])
+                self.assertFalse(report["metrics"]["api_scratch_disposal"])
+                self.assertFalse(report["metrics"][f"api_scratch_disposal_{mode}"])
+                self.assertEqual(report["metrics"]["api_scratch_tests"], 0)
 
     def test_arena_boundary_failure_cannot_be_hidden_by_passing_pool_tests(self):
         def invoke(root, args, env=None):

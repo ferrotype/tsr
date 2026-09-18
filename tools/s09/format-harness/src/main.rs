@@ -170,6 +170,248 @@ fn navigation(view: AstView<'_>, source: NodeId, length: usize, detail: bool) ->
     stream.result()
 }
 
+/// The number of leading statements the insertion probe takes. The position
+/// probe takes them all.
+const MAX_STATEMENTS: usize = 4;
+
+/// Every child `ForEachChild` reaches, with lists flattened.
+struct Flat<'v> {
+    view: AstView<'v>,
+    out: Vec<NodeId>,
+}
+
+impl ts_ast::ChildVisitor for Flat<'_> {
+    fn visit_node(&mut self, node: NodeId) -> std::ops::ControlFlow<()> {
+        self.out.push(node);
+        std::ops::ControlFlow::Continue(())
+    }
+    fn visit_list(&mut self, nodes: ts_ast::NodeListId) -> std::ops::ControlFlow<()> {
+        match self.view.list(nodes) {
+            Ok(list) => self.visit_node_slice(list.nodes()),
+            Err(_) => std::ops::ControlFlow::Break(()),
+        }
+    }
+    fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> std::ops::ControlFlow<()> {
+        match self.view.node_slice(nodes) {
+            Ok(read) => {
+                self.out.extend(read.iter().flatten());
+                std::ops::ControlFlow::Continue(())
+            }
+            Err(_) => std::ops::ControlFlow::Break(()),
+        }
+    }
+}
+
+/// `kind,pos,end(children...)` in child order, so that a structural difference
+/// shows as one.
+fn nested(view: AstView<'_>, id: NodeId, out: &mut String) -> Result<(), String> {
+    let node = view.node(id).map_err(|e| format!("{e:?}"))?;
+    out.push_str(&format!(
+        "{},{},{}(",
+        node.kind().raw(),
+        node.pos(),
+        node.end()
+    ));
+    let mut children = Flat {
+        view,
+        out: Vec::new(),
+    };
+    let _ = node.for_each_child(&mut children);
+    for child in children.out {
+        nested(view, child, out)?;
+    }
+    out.push(')');
+    Ok(())
+}
+
+/// What an API request carries: the statement encoded to protocol bytes and
+/// decoded into a fresh tree. The wire digest is its own row.
+fn decoded(
+    view: AstView<'_>,
+    root: NodeId,
+    statement: NodeId,
+    index: usize,
+    stream: &mut Stream,
+) -> Option<ts_encoder::DecodedTree> {
+    // The codec keeps upstream's panics, so they are caught as the oracle
+    // catches them and reported in upstream's words.
+    let answer = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let mut provider = ts_parser::ParserJsDocProvider::default();
+        ts_encoder::encode_node(view, statement, Some(root), &mut provider)
+            .map_err(|error| error.to_string())
+            .and_then(|wire| {
+                let digest = hex(&Sha256::digest(&wire.bytes));
+                ts_encoder::decode_nodes(&wire.bytes, &ts_arena::Counters::default())
+                    .map(|tree| (digest, tree))
+                    .map_err(|error| error.to_string())
+            })
+    }));
+    match answer {
+        Ok(Ok((digest, tree))) => {
+            stream.row(&format!("W|{index}|{digest}"));
+            Some(tree)
+        }
+        Ok(Err(error)) => {
+            stream.row(&format!("W|{index}|?{error}"));
+            None
+        }
+        Err(payload) => {
+            stream.row(&format!(
+                "W|{index}|!{}",
+                go_panic_text(&panic_text(&*payload))
+            ));
+            None
+        }
+    }
+}
+
+fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
+    payload
+        .downcast_ref::<String>()
+        .cloned()
+        .or_else(|| {
+            payload
+                .downcast_ref::<&str>()
+                .map(|text| (*text).to_owned())
+        })
+        .unwrap_or_else(|| "panic".to_owned())
+}
+
+/// Rust words an out-of-range index differently from the Go runtime.
+fn go_panic_text(text: &str) -> String {
+    let parse = || -> Option<String> {
+        let rest = text.strip_prefix("index out of bounds: the len is ")?;
+        let (length, index) = rest.split_once(" but the index is ")?;
+        Some(format!(
+            "runtime error: index out of range [{index}] with length {length}"
+        ))
+    };
+    parse().unwrap_or_else(|| text.to_owned())
+}
+
+fn leading_statements(
+    view: AstView<'_>,
+    root: NodeId,
+    limit: usize,
+) -> Result<Vec<NodeId>, String> {
+    let node = view.node(root).map_err(|e| format!("{e:?}"))?;
+    let Some(list) = node.statement_list() else {
+        return Ok(Vec::new());
+    };
+    let nodes = view.list(list).map_err(|e| format!("{e:?}"))?.nodes();
+    Ok(view
+        .node_slice(nodes)
+        .map_err(|e| format!("{e:?}"))?
+        .iter()
+        .flatten()
+        .take(limit)
+        .collect())
+}
+
+/// Where insertion is probed: three line starts spread over the file and one
+/// offset that is usually inside a line.
+fn targets(view: AstView<'_>, root: NodeId, length: usize) -> Result<Vec<i64>, String> {
+    let state = view.source_file(root).map_err(|e| format!("{e:?}"))?;
+    let lines = state.ecma_line_map();
+    let mut out: Vec<i64> = Vec::new();
+    let mut add = |position: i64| {
+        if !out.contains(&position) {
+            out.push(position);
+        }
+    };
+    for index in [0, lines.len() / 3, 2 * lines.len() / 3] {
+        add(i64::from(lines[index]));
+    }
+    let all = positions(length);
+    add(all[all.len() / 2]);
+    Ok(out)
+}
+
+/// The body of the insertion handler after request decoding, for each leading
+/// statement at each target. Upstream prints one decoded tree several times;
+/// here a tree is consumed by the request, so each row decodes its own.
+fn insertion(
+    view: AstView<'_>,
+    root: NodeId,
+    length: usize,
+    variant: &str,
+    detail: bool,
+) -> Result<Value, String> {
+    let settings = ts_format::probe::variant(variant).expect("a known variant");
+    let mut stream = Stream::new(detail);
+    let places = targets(view, root, length)?;
+    for (index, statement) in leading_statements(view, root, MAX_STATEMENTS)?
+        .into_iter()
+        .enumerate()
+    {
+        if decoded(view, root, statement, index, &mut stream).is_none() {
+            continue;
+        }
+        for &position in &places {
+            let answer = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let mut quiet = Stream::new(false);
+                let tree = decoded(view, root, statement, index, &mut quiet)
+                    .expect("the statement decoded a moment ago");
+                let mut provider = ts_parser::ParserJsDocProvider::default();
+                let mut target = ts_format::FormatFile {
+                    view,
+                    source: root,
+                    jsdoc: &mut provider,
+                };
+                ts_api::format_decoded_for_insertion(tree, &mut target, position, &settings)
+            }));
+            let text = match answer {
+                Ok(Ok(text)) => hex(&text),
+                Ok(Err(error)) => format!("!{error}"),
+                Err(payload) => format!("!{}", go_panic_text(&panic_text(&*payload))),
+            };
+            stream.row(&format!("R|{index}|{position}|{text}"));
+        }
+    }
+    Ok(stream.result())
+}
+
+/// `print_and_position_node` as the insertion handler calls it: the printed
+/// text, then every node of the positioned tree in child order.
+fn positioned(view: AstView<'_>, root: NodeId, detail: bool) -> Result<Value, String> {
+    let mut stream = Stream::new(detail);
+    for (index, statement) in leading_statements(view, root, usize::MAX)?
+        .into_iter()
+        .enumerate()
+    {
+        let Some(mut tree) = decoded(view, root, statement, index, &mut stream) else {
+            continue;
+        };
+        let Some(node) = tree.root else {
+            stream.row(&format!(
+                "P|{index}|!runtime error: invalid memory address or nil pointer dereference"
+            ));
+            continue;
+        };
+        let settings = ts_format::FormatCodeSettings::default();
+        let context = ts_printer::EmitContext::new();
+        match ts_printer::print_and_position_node(
+            &mut tree.builder,
+            node,
+            &settings.editor.new_line_character,
+            settings.editor.indent_size as isize,
+            &context,
+        ) {
+            Ok(text) => stream.row(&format!("P|{index}|{}", hex(&text))),
+            Err(error) => {
+                stream.row(&format!("P|{index}|!{error}"));
+                continue;
+            }
+        }
+        let mut shape = String::new();
+        match nested(tree.builder.view(), node, &mut shape) {
+            Ok(()) => stream.row(&format!("N|{index}|{shape}")),
+            Err(error) => stream.row(&format!("N|{index}|!{error}")),
+        }
+    }
+    Ok(stream.result())
+}
+
 /// The edit list is the observation. Whether it applies is a second fact: some
 /// settings make the pinned formatter emit overlapping edits.
 fn document(
@@ -260,6 +502,16 @@ fn observe(request: &Value) -> Result<Value, String> {
         match op {
             "nav" => {
                 out.insert("nav".into(), navigation(view, root, length, detail));
+            }
+            "insert" => {
+                let mut result = Map::new();
+                for name in ["default", "tabs"] {
+                    result.insert(name.into(), insertion(view, root, length, name, detail)?);
+                }
+                out.insert("insert".into(), Value::Object(result));
+            }
+            "position" => {
+                out.insert("position".into(), positioned(view, root, detail)?);
             }
             "entry" => {
                 let mut result = Map::new();
@@ -383,6 +635,8 @@ fn run() -> Result<(), String> {
 }
 
 fn main() {
+    // A caught panic is reported in its row, not on stderr.
+    std::panic::set_hook(Box::new(|_| {}));
     if let Err(error) = run() {
         eprintln!("S09 format harness protocol: {error}");
         std::process::exit(2);

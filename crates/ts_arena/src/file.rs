@@ -121,6 +121,19 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     pub fn store_and_source_mut(&mut self) -> (&mut N::Store, &SourceText) {
         (&mut self.owner.store, &self.owner.source)
     }
+    /// Give a storage that was built without text the text of the file
+    /// constructed in it, as when a decoded tree is printed and then wrapped in
+    /// a source file over the printed text. Only an empty source can be
+    /// replaced: nothing built so far can refer into it. The builder is
+    /// exclusive and unpublished, so no reader has seen the old text either.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        if !self.owner.source.as_bytes().is_empty() {
+            return Err(Error::InvalidGraph);
+        }
+        self.owner.source = source;
+        self.owner.position_map = OnceLock::new();
+        Ok(())
+    }
     /// Open this exclusive core with a fresh invariant scope. Checked local
     /// handles cannot escape or be used with any other scope, even on this same
     /// builder. The callback does not grant growth or publication capabilities.

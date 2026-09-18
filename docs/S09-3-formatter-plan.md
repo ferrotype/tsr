@@ -185,6 +185,48 @@ position rule; `AssignPositionsToNode`; `CreateSyntheticSourceFile`. Exit: text
 and every node position match for all positioned-printing observations, and the
 existing printing fixture still passes.
 
+Done. The printer now covers statements, declarations, class members, the
+expressions type display never produces, JSX and clauses: about 120 functions in
+`printer_statements.rs`, ports of the upstream functions of the same names. The
+62 emit functions that existed gained upstream's enter and exit calls, inserted
+by a script that matched each Rust function to its Go original and then checked
+by the compiler. The six notifications are part of the writer contract rather
+than a second handler object, because their only provider upstream is the change
+tracker's writer, whose handlers read the writer's own state. With no source
+file `PreserveSourceNewlines` only turns on the line-preserving branches of the
+list helpers; with one it measures lines between nodes and their comments, which
+stays a named boundary. A whole `SourceFile` root, which brings comments,
+shebang, helpers and triple-slash directives, stays one too.
+
+Positions are assigned to the decoded tree in place instead of to a clone.
+Upstream clones so that the caller's node can be printed again; the one caller
+here decodes a tree per request and drops it. The visible consequence of the
+clone is kept: upstream's visitor lifts an absent embedded statement into an
+empty synthesized block, so an `if` without `else` comes out with one, and the
+formatter then refuses it.
+
+The `position` probe was widened from the first four statements of a file to
+every top-level statement, and `compare --ops position` reports 16,120 of 16,120.
+The first complete run over four statements reported 16,069. Every difference
+had one of four causes: upstream allows a trailing comma in the type parameters
+of an arrow function, so `<T,>` stays; an instantiation expression emits its
+operand at member precedence, which the existing Rust code had one level too
+low; and two kinds of upstream panic whose text the port has to reproduce, a
+statement kind with no case (`KindJSImportDeclaration`) and an unchecked
+conversion of a function body or a label that a decoded tree filled with another
+node. Widening the probe found one more of the last kind. Mutations over the
+whole inventory: dropping the lifted `else` block makes 576 inputs differ, the
+trailing-whitespace trim of the last non-trivia position 101, the leading line
+count of an embedded statement 168. Dropping the list-end notification changes
+nothing in this probe, which prints node positions only; the insertion probe
+sees it (7,046 inputs).
+
+With the wider probe the frozen file holds 54,657,319 rows, reproduced by a
+second run.
+
+The checker's type display goes through the same printer. The E4 checker-text
+comparison of both runtimes still reports 64 probes and no mismatch.
+
 **F3. Formatter foundations.** Settings, `TextChange` and `ApplyBulkEdits`,
 `rule.go`, `context.go`, `util.go`, and the formatting scanner. Exit: a scanner
 probe (token, trivia and rescan decisions per corpus file) matches. That probe
@@ -277,6 +319,33 @@ printer input, formatter errors, repeated requests beside a live registry with
 no arena growth and no registered handle. `scripts/s09_ownership.py` then
 publishes `api_scratch_disposal` as printing and formatting together, in all
 four modes, and the informational printing metric stays as its component.
+
+Done. `ts_api::format_node_for_insertion` is the pinned handler after transport:
+decode, print and position, wrap the tree in a synthetic source file over the
+printed text, take the indentation at the target position, format the node with
+it, apply the edits. `compare --ops insert` reports 16,120 of 16,120 under both
+settings. Its first working run reported 1,990 of 2,000, and every difference
+was one defect outside the formatter: the Rust decoder built modifier lists
+without the modifier flags upstream's `NewModifierList` computes, so a decoded
+class did not know it had decorators. Mutations: dropping the list-end
+notification makes 7,046 inputs differ, the node's own delta 4,967, and flipping
+the line-start test 820.
+
+Two storage facts shaped it. The arena checks a token's range against the text
+of the storage that holds its parent, and a decoded tree's storage has none, so
+a builder with an empty source can now adopt one (`adopt_source`); nothing built
+so far can refer into an empty text. And a tree that has been given positions is
+not printed a second time, so the request consumes its decoded tree.
+
+Six tests in `crates/ts_api/src/formatting/scratch_checks.rs` hold the ownership
+contract against frozen native rows (`data/s09/insertion-*.json`, four sources,
+64 answers, from `scripts/s09_format.py fixtures`): native outputs and failures,
+live scratch until the text returns, sixteen repeated requests beside a live
+registry, a formatter failure, printer and decoder errors, and a decoder panic.
+After every request the tracked counters are back where they were.
+`scripts/s09_ownership.py` publishes `api_scratch_disposal` from the printing
+and insertion suites together, each in all four modes, and verifies the frozen
+rows against their inputs before the tests that read them run.
 
 ## 5. How failure shows up
 

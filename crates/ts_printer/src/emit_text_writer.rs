@@ -1,7 +1,7 @@
 //! The externally opaque writer contract (`printer.EmitTextWriter`,
 //! `tsc/internal/printer/emittextwriter.go`).
 
-use ts_ast::SymbolId;
+use ts_ast::{NodeId, NodeListId, SymbolId};
 
 /// One method per upstream interface member. Text is bytes; positions are byte
 /// offsets except `get_column`, which counts UTF-16 units (`core.UTF16Offset`, a
@@ -34,6 +34,24 @@ pub trait EmitTextWriter {
     fn is_at_start_of_line(&self) -> bool;
     fn has_trailing_comment(&self) -> bool;
     fn has_trailing_whitespace(&self) -> bool;
+
+    // Upstream's `PrintHandlers` emit notifications. Its only provider of
+    // these six is the change tracker's writer, whose handlers read the
+    // writer's own state, so they are part of the writer contract here rather
+    // than a second object aliasing the writer. They default to nothing.
+
+    /// `PrintHandlers.OnBeforeEmitNode`.
+    fn on_before_emit_node(&mut self, _node: NodeId) {}
+    /// `PrintHandlers.OnAfterEmitNode`.
+    fn on_after_emit_node(&mut self, _node: NodeId) {}
+    /// `PrintHandlers.OnBeforeEmitNodeList`.
+    fn on_before_emit_node_list(&mut self, _nodes: NodeListId) {}
+    /// `PrintHandlers.OnAfterEmitNodeList`.
+    fn on_after_emit_node_list(&mut self, _nodes: NodeListId) {}
+    /// `PrintHandlers.OnBeforeEmitToken`.
+    fn on_before_emit_token(&mut self, _node: NodeId) {}
+    /// `PrintHandlers.OnAfterEmitToken`.
+    fn on_after_emit_token(&mut self, _node: NodeId) {}
 }
 
 /// Upstream's `utf8.DecodeLastRuneInString`, reduced to the question the writers

@@ -1388,3 +1388,27 @@ fn storage_source_file_hooks_observe_initialized_metadata_and_keep_transaction_a
         })
         .unwrap();
 }
+
+#[test]
+fn a_storage_without_text_adopts_one_and_a_storage_with_text_keeps_its_own() {
+    let counters = Counters::new();
+    // A decoded tree's storage has no text. Once it adopts the text of the file
+    // constructed in it, tokens of that file are inside the storage's source.
+    let mut empty = AstBuilder::new(SourceText::from_loaded_bytes(&b""[..]), &counters);
+    let parent = empty.new_identifier(JsString::from_bytes(b"a".as_slice()));
+    empty
+        .adopt_source(SourceText::from_loaded_bytes(&b"a + b"[..]))
+        .unwrap();
+    let file = empty.complete(parent).unwrap().publish_unbound();
+    let token = file
+        .view()
+        .get_or_create_token(SyntaxKind::PlusToken, 1, 3, parent, 0)
+        .unwrap();
+    assert_eq!((token.pos(), token.end()), (1, 3));
+    // Nodes may refer into a text that is there, so it cannot be replaced.
+    let mut full = builder(&counters);
+    assert_eq!(
+        full.adopt_source(SourceText::from_loaded_bytes(&b"other"[..])),
+        Err(Error::InvalidGraph)
+    );
+}

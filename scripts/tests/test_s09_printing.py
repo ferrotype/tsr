@@ -42,7 +42,7 @@ class PrintingProvenanceTests(unittest.TestCase):
 
     def test_frozen_native_observation_verifies_without_go(self):
         observation = printing.verify_frozen(self.root)
-        self.assertEqual(len(observation["rows"]), 12)
+        self.assertEqual(len(observation["rows"]), 13)
 
     def test_requested_text_change_requires_a_new_native_capture(self):
         self.change_json("data/s09/printing-cases.json",
@@ -101,12 +101,20 @@ class PrintingProvenanceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "wrong native panic"):
             printing.verify_frozen(self.root)
 
-    def test_rust_boundary_reason_must_remain_explicit(self):
+    def test_a_rust_boundary_cannot_be_claimed_for_a_case_that_names_none(self):
         def change(value):
-            row = next(row for row in value["rows"] if row["name"] == "statement-boundary")
+            row = next(row for row in value["rows"] if row["name"] == "statement")
             row["rust_unsupported"] = "another boundary"
         self.mutate_observation(change)
-        with self.assertRaisesRegex(ValueError, "another Rust boundary"):
+        with self.assertRaisesRegex(ValueError, "missing or unknown observation fields"):
+            printing.verify_frozen(self.root)
+
+    def test_the_native_panic_rust_reports_as_an_error_is_held_to_its_text(self):
+        def change(value):
+            row = next(row for row in value["rows"] if row["name"] == "unhandled-statement")
+            row["panic"] = "unhandled statement: KindImportDeclaration"
+        self.mutate_observation(change)
+        with self.assertRaisesRegex(ValueError, "wrong native panic"):
             printing.verify_frozen(self.root)
 
     def test_supplied_malformed_wire_is_the_wire_observed(self):

@@ -63,7 +63,7 @@ fn native_decode_print_outputs_and_named_boundaries_match() {
     let requests: Value =
         serde_json::from_str(include_str!("../../../../data/s09/printing-cases.json")).unwrap();
     let cases = requests["cases"].as_array().unwrap();
-    assert_eq!(rows.len(), 12);
+    assert_eq!(rows.len(), 13);
     assert_eq!(rows.len(), cases.len());
     assert_eq!(observations["pin"], requests["pin"]);
     let counters = Counters::new();
@@ -92,6 +92,16 @@ fn native_decode_print_outputs_and_named_boundaries_match() {
                 "{}: expected Unsupported({reason})",
                 row["name"]
             );
+        } else if request["rust_expected"] == "error" {
+            // The pinned printer panics on the node kind. Rust returns the
+            // same text as an error, and the scratch is dropped all the same.
+            let expected = row["panic"].as_str().expect("the native panic text");
+            match result {
+                Ok(Err(PrintError::Print(error))) => {
+                    assert_eq!(error.to_string(), expected, "{}", row["name"]);
+                }
+                other => panic!("{}: expected a printer error, got {other:?}", row["name"]),
+            }
         } else if let Some(expected) = row["panic"].as_str() {
             let payload = result.expect_err("native decode/print panics");
             let message = payload
@@ -217,7 +227,7 @@ fn decoder_panic_drops_scratch_and_retires_snapshot_request() {
 
 #[test]
 fn printer_error_drops_allocated_scratch_without_retiring_snapshot() {
-    let row = case("source-newlines-boundary");
+    let row = case("unhandled-statement");
     let counters = Counters::new();
     let snapshot = snapshot(&counters);
     let before = counters.snapshot();
@@ -227,9 +237,10 @@ fn printer_error_drops_allocated_scratch_without_retiring_snapshot() {
     let result = snapshot.request(|| Ok(print_decoded(scratch, options(&row))));
     assert_eq!(
         result,
-        Ok(Err(PrintError::Print(ts_printer::Error::Unsupported(
-            "PreserveSourceNewlines"
-        ))))
+        Ok(Err(PrintError::Print(ts_printer::Error::UnexpectedKind {
+            context: "unhandled statement",
+            kind: ts_ast::SyntaxKind::JSImportDeclaration.into(),
+        })))
     );
     assert_eq!(counters.snapshot(), before);
     // Exercise the public wrapper's same failure with its own fresh decode.
@@ -242,9 +253,10 @@ fn printer_error_drops_allocated_scratch_without_retiring_snapshot() {
     });
     assert_eq!(
         result,
-        Ok(Err(PrintError::Print(ts_printer::Error::Unsupported(
-            "PreserveSourceNewlines"
-        ))))
+        Ok(Err(PrintError::Print(ts_printer::Error::UnexpectedKind {
+            context: "unhandled statement",
+            kind: ts_ast::SyntaxKind::JSImportDeclaration.into(),
+        })))
     );
     assert_eq!(counters.snapshot(), before);
     assert_eq!(snapshot.generation().validate(), Ok(()));

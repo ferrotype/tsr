@@ -1,8 +1,9 @@
-"""Exact production generation, registry, retention and request-print scratch tests.
+"""Exact production generation, registry, retention and request scratch tests.
 
 The S09-4 and S09-1 criteria do not complete E3, certify checker algorithms or
-extend the arena example's allocation counters to checker storage. The scoped
-decode/print scratch observation is informational; full S09-3 remains pending.
+extend the arena example's allocation counters to checker storage. S09-3 is
+printing and insertion formatting together; the printing observation stays
+published as its component.
 """
 
 from pathlib import Path
@@ -11,6 +12,7 @@ import sys
 
 from s04_common import strict_json_loads
 from s06_ownership import validate_output
+import s09_format
 import s09_printing
 
 
@@ -19,6 +21,7 @@ SUITES = {
     "pool": ("ts_project", "tests::"),
     "registry": ("ts_api", "tests::"),
     "scratch": ("ts_api", "printing::scratch_checks::"),
+    "insertion": ("ts_api", "formatting::scratch_checks::"),
     "results": ("ts_project", "retention::results::"),
     "ast": ("ts_project", "retention::ast::"),
     "builder": ("ts_checker", "node_builder::cache::retention::"),
@@ -40,7 +43,7 @@ def load_cases(root):
 
 def validate_manifest(manifest):
     if (type(manifest) is not dict or set(manifest) != {"version", "suites"}
-            or type(manifest["version"]) is not int or manifest["version"] != 3
+            or type(manifest["version"]) is not int or manifest["version"] != 4
             or type(manifest["suites"]) is not dict
             or set(manifest["suites"]) != set(SUITES)):
         raise ValueError("invalid S09 ownership inventory")
@@ -65,11 +68,14 @@ def measure(root, invoke, prefix, options, env, manifest, mode):
         raise ValueError("invalid S09 ownership measurement mode")
     outcomes = {}
     for name, suite in manifest["suites"].items():
-        if name == "scratch":
+        # The two request suites compare against frozen native rows, which are
+        # checked against their inputs before the tests that read them run.
+        verify = {"scratch": s09_printing.verify_frozen, "insertion": s09_format.verify_insertion_frozen}.get(name)
+        if verify is not None:
             try:
-                s09_printing.verify_frozen(root=root)
+                verify(root=root)
             except (ValueError, OSError) as error:
-                print(f"S09 printing fixture {mode} failed verification: {error}", file=sys.stderr)
+                print(f"S09 {name} fixture {mode} failed verification: {error}", file=sys.stderr)
                 outcomes[name] = False
                 continue
         args = [*prefix, "test", "--package", suite["package"], "--lib", "--locked",
@@ -102,6 +108,7 @@ def publish_metrics(report, modes, arena_modes, manifest):
         metrics[f"shared_pool_panic_retirement_{mode}"] = ownership_passed
         metrics[f"release_boundaries_{mode}"] = ownership_passed and arena_modes[mode]
         metrics[f"api_print_scratch_disposal_{mode}"] = outcomes["scratch"]
+        metrics[f"api_scratch_disposal_{mode}"] = outcomes["scratch"] and outcomes["insertion"]
         for criterion, name in RETENTION.items():
             metrics[f"{criterion}_{mode}"] = outcomes[name]
     for criterion in (*CRITERIA, *RETENTION):
@@ -114,6 +121,11 @@ def publish_metrics(report, modes, arena_modes, manifest):
     metrics["checker_retention_tests"] = sum(
         len(manifest["suites"][name]["cases"]) for name in RETENTION.values()
         if all(outcomes[name] for outcomes in modes.values()))
+    # S09-3: printing and insertion formatting, each in every mode.
+    metrics["api_scratch_disposal"] = all(metrics[f"api_scratch_disposal_{mode}"] for mode in MODES)
+    metrics["api_scratch_tests"] = (
+        sum(len(manifest["suites"][name]["cases"]) for name in ("scratch", "insertion"))
+        if metrics["api_scratch_disposal"] else 0)
     metrics["api_print_scratch_disposal"] = all(outcomes["scratch"] for outcomes in modes.values())
     metrics["api_print_scratch_tests"] = (
         len(manifest["suites"]["scratch"]["cases"]) if metrics["api_print_scratch_disposal"] else 0)

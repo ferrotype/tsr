@@ -19,6 +19,7 @@ import sys
 import tarfile
 import tempfile
 import time
+import tomllib
 
 from s04 import go_environment, verified_upstream
 from s04_common import command, strict_json_loads
@@ -28,6 +29,10 @@ ORACLE = ROOT / "tools/s09/format_oracle/main.go"
 # Copied into the export's internal/format: access to unexported internals.
 BRIDGE = ROOT / "tools/s09/format_oracle/format_bridge.go"
 PROBES = ROOT / "data/s09/format-probes.json"
+# A handful of insertion requests with their native answers, so that the Rust
+# tests, which also run under Miri and AddressSanitizer, need no Go toolchain.
+INSERTION_CASES = ROOT / "data/s09/insertion-cases.json"
+INSERTION_OBSERVATIONS = ROOT / "data/s09/insertion-observations.json"
 EXPORT_PATHS = ("tsc/go.mod", "tsc/go.sum", "tsc/internal")
 OPS = ("nav", "indent", "format", "position", "insert", "scan", "rules", "entry")
 # Facts about the implementation rather than about an input. They are asked once,
@@ -323,6 +328,69 @@ def observe(directory, ops, prefix=None, limit=None):
     return summary
 
 
+def insertion_cases():
+    cases = strict_json_loads(INSERTION_CASES.read_bytes())
+    pin = strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
+    if set(cases) != {"version", "pin", "cases"} or cases["version"] != 1 or cases["pin"] != pin:
+        raise ValueError("insertion cases target another upstream pin")
+    names = [case.get("name") for case in cases["cases"]]
+    if (not names or len(set(names)) != len(names)
+            or any(set(case) != {"name", "source"} or not isinstance(case["source"], str) or not case["name"]
+                   for case in cases["cases"])):
+        raise ValueError("insertion cases need unique names and a source each")
+    return cases
+
+
+def verify_insertion_frozen(root=ROOT):
+    """Offline: the frozen insertion rows answer the current cases, oracle and pin."""
+    root = Path(root)
+    cases = strict_json_loads((root / "data/s09/insertion-cases.json").read_bytes())
+    observation = strict_json_loads((root / "data/s09/insertion-observations.json").read_bytes())
+    pin = strict_json_loads((root / "data/upstream.json").read_bytes())["pin"]
+    oracle = digest((root / "tools/s09/format_oracle/main.go").read_bytes()
+                    + (root / "tools/s09/format_oracle/format_bridge.go").read_bytes())
+    go = tomllib.loads((root / "data/s04/toolchains.toml").read_text())["go"]
+    try:
+        if observation["version"] != VERSION or observation["pin"] != pin or cases["pin"] != pin:
+            raise ValueError("insertion rows target another upstream pin")
+        if observation["cases_sha256"] != digest(canonical(cases)) or observation["oracle_sha256"] != oracle:
+            raise ValueError("stale insertion rows: the cases or the oracle changed")
+        if observation["go"] != go or observation["toolchain_local"] is not True:
+            raise ValueError("insertion rows used a different Go toolchain")
+        names = [case["name"] for case in cases["cases"]]
+        if [row["name"] for row in observation["rows"]] != names:
+            raise ValueError("missing, extra or reordered insertion rows")
+        for case, row in zip(cases["cases"], observation["rows"]):
+            if bytes.fromhex(row["source_hex"]) != case["source"].encode() or set(row["insert"]) != set(INSERT_VARIANTS):
+                raise ValueError(f"{row['name']} answers another request")
+    except (KeyError, TypeError) as error:
+        raise ValueError(f"malformed insertion fixture: {error}") from error
+    return observation
+
+
+def insertion_fixtures(directory):
+    """The literal insert rows of the pinned oracle for the frozen cases."""
+    directory = Path(directory).resolve()
+    report = build(directory)
+    cases = insertion_cases()
+    requests = [{"version": VERSION, "id": case["name"], "source_hex": case["source"].encode().hex(),
+                 "filename": f"/{case['name']}.ts", "path": f"/{case['name']}.ts", "script_kind": 3,
+                 "jsx": False, "force": False} for case in cases["cases"]]
+    run(report["binary"], requests, ("insert",), directory / "insertion.ndjson", detail=True)
+    rows = []
+    for request, line in zip(requests, (directory / "insertion.ndjson").read_bytes().splitlines(), strict=True):
+        observation = strict_json_loads(line)
+        rows.append({"name": request["id"], "source_hex": request["source_hex"],
+                     "insert": {name: observation["insert"][name]["detail"] for name in INSERT_VARIANTS}})
+    # The toolchain by its version alone, as data/s04/toolchains.toml names it:
+    # the rows do not depend on the platform the oracle was built on.
+    return {"version": VERSION, "pin": report["pin"], "go": report["go"].split()[2],
+            "toolchain_local": report["toolchain_local"],
+            "oracle_sha256": report["oracle_sha256"], "cases_sha256": digest(canonical(cases)),
+            "derivation": "python3 scripts/s09_format.py fixtures --output <new directory> [--freeze]",
+            "rows": rows}
+
+
 def frozen_form(summary):
     """What a later run must reproduce exactly: no elapsed time, no subset flag."""
     native = {key: value for key, value in summary["native"].items() if key != "seconds"}
@@ -331,7 +399,8 @@ def frozen_form(summary):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("build", "observe", "detail", "freeze", "verify", "compare"))
+    parser.add_argument("command", choices=("build", "observe", "detail", "freeze", "verify", "compare", "fixtures"))
+    parser.add_argument("--freeze", action="store_true", help="with fixtures: write the observations file")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--ops", default=",".join(OPS))
     parser.add_argument("--prefix")
@@ -343,6 +412,13 @@ def main():
         raise ValueError("unknown operation")
     if args.command == "build":
         print(json.dumps(build(args.output), sort_keys=True))
+    elif args.command == "fixtures":
+        content = canonical(insertion_fixtures(args.output)) + b"\n"
+        if args.freeze:
+            INSERTION_OBSERVATIONS.write_bytes(content)
+        elif not INSERTION_OBSERVATIONS.exists() or INSERTION_OBSERVATIONS.read_bytes() != content:
+            raise ValueError("native insertion rows differ from data/s09/insertion-observations.json")
+        print(json.dumps({"cases": len(insertion_cases()["cases"]), "frozen": args.freeze}))
     elif args.command == "compare":
         print(json.dumps(compare(args.output, ops, args.prefix, args.limit), sort_keys=True))
     elif args.command == "detail":

@@ -73,14 +73,14 @@ Operations, with the call shapes the formatter itself uses:
   row carries the whole edit list. This probe stands in for the fourslash
   recording the plan first sketched: it reaches the same five entry points over
   the whole inventory rather than over some two hundred recorded calls.
-- `position`: each of the first four statements is encoded to protocol bytes and
+- `position`: every top-level statement is encoded to protocol bytes and
   decoded into a fresh tree, as an API request carries it, then passed to
   `PrintAndPositionNode`. Rows are the wire digest, the printed text, and the
   positioned clone as a nested `kind,pos,end(children)` string in child order.
   The wire digest is its own row so an encoding difference cannot pass for a
   printing one.
 - `insert`: the body of the pinned `handleFormatNodeForInsertion` after request
-  decoding, for each of those statements at three line starts spread over the
+  decoding, for each of the first four statements at three line starts spread over the
   file and one offset that is usually inside a line, under `default` and `tabs`.
   The target offset is given in bytes; the UTF-16 conversion is the API layer's.
 
@@ -132,13 +132,14 @@ python3 scripts/s09_format.py observe --output <dir> --prefix compiler/a  # a di
 python3 scripts/s09_format.py detail  --output <dir> --id <request id>    # literal rows of one input
 python3 scripts/s09_format.py freeze  --output <new directory>            # rewrites data/s09/format-probes.json
 python3 scripts/s09_format.py verify  --output <new directory>            # reproduces the frozen file or fails
+python3 scripts/s09_format.py fixtures --output <new directory> [--freeze] # the insertion rows the Rust tests read
 ```
 
 `compare` is the differential itself. It builds the oracle and the Rust harness
 in `tools/s09/format-harness`, sends every request to both, and reports how many
 inputs agree on every requested operation, with the disagreeing ones and both
-observations in `failures.ndjson`. The harness accepts only the operations that
-have been ported; asking for another is an error, never an empty answer.
+observations in `failures.ndjson`. Every operation is ported; asking the harness
+for an unknown one is an error, never an empty answer.
 
 ```sh
 python3 scripts/s09_format.py compare --ops nav --output <new directory>

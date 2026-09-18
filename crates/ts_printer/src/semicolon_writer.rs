@@ -3,7 +3,7 @@
 //! is set, as it is for `SymbolToString`.
 
 use crate::EmitTextWriter;
-use ts_ast::SymbolId;
+use ts_ast::{NodeId, NodeListId, SymbolId};
 
 pub struct TrailingSemicolonDeferringWriter<'a> {
     inner: &'a mut dyn EmitTextWriter,
@@ -150,5 +150,25 @@ impl EmitTextWriter for TrailingSemicolonDeferringWriter<'_> {
     // port: tsc/internal/printer/semicolon_writer.go:trailingSemicolonDeferringWriter.HasTrailingWhitespace
     fn has_trailing_whitespace(&self) -> bool {
         self.inner.has_trailing_whitespace()
+    }
+
+    // The notifications belong to the writer being wrapped.
+    fn on_before_emit_node(&mut self, node: NodeId) {
+        self.inner.on_before_emit_node(node);
+    }
+    fn on_after_emit_node(&mut self, node: NodeId) {
+        self.inner.on_after_emit_node(node);
+    }
+    fn on_before_emit_node_list(&mut self, nodes: NodeListId) {
+        self.inner.on_before_emit_node_list(nodes);
+    }
+    fn on_after_emit_node_list(&mut self, nodes: NodeListId) {
+        self.inner.on_after_emit_node_list(nodes);
+    }
+    fn on_before_emit_token(&mut self, node: NodeId) {
+        self.inner.on_before_emit_token(node);
+    }
+    fn on_after_emit_token(&mut self, node: NodeId) {
+        self.inner.on_after_emit_token(node);
     }
 }
