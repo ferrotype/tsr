@@ -1,7 +1,10 @@
 //! The pinned NewChecker type constructors, followed by bound global lookups.
 //! Each named marker owns an actual graph cell; counters observe those cells.
 
-use super::*;
+use super::{
+    missing, of, tf, Checker, Construction, Environment, Error, HashMap, IndexInfo, LiteralValue,
+    Rc, RefCell, Signature, Structure, TypeCell, K,
+};
 use crate::bound_input::BoundInputOptions;
 use ts_ast::symbol_flags as sf;
 
@@ -252,6 +255,8 @@ pub(super) fn intrinsics(
         bivariant_parameters: false,
         is_abstract: false,
         is_construct: false,
+        target: None,
+        parameter_declarations: Vec::new(),
     })
     .collect();
     let index_infos = vec![
@@ -332,6 +337,24 @@ fn empty_object(graph: &crate::Graph, additional_flags: u32) -> Rc<TypeCell> {
 impl Construction {
     // port: tsc/internal/checker/checker.go:Checker.initializeChecker
     pub(super) fn initialize_globals(self: &Rc<Self>) -> Result<(), Error> {
+        if self.input.options().strict_null_checks {
+            let weak = Rc::downgrade(self);
+            self.checker.register_non_nullable(move |ty| {
+                let state = weak.upgrade().ok_or(Error::Released)?;
+                // getGlobalNonNullableTypeInstantiation: the lib's alias when
+                // it exists, otherwise the plain intersection with `{}`.
+                match state.input.resolve_global(b"NonNullable", sf::TYPE)? {
+                    Some(group) => state.type_reference(
+                        &group,
+                        std::slice::from_ref(ty),
+                        &Environment::default(),
+                    ),
+                    // `any & {}` is `any`; other operands need a real intersection.
+                    None if ty.flags & tf::ANY != 0 => Ok(ty.clone()),
+                    None => missing("NonNullable without the lib alias"),
+                }
+            })?;
+        }
         let arguments = self.global_type("IArguments", 0)?;
         self.initialization
             .named

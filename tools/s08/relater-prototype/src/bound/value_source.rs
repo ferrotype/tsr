@@ -1,7 +1,10 @@
 //! Value queries and the supported native return-inference branches.
 //! Flow environments contain declaration identities, never identifier spellings.
 
-use super::*;
+use super::{
+    instantiate, mf, missing, of, tf, Construction, Environment, Error, HashMap, LiteralValue,
+    NodeId, Rc, SymbolGroup, TypeCell, TypeLink, K,
+};
 use ts_ast::{JsDocProvider, NodeDataRead};
 
 #[derive(Clone, Default)]
@@ -189,7 +192,19 @@ impl Construction {
                     Some(name) => self.name(name)?,
                     None => Rc::from("__function"),
                 };
-                self.object(declarations, env.clone(), name, of::ANONYMOUS)?
+                let ty = self.object(declarations, env.clone(), name, of::ANONYMOUS)?;
+                // The function's anonymous type has a declaration, so it could
+                // contain type variables and takes the counted instantiation
+                // path (which returns it unchanged without outer parameters).
+                self.record_type_source(
+                    &ty,
+                    instantiate::TypeSource {
+                        node: declaration,
+                        environment: env.clone(),
+                        alias: None,
+                    },
+                );
+                ty
             }
             Some(K::Parameter) => self.parameter_type_of_declaration(declaration, env)?,
             Some(K::VariableDeclaration | K::PropertyDeclaration | K::PropertySignature) => {
@@ -337,7 +352,7 @@ impl Construction {
             );
         }
         if self.input.options().strict_null_checks && (reaches_end || bare_return) {
-            returns.push(self.builtin(tf::UNDEFINED)?)
+            returns.push(self.builtin(tf::UNDEFINED)?);
         }
         let result = self.checker.graph.union(&returns)?;
         self.widen_return_literal(&result)
@@ -399,10 +414,10 @@ impl Construction {
                 if let Some(expression) = data.expression() {
                     let ty = self.expression_type(expression, env, &flow)?;
                     if !returns.iter().any(|prior| Rc::ptr_eq(prior, &ty)) {
-                        returns.push(ty)
+                        returns.push(ty);
                     }
                 } else {
-                    *bare = true
+                    *bare = true;
                 }
                 Ok((false, flow))
             }
@@ -484,7 +499,7 @@ impl Construction {
         let mut left = data.left().ok_or(Error::ResolutionFailed)?;
         let mut right = data.right().ok_or(Error::ResolutionFailed)?;
         if self.nullish_constant(right)?.is_none() {
-            std::mem::swap(&mut left, &mut right)
+            std::mem::swap(&mut left, &mut right);
         }
         let mut nullable = self.nullish_constant(right)?.ok_or_else(|| {
             Error::Unsupported("flow comparison is not a nullish equality".into())
@@ -493,7 +508,7 @@ impl Construction {
             operator.known(),
             Some(K::EqualsEqualsToken | K::ExclamationEqualsToken)
         ) {
-            nullable = tf::NULLABLE
+            nullable = tf::NULLABLE;
         }
         let group = self
             .input
@@ -518,9 +533,9 @@ impl Construction {
         let mut other = Vec::new();
         for part in parts {
             if part.flags & nullable != 0 {
-                matching.push(part)
+                matching.push(part);
             } else {
-                other.push(part)
+                other.push(part);
             }
         }
         let matching = self.checker.graph.union(&matching)?;
@@ -686,6 +701,8 @@ impl Construction {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bound::BoundChecker;
+    use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
     use ts_ast::SourceFileParseOptions;
     use ts_core::ScriptKind;

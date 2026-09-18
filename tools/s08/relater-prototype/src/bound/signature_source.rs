@@ -2,7 +2,16 @@
 //! its mapper and links to its target; merely resolving a method table does not
 //! resolve the method's parameters or return type.
 
-use super::*;
+use super::{
+    instantiate, missing, of, tf, Construction, Environment, Error, IndexInfo, Rc, Signature,
+    Structure, TypeCell, TypeLink,
+};
+
+/// `links.target` and `links.mapper` of an instantiated symbol.
+struct SymbolOrigin {
+    root: TypeLink,
+    mapper: instantiate::Mapper,
+}
 
 impl Construction {
     pub(super) fn attach_signature_factory(
@@ -20,7 +29,7 @@ impl Construction {
             parameters,
             move |checker, arguments| {
                 let state = weak.upgrade().ok_or(Error::Released)?;
-                if !std::ptr::eq(checker, &state.checker) {
+                if !std::ptr::eq(checker, &raw const state.checker) {
                     return missing("signature used by another checker");
                 }
                 let parameters = parameters_owned
@@ -37,6 +46,9 @@ impl Construction {
         ));
     }
 
+    /// The return type of an instantiated signature is the target's return
+    /// type instantiated with the signature's mapper, one step at a time
+    /// (`getReturnTypeOfSignature`), unlike symbols, which return to their root.
     fn instantiated_link(
         self: &Rc<Self>,
         source: TypeLink,
@@ -47,6 +59,42 @@ impl Construction {
             let state = weak.upgrade().ok_or(Error::Released)?;
             state.instantiate(&source.resolve()?, &mapper, None)
         })
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.instantiateSymbol
+    fn instantiated_symbol_link(
+        self: &Rc<Self>,
+        source: TypeLink,
+        mapper: instantiate::Mapper,
+    ) -> Result<TypeLink, Error> {
+        // A symbol whose type is resolved and cannot be affected by
+        // instantiation is returned as is.
+        if let Some(resolved) = source.resolved()? {
+            if !self.could_contain_type_variables(&resolved)? {
+                return Ok(source);
+            }
+        }
+        // An instantiation of an instantiated symbol goes back to the original
+        // target with the combined mapper, preserving original identities.
+        let (root, mapper) = match source.origin::<SymbolOrigin>() {
+            Some(origin) => (
+                origin.root.clone(),
+                instantiate::Mapper::compose(&origin.mapper, &mapper),
+            ),
+            None => (source, mapper),
+        };
+        let origin = Rc::new(SymbolOrigin {
+            root: root.clone(),
+            mapper: mapper.clone(),
+        });
+        let weak = Rc::downgrade(self);
+        Ok(TypeLink::lazy_with_origin(
+            move || {
+                let state = weak.upgrade().ok_or(Error::Released)?;
+                state.instantiate(&root.resolve()?, &mapper, None)
+            },
+            origin,
+        ))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateSignatureEx
@@ -116,19 +164,23 @@ impl Construction {
             .parameters
             .iter()
             .cloned()
-            .map(|link| self.instantiated_link(link, mapper.clone()))
-            .collect();
+            .map(|link| self.instantiated_symbol_link(link, mapper.clone()))
+            .collect::<Result<_, _>>()?;
         result.this_type = source
             .this_type
             .clone()
-            .map(|link| self.instantiated_link(link, mapper.clone()));
+            .map(|link| self.instantiated_symbol_link(link, mapper.clone()))
+            .transpose()?;
         result.return_type = self.instantiated_link(source.return_type.clone(), mapper);
         result.type_parameters = parameters.len();
         result.generic = None;
+        result.target = Some(Rc::new(source.clone()));
         self.attach_signature_factory(&mut result, &parameters);
         Ok(result)
     }
 
+    // Fallible like every other constructor here, so call sites stay uniform.
+    #[allow(clippy::unnecessary_wraps)]
     // port: tsc/internal/checker/checker.go:Checker.resolveAnonymousTypeMembers
     pub(super) fn instantiated_anonymous(
         self: &Rc<Self>,
@@ -147,7 +199,7 @@ impl Construction {
             let mut result = Structure::default();
             for member in &source.members {
                 let mut member = member.clone();
-                member.r#type = state.instantiated_link(member.r#type, mapper.clone());
+                member.r#type = state.instantiated_symbol_link(member.r#type, mapper.clone())?;
                 result.members.push(member);
             }
             for signature in &source.call_signatures {

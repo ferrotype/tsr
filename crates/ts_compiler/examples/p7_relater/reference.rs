@@ -145,6 +145,11 @@ pub(super) fn group(program: &Arc<Program>, actions: &[Value]) -> Result<Value> 
         lookup(&owner, source, actions)
     });
     let after_lookup = state(&owner);
+    // The observer accumulates every checkTypeRelatedTo outcome. Relations run
+    // while resolving the looked-up declarations belong to setup; the
+    // production probe scopes its calls to one action, so drop them here
+    // instead of attributing them to the first action.
+    owner.checker().take_observed();
     let mut observations = Vec::new();
     let mut unsupported = None;
     let mut relation_interval = Interval::default();

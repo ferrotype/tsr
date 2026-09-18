@@ -1,47 +1,194 @@
-# S08 reference relater — stopped work record
+# S08 reference relater: parity record
 
-Stopped at the owner's request on 2026-09-18. Branch `codex/s08-p7`, based on
-`f9ec1d1`. This commit preserves an **incomplete implementation checkpoint**. All delegated
-edits are finished; no measurement or build is left running. No acceptance
-evidence, thresholds or generated status views were changed.
+Branch `codex/s08-p7`. The measurement reference constructs its types from the
+retained AST and binder owners, compiler options and module-loader facts. It
+does not pre-resolve through the production checker. It owns lazy type links,
+native initialization, generic references and signature instantiation,
+tuple/mapped/conditional/template construction, relation caches and structured
+diagnostic rendering. `Description` remains a unit-test API only.
 
-The measurement reference now constructs types from retained AST/binder owners,
-compiler options and module-loader facts. It no longer pre-resolves through the
-production checker. It owns lazy type links, native initialization, generic
-references and signature instantiation, tuple/mapped/conditional/template
-construction, relation caches, and structured diagnostic rendering. The producer
-requires exact native states and diagnostics and stops a full capture before
-measurement when parity fails. `Description` remains a unit-test API only.
+## Status (2026-09-18)
 
-Validation at this stopping point:
+Over the frozen inventory, 21 fixtures in all five modes, compared by
+`scripts/s08_relater.py`'s strict comparator against the frozen native
+observations:
 
-- `cargo test -p s08_relater_prototype --lib`: **53 passed**.
-- `cargo build -p ts_compiler --example p7_relater --features relation-probe`: passed.
-- `PYTHONPATH=scripts python3 -m unittest test_s08_measurement.RelaterContract test_s08_relater_sources`: **11 passed**.
-- Formatting applied to the prototype and compiler packages.
-- Bounded development comparison: **75/100 groups strictly match** the frozen
-  native observations. This ran 20 fixtures, each in all five modes; the
-  `instantiation-limit` fixture was deliberately excluded from the final check.
-  Results are under `target/s08/reference-development/`. These are development
-  observations, not a capture accepted by the producer.
-- Workspace/release/MSRV/clippy checks and the full relater measurement have not
-  been run for this implementation.
+| implementation | strict groups | behavioral groups | unsupported |
+| --- | --- | --- | --- |
+| reference (bound program) | **105/105** | 105/105 | 0 |
+| production ID relater | 105/105 | 105/105 | 0 |
 
-## Remaining acceptance work
+Strict means identical results, top-level `checkTypeRelatedTo` outcomes,
+diagnostics, and identical `types_created`, `signatures_created`,
+`instantiations` and relation-cache entries and flags before lookup, after
+lookup and around every action. The checkpoint this work started from measured
+75/105 strict and 82/105 behavioral with three unsupported groups.
 
-| Fixture | Observed remaining issue |
+Validation: 59 prototype unit tests, the 11 Python relater contract tests,
+`python3 scripts/checks.py clippy` and `fmt` clean over the workspace (the
+package had 92 clippy findings left from the bound-program rewrite; they are
+fixed). No measurement capture was run and no evidence or status view changed:
+`scripts/s08_relater.py capture` and `cargo xtask run relater` are the owner's.
+With both implementations at full parity the producer's `same_work` condition
+holds, so a capture now yields the three ratio metrics instead of withholding
+them.
+
+## Method
+
+Totals cannot locate a construction difference. Both implementations were
+traced event by event (temporary, env-gated, removed before commit): every type
+creation with its flags, every counted instantiation with the source type, every
+relation-cache write and every top-level relation result, each with a filtered
+backtrace naming the responsible function. The production ID relater matches the
+native counters on all 105 groups, so its trace stands for the pinned checker's
+sequence; diffing it against the reference's trace names the Go function behind
+each missing or extra event. Every port below was read against the pinned
+source before it was written.
+
+## Ports, by the fixture that exposed them
+
+`deferred-generic-members` (first relation 19/8/23 against native 21/8/31):
+
+- `instantiateSymbol`: an instantiation of an instantiated property or parameter
+  symbol returns to the root symbol with `combineTypeMappers(links.mapper,
+  mapper)`, and a symbol whose resolved type holds no type variables is returned
+  as is. The reference instantiated the already instantiated type. Return types
+  stay chained, as in `getReturnTypeOfSignature`. This was most of the gap.
+- `getNormalizedType`: a deferred (node-backed) reference normalizes to the
+  ordinary reference of its target and resolved arguments.
+- `createMarkerType`: marker types run the counted
+  `instantiateTypes(typeParameters, mapper)` before creating the reference.
+- `isInstantiatedGenericParameter` (with a new `Signature.target`): resolves the
+  target signature's parameter before a callback comparison.
+- `isRelatedToEx`: a type parameter related to exactly its constraint is `True`
+  before any recursion or cache entry; an unconstrained one relates through
+  `unknown`, with the second, this-argument attempt. This fixed a cache entry
+  recorded as succeeded where native records failed.
+- `propertiesRelatedTo`: `sourceProp == targetProp` is symbol identity (one type
+  link), not a comparison of resolved types, which resolved the source first.
+
+`optional-rest-tuples`: `createNormalizedTupleType` takes a variadic array's
+element from `getIndexTypeOfType(t, numberType)`, which resolves the array
+reference's members during lookup rather than at the first relation.
+
+`flow-return-inference`, `jsdoc-module`:
+
+- `getObjectTypeInstantiation` filters outer type parameters for every
+  `SymbolFlagsTypeLiteral` symbol, which the binder also gives function types,
+  constructor types and mapped types, and for methods. The reference filtered
+  type literals and methods only, so a function type in an extends clause was
+  re-created instead of being returned by the identity entry. This is the filter
+  the rejected counting experiment (recorded below) pointed at.
+- A function declaration's anonymous type records its syntax provenance, so it
+  could contain type variables and takes the counted instantiation path
+  (permissive and restrictive instantiation of the check type).
+- `inferFromSignature`/`applyToParameterTypes`: parameter types are resolved and
+  the source's rest tuple is built by `getRestTypeAtPosition` (signatures now
+  carry their parameter declarations for the tuple labels). Contravariant
+  candidates stay a named refusal.
+- `getNonNullableType` in the callback check of `compareSignaturesRelated`,
+  through a checker-level hook for `getGlobalNonNullableTypeInstantiation`
+  registered under strictNullChecks.
+- An unaliased empty type literal is the shared `emptyTypeLiteralType`.
+- An instantiated intersection applies `getIntersectionType`'s absorbing
+  reductions (`any`, `never`, `unknown` removal, one constituent). A result that
+  needs a new intersection type stays the named unsupported branch.
+- The `Substitution`/`IndexedAccess`/`Conditional` type-flag bits were permuted
+  relative to the pin (24/25/26); corrected, with a unit test.
+
+`mapped-conditional-infer`:
+
+- `prependTypeMapping`/`appendTypeMapping`: merged mappers, which map the first
+  result through the second where a composite instantiates it. A homomorphic
+  mapped type is instantiated with the variable's mapping prepended, and a
+  mapped property's template with `appendTypeMapping(mappedType.mapper,
+  typeParameter, key)`, where the instantiated mapped type's mapper is the
+  composite of its cloned iteration parameter and the outer mapper.
+- `isTypeParameterPossiblyReferenced` begins with a precondition the reference
+  lacked: a type parameter whose symbol does not have exactly one declaration is
+  always possibly referenced. `Promise<T>` and its `this` type are declared in
+  several lib files.
+- Class and interface type parameters are members of the merged symbol: the
+  same-named parameter of every merged declaration is one type. The reference
+  created one per declaration, and with it a second `Promise<T>`. Environments
+  may be keyed by any of the merged declarations, so the mapper lookup consults
+  all of them; without that, a member declared in a secondary declaration was
+  left uninstantiated and the marker comparison returned `True` where native
+  returns `Maybe`.
+
+`instantiation-limit` (a constant 4 types and 4 instantiations short, the same
+on `Build<3>` as on `Build<1001>`, so all on the generic declaration path):
+
+- `resolveTypeReferenceMembers` pads the type arguments with the type itself as
+  `this`, for a tuple target too: the empty tuple `[]` is its own target and its
+  base is the array type with that this argument.
+- `getTupleBaseType`: a variadic element contributes `T[number]`, a real indexed
+  access type, to the base array's element union.
+- A generic (variadic) tuple defers every indexed access that is not a fixed
+  element index, after resolving the object's members as
+  `isStringIndexSignatureOnlyType` does.
+- `newConditionalType` instantiates the root's check and extends types afresh
+  (the extends type without the inferences) before the alias is instantiated.
+  The deferred conditional previously stored the inferred extends type.
+
+Earlier in the same effort, before this pass: the pin's conditional case in
+`getOuterTypeParameters` (a conditional contributes its `infer` parameters to
+every node below it, without which `ReturnType<typeof f>` resolved to `any`);
+draining the `checkTypeRelatedTo` observer after lookup so lookup-time relations
+are not charged to the first action; and `getUndefinedStrippedTargetIfNeeded`
+with the `filterType`/`extractTypesOfKind` path behind it.
+
+A negative result worth keeping: routing `instantiate_source_type`'s outer
+parameter mapping through the counted `instantiate` overshot native
+(`deferred-generic-members` 23 to 37 against 31). The counting site was right;
+the environment was too wide, because the possibly-referenced filter did not
+apply to function types. That is the first `flow-return-inference` port above.
+
+## Regression tests
+
+- `generic_member_relation_performs_the_native_construction`: the frozen
+  `deferred-generic-members` program, which needs no lib, must create 21 types
+  and 8 signatures, run 31 instantiations and leave the native cache flags for
+  the first identity relation, and nothing on a repeat. Verified to fail (25
+  against 31) with the root-returning symbol instantiation disabled.
+- `merged_interface_declarations_share_their_type_parameter`: verified to fail
+  with the canonical type parameter disabled.
+- `an_unaliased_empty_type_literal_is_the_shared_empty_type`,
+  `type_flags_match_the_pinned_enumeration`, and the three tests from the
+  earlier fixes.
+
+Lib-dependent rules (Promise, tuples, `NonNullable`) are covered by the frozen
+fixtures, not by unit tests: the unit fixtures bind without the default library.
+
+## Beyond the frozen inventory (development check, not evidence)
+
+Sixteen further programs were run through both implementations and compared
+group by group: 60 of 80 groups agree exactly. Own conditional and mapped types,
+two-parameter and callback generics, contravariance, optional and rest tuples,
+array-holding generics, `Promise<'x'>` against `Promise<string>`, `Record`,
+`Exclude` and `Build<3>` against a concrete tuple all match. The rest:
+
+| program | state |
 | --- | --- |
-| `optional-rest-tuples` | Three modes stop at `undefined-stripped union target`. Lookup is 102 types / 4 signatures / 0 instantiations versus native 105 / 5 / 1. Identity first-action state is 115 / 5 / 11 versus 116 / 5 / 12. Finish native tuple normalization/setup timing and optional-element relation handling. |
-| `deferred-generic-members` | All actions execute, but relation-cache flags and construction work differ. First action is 109 types / 12 signatures / 23 instantiations versus native 111 / 12 / 31. Continue canonical signature/mapper/variance investigation. |
-| `mapped-conditional-infer` | All actions execute, but lookup is one instantiation short; the first action has an extra nested ternary and reaches 196 / 33 / 140 versus native 186 / 30 / 155. Audit conditional inference, mapper composition and signature instantiation against the pin. |
-| `flow-return-inference` | Setup does not resolve the expected `number` identity. Identity relations return false; lookup is 95 / 8 / 6 versus native 103 / 8 / 11. This is a semantic issue, not merely accounting. |
-| `jsdoc-module` | Same ReturnType/inference identity problem: 91 / 7 / 6 versus native 99 / 7 / 11. The earlier rest-signature unsupported branch is fixed. |
-| `instantiation-limit` | Native 1000-step conditional tail loop is implemented and a small `Build<8>` test passes. Recheck the frozen `Build<1001>` case, its diagnostic range, and its actual 507,609-type / 507,513-instantiation state. No current full-fixture result is claimed. |
+| `Awaited<Promise<string>>` | named unsupported: intersection normalization after instantiation |
+| `Parameters<typeof f>` | named unsupported: conditional contravariant inference candidates |
+| `Partial<{...}>` | silent drift: first relation 99/4/14 against 100/4/16 |
+| `Pick<{...}, 'x' \| 'y'>` | silent drift: lookup one type short (98 against 99), first relation 11 against 12 instantiations |
 
-The other fifteen checked fixtures match all five modes, including exact
-lookup/action counts, cache flags and structured diagnostics. This includes
-template literals, byte/numeric literals, recursive objects, union/intersection
-error elaboration and all four deep-relation fixtures.
+The two drifts are the ones to take next, because nothing refuses them: they
+are homomorphic mapped types whose constraint is a type parameter constrained to
+`keyof T` and mapped modifiers, a path the frozen `mapped-conditional-infer`
+fixture does not take.
+
+## Known differences that do not affect the comparison
+
+Creation order within a phase differs in places: the reference creates an
+interface's or alias's type parameters before the declared type, where the pin
+creates the declared type first, and it creates a deferred conditional after its
+alias arguments are instantiated rather than before. Counts and states are
+identical; type ids inside a phase are not. Nothing compared depends on ids
+today. Union constituent order does depend on type ids in the pin, so a fixture
+that unions a type parameter with its own declaring type could expose this.
 
 ## Code map and boundaries
 
@@ -56,14 +203,21 @@ error elaboration and all four deep-relation fixtures.
 - `scripts/s08_relater.py`: strict comparison, source fingerprint and capture
   precondition; associated Python tests reject false equivalence.
 
-Named unsupported branches still include advanced conditional/signature
-inference, non-array variadic rest slicing, some mapped union/array cases,
-intersection re-instantiation, string mapping/substitution and some diagnostic
-display forms. Do not silently substitute success or adjust counters to close
-these gaps. Several thousand lines of new reference code still need independent
-review. Prototype unit tests do not establish native fixture parity.
+Named unsupported branches still include contravariant conditional inference
+candidates, inference between generic signatures, non-array variadic rest
+slicing, some mapped union/array cases, an instantiated intersection that needs a
+new intersection type, the non-nullable form of `unknown` and of instantiable
+types, the genericity of mapped and template parameter types, a type parameter
+constraint that needs a this argument, string mapping/substitution and some
+diagnostic display forms. Do not silently substitute success or adjust counters
+to close these gaps. Several thousand lines of reference code still need
+independent review. Prototype unit tests do not establish native fixture parity;
+the frozen comparison does.
 
-After fixing the six fixture families: run the full 105-group normal/allocation
-comparison, required code checks, then the frozen complete measurement batch.
-Only then record `run.relater.*` evidence and regenerate status. Until then the
-four E2 relater criteria remain unmet.
+## Remaining
+
+The six fixture families are closed. What is left is the owner's: the full
+normal/allocation capture (`scripts/s08_relater.py capture`), `cargo xtask run
+relater`, and the status regeneration. Until that capture is recorded the four E2
+relater criteria remain unmet in the ledger, although the parity the first one
+asks for now holds on the development host.

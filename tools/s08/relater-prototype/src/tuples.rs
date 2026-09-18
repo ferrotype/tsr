@@ -2,7 +2,10 @@
 //! The source frontend supplies normalized elements; array/rest library members
 //! remain lazy in the cell's ordinary structure resolver.
 
-use super::*;
+use super::{
+    flags, unsupported, Error, Rc, Relater, Ternary, TypeCell, TypeLink, FALSE, RECURSION_BOTH,
+    TRUE,
+};
 
 pub mod element_flags {
     pub const REQUIRED: u8 = 1;
@@ -162,7 +165,7 @@ impl Relater<'_> {
         if !source_rest && source_arity < target_min {
             self.report(
                 report_errors,
-                &ts_diagnostics::Source_has_0_element_s_but_target_requires_1,
+                ts_diagnostics::Source_has_0_element_s_but_target_requires_1,
                 vec![source_arity.to_string(), target_min.to_string()],
             );
             return Ok(Some(FALSE));
@@ -170,7 +173,7 @@ impl Relater<'_> {
         if !target_variable && target_arity < source_min {
             self.report(
                 report_errors,
-                &ts_diagnostics::Source_has_0_element_s_but_target_allows_only_1,
+                ts_diagnostics::Source_has_0_element_s_but_target_allows_only_1,
                 vec![source_min.to_string(), target_arity.to_string()],
             );
             return Ok(Some(FALSE));
@@ -211,7 +214,7 @@ impl Relater<'_> {
                 if source_position >= target_arity {
                     self.report(
                         report_errors,
-                        &ts_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
+                        ts_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
                         vec![target_arity.to_string()],
                     );
                     return Ok(Some(FALSE));
@@ -220,15 +223,15 @@ impl Relater<'_> {
             };
             let target_flags = target_shape.element_flags[target_position];
             if target_flags & ef::VARIADIC != 0 && source_flags & ef::VARIADIC == 0 {
-                self.report(report_errors, &ts_diagnostics::Source_provides_no_match_for_variadic_element_at_position_0_in_target, vec![target_position.to_string()]);
+                self.report(report_errors, ts_diagnostics::Source_provides_no_match_for_variadic_element_at_position_0_in_target, vec![target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             if source_flags & ef::VARIADIC != 0 && target_flags & ef::VARIABLE == 0 {
-                self.report(report_errors, &ts_diagnostics::Variadic_element_at_position_0_in_source_does_not_match_element_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
+                self.report(report_errors, ts_diagnostics::Variadic_element_at_position_0_in_source_does_not_match_element_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             if target_flags & ef::REQUIRED != 0 && source_flags & ef::REQUIRED == 0 {
-                self.report(report_errors, &ts_diagnostics::Source_provides_no_match_for_required_element_at_position_0_in_target, vec![target_position.to_string()]);
+                self.report(report_errors, ts_diagnostics::Source_provides_no_match_for_required_element_at_position_0_in_target, vec![target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             // With strictNullChecks and exactOptionalPropertyTypes disabled,
@@ -238,7 +241,7 @@ impl Relater<'_> {
             let related = if source_flags & ef::VARIADIC != 0 && target_flags & ef::REST != 0 {
                 // A variadic tuple element denotes an array/tuple as a whole.
                 // Relate its numeric index type to the rest's element type.
-                self.variadic_to_rest(source_type, target_type, report_errors, intersection_state)?
+                Self::variadic_to_rest()?
             } else {
                 self.is_related_to_ex(
                     source_type,
@@ -255,9 +258,9 @@ impl Relater<'_> {
                         && from_end >= target_end
                         && target_start as isize != source_arity as isize - target_end as isize - 1
                     {
-                        self.report(report_errors, &ts_diagnostics::Type_at_positions_0_through_1_in_source_is_not_compatible_with_type_at_position_2_in_target, vec![target_start.to_string(), (source_arity as isize - target_end as isize - 1).to_string(), target_position.to_string()]);
+                        self.report(report_errors, ts_diagnostics::Type_at_positions_0_through_1_in_source_is_not_compatible_with_type_at_position_2_in_target, vec![target_start.to_string(), (source_arity as isize - target_end as isize - 1).to_string(), target_position.to_string()]);
                     } else {
-                        self.report(report_errors, &ts_diagnostics::Type_at_position_0_in_source_is_not_compatible_with_type_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
+                        self.report(report_errors, ts_diagnostics::Type_at_position_0_in_source_is_not_compatible_with_type_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
                     }
                 }
                 return Ok(Some(FALSE));
@@ -267,17 +270,10 @@ impl Relater<'_> {
         Ok(Some(result))
     }
 
-    fn variadic_to_rest(
-        &mut self,
-        source: &Rc<TypeCell>,
-        target_element: &Rc<TypeCell>,
-        report_errors: bool,
-        intersection_state: u8,
-    ) -> Result<Ternary, Error> {
+    fn variadic_to_rest() -> Result<Ternary, Error> {
         // Creating the target array is semantic work in the pinned algorithm.
         // The bound frontend must provide the array factory before this path is
         // enabled; decomposing here would hide that work and its cache entries.
-        let _ = (source, target_element, report_errors, intersection_state);
         unsupported("variadic tuple-to-rest array construction")
     }
 }
@@ -285,6 +281,14 @@ impl Relater<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::object_flags;
+    use crate::Checker;
+    use crate::Graph;
+    use crate::Member;
+    use crate::Mode;
+    use crate::Resolver;
+    use crate::Structure;
+    use std::cell::Cell;
 
     #[test]
     fn deferred_arguments_are_shared_by_shape_and_reference() {

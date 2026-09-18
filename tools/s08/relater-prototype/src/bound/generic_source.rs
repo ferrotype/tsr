@@ -1,6 +1,9 @@
 //! Reference-owned generic targets, argument maps and instantiated objects.
 
-use super::*;
+use super::{
+    instantiate, missing, of, tf, Cell, Construction, Environment, Error, NodeId, Rc, Structure,
+    SymbolGroup, TypeCell, TypeLink, Weak, K,
+};
 use std::cell::OnceCell;
 use std::collections::HashSet;
 
@@ -81,7 +84,7 @@ impl Construction {
             let data = node.data_source();
             let data = data.as_heritage_clause().ok_or(Error::ResolutionFailed)?;
             if data.token() == K::ExtendsKeyword {
-                bases.extend(self.list(clause, data.types())?)
+                bases.extend(self.list(clause, data.types())?);
             }
         }
         Ok(bases)
@@ -203,7 +206,7 @@ impl Construction {
         }
         if ty.flags & tf::INTERSECTION != 0 {
             for part in ty.types()? {
-                self.inherited_structure(&part, inherited)?
+                self.inherited_structure(&part, inherited)?;
             }
             return Ok(());
         }
@@ -218,9 +221,52 @@ impl Construction {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfTypeParameter
+    /// The declaration that stands for a class or interface type parameter.
+    /// Those parameters are members of the merged symbol, so the same-named
+    /// parameter of every merged declaration is one symbol and one type; the
+    /// first declaration's node represents it.
+    fn canonical_type_parameter(&self, node: NodeId) -> Result<NodeId, Error> {
+        let read = self.input.node(node)?;
+        let Some(owner) = read.parent() else {
+            return Ok(node);
+        };
+        let owner_read = self.input.node(owner)?;
+        if !matches!(
+            owner_read.kind().known(),
+            Some(K::InterfaceDeclaration | K::ClassDeclaration)
+        ) {
+            return Ok(node);
+        }
+        let (Some(owner_name), Some(name)) = (owner_read.name(), read.name()) else {
+            return Ok(node);
+        };
+        let Some(group) = self.input.resolve_type_name(owner_name)? else {
+            return Ok(node);
+        };
+        let name = self.text(name)?;
+        for declaration in self.type_declaration_nodes(&group)? {
+            let declaration_read = self.input.node(declaration)?;
+            for candidate in self.list(declaration, declaration_read.type_parameter_list())? {
+                if let Some(candidate_name) = self.input.node(candidate)?.name() {
+                    if self.text(candidate_name)? == name {
+                        return Ok(candidate);
+                    }
+                }
+            }
+        }
+        Ok(node)
+    }
+
     pub(super) fn type_parameter(self: &Rc<Self>, node: NodeId) -> Result<Rc<TypeCell>, Error> {
         let key = (node, Default::default());
         if let Some(ty) = self.node_types.borrow().get(&key).cloned() {
+            return Ok(ty);
+        }
+        let canonical = self.canonical_type_parameter(node)?;
+        if canonical != node {
+            let ty = self.type_parameter(canonical)?;
+            self.record_merged_type_parameter(&ty, node);
+            self.node_types.borrow_mut().insert(key, ty.clone());
             return Ok(ty);
         }
         let read = self.input.node(node)?;
@@ -316,7 +362,7 @@ impl Construction {
                         let original = original_link.upgrade().ok_or(Error::Released)?;
                         match original
                             .type_parameter_shape()
-                            .map(|shape| shape.constraint())
+                            .map(super::super::generics::TypeParameterShape::constraint)
                             .transpose()?
                             .flatten()
                         {
@@ -458,7 +504,7 @@ impl Construction {
                             struct Reset<'a>(&'a Cell<bool>);
                             impl Drop for Reset<'_> {
                                 fn drop(&mut self) {
-                                    self.0.set(false)
+                                    self.0.set(false);
                                 }
                             }
                             let _reset = Reset(&resolving);
@@ -1017,7 +1063,10 @@ impl Construction {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bound::BoundChecker;
+    use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
+    use crate::LiteralValue;
 
     fn fixture(text: &[u8]) -> (BoundChecker, NodeId) {
         let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(

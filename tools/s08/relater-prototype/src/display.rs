@@ -3,7 +3,10 @@
 //! Member and argument links are followed here, when native TypeToString would
 //! request them. Construction never invokes this renderer to invent a name.
 
-use super::*;
+use super::{
+    element_flags, flags, object_flags, unsupported, Checker, Error, Graph, LiteralValue, Rc,
+    Signature, TypeCell, TypeParameterShape,
+};
 use std::collections::HashSet;
 
 const FUNCTION: u8 = 0;
@@ -173,17 +176,17 @@ impl Display<'_> {
                 if boolean_pair && value.flags & flags::BOOLEAN_LITERAL != 0 {
                     if !boolean_written {
                         printed.push("boolean".to_owned());
-                        boolean_written = true
+                        boolean_written = true;
                     }
                     continue;
                 }
                 printed.push(self.ty(&value)?.in_context(precedence));
             }
             if null {
-                printed.push("null".to_owned())
+                printed.push("null".to_owned());
             }
             if undefined {
-                printed.push("undefined".to_owned())
+                printed.push("undefined".to_owned());
             }
             return Ok(Printed {
                 text: printed.join(if union { " | " } else { " & " }),
@@ -248,7 +251,7 @@ impl Display<'_> {
             for (index, text) in template.texts.iter().enumerate() {
                 result.push_str(&escaped(text, ts_jsstring::QuoteChar::Backtick)?);
                 if let Some(ty) = types.get(index) {
-                    result.push_str(&format!("${{{}}}", self.ty(ty)?.text))
+                    result.push_str(&format!("${{{}}}", self.ty(ty)?.text));
                 }
             }
             result.push('`');
@@ -280,7 +283,7 @@ impl Display<'_> {
         }
         let mut items = Vec::new();
         for signature in &shape.call_signatures {
-            items.push(format!("{};", self.signature(signature, false)?))
+            items.push(format!("{};", self.signature(signature, false)?));
         }
         for signature in &shape.construct_signatures {
             if signature.is_abstract {
@@ -358,7 +361,7 @@ impl Display<'_> {
         }
         let mut parameters = Vec::new();
         if let Some(this) = signature.this_type()? {
-            parameters.push(format!("this: {}", self.ty(&this)?.text))
+            parameters.push(format!("this: {}", self.ty(&this)?.text));
         }
         for index in 0..signature.parameter_count() {
             let name = signature
@@ -422,6 +425,8 @@ fn property_name(name: &str) -> Result<String, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Member;
+    use crate::Structure;
 
     #[test]
     fn anonymous_intersections_render_members_only_when_formatted() {

@@ -1,6 +1,9 @@
 //! Reference-owned mapped members and indexed access constructors.
 
-use super::*;
+use super::{
+    instantiate, missing, of, tf, Construction, Environment, Error, HashMap, LiteralValue, Member,
+    NodeId, Rc, RefCell, Structure, TypeCell, TypeLink, Weak, K,
+};
 
 #[derive(Default)]
 pub(super) struct State {
@@ -28,6 +31,8 @@ impl Construction {
         self.mapped_with_alias(node, env, alias)
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn mapped_with_alias(
         self: &Rc<Self>,
         node: NodeId,
@@ -163,8 +168,12 @@ impl Construction {
                     {
                         return missing("homomorphic mapped union/array/tuple instantiation");
                     }
+                    // instantiateConstituent: the mapped type is instantiated
+                    // with the variable's mapping prepended, a distinct mapper
+                    // whose alias arguments are instantiated afresh.
                     let source_alias = self.alias_metadata(info.node, &info.environment, None)?;
-                    return self.instantiate_source_type(ty, mapper, None, source_alias);
+                    let prepended = instantiate::Mapper::prepend(&variable, &mapped, mapper)?;
+                    return self.instantiate_source_type(ty, &prepended, None, source_alias);
                 }
             }
         }
@@ -238,7 +247,7 @@ impl Construction {
                 .map(|member| self.mapped_property_key(member))
                 .collect::<Result<Vec<_>, _>>()?;
             for index in &structure.index_infos {
-                keys.push(index.key()?)
+                keys.push(index.key()?);
             }
             keys
         } else if constraint_type.flags & tf::UNION != 0 {
@@ -251,9 +260,28 @@ impl Construction {
             if key.flags & tf::NEVER != 0 {
                 continue;
             }
-            let mut environment = env.clone();
-            environment.0.push((parameter, Rc::downgrade(&key)));
-            let mapper = instantiate::Mapper::new(environment);
+            // getTypeOfMappedSymbol: `appendTypeMapping(mappedType.mapper,
+            // typeParameter, key)`. An instantiated mapped type's mapper is the
+            // composite of its cloned iteration parameter and the outer mapper,
+            // so the clone is instantiated through the outer mapper on the way.
+            let mapper = if env.1.is_some() {
+                let original = self.type_parameter(parameter)?;
+                let fresh = env.get(parameter)?.ok_or(Error::ResolutionFailed)?;
+                let mut outer = env.clone();
+                outer.0.retain(|(node, _)| *node != parameter);
+                let clone_mapper = instantiate::Mapper::with_types(
+                    Environment::default(),
+                    std::slice::from_ref(&original),
+                    std::slice::from_ref(&fresh),
+                )?;
+                let mapped_mapper =
+                    instantiate::Mapper::compose(&clone_mapper, &instantiate::Mapper::new(outer));
+                instantiate::Mapper::append(&mapped_mapper, &fresh, &key)?
+            } else {
+                let mut environment = env.clone();
+                environment.0.push((parameter, Rc::downgrade(&key)));
+                instantiate::Mapper::new(environment)
+            };
             let names = if let Some(name_type) = &name_type {
                 self.instantiate(name_type, &mapper, None)?
             } else {
@@ -289,10 +317,10 @@ impl Construction {
                 };
                 let (mut optional, mut readonly) = source_property.unwrap_or_default();
                 if let Some(token) = data.question_token() {
-                    optional = self.input.node(token)?.kind() != K::MinusToken
+                    optional = self.input.node(token)?.kind() != K::MinusToken;
                 }
                 if let Some(token) = data.readonly_token() {
-                    readonly = self.input.node(token)?.kind() != K::MinusToken
+                    readonly = self.input.node(token)?.kind() != K::MinusToken;
                 }
                 let strip_optional =
                     !optional && source_property.is_some_and(|property| property.0);
@@ -311,7 +339,7 @@ impl Construction {
                             ty = state
                                 .checker
                                 .graph
-                                .union(&[ty, state.builtin(tf::UNDEFINED)?])?
+                                .union(&[ty, state.builtin(tf::UNDEFINED)?])?;
                         } else if strip_optional {
                             if ty.flags & tf::UNION != 0 {
                                 let types = ty
@@ -321,7 +349,7 @@ impl Construction {
                                     .collect::<Vec<_>>();
                                 ty = state.checker.graph.union(&types)?;
                             } else if ty.flags & tf::UNDEFINED != 0 {
-                                ty = state.builtin(tf::NEVER)?
+                                ty = state.builtin(tf::NEVER)?;
                             }
                         }
                     }
@@ -348,6 +376,8 @@ impl Construction {
         }
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     // port: tsc/internal/checker/checker.go:Checker.getIndexType
     pub(super) fn keyof(
         self: &Rc<Self>,
@@ -386,11 +416,13 @@ impl Construction {
             .map(|member| self.mapped_property_key(member))
             .collect::<Result<Vec<_>, _>>()?;
         for index in &structure.index_infos {
-            keys.push(index.key()?)
+            keys.push(index.key()?);
         }
         self.checker.graph.union(&keys)
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     // port: tsc/internal/checker/checker.go:Checker.getIndexedAccessType
     pub(super) fn indexed_access(
         self: &Rc<Self>,
@@ -421,6 +453,53 @@ impl Construction {
                 .borrow_mut()
                 .insert(key, Rc::downgrade(&result));
             return Ok(result);
+        }
+        // A generic (variadic) tuple defers every access that is not a fixed
+        // element index. isStringIndexSignatureOnlyType has resolved the
+        // object's members by then, so they are resolved here first.
+        if let Some(tuple) = object.tuple_shape() {
+            if tuple
+                .element_flags
+                .iter()
+                .any(|flag| flag & crate::element_flags::VARIADIC != 0)
+            {
+                object.structure(&self.checker.graph)?;
+                let fixed_index = match index.literal.as_ref() {
+                    Some(LiteralValue::Number(bits)) => {
+                        let fixed = tuple
+                            .element_flags
+                            .iter()
+                            .take_while(|flag| *flag & crate::element_flags::VARIABLE == 0)
+                            .count();
+                        let value = f64::from_bits(*bits);
+                        value >= 0.0 && value < fixed as f64
+                    }
+                    _ => false,
+                };
+                if !fixed_index {
+                    let key = (object.id(), index.id());
+                    if let Some(cached) = self.mapped_state.indexed.borrow().get(&key) {
+                        return cached.upgrade().ok_or(Error::Released);
+                    }
+                    let result = self.checker.graph.allocate_full(
+                        tf::INDEXED_ACCESS,
+                        0,
+                        "indexed access".into(),
+                        None,
+                        None,
+                        None,
+                        false,
+                        vec![Rc::downgrade(&object), Rc::downgrade(&index)],
+                        false,
+                        None,
+                    );
+                    self.mapped_state
+                        .indexed
+                        .borrow_mut()
+                        .insert(key, Rc::downgrade(&result));
+                    return Ok(result);
+                }
+            }
         }
         if index.flags & tf::UNION != 0 {
             let results = index

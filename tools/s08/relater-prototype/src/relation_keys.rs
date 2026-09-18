@@ -1,6 +1,6 @@
 //! Key type construction used by native relation elaboration and index checks.
 
-use super::*;
+use super::{flags, object_flags, unsupported, Error, Member, Rc, Relater, TypeCell};
 
 impl Relater<'_> {
     // port: tsc/internal/checker/checker.go:Checker.getLiteralTypeFromProperty
@@ -140,7 +140,7 @@ impl Relater<'_> {
                     None
                 };
                 if let Some(value) = value {
-                    common.push(value)
+                    common.push(value);
                 }
             }
         }

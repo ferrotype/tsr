@@ -157,3 +157,112 @@ fn union_error_elaboration_constructs_real_keyof_types() {
         "the pin constructs the B index origin, two literal keys and their union"
     );
 }
+
+#[test]
+fn conditional_infer_parameters_scope_into_nested_extends_clause_types() {
+    // A conditional contributes its `infer` parameters to the outer type
+    // parameters of every node below it, so the function type written in the
+    // extends clause is instantiable through them. Without that scope the
+    // inferred mapper substitutes nothing, the extends check fails and the
+    // conditional takes its false branch.
+    for text in [
+        b"declare function fn0(x: string): number; type A = typeof fn0 extends (...args: any) => infer R ? R : any; type B = number;".as_slice(),
+        b"type Returned<T> = T extends (...args: any) => infer R ? R : any; declare function fn0(x: string): number; type A = Returned<typeof fn0>; type B = number;".as_slice(),
+    ] {
+        let (owner, source) = fixture(text);
+        let a = named(&owner, source, b"A");
+        let b = named(&owner, source, b"B");
+        let checker = owner.checker();
+        assert_eq!(checker.type_to_string(&a).unwrap(), "number");
+        assert!(checker
+            .is_type_related_to(&a, &b, crate::Mode::Identity)
+            .unwrap());
+    }
+}
+
+#[test]
+fn union_targets_drop_undefined_for_the_correspondence_fastpath() {
+    // `undefined` is frequently added by optionality and would otherwise spoil
+    // the index correspondence between two unions, so the target drops it when
+    // the source trivially has none.
+    let (owner, source) = fixture(
+        b"type A = { a: string } | { b: number }; type B = undefined | { a: string } | { b: number }; type C = { a: string } | { b: number };",
+    );
+    let a = named(&owner, source, b"A");
+    let b = named(&owner, source, b"B");
+    let c = named(&owner, source, b"C");
+    let checker = owner.checker();
+    assert!(checker
+        .is_type_related_to(&a, &b, crate::Mode::Assignable)
+        .unwrap());
+    assert!(checker
+        .is_type_related_to(&a, &c, crate::Mode::Assignable)
+        .unwrap());
+}
+
+#[test]
+fn generic_member_relation_performs_the_native_construction() {
+    // The frozen `deferred-generic-members` fixture, which needs no lib. The
+    // pinned checker creates 21 types and 8 signatures and runs 31 counted
+    // instantiations for the first identity relation, and leaves five
+    // assignable entries (two succeeded, three failed) from the variance
+    // measurement. Each number depends on a separate rule: deferred references
+    // are normalized, marker types instantiate their type parameters, an
+    // instantiated symbol returns to its root with a combined mapper, a type
+    // parameter relates to its constraint before any cache entry, and an
+    // unconstrained one relates through `unknown`.
+    let (owner, source) = fixture(
+        b"interface Box<T> { value: T; map<U>(f: (x: T) => U): Box<U> } type A = Box<'x'>; type B = Box<string>;",
+    );
+    let a = named(&owner, source, b"A");
+    let b = named(&owner, source, b"B");
+    let checker = owner.checker();
+    let (types, signatures) = (checker.graph.len(), owner.signatures_created());
+    assert_eq!(owner.instantiations(), 0);
+    assert!(!checker
+        .is_type_related_to(&a, &b, crate::Mode::Identity)
+        .unwrap());
+    assert_eq!(checker.graph.len() - types, 21);
+    assert_eq!(owner.signatures_created() - signatures, 8);
+    assert_eq!(owner.instantiations(), 31);
+    let mut assignable = checker.relation(crate::Mode::Assignable).result_flags();
+    assignable.sort_unstable();
+    assert_eq!(assignable, [1, 1, 2, 2, 2]);
+    assert_eq!(checker.relation(crate::Mode::Identity).result_flags(), [2]);
+    // A repeat is answered from the caches without any construction.
+    assert!(!checker
+        .is_type_related_to(&a, &b, crate::Mode::Identity)
+        .unwrap());
+    assert_eq!(checker.graph.len() - types, 21);
+    assert_eq!(owner.instantiations(), 31);
+}
+
+#[test]
+fn merged_interface_declarations_share_their_type_parameter() {
+    // Class and interface type parameters are members of the merged symbol:
+    // `T` in the second declaration is the first declaration's `T`, and a
+    // member declared there is instantiated with the reference's argument.
+    let (owner, source) = fixture(
+        b"interface P<T> { tag: 1 } interface P<T> { get(): T } type A = P<string>; type B = P<'x'>;",
+    );
+    let a = named(&owner, source, b"A");
+    let b = named(&owner, source, b"B");
+    let checker = owner.checker();
+    assert!(checker
+        .is_type_related_to(&b, &a, crate::Mode::Assignable)
+        .unwrap());
+    assert!(!checker
+        .is_type_related_to(&a, &b, crate::Mode::Assignable)
+        .unwrap());
+}
+
+#[test]
+fn an_unaliased_empty_type_literal_is_the_shared_empty_type() {
+    let (owner, source) = fixture(b"type A = { x: {} }; type B = { y: {} };");
+    let a = named(&owner, source, b"A");
+    let b = named(&owner, source, b"B");
+    let graph = &owner.checker().graph;
+    let x = a.member(graph, "x").unwrap().unwrap().r#type().unwrap();
+    let y = b.member(graph, "y").unwrap().unwrap().r#type().unwrap();
+    assert!(Rc::ptr_eq(&x, &y));
+}

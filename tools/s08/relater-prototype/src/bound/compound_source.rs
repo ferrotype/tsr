@@ -1,7 +1,10 @@
 //! Array and tuple construction from source annotations and real library targets.
 
 use super::instantiate::{Alias, Mapper};
-use super::*;
+use super::{
+    missing, of, tf, Construction, Environment, Error, LiteralValue, Member, NodeId, Rc, Structure,
+    TypeCell, TypeLink, K,
+};
 use crate::element_flags as ef;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -11,6 +14,8 @@ pub(super) struct TupleTargetKey {
 }
 
 impl Construction {
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn array(
         self: &Rc<Self>,
         _location: NodeId,
@@ -23,9 +28,9 @@ impl Construction {
             .resolve_global(name, ts_ast::symbol_flags::TYPE)?
             .ok_or_else(|| Error::Unsupported("global array declaration missing".into()))?;
         let target = self.declared(&group)?;
-        let array = self.instantiate_interface(&group, &target, &[element.clone()])?;
+        let array = self.instantiate_interface(&group, &target, std::slice::from_ref(&element))?;
         if array.array_element().is_none() {
-            array.set_array_element(&element, readonly)?
+            array.set_array_element(&element, readonly)?;
         }
         Ok(array)
     }
@@ -200,6 +205,8 @@ impl Construction {
         self.normalize_tuple(node, &target, &key, &arguments, None)
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     // port: tsc/internal/checker/checker.go:Checker.createNormalizedTupleTypeEx
     fn normalize_tuple(
         self: &Rc<Self>,
@@ -261,8 +268,18 @@ impl Construction {
                     }
                     continue;
                 }
-                if let Some(array) = ty.array_element() {
-                    elements.push(array.element()?);
+                if ty.array_element().is_some() {
+                    // `getIndexTypeOfType(t, numberType)`: the rest element is
+                    // the array's resolved numeric index type, which resolves
+                    // the reference's members here, not at first use.
+                    let structure = ty.structure(&self.checker.graph)?;
+                    let mut element = None;
+                    for info in &structure.index_infos {
+                        if info.key()?.flags & tf::NUMBER != 0 {
+                            element = Some(info.value()?);
+                        }
+                    }
+                    elements.push(element.ok_or(Error::ResolutionFailed)?);
                     normalized.push((ef::REST, label));
                     continue;
                 }
@@ -336,6 +353,22 @@ impl Construction {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.createTupleTargetType
+    // port: tsc/internal/checker/checker.go:Checker.createTupleTypeEx
+    pub(super) fn create_tuple_type(
+        self: &Rc<Self>,
+        location: NodeId,
+        elements: &[Rc<TypeCell>],
+        infos: Vec<(u8, Option<NodeId>)>,
+        readonly: bool,
+    ) -> Result<Rc<TypeCell>, Error> {
+        let key = TupleTargetKey { infos, readonly };
+        let target = self.tuple_target(location, key.clone())?;
+        if elements.is_empty() {
+            return Ok(target);
+        }
+        self.normalize_tuple(location, &target, &key, elements, None)
+    }
+
     fn tuple_target(
         self: &Rc<Self>,
         location: NodeId,
@@ -378,23 +411,38 @@ impl Construction {
         let target_key = key.clone();
         target.set_generic_target(&parameters, move |checker, target, arguments| {
             let state = weak.upgrade().ok_or(Error::Released)?;
-            if !std::ptr::eq(checker, &state.checker) {
+            if !std::ptr::eq(checker, &raw const state.checker) {
                 return missing("tuple factory used by another checker");
             }
             state.normalize_tuple(location, target, &target_key, arguments, None)
+        })?;
+        let weak = Rc::downgrade(self);
+        target.set_marker_arguments(move |parameters, source, marker| {
+            weak.upgrade()
+                .ok_or(Error::Released)?
+                .marker_arguments(parameters, source, marker)
         })?;
         let this = self.checker.graph.type_parameter("this", Some(&target));
         self.interface_this.borrow_mut().insert(target.id(), this);
         let weak = Rc::downgrade(self);
         let parameter_links = parameters.iter().map(Rc::downgrade).collect::<Vec<_>>();
         let readonly = key.readonly;
+        let element_flags = flags.clone();
+        // port: tsc/internal/checker/checker.go:Checker.getTupleBaseType
         let base = TypeLink::lazy(move || {
             let state = weak.upgrade().ok_or(Error::Released)?;
-            let parameters = parameter_links
-                .iter()
-                .map(|ty| ty.upgrade().ok_or(Error::Released))
-                .collect::<Result<Vec<_>, _>>()?;
-            let element = state.checker.graph.union(&parameters)?;
+            let number = state.builtin(tf::NUMBER)?;
+            let mut elements = Vec::with_capacity(parameter_links.len());
+            for (parameter, flag) in parameter_links.iter().zip(&element_flags) {
+                let parameter = parameter.upgrade().ok_or(Error::Released)?;
+                // A variadic element contributes what it spreads: `T[number]`.
+                elements.push(if flag & ef::VARIADIC != 0 {
+                    state.indexed_access(parameter, number.clone())?
+                } else {
+                    parameter
+                });
+            }
+            let element = state.checker.graph.union(&elements)?;
             state.array(location, element, readonly)
         });
         self.tuple_bases.borrow_mut().insert(target.id(), base);
@@ -426,6 +474,8 @@ impl Construction {
         self.checker.graph.union(&lengths)
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     fn tuple_instance(
         self: &Rc<Self>,
         location: NodeId,
@@ -493,6 +543,8 @@ impl Construction {
         Ok(tuple)
     }
 
+    // Constructor-style entry: callers hand over handles they have just built.
+    #[allow(clippy::needless_pass_by_value)]
     // port: tsc/internal/checker/checker.go:Checker.resolveObjectTypeMembers
     fn tuple_members(
         self: &Rc<Self>,
@@ -513,9 +565,10 @@ impl Construction {
             .cloned()
             .ok_or(Error::ResolutionFailed)?;
         let declared_base = base.resolve()?;
-        let mapper = if cell.id() == target.id() {
-            None
-        } else {
+        // resolveTypeReferenceMembers pads the type arguments with the type
+        // itself as `this`, for the tuple target too (the empty tuple `[]` is
+        // its own target): its base is the array type with that this argument.
+        let mapper = {
             let mut sources = target
                 .tuple_shape()
                 .ok_or(Error::ResolutionFailed)?
@@ -628,6 +681,8 @@ impl Construction {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bound::BoundChecker;
+    use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
     use ts_ast::SourceFileParseOptions;
     use ts_core::ScriptKind;

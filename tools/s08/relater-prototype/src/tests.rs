@@ -423,3 +423,14 @@ fn described_literal_union_matches_the_go_observations() {
         assert_eq!(rows, expected, "{mode:?}");
     }
 }
+
+#[test]
+fn type_flags_match_the_pinned_enumeration() {
+    // tsc/internal/checker/types.go: Substitution, IndexedAccess and
+    // Conditional are bits 24, 25 and 26. Observations expose type flags.
+    assert_eq!(flags::SUBSTITUTION, 1 << 24);
+    assert_eq!(flags::INDEXED_ACCESS, 1 << 25);
+    assert_eq!(flags::CONDITIONAL, 1 << 26);
+    assert_eq!(flags::UNION, 1 << 27);
+    assert_eq!(flags::INTERSECTION, 1 << 28);
+}

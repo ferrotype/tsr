@@ -93,9 +93,9 @@ pub mod flags {
     pub const INDEX: u32 = 1 << 21;
     pub const TEMPLATE_LITERAL: u32 = 1 << 22;
     pub const STRING_MAPPING: u32 = 1 << 23;
-    pub const INDEXED_ACCESS: u32 = 1 << 24;
-    pub const CONDITIONAL: u32 = 1 << 25;
-    pub const SUBSTITUTION: u32 = 1 << 26;
+    pub const SUBSTITUTION: u32 = 1 << 24;
+    pub const INDEXED_ACCESS: u32 = 1 << 25;
+    pub const CONDITIONAL: u32 = 1 << 26;
     pub const INSTANTIABLE_NON_PRIMITIVE: u32 =
         TYPE_PARAMETER | INDEXED_ACCESS | CONDITIONAL | SUBSTITUTION;
     pub const UNION: u32 = 1 << 27;
@@ -279,6 +279,11 @@ pub struct Signature {
     pub bivariant_parameters: bool,
     pub is_abstract: bool,
     pub is_construct: bool,
+    /// The signature this one instantiates (`Signature.target`).
+    pub(crate) target: Option<Rc<Signature>>,
+    /// The declaration of each parameter, where there is one: the labels of a
+    /// rest tuple built from these parameters (`getNameableDeclarationAtPosition`).
+    pub(crate) parameter_declarations: Vec<Option<ts_arena::NodeId>>,
 }
 
 impl Signature {
@@ -439,6 +444,9 @@ impl TypeCell {
     }
 }
 
+/// Constituent ids, the naming alias with its argument ids, and the origin.
+type UnionKey = (Vec<u32>, Option<(u64, Vec<u32>)>, Option<u32>);
+
 /// The owner of every type cell. Allocation is append-only through a
 /// `RefCell<Vec<Rc<_>>>`; readers hold `Rc` clones, never a borrow of the vector.
 #[derive(Default)]
@@ -450,7 +458,7 @@ pub struct Graph {
     lazy_records: RefCell<Vec<Rc<Member>>>,
     lazy_extra: Cell<usize>,
     literal_cache: RefCell<HashMap<(u32, LiteralValue), Weak<TypeCell>>>,
-    union_cache: RefCell<HashMap<(Vec<u32>, Option<(u64, Vec<u32>)>, Option<u32>), Weak<TypeCell>>>,
+    union_cache: RefCell<HashMap<UnionKey, Weak<TypeCell>>>,
     template_cache: RefCell<HashMap<template::TemplateKey, Weak<TypeCell>>>,
 }
 
@@ -776,6 +784,8 @@ impl Graph {
                                     bivariant_parameters: desc.bivariant_parameters,
                                     is_abstract: desc.is_abstract,
                                     is_construct: construct,
+                                    target: None,
+                                    parameter_declarations: Vec::new(),
                                 })
                             };
                         for desc in &calls {
@@ -909,7 +919,11 @@ pub struct Checker {
     property_keys: RefCell<HashMap<u32, Weak<TypeCell>>>,
     variance_markers: OnceCell<generics::VarianceMarkers>,
     variance_stack: RefCell<Vec<Weak<TypeCell>>>,
+    /// `getGlobalNonNullableTypeInstantiation`, present under strictNullChecks.
+    non_nullable: OnceCell<NonNullableInstantiation>,
 }
+
+type NonNullableInstantiation = Box<dyn Fn(&Rc<TypeCell>) -> Result<Rc<TypeCell>, Error>>;
 
 fn relation_index(mode: Mode) -> usize {
     MODES.iter().position(|m| *m == mode).expect("mode")
@@ -932,6 +946,18 @@ impl Checker {
                 intrinsics.entry(cell.flags).or_insert_with(|| cell.clone());
             }
         }
+    }
+
+    /// Install the owner's `NonNullable<T>` alias instantiation. A checker
+    /// without one (no strictNullChecks, or a description-built graph) leaves
+    /// types as they are, as `getNonNullableType` does without the option.
+    pub(crate) fn register_non_nullable(
+        &self,
+        instantiate: impl Fn(&Rc<TypeCell>) -> Result<Rc<TypeCell>, Error> + 'static,
+    ) -> Result<(), Error> {
+        self.non_nullable
+            .set(Box::new(instantiate))
+            .map_err(|_| Error::Unsupported(Rc::from("non-nullable instantiation already set")))
     }
 
     pub fn register_apparent_type(&self, flags: u32, cell: &Rc<TypeCell>) -> Result<(), Error> {
@@ -1134,6 +1160,126 @@ impl Checker {
         target: &Rc<TypeCell>,
     ) -> Result<bool, Error> {
         self.is_type_related_to(source, target, Mode::Assignable)
+    }
+}
+
+impl Relater<'_> {
+    // port: tsc/internal/checker/checker.go:Checker.getNonNullableType
+    /// `getAdjustedTypeWithFacts(t, NEUndefinedOrNull)`: constituents that are
+    /// only null or undefined drop out, and each remaining constituent that can
+    /// still compare equal to them is wrapped in `NonNullable<T>`.
+    fn non_nullable_type(&mut self, t: &Rc<TypeCell>) -> Result<Rc<TypeCell>, Error> {
+        let Some(instantiate) = self.checker.non_nullable.get() else {
+            return Ok(t.clone());
+        };
+        const NULLISH: u32 = flags::UNDEFINED | flags::NULL | flags::VOID;
+        if t.flags & flags::UNKNOWN != 0 {
+            // `unknown` adjusts through `{} | null | undefined` to `{}`.
+            return unsupported("non-nullable form of unknown");
+        }
+        let constituents = if t.flags & flags::UNION != 0 {
+            t.types()?
+        } else {
+            vec![t.clone()]
+        };
+        let mut changed = false;
+        let mut result = Vec::with_capacity(constituents.len());
+        for constituent in constituents {
+            if constituent.flags & NULLISH != 0 {
+                changed = true;
+                continue;
+            }
+            if constituent.flags & flags::ANY != 0 {
+                result.push(instantiate(&constituent)?);
+                changed = true;
+            } else if constituent.flags & flags::INSTANTIABLE != 0 {
+                // The facts of an instantiable type come from its base constraint.
+                return unsupported("non-nullable form of an instantiable type");
+            } else {
+                result.push(constituent);
+            }
+        }
+        if !changed {
+            return Ok(t.clone());
+        }
+        match result.len() {
+            0 => self.checker.intrinsic(flags::NEVER),
+            1 => Ok(result.remove(0)),
+            _ => self.graph().union(&result),
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isInstantiatedGenericParameter
+    /// Resolves the parameter of the signature this one instantiates, as
+    /// upstream does, and reports whether that declared type is generic.
+    fn is_instantiated_generic_parameter(
+        &mut self,
+        signature: &Signature,
+        position: usize,
+    ) -> Result<bool, Error> {
+        let Some(target) = signature.target.clone() else {
+            return Ok(false);
+        };
+        match self.try_signature_type_at_position(&target, position)? {
+            Some(ty) => is_generic_type(&ty),
+            None => Ok(false),
+        }
+    }
+}
+
+// port: tsc/internal/checker/checker.go:Checker.getGenericObjectFlags
+fn is_generic_type(ty: &Rc<TypeCell>) -> Result<bool, Error> {
+    if ty.flags & (flags::UNION | flags::INTERSECTION) != 0 {
+        for constituent in ty.types()? {
+            if is_generic_type(&constituent)? {
+                return Ok(true);
+            }
+        }
+        return Ok(false);
+    }
+    if ty.flags & (flags::INSTANTIABLE_NON_PRIMITIVE | flags::INDEX) != 0 {
+        return Ok(true);
+    }
+    if let Some(tuple) = ty.tuple_shape() {
+        return Ok(tuple
+            .element_flags
+            .iter()
+            .any(|flags| flags & tuples::element_flags::VARIADIC != 0));
+    }
+    // Mapped types and template or string-mapping types need their own
+    // genericity rules (isGenericMappedType, isGenericStringLikeType).
+    if ty.object_flags & object_flags::MAPPED != 0
+        || ty.flags & (flags::TEMPLATE_LITERAL | flags::STRING_MAPPING) != 0
+    {
+        return unsupported("genericity of a mapped or template parameter type");
+    }
+    Ok(false)
+}
+
+impl Checker {
+    // port: tsc/internal/checker/relater.go:Checker.getNormalizedType
+    /// Fresh literals relate as their regular forms and a deferred (node-backed)
+    /// reference as the ordinary reference of its target and resolved
+    /// arguments; carried unions and intersections are reduced by construction.
+    fn normalized_type(&self, cell: &Rc<TypeCell>) -> Result<Rc<TypeCell>, Error> {
+        let mut current = regular_form(cell);
+        loop {
+            let Some(reference) = current
+                .reference_shape()
+                .filter(|reference| reference.deferred_node().is_some())
+            else {
+                return Ok(current);
+            };
+            let target = reference.target()?;
+            let Some(generic) = target.generic_target() else {
+                return Ok(current);
+            };
+            let next = generic.instantiate(self, &target, &reference.arguments()?)?;
+            if Rc::ptr_eq(&next, &current) {
+                return Ok(current);
+            }
+            current = next;
+        }
     }
 }
 
@@ -1430,8 +1576,8 @@ impl Relater<'_> {
         }
         // `getNormalizedType`: fresh literals relate as their regular forms; the
         // carried unions and intersections are already reduced by construction.
-        let source = regular_form(original_source);
-        let mut target = regular_form(original_target);
+        let source = self.checker.normalized_type(original_source)?;
+        let mut target = self.checker.normalized_type(original_target)?;
         if Rc::ptr_eq(&source, &target) {
             return Ok(TRUE);
         }
@@ -1449,6 +1595,18 @@ impl Relater<'_> {
                 INTERSECTION_NONE,
                 recursion_flags,
             );
+        }
+        // A type parameter related to exactly its constraint is decided here,
+        // before any recursion or cache entry (relater.go isRelatedToEx).
+        if source.flags & flags::TYPE_PARAMETER != 0 {
+            let constraint = source
+                .type_parameter_shape()
+                .map(TypeParameterShape::constraint)
+                .transpose()?
+                .flatten();
+            if constraint.is_some_and(|constraint| Rc::ptr_eq(&constraint, &target)) {
+                return Ok(TRUE);
+            }
         }
         if source.flags & flags::DEFINITELY_NON_NULLABLE != 0 && target.flags & flags::UNION != 0 {
             let types = target.types()?;
@@ -1649,6 +1807,48 @@ impl Relater<'_> {
         Ok(FALSE)
     }
 
+    // port: tsc/internal/checker/relater.go:Relater.getUndefinedStrippedTargetIfNeeded
+    fn undefined_stripped_target(
+        &self,
+        source: &Rc<TypeCell>,
+        target: &Rc<TypeCell>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        if source.flags & flags::UNION == 0 || target.flags & flags::UNION == 0 {
+            return Ok(target.clone());
+        }
+        let source_types = source.types()?;
+        let target_types = target.types()?;
+        if source_types
+            .first()
+            .is_none_or(|first| first.flags & flags::UNDEFINED != 0)
+            || target_types
+                .first()
+                .is_none_or(|first| first.flags & flags::UNDEFINED == 0)
+        {
+            return Ok(target.clone());
+        }
+        // `extractTypesOfKind(target, ^Undefined)` through `filterType`. The
+        // denormalized-origin path builds a second union and is not reached by
+        // a target whose constituents are already normalized.
+        if target
+            .origin
+            .get()
+            .and_then(Weak::upgrade)
+            .is_some_and(|origin| origin.flags & flags::UNION != 0)
+        {
+            return unsupported("undefined-stripped union target with a union origin");
+        }
+        let filtered = target_types
+            .iter()
+            .filter(|ty| ty.flags & !flags::UNDEFINED != 0)
+            .cloned()
+            .collect::<Vec<_>>();
+        if filtered.len() == target_types.len() {
+            return Ok(target.clone());
+        }
+        self.checker.graph.union(&filtered)
+    }
+
     fn each_type_related_to_type(
         &mut self,
         source: &Rc<TypeCell>,
@@ -1658,23 +1858,17 @@ impl Relater<'_> {
     ) -> Result<Ternary, Error> {
         let mut result = TRUE;
         let source_types = source.types()?;
-        // `getUndefinedStrippedTargetIfNeeded` creates a filtered union type;
-        // the reference has no union constructor, so the case is unsupported.
-        if source.flags & flags::UNION != 0 && target.flags & flags::UNION != 0 {
-            let target_types = target.types()?;
-            if source_types[0].flags & flags::UNDEFINED == 0
-                && target_types[0].flags & flags::UNDEFINED != 0
-            {
-                return unsupported("undefined-stripped union target");
-            }
-        }
-        let stripped_types = if target.flags & flags::UNION != 0 {
-            target.types()?
+        // `undefined` is frequently added by optionality and would otherwise
+        // spoil the correspondence fastpath, so the target drops it when the
+        // source trivially has none.
+        let stripped_target = self.undefined_stripped_target(source, target)?;
+        let stripped_types = if stripped_target.flags & flags::UNION != 0 {
+            stripped_target.types()?
         } else {
             Vec::new()
         };
         for (index, source_type) in source_types.iter().enumerate() {
-            if target.flags & flags::UNION != 0
+            if stripped_target.flags & flags::UNION != 0
                 && source_types.len() >= stripped_types.len()
                 && source_types.len() % stripped_types.len() == 0
             {
@@ -2149,23 +2343,44 @@ impl Relater<'_> {
             return self.template_related_to(source, target);
         }
         if source.flags & flags::TYPE_PARAMETER != 0 {
-            if let Some(constraint) = source
+            // An unconstrained type parameter relates through `unknown`. The
+            // constraint is tried without errors first, then with its `this`
+            // argument (a type parameter or `unknown` is its own such type).
+            let declared = source
                 .type_parameter_shape()
                 .map(TypeParameterShape::constraint)
                 .transpose()?
-                .flatten()
-            {
-                if !Rc::ptr_eq(&constraint, source) {
-                    let result = self.is_related_to_ex(
-                        &constraint,
-                        target,
-                        RECURSION_SOURCE,
-                        report_errors,
-                        intersection_state,
-                    )?;
-                    if result != FALSE {
-                        return Ok(result);
-                    }
+                .flatten();
+            let unconstrained = declared.is_none();
+            let constraint = match declared {
+                Some(constraint) => constraint,
+                None => self.checker.intrinsic(flags::UNKNOWN)?,
+            };
+            if !Rc::ptr_eq(&constraint, source) {
+                let result = self.is_related_to_ex(
+                    &constraint,
+                    target,
+                    RECURSION_SOURCE,
+                    false,
+                    intersection_state,
+                )?;
+                if result != FALSE {
+                    return Ok(result);
+                }
+                if constraint.flags & flags::OBJECT != 0 {
+                    return unsupported("type parameter constraint with a this argument");
+                }
+                let result = self.is_related_to_ex(
+                    &constraint,
+                    target,
+                    RECURSION_SOURCE,
+                    report_errors
+                        && !unconstrained
+                        && target.flags & source.flags & flags::TYPE_PARAMETER == 0,
+                    intersection_state,
+                )?;
+                if result != FALSE {
+                    return Ok(result);
                 }
             }
             return Ok(FALSE);
@@ -2610,9 +2825,10 @@ impl Relater<'_> {
         for target_prop in &target_properties {
             if !optionals_only || target_prop.optional {
                 if let Some(source_prop) = self.property_of_type(source, &target_prop.name)? {
-                    let same = Rc::ptr_eq(&source_prop.r#type()?, &target_prop.r#type()?)
-                        && source_prop.optional == target_prop.optional
-                        && source_prop.readonly == target_prop.readonly
+                    // `sourceProp == targetProp` is symbol identity: the same
+                    // type link, never a comparison of resolved types (which
+                    // would resolve the source's type before the target's).
+                    let same = source_prop.r#type.ptr_eq(&target_prop.r#type)
                         && source.flags & flags::OBJECT != 0
                         && target.flags & flags::OBJECT != 0
                         && Self::same_declared_member(source, target);
@@ -2996,15 +3212,17 @@ impl Relater<'_> {
                 if Rc::ptr_eq(&source_type, &target_type) && !strict_arity {
                     continue;
                 }
-                let source_sig = if callback {
+                let source_sig = if callback || self.is_instantiated_generic_parameter(source, i)? {
                     None
                 } else {
-                    self.single_call_signature(&source_type)?
+                    let non_nullable = self.non_nullable_type(&source_type)?;
+                    self.single_call_signature(&non_nullable)?
                 };
-                let target_sig = if callback {
+                let target_sig = if callback || self.is_instantiated_generic_parameter(target, i)? {
                     None
                 } else {
-                    self.single_call_signature(&target_type)?
+                    let non_nullable = self.non_nullable_type(&target_type)?;
+                    self.single_call_signature(&non_nullable)?
                 };
                 let callbacks = source_sig.is_some()
                     && target_sig.is_some()

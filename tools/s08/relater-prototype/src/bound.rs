@@ -85,6 +85,10 @@ impl Environment {
 
 type EnvironmentKey = (Vec<(NodeId, u32)>, Vec<(u32, u32)>);
 type NodeKey = (NodeId, EnvironmentKey);
+/// A value symbol group under one environment.
+type ValueKey = (Vec<SymbolId>, EnvironmentKey);
+/// A generic target and the ids of its type arguments.
+type InstanceKey = (u32, Vec<u32>);
 
 /// The reference checker and its bound input have one explicit lifetime owner.
 /// Type-cell resolvers capture weak references to this owner, never a strong
@@ -104,14 +108,14 @@ struct Construction {
     instantiated_types: RefCell<HashMap<NodeKey, Rc<TypeCell>>>,
     source_signatures: RefCell<HashMap<NodeKey, Signature>>,
     identities: RefCell<HashMap<NodeId, u64>>,
-    value_types: RefCell<HashMap<(Vec<SymbolId>, EnvironmentKey), Rc<TypeCell>>>,
+    value_types: RefCell<HashMap<ValueKey, Rc<TypeCell>>>,
     return_types: RefCell<HashMap<NodeKey, Rc<TypeCell>>>,
     resolving_returns: RefCell<Vec<NodeKey>>,
     interface_this: RefCell<HashMap<u32, Rc<TypeCell>>>,
     tuple_targets: RefCell<HashMap<compound_source::TupleTargetKey, Rc<TypeCell>>>,
-    tuple_instances: RefCell<HashMap<(u32, Vec<u32>), Rc<TypeCell>>>,
+    tuple_instances: RefCell<HashMap<InstanceKey, Rc<TypeCell>>>,
     tuple_bases: RefCell<HashMap<u32, TypeLink>>,
-    interface_instances: RefCell<HashMap<(u32, Vec<u32>), Rc<TypeCell>>>,
+    interface_instances: RefCell<HashMap<InstanceKey, Rc<TypeCell>>>,
     instantiation: instantiate::State,
     mapped_state: mapped_source::State,
     conditional: conditional_source::State,
@@ -242,6 +246,41 @@ impl Construction {
                     .0
                     .push((parameter, Rc::downgrade(&self.type_parameter(parameter)?)));
             }
+            // A conditional type's `infer` parameters are in scope for every
+            // node below it, so a function type written in the extends clause
+            // is instantiable through them.
+            if read.kind() == K::ConditionalType {
+                for parameter in self.infer_type_parameters(node)? {
+                    result
+                        .0
+                        .push((parameter, Rc::downgrade(&self.type_parameter(parameter)?)));
+                }
+            }
+        }
+        Ok(result)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getInferTypeParameters
+    pub(super) fn infer_type_parameters(
+        self: &Rc<Self>,
+        node: NodeId,
+    ) -> Result<Vec<NodeId>, Error> {
+        let mut result = Vec::new();
+        let Some(locals) = self.input.binding(node)?.and_then(|binding| binding.locals) else {
+            return Ok(result);
+        };
+        for (_, symbol) in self.input.table(locals)? {
+            let Some(symbol) = symbol else { continue };
+            if self.input.symbol(symbol)?.flags() & ts_ast::symbol_flags::TYPE_PARAMETER == 0 {
+                continue;
+            }
+            result.push(
+                self.input
+                    .declarations(symbol)?
+                    .get(0)
+                    .flatten()
+                    .ok_or(Error::ResolutionFailed)?,
+            );
         }
         Ok(result)
     }
@@ -540,7 +579,7 @@ impl Construction {
                     let symbols = group.symbols.clone();
                     target.set_generic_target(&parameters, move |checker, target, args| {
                         let state = weak.upgrade().ok_or(Error::Released)?;
-                        if !std::ptr::eq(checker, &state.checker) {
+                        if !std::ptr::eq(checker, &raw const state.checker) {
                             return missing("generic target used by another checker");
                         }
                         state.instantiate_interface(
@@ -552,6 +591,12 @@ impl Construction {
                         )
                     })?;
                     target.set_reference_shape(&target, &parameters)?;
+                    let weak = Rc::downgrade(self);
+                    target.set_marker_arguments(move |parameters, source, marker| {
+                        weak.upgrade()
+                            .ok_or(Error::Released)?
+                            .marker_arguments(parameters, source, marker)
+                    })?;
                 }
                 target
             }
@@ -574,7 +619,7 @@ impl Construction {
         struct CurrentNode<'a>(&'a Cell<Option<NodeId>>, Option<NodeId>);
         impl Drop for CurrentNode<'_> {
             fn drop(&mut self) {
-                self.0.set(self.1)
+                self.0.set(self.1);
             }
         }
         let _current = CurrentNode(&self.current_node, self.current_node.replace(Some(node)));
@@ -659,6 +704,16 @@ impl Construction {
                 | K::MethodSignature
                 | K::MethodDeclaration,
             ) => {
+                // An unaliased type literal without members is the shared
+                // `emptyTypeLiteralType`, never a new object
+                // (getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode).
+                if read.kind() == K::TypeLiteral
+                    && alias.is_none()
+                    && source_alias.is_none()
+                    && self.list(node, read.member_list())?.is_empty()
+                {
+                    return self.initialization.named("emptyTypeLiteralType");
+                }
                 let declarations = if matches!(
                     read.kind().known(),
                     Some(K::MethodSignature | K::MethodDeclaration)
@@ -990,6 +1045,8 @@ impl Construction {
         self.object_with_alias(declarations, env, name, flags, None)
     }
 
+    // Fallible like every other constructor here, so call sites stay uniform.
+    #[allow(clippy::unnecessary_wraps)]
     fn object_with_alias(
         self: &Rc<Self>,
         declarations: Vec<NodeId>,
@@ -1045,9 +1102,9 @@ impl Construction {
             ) {
                 let signature = self.signature(declaration, env)?;
                 if signature.is_construct {
-                    structure.construct_signatures.push(signature)
+                    structure.construct_signatures.push(signature);
                 } else {
-                    structure.call_signatures.push(signature)
+                    structure.call_signatures.push(signature);
                 }
                 continue;
             }
@@ -1063,9 +1120,9 @@ impl Construction {
                     Some(K::CallSignature | K::ConstructSignature) => {
                         let signature = self.signature(node, env)?;
                         if signature.is_construct {
-                            structure.construct_signatures.push(signature)
+                            structure.construct_signatures.push(signature);
                         } else {
-                            structure.call_signatures.push(signature)
+                            structure.call_signatures.push(signature);
                         }
                     }
                     Some(K::IndexSignature) => {
@@ -1104,7 +1161,7 @@ impl Construction {
                             name_types.insert(name.clone(), name_type);
                         }
                         if !by_name.contains_key(&name) {
-                            order.push(name.clone())
+                            order.push(name.clone());
                         }
                         by_name.entry(name).or_default().push(node);
                     }
@@ -1156,7 +1213,7 @@ impl Construction {
         for inherited in self.inherited_members(declarations, env)? {
             for member in inherited.members {
                 if !structure.members.iter().any(|own| own.name == member.name) {
-                    structure.members.push(member)
+                    structure.members.push(member);
                 }
             }
             structure.call_signatures.extend(inherited.call_signatures);
@@ -1173,7 +1230,7 @@ impl Construction {
                     }
                 }
                 if !found {
-                    structure.index_infos.push(index)
+                    structure.index_infos.push(index);
                 }
             }
         }
@@ -1199,6 +1256,7 @@ impl Construction {
         let nodes = self.list(node, read.parameter_list())?;
         let mut parameters = Vec::new();
         let mut parameter_names = Vec::new();
+        let mut parameter_declarations = Vec::new();
         let mut minimum = 0;
         let mut rest = false;
         let mut this_type = None;
@@ -1228,7 +1286,7 @@ impl Construction {
                     ty = state
                         .checker
                         .graph
-                        .union(&[ty, state.builtin(tf::UNDEFINED)?])?
+                        .union(&[ty, state.builtin(tf::UNDEFINED)?])?;
                 }
                 Ok(ty)
             });
@@ -1238,8 +1296,9 @@ impl Construction {
             }
             parameters.push(ty);
             parameter_names.push(name);
+            parameter_declarations.push(Some(parameter));
             if !optional && !rest && read.initializer().is_none() {
-                minimum = parameters.len()
+                minimum = parameters.len();
             }
         }
         let weak = Rc::downgrade(self);
@@ -1268,6 +1327,8 @@ impl Construction {
                 read.kind().known(),
                 Some(K::ConstructorType | K::ConstructSignature)
             ),
+            target: None,
+            parameter_declarations,
         };
         self.attach_signature_factory(&mut signature, &type_parameters);
         self.source_signatures

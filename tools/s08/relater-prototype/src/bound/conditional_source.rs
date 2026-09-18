@@ -2,7 +2,11 @@
 //! Tail recursion is evaluated by the pinned loop, independently of Rust's stack.
 
 use super::instantiate::{Alias, Mapper};
-use super::*;
+use super::{
+    missing, of, tf, Construction, Environment, Error, HashMap, NodeId, Rc, RefCell, TypeCell,
+    Weak, K,
+};
+use crate::tuples::element_flags as ef;
 
 struct Root {
     node: NodeId,
@@ -93,25 +97,11 @@ impl Construction {
                 outer.0 = referenced;
             }
             let mut infer = Vec::new();
-            if let Some(locals) = self.input.binding(node)?.and_then(|b| b.locals) {
-                for (_, symbol) in self.input.table(locals)? {
-                    let Some(symbol) = symbol else { continue };
-                    if self.input.symbol(symbol)?.flags() & ts_ast::symbol_flags::TYPE_PARAMETER
-                        == 0
-                    {
-                        continue;
-                    }
-                    let declaration = self
-                        .input
-                        .declarations(symbol)?
-                        .get(0)
-                        .flatten()
-                        .ok_or(Error::ResolutionFailed)?;
-                    infer.push((
-                        declaration,
-                        Rc::downgrade(&self.type_parameter(declaration)?),
-                    ));
-                }
+            for declaration in self.infer_type_parameters(node)? {
+                infer.push((
+                    declaration,
+                    Rc::downgrade(&self.type_parameter(declaration)?),
+                ));
             }
             let root = Rc::new(Root {
                 node,
@@ -191,7 +181,7 @@ impl Construction {
         if let Some(cached) = self.conditional.cache.borrow().get(&key) {
             return cached.upgrade().ok_or(Error::Released);
         }
-        let mapper = self.conditional_mapper(&root, &arguments)?;
+        let mapper = Self::conditional_mapper(&root, &arguments)?;
         let check = root.check.upgrade().ok_or(Error::Released)?;
         let distribution = if root.distributive {
             Some(self.map_type(&check, &mapper)?)
@@ -238,7 +228,7 @@ impl Construction {
         Ok(result)
     }
 
-    fn conditional_mapper(&self, root: &Root, arguments: &[Rc<TypeCell>]) -> Result<Mapper, Error> {
+    fn conditional_mapper(root: &Root, arguments: &[Rc<TypeCell>]) -> Result<Mapper, Error> {
         let parameters = root.parameters()?;
         let mut environment = Environment::default();
         for ((node, _), argument) in root.outer.0.iter().zip(arguments) {
@@ -318,7 +308,7 @@ impl Construction {
                 .simple_tuple_arity(check_node)?
                 .zip(self.simple_tuple_arity(extends_node)?)
                 .is_some_and(|(a, b)| a == b);
-            let check_deferred = self.conditional_deferred(&check, check_tuples)?;
+            let check_deferred = Self::conditional_deferred(&check, check_tuples)?;
             let combined = if root.infer.is_empty() {
                 None
             } else {
@@ -329,7 +319,13 @@ impl Construction {
                     .collect::<Result<Vec<_>, _>>()?;
                 let mut candidates = vec![Vec::new(); parameters.len()];
                 if !check_deferred {
-                    self.infer_conditional_types(&check, &extends, &parameters, &mut candidates)?;
+                    self.infer_conditional_types(
+                        root.node,
+                        &check,
+                        &extends,
+                        &parameters,
+                        &mut candidates,
+                    )?;
                 }
                 let mut inferred = Vec::new();
                 for (parameter, candidates) in parameters.iter().zip(candidates) {
@@ -367,7 +363,7 @@ impl Construction {
             } else {
                 extends
             };
-            if !check_deferred && !self.conditional_deferred(&inferred_extends, check_tuples)? {
+            if !check_deferred && !Self::conditional_deferred(&inferred_extends, check_tuples)? {
                 let top = inferred_extends.flags & tf::ANY_OR_UNKNOWN != 0;
                 if !top
                     && (check.flags & tf::ANY != 0
@@ -451,6 +447,17 @@ impl Construction {
                     break self.instantiate_optional(&true_type, true_mapper)?;
                 }
             }
+            // newConditionalType instantiates the root's check and extends
+            // types afresh (the extends type without the inferences), and only
+            // then is the alias instantiated.
+            let check = self.instantiate_optional(
+                &root.check.upgrade().ok_or(Error::Released)?,
+                mapper.as_ref(),
+            )?;
+            let deferred_extends = self.instantiate_optional(
+                &root.extends.upgrade().ok_or(Error::Released)?,
+                mapper.as_ref(),
+            )?;
             let alias = if alias.is_some() {
                 alias
             } else if let Some(mapper) = &mapper {
@@ -469,7 +476,7 @@ impl Construction {
                 alias.as_ref().map(|alias| self.identity(alias.declaration)),
                 None,
                 false,
-                vec![Rc::downgrade(&check), Rc::downgrade(&inferred_extends)],
+                vec![Rc::downgrade(&check), Rc::downgrade(&deferred_extends)],
                 false,
                 None,
             );
@@ -517,7 +524,7 @@ impl Construction {
             .iter()
             .map(|ty| self.map_type(ty, &combined))
             .collect::<Result<Vec<_>, _>>()?;
-        let next = self.conditional_mapper(&instance.root, &arguments)?;
+        let next = Self::conditional_mapper(&instance.root, &arguments)?;
         if instance.root.distributive {
             let original = instance.root.check.upgrade().ok_or(Error::Released)?;
             let check = self.map_type(&original, &next)?;
@@ -528,7 +535,7 @@ impl Construction {
         Ok(Some((instance.root, next)))
     }
 
-    fn conditional_deferred(&self, ty: &Rc<TypeCell>, check_tuples: bool) -> Result<bool, Error> {
+    fn conditional_deferred(ty: &Rc<TypeCell>, check_tuples: bool) -> Result<bool, Error> {
         if ty.flags & tf::INSTANTIABLE_NON_PRIMITIVE != 0 {
             return Ok(true);
         }
@@ -541,7 +548,7 @@ impl Construction {
             }
             if check_tuples {
                 for element in tuple.elements()? {
-                    if self.conditional_deferred(&element, false)? {
+                    if Self::conditional_deferred(&element, false)? {
                         return Ok(true);
                     }
                 }
@@ -658,6 +665,7 @@ impl Construction {
 
     fn infer_conditional_types(
         self: &Rc<Self>,
+        location: NodeId,
         source: &Rc<TypeCell>,
         target: &Rc<TypeCell>,
         parameters: &[Rc<TypeCell>],
@@ -694,7 +702,9 @@ impl Construction {
                     if variances.get(index).is_some_and(|variance| *variance == 2) {
                         return missing("conditional contravariant inference candidates");
                     }
-                    self.infer_conditional_types(source, &target, parameters, candidates)?;
+                    self.infer_conditional_types(
+                        location, source, &target, parameters, candidates,
+                    )?;
                 }
                 return Ok(());
             }
@@ -709,6 +719,7 @@ impl Construction {
                     .find(|member| member.name == property.name)
                 {
                     self.infer_conditional_types(
+                        location,
                         &source.r#type()?,
                         &property.r#type()?,
                         parameters,
@@ -716,28 +727,123 @@ impl Construction {
                     )?;
                 }
             }
-            for (source, target) in source
+            // port: tsc/internal/checker/inference.go:Checker.inferFromSignatures
+            let count = source
                 .call_signatures
-                .iter()
-                .rev()
-                .zip(target.call_signatures.iter().rev())
-                .take(1)
-            {
-                self.infer_conditional_types(
-                    &source.return_type()?,
-                    &target.return_type()?,
-                    parameters,
-                    candidates,
-                )?;
+                .len()
+                .min(target.call_signatures.len());
+            let source_signatures = &source.call_signatures[source.call_signatures.len() - count..];
+            let target_signatures = &target.call_signatures[target.call_signatures.len() - count..];
+            for (source, target) in source_signatures.iter().zip(target_signatures) {
+                self.infer_from_signature(location, source, target, parameters, candidates)?;
             }
         }
         Ok(())
+    }
+
+    // port: tsc/internal/checker/inference.go:Checker.inferFromSignature
+    /// Parameters are contravariant positions; the reference has no
+    /// contra-candidate model, so a target parameter that could hold one of
+    /// the inferred parameters is refused by name. The types are resolved and
+    /// the source's rest tuple is built regardless, as upstream does.
+    fn infer_from_signature(
+        self: &Rc<Self>,
+        location: NodeId,
+        source: &crate::Signature,
+        target: &crate::Signature,
+        parameters: &[Rc<TypeCell>],
+        candidates: &mut [Vec<Rc<TypeCell>>],
+    ) -> Result<(), Error> {
+        if source.generic.is_some() || target.generic.is_some() {
+            return missing("conditional inference between generic signatures");
+        }
+        if source.this_type.is_some() && target.this_type.is_some() {
+            return missing("conditional inference of this types");
+        }
+        // applyToParameterTypes
+        let source_count = source.parameters.len();
+        let target_count = target.parameters.len();
+        let target_non_rest = target_count - usize::from(target.has_rest_parameter);
+        let paired = if source.has_rest_parameter {
+            target_non_rest
+        } else {
+            source_count.min(target_non_rest)
+        };
+        for index in 0..paired {
+            if source.has_rest_parameter && index + 1 >= source_count {
+                return missing("conditional inference from a source rest parameter");
+            }
+            source.parameters[index].resolve()?;
+            let target_type = target.parameters[index].resolve()?;
+            if self.could_contain_type_variables(&target_type)? {
+                return missing("conditional contravariant inference candidates");
+            }
+        }
+        if target.has_rest_parameter {
+            self.rest_type_at_position(location, source, paired)?;
+            let rest = target.parameters[target_count - 1].resolve()?;
+            // getEffectiveRestType: `any` stands for any[]; neither holds a
+            // type variable.
+            if rest.flags & tf::ANY == 0 && self.could_contain_type_variables(&rest)? {
+                return missing("conditional contravariant inference candidates");
+            }
+        }
+        // applyToReturnTypes
+        self.infer_conditional_types(
+            location,
+            &source.return_type.resolve()?,
+            &target.return_type.resolve()?,
+            parameters,
+            candidates,
+        )
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getRestTypeAtPosition
+    fn rest_type_at_position(
+        self: &Rc<Self>,
+        location: NodeId,
+        source: &crate::Signature,
+        position: usize,
+    ) -> Result<Rc<TypeCell>, Error> {
+        if source.has_rest_parameter {
+            return missing("rest type of a signature with a rest parameter");
+        }
+        // getMinArgumentCount: trailing parameters that accept void are optional.
+        let mut minimum = source.min_argument_count;
+        while minimum > 0 {
+            let ty = source.parameters[minimum - 1].resolve()?;
+            let accepts_void = if ty.flags & tf::UNION != 0 {
+                ty.types()?.iter().any(|part| part.flags & tf::VOID != 0)
+            } else {
+                ty.flags & tf::VOID != 0
+            };
+            if !accepts_void {
+                break;
+            }
+            minimum -= 1;
+        }
+        let mut types = Vec::new();
+        let mut infos = Vec::new();
+        for index in position..source.parameters.len() {
+            types.push(source.parameters[index].resolve()?);
+            infos.push((
+                if index < minimum {
+                    ef::REQUIRED
+                } else {
+                    ef::OPTIONAL
+                },
+                source.parameter_declarations.get(index).copied().flatten(),
+            ));
+        }
+        self.create_tuple_type(location, &types, infos, false)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bound::BoundChecker;
+    use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
 
     fn fixture(text: &[u8]) -> (BoundChecker, NodeId) {

@@ -1,10 +1,17 @@
 //! Generic reference variance and signature instantiation. Factories resolve
 //! bound declarations in the frontend; relation callbacks always stay here.
 
-use super::*;
+use super::{
+    flags, unsupported, Cell, Checker, Error, Graph, HashMap, Mode, OnceCell, Rc, RefCell, Relater,
+    Signature, Ternary, TypeCell, TypeLink, Weak, FALSE, RECURSION_BOTH, TRUE, UNKNOWN,
+};
 
 type InstantiateType =
     Box<dyn Fn(&Checker, &Rc<TypeCell>, &[Rc<TypeCell>]) -> Result<Rc<TypeCell>, Error>>;
+/// `instantiateTypes(typeParameters, mapper)` for a marker mapper: the counted
+/// instantiation of every type parameter with `source` mapped to `marker`.
+type MarkerArguments =
+    Box<dyn Fn(&[Rc<TypeCell>], &Rc<TypeCell>, &Rc<TypeCell>) -> Result<Vec<Rc<TypeCell>>, Error>>;
 type InstantiateSignature = Box<dyn Fn(&Checker, &[Rc<TypeCell>]) -> Result<Signature, Error>>;
 
 #[derive(Debug)]
@@ -28,6 +35,7 @@ impl ReferenceShape {
 pub struct GenericTarget {
     parameters: Vec<Weak<TypeCell>>,
     instantiate: InstantiateType,
+    marker_arguments: OnceCell<MarkerArguments>,
     variances: RefCell<Option<Vec<u8>>>,
     failed: Cell<bool>,
 }
@@ -149,10 +157,26 @@ impl TypeCell {
             .set(GenericTarget {
                 parameters: parameters.iter().map(Rc::downgrade).collect(),
                 instantiate: Box::new(instantiate),
+                marker_arguments: OnceCell::new(),
                 variances: RefCell::new(None),
                 failed: Cell::new(false),
             })
             .map_err(|_| Error::Unsupported(Rc::from("generic target metadata already set")))
+    }
+    /// Install the owner's counted type-parameter instantiation for marker
+    /// types. Without it markers substitute the argument directly, which is
+    /// what a description-built graph (no instantiation counter) wants.
+    pub(crate) fn set_marker_arguments(
+        &self,
+        marker_arguments: impl Fn(&[Rc<TypeCell>], &Rc<TypeCell>, &Rc<TypeCell>) -> Result<Vec<Rc<TypeCell>>, Error>
+            + 'static,
+    ) -> Result<(), Error> {
+        self.generic_target
+            .get()
+            .ok_or_else(|| Error::Unsupported(Rc::from("generic target metadata missing")))?
+            .marker_arguments
+            .set(Box::new(marker_arguments))
+            .map_err(|_| Error::Unsupported(Rc::from("marker arguments already set")))
     }
     pub fn generic_target(&self) -> Option<&GenericTarget> {
         self.generic_target.get()
@@ -274,10 +298,11 @@ impl GenericSignature {
     }
 }
 
+/// markerSuperType, markerSubType and markerOtherType.
 pub(super) struct VarianceMarkers {
-    super_type: Weak<TypeCell>,
-    sub_type: Weak<TypeCell>,
-    other_type: Weak<TypeCell>,
+    upper: Weak<TypeCell>,
+    lower: Weak<TypeCell>,
+    unrelated: Weak<TypeCell>,
 }
 
 impl Checker {
@@ -295,9 +320,9 @@ impl Checker {
         }
         self.variance_markers
             .set(VarianceMarkers {
-                super_type: Rc::downgrade(super_type),
-                sub_type: Rc::downgrade(sub_type),
-                other_type: Rc::downgrade(other_type),
+                upper: Rc::downgrade(super_type),
+                lower: Rc::downgrade(sub_type),
+                unrelated: Rc::downgrade(other_type),
             })
             .map_err(|_| Error::Unsupported(Rc::from("variance markers already set")))
     }
@@ -361,19 +386,26 @@ impl Checker {
                 let markers = self.variance_markers.get().ok_or_else(|| {
                     Error::Unsupported(Rc::from("variance markers not initialized"))
                 })?;
-                let mut arguments = parameters.clone();
-                arguments[index] = markers.super_type.upgrade().ok_or(Error::Released)?;
-                let with_super = data.instantiate(self, target, &arguments)?;
-                with_super.marker_instantiation.set(true);
-                arguments[index] = markers.sub_type.upgrade().ok_or(Error::Released)?;
-                let with_sub = data.instantiate(self, target, &arguments)?;
-                with_sub.marker_instantiation.set(true);
+                // port: tsc/internal/checker/relater.go:Checker.createMarkerType
+                let create_marker = |marker: &Weak<TypeCell>| -> Result<Rc<TypeCell>, Error> {
+                    let marker = marker.upgrade().ok_or(Error::Released)?;
+                    let arguments = if let Some(instantiate) = data.marker_arguments.get() {
+                        instantiate(&parameters, parameter, &marker)?
+                    } else {
+                        let mut arguments = parameters.clone();
+                        arguments[index] = marker;
+                        arguments
+                    };
+                    let result = data.instantiate(self, target, &arguments)?;
+                    result.marker_instantiation.set(true);
+                    Ok(result)
+                };
+                let with_super = create_marker(&markers.upper)?;
+                let with_sub = create_marker(&markers.lower)?;
                 let mut result = u8::from(self.is_type_assignable_to(&with_sub, &with_super)?)
                     | (u8::from(self.is_type_assignable_to(&with_super, &with_sub)?) << 1);
                 if result == 3 {
-                    arguments[index] = markers.other_type.upgrade().ok_or(Error::Released)?;
-                    let other = data.instantiate(self, target, &arguments)?;
-                    other.marker_instantiation.set(true);
+                    let other = create_marker(&markers.unrelated)?;
                     if self.is_type_assignable_to(&other, &with_super)? {
                         result = 4;
                     }
@@ -533,9 +565,7 @@ impl Relater<'_> {
                         false,
                         intersection_state,
                     )?;
-                    if reverse != FALSE {
-                        reverse
-                    } else {
+                    if reverse == FALSE {
                         self.is_related_to_ex(
                             source,
                             target,
@@ -543,6 +573,8 @@ impl Relater<'_> {
                             report_errors,
                             intersection_state,
                         )?
+                    } else {
+                        reverse
                     }
                 }
                 0 => {
@@ -701,7 +733,9 @@ mod tests {
         let graph = &checker.graph;
         let string = graph.primitive(flags::STRING, "string");
         let any = graph.primitive(flags::ANY, "any");
-        checker.register_intrinsics(&[string.clone(), any]);
+        // An unconstrained type parameter relates through `unknown`.
+        let unknown = graph.primitive(flags::UNKNOWN, "unknown");
+        checker.register_intrinsics(&[string.clone(), any, unknown]);
         let parameter = graph.type_parameter("T", None);
         let super_type = graph.type_parameter("markerSuper", None);
         let sub_type = graph.type_parameter("markerSub", Some(&super_type));
@@ -779,6 +813,8 @@ mod tests {
                 bivariant_parameters: false,
                 is_abstract: false,
                 is_construct: false,
+                target: None,
+                parameter_declarations: Vec::new(),
             })
         });
         let first = generic.erased(&checker).unwrap();

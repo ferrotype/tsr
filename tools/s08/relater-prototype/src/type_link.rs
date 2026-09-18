@@ -12,6 +12,9 @@ type Resolve = Box<dyn FnOnce() -> Result<Rc<TypeCell>, Error>>;
 struct State {
     value: OnceCell<Weak<TypeCell>>,
     resolver: RefCell<Option<Resolve>>,
+    /// What an instantiated symbol's link was instantiated from (upstream's
+    /// `links.target` and `links.mapper`), opaque to this module.
+    origin: Option<Rc<dyn std::any::Any>>,
 }
 
 #[derive(Clone)]
@@ -32,6 +35,7 @@ impl From<Weak<TypeCell>> for TypeLink {
         Self(Rc::new(State {
             value: cell,
             resolver: RefCell::new(None),
+            origin: None,
         }))
     }
 }
@@ -41,7 +45,38 @@ impl TypeLink {
         Self(Rc::new(State {
             value: OnceCell::new(),
             resolver: RefCell::new(Some(Box::new(resolve))),
+            origin: None,
         }))
+    }
+
+    /// A lazy link that records what it instantiates, so a later instantiation
+    /// can return to the root instead of instantiating this link's result.
+    pub(crate) fn lazy_with_origin(
+        resolve: impl FnOnce() -> Result<Rc<TypeCell>, Error> + 'static,
+        origin: Rc<dyn std::any::Any>,
+    ) -> Self {
+        Self(Rc::new(State {
+            value: OnceCell::new(),
+            resolver: RefCell::new(Some(Box::new(resolve))),
+            origin: Some(origin),
+        }))
+    }
+
+    /// Whether both handles are one link: one property symbol upstream.
+    pub(crate) fn ptr_eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+
+    pub(crate) fn origin<T: 'static>(&self) -> Option<&T> {
+        self.0.origin.as_ref()?.downcast_ref()
+    }
+
+    /// The type if this link has already resolved; never resolves it.
+    pub(crate) fn resolved(&self) -> Result<Option<Rc<TypeCell>>, Error> {
+        match self.0.value.get() {
+            Some(value) => value.upgrade().map(Some).ok_or(Error::Released),
+            None => Ok(None),
+        }
     }
 
     pub(crate) fn resolve(&self) -> Result<Rc<TypeCell>, Error> {

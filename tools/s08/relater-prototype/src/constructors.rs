@@ -1,7 +1,7 @@
 //! Literal and union construction shared by source resolution and template
 //! inference. These caches own keys; the graph remains the sole owner of cells.
 
-use super::*;
+use super::{flags, object_flags, unsupported, Error, Graph, LiteralValue, Rc, TypeCell, Weak};
 use std::cmp::Ordering;
 
 impl Graph {

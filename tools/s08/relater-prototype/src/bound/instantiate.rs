@@ -4,7 +4,10 @@
 //! advances only when `instantiateTypeWorker` runs, including workers which
 //! return their input unchanged. A recursive cache hit does not advance it.
 
-use super::*;
+use super::{
+    missing, of, tf, Cell, Construction, Environment, EnvironmentKey, Error, HashMap, NodeId,
+    NodeListId, Rc, RefCell, TypeCell, Weak, K,
+};
 
 /// Identity is the allocation, not the substitution list. In particular two
 /// equal mapper lists created for separate operations have separate caches.
@@ -17,6 +20,9 @@ struct MapperData {
     // They still map by cell identity, exactly like ordinary TypeMapper sources.
     types: Vec<(Weak<TypeCell>, Weak<TypeCell>)>,
     composite: Option<(Mapper, Mapper)>,
+    /// A merged mapper maps the first result through the second; a composite
+    /// one instantiates it (`TypeMapKindMerged` against `TypeMapKindComposite`).
+    merged: bool,
     functional: Option<FunctionalMapper>,
 }
 
@@ -42,6 +48,7 @@ impl Mapper {
             environment,
             types,
             composite: None,
+            merged: false,
             functional: None,
         }))
     }
@@ -101,8 +108,53 @@ impl Mapper {
             environment,
             types: Vec::new(),
             composite: Some((first.clone(), second.clone())),
+            merged: false,
             functional: None,
         }))
+    }
+
+    // port: tsc/internal/checker/mapper.go:appendTypeMapping
+    pub(super) fn append(
+        mapper: &Self,
+        source: &Rc<TypeCell>,
+        target: &Rc<TypeCell>,
+    ) -> Result<Self, Error> {
+        let second = Self::with_types(
+            Environment::default(),
+            std::slice::from_ref(source),
+            std::slice::from_ref(target),
+        )?;
+        let mut environment = mapper.0.environment.clone();
+        environment.1 = None;
+        Ok(Self(Rc::new(MapperData {
+            environment,
+            types: Vec::new(),
+            composite: Some((mapper.clone(), second)),
+            merged: true,
+            functional: None,
+        })))
+    }
+
+    // port: tsc/internal/checker/mapper.go:prependTypeMapping
+    pub(super) fn prepend(
+        source: &Rc<TypeCell>,
+        target: &Rc<TypeCell>,
+        mapper: &Self,
+    ) -> Result<Self, Error> {
+        let first = Self::with_types(
+            Environment::default(),
+            std::slice::from_ref(source),
+            std::slice::from_ref(target),
+        )?;
+        let mut environment = mapper.0.environment.clone();
+        environment.1 = None;
+        Ok(Self(Rc::new(MapperData {
+            environment,
+            types: Vec::new(),
+            composite: Some((first, mapper.clone())),
+            merged: true,
+            functional: None,
+        })))
     }
 
     pub(super) fn permissive() -> Self {
@@ -151,6 +203,9 @@ pub(super) struct TypeSource {
     pub(super) alias: Option<Alias>,
 }
 
+/// An alias declaration, its type argument ids and the alias it is named by.
+type AliasInstanceKey = (NodeId, Vec<u32>, Option<AliasKey>);
+
 #[derive(Clone, PartialEq, Eq, Hash)]
 struct AliasKey {
     declaration: NodeId,
@@ -184,9 +239,12 @@ pub(super) struct State {
     contains_variables: RefCell<HashMap<u32, bool>>,
     sources: RefCell<HashMap<u32, TypeSource>>,
     parameters: RefCell<HashMap<u32, NodeId>>,
+    /// The other declarations of a merged class or interface type parameter:
+    /// an environment may be keyed by any of them.
+    merged_parameters: RefCell<HashMap<u32, Vec<NodeId>>>,
     objects: RefCell<HashMap<SourceKey, Weak<TypeCell>>>,
     object_targets: RefCell<HashMap<u32, Weak<TypeCell>>>,
-    aliases: RefCell<HashMap<(NodeId, Vec<u32>, Option<AliasKey>), Weak<TypeCell>>>,
+    aliases: RefCell<HashMap<AliasInstanceKey, Weak<TypeCell>>>,
 }
 
 struct Invocation<'a> {
@@ -314,8 +372,34 @@ impl Construction {
             .insert(ty.id(), declaration);
     }
 
+    pub(super) fn record_merged_type_parameter(&self, ty: &TypeCell, declaration: NodeId) {
+        let mut merged = self.instantiation.merged_parameters.borrow_mut();
+        let declarations = merged.entry(ty.id()).or_default();
+        if !declarations.contains(&declaration) {
+            declarations.push(declaration);
+        }
+    }
+
     pub(super) fn reset_instantiation_count(&self) {
         self.instantiation.statement_count.set(0);
+    }
+
+    /// `instantiateTypes(typeParameters, newSimpleTypeMapper(source, marker))`.
+    pub(super) fn marker_arguments(
+        self: &Rc<Self>,
+        parameters: &[Rc<TypeCell>],
+        source: &Rc<TypeCell>,
+        marker: &Rc<TypeCell>,
+    ) -> Result<Vec<Rc<TypeCell>>, Error> {
+        let mapper = Mapper::with_types(
+            Environment::default(),
+            std::slice::from_ref(source),
+            std::slice::from_ref(marker),
+        )?;
+        parameters
+            .iter()
+            .map(|parameter| self.instantiate(parameter, &mapper, None))
+            .collect()
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateTypeWithAlias
@@ -376,7 +460,7 @@ impl Construction {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.couldContainTypeVariablesWorker
-    fn could_contain_type_variables(&self, ty: &Rc<TypeCell>) -> Result<bool, Error> {
+    pub(super) fn could_contain_type_variables(&self, ty: &Rc<TypeCell>) -> Result<bool, Error> {
         if ty.flags & tf::STRUCTURED_OR_INSTANTIABLE == 0 {
             return Ok(false);
         }
@@ -527,8 +611,8 @@ impl Construction {
         }
         if let Some((first, second)) = &mapper.0.composite {
             let mapped = self.map_type(ty, first)?;
-            return if Rc::ptr_eq(ty, &mapped) {
-                self.map_type(ty, second)
+            return if mapper.0.merged || Rc::ptr_eq(ty, &mapped) {
+                self.map_type(&mapped, second)
             } else {
                 self.instantiate(&mapped, second, None)
             };
@@ -547,6 +631,18 @@ impl Construction {
         if let Some(parameter) = parameter {
             if let Some(mapped) = mapper.0.environment.get(parameter)? {
                 return Ok(mapped);
+            }
+            let merged = self
+                .instantiation
+                .merged_parameters
+                .borrow()
+                .get(&ty.id())
+                .cloned()
+                .unwrap_or_default();
+            for declaration in merged {
+                if let Some(mapped) = mapper.0.environment.get(declaration)? {
+                    return Ok(mapped);
+                }
             }
         }
         Ok(ty.clone())
@@ -690,8 +786,34 @@ impl Construction {
     ) -> Result<Rc<TypeCell>, Error> {
         let kind = source.flags & tf::UNION_OR_INTERSECTION;
         if kind == tf::INTERSECTION {
-            // A syntax re-evaluation here would double-count substitutions and
-            // omit getIntersectionType's reductions. Keep that boundary visible.
+            // getIntersectionType's absorbing reductions: `any` and `never`
+            // absorb the intersection, `unknown` drops out, duplicates collapse
+            // and one remaining constituent is the result. A result that needs
+            // a new intersection type (with its ordering, primitive disjointness
+            // and union distribution rules) stays outside the reference.
+            let mut flat = Vec::new();
+            for ty in types {
+                if ty.flags & tf::INTERSECTION != 0 {
+                    flat.extend(ty.types()?);
+                } else {
+                    flat.push(ty);
+                }
+            }
+            if let Some(never) = flat.iter().find(|ty| ty.flags & tf::NEVER != 0) {
+                return Ok(never.clone());
+            }
+            if let Some(any) = flat.iter().find(|ty| ty.flags & tf::ANY != 0) {
+                return Ok(any.clone());
+            }
+            let mut set: Vec<Rc<TypeCell>> = Vec::new();
+            for ty in flat {
+                if ty.flags & tf::UNKNOWN == 0 && !set.iter().any(|seen| Rc::ptr_eq(seen, &ty)) {
+                    set.push(ty);
+                }
+            }
+            if set.len() == 1 {
+                return Ok(set.remove(0));
+            }
             return missing("intersection normalization after instantiation");
         }
         let Some(alias) = alias else {
@@ -851,9 +973,19 @@ impl Construction {
         let kind = self.input.node(source.node)?.kind();
         if ty.flags & tf::OBJECT != 0
             && (ty.object_flags & of::REFERENCE != 0
+                // `SymbolFlagsTypeLiteral` is what the binder gives a type
+                // literal, a function or constructor type and a mapped type;
+                // `SymbolFlagsMethod` covers both method forms.
                 || matches!(
                     kind.known(),
-                    Some(K::TypeLiteral | K::MethodDeclaration | K::MethodSignature)
+                    Some(
+                        K::TypeLiteral
+                            | K::FunctionType
+                            | K::ConstructorType
+                            | K::MappedType
+                            | K::MethodDeclaration
+                            | K::MethodSignature
+                    )
                 ))
         {
             let mut retained = Vec::with_capacity(outer.0.len());
@@ -903,6 +1035,42 @@ impl Construction {
         } else {
             parameter_read.parent()
         };
+        // A type parameter whose symbol does not have exactly one declaration
+        // is always possibly referenced. Class and interface type parameters
+        // (and their `this` type) live in the merged symbol's members, so every
+        // merged declaration contributes one.
+        let owner = container.filter(|&owner| {
+            self.input.node(owner).is_ok_and(|read| {
+                matches!(
+                    read.kind().known(),
+                    Some(K::InterfaceDeclaration | K::ClassDeclaration)
+                )
+            })
+        });
+        if let Some(owner) = owner {
+            if let Some(name) = self.input.node(owner)?.name() {
+                if let Some(group) = self.input.resolve_type_name(name)? {
+                    let mut count = 0;
+                    for declaration in self.type_declaration_nodes(&group)? {
+                        if is_this {
+                            count += 1;
+                            continue;
+                        }
+                        let read = self.input.node(declaration)?;
+                        for candidate in self.list(declaration, read.type_parameter_list())? {
+                            if self.text(candidate_name(self, candidate)?)?
+                                == self.text(candidate_name(self, parameter)?)?
+                            {
+                                count += 1;
+                            }
+                        }
+                    }
+                    if count != 1 {
+                        return Ok(true);
+                    }
+                }
+            }
+        }
         let mut current = Some(node);
         while current != container {
             let Some(current_node) = current else {
@@ -925,6 +1093,7 @@ impl Construction {
     }
 
     fn contains_parameter_reference(&self, parameter: NodeId, root: NodeId) -> Result<bool, Error> {
+        let _ = candidate_name;
         let is_this = matches!(
             self.input.node(parameter)?.kind().known(),
             Some(K::InterfaceDeclaration | K::ClassDeclaration | K::ClassExpression)
@@ -1050,9 +1219,20 @@ fn same_types(left: &[Rc<TypeCell>], right: &[Rc<TypeCell>]) -> bool {
             .all(|(left, right)| Rc::ptr_eq(left, right))
 }
 
+/// The name node of a type parameter declaration.
+fn candidate_name(state: &Construction, parameter: NodeId) -> Result<NodeId, Error> {
+    state
+        .input
+        .node(parameter)?
+        .name()
+        .ok_or(Error::ResolutionFailed)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bound::BoundChecker;
+    use crate::bound_input::BoundInput;
 
     fn owner(source: &str) -> (BoundChecker, NodeId) {
         let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(
@@ -1082,8 +1262,8 @@ mod tests {
         let number = state.builtin(tf::NUMBER).unwrap();
         let mapper = Mapper::with_types(
             Environment::default(),
-            &[parameter.clone()],
-            &[number.clone()],
+            std::slice::from_ref(&parameter),
+            std::slice::from_ref(&number),
         )
         .unwrap();
         let before = state.instantiations.get();

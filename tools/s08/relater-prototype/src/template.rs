@@ -1,6 +1,9 @@
 //! Byte-preserving template construction and matching from the pinned checker.
 
-use super::*;
+use super::{
+    flags, is_empty_anonymous_object_type, unsupported, Error, Graph, LiteralValue, Mode, Rc,
+    Relater, Ternary, TypeCell, Weak, FALSE, RECURSION_BOTH, TRUE,
+};
 
 #[derive(Debug)]
 pub struct TemplateParts {
@@ -291,7 +294,7 @@ impl Relater<'_> {
         target: &TemplateParts,
     ) -> Result<Option<Vec<Rc<TypeCell>>>, Error> {
         if let Some(LiteralValue::String(bytes)) = &source.literal {
-            return self.infer_literal_parts(&[bytes.clone()], &[], &target.texts);
+            return self.infer_literal_parts(std::slice::from_ref(bytes), &[], &target.texts);
         }
         let Some(parts) = source.template_parts() else {
             return Ok(None);
@@ -504,6 +507,7 @@ fn valid_bigint_string(bytes: &[u8]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Checker;
 
     fn checker() -> Checker {
         let checker = Checker::new();

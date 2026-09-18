@@ -1,6 +1,8 @@
 //! Signature arity and parameter-position access from pinned `relater.go`.
 
-use super::*;
+use super::{
+    element_flags, flags, unsupported, Error, LiteralValue, Rc, Relater, Signature, TypeCell,
+};
 
 impl Signature {
     // port: tsc/internal/checker/relater.go:Checker.isTopSignature
@@ -159,6 +161,7 @@ impl Relater<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Graph;
 
     fn signature(parameters: &[Rc<TypeCell>], rest: bool, return_type: &Rc<TypeCell>) -> Signature {
         Signature {
@@ -178,6 +181,8 @@ mod tests {
             bivariant_parameters: false,
             is_abstract: false,
             is_construct: false,
+            target: None,
+            parameter_declarations: Vec::new(),
         }
     }
 
@@ -189,14 +194,14 @@ mod tests {
         let string = graph.primitive(flags::STRING, "string");
         let array = graph.object("any[]", vec![]);
         array.set_array_element(&any, false).unwrap();
-        assert!(signature(&[any.clone()], true, &any)
+        assert!(signature(std::slice::from_ref(&any), true, &any)
             .is_top_signature()
             .unwrap());
         assert!(signature(&[array], true, &unknown)
             .is_top_signature()
             .unwrap());
         assert!(!signature(&[string], true, &any).is_top_signature().unwrap());
-        assert!(!signature(&[any.clone()], false, &any)
+        assert!(!signature(std::slice::from_ref(&any), false, &any)
             .is_top_signature()
             .unwrap());
     }
