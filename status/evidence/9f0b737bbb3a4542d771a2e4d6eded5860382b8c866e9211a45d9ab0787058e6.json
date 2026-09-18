@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run_id": "relater",
+  "recorded_at": 1789751382,
+  "context": {
+    "revision": "92fdaa9c372ad53c301fba998e0794da308f5e7f",
+    "source_sha256": "715c888d6b33d15b4fd0cdaeb7601bb531f216504dcb9f1d6cfffac887f3aed8",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "bbea8921ef0e0f88d371b5615f312b4c32dd1583dd8581cd0e37a5b2b314533b",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s08/relater-fixtures.json": "77a0ec2aebca2d37790308b59de85fd0f3b299cf5c7b9c29c9ebd34b5298a301",
+    "data/s08/supplemental-observations.json.xz": "f066fbde457a96da5c5c6bcc81166670bb910d0e3fde915ed5d14c24ff325d7d",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "tools/s08/contracts/relations.json": "9906e2033653b4e503f606721651d88e3f3814f9fc3438f8c8ee15c53dfae2bf",
+    "tools/s08/results/p0-contracts/native.tar.xz": "1a7a959a8e6ffb261bc46bb503427befae041200980a4304a543dfe7b20338b6"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_relater.py",
+    "producer"
+  ],
+  "target": "host",
+  "config": "S08 relater comparison (data/s08/relater-fixtures.json): consume one explicitly captured measurement at target/s08/relater on the designated quiet host; parity of the production ID relater and the isolated reference prototype against the frozen Go observations over all 21 fixtures and five modes precedes measurement; setup and relation intervals separate; 1 warmup + 7 alternating fresh-process samples per implementation for the normal and allocation executables; ratios reference/ID with max/min > 1.10 flagged; strict parity requires exact diagnostic payloads and lazy work; the reference constructs its types from the bound program and is compared on the same strict protocol, so comparison ratios become available only when both implementations match every case and execute the same group inventory",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\":{}}\n",
+  "stderr": "relater capture invalid/unavailable: [Errno 2] No such file or directory: '/Users/cristian/git/ts-rust/target/s08/relater-refresh/bin/relater-alloc'\nrun.relater metrics unavailable: no current full capture at target/s08/relater (see docs/S08-P7.md)\n",
+  "stdout_sha256": "42856de9d8bf36eed62e8776240fe1105f7cce8b89694760b33bd7889e2d9d18",
+  "stderr_sha256": "aa951fdd6322ed6a9772f1045e5b76c62f2eec583bc94a9c4208bdf838a5d7b1",
+  "valid_capture": true
+}
