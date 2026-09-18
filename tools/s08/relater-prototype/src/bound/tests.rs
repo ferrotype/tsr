@@ -446,3 +446,48 @@ fn an_alias_body_instantiates_through_its_alias_arguments() {
         "the separate cells stay structurally identical"
     );
 }
+
+fn declared(
+    checker: &BoundChecker,
+    source: NodeId,
+    name: &[u8],
+) -> Result<Rc<TypeCell>, crate::Error> {
+    let node = checker
+        .input()
+        .declaration_by_name(source, name)
+        .unwrap()
+        .unwrap();
+    checker.declared_type(node)
+}
+
+#[test]
+fn a_refused_base_constraint_stays_refused_on_a_second_request() {
+    // The base-constraint walk behind a declared constraint is remembered so it
+    // runs once. Remembering it before it finishes would let a second, identical
+    // relation skip the walk and succeed where the first was refused.
+    let (owner, source) =
+        fixture(b"type G<T, K extends T[keyof T]> = { value: K }; type B = { value: string };");
+    let g = named(&owner, source, b"G");
+    let b = named(&owner, source, b"B");
+    let checker = owner.checker();
+    let first = checker
+        .is_type_related_to(&g, &b, crate::Mode::Assignable)
+        .expect_err("the walk reaches an indexed access");
+    let second = checker
+        .is_type_related_to(&g, &b, crate::Mode::Assignable)
+        .expect_err("a refusal is terminal");
+    assert_eq!(first, second);
+}
+
+#[test]
+fn a_refused_infer_constraint_stays_refused_on_a_second_request() {
+    // The type parameter is published in the node cache, so the refusal has to
+    // come first; otherwise the second request finds the parameter and succeeds.
+    let (owner, source) = fixture(
+        b"type P<F> = F extends (...args: infer A) => unknown ? A : never;\
+          type A = P<(a: string) => void>;",
+    );
+    let first = declared(&owner, source, b"A").expect_err("an infer rest parameter is refused");
+    let second = declared(&owner, source, b"A").expect_err("a refusal is terminal");
+    assert_eq!(first, second);
+}

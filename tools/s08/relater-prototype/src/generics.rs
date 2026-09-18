@@ -73,8 +73,21 @@ pub struct TypeParameterShape {
     original: Option<Weak<TypeCell>>,
     /// `in` = 1, `out` = 2; zero means infer variance from marker relations.
     pub modifiers: u8,
-    /// Whether the base-constraint chain behind the constraint was walked.
-    base_constraint_resolved: Cell<bool>,
+    /// The state of the base-constraint walk behind the constraint.
+    base_constraint: RefCell<BaseConstraintWalk>,
+}
+
+/// A walk that fails must stay failed. Publishing the type parameter before the
+/// walk, or marking it walked before it finishes, would let an unsupported
+/// constraint succeed on an identical second request.
+#[derive(Debug, Default)]
+enum BaseConstraintWalk {
+    #[default]
+    Pending,
+    /// Re-entered through a circular constraint chain; the outer frame decides.
+    Walking,
+    Resolved,
+    Failed(Error),
 }
 impl TypeParameterShape {
     pub(crate) fn has_declared_constraint(&self) -> bool {
@@ -90,10 +103,21 @@ impl TypeParameterShape {
             .as_ref()
             .map(TypeLink::resolve)
             .transpose()?;
-        if let Some(constraint) = &constraint {
-            if !self.base_constraint_resolved.replace(true) {
-                resolve_base_constraint(constraint)?;
+        if let Some(resolved) = &constraint {
+            match &*self.base_constraint.borrow() {
+                BaseConstraintWalk::Pending => {}
+                BaseConstraintWalk::Walking | BaseConstraintWalk::Resolved => {
+                    return Ok(constraint)
+                }
+                BaseConstraintWalk::Failed(error) => return Err(error.clone()),
             }
+            *self.base_constraint.borrow_mut() = BaseConstraintWalk::Walking;
+            let walked = resolve_base_constraint(resolved);
+            *self.base_constraint.borrow_mut() = match &walked {
+                Ok(()) => BaseConstraintWalk::Resolved,
+                Err(error) => BaseConstraintWalk::Failed(error.clone()),
+            };
+            walked?;
         }
         Ok(constraint)
     }
@@ -234,7 +258,7 @@ impl TypeCell {
                 constraint: constraint.map(|t| Rc::downgrade(t).into()),
                 original: original.map(Rc::downgrade),
                 modifiers,
-                base_constraint_resolved: Cell::new(false),
+                base_constraint: RefCell::default(),
             })
             .map_err(|_| Error::Unsupported(Rc::from("type parameter metadata already set")))
     }
@@ -249,7 +273,7 @@ impl TypeCell {
                 constraint,
                 original: original.map(Rc::downgrade),
                 modifiers,
-                base_constraint_resolved: Cell::new(false),
+                base_constraint: RefCell::default(),
             })
             .map_err(|_| Error::Unsupported(Rc::from("type parameter metadata already set")))
     }

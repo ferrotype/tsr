@@ -274,6 +274,9 @@ impl Construction {
             read.name()
                 .ok_or_else(|| Error::Unsupported("type parameter name".into()))?,
         )?;
+        // Before the parameter is published: a refusal after the cache insert
+        // would let an identical second request succeed.
+        self.reject_inferred_constraint(node)?;
         let ty = self.checker.graph.allocate_full(
             tf::TYPE_PARAMETER,
             0,
@@ -303,7 +306,6 @@ impl Construction {
         });
         ty.set_lazy_type_parameter(constraint, None, 0)?;
         self.record_type_parameter(&ty, node);
-        self.reject_inferred_constraint(node)?;
         Ok(ty)
     }
 

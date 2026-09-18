@@ -121,7 +121,7 @@ impl Graph {
         self.union_with_alias(input, None, origin)
     }
 
-    fn union_with_alias(
+    pub(crate) fn union_with_alias(
         &self,
         input: &[Rc<TypeCell>],
         alias: Option<(u64, &str, &[u32])>,

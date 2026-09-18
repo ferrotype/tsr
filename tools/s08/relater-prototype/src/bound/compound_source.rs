@@ -13,6 +13,30 @@ pub(super) struct TupleTargetKey {
     readonly: bool,
 }
 
+// port: tsc/internal/checker/checker.go:getConstituentCountOfTypes
+fn constituent_count_of(types: &[Rc<TypeCell>]) -> Result<usize, Error> {
+    let mut total = 0;
+    for ty in types {
+        total += constituent_count(ty)?;
+    }
+    Ok(total)
+}
+
+// port: tsc/internal/checker/checker.go:getConstituentCount
+/// An aliased or non-composite type counts once, a union with a denormalized
+/// origin counts as that origin, and everything else counts its constituents.
+fn constituent_count(ty: &Rc<TypeCell>) -> Result<usize, Error> {
+    if ty.flags & (tf::UNION | tf::INTERSECTION) == 0 || ty.alias.is_some() {
+        return Ok(1);
+    }
+    if ty.flags & tf::UNION != 0 {
+        if let Some(origin) = ty.origin.get().and_then(std::rc::Weak::upgrade) {
+            return constituent_count(&origin);
+        }
+    }
+    constituent_count_of(&ty.types()?)
+}
+
 impl Construction {
     // Constructor-style entry: callers hand over handles they have just built.
     #[allow(clippy::needless_pass_by_value)]
@@ -578,13 +602,46 @@ impl Construction {
                 constituents.push(ty);
             }
         }
-        self.union_with_alias(&constituents, alias)
+        // A denormalized origin records the form the cross product expanded,
+        // when at least one constituent is still an intersection and the origin
+        // is smaller than the union it stands for. Display reads it, and it is a
+        // real type: omitting it loses a creation the pin performs.
+        let origin = if constituents
+            .iter()
+            .any(|ty| ty.flags & tf::INTERSECTION != 0)
+            && constituent_count_of(&constituents)? > constituent_count_of(set)?
+        {
+            Some(self.checker.graph.allocate_full(
+                tf::INTERSECTION,
+                0,
+                name,
+                None,
+                None,
+                None,
+                false,
+                set.iter().map(Rc::downgrade).collect(),
+                false,
+                None,
+            ))
+        } else {
+            None
+        };
+        self.union_with_alias_and_origin(&constituents, alias, origin.as_ref())
     }
 
     pub(super) fn union_with_alias(
         self: &Rc<Self>,
         types: &[Rc<TypeCell>],
         alias: Option<Alias>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        self.union_with_alias_and_origin(types, alias, None)
+    }
+
+    fn union_with_alias_and_origin(
+        self: &Rc<Self>,
+        types: &[Rc<TypeCell>],
+        alias: Option<Alias>,
+        origin: Option<&Rc<TypeCell>>,
     ) -> Result<Rc<TypeCell>, Error> {
         match alias {
             Some(alias) => {
@@ -593,15 +650,14 @@ impl Construction {
                     .iter()
                     .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
                     .collect::<Result<Vec<_>, _>>()?;
-                let result = self.checker.graph.union_named_arguments(
+                let result = self.checker.graph.union_with_alias(
                     types,
-                    self.identity(alias.declaration),
-                    &alias.name,
-                    &arguments,
+                    Some((self.identity(alias.declaration), &alias.name, &arguments)),
+                    origin,
                 )?;
                 Ok(Self::record_alias_arguments(result, &alias))
             }
-            None => self.checker.graph.union(types),
+            None => self.checker.graph.union_with_alias(types, None, origin),
         }
     }
 

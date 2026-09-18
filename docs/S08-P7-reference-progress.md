@@ -24,7 +24,7 @@ diagnostics, and identical `types_created`, `signatures_created`,
 lookup and around every action. The checkpoint this work started from measured
 75/105 strict and 82/105 behavioral with three unsupported groups.
 
-Validation: 67 prototype unit tests, the 11 Python relater contract tests,
+Validation: 69 prototype unit tests, the 11 Python relater contract tests,
 `python3 scripts/checks.py clippy` and `fmt` clean over the workspace (the
 package had 92 clippy findings left from the bound-program rewrite; they are
 fixed). No measurement capture was run and no evidence or status view changed:
@@ -127,6 +127,28 @@ before anything was changed):
   own is counted and keys a separate cell. This closed the last silent drift
   (one type and one counted instantiation on `[string, number, ...T][0 | 1]`).
 
+`x-intersection-distribution`, and two retry paths (a second review of
+`bbb97ce`):
+
+- A refusal must be terminal. The base-constraint walk behind a declared
+  constraint is remembered so it runs once; it was marked walked before it
+  finished, so a second, identical relation skipped the walk and succeeded where
+  the first was refused. The walk now records pending, walking, resolved or the
+  failure itself, and re-entry through a circular chain still stops at the outer
+  frame.
+- Likewise, a type parameter was published in the node cache before the
+  `getInferredTypeParameterConstraint` refusal ran, so the second request found
+  the parameter and returned a type. The refusal now runs before publication; it
+  reads syntax only, so no construction moves.
+- `getIntersectionTypeEx` attaches a denormalized origin to the cross-product
+  union when at least one constituent is still an intersection and
+  `getConstituentCountOfTypes` of the constituents exceeds that of the
+  intersected set. It is a real `newIntersectionType`, so omitting it lost a
+  creation: `({a: string} | {b: number}) & ({c: boolean} | {d: string})` built
+  11 types where the pin builds 12. `typeToTypeNodeWorker` substitutes that
+  origin for the union, so display prints the intersection of unions rather than
+  the expanded cross product; that rule is ported with it.
+
 `mapped-conditional-infer`:
 
 - `prependTypeMapping`/`appendTypeMapping`: merged mappers, which map the first
@@ -223,22 +245,26 @@ That is the comparator's rule, not the frozen contract's wording.
   `keyof_any_and_unknown_follow_the_pinned_results`,
   `an_intersection_reduces_over_unions_disjoint_domains_and_supertypes` and
   `a_contravariant_position_infers_its_own_candidate`.
-- For the review findings: `a_fixed_tuple_index_resolves_instead_of_deferring`
+- For the second review: `a_refused_base_constraint_stays_refused_on_a_second_request`
+  and `a_refused_infer_constraint_stays_refused_on_a_second_request`, both
+  verified to fail against the earlier order (the first by returning a relation
+  result, the second by returning a tuple type).
+- For the first review: `a_fixed_tuple_index_resolves_instead_of_deferring`
   (verified to fail with the string-literal name or the union index removed from
   the predicate), `conditional_inference_reuses_the_first_signature_for_excess_targets`
   (verified to fail with the bottom-up pairing replaced by the shorter list) and
   `an_alias_body_instantiates_through_its_alias_arguments` (verified to fail with
   the alias-argument containment disabled). The predicate reads the generic alias
-  body, because the instantiated alias resolves either way. 67 unit tests in all.
+  body, because the instantiated alias resolves either way. 69 unit tests in all.
 
 Lib-dependent rules (Promise, tuples, `NonNullable`) are covered by the frozen
 fixtures, not by unit tests: the unit fixtures bind without the default library.
 
 ## Beyond the frozen inventory (development check, not evidence)
 
-Thirty-two programs outside the inventory were run through both
+Thirty-three programs outside the inventory were run through both
 implementations and compared group by group (`extra.py` in the session
-scratchpad; the frozen 105 remain the only evidence). **130 of 160 groups agree
+scratchpad; the frozen 105 remain the only evidence). **135 of 165 groups agree
 exactly**, and no disagreement is silent: every remaining one is a named
 refusal. Own conditional and mapped types, two-parameter and callback generics,
 contravariance, optional and rest tuples, array-holding generics,

@@ -148,6 +148,15 @@ impl Display<'_> {
     }
 
     fn composite(&mut self, ty: &Rc<TypeCell>) -> Result<Printed, Error> {
+        // port: tsc/internal/checker/nodebuilderimpl.go:nodeBuilderImpl.typeToTypeNodeWorker
+        // A union that carries a denormalized origin prints as that origin, so
+        // `(A | B) & (C | D)` is not printed as its expanded cross product.
+        let origin = ty
+            .origin
+            .get()
+            .and_then(std::rc::Weak::upgrade)
+            .filter(|_| ty.flags & flags::UNION != 0);
+        let ty = origin.as_ref().unwrap_or(ty);
         if ty.flags & (flags::UNION | flags::INTERSECTION) != 0 {
             let union = ty.flags & flags::UNION != 0;
             let precedence = if union { UNION } else { INTERSECTION };
