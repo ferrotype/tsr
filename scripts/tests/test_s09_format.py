@@ -18,6 +18,8 @@ def observation(ops=OPS):
         value["indent"] = {name: {"rows": 2, "failures": 0, "sha256": SHA} for name in INDENT_VARIANTS}
     if "position" in ops:
         value["position"] = {"rows": 5, "failures": 0, "sha256": SHA}
+    if "scan" in ops:
+        value["scan"] = {"rows": 7, "failures": 0, "sha256": SHA}
     if "insert" in ops:
         value["insert"] = {name: {"rows": 4, "failures": 1, "sha256": SHA} for name in INSERT_VARIANTS}
     if "format" in ops:
@@ -80,7 +82,7 @@ class FormatObservationContract(unittest.TestCase):
 
     def test_every_stream_of_the_selected_operations_is_walked_once(self):
         self.assertEqual(len(list(walk_streams(observation(), OPS))),
-                         2 + len(INDENT_VARIANTS) + len(FORMAT_VARIANTS) + len(INSERT_VARIANTS))
+                         3 + len(INDENT_VARIANTS) + len(FORMAT_VARIANTS) + len(INSERT_VARIANTS))
         self.assertEqual(len(list(walk_streams(observation(("nav",)), ("nav",)))), 1)
         failed = {**observation(("nav",)), "parse": {"panic": "parser"}}
         self.assertEqual(len(list(walk_streams(failed, ("nav",)))), 2)

@@ -184,4 +184,6 @@ pub mod compiler_options;
 pub use compiler_options::*;
 
 mod go_sort;
+mod text_change;
 pub use go_sort::sort as sort_like_go;
+pub use text_change::{apply_bulk_edits, TextChange, UnappliableEdits};

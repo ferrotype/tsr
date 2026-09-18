@@ -247,6 +247,7 @@ dependencies = [
  "ts_ast",
  "ts_astnav",
  "ts_core",
+ "ts_format",
  "ts_jsstring",
  "ts_parser",
 ]
@@ -550,6 +551,19 @@ dependencies = [
  "ts_core",
  "ts_jsstring",
  "ts_parser",
+]
+
+[[package]]
+name = "ts_format"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_ast",
+ "ts_astnav",
+ "ts_core",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_scanner",
 ]
 
 [[package]]

@@ -25,9 +25,11 @@ from s04_common import command, strict_json_loads
 
 ROOT = Path(__file__).resolve().parents[1]
 ORACLE = ROOT / "tools/s09/format_oracle/main.go"
+# Copied into the export's internal/format: access to unexported internals.
+BRIDGE = ROOT / "tools/s09/format_oracle/format_bridge.go"
 PROBES = ROOT / "data/s09/format-probes.json"
 EXPORT_PATHS = ("tsc/go.mod", "tsc/go.sum", "tsc/internal")
-OPS = ("nav", "indent", "format", "position", "insert")
+OPS = ("nav", "indent", "format", "position", "insert", "scan")
 INDENT_VARIANTS = ("default", "tabs", "two")
 INSERT_VARIANTS = ("default", "tabs")
 FORMAT_VARIANTS = ("default", "tabs", "two", "dense", "terse")
@@ -59,13 +61,17 @@ def build(directory):
         package = checkout / "tsc/internal/s09format"
         package.mkdir()
         shutil.copyfile(ORACLE, package / "main.go")
+        bridge = checkout / "tsc/internal/format/s09_bridge.go"
+        if bridge.exists():
+            raise ValueError("the format bridge would replace a pinned source file")
+        shutil.copyfile(BRIDGE, bridge)
         command(["go", "vet", "-mod=readonly", "./internal/s09format"], cwd=checkout / "tsc", env=env)
         command(["go", "build", "-trimpath", "-mod=readonly", "-o", str(destination), "./internal/s09format"],
                 cwd=checkout / "tsc", env=env)
     verified_upstream()
     version = command(["go", "version"], cwd=ROOT, env=env).decode().strip()
     report = {"version": VERSION, "pin": pin, "go": version, "toolchain_local": env["GOTOOLCHAIN"] == "local",
-              "oracle_sha256": digest(ORACLE.read_bytes()), "binary": str(destination),
+              "oracle_sha256": digest(ORACLE.read_bytes() + BRIDGE.read_bytes()), "binary": str(destination),
               "binary_sha256": digest(destination.read_bytes())}
     (directory / "build.json").write_bytes(canonical(report) + b"\n")
     return report
@@ -113,7 +119,7 @@ def validate_observation(request, observation, ops):
     expected = {"id", "parse", *ops}
     if set(observation) != expected:
         raise ValueError(f"{request['id']}: observation fields {sorted(observation)} != {sorted(expected)}")
-    for op in ("nav", "position"):
+    for op in ("nav", "position", "scan"):
         if op in ops:
             validate_stream(op, observation[op])
     for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS), ("insert", INSERT_VARIANTS)):
@@ -210,7 +216,7 @@ def differences(native, rust, ops):
         out.append("parse")
     for op in ops:
         left, right = native.get(op), rust.get(op)
-        if op in ("nav", "position"):
+        if op in ("nav", "position", "scan"):
             if left != right:
                 out.append(op)
         else:
@@ -266,7 +272,7 @@ def compare(directory, ops, prefix=None, limit=None):
 def walk_streams(observation, ops):
     if "parse" in observation and "panic" in observation["parse"]:
         yield observation["parse"]
-    for op in ("nav", "position"):
+    for op in ("nav", "position", "scan"):
         if op in ops:
             yield observation[op]
     for op in ("indent", "format", "insert"):

@@ -1,0 +1,21 @@
+[package]
+name = "ts_format"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ts_arena = { path = "../ts_arena", version = "0.1.0" }
+ts_ast = { path = "../ts_ast", version = "0.1.0" }
+ts_astnav = { path = "../ts_astnav", version = "0.1.0" }
+ts_core = { path = "../ts_core", version = "0.1.0" }
+ts_jsstring = { path = "../ts_jsstring", version = "0.1.0" }
+ts_scanner = { path = "../ts_scanner", version = "0.1.0" }
+
+[dev-dependencies]
+ts_parser = { path = "../ts_parser", version = "0.1.0" }
+
+[lints]
+workspace = true

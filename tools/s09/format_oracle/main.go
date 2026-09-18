@@ -430,6 +430,12 @@ func observe(r request) map[string]any {
 			out["format"] = result
 		case "position":
 			guarded(out, "position", func() any { return positioned(file, r.Detail) })
+		case "scan":
+			guarded(out, "scan", func() any {
+				s := newStream(r.Detail)
+				format.S09ScanProbe(file, s.row)
+				return s.result()
+			})
 		case "insert":
 			result := map[string]any{}
 			for _, v := range variants()[:2] {

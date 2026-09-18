@@ -107,8 +107,10 @@ Crates follow `PLAN.md` section 8 and the ledger: a new `ts_astnav`, a new
 `ts_format`, positioned printing in `ts_printer`, text changes in `ts_core`. The
 `lsutil` pieces are ledgered to `ts_ls`, which does not exist and should not be
 created for four small files. They go in `ts_format::settings` and
-`ts_format::lsutil` with `// port:` markers naming the `lsutil` functions, and
-their ledger rows move to `ts_format`. `ts_ls` re-exports them when it arrives.
+`ts_format::lsutil` with `// port:` markers naming the `lsutil` functions.
+`ts_ls` re-exports them when it arrives. Their ledger rows keep `crate = "ts_ls"`,
+because that column is generated from the package map and validation rejects a
+hand edit; the row's `rust` field records where the code actually lives.
 
 Phases in the ledger do not move. These files are ported early; their rows
 become `ported` with a note, and the phase column keeps recording where the
@@ -186,6 +188,17 @@ existing printing fixture still passes.
 `rule.go`, `context.go`, `util.go`, and the formatting scanner. Exit: a scanner
 probe (token, trivia and rescan decisions per corpus file) matches. That probe
 is added to F0 when this step starts, since its shape depends on the port.
+
+Done. The `scan` probe drives the formatting scanner over each whole file, with
+the token-level node from navigation as the container of every token, which is
+what gives the rescan predicates realistic input. The oracle reaches the
+unexported scanner through a bridge file copied into the export's
+`internal/format`. `compare --ops scan,nav` reports 16,120 of 16,120 at the first
+complete run; with the greater-than rescan disabled, 13 of the first 3,000
+inputs differ, so the check can fail. `ApplyBulkEdits` returns the slice bounds
+upstream panics on instead of panicking. The crate carries a temporary
+`allow(dead_code)`, because the rules, the indenter and the span worker that
+consume these foundations are the next steps; it goes away with F6.
 
 **F4. Rules.** `rules.go`, `rulesmap.go` and the 88 predicates of
 `rulecontext.go`. Exit: for every adjacent token pair in the corpus, the rules

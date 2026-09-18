@@ -233,6 +233,17 @@ fn observe(request: &Value) -> Result<Value, String> {
             "nav" => {
                 out.insert("nav".into(), navigation(view, root, length, detail));
             }
+            "scan" => {
+                let mut stream = Stream::new(detail);
+                let mut provider = ts_parser::ParserJsDocProvider::default();
+                let mut format_file = ts_format::FormatFile {
+                    view,
+                    source: root,
+                    jsdoc: &mut provider,
+                };
+                ts_format::probe::scan(&mut format_file, &mut |row| stream.row(row));
+                out.insert("scan".into(), stream.result());
+            }
             other => return Err(format!("operation {other:?} is not ported yet")),
         }
     }

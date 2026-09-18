@@ -14,6 +14,7 @@ ts_arena = { path = "../../../crates/ts_arena" }
 ts_ast = { path = "../../../crates/ts_ast" }
 ts_astnav = { path = "../../../crates/ts_astnav" }
 ts_core = { path = "../../../crates/ts_core" }
+ts_format = { path = "../../../crates/ts_format" }
 ts_jsstring = { path = "../../../crates/ts_jsstring" }
 ts_parser = { path = "../../../crates/ts_parser" }
 
