@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -19,12 +20,38 @@ from s08_inventory import compact, sites
 from s08_measurement_contract import measured_ratios, type_mean_ratio
 from s08_oracle import ROOT
 from s08_queries import action, expected_baseline
+import s08_p0 as p0
 
 
 def load(name):
     path = ROOT / name
     raw = path.read_bytes()
     return strict_json_loads(lzma.decompress(raw) if path.suffix == '.xz' else raw)
+
+
+class FootprintPolicyTests(unittest.TestCase):
+    def test_owner_amendment_agrees_with_all_e5_criteria_and_frozen_receipt(self):
+        p0.validate_methods()
+        criteria = tomllib.loads((ROOT / 'status/experiments.toml').read_text())['E5']['criteria']
+        self.assertEqual({c['id']: (c['op'], c['threshold']) for c in criteria}, {
+            'peak_rss': ('<=', 0.85), 'allocated_bytes': ('<=', 0.85),
+            'type_footprint': ('<=', 0.85),
+        })
+        manifest = load('data/s08/p0-contract.json')
+        p0.validate_sources({'type-footprint.json': manifest['artifacts']['type-footprint.json']}, p0.DATA)
+
+    def test_old_method_limit_cannot_disagree_with_the_amended_ledger(self):
+        read = p0.read
+
+        def old_method(path):
+            value = read(path)
+            if Path(path) == p0.DATA / 'type-footprint.json':
+                value['threshold']['maximum'] = 0.8
+            return value
+
+        with patch.object(p0, 'read', side_effect=old_method):
+            with self.assertRaisesRegex(ValueError, 'footprint methodology disagrees with ledger'):
+                p0.validate_methods()
 
 
 class P0ProtocolTests(unittest.TestCase):

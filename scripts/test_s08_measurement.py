@@ -397,6 +397,11 @@ class CheckerCapture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'artifact changed'):
             checker.report(self.root)
 
+    def test_changed_footprint_policy_requires_fresh_capture(self):
+        self.footprint.write_bytes(canonical({'threshold': {'maximum': 0.85}}))
+        with self.assertRaisesRegex(ValueError, 'footprint contract differs'):
+            checker.report(self.root)
+
     def test_runtime_observer_sources_are_authenticated_independently_of_globs(self):
         # sources() is fixed at {} by this fixture: neither edited copy may
         # escape detection even if the broad fingerprint misses these files.

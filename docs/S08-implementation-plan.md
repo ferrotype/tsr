@@ -6,6 +6,11 @@ checker evidence is implied. The accompanying [review](S08-plan-review.md)
 records the source checks and amendments made before implementation, and the
 independent review of 10 September 2026 whose amendments are folded in below.
 
+The owner amended the per-type footprint limit from 0.80 to 0.85 on
+18 September 2026 ([ADR 0022](adr/0022-checker-type-footprint-threshold.md)).
+The current requirements below include that decision; earlier experiment
+records retain their original thresholds and verdicts.
+
 Source authority: TypeScript/Corsa
 `1f70213d4922b434345f639b441681e470c7cfc1`. Use the existing toolchain pins and
 the [Rust guide](CODEX-RUST-GUIDELINES.md). The requirements are
@@ -84,7 +89,7 @@ owner decision.
 | S08-4 | `TypeToString`/`TypeToStringEx` through generated type nodes and production printing |
 | S08-5 | Actual checker, relation and printing recursion/reentrancy paths exercised with reserved stacks and growth guards |
 | S08-6 | No accepted mismatch without an exact applicable owner-approved divergence; the current allow-list is empty |
-| S08-7 | Measured per-type footprint on the subset, Rust/Go **≤0.80** |
+| S08-7 | Measured per-type footprint on the subset, Rust/Go **≤0.85** (ADR 0022) |
 | S08-8 | E4 literal-type bytes and original-source/regenerated literal printing, including malformed bytes and WTF-8 |
 | S08-9 | Fixed checker workload: throughput, allocation traffic and retained bytes against Go, excluding parse/bind |
 | S08-10 | Real arena-reference/interior-mutability relater prototype, fixture parity and measured comparison with the production ID-based relater |
@@ -511,7 +516,7 @@ and whole-checker live bytes separately. Type-specific cache/indexing cost canno
 be hidden in an uncharged "other" bucket. An adapter unable to account for a
 required family yields unavailable evidence and a named gap, not a zero charge.
 The early model must include both retained and transient traffic. The final
-threshold remains **0.80**, and layout changes remain subject to complete-slice
+threshold is **0.85** under ADR 0022, and layout changes remain subject to complete-slice
 CPU/allocation measurements even though checker CPU has no numerical target.
 
 ### 6.2 Checker workload
@@ -655,7 +660,7 @@ when their production paths exist, not after every module edit.
 | **P4 — Body checking and full dependency closure** | Relations, expression/statement/grammar checks, flow narrowing and declaration/module diagnostics across all frozen options and loaded dependencies, including the required declaration-transform/emit-resolver path. Run all primary variants and retain every failure bucket; finish required missing operations without changing eligibility. Complete direct fixtures for lazy library capabilities. |
 | **P5 — Display, bytes and recursion** | Finish builder/accessibility/emit-metadata/printer closure, exact type/error baseline decoration, E4 production integration and actual nested serialization/resolution tests. Stress left/right binary chains, nested parentheses/JSX, recursive object relations, conditional/instantiation limits and printing on small stacks that prove growth. Panic cleanup and subsequent owner retirement are observed; native tests do not certify wasm stack behavior. |
 | **[P6 — Semantic acceptance](S08-P6.md)** | Exact E2 inventory, baseline bytes, ordering and type-display parity; measured recursion and divergence checks. Complete S08 ownership contributors and rerun applicable E3 instrumentation. Review algorithms, identity/lifetimes and ordinary-path costs separately. All nonmeasurement S08 requirements pass with current inputs. |
-| **[P7 — Required measurements](S08-P7.md)** | Finish and parity-check the isolated relater. Run the full type census, checkerbench and relater comparisons with frozen methodology. If type footprint misses 0.80, select one integrated candidate from actual attribution and record its complete comparison; no declaration of success based on a model. Unfavorable checker/relater throughput is reported, not hidden. |
+| **[P7 — Required measurements](S08-P7.md)** | Finish and parity-check the isolated relater. Run the full type census, checkerbench and relater comparisons with frozen methodology. If type footprint misses 0.85, select one integrated candidate from actual attribution and record its complete comparison; no declaration of success based on a model. Unfavorable checker/relater throughput is reported, not hidden. |
 | **P8 — Final evidence and delivery** | Stage the final tracked inventory. Refresh all affected correctness producers and S07 native graph/capture evidence once as needed for changed Cargo/source fingerprints. Verify captures, compose E2/E3/E4/E5/checkerbench/relater, regenerate status, require `cargo xtask check S08` and `status --check-committed`. Archive raw requests/results, policies, logs and replay code; push and run four-target CI. |
 
 Size of the work, so no checkpoint is mistaken for a sprint: the checker package

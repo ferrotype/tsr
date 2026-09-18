@@ -70,7 +70,7 @@
     "amendment_required": true,
     "criterion": "E5.type_footprint",
     "ledger": "status/experiments.toml",
-    "maximum": 0.8
+    "maximum": 0.85
   },
   "version": 1
 }
