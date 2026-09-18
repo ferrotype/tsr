@@ -430,6 +430,22 @@ func observe(r request) map[string]any {
 			out["format"] = result
 		case "position":
 			guarded(out, "position", func() any { return positioned(file, r.Detail) })
+		case "rules":
+			result := map[string]any{}
+			for _, v := range variants() {
+				guarded(result, v.name, func() any {
+					s := newStream(r.Detail)
+					format.S09RulesProbe(file, v.settings, s.row)
+					return s.result()
+				})
+			}
+			out["rules"] = result
+		case "rulesmap":
+			guarded(out, "rulesmap", func() any {
+				s := newStream(r.Detail)
+				format.S09RulesMapProbe(s.row)
+				return s.result()
+			})
 		case "scan":
 			guarded(out, "scan", func() any {
 				s := newStream(r.Detail)

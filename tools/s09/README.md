@@ -75,6 +75,24 @@ Operations, with the call shapes the formatter itself uses:
   file and one offset that is usually inside a line, under `default` and `tabs`.
   The target offset is given in bytes; the UTF-16 conversion is the API layer's.
 
+- `scan`: the formatting scanner driven over the whole file, with the
+  token-level node navigation finds at each token's start as its container, which
+  is what gives the rescan predicates realistic input. Rows carry the token, the
+  container's kind, whether the previous trailing trivia ended in a new line,
+  and the leading and trailing trivia.
+- `rules`: every token with the comments of its trivia, paired with its
+  neighbour; the rules that apply in the context of the pair's lowest common
+  ancestor, by name and in order, under all five settings.
+- `rulesmap`: every non-empty bucket of the rules map, in order. It describes the
+  implementation rather than an input, so it is asked once per run, with the
+  first input as the carrier, and frozen as its own digest.
+
+`scan`, `rules` and `rulesmap` reach unexported parts of the pinned package
+through `format_bridge.go`, which the producer copies into the export's
+`internal/format` as a new file. It adds exported entry points and changes
+nothing that exists; the producer refuses if a file of that name is already
+there.
+
 Each stream is published as a row count, a count of native failure rows and the
 SHA-256 of its rows. The row grammar is line based, not JSON, because the Rust
 side reproduces it byte for byte: `T|<offset>|<kind>,<pos>,<end>`, `-` for no

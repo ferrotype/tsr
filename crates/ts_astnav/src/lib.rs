@@ -47,6 +47,13 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+/// One hook call of upstream's visitor, for callers outside this crate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ChildVisit {
+    Node(NodeId),
+    List(Vec<NodeId>),
+}
+
 /// One hook call of upstream's visitor: a node (or token) child, or a list.
 #[derive(Clone, Copy)]
 enum Visit {
@@ -233,6 +240,20 @@ impl<'a, 'p> Navigator<'a, 'p> {
         }
         out.extend(self.child_visits(id)?);
         Ok(out)
+    }
+
+    /// Upstream's traversal as other packages use it: the hook calls for a
+    /// node's JSDoc and children in order, with each list resolved to its nodes.
+    pub fn visit_each_child_and_jsdoc(&mut self, id: NodeId) -> Result<Vec<ChildVisit>, Error> {
+        self.visits(id)?
+            .into_iter()
+            .map(|visit| {
+                Ok(match visit {
+                    Visit::Node(node) => ChildVisit::Node(node),
+                    Visit::List(list) => ChildVisit::List(self.list_nodes(list)?),
+                })
+            })
+            .collect()
     }
 
     // port: tsc/internal/astnav/tokens.go:GetStartOfNode

@@ -233,6 +233,27 @@ fn observe(request: &Value) -> Result<Value, String> {
             "nav" => {
                 out.insert("nav".into(), navigation(view, root, length, detail));
             }
+            "rules" => {
+                let mut result = Map::new();
+                for name in ["default", "tabs", "two", "dense", "terse"] {
+                    let mut stream = Stream::new(detail);
+                    let mut provider = ts_parser::ParserJsDocProvider::default();
+                    let mut format_file = ts_format::FormatFile {
+                        view,
+                        source: root,
+                        jsdoc: &mut provider,
+                    };
+                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    ts_format::probe::rules(&mut format_file, settings, &mut |row| stream.row(row));
+                    result.insert(name.into(), stream.result());
+                }
+                out.insert("rules".into(), Value::Object(result));
+            }
+            "rulesmap" => {
+                let mut stream = Stream::new(detail);
+                ts_format::probe::rules_map(&mut |row| stream.row(row));
+                out.insert("rulesmap".into(), stream.result());
+            }
             "scan" => {
                 let mut stream = Stream::new(detail);
                 let mut provider = ts_parser::ParserJsDocProvider::default();

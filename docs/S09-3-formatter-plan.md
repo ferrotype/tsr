@@ -205,6 +205,26 @@ consume these foundations are the next steps; it goes away with F6.
 selected and their order match. This isolates a wrong predicate from a wrong
 span walk, which otherwise look the same in the output.
 
+Done. Two probes. `rulesmap` lists every non-empty bucket of the map in order,
+so the construction is compared directly: 27,724 buckets, identical digest. It
+is a fact about the implementation rather than about an input, so it is asked
+once. `rules` pairs up every token of a file, with the comments of its trivia,
+and asks which rules apply in the context of the pair's lowest common ancestor,
+under all five settings. `compare --ops rules` reports 16,120 of 16,120 at the
+first complete run. Forcing one predicate true makes an input differ, and
+swapping two rules that share a bucket changes the map's digest, so both checks
+can fail; swapping two rules that never share one does not, which is correct,
+since order only matters within a bucket.
+
+The 135-rule table was generated from `rules.go` by a script rather than
+retyped, then committed as ordinary source. One upstream quirk is reproduced on
+purpose: `anyTokenIncludingMultilineComments` and `anyTokenIncludingEOF` are
+both built by appending to `allTokens`, which has room for exactly one more
+element, so the two appends write the same slot and both ranges end in
+`EndOfFile`. The predicates also pulled in the language-service helpers they
+call: `GetFirstToken`, `GetLastToken`, `GetLastChild` and
+`PositionIsASICandidate`.
+
 **F5. Smart indenter.** `indent.go`. Exit: every indentation probe matches in
 all three settings variants.
 

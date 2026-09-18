@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s09_format import (FORMAT_VARIANTS, INDENT_VARIANTS, INSERT_VARIANTS, OPS, differences, frozen_form, validate_observation, validate_stream,
+from s09_format import (GLOBAL_OPS, FORMAT_VARIANTS, INDENT_VARIANTS, INSERT_VARIANTS, OPS, differences, frozen_form, validate_observation, validate_stream,
                         walk_streams)
 
 SHA = "0" * 64
@@ -20,6 +20,8 @@ def observation(ops=OPS):
         value["position"] = {"rows": 5, "failures": 0, "sha256": SHA}
     if "scan" in ops:
         value["scan"] = {"rows": 7, "failures": 0, "sha256": SHA}
+    if "rules" in ops:
+        value["rules"] = {name: {"rows": 6, "failures": 0, "sha256": SHA} for name in FORMAT_VARIANTS}
     if "insert" in ops:
         value["insert"] = {name: {"rows": 4, "failures": 1, "sha256": SHA} for name in INSERT_VARIANTS}
     if "format" in ops:
@@ -82,7 +84,7 @@ class FormatObservationContract(unittest.TestCase):
 
     def test_every_stream_of_the_selected_operations_is_walked_once(self):
         self.assertEqual(len(list(walk_streams(observation(), OPS))),
-                         3 + len(INDENT_VARIANTS) + len(FORMAT_VARIANTS) + len(INSERT_VARIANTS))
+                         3 + len(INDENT_VARIANTS) + 2 * len(FORMAT_VARIANTS) + len(INSERT_VARIANTS))
         self.assertEqual(len(list(walk_streams(observation(("nav",)), ("nav",)))), 1)
         failed = {**observation(("nav",)), "parse": {"panic": "parser"}}
         self.assertEqual(len(list(walk_streams(failed, ("nav",)))), 2)
@@ -105,12 +107,21 @@ class FormatObservationContract(unittest.TestCase):
         changed["indent"]["tabs"]["failures"] = 1
         del changed["insert"]["default"]
         changed["parse"]["node_count"] += 1
-        self.assertEqual(differences(native, changed, OPS),
-                         ["parse", "nav", "indent/tabs", "format/terse", "insert/default"])
+        self.assertEqual(sorted(differences(native, changed, OPS)),
+                         sorted(["parse", "nav", "indent/tabs", "format/terse", "insert/default"]))
         # Only the requested operations are compared, and a missing one differs.
         self.assertEqual(differences(native, changed, ("position",)), ["parse"])
         del changed["position"]
         self.assertIn("position", differences(native, changed, ("position",)))
+
+    def test_a_global_operation_is_asked_once_and_is_not_a_per_input_operation(self):
+        from s09_format import SINGLE, global_request
+        self.assertEqual(GLOBAL_OPS, ("rulesmap",))
+        self.assertFalse(set(GLOBAL_OPS) & set(OPS))
+        self.assertTrue(set(GLOBAL_OPS) <= set(SINGLE), "a global answer is one stream")
+        carrier = global_request([{"id": "first", "source_hex": "00", "version": 1}, {"id": "second"}])
+        self.assertEqual(carrier, {"id": "global", "source_hex": "00", "version": 1,
+                                   "ops": ["rulesmap"], "detail": False})
 
 
 if __name__ == "__main__":

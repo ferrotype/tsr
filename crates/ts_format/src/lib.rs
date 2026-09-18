@@ -11,7 +11,11 @@
 #![allow(dead_code)]
 
 mod context;
+mod lsutil;
 mod rule;
+mod rulecontext;
+mod rules;
+mod rulesmap;
 mod scanner;
 mod settings;
 mod util;
@@ -71,3 +75,6 @@ impl<'a> FormatFile<'a, '_> {
         )?)
     }
 }
+
+#[cfg(test)]
+mod tests;

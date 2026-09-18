@@ -29,10 +29,16 @@ ORACLE = ROOT / "tools/s09/format_oracle/main.go"
 BRIDGE = ROOT / "tools/s09/format_oracle/format_bridge.go"
 PROBES = ROOT / "data/s09/format-probes.json"
 EXPORT_PATHS = ("tsc/go.mod", "tsc/go.sum", "tsc/internal")
-OPS = ("nav", "indent", "format", "position", "insert", "scan")
+OPS = ("nav", "indent", "format", "position", "insert", "scan", "rules")
+# Facts about the implementation rather than about an input. They are asked once,
+# with the first input of the inventory as the carrier.
+GLOBAL_OPS = ("rulesmap",)
 INDENT_VARIANTS = ("default", "tabs", "two")
 INSERT_VARIANTS = ("default", "tabs")
 FORMAT_VARIANTS = ("default", "tabs", "two", "dense", "terse")
+# Operations that answer with one stream, and those that answer per settings variant.
+SINGLE = ("nav", "position", "scan", "rulesmap")
+VARIANTS = {"indent": INDENT_VARIANTS, "format": FORMAT_VARIANTS, "insert": INSERT_VARIANTS, "rules": FORMAT_VARIANTS}
 REQUEST_FIELDS = ("source_hex", "filename", "path", "script_kind", "jsx", "force")
 VERSION = 1
 
@@ -119,10 +125,10 @@ def validate_observation(request, observation, ops):
     expected = {"id", "parse", *ops}
     if set(observation) != expected:
         raise ValueError(f"{request['id']}: observation fields {sorted(observation)} != {sorted(expected)}")
-    for op in ("nav", "position", "scan"):
+    for op in SINGLE:
         if op in ops:
             validate_stream(op, observation[op])
-    for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS), ("insert", INSERT_VARIANTS)):
+    for op, names in VARIANTS.items():
         if op in ops:
             if set(observation[op]) != set(names):
                 raise ValueError(f"{request['id']}: {op} variants differ from the contract")
@@ -216,7 +222,7 @@ def differences(native, rust, ops):
         out.append("parse")
     for op in ops:
         left, right = native.get(op), rust.get(op)
-        if op in ("nav", "position", "scan"):
+        if op in SINGLE:
             if left != right:
                 out.append(op)
         else:
@@ -237,7 +243,12 @@ def compare(directory, ops, prefix=None, limit=None):
     sides = [Side("oracle", report["binary"]), Side("rust", rust)]
     matched, failures, by_part = 0, [], {}
     started = time.monotonic()
+    global_matches = {}
     try:
+        carrier = global_request(requests)
+        native, ported = (side.ask(canonical(carrier) + b"\n", carrier) for side in sides)
+        for op in GLOBAL_OPS:
+            global_matches[op] = "error" not in ported and native.get(op) == ported.get(op)
         with (directory / "failures.ndjson").open("w") as sink:
             for index, request in enumerate(selected):
                 line = canonical({**request, "ops": list(ops), "detail": False}) + b"\n"
@@ -264,18 +275,23 @@ def compare(directory, ops, prefix=None, limit=None):
                "inventory": {"s06_requests": total, "distinct_inputs": len(requests)},
                "diagnostic_subset": len(selected) != len(requests), "requests": len(selected), "matched": matched,
                "parity": matched / len(selected), "mismatched_by_part": dict(sorted(by_part.items())),
+               "global": global_matches,
                "first_failures": failures[:20], "seconds": round(time.monotonic() - started, 1)}
     (directory / "compare.json").write_bytes(canonical(summary) + b"\n")
     return summary
 
 
+def global_request(requests):
+    return {**requests[0], "id": "global", "ops": list(GLOBAL_OPS), "detail": False}
+
+
 def walk_streams(observation, ops):
     if "parse" in observation and "panic" in observation["parse"]:
         yield observation["parse"]
-    for op in ("nav", "position", "scan"):
+    for op in SINGLE:
         if op in ops:
             yield observation[op]
-    for op in ("indent", "format", "insert"):
+    for op in VARIANTS:
         if op in ops:
             yield from observation[op].values()
 
@@ -289,6 +305,13 @@ def observe(directory, ops, prefix=None, limit=None):
         raise ValueError("the filter selected no request")
     inventory_sha256 = digest(b"".join(canonical(r) + b"\n" for r in requests))
     result = run(report["binary"], selected, ops, directory / "native.ndjson")
+    carrier = global_request(requests)
+    answered = run(report["binary"], [{k: v for k, v in carrier.items() if k not in ("ops", "detail")}],
+                   GLOBAL_OPS, directory / "native-global.ndjson")
+    if answered["panics"]:
+        raise ValueError("the oracle failed on a global operation")
+    result["global"] = {op: {k: v for k, v in strict_json_loads((directory / "native-global.ndjson").read_bytes())[op].items()
+                             if k in ("rows", "failures", "sha256")} for op in GLOBAL_OPS}
     summary = {"version": VERSION, "pin": report["pin"], "go": report["go"], "toolchain_local": report["toolchain_local"],
                "oracle_sha256": report["oracle_sha256"], "script_sha256": digest(Path(__file__).read_bytes()),
                "ops": list(ops), "indent_variants": list(INDENT_VARIANTS), "format_variants": list(FORMAT_VARIANTS),
