@@ -1,5 +1,9 @@
 # S08 implementation plan: checker, type display and measured storage
 
+This is the original implementation plan. See the [S08 completion record](S08.md)
+for delivered scope, current measurements and final evidence; checkpoint status
+statements below retain their historical meaning.
+
 Prepared 10 September 2026 on `codex/s08-plan`, based on merged `main`
 `4c0818d` (S07-bis PR #12). Status: planned; no S08 implementation or passing
 checker evidence is implied. The accompanying [review](S08-plan-review.md)

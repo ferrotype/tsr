@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "local_directory": "/Users/cristian/git/ts-rust-s04-report/s08-completion",
+  "measurements": {
+    "archive": "s08-measurements-4a3f3e8.tar.gz",
+    "sha256": "c191e7c05eb0583e3a2b6c1a631ebd047489ee915c174a1df1b86311deb99073",
+    "bytes": 568518394,
+    "raw_bytes": 4016872255,
+    "files": 56914,
+    "source_revision": "4a3f3e8923445c9e0c0471e876baf8f525d3950d",
+    "original_root": "/Users/cristian/git/ts-rust"
+  },
+  "s07_binaries": {
+    "archive": "s07-measured-binaries.tar.gz",
+    "sha256": "0e5ec159e7e7838e688a148a950477df98ed6bd2452d535354aacb11f71b3d7b",
+    "bytes": 10603968,
+    "restore_root": "/Users/cristian/git/.ts-rust-workloads",
+    "files": {
+      "s07-benchmark/go-benchmark": "35172610a07a040b41d11aa7771b2f604120b0c2eca04044cb6672aa93cb0cf4",
+      "s07-benchmark/rust-benchmark": "37f11913e9c8ffca4d5e350c0fbdf2a284ced6340d058f8296b28d07bad83ea6",
+      "s07-benchmark/rust-benchmark-allocation": "d615c9e01a43f3fd9700bc62490c4db88aaee98cdb31779a10d8a2b4b0e7a213"
+    }
+  },
+  "restoration": "Restore measurements under their original_root and S07 binaries under restore_root. Checkout the recorded compiler sources and pinned upstream; preserve Cargo configuration. Run the report/verify commands from docs/S08.md."
+}

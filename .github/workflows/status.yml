@@ -281,6 +281,7 @@ jobs:
             'run.e3.checker_result_retention == true' \
             'run.e3.checker_ast_retention == true' \
             'run.e3.builder_cache_retention == true' \
+            'run.e3.independent_checker_merges == true' \
             'run.e3.ast_runtime == true' \
             'run.e3.id_exhaustion == true' \
             'run.e3.wrong_owner_rejected == true' \
