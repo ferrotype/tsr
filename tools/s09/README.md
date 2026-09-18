@@ -107,6 +107,16 @@ python3 scripts/s09_format.py freeze  --output <new directory>            # rewr
 python3 scripts/s09_format.py verify  --output <new directory>            # reproduces the frozen file or fails
 ```
 
+`compare` is the differential itself. It builds the oracle and the Rust harness
+in `tools/s09/format-harness`, sends every request to both, and reports how many
+inputs agree on every requested operation, with the disagreeing ones and both
+observations in `failures.ndjson`. The harness accepts only the operations that
+have been ported; asking for another is an error, never an empty answer.
+
+```sh
+python3 scripts/s09_format.py compare --ops nav --output <new directory>
+```
+
 `data/s09/format-probes.json` binds the pin, the local Go toolchain, the oracle
 and script hashes, the inventory digest, the operation and variant lists, and
 the native totals with the digest of the whole observation stream. `verify`

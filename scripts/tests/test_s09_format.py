@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s09_format import (FORMAT_VARIANTS, INDENT_VARIANTS, INSERT_VARIANTS, OPS, frozen_form, validate_observation, validate_stream,
+from s09_format import (FORMAT_VARIANTS, INDENT_VARIANTS, INSERT_VARIANTS, OPS, differences, frozen_form, validate_observation, validate_stream,
                         walk_streams)
 
 SHA = "0" * 64
@@ -93,6 +93,22 @@ class FormatObservationContract(unittest.TestCase):
                                   "native": {"requests": 2, "rows": 9, "stream_sha256": SHA}})
         self.assertEqual(frozen, frozen_form({**summary, "native": {**summary["native"], "seconds": 1.0}}))
         self.assertIn("seconds", summary["native"], "the run summary keeps its timing")
+
+    def test_differences_name_the_operation_and_variant_that_disagree(self):
+        native = observation()
+        self.assertEqual(differences(native, copy.deepcopy(native), OPS), [])
+        changed = copy.deepcopy(native)
+        changed["nav"]["sha256"] = "1" * 64
+        changed["format"]["terse"]["rows"] += 1
+        changed["indent"]["tabs"]["failures"] = 1
+        del changed["insert"]["default"]
+        changed["parse"]["node_count"] += 1
+        self.assertEqual(differences(native, changed, OPS),
+                         ["parse", "nav", "indent/tabs", "format/terse", "insert/default"])
+        # Only the requested operations are compared, and a missing one differs.
+        self.assertEqual(differences(native, changed, ("position",)), ["parse"])
+        del changed["position"]
+        self.assertIn("position", differences(native, changed, ("position",)))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,21 @@
+[package]
+name = "s09_format_harness"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "S09-3 formatter port: answers the native format oracle's requests with the Rust implementation, row for row"
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+ts_arena = { path = "../../../crates/ts_arena" }
+ts_ast = { path = "../../../crates/ts_ast" }
+ts_astnav = { path = "../../../crates/ts_astnav" }
+ts_core = { path = "../../../crates/ts_core" }
+ts_jsstring = { path = "../../../crates/ts_jsstring" }
+ts_parser = { path = "../../../crates/ts_parser" }
+
+[lints]
+workspace = true

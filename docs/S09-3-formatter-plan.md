@@ -161,6 +161,16 @@ the printing fixture does, so stale observations cannot certify new code.
 **F1. `ts_astnav`.** The five entry points and what they need. Exit: every
 navigation probe matches.
 
+Done. `compare --ops nav` reports 16,120 of 16,120 inputs, 35.1 million rows,
+including the one row where the pinned navigation asserts. The first complete
+run stood at 15,840. All 280 differences had one cause: upstream's
+`VisitEachChild` visits a JSDoc parameter tag's name before its type whatever
+order they were written in, while `ForEachChild` follows `IsNameFirst`, and
+navigation uses the former. Alongside the crate, the AST gained the token cache
+entry point (`SourceFile.GetOrCreateToken`) and the scanner crate
+`GetTokenPosOfNode`. `findRightmostNode` has no caller upstream and is not
+ported.
+
 **F2. Positioned printing.** First the statement, declaration and JSX
 printer described in the correction above, which is the bulk of this step and is
 proved the same way: the `position` probe prints each file's leading statements,

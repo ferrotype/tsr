@@ -165,6 +165,104 @@ def run(binary, requests, ops, output, detail=False):
             "panic_ids": sorted(set(panics))}
 
 
+def rust_binary():
+    """The harness in tools/s09/format-harness, built in release mode."""
+    output = command(["cargo", "build", "--package", "s09_format_harness", "--release", "--locked",
+                      "--message-format=json"], cwd=ROOT)
+    binaries = [item["executable"] for item in map(strict_json_loads, filter(bytes.strip, output.splitlines()))
+                if item.get("reason") == "compiler-artifact" and item.get("target", {}).get("name") == "s09_format_harness"
+                and item.get("executable")]
+    if len(binaries) != 1:
+        raise ValueError("Cargo did not identify exactly one format harness")
+    return binaries[0]
+
+
+class Side:
+    """One long-lived implementation answering one request at a time."""
+
+    def __init__(self, name, binary):
+        self.name = name
+        self.process = subprocess.Popen([str(binary)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+
+    def ask(self, line, request):
+        self.process.stdin.write(line)
+        self.process.stdin.flush()
+        answer = self.process.stdout.readline()
+        if not answer.endswith(b"\n"):
+            raise RuntimeError(f"{request['id']}: {self.name} ended: "
+                               + self.process.stderr.read().decode(errors="replace")[-2000:])
+        return strict_json_loads(answer)
+
+    def close(self):
+        if self.process.poll() is None:
+            self.process.stdin.close()
+            try:
+                self.process.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+
+
+def differences(native, rust, ops):
+    """Where two observations of one request disagree, by operation and variant."""
+    out = []
+    if native.get("parse") != rust.get("parse"):
+        out.append("parse")
+    for op in ops:
+        left, right = native.get(op), rust.get(op)
+        if op in ("nav", "position"):
+            if left != right:
+                out.append(op)
+        else:
+            out.extend(f"{op}/{name}" for name in sorted(set(left or {}) | set(rust.get(op) or {}))
+                       if (left or {}).get(name) != (right or {}).get(name))
+    return out
+
+
+def compare(directory, ops, prefix=None, limit=None):
+    """Live differential: both implementations answer every request."""
+    directory = Path(directory).resolve()
+    report = build(directory)
+    rust = rust_binary()
+    requests, total = inventory()
+    selected = [r for r in requests if not prefix or r["id"].startswith(prefix)][:limit]
+    if not selected:
+        raise ValueError("the filter selected no request")
+    sides = [Side("oracle", report["binary"]), Side("rust", rust)]
+    matched, failures, by_part = 0, [], {}
+    started = time.monotonic()
+    try:
+        with (directory / "failures.ndjson").open("w") as sink:
+            for index, request in enumerate(selected):
+                line = canonical({**request, "ops": list(ops), "detail": False}) + b"\n"
+                native, ported = (side.ask(line, request) for side in sides)
+                validate_observation(request, native, ops)
+                if "error" in ported:
+                    parts = ["error: " + str(ported["error"])]
+                else:
+                    parts = differences(native, ported, ops)
+                if parts:
+                    failures.append(request["id"])
+                    for part in parts:
+                        by_part[part.split(":")[0]] = by_part.get(part.split(":")[0], 0) + 1
+                    sink.write(json.dumps({"id": request["id"], "parts": parts, "native": native, "rust": ported},
+                                          sort_keys=True) + "\n")
+                else:
+                    matched += 1
+                if index % 2000 == 0:
+                    print(f"S09 format compare {index + 1}/{len(selected)}: {matched} match", file=sys.stderr)
+    finally:
+        for side in sides:
+            side.close()
+    summary = {"version": VERSION, "pin": report["pin"], "ops": list(ops),
+               "inventory": {"s06_requests": total, "distinct_inputs": len(requests)},
+               "diagnostic_subset": len(selected) != len(requests), "requests": len(selected), "matched": matched,
+               "parity": matched / len(selected), "mismatched_by_part": dict(sorted(by_part.items())),
+               "first_failures": failures[:20], "seconds": round(time.monotonic() - started, 1)}
+    (directory / "compare.json").write_bytes(canonical(summary) + b"\n")
+    return summary
+
+
 def walk_streams(observation, ops):
     if "parse" in observation and "panic" in observation["parse"]:
         yield observation["parse"]
@@ -203,7 +301,7 @@ def frozen_form(summary):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("build", "observe", "detail", "freeze", "verify"))
+    parser.add_argument("command", choices=("build", "observe", "detail", "freeze", "verify", "compare"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--ops", default=",".join(OPS))
     parser.add_argument("--prefix")
@@ -215,6 +313,8 @@ def main():
         raise ValueError("unknown operation")
     if args.command == "build":
         print(json.dumps(build(args.output), sort_keys=True))
+    elif args.command == "compare":
+        print(json.dumps(compare(args.output, ops, args.prefix, args.limit), sort_keys=True))
     elif args.command == "detail":
         report = build(args.output)
         requests, _ = inventory()

@@ -123,6 +123,51 @@ pub fn get_scanner_for_source_file(source: &SourceFileState, position: i64) -> S
     scanner
 }
 
+/// The position of a node's first token. A missing node keeps its position,
+/// because skipping trivia from it would run on to the next token, and a JSDoc
+/// node or JSX text stops at a comment, which JSX text cannot really contain.
+/// port: tsc/internal/scanner/scanner.go:GetTokenPosOfNode
+pub fn get_token_pos_of_node(
+    view: AstView<'_>,
+    source: NodeId,
+    id: NodeId,
+    include_jsdoc: bool,
+    jsdoc: &mut dyn ts_ast::JsDocProvider,
+) -> Result<i64, Error> {
+    let node = view.node(id)?;
+    if ts_ast::node_is_missing(Some(&node)) {
+        return Ok(i64::from(node.pos()));
+    }
+    let file = view.source_file(source)?;
+    let text = file.text().as_bytes();
+    if ts_ast::utilities_middle::is_js_doc_node(&node) || node.kind() == K::JsxText {
+        return Ok(crate::skip_trivia_ex(
+            text,
+            i64::from(node.pos()),
+            Some(&crate::SkipTriviaOptions {
+                stop_after_line_break: false,
+                stop_at_comments: true,
+                in_jsdoc: false,
+            }),
+        ));
+    }
+    if include_jsdoc {
+        let roots = jsdoc.jsdoc(view, source, id)?;
+        if let Some(&first) = roots.first() {
+            return get_token_pos_of_node(view, source, first, false, jsdoc);
+        }
+    }
+    Ok(crate::skip_trivia_ex(
+        text,
+        i64::from(node.pos()),
+        Some(&crate::SkipTriviaOptions {
+            stop_after_line_break: false,
+            stop_at_comments: false,
+            in_jsdoc: node.flags() & node_flags::JS_DOC != 0,
+        }),
+    ))
+}
+
 /// port: tsc/internal/scanner/scanner.go:ScanTokenAtPosition
 pub fn scan_token_at_position(
     view: AstView<'_>,

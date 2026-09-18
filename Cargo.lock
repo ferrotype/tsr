@@ -238,6 +238,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "s09_format_harness"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "sha2",
+ "ts_arena",
+ "ts_ast",
+ "ts_astnav",
+ "ts_core",
+ "ts_jsstring",
+ "ts_parser",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.229"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -403,6 +417,18 @@ dependencies = [
  "ts_core",
  "ts_diagnostics",
  "ts_jsstring",
+]
+
+[[package]]
+name = "ts_astnav"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_ast",
+ "ts_core",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_scanner",
 ]
 
 [[package]]
