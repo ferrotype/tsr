@@ -89,6 +89,8 @@ type NodeKey = (NodeId, EnvironmentKey);
 type ValueKey = (Vec<SymbolId>, EnvironmentKey);
 /// A generic target and the ids of its type arguments.
 type InstanceKey = (u32, Vec<u32>);
+/// The ids of an intersection's constituents and its naming alias.
+type IntersectionKey = (Vec<u32>, Option<(u64, Vec<u32>)>);
 
 /// The reference checker and its bound input have one explicit lifetime owner.
 /// Type-cell resolvers capture weak references to this owner, never a strong
@@ -115,6 +117,7 @@ struct Construction {
     tuple_targets: RefCell<HashMap<compound_source::TupleTargetKey, Rc<TypeCell>>>,
     tuple_instances: RefCell<HashMap<InstanceKey, Rc<TypeCell>>>,
     tuple_bases: RefCell<HashMap<u32, TypeLink>>,
+    intersections: RefCell<HashMap<IntersectionKey, Rc<TypeCell>>>,
     interface_instances: RefCell<HashMap<InstanceKey, Rc<TypeCell>>>,
     instantiation: instantiate::State,
     mapped_state: mapped_source::State,
@@ -148,6 +151,7 @@ impl BoundChecker {
             tuple_targets: RefCell::new(HashMap::new()),
             tuple_instances: RefCell::new(HashMap::new()),
             tuple_bases: RefCell::new(HashMap::new()),
+            intersections: RefCell::new(HashMap::new()),
             interface_instances: RefCell::new(HashMap::new()),
             instantiation: instantiate::State::default(),
             mapped_state: mapped_source::State::default(),
@@ -628,7 +632,89 @@ impl Construction {
             let alias = self.alias_metadata(node, env, alias)?;
             return self.instantiate(&source, mapper, alias);
         }
-        self.type_node_worker(node, env, alias)
+        let result = self.type_node_worker(node, env, alias)?;
+        self.conditional_flow_type(&result, node)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getConditionalFlowTypeOfType
+    /// A type variable resolved inside a conditional's true branch carries the
+    /// implied constraint from the extends clause as a substitution type. The
+    /// reference does not construct substitution types (see the named
+    /// unsupported kinds), so it refuses instead of silently resolving to the
+    /// bare type variable, which would diverge from the pinned construction.
+    fn conditional_flow_type(
+        self: &Rc<Self>,
+        ty: &Rc<TypeCell>,
+        node: NodeId,
+    ) -> Result<Rc<TypeCell>, Error> {
+        if ty.flags & tf::TYPE_VARIABLE == 0 {
+            return Ok(ty.clone());
+        }
+        let mut current = node;
+        while let Some(parent) = self.input.node(current)?.parent() {
+            let read = self.input.node(parent)?;
+            if ts_ast::utilities::is_statement(self.input.ast(parent)?, parent)? {
+                break;
+            }
+            let conditional = read
+                .data_source()
+                .as_conditional_type_node()
+                .filter(|data| data.true_type() == Some(current));
+            if let Some(conditional) = conditional {
+                let check = conditional.check_type().ok_or(Error::ResolutionFailed)?;
+                if self.implied_constraint_applies(ty, check)? {
+                    return missing("substitution type in a conditional true branch");
+                }
+            }
+            current = parent;
+        }
+        Ok(ty.clone())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getImpliedConstraint
+    /// Whether the conditional's check type is the same type variable as `ty`,
+    /// so the extends clause would become its substituted constraint. A unary
+    /// tuple on both sides is unwrapped; the reference has no such fixture, so
+    /// that form is refused rather than approximated.
+    fn implied_constraint_applies(
+        self: &Rc<Self>,
+        ty: &Rc<TypeCell>,
+        check: NodeId,
+    ) -> Result<bool, Error> {
+        let read = self.input.node(check)?;
+        if read.kind() == K::TupleType {
+            let elements = self.list(
+                check,
+                read.data_source()
+                    .as_tuple_type_node()
+                    .and_then(|data| data.elements()),
+            )?;
+            if elements.len() == 1 {
+                return missing("implied constraint through unary tuple nodes");
+            }
+            return Ok(false);
+        }
+        if read.kind() != K::TypeReference {
+            return Ok(false);
+        }
+        let name = read
+            .data_source()
+            .as_type_reference_node()
+            .and_then(|data| data.type_name())
+            .ok_or(Error::ResolutionFailed)?;
+        let Some(group) = self.input.resolve_type_name(name)? else {
+            return Ok(false);
+        };
+        let declarations = self.type_declaration_nodes(&group)?;
+        let Some(&declaration) = declarations.first() else {
+            return Ok(false);
+        };
+        if self.input.node(declaration)?.kind() != K::TypeParameter {
+            return Ok(false);
+        }
+        // `getActualTypeVariable` on both sides: a type parameter cell is its
+        // own actual type variable here, so identity is the test.
+        Ok(Rc::ptr_eq(&self.type_parameter(declaration)?, ty))
     }
 
     fn type_node_worker(
@@ -775,20 +861,8 @@ impl Construction {
                         self.checker.graph.union(&types)?
                     }
                 } else {
-                    self.checker.graph.allocate_full(
-                        tf::INTERSECTION,
-                        0,
-                        alias.unwrap_or_else(|| Rc::from("intersection")),
-                        None,
-                        source_alias
-                            .as_ref()
-                            .map(|alias| self.identity(alias.declaration)),
-                        None,
-                        false,
-                        types.iter().map(Rc::downgrade).collect(),
-                        false,
-                        None,
-                    )
+                    let name = alias.unwrap_or_else(|| Rc::from("intersection"));
+                    self.intersection(&types, name, source_alias.clone())?
                 }
             }
             Some(K::ArrayType) => {
@@ -857,7 +931,11 @@ impl Construction {
                 )?;
                 let index =
                     self.type_node(data.index_type().ok_or(Error::ResolutionFailed)?, env, None)?;
-                self.indexed_access(object, index)?
+                let alias = match source_alias.clone() {
+                    Some(alias) => Some(alias),
+                    None => self.alias_metadata(node, env, alias)?,
+                };
+                self.indexed_access_with_alias(object, index, alias)?
             }
             Some(K::TypeQuery) => self.type_query(node, env)?,
             Some(K::ThisType) => self.this_type(node)?,

@@ -353,6 +353,353 @@ impl Construction {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.createTupleTargetType
+    // port: tsc/internal/checker/checker.go:Checker.getIntersectionTypeEx
+    /// `getIntersectionType`, without the reductions that call back into
+    /// relations: each of those is refused by name rather than skipped, because
+    /// skipping one would change both the result and the construction counts.
+    #[allow(clippy::needless_pass_by_value)] // The name is stored on the result.
+    pub(super) fn intersection(
+        self: &Rc<Self>,
+        types: &[Rc<TypeCell>],
+        name: Rc<str>,
+        alias: Option<Alias>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        let mut set = Vec::with_capacity(types.len());
+        let mut includes = 0;
+        self.add_types_to_intersection(&mut set, &mut includes, types)?;
+        let strict = self.input.options().strict_null_checks;
+        // An intersection is empty if it holds never, two distinct unit types,
+        // an object and a nullable type, or types from two disjoint domains.
+        if includes & tf::NEVER != 0 {
+            return self.builtin(tf::NEVER);
+        }
+        let disjoint = |domain: u32| {
+            includes & domain != 0 && includes & (tf::DISJOINT_DOMAINS & !domain) != 0
+        };
+        if strict
+            && includes & tf::NULLABLE != 0
+            && includes & (tf::OBJECT | tf::NON_PRIMITIVE | tf::INCLUDES_EMPTY_OBJECT) != 0
+            || disjoint(tf::NON_PRIMITIVE)
+            || disjoint(tf::STRING_LIKE)
+            || disjoint(tf::NUMBER_LIKE)
+            || disjoint(tf::BIG_INT_LIKE)
+            || disjoint(tf::ES_SYMBOL_LIKE)
+            || disjoint(tf::VOID_LIKE)
+        {
+            return self.builtin(tf::NEVER);
+        }
+        if includes & (tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0
+            && includes & tf::STRING_LITERAL != 0
+        {
+            return missing("intersection of string literals with template patterns");
+        }
+        if includes & tf::ANY != 0 {
+            if includes & tf::INCLUDES_WILDCARD != 0 {
+                return self.initialization.named("wildcardType");
+            }
+            return self.builtin(tf::ANY);
+        }
+        if !strict && includes & tf::NULLABLE != 0 {
+            if includes & tf::INCLUDES_EMPTY_OBJECT != 0 {
+                return self.builtin(tf::NEVER);
+            }
+            if includes & tf::UNDEFINED != 0 {
+                return self.builtin(tf::UNDEFINED);
+            }
+            return self.builtin(tf::NULL);
+        }
+        if includes & tf::STRING != 0
+            && includes & (tf::STRING_LITERAL | tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0
+            || includes & tf::NUMBER != 0 && includes & tf::NUMBER_LITERAL != 0
+            || includes & tf::BIG_INT != 0 && includes & tf::BIG_INT_LITERAL != 0
+            || includes & tf::ES_SYMBOL != 0 && includes & tf::UNIQUE_ES_SYMBOL != 0
+            || includes & tf::VOID != 0 && includes & tf::UNDEFINED != 0
+            || includes & tf::INCLUDES_EMPTY_OBJECT != 0
+                && includes & tf::DEFINITELY_NON_NULLABLE != 0
+        {
+            self.remove_redundant_supertypes(&mut set, includes);
+        }
+        match set.as_slice() {
+            [] => return self.builtin(tf::UNKNOWN),
+            [only] => return Ok(only.clone()),
+            _ => {}
+        }
+        if set.len() == 2 {
+            // A type variable intersected with a primitive, the object type or
+            // `{}` reduces through the variable's base constraint, which is a
+            // relation-driven reduction the reference does not model.
+            let index = usize::from(set[0].flags & tf::TYPE_VARIABLE == 0);
+            let variable = &set[index];
+            let other = &set[1 - index];
+            if variable.flags & tf::TYPE_VARIABLE != 0
+                && (other.flags & (tf::PRIMITIVE | tf::NON_PRIMITIVE) != 0
+                    || includes & tf::INCLUDES_EMPTY_OBJECT != 0)
+            {
+                // The reduction only applies when the variable has a base
+                // constraint composed of primitive types, the object type or
+                // `{}`; deciding it then needs the subtype relation, which the
+                // reference does not run during construction. An unconstrained
+                // variable (or one constrained otherwise) falls through to the
+                // ordinary intersection, as upstream does.
+                let constraint = Self::base_constraint(variable)?;
+                let reduces = constraint.is_some_and(|constraint| {
+                    let constituents = if constraint.flags & tf::UNION != 0 {
+                        constraint.types().unwrap_or_default()
+                    } else {
+                        vec![constraint]
+                    };
+                    constituents.iter().all(|ty| {
+                        ty.flags & (tf::PRIMITIVE | tf::NON_PRIMITIVE) != 0
+                            || self.is_empty_anonymous_object(ty)
+                    })
+                });
+                if reduces {
+                    return missing("intersection of a constrained type variable with a primitive");
+                }
+            }
+        }
+        let key = (
+            set.iter().map(|ty| ty.id()).collect::<Vec<_>>(),
+            alias
+                .as_ref()
+                .map(|alias| -> Result<_, Error> {
+                    Ok((
+                        self.identity(alias.declaration),
+                        alias
+                            .arguments
+                            .iter()
+                            .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
+                            .collect::<Result<Vec<_>, _>>()?,
+                    ))
+                })
+                .transpose()?,
+        );
+        if let Some(cached) = self.intersections.borrow().get(&key) {
+            return Ok(cached.clone());
+        }
+        let result = if includes & tf::UNION != 0 {
+            self.intersection_over_unions(&set, types.len(), name.clone(), alias.clone())?
+        } else {
+            self.checker.graph.allocate_full(
+                tf::INTERSECTION,
+                0,
+                name,
+                None,
+                alias.as_ref().map(|alias| self.identity(alias.declaration)),
+                None,
+                false,
+                set.iter().map(Rc::downgrade).collect(),
+                false,
+                None,
+            )
+        };
+        self.intersections.borrow_mut().insert(key, result.clone());
+        Ok(result)
+    }
+
+    /// `X & (A | B)` becomes `X & A | X & B`. Upstream first merges two or more
+    /// unions of primitive types, then peels a shared `undefined` or `null`,
+    /// then splits three or more constituents in half, and otherwise takes the
+    /// cross product.
+    fn intersection_over_unions(
+        self: &Rc<Self>,
+        set: &[Rc<TypeCell>],
+        inputs: usize,
+        name: Rc<str>,
+        alias: Option<Alias>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        if set
+            .iter()
+            .filter(|ty| ty.object_flags & of::PRIMITIVE_UNION != 0)
+            .count()
+            > 1
+        {
+            return missing("intersection of two unions of primitive types");
+        }
+        let nullable_split = |flag: u32| {
+            set.iter().all(|ty| {
+                ty.flags & tf::UNION != 0
+                    && ty
+                        .types()
+                        .is_ok_and(|parts| parts.iter().any(|part| part.flags & flag != 0))
+            })
+        };
+        for flag in [tf::UNDEFINED, tf::NULL] {
+            if nullable_split(flag) {
+                let mut rest = Vec::with_capacity(set.len());
+                for ty in set {
+                    let kept = ty
+                        .types()?
+                        .into_iter()
+                        .filter(|part| part.flags & flag == 0)
+                        .collect::<Vec<_>>();
+                    rest.push(self.checker.graph.union(&kept)?);
+                }
+                let intersection = self.intersection(&rest, name, None)?;
+                let nullable = self.builtin(flag)?;
+                return self.union_with_alias(&[intersection, nullable], alias);
+            }
+        }
+        if set.len() >= 3 && inputs > 2 {
+            let middle = set.len() / 2;
+            let left = self.intersection(&set[..middle], name.clone(), None)?;
+            let right = self.intersection(&set[middle..], name.clone(), None)?;
+            return self.intersection(&[left, right], name, alias);
+        }
+        let size = set
+            .iter()
+            .try_fold(1usize, |size, ty| -> Result<usize, Error> {
+                Ok(if ty.flags & tf::UNION != 0 {
+                    size.saturating_mul(ty.types()?.len())
+                } else {
+                    size
+                })
+            })?;
+        if size >= 100_000 {
+            return missing("intersection cross product size limit");
+        }
+        let mut constituents = Vec::new();
+        for index in 0..size {
+            let mut combination = set.to_vec();
+            let mut remaining = index;
+            for (position, ty) in set.iter().enumerate().rev() {
+                if ty.flags & tf::UNION != 0 {
+                    let parts = ty.types()?;
+                    combination[position] = parts[remaining % parts.len()].clone();
+                    remaining /= parts.len();
+                }
+            }
+            let ty = self.intersection(&combination, name.clone(), None)?;
+            if ty.flags & tf::NEVER == 0 {
+                constituents.push(ty);
+            }
+        }
+        self.union_with_alias(&constituents, alias)
+    }
+
+    fn union_with_alias(
+        self: &Rc<Self>,
+        types: &[Rc<TypeCell>],
+        alias: Option<Alias>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        match alias {
+            Some(alias) => {
+                let arguments = alias
+                    .arguments
+                    .iter()
+                    .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
+                    .collect::<Result<Vec<_>, _>>()?;
+                self.checker.graph.union_named_arguments(
+                    types,
+                    self.identity(alias.declaration),
+                    &alias.name,
+                    &arguments,
+                )
+            }
+            None => self.checker.graph.union(types),
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.addTypeToIntersection
+    fn add_types_to_intersection(
+        self: &Rc<Self>,
+        set: &mut Vec<Rc<TypeCell>>,
+        includes: &mut u32,
+        types: &[Rc<TypeCell>],
+    ) -> Result<(), Error> {
+        for ty in types {
+            let ty = crate::regular_form(ty);
+            if ty.flags & tf::INTERSECTION != 0 {
+                self.add_types_to_intersection(set, includes, &ty.types()?)?;
+                continue;
+            }
+            if self.is_empty_anonymous_object(&ty) {
+                if *includes & tf::INCLUDES_EMPTY_OBJECT == 0 {
+                    *includes |= tf::INCLUDES_EMPTY_OBJECT;
+                    set.push(ty);
+                }
+                continue;
+            }
+            if ty.flags & tf::ANY_OR_UNKNOWN != 0 {
+                if self
+                    .initialization
+                    .named
+                    .borrow()
+                    .get("wildcardType")
+                    .is_some_and(|wildcard| Rc::ptr_eq(wildcard, &ty))
+                {
+                    *includes |= tf::INCLUDES_WILDCARD;
+                }
+            } else if (self.input.options().strict_null_checks || ty.flags & tf::NULLABLE == 0)
+                && !set.iter().any(|seen| Rc::ptr_eq(seen, &ty))
+            {
+                // Two distinct unit types empty the intersection.
+                if ty.flags & tf::UNIT != 0 && *includes & tf::UNIT != 0 {
+                    *includes |= tf::NON_PRIMITIVE;
+                }
+                set.push(ty.clone());
+            }
+            *includes |= ty.flags & tf::INCLUDES_MASK;
+        }
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.removeRedundantSupertypes
+    fn remove_redundant_supertypes(&self, set: &mut Vec<Rc<TypeCell>>, includes: u32) {
+        let mut index = set.len();
+        while index > 0 {
+            index -= 1;
+            let ty = &set[index];
+            let remove = ty.flags & tf::STRING != 0
+                && includes & (tf::STRING_LITERAL | tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0
+                || ty.flags & tf::NUMBER != 0 && includes & tf::NUMBER_LITERAL != 0
+                || ty.flags & tf::BIG_INT != 0 && includes & tf::BIG_INT_LITERAL != 0
+                || ty.flags & tf::ES_SYMBOL != 0 && includes & tf::UNIQUE_ES_SYMBOL != 0
+                || ty.flags & tf::VOID != 0 && includes & tf::UNDEFINED != 0
+                || self.is_empty_anonymous_object(ty)
+                    && includes & tf::DEFINITELY_NON_NULLABLE != 0;
+            if remove {
+                set.remove(index);
+            }
+        }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getBaseConstraintOfType
+    /// The base constraint of a type parameter, following a chain of type
+    /// parameters. Other instantiable kinds compute theirs through paths the
+    /// reference refuses elsewhere, so they report none here.
+    fn base_constraint(ty: &Rc<TypeCell>) -> Result<Option<Rc<TypeCell>>, Error> {
+        let mut current = ty.clone();
+        for _ in 0..100 {
+            if current.flags & tf::TYPE_PARAMETER == 0 {
+                return Ok(Some(current));
+            }
+            let Some(constraint) = current
+                .type_parameter_shape()
+                .map(crate::TypeParameterShape::constraint)
+                .transpose()?
+                .flatten()
+            else {
+                return Ok(None);
+            };
+            if Rc::ptr_eq(&constraint, &current) {
+                return Ok(None);
+            }
+            current = constraint;
+        }
+        missing("circular base constraint")
+    }
+
+    /// `IsEmptyAnonymousObjectType`, which never resolves members: the shared
+    /// empty type literal is the only such type the reference builds.
+    fn is_empty_anonymous_object(&self, ty: &Rc<TypeCell>) -> bool {
+        self.initialization
+            .named
+            .borrow()
+            .get("emptyTypeLiteralType")
+            .is_some_and(|empty| Rc::ptr_eq(empty, ty))
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.createTupleTypeEx
     pub(super) fn create_tuple_type(
         self: &Rc<Self>,

@@ -221,40 +221,92 @@ impl Construction {
             .map(|node| self.type_node(node, &Environment::default(), None))
             .transpose()?;
         let template = self.type_node(template_node, &Environment::default(), None)?;
-        let modifier_type = if let Some(operator) = self
+        // getTemplateTypeFromMappedType: a `?` (or `+?`) modifier makes the
+        // template itself optional, once, so every property instantiates the
+        // union `X | undefined` rather than gaining `undefined` afterwards.
+        let includes_optional = match data.question_token() {
+            Some(token) => self.input.node(token)?.kind() != K::MinusToken,
+            None => false,
+        };
+        let template = if includes_optional && self.input.options().strict_null_checks {
+            let undefined = self.builtin(tf::UNDEFINED)?;
+            let already = Rc::ptr_eq(&template, &undefined)
+                || template.flags & tf::UNION != 0
+                    && template
+                        .types()?
+                        .first()
+                        .is_some_and(|first| Rc::ptr_eq(first, &undefined));
+            if already {
+                template
+            } else {
+                self.checker.graph.union(&[template, undefined])?
+            }
+        } else {
+            template
+        };
+        // port: tsc/internal/checker/checker.go:Checker.getModifiersTypeFromMappedType
+        let keyof_operand = self
             .input
             .node(constraint_node)?
             .data_source()
             .as_type_operator_node()
-        {
-            if operator.operator() == K::KeyOfKeyword {
-                Some(self.type_node(
-                    operator.r#type().ok_or(Error::ResolutionFailed)?,
-                    env,
-                    None,
-                )?)
+            .filter(|operator| operator.operator() == K::KeyOfKeyword)
+            .map(|operator| operator.r#type().ok_or(Error::ResolutionFailed))
+            .transpose()?;
+        let modifier_type = if let Some(operand) = keyof_operand {
+            // A `keyof T` constraint declaration: the modifiers type is T.
+            Some(self.type_node(operand, env, None)?)
+        } else {
+            // Otherwise the declared constraint, through a type parameter's own
+            // constraint: `P in K` with `K extends keyof T` also has modifiers
+            // type T. Anything else has none (`unknown` upstream).
+            let declared = self
+                .type_parameter(parameter)?
+                .type_parameter_shape()
+                .ok_or(Error::ResolutionFailed)?
+                .constraint()?;
+            let extended = match declared {
+                Some(constraint) if constraint.flags & tf::TYPE_PARAMETER != 0 => constraint
+                    .type_parameter_shape()
+                    .map(crate::TypeParameterShape::constraint)
+                    .transpose()?
+                    .flatten(),
+                other => other,
+            };
+            match extended {
+                Some(index) if index.flags & tf::INDEX != 0 => {
+                    let target = index
+                        .types()?
+                        .into_iter()
+                        .next()
+                        .ok_or(Error::ResolutionFailed)?;
+                    Some(match &env.1 {
+                        Some(mapper) => self.instantiate(&target, mapper, None)?,
+                        None => target,
+                    })
+                }
+                _ => None,
+            }
+        };
+        // Only a `keyof T` constraint declaration takes its keys from the
+        // modifiers type; otherwise they come from the constraint itself.
+        let keys =
+            if let Some(modifiers) = modifier_type.as_ref().filter(|_| keyof_operand.is_some()) {
+                let structure = modifiers.structure(&self.checker.graph)?;
+                let mut keys = structure
+                    .members
+                    .iter()
+                    .map(|member| self.mapped_property_key(member))
+                    .collect::<Result<Vec<_>, _>>()?;
+                for index in &structure.index_infos {
+                    keys.push(index.key()?);
+                }
+                keys
+            } else if constraint_type.flags & tf::UNION != 0 {
+                constraint_type.types()?
             } else {
-                None
-            }
-        } else {
-            None
-        };
-        let keys = if let Some(modifiers) = &modifier_type {
-            let structure = modifiers.structure(&self.checker.graph)?;
-            let mut keys = structure
-                .members
-                .iter()
-                .map(|member| self.mapped_property_key(member))
-                .collect::<Result<Vec<_>, _>>()?;
-            for index in &structure.index_infos {
-                keys.push(index.key()?);
-            }
-            keys
-        } else if constraint_type.flags & tf::UNION != 0 {
-            constraint_type.types()?
-        } else {
-            vec![constraint_type]
-        };
+                vec![constraint_type]
+            };
         let mut structure = Structure::default();
         for key in keys {
             if key.flags & tf::NEVER != 0 {
@@ -335,7 +387,16 @@ impl Construction {
                         None,
                     )?;
                     if state.input.options().strict_null_checks {
-                        if optional {
+                        // An optional property gains `undefined` only when its
+                        // type cannot already be undefined or void.
+                        let maybe_undefined = if ty.flags & tf::UNION != 0 {
+                            ty.types()?
+                                .iter()
+                                .any(|part| part.flags & (tf::UNDEFINED | tf::VOID) != 0)
+                        } else {
+                            ty.flags & (tf::UNDEFINED | tf::VOID) != 0
+                        };
+                        if optional && !maybe_undefined {
                             ty = state
                                 .checker
                                 .graph
@@ -406,6 +467,14 @@ impl Construction {
                 .insert(operand.id(), Rc::downgrade(&result));
             return Ok(result);
         }
+        // getIndexTypeEx: `keyof unknown` is never, and `keyof any` and
+        // `keyof never` are the shared `string | number | symbol`.
+        if operand.flags & tf::UNKNOWN != 0 {
+            return self.builtin(tf::NEVER);
+        }
+        if operand.flags & (tf::ANY | tf::NEVER) != 0 {
+            return self.initialization.named("stringNumberSymbolType");
+        }
         if operand.flags & tf::OBJECT == 0 {
             return missing("keyof nonobject");
         }
@@ -428,6 +497,18 @@ impl Construction {
         self: &Rc<Self>,
         object: Rc<TypeCell>,
         index: Rc<TypeCell>,
+    ) -> Result<Rc<TypeCell>, Error> {
+        self.indexed_access_with_alias(object, index, None)
+    }
+
+    /// `alias` names the union a distributed access builds, as
+    /// `getUnionTypeEx(propTypes, UnionReductionLiteral, alias, nil)` does.
+    #[allow(clippy::needless_pass_by_value)]
+    pub(super) fn indexed_access_with_alias(
+        self: &Rc<Self>,
+        object: Rc<TypeCell>,
+        index: Rc<TypeCell>,
+        alias: Option<instantiate::Alias>,
     ) -> Result<Rc<TypeCell>, Error> {
         if object.flags & (tf::TYPE_PARAMETER | tf::INDEXED_ACCESS | tf::CONDITIONAL) != 0
             || index.flags & (tf::TYPE_PARAMETER | tf::INDEX) != 0
@@ -501,13 +582,28 @@ impl Construction {
                 }
             }
         }
-        if index.flags & tf::UNION != 0 {
+        if index.flags & tf::UNION != 0 && index.flags & tf::BOOLEAN == 0 {
             let results = index
                 .types()?
                 .into_iter()
                 .map(|index| self.indexed_access(object.clone(), index))
                 .collect::<Result<Vec<_>, _>>()?;
-            return self.checker.graph.union(&results);
+            return match alias {
+                Some(alias) => {
+                    let arguments = alias
+                        .arguments
+                        .iter()
+                        .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    self.checker.graph.union_named_arguments(
+                        &results,
+                        self.identity(alias.declaration),
+                        &alias.name,
+                        &arguments,
+                    )
+                }
+                None => self.checker.graph.union(&results),
+            };
         }
         let name = match index.literal.as_ref() {
             Some(LiteralValue::String(bytes)) => String::from_utf8(bytes.clone())

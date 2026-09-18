@@ -8,6 +8,21 @@ use super::{
 };
 use crate::tuples::element_flags as ef;
 
+/// One `infer` parameter's candidates, kept apart by the variance of the
+/// position each was found in (`InferenceInfo.candidates`/`contraCandidates`).
+#[derive(Clone, Default)]
+struct Candidates {
+    covariant: Vec<Rc<TypeCell>>,
+    contra: Vec<Rc<TypeCell>>,
+}
+
+/// `InferenceState.contravariant` and `.bivariant`.
+#[derive(Clone, Copy, Default)]
+struct Variance {
+    contravariant: bool,
+    bivariant: bool,
+}
+
 struct Root {
     node: NodeId,
     check: Weak<TypeCell>,
@@ -317,7 +332,7 @@ impl Construction {
                     .iter()
                     .map(|(_, ty)| ty.upgrade().ok_or(Error::Released))
                     .collect::<Result<Vec<_>, _>>()?;
-                let mut candidates = vec![Vec::new(); parameters.len()];
+                let mut candidates = vec![Candidates::default(); parameters.len()];
                 if !check_deferred {
                     self.infer_conditional_types(
                         root.node,
@@ -325,12 +340,23 @@ impl Construction {
                         &extends,
                         &parameters,
                         &mut candidates,
+                        Variance::default(),
                     )?;
                 }
                 let mut inferred = Vec::new();
                 for (parameter, candidates) in parameters.iter().zip(candidates) {
+                    // getTypeFromInference: covariant candidates first, then a
+                    // contravariant intersection, then the constraint.
+                    let contra = candidates.covariant.is_empty() && !candidates.contra.is_empty();
+                    let candidates = if contra {
+                        candidates.contra
+                    } else {
+                        candidates.covariant
+                    };
                     let ty = if candidates.len() == 1 {
                         candidates[0].clone()
+                    } else if contra {
+                        self.intersection(&candidates, "intersection".into(), None)?
                     } else if candidates.is_empty() {
                         parameter
                             .type_parameter_shape()
@@ -669,17 +695,25 @@ impl Construction {
         source: &Rc<TypeCell>,
         target: &Rc<TypeCell>,
         parameters: &[Rc<TypeCell>],
-        candidates: &mut [Vec<Rc<TypeCell>>],
+        candidates: &mut [Candidates],
+        variance: Variance,
     ) -> Result<(), Error> {
         if let Some(index) = parameters
             .iter()
             .position(|parameter| Rc::ptr_eq(parameter, target))
         {
-            if !candidates[index]
+            // A candidate found in a purely contravariant position is kept
+            // apart, as upstream's `contraCandidates` are.
+            let candidates = if variance.contravariant && !variance.bivariant {
+                &mut candidates[index].contra
+            } else {
+                &mut candidates[index].covariant
+            };
+            if !candidates
                 .iter()
                 .any(|candidate| Rc::ptr_eq(candidate, source))
             {
-                candidates[index].push(source.clone());
+                candidates.push(source.clone());
             }
             return Ok(());
         }
@@ -703,7 +737,7 @@ impl Construction {
                         return missing("conditional contravariant inference candidates");
                     }
                     self.infer_conditional_types(
-                        location, source, &target, parameters, candidates,
+                        location, source, &target, parameters, candidates, variance,
                     )?;
                 }
                 return Ok(());
@@ -724,6 +758,7 @@ impl Construction {
                         &property.r#type()?,
                         parameters,
                         candidates,
+                        variance,
                     )?;
                 }
             }
@@ -735,7 +770,9 @@ impl Construction {
             let source_signatures = &source.call_signatures[source.call_signatures.len() - count..];
             let target_signatures = &target.call_signatures[target.call_signatures.len() - count..];
             for (source, target) in source_signatures.iter().zip(target_signatures) {
-                self.infer_from_signature(location, source, target, parameters, candidates)?;
+                self.infer_from_signature(
+                    location, source, target, parameters, candidates, variance,
+                )?;
             }
         }
         Ok(())
@@ -752,11 +789,17 @@ impl Construction {
         source: &crate::Signature,
         target: &crate::Signature,
         parameters: &[Rc<TypeCell>],
-        candidates: &mut [Vec<Rc<TypeCell>>],
+        candidates: &mut [Candidates],
+        variance: Variance,
     ) -> Result<(), Error> {
         if source.generic.is_some() || target.generic.is_some() {
             return missing("conditional inference between generic signatures");
         }
+        // Once inference descends into a bivariant signature it stays bivariant.
+        let parameter_variance = Variance {
+            contravariant: !variance.contravariant,
+            bivariant: variance.bivariant || target.bivariant_parameters,
+        };
         if source.this_type.is_some() && target.this_type.is_some() {
             return missing("conditional inference of this types");
         }
@@ -773,28 +816,43 @@ impl Construction {
             if source.has_rest_parameter && index + 1 >= source_count {
                 return missing("conditional inference from a source rest parameter");
             }
-            source.parameters[index].resolve()?;
+            let source_type = source.parameters[index].resolve()?;
             let target_type = target.parameters[index].resolve()?;
-            if self.could_contain_type_variables(&target_type)? {
-                return missing("conditional contravariant inference candidates");
-            }
+            // A conditional's inferences are always made with strict function
+            // types, so a parameter position always flips variance.
+            self.infer_conditional_types(
+                location,
+                &source_type,
+                &target_type,
+                parameters,
+                candidates,
+                parameter_variance,
+            )?;
         }
         if target.has_rest_parameter {
-            self.rest_type_at_position(location, source, paired)?;
+            let source_rest = self.rest_type_at_position(location, source, paired)?;
             let rest = target.parameters[target_count - 1].resolve()?;
-            // getEffectiveRestType: `any` stands for any[]; neither holds a
-            // type variable.
-            if rest.flags & tf::ANY == 0 && self.could_contain_type_variables(&rest)? {
-                return missing("conditional contravariant inference candidates");
+            // getEffectiveRestType: `any` stands for `any[]` and holds no
+            // type variable, so it collects no candidate.
+            if rest.flags & tf::ANY == 0 {
+                self.infer_conditional_types(
+                    location,
+                    &source_rest,
+                    &rest,
+                    parameters,
+                    candidates,
+                    parameter_variance,
+                )?;
             }
         }
-        // applyToReturnTypes
+        // applyToReturnTypes keeps the current variance.
         self.infer_conditional_types(
             location,
             &source.return_type.resolve()?,
             &target.return_type.resolve()?,
             parameters,
             candidates,
+            variance,
         )
     }
 

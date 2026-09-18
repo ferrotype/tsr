@@ -192,29 +192,75 @@ That is the comparator's rule, not the frozen contract's wording.
 - `an_unaliased_empty_type_literal_is_the_shared_empty_type`,
   `type_flags_match_the_pinned_enumeration`, and the three tests from the
   earlier fixes.
+- For this pass: `an_optional_mapped_type_makes_its_template_optional_once`,
+  `mapped_modifiers_come_through_a_constrained_key_parameter`,
+  `keyof_any_and_unknown_follow_the_pinned_results`,
+  `an_intersection_reduces_over_unions_disjoint_domains_and_supertypes` and
+  `a_contravariant_position_infers_its_own_candidate`. 64 unit tests in all.
 
 Lib-dependent rules (Promise, tuples, `NonNullable`) are covered by the frozen
 fixtures, not by unit tests: the unit fixtures bind without the default library.
 
 ## Beyond the frozen inventory (development check, not evidence)
 
-Sixteen further programs were run through both implementations and compared
-group by group: 60 of 80 groups agree exactly. Own conditional and mapped types,
-two-parameter and callback generics, contravariance, optional and rest tuples,
-array-holding generics, `Promise<'x'>` against `Promise<string>`, `Record`,
-`Exclude` and `Build<3>` against a concrete tuple all match. The rest:
+Twenty-six programs outside the inventory were run through both
+implementations and compared group by group (`extra.py` in the session
+scratchpad; the frozen 105 remain the only evidence). **105 of 130 groups agree
+exactly**, and no disagreement is silent: every remaining one is a named
+refusal. Own conditional and mapped types, two-parameter and callback generics,
+contravariance, optional and rest tuples, array-holding generics,
+`Promise<'x'>` against `Promise<string>`, and `Partial`, `Pick`, `Record`,
+`Required`, `Readonly`, `NonNullable`, `ReturnType`, `keyof`, a distributed
+indexed access, `Build<3>` and the modifier-carrying `Pick` all match.
 
-| program | state |
+Closed in this pass (each had been a silent drift, which the frozen contract
+forbids as much as a wrong result):
+
+- `getTemplateTypeFromMappedType` applies a mapped type's `?` modifier to the
+  template once, so a property instantiates `X | undefined` rather than gaining
+  `undefined` afterwards, and `getTypeOfMappedSymbol` adds nothing when the
+  property type can already be undefined or void (`Partial`).
+- `getConstraintOfTypeParameter` resolves the base constraint behind a declared
+  constraint, which is where `keyof T` is created for `P in K` with
+  `K extends keyof T`, and `getModifiersTypeFromMappedType` finds the modifiers
+  type through that constraint, while the keys still come from the constraint
+  itself (`Pick`).
+- `getIndexTypeEx`: `keyof unknown` is `never` and `keyof any` is the shared
+  `string | number | symbol` (`Record`).
+- A distributed indexed access passes its alias to the union it builds
+  (`getUnionTypeEx(propTypes, ..., alias, nil)`), and a boolean index is not
+  distributed.
+- `getIntersectionType` is ported: flattening with the `includes` mask, the
+  never/nullable/disjoint-domain/any reductions, `removeRedundantSupertypes`,
+  the shared empty type literal, the intersection cache, and union
+  distribution (paired nullable peeling, divide and conquer, cross product).
+  Both the intersection type node and instantiation now go through it
+  (`NonNullable`). The reductions that call back into relations, and two or
+  more unions of primitive types, are refused by name.
+- Contravariant inference candidates: a conditional's inference now carries
+  upstream's `contravariant`/`bivariant` state, keeps `contraCandidates` apart
+  and resolves through `getTypeFromInference`, so an `infer` parameter in a
+  parameter position collects its own candidate.
+
+What still refuses, by name, one program each:
+
+| program | named refusal |
 | --- | --- |
-| `Awaited<Promise<string>>` | named unsupported: intersection normalization after instantiation |
-| `Parameters<typeof f>` | named unsupported: conditional contravariant inference candidates |
-| `Partial<{...}>` | silent drift: first relation 99/4/14 against 100/4/16 |
-| `Pick<{...}, 'x' \| 'y'>` | silent drift: lookup one type short (98 against 99), first relation 11 against 12 instantiations |
+| `Awaited<Promise<string>>` | generic signature inference through compound types |
+| `Parameters<typeof f>` | implicit `unknown[]` constraint of an infer parameter in a rest position |
+| `Extract<'a' \| 'b' \| 1, string>` | substitution type in a conditional true branch |
+| `Omit<{...}, 'y'>` | base constraint of an indexed access or conditional type |
+| `G<T> = { [K in keyof T as ...]: ... }` | mapped nonliteral key/index signature |
 
-The two drifts are the ones to take next, because nothing refuses them: they
-are homomorphic mapped types whose constraint is a type parameter constrained to
-`keyof T` and mapped modifiers, a path the frozen `mapped-conditional-infer`
-fixture does not take.
+The two the owner asked for moved but did not close. `Awaited` needed
+`getIntersectionType`, which is now ported, and now stops at inference through
+an intersection's members. `Parameters` needed contravariant candidates, which
+are now ported, and now stops at `getInferredTypeParameterConstraint`: an
+`infer P` in a rest position is implicitly constrained to `unknown[]`, which
+creates an array type during lookup. That rule is refused precisely where it
+would produce a constraint, so `Promise<infer U>` and the other frozen infer
+forms are unaffected. `Extract` needs substitution types, which remain a named
+unsupported kind.
 
 ## Known differences that do not affect the comparison
 

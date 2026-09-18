@@ -73,13 +73,29 @@ pub struct TypeParameterShape {
     original: Option<Weak<TypeCell>>,
     /// `in` = 1, `out` = 2; zero means infer variance from marker relations.
     pub modifiers: u8,
+    /// Whether the base-constraint chain behind the constraint was walked.
+    base_constraint_resolved: Cell<bool>,
 }
 impl TypeParameterShape {
     pub(crate) fn has_declared_constraint(&self) -> bool {
         self.constraint.is_some()
     }
+    // port: tsc/internal/checker/checker.go:Checker.getConstraintOfTypeParameter
+    /// The declared constraint. The first request also resolves the base
+    /// constraint behind it, as `hasNonCircularBaseConstraint` does: for
+    /// `P in K` with `K extends keyof T` that is where `keyof T` is created.
     pub fn constraint(&self) -> Result<Option<Rc<TypeCell>>, Error> {
-        self.constraint.as_ref().map(TypeLink::resolve).transpose()
+        let constraint = self
+            .constraint
+            .as_ref()
+            .map(TypeLink::resolve)
+            .transpose()?;
+        if let Some(constraint) = &constraint {
+            if !self.base_constraint_resolved.replace(true) {
+                resolve_base_constraint(constraint)?;
+            }
+        }
+        Ok(constraint)
     }
     pub fn original(&self) -> Result<Option<Rc<TypeCell>>, Error> {
         self.original
@@ -87,6 +103,32 @@ impl TypeParameterShape {
             .map(|t| t.upgrade().ok_or(Error::Released))
             .transpose()
     }
+}
+
+// port: tsc/internal/checker/checker.go:Checker.computeBaseConstraint
+/// The resolution the base-constraint computation performs, for the kinds the
+/// reference carries: a type parameter's own constraint (transitively, through
+/// `constraint`, whose flag also ends a circular chain) and the constituents of
+/// a union or intersection. An index type's base constraint is the key union
+/// and an object or primitive is its own. Kinds whose base constraint builds new
+/// types are refused by name.
+fn resolve_base_constraint(ty: &Rc<TypeCell>) -> Result<(), Error> {
+    if ty.flags & flags::TYPE_PARAMETER != 0 {
+        if let Some(shape) = ty.type_parameter_shape() {
+            shape.constraint()?;
+        }
+        return Ok(());
+    }
+    if ty.flags & (flags::UNION | flags::INTERSECTION) != 0 {
+        for constituent in ty.types()? {
+            resolve_base_constraint(&constituent)?;
+        }
+        return Ok(());
+    }
+    if ty.flags & (flags::INDEXED_ACCESS | flags::CONDITIONAL) != 0 {
+        return unsupported("base constraint of an indexed access or conditional type");
+    }
+    Ok(())
 }
 
 impl Graph {
@@ -192,6 +234,7 @@ impl TypeCell {
                 constraint: constraint.map(|t| Rc::downgrade(t).into()),
                 original: original.map(Rc::downgrade),
                 modifiers,
+                base_constraint_resolved: Cell::new(false),
             })
             .map_err(|_| Error::Unsupported(Rc::from("type parameter metadata already set")))
     }
@@ -206,6 +249,7 @@ impl TypeCell {
                 constraint,
                 original: original.map(Rc::downgrade),
                 modifiers,
+                base_constraint_resolved: Cell::new(false),
             })
             .map_err(|_| Error::Unsupported(Rc::from("type parameter metadata already set")))
     }

@@ -137,6 +137,30 @@ pub mod flags {
         | TEMPLATE_LITERAL
         | STRING_MAPPING;
     pub const INSTANTIABLE_PRIMITIVE: u32 = INDEX | TEMPLATE_LITERAL | STRING_MAPPING;
+    /// `TypeFlagsTypeVariable`.
+    pub const TYPE_VARIABLE: u32 = TYPE_PARAMETER | INDEXED_ACCESS;
+    pub const DISJOINT_DOMAINS: u32 = NON_PRIMITIVE
+        | STRING_LIKE
+        | NUMBER_LIKE
+        | BIG_INT_LIKE
+        | BOOLEAN_LIKE
+        | ES_SYMBOL_LIKE
+        | VOID_LIKE
+        | NULL;
+    /// The flags an intersection's `includes` mask carries over from a member.
+    pub const INCLUDES_MASK: u32 = ANY
+        | UNKNOWN
+        | PRIMITIVE
+        | NEVER
+        | OBJECT
+        | UNION
+        | INTERSECTION
+        | NON_PRIMITIVE
+        | TEMPLATE_LITERAL
+        | STRING_MAPPING;
+    /// Pseudo-flags an `includes` mask borrows from unused bits, as upstream does.
+    pub const INCLUDES_EMPTY_OBJECT: u32 = CONDITIONAL;
+    pub const INCLUDES_WILDCARD: u32 = INDEXED_ACCESS;
     pub const STRUCTURED_OR_INSTANTIABLE: u32 = STRUCTURED_TYPE | INSTANTIABLE;
     /// `TypeFlagsSingleton`: identical flags mean identical types.
     pub const SINGLETON: u32 = ANY
@@ -1283,7 +1307,7 @@ impl Checker {
     }
 }
 
-fn regular_form(cell: &Rc<TypeCell>) -> Rc<TypeCell> {
+pub(crate) fn regular_form(cell: &Rc<TypeCell>) -> Rc<TypeCell> {
     if cell.fresh {
         if let Some(regular) = cell.alternate() {
             return regular;

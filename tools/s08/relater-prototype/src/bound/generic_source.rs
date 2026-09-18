@@ -303,7 +303,104 @@ impl Construction {
         });
         ty.set_lazy_type_parameter(constraint, None, 0)?;
         self.record_type_parameter(&ty, node);
+        self.reject_inferred_constraint(node)?;
         Ok(ty)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.getInferredTypeParameterConstraint
+    /// An `infer P` declaration in certain positions gains an implicit
+    /// constraint: `unknown[]` in a rest position, `string` in a template span,
+    /// `string | number | symbol` as a mapped type's parameter, and the
+    /// referenced parameter's constraint inside a type reference. The reference
+    /// does not model those, so it refuses where one would be produced rather
+    /// than resolving the parameter unconstrained.
+    fn reject_inferred_constraint(self: &Rc<Self>, node: NodeId) -> Result<(), Error> {
+        let read = self.input.node(node)?;
+        let Some(infer) = read.parent() else {
+            return Ok(());
+        };
+        if self.input.node(infer)?.kind() != K::InferType {
+            return Ok(());
+        }
+        let mut child = infer;
+        let mut parent = self.input.node(infer)?.parent();
+        while let Some(node) = parent.filter(|&node| {
+            self.input
+                .node(node)
+                .is_ok_and(|read| read.kind() == K::ParenthesizedType)
+        }) {
+            child = node;
+            parent = self.input.node(node)?.parent();
+        }
+        let Some(parent) = parent else {
+            return Ok(());
+        };
+        let parent_read = self.input.node(parent)?;
+        let rest = match parent_read.kind().known() {
+            Some(K::Parameter) => parent_read
+                .data_source()
+                .as_parameter_declaration()
+                .and_then(|data| data.dot_dot_dot_token())
+                .is_some(),
+            Some(K::RestType) => true,
+            Some(K::NamedTupleMember) => parent_read
+                .data_source()
+                .as_named_tuple_member()
+                .and_then(|data| data.dot_dot_dot_token())
+                .is_some(),
+            _ => false,
+        };
+        if rest {
+            return missing(
+                "implicit unknown[] constraint of an infer parameter in a rest position",
+            );
+        }
+        if matches!(
+            parent_read.kind().known(),
+            Some(K::TemplateLiteralTypeSpan | K::MappedType)
+        ) || parent_read.kind() == K::TypeParameter
+        {
+            return missing(
+                "implicit constraint of an infer parameter in a template or mapped type",
+            );
+        }
+        if parent_read.kind() == K::TypeReference {
+            // Only a referenced parameter that declares a constraint produces
+            // one here; `Promise<infer U>` and the like do not.
+            let name = parent_read
+                .data_source()
+                .as_type_reference_node()
+                .and_then(|data| data.type_name())
+                .ok_or(Error::ResolutionFailed)?;
+            let Some(group) = self.input.resolve_type_name(name)? else {
+                return Ok(());
+            };
+            let declarations = self.type_declaration_nodes(&group)?;
+            let Some(&declaration) = declarations.first() else {
+                return Ok(());
+            };
+            let parameters = self.list(
+                declaration,
+                self.input.node(declaration)?.type_parameter_list(),
+            )?;
+            let arguments = self.list(parent, parent_read.type_argument_list())?;
+            if let Some(index) = arguments.iter().position(|&argument| argument == child) {
+                if let Some(&parameter) = parameters.get(index) {
+                    let declared = self
+                        .input
+                        .node(parameter)?
+                        .data_source()
+                        .as_type_parameter_declaration()
+                        .and_then(|data| data.constraint());
+                    if declared.is_some() {
+                        return missing(
+                            "implicit constraint of an infer parameter from a referenced parameter",
+                        );
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     pub(super) fn parameters(

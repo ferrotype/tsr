@@ -752,14 +752,15 @@ impl Construction {
             }
             // The result alias has a separate argument instantiation even when
             // a property lookup returns an already existing cell.
-            let _alias = if alias.is_some() {
+            let alias = if alias.is_some() {
                 alias
             } else {
                 self.instantiate_alias(source_alias, mapper)?
             };
-            return self.indexed_access(
+            return self.indexed_access_with_alias(
                 self.instantiate(&types[0], mapper, None)?,
                 self.instantiate(&types[1], mapper, None)?,
+                alias,
             );
         }
         if ty.flags & tf::TEMPLATE_LITERAL != 0 {
@@ -814,7 +815,7 @@ impl Construction {
             if set.len() == 1 {
                 return Ok(set.remove(0));
             }
-            return missing("intersection normalization after instantiation");
+            return self.intersection(&set, source.name.clone(), alias);
         }
         let Some(alias) = alias else {
             return self.checker.graph.union(&types);
