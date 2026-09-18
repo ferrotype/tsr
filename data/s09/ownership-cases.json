@@ -76,6 +76,16 @@
         "retention::ast::signature_declaration_survives_builder_release",
         "retention::ast::synthetic_expression_resolves_type_and_file_parent_after_lease_release"
       ]
+    },
+    "builder": {
+      "package": "ts_checker",
+      "filter": "node_builder::cache::retention::",
+      "cases": [
+        "node_builder::cache::retention::a_clone_resolves_its_original_after_that_cache_entry_is_removed_and_allocation_rotates",
+        "node_builder::cache::retention::a_nested_publication_replaces_a_cache_entry_without_breaking_its_dependents",
+        "node_builder::cache::retention::storage_is_reclaimed_generation_by_generation_as_the_last_root_of_each_drops",
+        "node_builder::cache::retention::storage_outlives_its_cache_roots_and_a_returned_frame_while_a_factory_holds_it"
+      ]
     }
   },
   "version": 3

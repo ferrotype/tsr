@@ -67,7 +67,8 @@ class CheckerOwnershipProducer(unittest.TestCase):
             del missing["suites"][name]
             with self.assertRaises(ValueError):
                 validate_manifest(missing)
-            for key, value in (("package", "ts_checker"), ("filter", "unrelated::"),
+            # A package no suite names, so the retarget is a change for every one.
+            for key, value in (("package", "ts_compiler"), ("filter", "unrelated::"),
                                ("skip", ["retirement_before_commit"]), ("exact", True)):
                 changed = copy.deepcopy(self.manifest)
                 changed["suites"][name][key] = value
@@ -200,18 +201,19 @@ class CheckerOwnershipProducer(unittest.TestCase):
         publish_metrics(report, self.modes, self.arena, self.manifest)
         self.assertTrue(all(report["metrics"][criterion] for criterion in CRITERIA))
         self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
-        for unavailable in ("independent_checker_merges", "builder_cache_retention", "api_scratch_disposal",
+        for unavailable in ("independent_checker_merges", "api_scratch_disposal",
                             "live_owner_delta", "live_allocation_delta", "miri", "address_sanitizer"):
             self.assertNotIn(unavailable, report["metrics"])
 
     def test_each_retention_criterion_is_one_suite_in_every_mode_and_scored_apart_from_s09_4(self):
         report = {"metrics": {}}
         publish_metrics(report, self.modes, self.arena, self.manifest)
-        self.assertEqual(set(RETENTION), {"checker_result_retention", "checker_ast_retention"})
+        self.assertEqual(set(RETENTION), {"checker_result_retention", "checker_ast_retention",
+                                          "builder_cache_retention"})
         self.assertTrue(all(report["metrics"][criterion] for criterion in RETENTION))
-        self.assertEqual(report["metrics"]["checker_retention_tests"], 4)
+        self.assertEqual(report["metrics"]["checker_retention_tests"], 6)
         for criterion, suite in RETENTION.items():
-            other = next(name for name in RETENTION if name != criterion)
+            others = [name for name in RETENTION if name != criterion]
             for mode in MODES:
                 changed = copy.deepcopy(self.modes)
                 changed[mode][suite] = False
@@ -220,9 +222,10 @@ class CheckerOwnershipProducer(unittest.TestCase):
                 with self.subTest(criterion=criterion, mode=mode):
                     self.assertFalse(report["metrics"][criterion])
                     self.assertFalse(report["metrics"][f"{criterion}_{mode}"])
-                    self.assertTrue(report["metrics"][other], "the sibling criterion keeps its own outcome")
+                    self.assertTrue(all(report["metrics"][name] for name in others),
+                                    "the sibling criteria keep their own outcomes")
                     self.assertTrue(all(report["metrics"][name] for name in CRITERIA), "and so does S09-4")
-                    self.assertEqual(report["metrics"]["checker_retention_tests"], 2)
+                    self.assertEqual(report["metrics"]["checker_retention_tests"], 4)
                     self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
         # A pool or registry failure is S09-4's to report; the retention suites
         # ran and passed, so their criteria are not falsified by association.

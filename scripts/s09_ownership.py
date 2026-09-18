@@ -21,11 +21,14 @@ SUITES = {
     "scratch": ("ts_api", "printing::scratch_checks::"),
     "results": ("ts_project", "retention::results::"),
     "ast": ("ts_project", "retention::ast::"),
+    "builder": ("ts_checker", "node_builder::cache::retention::"),
 }
 OWNERSHIP_SUITES = ("generation", "pool", "registry")
-# S09-1: each criterion is one suite over a program-backed pool. They are
-# scored apart from S09-4, so a regression names the contract it broke.
-RETENTION = {"checker_result_retention": "results", "checker_ast_retention": "ast"}
+# S09-1 and S09-2: each criterion is one suite. The first two run over a
+# program-backed pool and the third over the checker's cached node builder. They
+# are scored apart from S09-4, so a regression names the contract it broke.
+RETENTION = {"checker_result_retention": "results", "checker_ast_retention": "ast",
+             "builder_cache_retention": "builder"}
 MODES = {"debug", "release", "miri", "address_sanitizer"}
 CRITERIA = ("shared_pool_panic_retirement", "release_boundaries")
 
