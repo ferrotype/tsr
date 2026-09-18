@@ -189,7 +189,7 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 | E2: Checker slice | relater_retained_bytes | `run.relater.retained_bytes_ratio >= 0` measured arena-reference/ID-based retained bytes at the same declared live-root checkpoint; required comparison with positive baseline bytes | 2.437409636562528 | pass |
 | E3: Ownership | shared_bound_file | `run.e3.shared_bound_file == true` two programs share a bound file; surviving queries pass after either program drops | true | pass |
 | E3: Ownership | retained_snapshot_edit | `run.e3.retained_snapshot_edit == true` old and new snapshots answer correctly across an edit | true | pass |
-| E3: Ownership | independent_checker_merges | `run.e3.independent_checker_merges == true` two checkers independently merge declarations over shared files | missing | pending |
+| E3: Ownership | independent_checker_merges | `run.e3.independent_checker_merges == true` two checkers independently merge declarations over shared files | true | pass |
 | E3: Ownership | concurrent_lazy_storage | `run.e3.concurrent_lazy_storage == true` same-lock cache lookup/publication, miss recheck and page growth preserve initialized nodes, supplied token parents and file ownership under concurrent first use | true | pass |
 | E3: Ownership | mapper_bundle_disposal | `run.e3.mapper_bundle_disposal == true` multi-output content-mapper bundles survive varied owner-release orders | true | pass |
 | E3: Ownership | builder_cache_retention | `run.e3.builder_cache_retention == true` cache, persistent emit-table keys/values and returned-handle dependencies retain builder generations; cloning A into B preserves original links after A's cache entry drops | missing | pending |
@@ -256,8 +256,8 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | clippy | current | [result](status/evidence/5de3da161c9d5c6e5994fbc6c9a169fa890bf36649d7a244f00ec455ea579465.json) |
 | deny | current | [result](status/evidence/74b936fede2186fd95b7ea1fa7ab76b907033a35e8d7b9bf13401c5e51ef9c06.json) |
 | e1 | current | [result](status/evidence/467b6dbb279f3fbcfec0967b6265058843c2d2dab7f4e6eb5a29b93fc5eed9bd.json) |
-| e2 | current | [result](status/evidence/3cd0bd657ba776a36cc828a434cd6e18d3f805abc9f9f5e502189dc47b17717a.json) |
-| e3 | current | [result](status/evidence/ed3e1abefff0a902c3baec797ed747ba9d1620df1905800b1004b5734b1100d8.json) |
+| e2 | current | [result](status/evidence/3f66c34eb5d3f1069491403d6ce9851cfda1750da60ec780aea32163783fbfc4.json) |
+| e3 | current | [result](status/evidence/c5a69f5172d918a8586a880a579979c6b6b430cc024c399200a8f9d42caa2a02.json) |
 | e4 | current | [result](status/evidence/c1300aaec0de00aef2f77c8c12c6ea37b216e533e388a61fb71d85cfd944c8f1.json) |
 | e5 | current | [result](status/evidence/ced909168f79d5172601c10275d991fad8bf4985fd181a92753d73b9a83ced6a.json) |
 | e6 | current | [result](status/evidence/fb4c56516607259f97347b0329150765e50785741fcdb330ef99d83e3fa12623.json) |
@@ -267,7 +267,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | program | current | [result](status/evidence/cfff72c989c41d6cf1e0f085d4e5681624e9e9726e52a0af963e01cb2351329d.json) |
 | relater | current | [result](status/evidence/3b414ef57cb47cb611959f9ac683302c1168dcbba37e2959addee7835d7aa8fe.json) |
 | scanner | current | [result](status/evidence/98e6abe4b3f3879202ed4f451adc8f39e4d265949fd90e866cd62541a97ef8e4.json) |
-| selftest | current | [result](status/evidence/f95a1e93411f86ced7ca57095f93e99bbe463bffbced9aaf759b46c1fd581943.json) |
+| selftest | current | [result](status/evidence/d7e8064b923699c3a5bf4a5e64b586c2c22378ed0613b33129bac841244850ae.json) |
 | workspace | current | [result](status/evidence/0abe6660869b161ca0b283818517deb8a74c389610a274453b2e171dc3ae064a.json) |
 
 ## Sprints
@@ -460,7 +460,7 @@ Items:
 - [x] S07-5 Program and snapshot owners in the E3 harness: a bound file shared by two programs; an edit while an old snapshot answers
 - [x] S07-6 Function-level traceability for the binder package
 
-### S08 Checker slice, printer and node builder (open)
+### S08 Checker slice, printer and node builder (done)
 
 The frozen checker slice (literal, object, union, intersection, array and tuple types; getTypeOfSymbol; isRelatedTo; narrowing; typeToString through printer and node-builder slices; the comparators ported line by line) reproduces the .types and .errors.txt baselines on the subset, completes E4 through production literal-type and printer paths, and passes declaration-merging, recursion and reentrancy fixtures. Per-type footprint, checker throughput, allocations and retained memory are measured; the alternative relater prototype has parity and a measured comparison.
 
@@ -468,7 +468,7 @@ Exit checks:
 
 - [x] `sprint.S07.done == 1`
 - [x] `exp.E2.pass == 1`
-- [ ] `exp.E3.independent_checker_merges.pass == 1`
+- [x] `exp.E3.independent_checker_merges.pass == 1`
 - [x] `exp.E4.pass == 1`
 - [x] `exp.E5.pass == 1`
 - [x] `run.e2.type_to_string_parity == 1`
@@ -477,7 +477,7 @@ Exit checks:
 
 Items:
 
-- [ ] S08-1 Checker-owned symbols, types and signatures with &mut self mutation (ADRs 0007 and 0008); checker-local declaration merges over shared files
+- [x] S08-1 Checker-owned symbols, types and signatures with &mut self mutation (ADRs 0007 and 0008); checker-local declaration merges over shared files
 - [x] S08-2 Type construction, relations and narrowing for the slice; .types and .errors.txt parity on the subset
 - [x] S08-3 Comparators ported line by line (ADR 0010); the union-ordering sub-test; the residual id-sensitive fixtures
 - [x] S08-4 Printer and node-builder slices for typeToString
@@ -494,7 +494,7 @@ Production arena, resolver and lease components run under minimal program, snaps
 
 Exit checks:
 
-- [ ] `sprint.S08.done == 1`
+- [x] `sprint.S08.done == 1`
 - [ ] `exp.E3.pass == 1`
 - [x] `run.clippy.clean == true`
 
@@ -512,7 +512,7 @@ The parser and the checker slice run as wasm32 with an in-memory host and are me
 
 Exit checks:
 
-- [ ] `sprint.S08.done == 1`
+- [x] `sprint.S08.done == 1`
 - [ ] `exp.E7.pass == 1`
 - [ ] `exp.E8.pass == 1`
 
@@ -552,7 +552,7 @@ Exit checks:
 - [x] `sprint.S05.done == 1`
 - [x] `sprint.S06.done == 1`
 - [x] `sprint.S07.done == 1`
-- [ ] `sprint.S08.done == 1`
+- [x] `sprint.S08.done == 1`
 - [ ] `sprint.S09.done == 1`
 - [ ] `sprint.S10.done == 1`
 - [x] `exp.E1.pass == 1`
