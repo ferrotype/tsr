@@ -416,19 +416,26 @@ impl Construction {
             .get(&ty.id())
             .and_then(|source| source.alias.clone());
         let contains_variables = self.could_contain_type_variables(ty)?;
-        let alias_variables = if let Some(alias) =
-            source_alias.as_ref().filter(|_| !contains_variables)
-        {
+        // couldContainTypeVariables also holds when the alias type arguments
+        // could contain one, so instantiating a generic alias's body is real
+        // work even when the body itself is free of type variables.
+        let alias_variables = if contains_variables {
+            false
+        } else {
+            let arguments = ty
+                .alias_arguments
+                .get()
+                .cloned()
+                .or_else(|| source_alias.as_ref().map(|alias| alias.arguments.clone()))
+                .unwrap_or_default();
             let mut contains = false;
-            for argument in &alias.arguments {
+            for argument in &arguments {
                 if self.could_contain_type_variables(&argument.upgrade().ok_or(Error::Released)?)? {
                     contains = true;
                     break;
                 }
             }
             contains
-        } else {
-            false
         };
         if !contains_variables && !alias_variables {
             return Ok(ty.clone());

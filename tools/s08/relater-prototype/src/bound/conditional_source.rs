@@ -763,16 +763,23 @@ impl Construction {
                 }
             }
             // port: tsc/internal/checker/inference.go:Checker.inferFromSignatures
-            let count = source
-                .call_signatures
-                .len()
-                .min(target.call_signatures.len());
-            let source_signatures = &source.call_signatures[source.call_signatures.len() - count..];
-            let target_signatures = &target.call_signatures[target.call_signatures.len() - count..];
-            for (source, target) in source_signatures.iter().zip(target_signatures) {
-                self.infer_from_signature(
-                    location, source, target, parameters, candidates, variance,
-                )?;
+            // Signatures pair from the bottom up, and a source with fewer
+            // signatures than the target infers from its first signature to
+            // every excess target signature.
+            let sources = source.call_signatures.len();
+            let targets = target.call_signatures.len();
+            if sources > 0 {
+                for index in 0..targets {
+                    let source_index = (sources + index).saturating_sub(targets);
+                    self.infer_from_signature(
+                        location,
+                        &source.call_signatures[source_index],
+                        &target.call_signatures[index],
+                        parameters,
+                        candidates,
+                        variance,
+                    )?;
+                }
             }
         }
         Ok(())

@@ -19,6 +19,39 @@ struct Mapped {
     constraint: TypeLink,
 }
 
+// port: tsc/internal/checker/checker.go:indexTypeLessThan
+/// Whether every constituent of the index names a fixed element: a string or
+/// number literal whose property name is a numeric literal name below `limit`.
+fn index_type_less_than(index: &Rc<TypeCell>, limit: usize) -> Result<bool, Error> {
+    let constituents = if index.flags & tf::UNION != 0 {
+        index.types()?
+    } else {
+        vec![index.clone()]
+    };
+    for constituent in constituents {
+        let name = match constituent.literal.as_ref() {
+            Some(LiteralValue::String(bytes)) => match std::str::from_utf8(bytes) {
+                Ok(name) => name.to_owned(),
+                Err(_) => return Ok(false),
+            },
+            Some(LiteralValue::Number(bits)) => {
+                ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+            }
+            _ => return Ok(false),
+        };
+        // isNumericLiteralName: the name must round-trip through ToNumber.
+        let value = ts_jsnum::from_string(name.as_bytes());
+        if value.to_string() != name {
+            return Ok(false);
+        }
+        let value = value.value();
+        if !(value >= 0.0 && value < limit as f64) {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
 impl Construction {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromMappedTypeNode
     pub(super) fn mapped(
@@ -545,18 +578,7 @@ impl Construction {
                 .any(|flag| flag & crate::element_flags::VARIADIC != 0)
             {
                 object.structure(&self.checker.graph)?;
-                let fixed_index = match index.literal.as_ref() {
-                    Some(LiteralValue::Number(bits)) => {
-                        let fixed = tuple
-                            .element_flags
-                            .iter()
-                            .take_while(|flag| *flag & crate::element_flags::VARIABLE == 0)
-                            .count();
-                        let value = f64::from_bits(*bits);
-                        value >= 0.0 && value < fixed as f64
-                    }
-                    _ => false,
-                };
+                let fixed_index = index_type_less_than(&index, tuple.total_fixed_elements())?;
                 if !fixed_index {
                     let key = (object.id(), index.id());
                     if let Some(cached) = self.mapped_state.indexed.borrow().get(&key) {
@@ -588,22 +610,7 @@ impl Construction {
                 .into_iter()
                 .map(|index| self.indexed_access(object.clone(), index))
                 .collect::<Result<Vec<_>, _>>()?;
-            return match alias {
-                Some(alias) => {
-                    let arguments = alias
-                        .arguments
-                        .iter()
-                        .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
-                        .collect::<Result<Vec<_>, _>>()?;
-                    self.checker.graph.union_named_arguments(
-                        &results,
-                        self.identity(alias.declaration),
-                        &alias.name,
-                        &arguments,
-                    )
-                }
-                None => self.checker.graph.union(&results),
-            };
+            return self.union_with_alias(&results, alias);
         }
         let name = match index.literal.as_ref() {
             Some(LiteralValue::String(bytes)) => String::from_utf8(bytes.clone())

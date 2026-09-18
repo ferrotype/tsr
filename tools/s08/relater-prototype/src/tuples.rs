@@ -14,6 +14,7 @@ pub mod element_flags {
     pub const VARIADIC: u8 = 8;
     pub const VARIABLE: u8 = REST | VARIADIC;
     pub const NON_REST: u8 = REQUIRED | OPTIONAL | VARIADIC;
+    pub const FIXED: u8 = REQUIRED | OPTIONAL;
 }
 
 #[derive(Debug)]
@@ -26,6 +27,27 @@ pub struct TupleShape {
 }
 
 impl TupleShape {
+    // port: tsc/internal/checker/checker.go:getTotalFixedElementCount
+    /// The initial required or optional elements plus the fixed elements that
+    /// trail the last variable one.
+    pub(crate) fn total_fixed_elements(&self) -> usize {
+        let fixed_length = self
+            .element_flags
+            .iter()
+            .take_while(|flags| *flags & element_flags::FIXED != 0)
+            .count();
+        let trailing = self
+            .element_flags
+            .iter()
+            .rev()
+            .take_while(|flags| *flags & element_flags::FIXED != 0)
+            .count();
+        // The two runs can only overlap in a tuple with no variable element,
+        // which the pin never asks about: it consults this count for generic
+        // tuples, and those always carry a variadic or rest element.
+        fixed_length + trailing
+    }
+
     pub fn elements(&self) -> Result<Vec<Rc<TypeCell>>, Error> {
         self.elements.iter().map(TypeLink::resolve).collect()
     }

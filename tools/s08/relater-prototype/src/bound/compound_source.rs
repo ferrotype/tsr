@@ -480,7 +480,7 @@ impl Construction {
         let result = if includes & tf::UNION != 0 {
             self.intersection_over_unions(&set, types.len(), name.clone(), alias.clone())?
         } else {
-            self.checker.graph.allocate_full(
+            let result = self.checker.graph.allocate_full(
                 tf::INTERSECTION,
                 0,
                 name,
@@ -491,7 +491,11 @@ impl Construction {
                 set.iter().map(Rc::downgrade).collect(),
                 false,
                 None,
-            )
+            );
+            match alias.as_ref() {
+                Some(alias) => Self::record_alias_arguments(result, alias),
+                None => result,
+            }
         };
         self.intersections.borrow_mut().insert(key, result.clone());
         Ok(result)
@@ -577,7 +581,7 @@ impl Construction {
         self.union_with_alias(&constituents, alias)
     }
 
-    fn union_with_alias(
+    pub(super) fn union_with_alias(
         self: &Rc<Self>,
         types: &[Rc<TypeCell>],
         alias: Option<Alias>,
@@ -589,15 +593,25 @@ impl Construction {
                     .iter()
                     .map(|ty| ty.upgrade().map(|ty| ty.id()).ok_or(Error::Released))
                     .collect::<Result<Vec<_>, _>>()?;
-                self.checker.graph.union_named_arguments(
+                let result = self.checker.graph.union_named_arguments(
                     types,
                     self.identity(alias.declaration),
                     &alias.name,
                     &arguments,
-                )
+                )?;
+                Ok(Self::record_alias_arguments(result, &alias))
             }
             None => self.checker.graph.union(types),
         }
+    }
+
+    /// A type named by an alias keeps that alias's type arguments, which
+    /// `couldContainTypeVariables` consults (`t.alias.typeArguments`).
+    pub(super) fn record_alias_arguments(ty: Rc<TypeCell>, alias: &Alias) -> Rc<TypeCell> {
+        if ty.alias.is_some() {
+            ty.alias_arguments.get_or_init(|| alias.arguments.clone());
+        }
+        ty
     }
 
     // port: tsc/internal/checker/checker.go:Checker.addTypeToIntersection

@@ -24,7 +24,7 @@ diagnostics, and identical `types_created`, `signatures_created`,
 lookup and around every action. The checkpoint this work started from measured
 75/105 strict and 82/105 behavioral with three unsupported groups.
 
-Validation: 59 prototype unit tests, the 11 Python relater contract tests,
+Validation: 67 prototype unit tests, the 11 Python relater contract tests,
 `python3 scripts/checks.py clippy` and `fmt` clean over the workspace (the
 package had 92 clippy findings left from the bound-program rewrite; they are
 fixed). No measurement capture was run and no evidence or status view changed:
@@ -100,6 +100,32 @@ reference's members during lookup rather than at the first relation.
   increasing flag value first, so a union holding two of these kinds (an indexed
   access and a conditional, say) would have been ordered differently from the
   pin. The comparator does not compare type flags today.
+
+`x-tuple-string-index`, `x-tuple-union-index`, `x-excess-target-signatures`
+(development programs written for a review of `75bfd6c`, reproduced as drifts
+before anything was changed):
+
+- `indexTypeLessThan` in full: every constituent of a union index counts, a
+  string literal counts when its name round-trips through `ToNumber`
+  (`isNumericLiteralName`), and the limit is `getTotalFixedElementCount`, which
+  is the fixed prefix plus the trailing run of fixed elements. The reference
+  accepted a single numeric literal only, so `[string, number, ...T]['0']` and
+  `[string, number, ...T][0 | 1]` deferred, and the generic alias body displayed
+  as an unresolved indexed access instead of `string` and `string | number`. The
+  instantiated alias resolved either way, which is why totals alone missed it.
+- `inferFromSignatures`: signatures pair from the bottom up, and a source with
+  fewer signatures than the target infers from its first signature to every
+  excess target signature. The reference paired the last
+  `min(source, target)` only, so in
+  `(() => string) extends { (): infer R; (): void }` the inference for `R` never
+  ran and the conditional produced `unknown` where the pin produces `string`.
+  This was a wrong result, not a count difference.
+- `couldContainTypeVariables` also holds when a type's alias type arguments
+  could contain a type variable. The union a distributed indexed access names by
+  its alias now carries those arguments, which no source declaration records for
+  it, so instantiating a generic alias whose body holds no type variable of its
+  own is counted and keys a separate cell. This closed the last silent drift
+  (one type and one counted instantiation on `[string, number, ...T][0 | 1]`).
 
 `mapped-conditional-infer`:
 
@@ -196,16 +222,23 @@ That is the comparator's rule, not the frozen contract's wording.
   `mapped_modifiers_come_through_a_constrained_key_parameter`,
   `keyof_any_and_unknown_follow_the_pinned_results`,
   `an_intersection_reduces_over_unions_disjoint_domains_and_supertypes` and
-  `a_contravariant_position_infers_its_own_candidate`. 64 unit tests in all.
+  `a_contravariant_position_infers_its_own_candidate`.
+- For the review findings: `a_fixed_tuple_index_resolves_instead_of_deferring`
+  (verified to fail with the string-literal name or the union index removed from
+  the predicate), `conditional_inference_reuses_the_first_signature_for_excess_targets`
+  (verified to fail with the bottom-up pairing replaced by the shorter list) and
+  `an_alias_body_instantiates_through_its_alias_arguments` (verified to fail with
+  the alias-argument containment disabled). The predicate reads the generic alias
+  body, because the instantiated alias resolves either way. 67 unit tests in all.
 
 Lib-dependent rules (Promise, tuples, `NonNullable`) are covered by the frozen
 fixtures, not by unit tests: the unit fixtures bind without the default library.
 
 ## Beyond the frozen inventory (development check, not evidence)
 
-Twenty-six programs outside the inventory were run through both
+Thirty-two programs outside the inventory were run through both
 implementations and compared group by group (`extra.py` in the session
-scratchpad; the frozen 105 remain the only evidence). **105 of 130 groups agree
+scratchpad; the frozen 105 remain the only evidence). **130 of 160 groups agree
 exactly**, and no disagreement is silent: every remaining one is a named
 refusal. Own conditional and mapped types, two-parameter and callback generics,
 contravariance, optional and rest tuples, array-holding generics,
@@ -251,6 +284,7 @@ What still refuses, by name, one program each:
 | `Extract<'a' \| 'b' \| 1, string>` | substitution type in a conditional true branch |
 | `Omit<{...}, 'y'>` | base constraint of an indexed access or conditional type |
 | `G<T> = { [K in keyof T as ...]: ... }` | mapped nonliteral key/index signature |
+| `[string, ...T, number][1]` | property of a generic tuple past its fixed prefix |
 
 The two the owner asked for moved but did not close. `Awaited` needed
 `getIntersectionType`, which is now ported, and now stops at inference through
@@ -260,7 +294,12 @@ are now ported, and now stops at `getInferredTypeParameterConstraint`: an
 creates an array type during lookup. That rule is refused precisely where it
 would produce a constraint, so `Promise<infer U>` and the other frozen infer
 forms are unaffected. `Extract` needs substitution types, which remain a named
-unsupported kind.
+unsupported kind. The last entry is new, found while testing the fixed-index
+predicate: the index is inside the total fixed count, so the access correctly
+does not defer, and the property lookup that follows then has no rule for an
+element after the variadic one. The trailing term of
+`getTotalFixedElementCount` therefore has no passing test; it is a literal port
+of the pin's two-line function.
 
 ## Known differences that do not affect the comparison
 

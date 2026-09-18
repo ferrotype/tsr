@@ -357,3 +357,92 @@ fn a_contravariant_position_infers_its_own_candidate() {
         .is_type_related_to(&a, &b, crate::Mode::Identity)
         .unwrap());
 }
+
+#[test]
+fn a_fixed_tuple_index_resolves_instead_of_deferring() {
+    // indexTypeLessThan accepts a string literal whose name round-trips through
+    // ToNumber and every constituent of a union index, and it counts against the
+    // total fixed element count, which includes a fixed suffix after the
+    // variadic element. A narrower predicate defers these accesses, and the
+    // access then displays as an unresolved indexed access. The instantiated
+    // alias resolves either way, so the generic body is what the test reads.
+    let (owner, source) = fixture(
+        b"interface Array<T> { length: number; [n: number]: T }\
+          interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T }\
+          type T0<T extends unknown[]> = [string, ...T, number][0]; type A = T0<[boolean]>;\
+          type T1<T extends unknown[]> = [string, number, ...T]['0']; type C = T1<[boolean]>;\
+          type T2<T extends unknown[]> = [string, number, ...T][0 | 1]; type D = T2<[boolean]>;\
+          type B = string; type E = string | number;",
+    );
+    let checker = owner.checker();
+    for (left, right) in [
+        (b"T0".as_slice(), b"B".as_slice()),
+        (b"T1".as_slice(), b"B".as_slice()),
+        (b"T2".as_slice(), b"E".as_slice()),
+    ] {
+        let resolved = named(&owner, source, left);
+        let expected = named(&owner, source, right);
+        assert_eq!(
+            resolved.flags & tf::INDEXED_ACCESS,
+            0,
+            "{} must resolve, not defer",
+            String::from_utf8_lossy(left)
+        );
+        assert!(
+            checker
+                .is_type_related_to(&resolved, &expected, crate::Mode::Identity)
+                .unwrap(),
+            "{} resolves to {}",
+            String::from_utf8_lossy(left),
+            expected.name
+        );
+    }
+}
+
+#[test]
+fn conditional_inference_reuses_the_first_signature_for_excess_targets() {
+    // inferFromSignatures pairs signatures from the bottom up, so a source with
+    // one signature infers from it to every excess target signature. Pairing
+    // only the last min(source, target) signatures leaves R uninferred, and the
+    // conditional then resolves to the inference default rather than to string.
+    let (owner, source) = fixture(
+        b"type A = (() => string) extends { (): infer R; (): void } ? R : never; type B = string;",
+    );
+    let a = named(&owner, source, b"A");
+    let b = named(&owner, source, b"B");
+    assert!(
+        owner
+            .checker()
+            .is_type_related_to(&a, &b, crate::Mode::Identity)
+            .unwrap(),
+        "R infers string from the only source signature, not unknown"
+    );
+}
+
+#[test]
+fn an_alias_body_instantiates_through_its_alias_arguments() {
+    // couldContainTypeVariables also holds when a type's alias type arguments
+    // could contain one, so instantiating a generic alias whose body has no type
+    // variable of its own is still real work and still keys a separate cell. The
+    // union a distributed indexed access builds is named by the alias, so it
+    // carries those arguments even though no source declaration records it.
+    let (owner, source) = fixture(
+        b"interface Array<T> { length: number; [n: number]: T }\
+          interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T }\
+          type W<T extends unknown[]> = [string, number, ...T][0 | 1]; type A = W<[boolean]>;",
+    );
+    let body = named(&owner, source, b"W");
+    let instance = named(&owner, source, b"A");
+    assert_eq!(body.flags & tf::UNION, tf::UNION);
+    assert!(
+        !Rc::ptr_eq(&body, &instance),
+        "the alias arguments differ, so the instance is a separate cell"
+    );
+    assert!(
+        owner
+            .checker()
+            .is_type_related_to(&body, &instance, crate::Mode::Identity)
+            .unwrap(),
+        "the separate cells stay structurally identical"
+    );
+}
