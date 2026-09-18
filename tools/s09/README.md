@@ -39,3 +39,57 @@ These observations cover printing, including named unsupported Rust syntax and
 options. They do not cover insertion formatting, session scratch disposal,
 generation retirement, or a complete S09-3 result. Rust ownership tests must
 exercise request lifetime separately. No upstream source is modified.
+
+# Formatter observations
+
+`format_oracle/main.go` is step F0 of the [formatter plan](../../docs/S09-3-formatter-plan.md).
+It is a persistent process, built as a `main` package inside a fresh
+`git archive` export of the pinned tree, because it imports internal packages.
+No upstream source is modified and the submodule is never touched. It reads one
+JSON request per line and answers one JSON observation per line.
+
+The denominator is the frozen S06 parser inventory, reduced to distinct parser
+inputs: the same source, file name, script kind and module-indicator options
+parse to the same tree, so formatting them twice proves nothing. Parse parity on
+these inputs is E1's, which is why they are reused rather than invented.
+
+Operations, with the call shapes the formatter itself uses:
+
+- `nav`: at up to 512 evenly spaced byte offsets plus the end of text,
+  `GetTokenAtPosition`, `FindPrecedingToken`, `FindPrecedingTokenEx` excluding
+  JSDoc, `GetStartOfNode` with and without JSDoc, `FindChildOfKind` for the six
+  bracket kinds, and `FindNextToken` under the token's parent and under the file.
+- `indent`: `GetIndentation` at every line start under both assumptions, and at
+  every eighth navigation offset, under the `default`, `tabs` and `two` settings.
+- `format`: the `FormatDocument` edit list under `default`, `tabs`, `two`,
+  `dense` and `terse`. The last two flip the rule options away from their
+  defaults, including semicolon insertion and removal.
+
+Each stream is published as a row count, a count of native failure rows and the
+SHA-256 of its rows. The row grammar is line based, not JSON, because the Rust
+side reproduces it byte for byte: `T|<offset>|<kind>,<pos>,<end>`, `-` for no
+node, `E|<pos>|<end>|<hex of new text>` for an edit. A native panic inside one
+call becomes that row's value, prefixed with `!`, so one failing position does
+not hide the rest of the file and the port is held to the failure too.
+
+Two native facts the observations record rather than hide. The pinned navigation
+asserts on one input (`taggedTemplatesWithTypeArguments2.ts`). And under
+semicolon removal the formatter emits overlapping edits on about 1,500 inputs,
+which `ApplyBulkEdits` cannot apply; the edit list is the observation, and the
+failure to apply it is recorded beside it as `text_panic`.
+
+```sh
+python3 scripts/s09_format.py observe --output <new directory>            # whole inventory, about 4 minutes
+python3 scripts/s09_format.py observe --output <dir> --prefix compiler/a  # a diagnostic subset
+python3 scripts/s09_format.py detail  --output <dir> --id <request id>    # literal rows of one input
+python3 scripts/s09_format.py freeze  --output <new directory>            # rewrites data/s09/format-probes.json
+python3 scripts/s09_format.py verify  --output <new directory>            # reproduces the frozen file or fails
+```
+
+`data/s09/format-probes.json` binds the pin, the local Go toolchain, the oracle
+and script hashes, the inventory digest, the operation and variant lists, and
+the native totals with the digest of the whole observation stream. `verify`
+repeats the complete observation and requires the frozen file byte for byte; a
+second complete run reproduced it. The corpus comparison is a live differential, as
+E1's is: Go and Rust answer the same requests and are compared request by
+request, so no per-file observation is committed.
