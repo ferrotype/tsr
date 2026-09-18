@@ -427,7 +427,10 @@ fn described_literal_union_matches_the_go_observations() {
 #[test]
 fn type_flags_match_the_pinned_enumeration() {
     // tsc/internal/checker/types.go: Substitution, IndexedAccess and
-    // Conditional are bits 24, 25 and 26. Observations expose type flags.
+    // Conditional are bits 24, 25 and 26. The values matter, not only the
+    // names: `CompareTypes` orders union constituents by increasing flag value
+    // first (`compare_cells` here), so permuted bits reorder a union that holds
+    // two of these kinds.
     assert_eq!(flags::SUBSTITUTION, 1 << 24);
     assert_eq!(flags::INDEXED_ACCESS, 1 << 25);
     assert_eq!(flags::CONDITIONAL, 1 << 26);

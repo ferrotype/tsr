@@ -94,7 +94,12 @@ reference's members during lookup rather than at the first relation.
   reductions (`any`, `never`, `unknown` removal, one constituent). A result that
   needs a new intersection type stays the named unsupported branch.
 - The `Substitution`/`IndexedAccess`/`Conditional` type-flag bits were permuted
-  relative to the pin (24/25/26); corrected, with a unit test.
+  relative to the pin (24/25/26); corrected, with a unit test. Inside the
+  prototype the names were used consistently, so no frozen fixture was affected.
+  It was a latent ordering defect: `CompareTypes` sorts union constituents by
+  increasing flag value first, so a union holding two of these kinds (an indexed
+  access and a conditional, say) would have been ordered differently from the
+  pin. The comparator does not compare type flags today.
 
 `mapped-conditional-infer`:
 
@@ -143,6 +148,37 @@ parameter mapping through the counted `instantiate` overshot native
 (`deferred-generic-members` 23 to 37 against 31). The counting site was right;
 the environment was too wide, because the possibly-referenced filter did not
 apply to function types. That is the first `flow-return-inference` port above.
+
+## Semantic fixes and work parity
+
+The reference is not the production checker and nothing in `crates/` changed.
+It is the second implementation the E2 relater criteria compare the production
+ID relater against, and the frozen contract (`data/s08/relater-fixtures.json`)
+forbids "sealing/pre-resolving lazy graphs to bypass relation allocations": a
+reference that skips work the pinned algorithm performs would win the
+throughput and allocation comparison for the wrong reason. The counters are how
+that is checked.
+
+Most ports above changed what the reference computes, not only how much: the
+merged type parameter (two `T`s, a second `Promise<T>`, and `True` where native
+returns `Maybe`), the cache entry recorded as succeeded instead of failed for an
+unconstrained type parameter, `T` instead of `T[number]` in a variadic tuple's
+base, `length` of a generic tuple resolved instead of deferred, a deferred
+conditional that stored the inferred extends type, a function type re-created
+instead of returned by the identity entry, the shared empty type literal,
+deferred references left unnormalized, and the intersection reductions.
+
+A few are work parity only, with an unchanged result on these fixtures: the
+counted `instantiateTypes` in `createMarkerType`, the counted instantiation of a
+function declaration's type that returns it unchanged, the source rest tuple
+built for an `any` rest target, `NonNullable<any>`, and the alias-argument
+instantiation of a deferred conditional (which predates this pass).
+
+One consequence for production is worth stating: `relater_prototype_parity`
+requires both implementations to match under the strict comparator, so a
+production optimization that avoids creating a type or an instantiation on one
+of these 21 fixtures' paths would lower that metric even with identical results.
+That is the comparator's rule, not the frozen contract's wording.
 
 ## Regression tests
 
