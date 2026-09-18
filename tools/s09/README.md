@@ -64,6 +64,16 @@ Operations, with the call shapes the formatter itself uses:
 - `format`: the `FormatDocument` edit list under `default`, `tabs`, `two`,
   `dense` and `terse`. The last two flip the rule options away from their
   defaults, including semicolon insertion and removal.
+- `position`: each of the first four statements is encoded to protocol bytes and
+  decoded into a fresh tree, as an API request carries it, then passed to
+  `PrintAndPositionNode`. Rows are the wire digest, the printed text, and the
+  positioned clone as a nested `kind,pos,end(children)` string in child order.
+  The wire digest is its own row so an encoding difference cannot pass for a
+  printing one.
+- `insert`: the body of the pinned `handleFormatNodeForInsertion` after request
+  decoding, for each of those statements at three line starts spread over the
+  file and one offset that is usually inside a line, under `default` and `tabs`.
+  The target offset is given in bytes; the UTF-16 conversion is the API layer's.
 
 Each stream is published as a row count, a count of native failure rows and the
 SHA-256 of its rows. The row grammar is line based, not JSON, because the Rust
@@ -72,11 +82,22 @@ node, `E|<pos>|<end>|<hex of new text>` for an edit. A native panic inside one
 call becomes that row's value, prefixed with `!`, so one failing position does
 not hide the rest of the file and the port is held to the failure too.
 
-Two native facts the observations record rather than hide. The pinned navigation
-asserts on one input (`taggedTemplatesWithTypeArguments2.ts`). And under
-semicolon removal the formatter emits overlapping edits on about 1,500 inputs,
-which `ApplyBulkEdits` cannot apply; the edit list is the observation, and the
-failure to apply it is recorded beside it as `text_panic`.
+Three native facts the observations record rather than hide.
+
+- The pinned navigation asserts on one input
+  (`taggedTemplatesWithTypeArguments2.ts`).
+- Under semicolon removal the formatter emits overlapping edits on about 1,500
+  inputs, which `ApplyBulkEdits` cannot apply. The edit list is the observation,
+  and the failure to apply it is recorded beside it as `text_panic`.
+- Insertion formatting fails on any node that contains an `if` without an
+  `else`. `AssignPositionsToNode` installs a `VisitNode` hook, and with that hook
+  set `NodeVisitor.visitEmbeddedStatement` (`ast/visitor.go`) lifts the hook's
+  result into a block without checking for nil, so the absent else statement
+  becomes an empty synthesized block. The formatter's span worker then fails
+  `debug.Assert(!ast.NodeIsSynthesized(child))`. The positioned tree row shows
+  the extra `Block,-1,-1()` child, and the insertion row carries
+  `!Debug failure. False expression.`. The port has to reproduce both; whether
+  to diverge later is an ADR 0004 decision, not something the port settles.
 
 ```sh
 python3 scripts/s09_format.py observe --output <new directory>            # whole inventory, about 4 minutes

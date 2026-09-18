@@ -27,8 +27,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ORACLE = ROOT / "tools/s09/format_oracle/main.go"
 PROBES = ROOT / "data/s09/format-probes.json"
 EXPORT_PATHS = ("tsc/go.mod", "tsc/go.sum", "tsc/internal")
-OPS = ("nav", "indent", "format")
+OPS = ("nav", "indent", "format", "position", "insert")
 INDENT_VARIANTS = ("default", "tabs", "two")
+INSERT_VARIANTS = ("default", "tabs")
 FORMAT_VARIANTS = ("default", "tabs", "two", "dense", "terse")
 REQUEST_FIELDS = ("source_hex", "filename", "path", "script_kind", "jsx", "force")
 VERSION = 1
@@ -112,9 +113,10 @@ def validate_observation(request, observation, ops):
     expected = {"id", "parse", *ops}
     if set(observation) != expected:
         raise ValueError(f"{request['id']}: observation fields {sorted(observation)} != {sorted(expected)}")
-    if "nav" in ops:
-        validate_stream("nav", observation["nav"])
-    for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS)):
+    for op in ("nav", "position"):
+        if op in ops:
+            validate_stream(op, observation[op])
+    for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS), ("insert", INSERT_VARIANTS)):
         if op in ops:
             if set(observation[op]) != set(names):
                 raise ValueError(f"{request['id']}: {op} variants differ from the contract")
@@ -166,9 +168,10 @@ def run(binary, requests, ops, output, detail=False):
 def walk_streams(observation, ops):
     if "parse" in observation and "panic" in observation["parse"]:
         yield observation["parse"]
-    if "nav" in ops:
-        yield observation["nav"]
-    for op in ("indent", "format"):
+    for op in ("nav", "position"):
+        if op in ops:
+            yield observation[op]
+    for op in ("indent", "format", "insert"):
         if op in ops:
             yield from observation[op].values()
 
@@ -185,6 +188,7 @@ def observe(directory, ops, prefix=None, limit=None):
     summary = {"version": VERSION, "pin": report["pin"], "go": report["go"], "toolchain_local": report["toolchain_local"],
                "oracle_sha256": report["oracle_sha256"], "script_sha256": digest(Path(__file__).read_bytes()),
                "ops": list(ops), "indent_variants": list(INDENT_VARIANTS), "format_variants": list(FORMAT_VARIANTS),
+               "insert_variants": list(INSERT_VARIANTS),
                "inventory": {"s06_requests": total, "distinct_inputs": len(requests), "sha256": inventory_sha256},
                "diagnostic_subset": len(selected) != len(requests), "native": result}
     (directory / "summary.json").write_bytes(canonical(summary) + b"\n")

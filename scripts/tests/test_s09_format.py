@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s09_format import (FORMAT_VARIANTS, INDENT_VARIANTS, OPS, frozen_form, validate_observation, validate_stream,
+from s09_format import (FORMAT_VARIANTS, INDENT_VARIANTS, INSERT_VARIANTS, OPS, frozen_form, validate_observation, validate_stream,
                         walk_streams)
 
 SHA = "0" * 64
@@ -16,6 +16,10 @@ def observation(ops=OPS):
         value["nav"] = {"rows": 3, "failures": 0, "sha256": SHA}
     if "indent" in ops:
         value["indent"] = {name: {"rows": 2, "failures": 0, "sha256": SHA} for name in INDENT_VARIANTS}
+    if "position" in ops:
+        value["position"] = {"rows": 5, "failures": 0, "sha256": SHA}
+    if "insert" in ops:
+        value["insert"] = {name: {"rows": 4, "failures": 1, "sha256": SHA} for name in INSERT_VARIANTS}
     if "format" in ops:
         value["format"] = {name: {"rows": 1, "failures": 0, "sha256": SHA, "text_sha256": SHA} for name in FORMAT_VARIANTS}
     return value
@@ -43,7 +47,7 @@ class FormatObservationContract(unittest.TestCase):
             validate_observation(self.request, observation(), ("nav",))
 
     def test_the_variant_sets_are_part_of_the_contract(self):
-        for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS)):
+        for op, names in (("indent", INDENT_VARIANTS), ("format", FORMAT_VARIANTS), ("insert", INSERT_VARIANTS)):
             value = observation()
             del value[op][names[-1]]
             with self.subTest(op=op, change="missing"), self.assertRaises(ValueError):
@@ -75,7 +79,8 @@ class FormatObservationContract(unittest.TestCase):
                 validate_stream("format", value)
 
     def test_every_stream_of_the_selected_operations_is_walked_once(self):
-        self.assertEqual(len(list(walk_streams(observation(), OPS))), 1 + len(INDENT_VARIANTS) + len(FORMAT_VARIANTS))
+        self.assertEqual(len(list(walk_streams(observation(), OPS))),
+                         2 + len(INDENT_VARIANTS) + len(FORMAT_VARIANTS) + len(INSERT_VARIANTS))
         self.assertEqual(len(list(walk_streams(observation(("nav",)), ("nav",)))), 1)
         failed = {**observation(("nav",)), "parse": {"panic": "parser"}}
         self.assertEqual(len(list(walk_streams(failed, ("nav",)))), 2)

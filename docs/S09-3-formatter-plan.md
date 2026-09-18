@@ -98,7 +98,19 @@ roadmap put them.
 Each step ends on a parity check against frozen native observations, with the
 denominator fixed before the Rust code exists. No step is "done" on unit tests.
 
-**F0. Oracle and frozen observations.** A Go overlay beside
+**F0. Oracle and frozen observations.** Done for the corpus; see
+`tools/s09/README.md` for what was built. It differs from the sketch below in
+two ways. The corpus comparison is a live differential, as E1's is, so no
+per-file observation is committed: the oracle is a persistent process built
+inside a fresh export of the pinned tree, and `data/s09/format-probes.json`
+freezes the inventory digest, the operation and variant contract and the digest
+of the whole native stream. And the denominator is the S06 parser inventory
+reduced to its 16,120 distinct parser inputs. Positioned printing and insertion
+are corpus-wide probes too, over each file's leading statements, rather than a
+handful of fixtures. Still to do under F0: the fourslash recording, before F6,
+and the scanner and rule probes when F3 and F4 start.
+
+The original sketch: a Go overlay beside
 `tools/s09/printing_test.go`, run with Go 1.27.1 and `GOTOOLCHAIN=local`, that
 writes under `data/s09/format-*`:
 

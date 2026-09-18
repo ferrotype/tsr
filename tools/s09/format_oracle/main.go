@@ -26,12 +26,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/microsoft/TypeScript/tsc/internal/api/encoder"
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/astnav"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/format"
 	"github.com/microsoft/TypeScript/tsc/internal/ls/lsutil"
 	"github.com/microsoft/TypeScript/tsc/internal/parser"
+	"github.com/microsoft/TypeScript/tsc/internal/printer"
 	"github.com/microsoft/TypeScript/tsc/internal/scanner"
 	"github.com/microsoft/TypeScript/tsc/internal/tspath"
 )
@@ -41,6 +43,8 @@ const (
 	maxRequest      = 64 << 20
 	// At most this many evenly spaced probe positions per file, plus the end.
 	maxPositions = 512
+	// The leading statements of a file that are encoded, decoded and printed.
+	maxStatements = 4
 )
 
 type request struct {
@@ -74,7 +78,8 @@ func newStream(detail bool) *stream {
 
 func (s *stream) row(text string) {
 	s.rows++
-	if strings.Contains(text, "|!") {
+	// '!' marks a native panic and '?' a returned native error.
+	if strings.Contains(text, "|!") || strings.Contains(text, "|?") {
 		s.failures++
 	}
 	io.WriteString(s.hash, text)
@@ -256,6 +261,126 @@ func document(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detail b
 	return out
 }
 
+// decoded is what an API request carries: the statement encoded to protocol
+// bytes and decoded into a fresh tree with no source file and no parents above
+// it. The wire digest is its own row, so an encoding difference shows up as one
+// and does not pass for a printing difference.
+func decoded(s *stream, file *ast.SourceFile, index int) *ast.Node {
+	var root *ast.Node
+	s.row("W|" + strconv.Itoa(index) + "|" + call(func() string {
+		wire, _, err := encoder.EncodeNode(file.Statements.Nodes[index], file)
+		if err != nil {
+			return "?" + err.Error()
+		}
+		sum := sha256.Sum256(wire)
+		node, err := encoder.DecodeNodes(wire)
+		if err != nil {
+			return "?" + err.Error()
+		}
+		root = node
+		return hex.EncodeToString(sum[:])
+	}))
+	return root
+}
+
+func statements(file *ast.SourceFile) int {
+	if file.Statements == nil {
+		return 0
+	}
+	return min(len(file.Statements.Nodes), maxStatements)
+}
+
+// positioned is printer.PrintAndPositionNode as the insertion handler calls it:
+// the printed text, then every node of the positioned clone in child order.
+func positioned(file *ast.SourceFile, detail bool) map[string]any {
+	s := newStream(detail)
+	for index := range statements(file) {
+		at := strconv.Itoa(index)
+		root := decoded(s, file, index)
+		if root == nil {
+			continue
+		}
+		var clone *ast.Node
+		s.row("P|" + at + "|" + call(func() string {
+			settings := lsutil.GetDefaultFormatCodeSettings()
+			text, node := printer.PrintAndPositionNode(ast.NewNodeFactory(ast.NodeFactoryHooks{}), root, nil,
+				settings.NewLineCharacter, settings.IndentSize, nil)
+			clone = node
+			return hex.EncodeToString([]byte(text))
+		}))
+		if clone == nil {
+			continue
+		}
+		s.row("N|" + at + "|" + call(func() string {
+			var out strings.Builder
+			var walk func(n *ast.Node) bool
+			// Nested, so a structural difference is visible as one:
+			// kind,pos,end(children...) in child order.
+			walk = func(n *ast.Node) bool {
+				out.WriteString(node(n))
+				out.WriteByte('(')
+				n.ForEachChild(walk)
+				out.WriteByte(')')
+				return false
+			}
+			walk(clone)
+			return out.String()
+		}))
+	}
+	return s.result()
+}
+
+// targets are where a statement is inserted: three line starts spread over the
+// file and one offset that is usually inside a line.
+func targets(file *ast.SourceFile) []int {
+	lines := scanner.GetECMALineStarts(file)
+	var out []int
+	add := func(p int) {
+		for _, seen := range out {
+			if seen == p {
+				return
+			}
+		}
+		out = append(out, p)
+	}
+	for _, index := range []int{0, len(lines) / 3, 2 * len(lines) / 3} {
+		add(int(lines[index]))
+	}
+	all := positions(len(file.Text()))
+	add(all[len(all)/2])
+	return out
+}
+
+// insertion is the body of the pinned handleFormatNodeForInsertion after its
+// request decoding, with the target offset already in bytes.
+func insertion(file *ast.SourceFile, settings lsutil.FormatCodeSettings, detail bool) map[string]any {
+	s := newStream(detail)
+	for index := range statements(file) {
+		root := decoded(s, file, index)
+		if root == nil {
+			continue
+		}
+		for _, pos := range targets(file) {
+			s.row("R|" + strconv.Itoa(index) + "|" + strconv.Itoa(pos) + "|" + call(func() string {
+				newLine := settings.NewLineCharacter
+				factory := ast.NewNodeFactory(ast.NodeFactoryHooks{})
+				text, nodeWithPos := printer.PrintAndPositionNode(factory, root, nil, newLine, settings.IndentSize, nil)
+				synthetic := printer.CreateSyntheticSourceFile(factory, nodeWithPos, text, file.ParseOptions())
+				atLineStart := format.GetLineStartPositionForPosition(pos, file) == pos
+				initial := format.GetIndentation(pos, file, settings, atLineStart)
+				delta := 0
+				if settings.IndentSize != 0 && format.ShouldIndentChildNode(settings, root, nil, nil) {
+					delta = settings.IndentSize
+				}
+				ctx := format.WithFormatCodeSettings(context.Background(), settings, newLine)
+				changes := format.FormatNodeGivenIndentation(ctx, nodeWithPos, synthetic, file.LanguageVariant, initial, delta)
+				return hex.EncodeToString([]byte(core.ApplyBulkEdits(text, changes)))
+			}))
+		}
+	}
+	return s.result()
+}
+
 // guarded records a native panic as the observation instead of ending the
 // process: a panic is a native outcome the port has to account for.
 func guarded(out map[string]any, name string, action func() any) {
@@ -303,6 +428,14 @@ func observe(r request) map[string]any {
 				guarded(result, v.name, func() any { return document(file, v.settings, r.Detail) })
 			}
 			out["format"] = result
+		case "position":
+			guarded(out, "position", func() any { return positioned(file, r.Detail) })
+		case "insert":
+			result := map[string]any{}
+			for _, v := range variants()[:2] {
+				guarded(result, v.name, func() any { return insertion(file, v.settings, r.Detail) })
+			}
+			out["insert"] = result
 		default:
 			out["error"] = "unknown operation " + strconv.Quote(op)
 			return out
