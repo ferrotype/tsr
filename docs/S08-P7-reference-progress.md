@@ -361,10 +361,27 @@ to close these gaps. Several thousand lines of reference code still need
 independent review. Prototype unit tests do not establish native fixture parity;
 the frozen comparison does.
 
-## Remaining
+## Result
 
-The six fixture families are closed. What is left is the owner's: the full
-normal/allocation capture (`scripts/s08_relater.py capture`), `cargo xtask run
-relater`, and the status regeneration. Until that capture is recorded the four E2
-relater criteria remain unmet in the ledger, although the parity the first one
-asks for now holds on the development host.
+The capture is recorded (`status/evidence`, run `relater`, state current). All
+four E2 relater criteria pass. Both implementations match every frozen case, so
+the comparison measures identical work, and the ratios are reference over ID:
+
+| quantity | ID | reference | ratio |
+| --- | --- | --- | --- |
+| relation interval (median of 7) | 63.6 ms | 81.2 ms | 1.276 |
+| setup interval | 1.613 s | 1.748 s | 1.084 |
+| bytes requested in the relation | 88.1 MB | 141.9 MB | 1.611 |
+| retained at the checkpoint | 1.292 GB | 3.149 GB | 2.437 |
+| bytes requested during setup | 3.55 GB | 4.51 GB | 1.270 |
+
+The byte series are identical across all seven samples per implementation. The
+timing is flagged unstable (max over min 1.146 for ID, 1.217 for the reference),
+but the bootstrap 95% interval for the relation ratio is 1.076 to 1.334, so the
+direction holds at the pessimistic end. The allocation-mode timing is much
+noisier and should not be quoted.
+
+The negative result is the answer the spike existed to produce: ADR 0008's
+fallback is measured, not assumed, and it loses on every axis. The reference is
+not extended further. Its remaining named refusals stay named rather than being
+closed, since work beyond parity on the frozen fixtures buys nothing now.
