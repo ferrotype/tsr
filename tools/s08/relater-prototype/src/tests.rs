@@ -21,18 +21,20 @@ fn self_linked(checker: &Checker, name: &'static str, value: &Rc<TypeCell>) -> R
             }
             let members = vec![
                 Member {
+                    name_type: None,
                     name: Rc::from("value"),
                     optional: false,
                     readonly: false,
                     class_member: true,
-                    r#type: value_link.clone(),
+                    r#type: value_link.clone().into(),
                 },
                 Member {
+                    name_type: None,
                     name: Rc::from("next"),
                     optional: false,
                     readonly: false,
                     class_member: true,
-                    r#type: next,
+                    r#type: next.into(),
                 },
             ];
             for member in &members {

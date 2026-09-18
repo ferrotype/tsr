@@ -3,23 +3,15 @@
 //! of stable heap cells linked by references instead of arena ids, with lazily
 //! resolved members that allocate during a relation.
 //!
-//! P1 fixed the safe construction and mutation API (below) and proved the
-//! recursion, assumption stack and relation cache on the frozen recursive
-//! fixtures. P7 extends the algorithm to the type kinds the 21 frozen fixtures
-//! of `data/s08/relater-fixtures.json` use where the isolated graph can carry
-//! them: intrinsics, literals (fresh and regular), unions, intersections and
-//! object types with properties, index signatures and non-generic call or
-//! construct signatures. A fixture whose relation needs generic instantiation,
-//! inference, conditional, mapped, template-literal or tuple machinery is
-//! reported as unsupported by construction (`Error::Unsupported`), never
-//! approximated; the measurement records which fixtures the reference covers.
+//! [`BoundChecker`] constructs its own type graph from completed AST/binder
+//! owners, compiler options and module-loader decisions. The measurement path
+//! never resolves types through the production checker. Member types, generic
+//! arguments, mapped templates and conditional branches retain native lazy
+//! construction points. Diagnostics carry structured native message identity.
 //!
-//! The graph is constructed from a [`Description`], a plain data snapshot the
-//! measurement child derives from the production checker's resolved types at
-//! setup time. Construction is not delegation: every relation, cache entry,
-//! assumption and diagnostic below is computed here; object members are
-//! materialized lazily on first use, so first-call work stays inside the
-//! relation interval.
+//! [`Description`] remains a focused graph-test API; the measurement child does
+//! not use it. Coverage is established by the frozen 105-group comparison, not
+//! by the constructors available here. Unimplemented branches fail explicitly.
 //!
 //! # Construction and mutation scopes
 //!
@@ -44,6 +36,29 @@
 use std::cell::{Cell, OnceCell, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::rc::{Rc, Weak};
+use ts_diagnostics as d;
+
+mod relation_keys;
+mod type_link;
+use type_link::TypeLink;
+
+mod bound;
+pub mod bound_input;
+pub use bound::BoundChecker;
+
+mod diagnostics;
+use diagnostics::ErrorChain;
+pub use diagnostics::{Diagnostic, DiagnosticLocation};
+
+mod constructors;
+mod display;
+mod generics;
+mod signatures;
+mod template;
+mod tuples;
+pub use generics::{GenericSignature, GenericTarget, ReferenceShape, TypeParameterShape};
+pub use template::TemplateParts;
+pub use tuples::{element_flags, ArrayElement, TupleShape};
 
 /// `Ternary`: `x & y` picks the lesser in the order False < Unknown < Maybe < True.
 pub type Ternary = i8;
@@ -81,6 +96,8 @@ pub mod flags {
     pub const INDEXED_ACCESS: u32 = 1 << 24;
     pub const CONDITIONAL: u32 = 1 << 25;
     pub const SUBSTITUTION: u32 = 1 << 26;
+    pub const INSTANTIABLE_NON_PRIMITIVE: u32 =
+        TYPE_PARAMETER | INDEXED_ACCESS | CONDITIONAL | SUBSTITUTION;
     pub const UNION: u32 = 1 << 27;
     pub const INTERSECTION: u32 = 1 << 28;
     pub const ANY_OR_UNKNOWN: u32 = ANY | UNKNOWN;
@@ -150,7 +167,9 @@ pub mod flags {
         | NEVER
         | OBJECT
         | UNION
-        | INTERSECTION;
+        | INTERSECTION
+        | TEMPLATE_LITERAL
+        | TYPE_PARAMETER;
 }
 
 /// `ObjectFlags` bits the algorithm consults.
@@ -158,7 +177,9 @@ pub mod object_flags {
     pub const CLASS: u32 = 1 << 0;
     pub const INTERFACE: u32 = 1 << 1;
     pub const REFERENCE: u32 = 1 << 2;
+    pub const TUPLE: u32 = 1 << 3;
     pub const ANONYMOUS: u32 = 1 << 4;
+    pub const MAPPED: u32 = 1 << 5;
     pub const INSTANTIATED: u32 = 1 << 6;
     pub const OBJECT_LITERAL: u32 = 1 << 7;
     pub const FRESH_LITERAL: u32 = 1 << 13;
@@ -211,17 +232,18 @@ fn unsupported<T>(what: &str) -> Result<T, Error> {
 /// A resolved property of an object type.
 #[derive(Clone, Debug)]
 pub struct Member {
+    pub(crate) name_type: Option<TypeLink>,
     pub name: Rc<str>,
     pub optional: bool,
     pub readonly: bool,
     /// `SymbolFlagsClassMember`: properties, methods and accessors.
     pub class_member: bool,
-    r#type: Weak<TypeCell>,
+    r#type: TypeLink,
 }
 
 impl Member {
     pub fn r#type(&self) -> Result<Rc<TypeCell>, Error> {
-        self.r#type.upgrade().ok_or(Error::Released)
+        self.r#type.resolve()
     }
 }
 
@@ -245,12 +267,14 @@ impl IndexInfo {
 /// A resolved, non-generic call or construct signature.
 #[derive(Clone, Debug)]
 pub struct Signature {
-    parameters: Vec<Weak<TypeCell>>,
+    parameters: Vec<TypeLink>,
+    pub parameter_names: Vec<Rc<str>>,
     pub min_argument_count: usize,
     pub has_rest_parameter: bool,
     pub type_parameters: usize,
-    this_type: Option<Weak<TypeCell>>,
-    return_type: Weak<TypeCell>,
+    pub generic: Option<Rc<GenericSignature>>,
+    this_type: Option<TypeLink>,
+    return_type: TypeLink,
     /// Method-style declarations compare parameters bivariantly.
     pub bivariant_parameters: bool,
     pub is_abstract: bool,
@@ -260,16 +284,16 @@ pub struct Signature {
 impl Signature {
     fn parameter(&self, index: usize) -> Result<Option<Rc<TypeCell>>, Error> {
         match self.parameters.get(index) {
-            Some(weak) => weak.upgrade().map(Some).ok_or(Error::Released),
+            Some(link) => link.resolve().map(Some),
             None => Ok(None),
         }
     }
     fn return_type(&self) -> Result<Rc<TypeCell>, Error> {
-        self.return_type.upgrade().ok_or(Error::Released)
+        self.return_type.resolve()
     }
     fn this_type(&self) -> Result<Option<Rc<TypeCell>>, Error> {
         match &self.this_type {
-            Some(weak) => weak.upgrade().map(Some).ok_or(Error::Released),
+            Some(link) => link.resolve().map(Some),
             None => Ok(None),
         }
     }
@@ -292,7 +316,7 @@ type Resolver = Box<dyn Fn(&Graph, &TypeCell) -> Result<Structure, Error>>;
 
 /// A literal type's value; identity of literal types is by cell (interned by
 /// the description), the value serves display and the enum-free simple checks.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LiteralValue {
     String(Vec<u8>),
     Number(u64),
@@ -309,6 +333,7 @@ pub struct TypeCell {
     /// Recursion identity for interface-like types (upstream: the symbol).
     symbol: Option<u64>,
     alias: Option<u64>,
+    alias_arguments: OnceCell<Vec<Weak<TypeCell>>>,
     literal: Option<LiteralValue>,
     fresh: bool,
     /// The fresh form of a regular literal, or the regular form of a fresh one.
@@ -316,6 +341,15 @@ pub struct TypeCell {
     /// Union or intersection constituents (eager, as upstream; linked once
     /// every described cell exists).
     types: RefCell<Vec<Weak<TypeCell>>>,
+    origin: OnceCell<Weak<TypeCell>>,
+    /// Type-reference/template metadata is installed once during construction.
+    tuple_shape: OnceCell<TupleShape>,
+    array_element: OnceCell<ArrayElement>,
+    template_parts: OnceCell<TemplateParts>,
+    reference_shape: OnceCell<ReferenceShape>,
+    generic_target: OnceCell<GenericTarget>,
+    type_parameter: OnceCell<TypeParameterShape>,
+    marker_instantiation: Cell<bool>,
     /// `isObjectTypeWithInferableIndex`.
     inferable_index: bool,
     /// Set once by the first `structure` call; empty for non-objects.
@@ -415,6 +449,9 @@ pub struct Graph {
     /// index infos and signatures upstream).
     lazy_records: RefCell<Vec<Rc<Member>>>,
     lazy_extra: Cell<usize>,
+    literal_cache: RefCell<HashMap<(u32, LiteralValue), Weak<TypeCell>>>,
+    union_cache: RefCell<HashMap<(Vec<u32>, Option<(u64, Vec<u32>)>, Option<u32>), Weak<TypeCell>>>,
+    template_cache: RefCell<HashMap<template::TemplateKey, Weak<TypeCell>>>,
 }
 
 impl Graph {
@@ -458,10 +495,19 @@ impl Graph {
             name,
             symbol,
             alias,
+            alias_arguments: OnceCell::new(),
             literal,
             fresh,
             alternate: RefCell::new(Weak::new()),
             types: RefCell::new(types),
+            origin: OnceCell::new(),
+            tuple_shape: OnceCell::new(),
+            array_element: OnceCell::new(),
+            template_parts: OnceCell::new(),
+            reference_shape: OnceCell::new(),
+            generic_target: OnceCell::new(),
+            type_parameter: OnceCell::new(),
+            marker_instantiation: Cell::new(false),
             inferable_index,
             structure: OnceCell::new(),
             resolver: RefCell::new(resolver),
@@ -511,11 +557,12 @@ impl Graph {
                     return Err(Error::UndeclaredMember(name.clone()));
                 }
                 let member = Member {
+                    name_type: None,
                     name: name.clone(),
                     optional: *optional,
                     readonly: false,
                     class_member: true,
-                    r#type: r#type.clone(),
+                    r#type: r#type.clone().into(),
                 };
                 // Upstream allocates a property symbol per member here.
                 graph
@@ -686,11 +733,12 @@ impl Graph {
                         let mut structure = Structure::default();
                         for member in &members {
                             let record = Member {
+                                name_type: None,
                                 name: Rc::from(member.name.as_str()),
                                 optional: member.optional,
                                 readonly: member.readonly,
                                 class_member: member.class_member,
-                                r#type: link(member.r#type, &member.name)?,
+                                r#type: link(member.r#type, &member.name)?.into(),
                             };
                             // Upstream allocates a property symbol per member here.
                             graph
@@ -710,19 +758,21 @@ impl Graph {
                         let signature =
                             |desc: &SignatureDesc, construct: bool| -> Result<Signature, Error> {
                                 Ok(Signature {
+                                    parameter_names: Vec::new(),
                                     parameters: desc
                                         .parameters
                                         .iter()
-                                        .map(|index| link(*index, "parameter"))
+                                        .map(|index| link(*index, "parameter").map(Into::into))
                                         .collect::<Result<Vec<_>, _>>()?,
                                     min_argument_count: desc.min_argument_count,
                                     has_rest_parameter: desc.has_rest_parameter,
                                     type_parameters: desc.type_parameters,
+                                    generic: None,
                                     this_type: desc
                                         .this_type
-                                        .map(|index| link(index, "this"))
+                                        .map(|index| link(index, "this").map(Into::into))
                                         .transpose()?,
-                                    return_type: link(desc.return_type, "return")?,
+                                    return_type: link(desc.return_type, "return")?.into(),
                                     bivariant_parameters: desc.bivariant_parameters,
                                     is_abstract: desc.is_abstract,
                                     is_construct: construct,
@@ -851,9 +901,14 @@ const RECURSION_BOTH: u8 = 3;
 pub struct Checker {
     pub graph: Graph,
     relations: [Relation; 5],
-    diagnostics: RefCell<Vec<String>>,
+    diagnostics: RefCell<Vec<Diagnostic>>,
+    member_declarations: RefCell<HashMap<(u32, Rc<str>), DiagnosticLocation>>,
     observer: RefCell<Vec<Ternary>>,
     intrinsics: RefCell<HashMap<u32, Rc<TypeCell>>>,
+    apparent_types: RefCell<HashMap<u32, Weak<TypeCell>>>,
+    property_keys: RefCell<HashMap<u32, Weak<TypeCell>>>,
+    variance_markers: OnceCell<generics::VarianceMarkers>,
+    variance_stack: RefCell<Vec<Weak<TypeCell>>>,
 }
 
 fn relation_index(mode: Mode) -> usize {
@@ -879,6 +934,40 @@ impl Checker {
         }
     }
 
+    pub fn register_apparent_type(&self, flags: u32, cell: &Rc<TypeCell>) -> Result<(), Error> {
+        if !self.graph.owns(cell) {
+            return unsupported("apparent type owner mismatch");
+        }
+        self.apparent_types
+            .borrow_mut()
+            .insert(flags, Rc::downgrade(cell));
+        Ok(())
+    }
+
+    fn apparent_primitive_type(&self, source: &Rc<TypeCell>) -> Result<Rc<TypeCell>, Error> {
+        let flag = if source.flags & flags::STRING_LIKE != 0 {
+            flags::STRING
+        } else if source.flags & flags::NUMBER_LIKE != 0 {
+            flags::NUMBER
+        } else if source.flags & flags::BIG_INT_LIKE != 0 {
+            flags::BIG_INT
+        } else if source.flags & flags::BOOLEAN_LIKE != 0 {
+            flags::BOOLEAN
+        } else if source.flags & flags::ES_SYMBOL_LIKE != 0 {
+            flags::ES_SYMBOL
+        } else if source.flags & flags::NON_PRIMITIVE != 0 {
+            flags::NON_PRIMITIVE
+        } else {
+            return Ok(source.clone());
+        };
+        self.apparent_types
+            .borrow()
+            .get(&flag)
+            .ok_or_else(|| Error::Unsupported("primitive wrapper not initialized".into()))?
+            .upgrade()
+            .ok_or(Error::Released)
+    }
+
     fn intrinsic(&self, flag: u32) -> Result<Rc<TypeCell>, Error> {
         self.intrinsics
             .borrow()
@@ -892,7 +981,28 @@ impl Checker {
     }
 
     pub fn diagnostics(&self) -> Vec<String> {
-        self.diagnostics.borrow().clone()
+        self.diagnostics
+            .borrow()
+            .iter()
+            .map(Diagnostic::display_text)
+            .collect()
+    }
+
+    pub fn structured_diagnostics(&self) -> std::cell::Ref<'_, [Diagnostic]> {
+        std::cell::Ref::map(self.diagnostics.borrow(), |diagnostics| {
+            diagnostics.as_slice()
+        })
+    }
+
+    pub fn register_member_declaration(
+        &self,
+        owner: &TypeCell,
+        name: impl Into<Rc<str>>,
+        location: DiagnosticLocation,
+    ) {
+        self.member_declarations
+            .borrow_mut()
+            .insert((owner.id, name.into()), location);
     }
 
     /// Every `checkTypeRelatedTo` ternary since the last `take_observed`.
@@ -910,6 +1020,22 @@ impl Checker {
         mode: Mode,
         report_errors: bool,
     ) -> Result<(Ternary, bool), Error> {
+        self.check_type_related_to_at(
+            source,
+            target,
+            mode,
+            report_errors.then(DiagnosticLocation::default),
+        )
+    }
+
+    pub fn check_type_related_to_at(
+        &self,
+        source: &Rc<TypeCell>,
+        target: &Rc<TypeCell>,
+        mode: Mode,
+        error_location: Option<DiagnosticLocation>,
+    ) -> Result<(Ternary, bool), Error> {
+        let report_errors = error_location.is_some();
         let relation = self.relation(mode);
         let mut relater = Relater {
             checker: self,
@@ -922,7 +1048,8 @@ impl Checker {
             expanding_flags: 0,
             relation_count: (16_000_000 - relation.entries() as i64) / 8,
             overflow: false,
-            error_chain: Vec::new(),
+            error_chain: ErrorChain::default(),
+            related_info: Vec::new(),
         };
         let result = relater.is_related_to_ex(
             source,
@@ -937,14 +1064,16 @@ impl Checker {
                 key,
                 relation_result::FAILED | relation_result::COMPLEXITY_OVERFLOW,
             );
-            self.diagnostics.borrow_mut().push(format!(
-                "Excessive complexity comparing types '{}' and '{}'.",
-                source.name, target.name
+            self.diagnostics.borrow_mut().push(Diagnostic::new(
+                error_location.unwrap_or_default(),
+                d::Excessive_complexity_comparing_types_0_and_1,
+                vec![self.type_to_string(source)?, self.type_to_string(target)?],
             ));
-        } else if !relater.error_chain.is_empty() {
-            self.diagnostics
-                .borrow_mut()
-                .push(relater.error_chain.join(" | "));
+        } else if let Some(diagnostic) = relater
+            .error_chain
+            .diagnostic(&error_location.unwrap_or_default(), &relater.related_info)
+        {
+            self.diagnostics.borrow_mut().push(diagnostic);
         }
         self.observer.borrow_mut().push(result);
         Ok((result, result != FALSE))
@@ -1179,7 +1308,8 @@ struct Relater<'c> {
     expanding_flags: u8,
     relation_count: i64,
     overflow: bool,
-    error_chain: Vec<String>,
+    error_chain: ErrorChain,
+    related_info: Vec<Diagnostic>,
 }
 
 const EXPANDING_SOURCE: u8 = 1;
@@ -1191,36 +1321,55 @@ impl Relater<'_> {
         &self.checker.graph
     }
 
-    fn report(&mut self, report_errors: bool, message: String) {
+    fn report(&mut self, report_errors: bool, message: &'static d::Message, args: Vec<String>) {
         if report_errors {
-            self.error_chain.push(message);
+            self.report_error(message, args);
         }
     }
 
-    fn error_state(&self) -> usize {
-        self.error_chain.len()
+    fn report_error(&mut self, message: &'static d::Message, args: Vec<String>) {
+        self.error_chain.report(message, args);
     }
 
-    fn restore_error_state(&mut self, state: usize) {
-        self.error_chain.truncate(state);
+    fn error_state(&self) -> (ErrorChain, Vec<Diagnostic>) {
+        (self.error_chain.clone(), self.related_info.clone())
     }
 
-    fn relation_message(&self, source: &TypeCell, target: &TypeCell) -> String {
-        match self.mode {
-            Mode::Comparable => format!(
-                "Type '{}' is not comparable to type '{}'.",
-                source.name, target.name
-            ),
-            _ => format!(
-                "Type '{}' is not assignable to type '{}'.",
-                source.name, target.name
-            ),
+    fn restore_error_state(&mut self, state: (ErrorChain, Vec<Diagnostic>)) {
+        (self.error_chain, self.related_info) = state;
+    }
+
+    fn report_error_results(
+        &mut self,
+        source: &Rc<TypeCell>,
+        target: &Rc<TypeCell>,
+    ) -> Result<(), Error> {
+        let source_name = self.checker.type_to_string(source)?;
+        let target_name = self.checker.type_to_string(target)?;
+        if source.is_readonly_array_or_tuple()
+            && target.is_array_or_tuple()
+            && !target.is_readonly_array_or_tuple()
+        {
+            self.report_error(
+                d::The_type_0_is_readonly_and_cannot_be_assigned_to_the_mutable_type_1,
+                vec![source_name.clone(), target_name.clone()],
+            );
         }
-    }
-
-    fn report_error_results(&mut self, source: &TypeCell, target: &TypeCell) {
-        let message = self.relation_message(source, target);
-        self.error_chain.push(message);
+        if self
+            .error_chain
+            .suppress_relation(&source_name, &target_name)
+        {
+            return Ok(());
+        }
+        let message = if self.mode == Mode::Comparable {
+            d::Type_0_is_not_comparable_to_type_1
+        } else if source_name == target_name {
+            d::Type_0_is_not_assignable_to_type_1_Two_different_types_with_this_name_exist_but_they_are_unrelated
+        } else {
+            d::Type_0_is_not_assignable_to_type_1
+        };
+        self.report_error(message, vec![source_name, target_name]);
+        Ok(())
     }
 
     fn is_related_to(
@@ -1275,7 +1424,7 @@ impl Relater<'_> {
                 return Ok(TRUE);
             }
             if report_errors {
-                self.report_error_results(original_source, original_target);
+                self.report_error_results(original_source, original_target)?;
             }
             return Ok(FALSE);
         }
@@ -1350,21 +1499,23 @@ impl Relater<'_> {
                 && !self.has_common_properties(&source, &target)?
             {
                 if report_errors {
-                    let source_name = if original_source.alias.is_some() {
-                        &original_source.name
+                    let source_display = if original_source.alias.is_some() {
+                        original_source
                     } else {
-                        &source.name
+                        &source
                     };
-                    let target_name = if original_target.alias.is_some() {
-                        &original_target.name
+                    let target_display = if original_target.alias.is_some() {
+                        original_target
                     } else {
-                        &target.name
+                        &target
                     };
-                    let message = format!(
-                        "Type '{}' has no properties in common with type '{}'.",
-                        source_name, target_name
+                    self.report_error(
+                        d::Type_0_has_no_properties_in_common_with_type_1,
+                        vec![
+                            self.checker.type_to_string(source_display)?,
+                            self.checker.type_to_string(target_display)?,
+                        ],
                     );
-                    self.error_chain.push(message);
                 }
                 return Ok(FALSE);
             }
@@ -1405,7 +1556,7 @@ impl Relater<'_> {
             } else {
                 &target
             };
-            self.report_error_results(source, target);
+            self.report_error_results(source, target)?;
         }
         Ok(FALSE)
     }
@@ -1704,42 +1855,37 @@ impl Relater<'_> {
                 return Ok(None);
             }
         }
-        // findMostOverlappyType: keyof overlap counted as common property names.
-        let mut best: Option<Rc<TypeCell>> = None;
+        // port: tsc/internal/checker/relater.go:Checker.findMostOverlappyType
+        let mut best = None;
         if source.flags & (flags::PRIMITIVE | flags::INSTANTIABLE_PRIMITIVE) == 0 {
             let mut matching = 0;
-            let source_names = self.key_names(source)?;
             for candidate in target.types()? {
                 if candidate.flags & (flags::PRIMITIVE | flags::INSTANTIABLE_PRIMITIVE) == 0 {
-                    let target_names = self.key_names(&candidate)?;
-                    let length = match (&source_names, &target_names) {
-                        (None, _) | (_, None) => {
-                            return unsupported("index-signature keyof overlap")
+                    let source_keys = self.relation_key_type(source)?;
+                    let target_keys = self.relation_key_type(&candidate)?;
+                    let overlap = self.key_intersection(&source_keys, &target_keys)?;
+                    if overlap.flags & flags::INDEX != 0 {
+                        return Ok(Some(candidate));
+                    }
+                    if overlap.flags & (flags::UNIT | flags::UNION) != 0 {
+                        let length = if overlap.flags & flags::UNION != 0 {
+                            overlap
+                                .types()?
+                                .iter()
+                                .filter(|ty| ty.flags & flags::UNIT != 0)
+                                .count()
+                        } else {
+                            1
+                        };
+                        if length >= matching {
+                            best = Some(candidate);
+                            matching = length;
                         }
-                        (Some(a), Some(b)) => a.iter().filter(|name| b.contains(*name)).count(),
-                    };
-                    if length >= 1 && length >= matching {
-                        best = Some(candidate.clone());
-                        matching = length;
                     }
                 }
             }
         }
         Ok(best)
-    }
-
-    /// Property names of an object-like type, or `None` when an index
-    /// signature makes `keyof` non-literal.
-    fn key_names(&mut self, t: &Rc<TypeCell>) -> Result<Option<Vec<Rc<str>>>, Error> {
-        if !self.index_infos_of_type(t)?.is_empty() {
-            return Ok(None);
-        }
-        Ok(Some(
-            self.properties_of_type(t)?
-                .iter()
-                .map(|m| m.name.clone())
-                .collect(),
-        ))
     }
 
     fn has_discriminant_properties(
@@ -1800,11 +1946,13 @@ impl Relater<'_> {
                 // Elaborating errors: compare again to produce the message.
             } else {
                 if report_errors && entry & relation_result::OVERFLOW != 0 {
-                    let message = format!(
-                        "Excessive complexity comparing types '{}' and '{}'.",
-                        source.name, target.name
+                    self.report_error(
+                        d::Excessive_complexity_comparing_types_0_and_1,
+                        vec![
+                            self.checker.type_to_string(source)?,
+                            self.checker.type_to_string(target)?,
+                        ],
                     );
-                    self.error_chain.push(message);
                 }
                 return Ok(if entry & relation_result::SUCCEEDED != 0 {
                     TRUE
@@ -1971,6 +2119,9 @@ impl Relater<'_> {
                 }
                 return Ok(result);
             }
+            if source.flags & flags::TEMPLATE_LITERAL != 0 {
+                return self.template_identity_related_to(source, target);
+            }
             if source.flags & flags::OBJECT == 0 {
                 return Ok(FALSE);
             }
@@ -1994,14 +2145,60 @@ impl Relater<'_> {
                 return Ok(FALSE);
             }
         }
-        let source_is_primitive = source.flags & flags::PRIMITIVE != 0;
-        if self.mode != Mode::Identity && source_is_primitive {
-            // `getApparentType` would substitute the global wrapper object types.
-            return unsupported("apparent type of a primitive source");
+        if self.mode != Mode::Identity && target.flags & flags::TEMPLATE_LITERAL != 0 {
+            return self.template_related_to(source, target);
         }
+        if source.flags & flags::TYPE_PARAMETER != 0 {
+            if let Some(constraint) = source
+                .type_parameter_shape()
+                .map(TypeParameterShape::constraint)
+                .transpose()?
+                .flatten()
+            {
+                if !Rc::ptr_eq(&constraint, source) {
+                    let result = self.is_related_to_ex(
+                        &constraint,
+                        target,
+                        RECURSION_SOURCE,
+                        report_errors,
+                        intersection_state,
+                    )?;
+                    if result != FALSE {
+                        return Ok(result);
+                    }
+                }
+            }
+            return Ok(FALSE);
+        }
+        if target.flags & flags::TYPE_PARAMETER != 0 {
+            return Ok(FALSE);
+        }
+        // A pattern template is not an object wrapper when the target is a
+        // primitive. Its base constraint is itself for concrete placeholders.
+        if source.flags & flags::TEMPLATE_LITERAL != 0 && target.flags & flags::OBJECT == 0 {
+            return Ok(FALSE);
+        }
+        let source_is_primitive = source.flags & flags::PRIMITIVE != 0;
+        let apparent_source;
+        let source = if self.mode != Mode::Identity
+            && (source_is_primitive || source.flags & flags::NON_PRIMITIVE != 0)
+        {
+            apparent_source = self.checker.apparent_primitive_type(source)?;
+            &apparent_source
+        } else {
+            source
+        };
         if source.flags & flags::OBJECT != 0 && target.flags & flags::OBJECT != 0 {
+            if let Some(result) =
+                self.reference_arguments_related(source, target, report_errors, intersection_state)?
+            {
+                return Ok(result);
+            }
             if source.object_flags & object_flags::REFERENCE != 0
                 && target.object_flags & object_flags::REFERENCE != 0
+                && !source.is_array_or_tuple()
+                && !target.is_array_or_tuple()
+                && (source.reference_shape().is_none() || target.reference_shape().is_none())
             {
                 return unsupported("type reference variance");
             }
@@ -2133,6 +2330,7 @@ impl Relater<'_> {
                                 );
                             }
                             let merged = Member {
+                                name_type: existing.name_type.clone(),
                                 name: existing.name.clone(),
                                 optional: if t.flags & flags::UNION != 0 {
                                     existing.optional || member.optional
@@ -2310,8 +2508,7 @@ impl Relater<'_> {
 
     // ---- properties -----------------------------------------------------------
 
-    /// `propertiesRelatedTo` for object-like sources and targets (tuples are
-    /// not carried).
+    /// `propertiesRelatedTo` for object-like sources and targets.
     fn properties_related_to(
         &mut self,
         source: &Rc<TypeCell>,
@@ -2323,10 +2520,16 @@ impl Relater<'_> {
         if self.mode == Mode::Identity {
             return self.properties_identical_to(source, target);
         }
+        if let Some(result) =
+            self.tuple_properties_related_to(source, target, report_errors, intersection_state)?
+        {
+            return Ok(result);
+        }
         let mut result = TRUE;
         let require_optional_properties = (self.mode == Mode::Subtype
             || self.mode == Mode::StrictSubtype)
-            && !is_object_literal_type(source);
+            && !is_object_literal_type(source)
+            && source.tuple_shape().is_none();
         let target_properties = self.properties_of_type(target)?;
         let unmatched: Vec<Member> = {
             let mut missing = Vec::new();
@@ -2342,11 +2545,26 @@ impl Relater<'_> {
         if let Some(first) = unmatched.first() {
             if report_errors && self.should_report_unmatched_property_error(source, target)? {
                 if unmatched.len() == 1 {
-                    let message = format!(
-                        "Property '{}' is missing in type '{}' but required in type '{}'.",
-                        first.name, source.name, target.name
+                    self.report_error(
+                        d::Property_0_is_missing_in_type_1_but_required_in_type_2,
+                        vec![
+                            first.name.to_string(),
+                            self.checker.type_to_string(source)?,
+                            self.checker.type_to_string(target)?,
+                        ],
                     );
-                    self.error_chain.push(message);
+                    if let Some(location) = self
+                        .checker
+                        .member_declarations
+                        .borrow()
+                        .get(&(target.id, first.name.clone()))
+                    {
+                        self.related_info.push(Diagnostic::new(
+                            location.clone(),
+                            d::X_0_is_declared_here,
+                            vec![first.name.to_string()],
+                        ));
+                    }
                 } else {
                     let names: Vec<&str> = unmatched
                         .iter()
@@ -2357,17 +2575,18 @@ impl Relater<'_> {
                         })
                         .map(|m| &*m.name)
                         .collect();
+                    let mut args = vec![
+                        self.checker.type_to_string(source)?,
+                        self.checker.type_to_string(target)?,
+                        names.join(", "),
+                    ];
                     let message = if unmatched.len() > 5 {
-                        format!("Type '{}' is missing the following properties from type '{}': {}, and {} more.", source.name, target.name, names.join(", "), unmatched.len() - 4)
+                        args.push((unmatched.len() - 4).to_string());
+                        d::Type_0_is_missing_the_following_properties_from_type_1_Colon_2_and_3_more
                     } else {
-                        format!(
-                            "Type '{}' is missing the following properties from type '{}': {}",
-                            source.name,
-                            target.name,
-                            names.join(", ")
-                        )
+                        d::Type_0_is_missing_the_following_properties_from_type_1_Colon_2
                     };
-                    self.error_chain.push(message);
+                    self.report_error(message, args);
                 }
             }
             return Ok(FALSE);
@@ -2375,13 +2594,15 @@ impl Relater<'_> {
         if is_object_literal_type(target) {
             for source_prop in self.properties_of_type(source)? {
                 if self.property_of_type(target, &source_prop.name)?.is_none() {
-                    self.report(
-                        report_errors,
-                        format!(
-                            "Property '{}' does not exist on type '{}'.",
-                            source_prop.name, target.name
-                        ),
-                    );
+                    if report_errors {
+                        self.report_error(
+                            d::Property_0_does_not_exist_on_type_1,
+                            vec![
+                                source_prop.name.to_string(),
+                                self.checker.type_to_string(target)?,
+                            ],
+                        );
+                    }
                     return Ok(FALSE);
                 }
             }
@@ -2477,7 +2698,8 @@ impl Relater<'_> {
         if related == FALSE {
             self.report(
                 report_errors,
-                format!("Types of property '{}' are incompatible.", target_prop.name),
+                d::Types_of_property_0_are_incompatible,
+                vec![target_prop.name.to_string()],
             );
             return Ok(FALSE);
         }
@@ -2486,13 +2708,16 @@ impl Relater<'_> {
             && target_prop.class_member
             && !target_prop.optional
         {
-            self.report(
-                report_errors,
-                format!(
-                    "Property '{}' is optional in type '{}' but required in type '{}'.",
-                    target_prop.name, source.name, target.name
-                ),
-            );
+            if report_errors {
+                self.report_error(
+                    d::Property_0_is_optional_in_type_1_but_required_in_type_2,
+                    vec![
+                        target_prop.name.to_string(),
+                        self.checker.type_to_string(source)?,
+                        self.checker.type_to_string(target)?,
+                    ],
+                );
+            }
             return Ok(FALSE);
         }
         Ok(related)
@@ -2556,8 +2781,8 @@ impl Relater<'_> {
         {
             self.report(
                 report_errors,
-                "Cannot assign an abstract constructor type to a non-abstract constructor type."
-                    .into(),
+                d::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type,
+                vec![],
             );
             return Ok(FALSE);
         }
@@ -2568,8 +2793,30 @@ impl Relater<'_> {
             && source.symbol == target.symbol
             || source.object_flags & object_flags::REFERENCE != 0
                 && target.object_flags & object_flags::REFERENCE != 0
+                && match (source.reference_shape(), target.reference_shape()) {
+                    (Some(source), Some(target)) => {
+                        Rc::ptr_eq(&source.target()?, &target.target()?)
+                    }
+                    _ => false,
+                }
         {
-            return unsupported("instantiated signature pairing");
+            if source_signatures.len() != target_signatures.len() {
+                return unsupported("same-target signature inventory differs");
+            }
+            for (source, target) in source_signatures.iter().zip(&target_signatures) {
+                let related = self.signature_related_to(
+                    source,
+                    target,
+                    true,
+                    report_errors,
+                    intersection_state,
+                )?;
+                if related == FALSE {
+                    return Ok(FALSE);
+                }
+                result &= related;
+            }
+            return Ok(result);
         }
         if source_signatures.len() == 1 && target_signatures.len() == 1 {
             let erase = self.mode == Mode::Comparable;
@@ -2600,26 +2847,18 @@ impl Relater<'_> {
                     should_elaborate = false;
                 }
                 if should_elaborate {
-                    let message = format!(
-                        "Type '{}' provides no match for the signature '{}'.",
-                        source.name,
-                        Self::signature_text(t)?
+                    self.report_error(
+                        d::Type_0_provides_no_match_for_the_signature_1,
+                        vec![
+                            self.checker.type_to_string(source)?,
+                            self.checker.signature_to_string(t)?,
+                        ],
                     );
-                    self.error_chain.push(message);
                 }
                 return Ok(FALSE);
             }
         }
         Ok(result)
-    }
-
-    fn signature_text(s: &Signature) -> Result<String, Error> {
-        let mut parts = Vec::new();
-        for index in 0..s.parameter_count() {
-            let parameter = s.parameter(index)?.ok_or(Error::Released)?;
-            parts.push(format!("p{index}: {}", parameter.name));
-        }
-        Ok(format!("({}): {}", parts.join(", "), s.return_type()?.name))
     }
 
     fn signature_related_to(
@@ -2630,9 +2869,15 @@ impl Relater<'_> {
         report_errors: bool,
         intersection_state: u8,
     ) -> Result<Ternary, Error> {
-        if erase && (source.type_parameters > 0 || target.type_parameters > 0) {
-            return unsupported("erased generic signature");
-        }
+        let erased_source;
+        let erased_target;
+        let (source, target) = if erase {
+            erased_source = self.erased_signature(source)?;
+            erased_target = self.erased_signature(target)?;
+            (&erased_source, &erased_target)
+        } else {
+            (source, target)
+        };
         let strict_top = self.mode == Mode::Subtype || self.mode == Mode::StrictSubtype;
         let strict_arity = self.mode == Mode::StrictSubtype;
         self.compare_signatures_related(
@@ -2646,8 +2891,7 @@ impl Relater<'_> {
         )
     }
 
-    /// `compareSignaturesRelated` for non-generic signatures without rest
-    /// parameters; callback parameters recurse bivariantly as upstream.
+    /// `compareSignaturesRelated`; callback parameters recurse bivariantly.
     #[allow(clippy::too_many_arguments, clippy::fn_params_excessive_bools)]
     fn compare_signatures_related(
         &mut self,
@@ -2659,30 +2903,55 @@ impl Relater<'_> {
         report_errors: bool,
         intersection_state: u8,
     ) -> Result<Ternary, Error> {
-        if source.type_parameters > 0 || target.type_parameters > 0 {
-            return unsupported("generic signature comparison");
+        if !(strict_top && source.is_top_signature()?) && target.is_top_signature()? {
+            return Ok(TRUE);
         }
-        if source.has_rest_parameter || target.has_rest_parameter {
-            return unsupported("rest parameter comparison");
+        if strict_top && source.is_top_signature()? && !target.is_top_signature()? {
+            return Ok(FALSE);
         }
-        let _ = strict_top; // top signatures need rest parameters, which are not carried
-        let target_count = target.parameter_count();
-        let source_has_more = if strict_arity {
-            source.parameter_count() > target_count
-        } else {
-            source.min_argument_count > target_count
-        };
+        let target_count = target.effective_parameter_count()?;
+        let source_has_more = !target.has_effective_rest_parameter()?
+            && if strict_arity {
+                source.has_effective_rest_parameter()?
+                    || source.effective_parameter_count()? > target_count
+            } else {
+                self.min_argument_count(source)? > target_count
+            };
         if source_has_more {
             if report_errors && !strict_arity {
-                let message = format!(
-                    "Target signature provides too few arguments. Expected {} or more, but got {}.",
-                    source.min_argument_count, target_count
+                self.report_error(
+                    d::Target_signature_provides_too_few_arguments_Expected_0_or_more_but_got_1,
+                    vec![
+                        self.min_argument_count(source)?.to_string(),
+                        target_count.to_string(),
+                    ],
                 );
-                self.error_chain.push(message);
             }
             return Ok(FALSE);
         }
-        let source_count = source.parameter_count();
+        let instantiated;
+        let same_type_parameters =
+            if let (Some(source), Some(target)) = (&source.generic, &target.generic) {
+                let source = source.parameters()?;
+                let target = target.parameters()?;
+                source.len() == target.len()
+                    && source
+                        .iter()
+                        .zip(&target)
+                        .all(|(source, target)| Rc::ptr_eq(source, target))
+            } else {
+                false
+            };
+        let (source, target) = if source.type_parameters > 0 && !same_type_parameters {
+            instantiated = self.instantiate_signature_in_context(source, target)?;
+            (&instantiated.0, &instantiated.1)
+        } else {
+            (source, target)
+        };
+        let source_count = source.effective_parameter_count()?;
+        if source.has_non_array_rest_type()? || target.has_non_array_rest_type()? {
+            return unsupported("signature non-array rest slicing");
+        }
         let strict_variance = !callback && !target.bivariant_parameters;
         let mut result = TRUE;
         if let Some(source_this) = source.this_type()? {
@@ -2710,7 +2979,8 @@ impl Relater<'_> {
                     if related == FALSE {
                         self.report(
                             report_errors,
-                            "The 'this' types of each signature are incompatible.".into(),
+                            d::The_this_types_of_each_signature_are_incompatible,
+                            vec![],
                         );
                         return Ok(FALSE);
                     }
@@ -2720,8 +2990,8 @@ impl Relater<'_> {
         }
         let param_count = source_count.max(target_count);
         for i in 0..param_count {
-            let source_type = source.parameter(i)?;
-            let target_type = target.parameter(i)?;
+            let source_type = self.try_signature_type_at_position(source, i)?;
+            let target_type = self.try_signature_type_at_position(target, i)?;
             if let (Some(source_type), Some(target_type)) = (source_type, target_type) {
                 if Rc::ptr_eq(&source_type, &target_type) && !strict_arity {
                     continue;
@@ -2775,8 +3045,8 @@ impl Relater<'_> {
                 }
                 if related != FALSE
                     && strict_arity
-                    && i >= source.min_argument_count
-                    && i < target.min_argument_count
+                    && i >= self.min_argument_count(source)?
+                    && i < self.min_argument_count(target)?
                     && self.is_related_to_ex(
                         &source_type,
                         &target_type,
@@ -2790,7 +3060,17 @@ impl Relater<'_> {
                 if related == FALSE {
                     self.report(
                         report_errors,
-                        format!("Types of parameters 'p{i}' and 'p{i}' are incompatible."),
+                        d::Types_of_parameters_0_and_1_are_incompatible,
+                        vec![
+                            source
+                                .parameter_names
+                                .get(i)
+                                .map_or_else(|| format!("p{i}"), ToString::to_string),
+                            target
+                                .parameter_names
+                                .get(i)
+                                .map_or_else(|| format!("p{i}"), ToString::to_string),
+                        ],
                     );
                     return Ok(FALSE);
                 }
@@ -2811,27 +3091,24 @@ impl Relater<'_> {
         )?;
         result &= related;
         if result == FALSE && report_errors {
-            let message =
-                if source.parameter_count() == 0 && target.parameter_count() == 0 {
-                    format!(
-                    "{} signatures with no arguments have incompatible return types '{}' and '{}'.",
-                    if source.is_construct { "Construct" } else { "Call" },
-                    source_return.name,
-                    target_return.name
-                )
+            let message = if source.parameter_count() == 0 && target.parameter_count() == 0 {
+                if source.is_construct {
+                    d::Construct_signatures_with_no_arguments_have_incompatible_return_types_0_and_1
                 } else {
-                    format!(
-                        "{} signature return types '{}' and '{}' are incompatible.",
-                        if source.is_construct {
-                            "Construct"
-                        } else {
-                            "Call"
-                        },
-                        source_return.name,
-                        target_return.name
-                    )
-                };
-            self.error_chain.push(message);
+                    d::Call_signatures_with_no_arguments_have_incompatible_return_types_0_and_1
+                }
+            } else if source.is_construct {
+                d::Construct_signature_return_types_0_and_1_are_incompatible
+            } else {
+                d::Call_signature_return_types_0_and_1_are_incompatible
+            };
+            self.report_error(
+                message,
+                vec![
+                    self.checker.type_to_string(&source_return)?,
+                    self.checker.type_to_string(&target_return)?,
+                ],
+            );
         }
         Ok(result)
     }
@@ -2881,18 +3158,26 @@ impl Relater<'_> {
         source: &Signature,
         target: &Signature,
     ) -> Result<Ternary, Error> {
-        if source.type_parameters > 0 || target.type_parameters > 0 {
-            return unsupported("generic signature identity");
-        }
-        if source.has_rest_parameter || target.has_rest_parameter {
-            return unsupported("rest parameter identity");
+        if source.type_parameters != target.type_parameters {
+            return Ok(FALSE);
         }
         // isMatchingSignature.
-        if !(source.parameter_count() == target.parameter_count()
-            && source.min_argument_count == target.min_argument_count)
+        if !(source.effective_parameter_count()? == target.effective_parameter_count()?
+            && self.min_argument_count(source)? == self.min_argument_count(target)?
+            && source.has_effective_rest_parameter()? == target.has_effective_rest_parameter()?)
         {
             return Ok(FALSE);
         }
+        let instantiated;
+        let source = if source.type_parameters > 0 {
+            instantiated = self.instantiate_identical_signature(source, target)?;
+            let Some(instantiated) = &instantiated else {
+                return Ok(FALSE);
+            };
+            instantiated
+        } else {
+            source
+        };
         let mut result = TRUE;
         if let (Some(s), Some(t)) = (source.this_type()?, target.this_type()?) {
             let related = self.is_related_to_simple(&s, &t)?;
@@ -2901,9 +3186,15 @@ impl Relater<'_> {
             }
             result &= related;
         }
-        for i in 0..target.parameter_count() {
-            let s = source.parameter(i)?.ok_or(Error::Released)?;
-            let t = target.parameter(i)?.ok_or(Error::Released)?;
+        for i in 0..target.effective_parameter_count()? {
+            let s = match self.try_signature_type_at_position(source, i)? {
+                Some(ty) => ty,
+                None => self.checker.intrinsic(flags::ANY)?,
+            };
+            let t = match self.try_signature_type_at_position(target, i)? {
+                Some(ty) => ty,
+                None => self.checker.intrinsic(flags::ANY)?,
+            };
             let related = self.is_related_to_simple(&t, &s)?;
             if related == FALSE {
                 return Ok(FALSE);
@@ -2984,13 +3275,15 @@ impl Relater<'_> {
                 intersection_state,
             );
         }
-        self.report(
-            report_errors,
-            format!(
-                "Index signature for type '{}' is missing in type '{}'.",
-                key.name, source.name
-            ),
-        );
+        if report_errors {
+            self.report_error(
+                d::Index_signature_for_type_0_is_missing_in_type_1,
+                vec![
+                    self.checker.type_to_string(&key)?,
+                    self.checker.type_to_string(source)?,
+                ],
+            );
+        }
         Ok(FALSE)
     }
 
@@ -3017,7 +3310,8 @@ impl Relater<'_> {
         let key = target_info.key()?;
         let value = target_info.value()?;
         for property in self.properties_of_type(source)? {
-            if Self::is_applicable_index_name(&property.name, &key)? {
+            let property_key = self.property_key(&property)?;
+            if self.is_applicable_index_type(&property_key, &key)? {
                 let property_type = property.r#type()?;
                 // Optional properties: `undefined` is part of the declared type
                 // under `strictNullChecks`; `getTypeWithFacts(NEUndefined)` would
@@ -3040,10 +3334,8 @@ impl Relater<'_> {
                 if related == FALSE {
                     self.report(
                         report_errors,
-                        format!(
-                            "Property '{}' is incompatible with index signature.",
-                            property.name
-                        ),
+                        d::Property_0_is_incompatible_with_index_signature,
+                        vec![property.name.to_string()],
                     );
                     return Ok(FALSE);
                 }
@@ -3097,15 +3389,20 @@ impl Relater<'_> {
         )?;
         if related == FALSE && report_errors {
             let (s, t) = (source_info.key()?, target_info.key()?);
-            let message = if Rc::ptr_eq(&s, &t) {
-                format!("'{}' index signatures are incompatible.", s.name)
+            if Rc::ptr_eq(&s, &t) {
+                self.report_error(
+                    d::X_0_index_signatures_are_incompatible,
+                    vec![self.checker.type_to_string(&s)?],
+                );
             } else {
-                format!(
-                    "'{}' and '{}' index signatures are incompatible.",
-                    s.name, t.name
-                )
-            };
-            self.error_chain.push(message);
+                self.report_error(
+                    d::X_0_and_1_index_signatures_are_incompatible,
+                    vec![
+                        self.checker.type_to_string(&s)?,
+                        self.checker.type_to_string(&t)?,
+                    ],
+                );
+            }
         }
         Ok(related)
     }

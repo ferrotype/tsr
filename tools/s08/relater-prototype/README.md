@@ -48,22 +48,44 @@ actions of every mode (`data/s08/supplemental-observations.json.xz`). A
   `Error::UndeclaredMember`; subsequent reads remain failed rather than publishing
   an empty default.
 
-## P7 extension
+## Bound-program construction for P7
 
-P7 (`docs/S08-P7.md`) keeps this API and extends the algorithm to intrinsics,
-literals (fresh and regular), unions, intersections and object types with
-properties, index signatures and non-generic call/construct signatures, porting
-the pinned `relater.go` paths for those kinds. A `Description` (plain type
-snapshot) constructs the graph with lazy object resolvers; the measurement child
-`crates/ts_compiler/examples/p7_relater.rs` derives it from the production
-checker's resolved types at setup and relates in this crate. Paths that need
-generic instantiation, inference, conditional, mapped, template-literal or
-tuple machinery fail with `Error::Unsupported`; the four frozen fixtures that
-need them are reported as unsupported, never approximated.
+The measurement child passes completed AST/binder owners, compiler options and
+module-loader decisions to `BoundChecker`. The reference owns its global type
+initialization, declaration links, type constructors, instantiation caches and
+relation caches. It does not ask the production checker to resolve A, B or their
+reachable graphs, and never delegates a relation to the production engine.
 
-## What it does not do
+A property table contains lazy type links. Generic references retain unresolved
+argument nodes where the pin does; discovering an object member does not resolve
+that member's type. Tuple targets, mapped templates and conditional roots retain
+their distinct native construction and resolution points. Substitution counters
+advance at real instantiation workers, including the native mapper-cache and
+recursion-limit behavior. They are not estimates derived from graph size.
 
-No diagnostics text parity (one textual chain per failed reported relation,
-compared by count), no generics, tuples, mapped, conditional or template literal
-types, and no production path. The measurement over `relater-fixtures.json`
-lives in `scripts/s08_relater.py`.
+The implementation includes tuple normalization and relations, generic reference
+variance and signatures, mapped property substitution, conditional inference and
+tail evaluation, and template-literal construction and matching. Unsupported
+branches return a named error and remain failures of the comparison; they do not
+become empty objects, `any` substitutions or excluded fixtures. The frozen
+21-fixture comparison, rather than this capability list, determines coverage.
+
+Diagnostics carry native message keys, arguments, locations, nested chains and
+related information. Type display runs when a diagnostic needs it, preserving any
+lazy work it causes inside the relation interval. The old `Description` graph
+builder remains available for focused ownership and algorithm tests; the
+measurement child does not use it.
+
+## Verification and measurement
+
+`scripts/s08_relater.py parity` checks both implementations against the frozen Go
+observations: all 105 groups, every ordered action and diagnostic, before/after
+lookup state, type/signature/instantiation counts and relation-cache flags. An
+informational behavior projection cannot satisfy parity. Full capture stops
+before warmups when parity fails; explicitly requested smoke captures may retain
+partial results, but their comparison ratios remain unavailable.
+
+Only a current complete comparison of equivalent work can publish timing and
+allocation metrics. Construction and relation intervals are separate, raw live
+endpoints remain signed, and results stay rooted through the retained checkpoint.
+No acceptance result is implied by compiling the reference or by isolated tests.

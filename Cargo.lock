@@ -225,6 +225,17 @@ checksum = "04d056b875a9d2e6cb9a61d127afee9ac5999b9f87bcb32079d1318e505be714"
 [[package]]
 name = "s08_relater_prototype"
 version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_ast",
+ "ts_binder",
+ "ts_core",
+ "ts_diagnostics",
+ "ts_jsnum",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_scanner",
+]
 
 [[package]]
 name = "serde"

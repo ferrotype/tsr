@@ -47,8 +47,8 @@ def method():
 
 def sources():
     result = {}
-    for pattern in ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**",
-                    "tools/s08/relater-prototype/**", "crates/ts_compiler/examples/p7_relater.rs", "crates/ts_compiler/examples/p3/mod.rs",
+    for pattern in ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**/*",
+                    "tools/s08/relater-prototype/**/*", "crates/ts_compiler/examples/p7_relater.rs", "crates/ts_compiler/examples/p3/mod.rs",
                     "scripts/s08_relater.py", "scripts/s08_measurement.py", "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
                     "scripts/s04.py", "scripts/s04_common.py", "scripts/s08_oracle.py",
                     "data/s08/relater-fixtures.json", "data/s08/supplemental-observations.json.xz", "tools/s08/contracts/relations.json",
@@ -153,20 +153,20 @@ def cache_delta(before, after):
 def compare_group(implementation, go_group, actions, found, *, behavior_only=False):
     """Exact protocol parity; a separately named projection reports partial behavior.
 
-    The current reference graph is pre-resolved by the production checker. It
-    cannot meet the frozen lazy-resolution contract even when booleans agree.
+    Bound-program construction is necessary but not sufficient: native state,
+    lazy creation counts, cache transitions and diagnostic payloads must agree.
     """
     differences = []
-    if implementation == "reference" and not behavior_only:
+    if implementation == "reference" and not behavior_only and found.get("source_mode") != "bound_program":
         differences.append("reference setup pre-resolves the production graph; lazy protocol unavailable")
     if found["state"] != "executed":
         return [f"group not executed: {found.get('reason')}"]
     if [a["action"] for a in go_group["actions"]] != actions or len(found["actions"]) != len(actions):
         return ["relation action drift"]
-    if not same_json_value(found["before_lookup"], go_group["before_lookup"]):
+    if not behavior_only and not same_json_value(found["before_lookup"], go_group["before_lookup"]):
         differences.append("before_lookup")
-    if implementation == "reference" and not same_json_value(cache_view(found["after_lookup"]), cache_view(go_group["actions"][0]["before"])):
-        differences.append("production lookup caches differ from the observed starting state")
+    if not behavior_only and not same_json_value(found["after_lookup"], go_group["actions"][0]["before"]):
+        differences.append("after_lookup")
     for index, (wanted, observed) in enumerate(zip(go_group["actions"], found["actions"], strict=True)):
         if not same_json_value(observed["action"], wanted["action"]):
             differences.append(f"action {index}: reordered")
@@ -174,7 +174,7 @@ def compare_group(implementation, go_group, actions, found, *, behavior_only=Fal
         for key in ("result", "ternary_calls"):
             if not same_json_value(observed[key], wanted[key]):
                 differences.append(f"action {index}: {key} {observed[key]!r} != {wanted[key]!r}")
-        if implementation == "id":
+        if not behavior_only:
             for key in ("before", "after", "diagnostics"):
                 if not same_json_value(observed[key], wanted[key]):
                     differences.append(f"action {index}: {key}")
@@ -183,25 +183,19 @@ def compare_group(implementation, go_group, actions, found, *, behavior_only=Fal
             wanted_delta = cache_delta(wanted["before"], wanted["after"])
             if not same_json_value(observed_delta, wanted_delta):
                 differences.append(f"action {index}: cache delta {observed_delta!r} != {wanted_delta!r}")
-            if behavior_only:
-                if len(observed["diagnostics"]) != len(wanted["diagnostics"]):
-                    differences.append(f"action {index}: diagnostic count")
-            else:
-                if not same_json_value(observed["diagnostics"], wanted["diagnostics"]):
-                    differences.append(f"action {index}: diagnostic payload")
-                for point in ("before", "after"):
-                    if not same_json_value(cache_view(observed[point]), cache_view(wanted[point])):
-                        differences.append(f"action {index}: {point} cache state")
+            if len(observed["diagnostics"]) != len(wanted["diagnostics"]):
+                differences.append(f"action {index}: diagnostic count")
     return differences
 
 
 def transitions(go_group, found):
-    """First/repeat creation transitions: Go counters against the reference's lazy records."""
+    """Actual semantic creation deltas, without surrogate allocation counters."""
     rows = []
     for wanted, observed in zip(go_group["actions"], found.get("actions", []), strict=False):
-        go_created = sum(wanted["after"][k] - wanted["before"][k] for k in ("types_created", "signatures_created", "instantiations"))
-        ref_created = observed["after"].get("lazy_records", 0) - observed["before"].get("lazy_records", 0)
-        rows.append({"go_created": go_created, "reference_lazy_records": ref_created, "agree": (go_created > 0) == (ref_created > 0)})
+        counters = ("types_created", "signatures_created", "instantiations")
+        go_created = {k: wanted["after"][k] - wanted["before"][k] for k in counters}
+        ref_created = {k: observed["after"][k] - observed["before"][k] for k in counters}
+        rows.append({"go_created": go_created, "reference_created": ref_created, "agree": same_json_value(go_created, ref_created)})
     return rows
 
 
@@ -281,6 +275,8 @@ def capture(directory, samples_per_runtime=7, smoke=False):
     directory.mkdir(parents=True, exist_ok=True)
     build_report = build(directory)
     comparison = parity(directory, build_report)
+    if not comparison["both_match_every_case"] and not smoke:
+        raise ValueError("relater parity failed; inspect parity.json before collecting a measurement batch")
     plan = method()
     order = [[r.lower() for r in pair] for pair in plan["sampling"]["measured_order"]]
     order = [[{"id": "id", "reference": "reference"}[r] for r in pair] for pair in order][:samples_per_runtime]
@@ -347,7 +343,8 @@ def observed_totals(observed, requests):
 
 def semantic_rows(observed):
     return [{"id": row['id'], "state": row['state'], "groups": [
-        {key: group[key] for key in ('mode', 'state', 'reason', 'before_lookup', 'after_lookup', 'actions')}
+        {**{key: group[key] for key in ('mode', 'state', 'reason', 'before_lookup', 'after_lookup', 'actions')},
+         "source_mode": group.get("source_mode")}
         for group in row['groups']]} for row in observed['rows']]
 
 
@@ -419,10 +416,12 @@ def report(directory):
     # Timing compares the same fixed work: only groups both implementations execute count,
     # so the child totals are usable only when the executed inventories agree.
     same_inventory = executed["id"] == executed["reference"]
-    # The current reference setup does lazy semantic work before the relation interval.
-    # Equal group counts (or an inventory amendment) cannot make these endpoints comparable.
-    same_work = False
-    result["unavailable"]["comparison_protocol"] = "reference graph is pre-resolved during setup; lazy work and diagnostic payloads are not equivalent"
+    # Equal inventories alone do not prove comparable endpoints. Strict parity
+    # includes bound construction, initial state, every semantic creation count,
+    # ordered diagnostics and the first/repeat cache transitions.
+    same_work = same_inventory and comparison["both_match_every_case"]
+    if not same_work:
+        result["unavailable"]["comparison_protocol"] = "reference and ID do not both match the bound-program construction, lazy-work and diagnostic protocol"
     if not same_inventory:
         result["unavailable"]["fixed_work"] = f"executed groups differ: id {executed['id']} reference {executed['reference']}; the reference covers fewer fixtures"
     for mode in MODES:
@@ -438,12 +437,11 @@ def report(directory):
             for key in ("setup_requested_bytes", "relation_requested_bytes", "retained_bytes"):
                 summary[key] = {i: [r["totals"][key] for r in runs[i]] for i in IMPLEMENTATIONS}
                 id_values, reference_values = summary[key]["id"], summary[key]["reference"]
-                if min(id_values) <= 0:
-                    summary[f"{key}_ratio"] = {"unavailable": "non-positive ID baseline bytes"}
+                if min(id_values) <= 0 or min(reference_values) <= 0:
+                    summary[f"{key}_ratio"] = {"unavailable": "non-positive ID or reference bytes; raw signed endpoints remain recorded"}
                     continue
                 try:
-                    summary[f"{key}_ratio"] = ratio_summary(id_values, [max(v, 1) for v in reference_values])
-                    summary[f"{key}_ratio"]["ratio"] = median(reference_values) / median(id_values)
+                    summary[f"{key}_ratio"] = ratio_summary(id_values, reference_values)
                 except ValueError as error:
                     summary[f"{key}_ratio"] = {"unavailable": str(error)}
         for key in list(summary):

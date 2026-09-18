@@ -509,7 +509,7 @@ class RelaterContract(unittest.TestCase):
         target = next(a for a in found['actions'] if a['diagnostics'])
         target['diagnostics'][0]['text_hex'] = '77726f6e67'
         errors = relater.compare_group('reference', group, actions, found)
-        self.assertTrue(any('diagnostic payload' in e for e in errors))
+        self.assertTrue(any('diagnostics' in e for e in errors))
         self.assertFalse(relater.compare_group('reference', group, actions, found, behavior_only=True))
 
     def test_complete_behavior_does_not_certify_pre_resolved_reference(self):
@@ -518,6 +518,29 @@ class RelaterContract(unittest.TestCase):
         self.assertFalse(relater.compare_group('reference', group, actions, found, behavior_only=True))
         self.assertEqual(relater.compare_group('reference', group, actions, found),
                          ['reference setup pre-resolves the production graph; lazy protocol unavailable'])
+
+    def test_bound_program_still_requires_all_semantic_states(self):
+        group, found, actions = self.diagnostic_group()
+        found['source_mode'] = 'bound_program'
+        self.assertFalse(relater.compare_group('reference', group, actions, found))
+        for point in ('before', 'after'):
+            for counter in ('types_created', 'signatures_created', 'instantiations'):
+                with self.subTest(point=point, counter=counter):
+                    changed = copy.deepcopy(found)
+                    changed['actions'][0][point][counter] += 1
+                    errors = relater.compare_group('reference', group, actions, changed)
+                    self.assertIn(f'action 0: {point}', errors)
+
+    def test_bound_program_lookup_and_first_action_must_agree(self):
+        group, found, actions = self.diagnostic_group()
+        found['source_mode'] = 'bound_program'
+        found['after_lookup']['types_created'] += 1
+        self.assertIn('after_lookup', relater.compare_group('reference', group, actions, found))
+
+    def test_creation_transitions_compare_actual_counts_not_nonzero(self):
+        group, found, _ = self.diagnostic_group()
+        found['actions'][0]['after']['types_created'] += 1
+        self.assertFalse(relater.transitions(group, found)[0]['agree'])
 
     def test_duplicate_or_missing_checker_rows_rejected(self):
         for rows in [[], [CheckerCapture.row(), CheckerCapture.row()]]:
@@ -541,7 +564,7 @@ class RelaterContract(unittest.TestCase):
                        'runs': [{'mode': mode, 'implementation': impl, 'warmup': False, 'totals': totals}
                                 for mode in relater.MODES for impl in relater.IMPLEMENTATIONS for _ in range(7)]}
             (root / 'capture.json').write_bytes(canonical(capture))
-            parity = {'parity': 0, 'implementations': {
+            parity = {'parity': 0, 'both_match_every_case': False, 'implementations': {
                 'id': {'parity': 1}, 'reference': {'parity': 0, 'unsupported': 0, 'behavior_agreement': 1}}}
             with patch.object(relater, 'verify_capture', return_value=parity), patch.object(relater, 'sources', return_value={}):
                 result = relater.report(root)
@@ -551,6 +574,15 @@ class RelaterContract(unittest.TestCase):
                 self.assertNotIn(key, result['metrics'])
             for mode in result['modes'].values():
                 self.assertIn('unavailable', mode['relation_ns_ratio'])
+
+    def test_failed_relater_parity_stops_before_measurement_children(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with patch.object(relater, 'build', return_value={}), \
+                 patch.object(relater, 'parity', return_value={'both_match_every_case': False}), \
+                 patch.object(relater, 'run_child') as child:
+                with self.assertRaisesRegex(ValueError, 'relater parity failed'):
+                    relater.capture(Path(temporary))
+                child.assert_not_called()
 
     def test_relater_totals_are_reconstructed(self):
         group = {'mode': 'assignable', 'state': 'executed', 'setup_ns': 12, 'relation_ns': 3,
