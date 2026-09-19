@@ -209,14 +209,14 @@ id = "owners_return_to_baseline"
 metric = "run.e3.live_owner_delta"
 op = "=="
 threshold = 0
-unit = "maximum absolute live-owner count deviation from the pre-scenario baseline after final owner, lease, cache, emit-table, retained-result and registry-root drops"
+unit = "maximum absolute live-owner delta in the seven S04 arena scenarios; full E3 also requires the separately gated program, checker, builder and API suites, whose final-drop assertions cover their retained roots"
 
 [[E3.criteria]]
 id = "allocations_return_to_baseline"
 metric = "run.e3.live_allocation_delta"
 op = "=="
 threshold = 0
-unit = "maximum absolute live-allocation count deviation from the pre-scenario baseline after final owner, lease, cache, emit-table, retained-result and registry-root drops"
+unit = "maximum absolute tracked-storage-allocation delta in the seven S04 arena scenarios; full E3 also requires the separately gated program, checker, builder and API suites with their own final-drop counter assertions; not malloc calls or RSS"
 
 [[E3.criteria]]
 id = "miri"
