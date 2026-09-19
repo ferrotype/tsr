@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "clippy",
+  "recorded_at": 1789826589,
+  "context": {
+    "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
+    "source_sha256": "8b085da1e3ee4544cd0d9fff4810c160e7be0e1b787db3a9572ce50a4abb839b",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/runner/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/runner/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "9732e9b52e5b137977563a562737345d1615edcecfae6116d97c570d960b1103",
+  "inputs": {
+    "Cargo.lock": "4a42cf4a8d8e23ef867f7cca3c40788963b6b6b4553b53eec578d107ce28f5c3",
+    "Cargo.toml": "ac08fcaf5c3f1e2b8912575abdda4f59f4d92a11991c407fa9e60ff425b31381"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "clippy"
+  ],
+  "target": "host",
+  "config": "debug; all targets and features; -D warnings",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "clippy 0.1.97 (8bab26f4f6 2026-07-14)\n+ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_jsstring v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_jsstring)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_diagnostics v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_diagnostics)\n\u001b[1m\u001b[92m   Compiling\u001b[0m ts_node v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_node)\n\u001b[1m\u001b[92m    Checking\u001b[0m xtask v0.1.0 (/Users/runner/work/ts-rust/ts-rust/xtask)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_core v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_core)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_arena v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_arena)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_jsnum v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_jsnum)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_tspath v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_tspath)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_vfs v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_vfs)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_bundled v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_bundled)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_semver v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_semver)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_ast v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_ast)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_testhost v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_testhost)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_scanner v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_scanner)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_nodebuilder v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_nodebuilder)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_pseudochecker v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_pseudochecker)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_encoder v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_encoder)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_parser v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_parser)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_printer v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_printer)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_binder v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_binder)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_tsoptions v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_tsoptions)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_transformers v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_transformers)\n\u001b[1m\u001b[92m    Checking\u001b[0m s08_relater_prototype v0.1.0 (/Users/runner/work/ts-rust/ts-rust/tools/s08/relater-prototype)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_module v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_module)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_astnav v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_astnav)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_checker v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_checker)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_format v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_format)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_bench v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_bench)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_compiler v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_compiler)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_project v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_project)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_api v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_api)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_embed v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_embed)\n\u001b[1m\u001b[92m    Checking\u001b[0m s10_corpus v0.1.0 (/Users/runner/work/ts-rust/ts-rust/tools/s10/corpus-adapter)\n\u001b[1m\u001b[92m    Checking\u001b[0m s09_format_harness v0.1.0 (/Users/runner/work/ts-rust/ts-rust/tools/s09/format-harness)\n\u001b[1m\u001b[92m    Checking\u001b[0m ts_wasm v0.1.0 (/Users/runner/work/ts-rust/ts-rust/crates/ts_wasm)\n\u001b[1m\u001b[92m    Finished\u001b[0m `dev` profile [unoptimized + debuginfo] target(s) in 31.62s\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "7f20d380ea57d4361bdc034d4e1f0a79ff5d54dafc1a863792979bdf4239dd53",
+  "valid_capture": true
+}
