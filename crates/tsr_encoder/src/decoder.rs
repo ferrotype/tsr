@@ -1,12 +1,12 @@
 //! Bottom-up protocol decoding. Returned errors, panics and sibling-chain
 //! nontermination follow the pinned Go boundary; adapters apply an external watchdog.
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     AstBuilder, ExternalModuleIndicatorOptions, FactoryMethods, JsString, NodeId, NodeKind,
     NodeListId, NodeSlice, SourceFileParseOptions, SyntaxKind,
 };
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DecodeError {
@@ -174,12 +174,12 @@ impl<'a> Decoder<'a> {
                     DecodeError::Baseline(format!("at node {index} (kind {kind}): {message}"))
                 })?;
             let flags = self.node_field(index, 24);
-            ts_ast::Factory::set_node_range(
+            tsr_ast::Factory::set_node_range(
                 &mut self.factory,
                 node,
                 TextRange::new(i64::from(pos), i64::from(end)),
             );
-            ts_ast::Factory::set_node_flags(&mut self.factory, node, flags);
+            tsr_ast::Factory::set_node_flags(&mut self.factory, node, flags);
             self.nodes[index] = Some(node);
         }
         Ok(DecodedTree {
@@ -233,7 +233,7 @@ impl<'a> Decoder<'a> {
             .to_owned();
         // A modifier list carries the flags of its modifiers, which
         // `NewModifierList` computes.
-        let modifiers = ts_ast::RuntimeFactory::new_modifier_list(&mut self.factory, list.nodes());
+        let modifiers = tsr_ast::RuntimeFactory::new_modifier_list(&mut self.factory, list.nodes());
         self.factory
             .set_list_location(modifiers, list.loc())
             .expect("decoded modifier owner");

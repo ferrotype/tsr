@@ -2,8 +2,8 @@
 //! stack. Failed port operations are terminal; a resolution cycle uses Go's
 //! unknown-symbol result without turning an incomplete alias into a cache hit.
 use crate::{CheckerState, Error, TypeId, TypeSystemPropertyName};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct ModuleAliasState {
@@ -15,16 +15,16 @@ pub(crate) struct ModuleAliasState {
     pub(crate) targets: crate::types::Map<SymbolId, Result<SymbolId, Error>>,
     pub(crate) immediate_targets: crate::types::Map<SymbolId, SymbolId>,
     pub(crate) type_only: crate::types::Map<SymbolId, NodeId>,
-    pub(crate) resolved_exports: crate::types::Map<SymbolId, Result<ts_ast::SymbolTableId, Error>>,
+    pub(crate) resolved_exports: crate::types::Map<SymbolId, Result<tsr_ast::SymbolTableId, Error>>,
     pub(crate) resolving_exports: crate::types::Set<SymbolId>,
     pub(crate) type_only_exports:
-        crate::types::Map<SymbolId, crate::types::Map<ts_ast::JsString, NodeId>>,
-    pub(crate) patterns: Vec<ts_ast::PatternAmbientModule>,
+        crate::types::Map<SymbolId, crate::types::Map<tsr_ast::JsString, NodeId>>,
+    pub(crate) patterns: Vec<tsr_ast::PatternAmbientModule>,
     pub(crate) default_only_types: crate::types::Map<TypeId, TypeId>,
     pub(crate) synthetic_types: crate::types::Map<TypeId, TypeId>,
     pub(crate) export_types: crate::types::Map<SymbolId, (SymbolId, NodeId)>,
-    pub(crate) pattern_augmentations: crate::types::Map<ts_ast::JsString, SymbolId>,
-    pub(crate) pattern_targets: crate::types::Map<ts_ast::JsString, SymbolId>,
+    pub(crate) pattern_augmentations: crate::types::Map<tsr_ast::JsString, SymbolId>,
+    pub(crate) pattern_targets: crate::types::Map<tsr_ast::JsString, SymbolId>,
 }
 impl ModuleAliasState {
     #[cfg(any(test, feature = "storage-pilot"))]
@@ -203,7 +203,7 @@ impl CheckerState {
     ) -> Result<Option<NodeId>, Error> {
         let declarations: Vec<_> = self.symbol_declarations(symbol)?.iter().flatten().collect();
         for declaration in declarations.into_iter().rev() {
-            if ts_ast::is_alias_symbol_declaration(self.ast(declaration)?, declaration)? {
+            if tsr_ast::is_alias_symbol_declaration(self.ast(declaration)?, declaration)? {
                 return Ok(Some(declaration));
             }
         }
@@ -215,7 +215,7 @@ impl CheckerState {
         symbol: SymbolId,
     ) -> Result<Option<SymbolId>, Error> {
         if self.symbol(symbol)?.flags() & sf::ALIAS == 0 {
-            return Err(ts_arena::Error::InvalidGraph.into());
+            return Err(tsr_arena::Error::InvalidGraph.into());
         }
         if let Some(&target) = self.module_aliases.immediate_targets.get(&symbol) {
             return Ok(Some(target));
@@ -260,7 +260,7 @@ impl CheckerState {
 
     fn resolve_alias_worker(&mut self, symbol: SymbolId) -> Result<SymbolId, Error> {
         if self.symbol(symbol)?.flags() & sf::ALIAS == 0 {
-            return Err(ts_arena::Error::InvalidGraph.into());
+            return Err(tsr_arena::Error::InvalidGraph.into());
         }
         if let Some(&target) = self.module_aliases.targets.get(&symbol) {
             return target;
@@ -286,7 +286,7 @@ impl CheckerState {
             let mut target = self
                 .target_of_alias_declaration(declaration)?
                 .unwrap_or(self.builtins.unknown_symbol);
-            if ts_ast::is_non_local_alias(
+            if tsr_ast::is_non_local_alias(
                 Some(&self.symbol(target)?),
                 sf::VALUE | sf::TYPE | sf::NAMESPACE,
             ) {
@@ -317,7 +317,7 @@ impl CheckerState {
                     let text = self.symbol_to_string(symbol)?;
                     self.error_at(
                         Some(declaration),
-                        ts_diagnostics::Circular_definition_of_import_alias_0,
+                        tsr_diagnostics::Circular_definition_of_import_alias_0,
                         vec![text],
                     )?;
                     Ok(self.builtins.unknown_symbol)
@@ -337,7 +337,7 @@ impl CheckerState {
             Some(K::ImportEqualsDeclaration) => Ok(read
                 .data_source()
                 .as_import_equals_declaration()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .is_type_only()
                 .then_some(node)),
             Some(K::ImportClause) => Ok(read.is_type_only().then_some(node)),
@@ -375,7 +375,7 @@ impl CheckerState {
                 if read
                     .data_source()
                     .as_export_specifier()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .is_type_only()
                 {
                     return Ok(Some(node));
@@ -393,7 +393,7 @@ impl CheckerState {
                     .node(declaration)?
                     .data_source()
                     .as_export_declaration()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .is_type_only()
                     .then_some(declaration))
             }
@@ -427,7 +427,7 @@ impl CheckerState {
                     Some(K::ExportSpecifier | K::ExportDeclaration)
                 );
                 let text = if read.kind() == K::ExportDeclaration {
-                    ts_ast::JsString::from_bytes(b"*".as_slice())
+                    tsr_ast::JsString::from_bytes(b"*".as_slice())
                 } else {
                     let name = read
                         .name()
@@ -435,14 +435,14 @@ impl CheckerState {
                     self.node_text(name)?.into_js_string()
                 };
                 if let Some(diagnostic) = self.error_at(Some(reference), if export {
-                    ts_diagnostics::An_import_alias_cannot_reference_a_declaration_that_was_exported_using_export_type
+                    tsr_diagnostics::An_import_alias_cannot_reference_a_declaration_that_was_exported_using_export_type
                 } else {
-                    ts_diagnostics::An_import_alias_cannot_reference_a_declaration_that_was_imported_using_import_type
+                    tsr_diagnostics::An_import_alias_cannot_reference_a_declaration_that_was_imported_using_import_type
                 }, vec![])? {
                     let related = self.diagnostic_for_node(Some(declaration), if export {
-                        ts_diagnostics::X_0_was_exported_here
+                        tsr_diagnostics::X_0_was_exported_here
                     } else {
-                        ts_diagnostics::X_0_was_imported_here
+                        tsr_diagnostics::X_0_was_imported_here
                     }, vec![text])?;
                     self.add_related_diagnostic(diagnostic, related)?;
                 }
@@ -480,7 +480,7 @@ impl CheckerState {
                 let reference = read
                     .data_source()
                     .as_import_equals_declaration()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .module_reference()
                     .ok_or(Error::MissingLink("import alias reference"))?;
                 if self.node(reference)?.kind() == K::ExternalModuleReference {
@@ -499,7 +499,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_export_specifier()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let name = data
                     .property_name()
                     .or(data.name())
@@ -517,7 +517,7 @@ impl CheckerState {
                 let declaration_data = declaration_read
                     .data_source()
                     .as_export_declaration()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 if declaration_data.module_specifier().is_some() {
                     return self.target_of_external_alias(node);
                 }
@@ -647,6 +647,6 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("module declaration container"))?;
         }
         Ok(self.node(container)?.kind() == K::ModuleDeclaration
-            && !ts_ast::is_ambient_module(self.ast(container)?, container)?)
+            && !tsr_ast::is_ambient_module(self.ast(container)?, container)?)
     }
 }

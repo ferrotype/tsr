@@ -1,9 +1,9 @@
 //! Declaration accessibility shares the name-chain and container algorithms
 //! used by name serialization, including alias and module ordering.
 use crate::{node_builder::NodeBuilder, CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_printer::emit_resolver::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_printer::emit_resolver::{
     SymbolAccessibility as Access, SymbolAccessibilityResult as ResultInfo,
 };
 
@@ -34,7 +34,7 @@ impl CheckerState {
         };
         // One scratch name context spans the recursive search. Its visited
         // tables and alias ordering are the same ones used by serialization.
-        let mut builder = NodeBuilder::new(self, ts_nodebuilder::flags::IGNORE_ERRORS);
+        let mut builder = NodeBuilder::new(self, tsr_nodebuilder::flags::IGNORE_ERRORS);
         if let Some(result) = builder.any_symbol_accessible(
             &[symbol],
             enclosing,
@@ -145,7 +145,7 @@ impl CheckerState {
             });
         }
         let meaning = self.emit_entity_meaning(node)?;
-        let first = ts_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
+        let first = tsr_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
         let name = self.node_text(first)?.into_js_string();
         let symbol = self.resolve_name(Some(enclosing), name.as_bytes(), meaning, None, false)?;
         if let Some(symbol) = symbol {
@@ -156,7 +156,7 @@ impl CheckerState {
                 return Ok(result);
             }
         } else if name.as_bytes() == b"this" {
-            let container = ts_ast::get_this_container(self.ast(first)?, first, false, false)?;
+            let container = tsr_ast::get_this_container(self.ast(first)?, first, false, false)?;
             let symbol = self.get_symbol_of_declaration(container)?;
             if self
                 .emit_symbol_accessible(symbol, Some(enclosing), meaning, false, true)?
@@ -185,18 +185,18 @@ impl CheckerState {
         enclosing: Option<NodeId>,
         meaning: u32,
     ) -> Result<JsString, Error> {
-        use ts_printer::EmitTextWriter;
-        let mut builder = NodeBuilder::new(self, ts_nodebuilder::flags::IGNORE_ERRORS);
+        use tsr_printer::EmitTextWriter;
+        let mut builder = NodeBuilder::new(self, tsr_nodebuilder::flags::IGNORE_ERRORS);
         let node = builder.symbol_expression_with_meaning(symbol, enclosing, meaning)?;
-        let printer = ts_printer::Printer::new(
-            ts_printer::PrinterOptions {
+        let printer = tsr_printer::Printer::new(
+            tsr_printer::PrinterOptions {
                 remove_comments: true,
                 omit_trailing_semicolon: true,
                 ..Default::default()
             },
             &builder.emit,
         );
-        let mut writer = ts_printer::SingleLineStringWriter::new();
+        let mut writer = tsr_printer::SingleLineStringWriter::new();
         printer.write(builder.ast.view(), node, None, &mut writer)?;
         Ok(JsString::from_bytes(writer.text().to_vec()))
     }

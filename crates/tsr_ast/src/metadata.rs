@@ -8,7 +8,7 @@ use crate::{
     MappedDiagnosticDirective, NodeId, Pragma,
 };
 use std::ops::{Deref, Range};
-use ts_arena::{AuxId, Error};
+use tsr_arena::{AuxId, Error};
 
 #[derive(Debug)]
 pub enum SourceMetadataData {

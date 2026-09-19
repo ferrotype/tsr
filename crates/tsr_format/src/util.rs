@@ -1,9 +1,9 @@
 //! AST helpers of the formatter (`format/util.go`).
 
 use crate::{Error, FormatFile};
-use ts_arena::NodeId;
-use ts_ast::{NodeListId, SyntaxKind as K};
-use ts_core::TextRange;
+use tsr_arena::NodeId;
+use tsr_ast::{NodeListId, SyntaxKind as K};
+use tsr_core::TextRange;
 
 // port: tsc/internal/format/util.go:rangeIsOnOneLine
 pub(crate) fn range_is_on_one_line(
@@ -179,7 +179,7 @@ pub(crate) fn is_list_element(
                 .data_source()
                 .as_catch_clause()
                 .and_then(|clause| clause.block())
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             contained_by(file, node, file.node(block)?.statement_list())
         }
         _ => Ok(false),

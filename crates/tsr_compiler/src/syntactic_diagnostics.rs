@@ -2,11 +2,11 @@
 //! option-dependent JavaScript checks the checker owns only for checked files.
 use crate::{Error, Program, ProgramFile};
 use std::ops::ControlFlow;
-use ts_ast::{
+use tsr_ast::{
     subtree_flags, AstView, ChildVisitor, Diagnostic, NodeId, NodeListId, NodeSlice,
     SyntaxKind as K,
 };
-use ts_core::{CompilerOptions, TextRange};
+use tsr_core::{CompilerOptions, TextRange};
 
 impl Program {
     /// One retained file, or every program file when `file` is absent.
@@ -39,8 +39,8 @@ impl Program {
         let source = file.bound().view().source_file()?;
         diagnostics.extend_from_slice(source.diagnostics());
         diagnostics.extend_from_slice(source.js_diagnostics());
-        if ts_ast::utilities::is_source_file_js(&source)
-            && !ts_ast::utilities::is_check_js_enabled_for_file(&source, self.options())
+        if tsr_ast::utilities::is_source_file_js(&source)
+            && !tsr_ast::utilities::is_check_js_enabled_for_file(&source, self.options())
         {
             additional_js_syntactic_diagnostics(
                 file.bound().view().ast(),
@@ -73,18 +73,18 @@ fn additional_js_syntactic_diagnostics(
             continue;
         }
         let read = view.node(node)?;
-        if read.kind() == K::Parameter && ts_ast::utilities_middle::has_decorators(view, &read)? {
+        if read.kind() == K::Parameter && tsr_ast::utilities_middle::has_decorators(view, &read)? {
             for modifier in view
                 .node_slice(read.modifier_nodes(view)?)?
                 .iter()
                 .flatten()
             {
                 let decorator = view.node(modifier)?;
-                if ts_ast::is_decorator(&decorator) {
+                if tsr_ast::is_decorator(&decorator) {
                     diagnostics.push(Diagnostic::new(
                         Some(file),
                         TextRange::new(i64::from(decorator.pos()), i64::from(decorator.end())),
-                        ts_diagnostics::Decorators_are_not_valid_here,
+                        tsr_diagnostics::Decorators_are_not_valid_here,
                         Vec::new(),
                     ));
                     break;
@@ -115,7 +115,7 @@ fn push_children(view: AstView<'_>, node: NodeId, pending: &mut Vec<NodeId>) -> 
 struct Children<'a, 'b> {
     view: AstView<'a>,
     nodes: &'b mut Vec<NodeId>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 
 impl ChildVisitor for Children<'_, '_> {
@@ -150,19 +150,19 @@ impl ChildVisitor for Children<'_, '_> {
 mod tests {
     use crate::{FileCache, Program, ProgramOptions};
     use std::sync::Arc;
-    use ts_core::{CompilerOptions, ScriptTarget, Tristate};
-    use ts_jsstring::JsString;
+    use tsr_core::{CompilerOptions, ScriptTarget, Tristate};
+    use tsr_jsstring::JsString;
 
     // Pinned compiler/parameterDecoratorInJsFile.ts; `@dec` spans 60..64.
     const DECORATED: &[u8] =
         b"function dec(target, key, index) {}\n\nclass Foo {\n    method(@dec x) {}\n}";
 
     fn program(name: &[u8], text: &[u8], options: CompilerOptions) -> Program {
-        let mut files = ts_vfs::MemoryBuilder::new(b"/", true);
+        let mut files = tsr_vfs::MemoryBuilder::new(b"/", true);
         files.insert_loaded(name, text);
         Program::load(
             ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(
+                config: tsr_tsoptions::ParsedCommandLine::new(
                     CompilerOptions {
                         allow_js: Tristate::TRUE,
                         no_emit: Tristate::TRUE,
@@ -177,7 +177,7 @@ mod tests {
                 skip_module_resolution: true,
             },
             &mut FileCache::new(),
-            &ts_arena::Counters::new(),
+            &tsr_arena::Counters::new(),
         )
         .unwrap()
     }
@@ -249,7 +249,7 @@ mod tests {
         let second = program(b"/a.js", DECORATED, check_js(Tristate::FALSE));
         assert!(matches!(
             first.syntactic_diagnostics(Some(second.file(b"/a.js").unwrap())),
-            Err(crate::Error::Ast(ts_arena::Error::WrongOwner))
+            Err(crate::Error::Ast(tsr_arena::Error::WrongOwner))
         ));
     }
 }

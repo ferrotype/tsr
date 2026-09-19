@@ -1,8 +1,8 @@
 use crate::{ConfigValue, ParseConfigHost, ParsedCommandLine, TsConfigSourceFile};
-use ts_ast::Diagnostic;
-use ts_core::CompilerOptions;
-use ts_jsstring::JsString;
-use ts_vfs::Error;
+use tsr_ast::Diagnostic;
+use tsr_core::CompilerOptions;
+use tsr_jsstring::JsString;
+use tsr_vfs::Error;
 
 /// Read errors are separate from recoverable configuration diagnostics, as in
 /// the source API. Successful results retain all ASTs referenced by diagnostics.
@@ -18,8 +18,8 @@ pub fn get_parsed_command_line_of_config_file(
     raw: &ConfigValue,
     host: &dyn ParseConfigHost,
 ) -> Result<ReadConfigResult, Error> {
-    let name = ts_tspath::absolute(name, host.current_directory());
-    let path = ts_tspath::to_path(
+    let name = tsr_tspath::absolute(name, host.current_directory());
+    let path = tsr_tspath::to_path(
         &name,
         host.current_directory(),
         host.fs().use_case_sensitive_file_names(),
@@ -38,7 +38,7 @@ pub fn get_parsed_command_line_of_config_file_path(
         return Ok(ReadConfigResult {
             command_line: None,
             read_errors: vec![Diagnostic::compiler(
-                ts_diagnostics::Cannot_read_file_0,
+                tsr_diagnostics::Cannot_read_file_0,
                 vec![JsString::from_bytes(name)],
             )],
         });
@@ -47,7 +47,7 @@ pub fn get_parsed_command_line_of_config_file_path(
     let command_line = crate::parse_json_source_file_config_file_content(
         source,
         host,
-        &ts_tspath::directory(name),
+        &tsr_tspath::directory(name),
         options,
         raw,
         name,

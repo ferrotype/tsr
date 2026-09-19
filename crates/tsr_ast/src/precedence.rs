@@ -82,12 +82,12 @@ pub mod operator_precedence_flags {
 fn get_operator(
     view: crate::AstView<'_>,
     node: &crate::NodeRead<'_>,
-) -> Result<NodeKind, ts_arena::Error> {
+) -> Result<NodeKind, tsr_arena::Error> {
     let data = node.data_source();
     if let Some(binary) = data.as_binary_expression() {
         let token = binary
             .operator_token()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         return Ok(view.node(token)?.kind());
     }
     if let Some(prefix) = data.as_prefix_unary_expression() {
@@ -103,7 +103,7 @@ fn get_operator(
 pub fn get_expression_precedence(
     view: crate::AstView<'_>,
     node: &crate::NodeRead<'_>,
-) -> Result<i32, ts_arena::Error> {
+) -> Result<i32, tsr_arena::Error> {
     let operator = get_operator(view, node)?;
     let flags = if node.kind() == SyntaxKind::NewExpression && node.argument_list().is_none() {
         operator_precedence_flags::NEW_WITHOUT_ARGUMENTS
@@ -212,7 +212,7 @@ pub fn get_leftmost_expression(
     view: crate::AstView<'_>,
     mut node: crate::NodeId,
     stop_at_call_expressions: bool,
-) -> Result<crate::NodeId, ts_arena::Error> {
+) -> Result<crate::NodeId, tsr_arena::Error> {
     use SyntaxKind as K;
     loop {
         let read = view.node(node)?;

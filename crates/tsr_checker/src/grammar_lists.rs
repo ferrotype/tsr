@@ -1,8 +1,8 @@
 //! Shared grammar lists retain native ranges and first-error ordering.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, JsString, NodeListId, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, JsString, NodeListId, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.grammarErrorAtPos
@@ -50,9 +50,9 @@ impl CheckerState {
         if !view.node_slice(list.nodes())?.is_empty() {
             return Ok(false);
         }
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::MissingLink("type parameter source"))?;
-        let end = ts_scanner::skip_trivia(
+        let end = tsr_scanner::skip_trivia(
             view.source_file(source)?.text().as_bytes(),
             list.loc().end(),
         ) + 1;
@@ -75,7 +75,7 @@ impl CheckerState {
             return Ok(true);
         }
         if self.node(node)?.kind() == K::ArrowFunction {
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("arrow grammar source"))?;
             if let Some(list) = self.node(node)?.type_parameter_list() {
                 let parameters = self.source_list(node, Some(list))?;

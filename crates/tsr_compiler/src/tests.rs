@@ -2,9 +2,9 @@ use crate as ts_compiler_error;
 use crate::{FileCache, Program, ProgramOptions};
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_jsstring::JsString;
-use ts_vfs::MemoryBuilder;
+use tsr_arena::Counters;
+use tsr_jsstring::JsString;
+use tsr_vfs::MemoryBuilder;
 #[path = "../../../tools/s07/program/rust_observation.rs"]
 mod observation;
 use observation::{bytes, observe};
@@ -71,12 +71,12 @@ fn retained_snapshot_edit_reuses_only_equal_parse_inputs() {
     assert_eq!(retained.view().symbol(old_m).unwrap().name_bytes(), b"m");
     drop(retained);
     cache.prune();
-    assert_eq!(counters.snapshot(), ts_arena::Counts::default());
+    assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
 }
 
 #[test]
 fn resolver_scope_routes_retained_files_and_rejects_foreign_generations() {
-    use ts_binder::name_resolver::ResolverHost;
+    use tsr_binder::name_resolver::ResolverHost;
     let requests: Vec<Value> =
         serde_json::from_str(include_str!("../../../data/s07/program-requests.json")).unwrap();
     let counters = Counters::new();
@@ -105,11 +105,11 @@ fn resolver_scope_routes_retained_files_and_rejects_foreign_generations() {
         }
         assert!(matches!(
             host.ast(foreign.files()[0].source()),
-            Err(ts_arena::Error::WrongOwner)
+            Err(tsr_arena::Error::WrongOwner)
         ));
         let transient = host
             .new_transient_symbol(
-                ts_ast::symbol_flags::PROPERTY | ts_ast::symbol_flags::TRANSIENT,
+                tsr_ast::symbol_flags::PROPERTY | tsr_ast::symbol_flags::TRANSIENT,
                 JsString::from_bytes(b"arguments".as_slice()),
             )
             .unwrap();
@@ -119,12 +119,12 @@ fn resolver_scope_routes_retained_files_and_rejects_foreign_generations() {
     assert_eq!(counters.snapshot(), before);
     drop(program);
     drop(foreign);
-    assert_eq!(counters.snapshot(), ts_arena::Counts::default());
+    assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
 }
 
 #[test]
 fn unimplemented_resolution_does_not_become_unresolved_success() {
-    use ts_vfs::FileSystem;
+    use tsr_vfs::FileSystem;
     let mut builder = MemoryBuilder::new(b"/src", true);
     builder.insert_physical(b"/src/main.ts", b"import 'pkg'".as_slice());
     builder.insert_physical(
@@ -132,17 +132,17 @@ fn unimplemented_resolution_does_not_become_unresolved_success() {
         b"{\"typesVersions\":{\"*\":{\"*\":[\"./index.js\"]}}}".as_slice(),
     );
     let host: Arc<dyn FileSystem> = Arc::new(builder.finish());
-    let mut resolver = ts_module::Resolver::new(
+    let mut resolver = tsr_module::Resolver::new(
         host,
-        Arc::new(ts_core::CompilerOptions {
-            module_resolution: ts_core::ModuleResolutionKind(-1),
+        Arc::new(tsr_core::CompilerOptions {
+            module_resolution: tsr_core::ModuleResolutionKind(-1),
             ..Default::default()
         }),
         b"/src",
     )
     .unwrap();
     assert!(matches!(
-        resolver.resolve(b"pkg", b"/src/main.ts", ts_core::ModuleKind::ESNEXT),
-        Err(ts_module::Error::Unsupported("module resolution kind"))
+        resolver.resolve(b"pkg", b"/src/main.ts", tsr_core::ModuleKind::ESNEXT),
+        Err(tsr_module::Error::Unsupported("module resolution kind"))
     ));
 }

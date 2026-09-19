@@ -1,8 +1,8 @@
 //! Distinct source path comparisons: simple folding, filename canonicalization,
 //! and Go's lowercase ordering are deliberately separate operations.
 use crate::{canonical, combine, directory, root_length};
-pub use ts_jsstring::equal_fold;
-use ts_jsstring::{helpers::to_lower_go, wtf8::decode_utf8};
+pub use tsr_jsstring::equal_fold;
+use tsr_jsstring::{helpers::to_lower_go, wtf8::decode_utf8};
 /// port: tsc/internal/tspath/path.go:PathIsRelative
 pub fn is_relative(path: &[u8]) -> bool {
     matches!(path, b"." | b"..")

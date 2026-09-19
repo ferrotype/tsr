@@ -4,7 +4,7 @@ use crate::{
     TextSliceRead,
 };
 use std::ops::Deref;
-use ts_arena::Error;
+use tsr_arena::Error;
 
 pub struct NodeText<'a>(TextStorage<'a>);
 enum TextStorage<'a> {

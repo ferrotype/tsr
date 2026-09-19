@@ -6,44 +6,44 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     sync::Arc,
 };
-use ts_arena::Counters;
-use ts_ast::{Diagnostic, NodeId, SourceFileParseOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptKind};
-use ts_jsstring::JsString;
-use ts_module::{ResolvedModule, ResolvedTypeReferenceDirective, Resolver};
-use ts_tspath as path;
-use ts_vfs::FileSystem;
+use tsr_arena::Counters;
+use tsr_ast::{Diagnostic, NodeId, SourceFileParseOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptKind};
+use tsr_jsstring::JsString;
+use tsr_module::{ResolvedModule, ResolvedTypeReferenceDirective, Resolver};
+use tsr_tspath as path;
+use tsr_vfs::FileSystem;
 #[derive(Debug)]
 pub enum Error {
-    Checker(ts_checker::Error),
-    Host(ts_vfs::Error),
-    Resolution(ts_module::Error),
-    Ast(ts_arena::Error),
-    Bind(ts_ast::BindError),
+    Checker(tsr_checker::Error),
+    Host(tsr_vfs::Error),
+    Resolution(tsr_module::Error),
+    Ast(tsr_arena::Error),
+    Bind(tsr_ast::BindError),
     Unsupported(&'static str),
 }
-impl From<ts_checker::Error> for Error {
-    fn from(error: ts_checker::Error) -> Self {
+impl From<tsr_checker::Error> for Error {
+    fn from(error: tsr_checker::Error) -> Self {
         Self::Checker(error)
     }
 }
-impl From<ts_vfs::Error> for Error {
-    fn from(e: ts_vfs::Error) -> Self {
+impl From<tsr_vfs::Error> for Error {
+    fn from(e: tsr_vfs::Error) -> Self {
         Self::Host(e)
     }
 }
-impl From<ts_module::Error> for Error {
-    fn from(e: ts_module::Error) -> Self {
+impl From<tsr_module::Error> for Error {
+    fn from(e: tsr_module::Error) -> Self {
         Self::Resolution(e)
     }
 }
-impl From<ts_arena::Error> for Error {
-    fn from(e: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(e: tsr_arena::Error) -> Self {
         Self::Ast(e)
     }
 }
-impl From<ts_ast::BindError> for Error {
-    fn from(e: ts_ast::BindError) -> Self {
+impl From<tsr_ast::BindError> for Error {
+    fn from(e: tsr_ast::BindError) -> Self {
         Self::Bind(e)
     }
 }
@@ -54,7 +54,7 @@ impl std::fmt::Display for Error {
 }
 impl std::error::Error for Error {}
 pub struct ProgramOptions {
-    pub config: ts_tsoptions::ParsedCommandLine,
+    pub config: tsr_tsoptions::ParsedCommandLine,
     pub host: Arc<dyn FileSystem>,
     pub current_directory: JsString,
     pub default_library_path: JsString,
@@ -88,7 +88,7 @@ pub struct Program {
         std::sync::Mutex<std::collections::HashMap<NodeId, Vec<Diagnostic>>>,
     pub(crate) diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics,
     option_verification: crate::OptionVerification,
-    config: ts_tsoptions::ParsedCommandLine,
+    config: tsr_tsoptions::ParsedCommandLine,
     cwd: JsString,
     external_paths: BTreeSet<JsString>,
     options: Arc<CompilerOptions>,
@@ -101,7 +101,7 @@ pub struct Program {
     resolutions: Vec<Resolution>,
     type_resolutions: Vec<TypeResolution>,
     include_diagnostics: Vec<Diagnostic>,
-    trace: Vec<ts_module::DiagAndArgs>,
+    trace: Vec<tsr_module::DiagAndArgs>,
 }
 impl Program {
     pub fn load(
@@ -111,7 +111,7 @@ impl Program {
     ) -> Result<Self, Error> {
         Loader::new(options, cache, counters)?.run()
     }
-    pub fn config(&self) -> &ts_tsoptions::ParsedCommandLine {
+    pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
     }
     pub fn current_directory(&self) -> &[u8] {
@@ -147,7 +147,7 @@ impl Program {
     pub fn type_resolutions(&self) -> &[TypeResolution] {
         &self.type_resolutions
     }
-    pub fn trace(&self) -> &[ts_module::DiagAndArgs] {
+    pub fn trace(&self) -> &[tsr_module::DiagAndArgs] {
         &self.trace
     }
     pub fn include_diagnostics(&self) -> &[Diagnostic] {
@@ -160,13 +160,13 @@ impl Program {
     }
 }
 struct Loader<'a> {
-    config: ts_tsoptions::ParsedCommandLine,
+    config: tsr_tsoptions::ParsedCommandLine,
     pending: Vec<LoadTask>,
     roles: BTreeMap<JsString, (bool, bool)>,
     child_tasks: BTreeMap<JsString, Vec<LoadTask>>,
     file_traces: BTreeMap<JsString, FileTraces>,
-    library_traces: BTreeMap<JsString, Vec<ts_module::DiagAndArgs>>,
-    trace: Vec<ts_module::DiagAndArgs>,
+    library_traces: BTreeMap<JsString, Vec<tsr_module::DiagAndArgs>>,
+    trace: Vec<tsr_module::DiagAndArgs>,
     options: Arc<CompilerOptions>,
     host: Arc<dyn FileSystem>,
     cwd: JsString,
@@ -180,7 +180,7 @@ struct Loader<'a> {
     roots: Vec<IncludeEdge>,
     children: BTreeMap<JsString, Vec<IncludeEdge>>,
     include_reasons: BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
-    package_ids: BTreeMap<JsString, ts_module::PackageId>,
+    package_ids: BTreeMap<JsString, tsr_module::PackageId>,
     files: Vec<Arc<ProgramFile>>,
     metadata: BTreeMap<JsString, SourceFileMetaData>,
     libs: BTreeSet<JsString>,
@@ -263,7 +263,7 @@ impl<'a> Loader<'a> {
             let libraries = self.options.lib.clone();
             if let Some(libs) = libraries {
                 for (index, lib) in libs.into_iter().enumerate() {
-                    if let Some(name) = ts_tsoptions::lib_file_name(lib.as_bytes()) {
+                    if let Some(name) = tsr_tsoptions::lib_file_name(lib.as_bytes()) {
                         self.load_lib(
                             name.as_bytes(),
                             None,
@@ -273,7 +273,7 @@ impl<'a> Loader<'a> {
                 }
             } else {
                 self.load_lib(
-                    ts_tsoptions::default_lib_file_name(&self.options).as_bytes(),
+                    tsr_tsoptions::default_lib_file_name(&self.options).as_bytes(),
                     None,
                     IncludeReasonData::Lib { index: None },
                 )?;
@@ -355,7 +355,7 @@ impl<'a> Loader<'a> {
             retained_paths.contains(&r.file)
                 || r.file
                     .as_bytes()
-                    .ends_with(ts_module::INFERRED_TYPES_CONTAINING_FILE)
+                    .ends_with(tsr_module::INFERRED_TYPES_CONTAINING_FILE)
         });
         self.resolutions
             .sort_by(|a, b| (&a.file, &a.name, a.mode).cmp(&(&b.file, &b.name, b.mode)));
@@ -386,13 +386,13 @@ impl<'a> Loader<'a> {
             .collect();
         self.diagnostics
             .retain(|d| d.file.is_none_or(|file| names.contains_key(&file)));
-        let name = |id| names.get(&id).copied().ok_or(ts_arena::Error::WrongOwner);
+        let name = |id| names.get(&id).copied().ok_or(tsr_arena::Error::WrongOwner);
         self.diagnostics.sort_by(|a, b| {
-            ts_ast::compare_diagnostics(a, b, &name)
+            tsr_ast::compare_diagnostics(a, b, &name)
                 .expect("all include diagnostic source identities validated")
         });
         self.diagnostics.dedup_by(|a, b| {
-            ts_ast::equal_diagnostics(a, b, &name)
+            tsr_ast::equal_diagnostics(a, b, &name)
                 .expect("all include diagnostic source identities validated")
         });
         let external_paths = self
@@ -438,7 +438,7 @@ impl<'a> Loader<'a> {
         &mut self,
         parent: Option<&JsString>,
         name: &[u8],
-        package: Option<&ts_module::PackageId>,
+        package: Option<&tsr_module::PackageId>,
         reason: IncludeReasonData,
     ) {
         let key = path::to_path(
@@ -508,7 +508,7 @@ impl<'a> Loader<'a> {
         } else {
             path::directory(self.options.config_file_path.as_bytes())
         };
-        let containing = path::combine(&directory, &[ts_module::INFERRED_TYPES_CONTAINING_FILE]);
+        let containing = path::combine(&directory, &[tsr_module::INFERRED_TYPES_CONTAINING_FILE]);
         let key = path::to_path(
             &containing,
             self.cwd.as_bytes(),
@@ -549,19 +549,19 @@ impl<'a> Loader<'a> {
             } else {
                 let reason = Diagnostic::compiler(
                     if self.options.uses_wildcard_types() {
-                        ts_diagnostics::Entry_point_for_implicit_type_library_0
+                        tsr_diagnostics::Entry_point_for_implicit_type_library_0
                     } else {
-                        ts_diagnostics::Entry_point_of_type_library_0_specified_in_compilerOptions
+                        tsr_diagnostics::Entry_point_of_type_library_0_specified_in_compilerOptions
                     },
                     vec![name.clone()],
                 );
                 let mut because = Diagnostic::compiler(
-                    ts_diagnostics::The_file_is_in_the_program_because_Colon,
+                    tsr_diagnostics::The_file_is_in_the_program_because_Colon,
                     Vec::new(),
                 );
                 because.message_chain.push(Arc::new(reason));
                 let mut diagnostic = Diagnostic::compiler(
-                    ts_diagnostics::Cannot_find_type_definition_file_for_0,
+                    tsr_diagnostics::Cannot_find_type_definition_file_for_0,
                     vec![name.clone()],
                 );
                 diagnostic.message_chain.push(Arc::new(because));
@@ -581,10 +581,10 @@ impl<'a> Loader<'a> {
         &mut self,
         name: &[u8],
         reference: &[u8],
-        source: Option<(&ProgramFile, ts_core::TextRange)>,
+        source: Option<(&ProgramFile, tsr_core::TextRange)>,
     ) -> Result<Option<Vec<u8>>, Error> {
         let diagnostic_name = JsString::from_bytes(path::normalize_slashes(reference).into_owned());
-        let groups = ts_tsoptions::supported_extensions(&self.options, &[]);
+        let groups = tsr_tsoptions::supported_extensions(&self.options, &[]);
         let quoted_extensions = || {
             let mut text = Vec::new();
             for ext in groups.iter().flatten() {
@@ -600,7 +600,7 @@ impl<'a> Loader<'a> {
         let allow_non_ts = self.options.allow_non_ts_extensions.is_true();
         let failure = if path::has_extension(name) {
             let canonical = path::canonical(name, self.host.use_case_sensitive_file_names());
-            let supported = ts_tsoptions::supported_extensions_with_json(&self.options, &[])
+            let supported = tsr_tsoptions::supported_extensions_with_json(&self.options, &[])
                 .iter()
                 .flatten()
                 .any(|ext| canonical.as_ref().ends_with(ext.as_bytes()));
@@ -609,12 +609,12 @@ impl<'a> Loader<'a> {
                     ScriptKind::from_file_name(&canonical),
                     ScriptKind::JS | ScriptKind::JSX
                 ) {
-                    (ts_diagnostics::File_0_is_a_JavaScript_file_Did_you_mean_to_enable_the_allowJs_option, vec![diagnostic_name])
+                    (tsr_diagnostics::File_0_is_a_JavaScript_file_Did_you_mean_to_enable_the_allowJs_option, vec![diagnostic_name])
                 } else {
-                    (ts_diagnostics::File_0_has_an_unsupported_extension_The_only_supported_extensions_are_1, vec![diagnostic_name, quoted_extensions()])
+                    (tsr_diagnostics::File_0_has_an_unsupported_extension_The_only_supported_extensions_are_1, vec![diagnostic_name, quoted_extensions()])
                 }
             } else if !self.host.file_exists(name)? {
-                (ts_diagnostics::File_0_not_found, vec![diagnostic_name])
+                (tsr_diagnostics::File_0_not_found, vec![diagnostic_name])
             } else if source.is_some_and(|(file, _)| {
                 let state = file.bound.view().source_file().expect("retained source");
                 path::canonical(
@@ -623,7 +623,7 @@ impl<'a> Loader<'a> {
                 ) == canonical
             }) {
                 (
-                    ts_diagnostics::A_file_cannot_have_a_reference_to_itself,
+                    tsr_diagnostics::A_file_cannot_have_a_reference_to_itself,
                     Vec::new(),
                 )
             } else {
@@ -633,7 +633,7 @@ impl<'a> Loader<'a> {
             if self.host.file_exists(name)? {
                 return Ok(Some(name.to_vec()));
             }
-            (ts_diagnostics::File_0_not_found, vec![diagnostic_name])
+            (tsr_diagnostics::File_0_not_found, vec![diagnostic_name])
         } else {
             for ext in &groups[0] {
                 let mut candidate = name.to_vec();
@@ -643,7 +643,7 @@ impl<'a> Loader<'a> {
                 }
             }
             (
-                ts_diagnostics::Could_not_resolve_the_path_0_with_the_extensions_Colon_1,
+                tsr_diagnostics::Could_not_resolve_the_path_0_with_the_extensions_Colon_1,
                 vec![diagnostic_name, quoted_extensions()],
             )
         };
@@ -652,11 +652,11 @@ impl<'a> Loader<'a> {
         } else {
             let mut diagnostic = Diagnostic::compiler(failure.0, failure.1);
             let mut because = Diagnostic::compiler(
-                ts_diagnostics::The_file_is_in_the_program_because_Colon,
+                tsr_diagnostics::The_file_is_in_the_program_because_Colon,
                 Vec::new(),
             );
             because.message_chain.push(Arc::new(Diagnostic::compiler(
-                ts_diagnostics::Root_file_specified_for_compilation,
+                tsr_diagnostics::Root_file_specified_for_compilation,
                 Vec::new(),
             )));
             diagnostic.message_chain.push(Arc::new(because));
@@ -788,7 +788,7 @@ impl<'a> Loader<'a> {
         let pending_start = self.pending.len();
         let kind = ScriptKind::ensure_from_file_name(&name);
         if !self.options.allow_non_ts_extensions.is_true() {
-            let extensions = ts_tsoptions::supported_extensions_with_json(&self.options, &[]);
+            let extensions = tsr_tsoptions::supported_extensions_with_json(&self.options, &[]);
             if !extensions
                 .iter()
                 .flatten()
@@ -880,7 +880,7 @@ impl<'a> Loader<'a> {
                         self.diagnostics.push(Diagnostic::new(
                             Some(file.source()),
                             reference.loc,
-                            ts_diagnostics::Cannot_find_type_definition_file_for_0,
+                            tsr_diagnostics::Cannot_find_type_definition_file_for_0,
                             vec![reference.file_name.clone()],
                         ));
                     }
@@ -895,7 +895,7 @@ impl<'a> Loader<'a> {
             if !self.options.no_lib.is_true() {
                 for (index, reference) in state.lib_reference_directives()?.iter().enumerate() {
                     let lower = reference.file_name.as_bytes().to_ascii_lowercase();
-                    if let Some(lib) = ts_tsoptions::lib_file_name(&lower) {
+                    if let Some(lib) = tsr_tsoptions::lib_file_name(&lower) {
                         self.load_lib(
                             lib.as_bytes(),
                             Some(&key),
@@ -954,12 +954,12 @@ impl<'a> Loader<'a> {
                 )?;
             }
             for (index, &usage) in state.imports()?.iter().enumerate() {
-                let usage = usage.ok_or(ts_arena::Error::InvalidGraph)?;
+                let usage = usage.ok_or(tsr_arena::Error::InvalidGraph)?;
                 self.resolve_import(&file, &name, &key, &meta, (usage, index), true)?;
             }
             for &usage in state.module_augmentations()?.iter() {
-                let usage = usage.ok_or(ts_arena::Error::InvalidGraph)?;
-                if view.node(usage)?.kind() == ts_ast::SyntaxKind::StringLiteral {
+                let usage = usage.ok_or(tsr_arena::Error::InvalidGraph)?;
+                if view.node(usage)?.kind() == tsr_ast::SyntaxKind::StringLiteral {
                     self.resolve_import(&file, &name, &key, &meta, (usage, 0), false)?;
                 }
             }
@@ -1005,7 +1005,7 @@ impl<'a> Loader<'a> {
             module_name,
             mode,
             (
-                include && (is_js || view.node(usage)?.flags() & ts_ast::node_flags::JS_DOC == 0),
+                include && (is_js || view.node(usage)?.flags() & tsr_ast::node_flags::JS_DOC == 0),
                 index as isize,
                 None,
             ),
@@ -1033,7 +1033,7 @@ impl<'a> Loader<'a> {
         if site.0
             && result.is_resolved()
             && !self.options.no_resolve.is_true()
-            && ts_module::resolution_diagnostic(
+            && tsr_module::resolution_diagnostic(
                 &self.options,
                 &result,
                 view.source_file(file.source())?.is_declaration_file,
@@ -1079,7 +1079,7 @@ fn lib_priority(name: &[u8], library_path: &[u8]) -> usize {
         .strip_prefix(library_path)
         .is_some_and(|suffix| suffix.starts_with(b"/"))
     {
-        return ts_tsoptions::LIB_MAP.len() + 2;
+        return tsr_tsoptions::LIB_MAP.len() + 2;
     }
 
     let base = path::base_name(name);
@@ -1090,24 +1090,24 @@ fn lib_priority(name: &[u8], library_path: &[u8]) -> usize {
         .strip_prefix(b"lib.")
         .and_then(|s| s.strip_suffix(b".d.ts"));
     key.and_then(|key| {
-        ts_tsoptions::LIB_MAP
+        tsr_tsoptions::LIB_MAP
             .iter()
             .position(|(name, _)| name.as_bytes() == key)
     })
-    .map_or(ts_tsoptions::LIB_MAP.len() + 2, |i| i + 1)
+    .map_or(tsr_tsoptions::LIB_MAP.len() + 2, |i| i + 1)
 }
 fn missing_root(name: &[u8]) -> Diagnostic {
     let root = Diagnostic::compiler(
-        ts_diagnostics::Root_file_specified_for_compilation,
+        tsr_diagnostics::Root_file_specified_for_compilation,
         Vec::new(),
     );
     let mut because = Diagnostic::compiler(
-        ts_diagnostics::The_file_is_in_the_program_because_Colon,
+        tsr_diagnostics::The_file_is_in_the_program_because_Colon,
         Vec::new(),
     );
     because.message_chain.push(Arc::new(root));
     let mut result = Diagnostic::compiler(
-        ts_diagnostics::File_0_not_found,
+        tsr_diagnostics::File_0_not_found,
         vec![JsString::from_bytes(name)],
     );
     result.message_chain.push(Arc::new(because));
@@ -1116,8 +1116,8 @@ fn missing_root(name: &[u8]) -> Diagnostic {
 
 #[derive(Default)]
 struct FileTraces {
-    types: Vec<ts_module::DiagAndArgs>,
-    modules: Vec<ts_module::DiagAndArgs>,
+    types: Vec<tsr_module::DiagAndArgs>,
+    modules: Vec<tsr_module::DiagAndArgs>,
 }
 #[derive(Clone)]
 struct LoadTask {
@@ -1135,13 +1135,13 @@ struct Collector<'a> {
     loaded_paths: BTreeSet<JsString>,
     include_reasons: &'a mut BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
     file_traces: &'a mut BTreeMap<JsString, FileTraces>,
-    trace: Vec<ts_module::DiagAndArgs>,
+    trace: Vec<tsr_module::DiagAndArgs>,
     files: &'a mut BTreeMap<JsString, Arc<ProgramFile>>,
     children: &'a BTreeMap<JsString, Vec<IncludeEdge>>,
-    package_ids: &'a BTreeMap<JsString, ts_module::PackageId>,
+    package_ids: &'a BTreeMap<JsString, tsr_module::PackageId>,
     deduplicate: bool,
     seen: BTreeSet<JsString>,
-    packages: BTreeMap<ts_module::PackageId, JsString>,
+    packages: BTreeMap<tsr_module::PackageId, JsString>,
     redirects: BTreeMap<JsString, JsString>,
     output: Vec<Arc<ProgramFile>>,
 }
@@ -1171,7 +1171,7 @@ impl Collector<'_> {
         let Some(file) = self.files.remove(key) else {
             if key
                 .as_bytes()
-                .ends_with(ts_module::INFERRED_TYPES_CONTAINING_FILE)
+                .ends_with(tsr_module::INFERRED_TYPES_CONTAINING_FILE)
             {
                 if let Some(children) = self.children.get(key) {
                     for child in children {

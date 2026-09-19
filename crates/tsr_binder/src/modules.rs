@@ -1,9 +1,9 @@
 use crate::{ast as a, checked, need, Binder};
-use ts_ast::{
+use tsr_ast::{
     internal_symbol_names as names, modifier_flags as mf, node_flags as nf, symbol_flags as sf,
     JsString, NodeId, SymbolId, SymbolTable, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl Binder<'_, '_, '_> {
     // port: tsc/internal/binder/binder.go:Binder.bindSourceFileIfExternalModule
@@ -23,7 +23,7 @@ impl Binder<'_, '_, '_> {
     // port: tsc/internal/binder/binder.go:Binder.bindSourceFileAsExternalModule
     pub fn bind_source_file_as_external_module(&mut self) {
         let file = checked(self.view().source_file(self.file));
-        let name = ts_core::path::remove_file_extension(file.file_name());
+        let name = tsr_core::path::remove_file_extension(file.file_name());
         let name = JsString::from_bytes([b"\"".as_slice(), name, b"\""].concat());
         self.bind_anonymous_declaration(self.file, sf::VALUE_MODULE, name);
     }
@@ -44,7 +44,7 @@ impl Binder<'_, '_, '_> {
                     sf::VALUE_MODULE_EXCLUDES,
                 );
                 if self.n(name).kind() == K::StringLiteral {
-                    let pattern = ts_core::pattern::Pattern::parse(self.text(name).as_bytes());
+                    let pattern = tsr_core::pattern::Pattern::parse(self.text(name).as_bytes());
                     if !pattern.is_valid() {
                         self.error_on_first_token(
                             name,

@@ -1,9 +1,9 @@
 use super::*;
 use crate::{Error, ResponseQueue, Snapshot};
 use serde_json::Value;
-use ts_arena::Counts;
-use ts_checker::CheckerOptions;
-use ts_project::{CheckerPool, Project};
+use tsr_arena::Counts;
+use tsr_checker::CheckerOptions;
+use tsr_project::{CheckerPool, Project};
 
 fn observations() -> Value {
     serde_json::from_str(include_str!(
@@ -44,7 +44,7 @@ fn options(row: &Value) -> PrintNodeOptions {
 
 fn snapshot(counters: &Counters) -> Snapshot {
     let pool = CheckerPool::for_types(CheckerOptions::default(), counters, 1);
-    Snapshot::new(ts_project::Snapshot::new(Project::new(pool))).unwrap()
+    Snapshot::new(tsr_project::Snapshot::new(Project::new(pool))).unwrap()
 }
 
 fn assert_allocated(counters: &Counters, before: Counts) {
@@ -88,7 +88,7 @@ fn native_decode_print_outputs_and_named_boundaries_match() {
         if let Some(reason) = row["rust_unsupported"].as_str() {
             assert!(row["text_hex"].is_string(), "boundary needs native output");
             assert!(
-                matches!(result, Ok(Err(PrintError::Print(ts_printer::Error::Unsupported(actual)))) if actual == reason),
+                matches!(result, Ok(Err(PrintError::Print(tsr_printer::Error::Unsupported(actual)))) if actual == reason),
                 "{}: expected Unsupported({reason})",
                 row["name"]
             );
@@ -215,7 +215,7 @@ fn decoder_panic_drops_scratch_and_retires_snapshot_request() {
     assert_eq!(counters.snapshot(), before);
     assert_eq!(
         snapshot.generation().validate(),
-        Err(ts_arena::Error::Retired)
+        Err(tsr_arena::Error::Retired)
     );
     let registry = snapshot.0.registry.lock().unwrap();
     assert!(registry.types.is_empty());
@@ -237,9 +237,9 @@ fn printer_error_drops_allocated_scratch_without_retiring_snapshot() {
     let result = snapshot.request(|| Ok(print_decoded(scratch, options(&row))));
     assert_eq!(
         result,
-        Ok(Err(PrintError::Print(ts_printer::Error::UnexpectedKind {
+        Ok(Err(PrintError::Print(tsr_printer::Error::UnexpectedKind {
             context: "unhandled statement",
-            kind: ts_ast::SyntaxKind::JSImportDeclaration.into(),
+            kind: tsr_ast::SyntaxKind::JSImportDeclaration.into(),
         })))
     );
     assert_eq!(counters.snapshot(), before);
@@ -253,9 +253,9 @@ fn printer_error_drops_allocated_scratch_without_retiring_snapshot() {
     });
     assert_eq!(
         result,
-        Ok(Err(PrintError::Print(ts_printer::Error::UnexpectedKind {
+        Ok(Err(PrintError::Print(tsr_printer::Error::UnexpectedKind {
             context: "unhandled statement",
-            kind: ts_ast::SyntaxKind::JSImportDeclaration.into(),
+            kind: tsr_ast::SyntaxKind::JSImportDeclaration.into(),
         })))
     );
     assert_eq!(counters.snapshot(), before);

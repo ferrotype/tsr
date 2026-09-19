@@ -87,7 +87,7 @@ pub fn find_declaration(
     let lower: std::borrow::Cow<'_, [u8]> = if name.is_ascii() {
         std::borrow::Cow::Borrowed(name)
     } else {
-        std::borrow::Cow::Owned(ts_jsstring::helpers::to_lower_go(name))
+        std::borrow::Cow::Owned(tsr_jsstring::helpers::to_lower_go(name))
     };
     if allow_short {
         if let Some(found) = options.iter().find(|option| {

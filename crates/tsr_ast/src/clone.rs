@@ -3,7 +3,7 @@ use crate::{
     NodeVisitor, NodeVisitorHooks, RuntimeFactory,
 };
 use std::ops::ControlFlow;
-use ts_core::TextRange;
+use tsr_core::TextRange;
 
 // port: tsc/internal/ast/ast.go:Node.Clone
 pub fn clone_node(factory: &mut dyn RuntimeFactory, original: NodeId) -> NodeId {

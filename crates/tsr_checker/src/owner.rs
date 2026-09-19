@@ -14,13 +14,13 @@
 //! the permit is released (`CheckerLease`'s drop does this); the poisoned state
 //! lock is a backstop, never the recovery mechanism.
 //!
-//! Two lock acquisitions per operation is a known cost of reusing the `ts_arena`
+//! Two lock acquisitions per operation is a known cost of reusing the `tsr_arena`
 //! permit unchanged. Operations are per query, not per node; P1 measures it and
 //! folds the state into the permit if it shows.
 
 use crate::{CheckerOptions, CheckerState, Error};
 use std::sync::{Arc, Mutex, MutexGuard};
-use ts_arena::{CheckerIdentity, CheckerLease, Counters};
+use tsr_arena::{CheckerIdentity, CheckerLease, Counters};
 
 pub struct CheckerOwner {
     identity: Arc<CheckerIdentity>,
@@ -79,7 +79,7 @@ impl CheckerOwner {
         let lease = self.identity.lease()?;
         let state = self.state.lock().map_err(|_| {
             self.identity.generation().retire();
-            Error::Arena(ts_arena::Error::Retired)
+            Error::Arena(tsr_arena::Error::Retired)
         })?;
         Ok(Operation {
             owner: self,
@@ -94,7 +94,7 @@ impl CheckerOwner {
 /// This compile-fail case checks that mutable checker state is crate-private.
 ///
 /// ```compile_fail
-/// use ts_checker::Operation;
+/// use tsr_checker::Operation;
 /// fn swap_checkers(a: &mut Operation<'_>, b: &mut Operation<'_>) {
 ///     std::mem::swap(a.state_mut(), b.state_mut());
 /// }
@@ -105,7 +105,7 @@ impl CheckerOwner {
 /// when an operation imports or resolves them.
 ///
 /// ```compile_fail
-/// use ts_checker::{TypeStore, TypeId};
+/// use tsr_checker::{TypeStore, TypeId};
 /// fn private_store_lookup(store: &TypeStore, id: TypeId) { store.get(id); }
 /// ```
 ///

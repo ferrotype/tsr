@@ -8,7 +8,7 @@ The compiler already retains synthetic `tslib` resolutions. The new host method 
 
 The fixture protocol now accepts the explicit pinned target/module enum values and optional `useDefineForClassFields`, `importHelpers`, and `noEmit` booleans. Existing fixture defaults and the independent merge probe remain unchanged.
 
-Validated on the immutable `target/s08/p4-build21507/p2_checker` binary (SHA-256 `408958d8f567475b4b9434668b4840ead3e5aa18a575c310f3940a5221e82ae1`). The build also compiled both P3 examples with `relation-probe` and `ts_checker/storage-pilot`, including the added link-store census.
+Validated on the immutable `target/s08/p4-build21507/p2_checker` binary (SHA-256 `408958d8f567475b4b9434668b4840ead3e5aa18a575c310f3940a5221e82ae1`). The build also compiled both P3 examples with `relation-probe` and `tsr_checker/storage-pilot`, including the added link-store census.
 
 | Fixture | Programs | Native observation SHA-256 |
 | --- | ---: | --- |

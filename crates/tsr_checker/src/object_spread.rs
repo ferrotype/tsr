@@ -3,8 +3,8 @@
 use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, IndexInfoId, TypeId, UnionReduction,
 };
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, SymbolTable};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, SymbolTable};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSpreadType

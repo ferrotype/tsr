@@ -2,7 +2,7 @@
 
 use super::{CompactContext, CoreStore, FieldKey, FullReference, PackingContext, StoredNode};
 use crate::{AstPayloadStore, FlowId, NodeBinding, NodeId, SymbolId, SymbolTableId};
-use ts_arena::ArenaId;
+use tsr_arena::ArenaId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct BindingArenas {
@@ -132,7 +132,7 @@ impl CoreStore {
         header: &mut StoredNode,
         id: NodeId,
         auxiliary: ArenaId,
-        source: &ts_jsstring::SourceText,
+        source: &tsr_jsstring::SourceText,
         write: BindingWrite,
     ) -> bool {
         let stored = if let Some(binding) = self.binding_overrides.get_mut(&id.slot()) {
@@ -161,7 +161,7 @@ impl CoreStore {
         header: &mut StoredNode,
         id: NodeId,
         auxiliary: ArenaId,
-        source: &ts_jsstring::SourceText,
+        source: &tsr_jsstring::SourceText,
         binding: Option<NodeBinding>,
     ) {
         if !self.binding_overrides.is_empty() {

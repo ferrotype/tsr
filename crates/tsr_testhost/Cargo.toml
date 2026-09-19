@@ -1,5 +1,5 @@
 [package]
-name = "ts_testhost"
+name = "tsr_testhost"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -10,9 +10,9 @@ publish.workspace = true
 base64 = "0.22.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
-ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
 
-ts_tspath = { version = "0.1.0", path = "../ts_tspath" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
 
 [lints]
 workspace = true

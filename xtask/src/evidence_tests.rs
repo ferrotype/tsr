@@ -352,15 +352,15 @@ fn generation_evidence_tracks_generator_inputs_but_not_unconsumed_leaf_bodies() 
         }
     }
     let leaf_bodies = [
-        "crates/ts_arena/src/arena.rs",
-        "crates/ts_jsstring/src/jsstring.rs",
+        "crates/tsr_arena/src/arena.rs",
+        "crates/tsr_jsstring/src/jsstring.rs",
     ];
     let consumed = [
-        "crates/ts_ast/src/data_generated.rs",
-        "crates/ts_diagnostics/src/generated.rs",
-        "crates/ts_encoder/src/generated.rs",
-        "crates/ts_arena/Cargo.toml",
-        "crates/ts_jsstring/Cargo.toml",
+        "crates/tsr_ast/src/data_generated.rs",
+        "crates/tsr_diagnostics/src/generated.rs",
+        "crates/tsr_encoder/src/generated.rs",
+        "crates/tsr_arena/Cargo.toml",
+        "crates/tsr_jsstring/Cargo.toml",
         "xtask/src/gen/ast.rs",
         "tools/s03/ast-export.mts",
         "scripts/s03.py",

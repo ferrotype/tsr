@@ -2,8 +2,8 @@
 //! spelling equality alone never identifies a variable.
 
 use crate::{type_facts as f, type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.narrowType
@@ -44,7 +44,7 @@ impl CheckerState {
                 false
             };
             coalescing
-                || ts_ast::utilities::is_expression_of_optional_chain_root(
+                || tsr_ast::utilities::is_expression_of_optional_chain_root(
                     self.ast(expression)?,
                     expression,
                 )?
@@ -116,7 +116,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_prefix_unary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 if data.operator() == K::ExclamationToken {
                     return self.narrow_reference_type(
                         reference,
@@ -132,7 +132,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let left = data.left().ok_or(Error::MissingLink("binary left"))?;
                 let right = data.right().ok_or(Error::MissingLink("binary right"))?;
                 let op = data
@@ -358,7 +358,7 @@ impl CheckerState {
     fn narrow_optional_chain_containment(
         &mut self,
         ty: TypeId,
-        operator: ts_ast::NodeKind,
+        operator: tsr_ast::NodeKind,
         value: NodeId,
         assume: bool,
     ) -> Result<TypeId, Error> {
@@ -422,7 +422,7 @@ impl CheckerState {
             if let Some(symbol) = self.lookup_symbol(
                 self.builtins.globals,
                 b"Record",
-                ts_ast::symbol_flags::TYPE_ALIAS,
+                tsr_ast::symbol_flags::TYPE_ALIAS,
             )? {
                 let declared = self.get_declared_type_of_symbol(symbol)?;
                 let parameters = self
@@ -454,11 +454,11 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         if let Some(property) = self.constituent_property(ty, name, false)? {
             let symbol = self.symbol(property)?;
-            return Ok(symbol.flags() & ts_ast::symbol_flags::OPTIONAL != 0
-                || symbol.check_flags() & ts_ast::check_flags::PARTIAL != 0
+            return Ok(symbol.flags() & tsr_ast::symbol_flags::OPTIONAL != 0
+                || symbol.check_flags() & tsr_ast::check_flags::PARTIAL != 0
                 || assume);
         }
-        let key = self.get_string_literal_type(ts_ast::JsString::from_bytes(name))?;
+        let key = self.get_string_literal_type(tsr_ast::JsString::from_bytes(name))?;
         Ok(self.applicable_index_info(ty, key)?.is_some() || !assume)
     }
 

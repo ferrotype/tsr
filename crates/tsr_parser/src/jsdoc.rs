@@ -2,11 +2,11 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{JSDocInfo, Parser, ParserFactory, ParsingContext};
 use std::sync::Arc;
-use ts_ast::SyntaxKind as K;
-use ts_ast::{node_flags, Diagnostic, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId};
-use ts_core::TextRange;
-use ts_diagnostics::{self as diagnostics, Message};
-use ts_scanner::CommentRange;
+use tsr_ast::SyntaxKind as K;
+use tsr_ast::{node_flags, Diagnostic, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId};
+use tsr_core::TextRange;
+use tsr_diagnostics::{self as diagnostics, Message};
+use tsr_scanner::CommentRange;
 
 #[derive(Clone, Copy, PartialEq)]
 enum CommentState {
@@ -43,12 +43,12 @@ pub(crate) fn get_jsdoc_comment_ranges(
                 | K::ExportSpecifier
         )
     ) {
-        ranges.extend(ts_scanner::get_trailing_comment_ranges(
+        ranges.extend(tsr_scanner::get_trailing_comment_ranges(
             text,
             node.range().pos(),
         ));
     }
-    ranges.extend(ts_scanner::get_leading_comment_ranges(
+    ranges.extend(tsr_scanner::get_leading_comment_ranges(
         text,
         node.range().pos(),
     ));
@@ -212,7 +212,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         // stringSliceArena.Clone returns nil for an empty input, including the
         // text node emitted immediately before a leading JSDoc link.
         let text = if comments.is_empty() {
-            ts_ast::TextSlice::empty()
+            tsr_ast::TextSlice::empty()
         } else {
             self.factory.alloc_text(comments.to_vec())
         };
@@ -616,7 +616,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
         // Go starts with a nil slice and only allocates after a text token.
         let text = if text.is_empty() {
-            ts_ast::TextSlice::empty()
+            tsr_ast::TextSlice::empty()
         } else {
             self.factory.alloc_text(text)
         };
@@ -644,7 +644,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             name = self.finish_node(node, pos);
         }
         while self.token == K::PrivateIdentifier {
-            self.scan_operation(ts_scanner::Scanner::rescan_hash_token);
+            self.scan_operation(tsr_scanner::Scanner::rescan_hash_token);
             self.next_token_jsdoc();
             let right = self.parse_identifier();
             let node = self.factory.new_qualified_name(Some(name), Some(right));
@@ -730,7 +730,7 @@ fn trim_space_end(text: &JsString, space: fn(i32) -> bool) -> JsString {
                 start -= 1;
             }
         }
-        let (rune, width) = ts_jsstring::wtf8::decode_utf8(&bytes[start..]);
+        let (rune, width) = tsr_jsstring::wtf8::decode_utf8(&bytes[start..]);
         if start + width != end || !space(rune) {
             break;
         }
@@ -741,7 +741,7 @@ fn trim_space_end(text: &JsString, space: fn(i32) -> bool) -> JsString {
 
 /// port: tsc/internal/parser/jsdoc.go:trimEnd
 fn trim_end(text: &JsString) -> JsString {
-    trim_space_end(text, ts_scanner::is_white_space_like)
+    trim_space_end(text, tsr_scanner::is_white_space_like)
 }
 /// port: tsc/internal/parser/jsdoc.go:removeTrailingWhitespace
 fn remove_trailing_whitespace(comments: &mut Vec<JsString>) {

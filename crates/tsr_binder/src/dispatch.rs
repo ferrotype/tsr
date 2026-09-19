@@ -1,6 +1,6 @@
 use crate::target::BindingNode;
 use crate::{ast as a, checked, Binder};
-use ts_ast::{
+use tsr_ast::{
     internal_symbol_names as names, node_flags as nf, symbol_flags as sf, JsString, NodeId,
     SyntaxKind as K,
 };
@@ -48,12 +48,12 @@ impl<'scope> Binder<'_, 'scope, '_> {
         }
     }
     // Shared entry phase for ordinary binding and binary continuations.
-    pub(crate) fn bind_target_head(&mut self, node: BindingNode<'scope>) -> ts_ast::NodeKind {
+    pub(crate) fn bind_target_head(&mut self, node: BindingNode<'scope>) -> tsr_ast::NodeKind {
         let kind = self.node_kind(node);
         self.bind_node_head_known(node, kind);
         kind
     }
-    fn bind_node_head_known(&mut self, target: BindingNode<'scope>, kind: ts_ast::NodeKind) {
+    fn bind_node_head_known(&mut self, target: BindingNode<'scope>, kind: tsr_ast::NodeKind) {
         let node = self.node_id(target);
         match kind.known() {
             Some(K::Identifier) => {

@@ -1,7 +1,7 @@
 //! Discriminant narrowing shares P3's property and constituent caches.
 use crate::{type_facts as f, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
 }
@@ -53,7 +53,7 @@ impl CheckerState {
                     | K::FunctionExpression
                     | K::ArrowFunction
             )
-        ) || ts_ast::utilities::is_object_literal_method(
+        ) || tsr_ast::utilities::is_object_literal_method(
             self.ast(reference)?,
             Some(reference),
         )?;
@@ -61,7 +61,7 @@ impl CheckerState {
         if pseudo {
             if read.kind() == K::Identifier {
                 let mut symbol = self.resolved_value_symbol(expr)?;
-                if self.symbol(symbol)?.flags() & ts_ast::symbol_flags::EXPORT_VALUE != 0 {
+                if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::EXPORT_VALUE != 0 {
                     symbol = self.symbol(symbol)?.export_symbol().unwrap_or(symbol);
                 }
                 if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
@@ -70,13 +70,13 @@ impl CheckerState {
                         Some(K::BindingElement) => read
                             .data_source()
                             .as_binding_element()
-                            .ok_or(ts_arena::Error::InvalidGraph)?
+                            .ok_or(tsr_arena::Error::InvalidGraph)?
                             .dot_dot_dot_token()
                             .is_some(),
                         Some(K::Parameter) => read
                             .data_source()
                             .as_parameter_declaration()
-                            .ok_or(ts_arena::Error::InvalidGraph)?
+                            .ok_or(tsr_arena::Error::InvalidGraph)?
                             .dot_dot_dot_token()
                             .is_some(),
                         _ => return Ok(None),
@@ -146,7 +146,7 @@ impl CheckerState {
         let read = self.node(node)?;
         if read.kind() == K::VariableDeclaration && read.type_node().is_none() {
             if let Some(initializer) = read.initializer() {
-                return Ok(Some(ts_ast::skip_parentheses(
+                return Ok(Some(tsr_ast::skip_parentheses(
                     self.ast(initializer)?,
                     initializer,
                 )?));
@@ -209,7 +209,7 @@ impl CheckerState {
         &mut self,
         ty: TypeId,
         access: NodeId,
-        operator: ts_ast::NodeKind,
+        operator: tsr_ast::NodeKind,
         value: NodeId,
         assume: bool,
     ) -> Result<TypeId, Error> {
@@ -243,7 +243,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.getKeyPropertyName
-    pub(crate) fn flow_key_property_name(&mut self, ty: TypeId) -> Result<ts_ast::JsString, Error> {
+    pub(crate) fn flow_key_property_name(
+        &mut self,
+        ty: TypeId,
+    ) -> Result<tsr_ast::JsString, Error> {
         if self.types.union(ty)?.key_property_name.is_none() {
             self.compute_key_property_name(ty)?;
         }

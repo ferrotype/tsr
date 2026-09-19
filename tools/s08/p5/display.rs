@@ -1,13 +1,13 @@
 //! Direct public display requests. Expected bytes are never read by this adapter.
 use serde_json::{json, Value};
 use std::{ops::ControlFlow, sync::Arc};
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId};
-use ts_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SyntaxKind as K};
-use ts_checker::CheckerOwner;
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
-use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
+use tsr_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SyntaxKind as K};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
+use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -52,7 +52,7 @@ fn hex(bytes: &[u8]) -> String {
 struct Children<'a> {
     view: AstView<'a>,
     nodes: Vec<NodeId>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 impl ChildVisitor for Children<'_> {
     fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
@@ -128,7 +128,7 @@ pub fn observe(request: &Value) -> Result<Value> {
     let mut programs = Vec::new();
     for r in array(&request["programs"])? {
         let counters = Counters::new();
-        let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
         for (path, content) in r["files"].as_object().ok_or("expected files")? {
             fs.insert_loaded(path.as_bytes(), text(content)?.as_bytes());
         }
@@ -152,7 +152,7 @@ pub fn observe(request: &Value) -> Result<Value> {
         };
         let program = Arc::new(Program::load(
             ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(
+                config: tsr_tsoptions::ParsedCommandLine::new(
                     CompilerOptions {
                         target: ScriptTarget::ESNEXT,
                         module,

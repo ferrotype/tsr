@@ -6,12 +6,12 @@
 
 use crate::{node_check_flags as nc, CheckerState, Error, TypeId};
 use std::sync::{Arc, Mutex};
-use ts_arena::NodeId;
-use ts_ast::{Diagnostic, SyntaxKind};
-use ts_core::TextRange;
-use ts_diagnostics::Category;
-use ts_jsstring::JsString;
-use ts_scanner::{DiagnosticArgument, ScannerDiagnostic};
+use tsr_arena::NodeId;
+use tsr_ast::{Diagnostic, SyntaxKind};
+use tsr_core::TextRange;
+use tsr_diagnostics::Category;
+use tsr_jsstring::JsString;
+use tsr_scanner::{DiagnosticArgument, ScannerDiagnostic};
 
 fn argument(argument: DiagnosticArgument) -> JsString {
     match argument {
@@ -44,7 +44,7 @@ impl CheckerState {
     /// position; a file with parse diagnostics is not re-scanned.
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarRegularExpressionLiteral
     fn check_grammar_regular_expression_literal(&mut self, node: NodeId) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("regular expression source file"))?;
         let collected: Vec<ScannerDiagnostic> = {
             let view = self.ast(source)?;
@@ -57,7 +57,7 @@ impl CheckerState {
             let position = i64::from(view.node(node)?.pos());
             let sink = Arc::new(Mutex::new(Vec::new()));
             let collector = Arc::clone(&sink);
-            let mut scanner = ts_scanner::Scanner::new();
+            let mut scanner = tsr_scanner::Scanner::new();
             scanner.set_script_target(target);
             scanner.set_language_variant(variant);
             scanner.set_on_error(Some(Box::new(move |diagnostic| {

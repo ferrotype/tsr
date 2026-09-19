@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
-use ts_ast::{utilities as u, AstBuilder, FactoryMethods, NodeKind, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_ast::{utilities as u, AstBuilder, FactoryMethods, NodeKind, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 #[test]
 fn matches_pinned_go_front_utility_observations() {
     let mut actual = BTreeMap::<String, String>::new();
-    let mut f = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+    let mut f = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
     for raw in i16::MIN..=i16::MAX {
         let kind = NodeKind::from_raw(raw);
         let id = f.new_token(kind);
@@ -85,18 +85,18 @@ fn matches_pinned_go_front_utility_observations() {
     }
     emit!(
         "nil/for",
-        u::is_for_in_or_of_statement(None::<&ts_ast::Node>)
+        u::is_for_in_or_of_statement(None::<&tsr_ast::Node>)
     );
-    emit!("nil/function", u::is_function_like(None::<&ts_ast::Node>));
+    emit!("nil/function", u::is_function_like(None::<&tsr_ast::Node>));
     emit!(
         "nil/function-decl",
-        u::is_function_like_declaration(None::<&ts_ast::Node>)
+        u::is_function_like_declaration(None::<&tsr_ast::Node>)
     );
     emit!(
         "nil/function-static",
-        u::is_function_like_or_class_static_block_declaration(None::<&ts_ast::NodeRead<'_>>)
+        u::is_function_like_or_class_static_block_declaration(None::<&tsr_ast::NodeRead<'_>>)
     );
-    emit!("nil/js", u::is_in_js_file(None::<&ts_ast::Node>));
+    emit!("nil/js", u::is_in_js_file(None::<&tsr_ast::Node>));
     emit!("nil/block", u::is_function_block(f.view(), None).unwrap());
     emit!(
         "nil/object-method",
@@ -146,8 +146,8 @@ fn matches_pinned_go_front_utility_observations() {
     let a = f.new_token(K::Identifier.into());
     let b = f.new_token(K::ClassExpression.into());
     let c = f.new_source_file(
-        ts_ast::SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(b"/s06/front.ts".as_slice()),
+        tsr_ast::SourceFileParseOptions {
+            file_name: tsr_ast::JsString::from_bytes(b"/s06/front.ts".as_slice()),
             ..Default::default()
         },
         SourceText::default(),
@@ -182,9 +182,9 @@ fn matches_pinned_go_front_utility_observations() {
             .unwrap()
             .is_none()
     );
-    let mut yes1 = |_: &ts_ast::NodeRead<'_>| true;
-    let mut yes2 = |_: &ts_ast::NodeRead<'_>| true;
-    let mut yes3 = |_: &ts_ast::NodeRead<'_>| true;
+    let mut yes1 = |_: &tsr_ast::NodeRead<'_>| true;
+    let mut yes2 = |_: &tsr_ast::NodeRead<'_>| true;
+    let mut yes3 = |_: &tsr_ast::NodeRead<'_>| true;
     let many =
         u::find_many_ancestors(f.view(), Some(a), &mut [&mut yes1, &mut yes2, &mut yes3]).unwrap();
     emit!("ancestor/many-order", many == [Some(a), Some(b), Some(c)]);
@@ -195,7 +195,7 @@ fn matches_pinned_go_front_utility_observations() {
             .is_empty()
     );
     for value in [-1, 0, 1, 2, 3] {
-        let callback = |n: &ts_ast::NodeRead<'_>| {
+        let callback = |n: &tsr_ast::NodeRead<'_>| {
             if n.kind() == K::Identifier {
                 u::FindAncestorResult(value)
             } else {
@@ -268,7 +268,7 @@ fn matches_pinned_go_front_utility_observations() {
     let hidden = f.new_token(K::Identifier.into());
     f.node_mut(hidden)
         .unwrap()
-        .set_flags(ts_ast::node_flags::REPARSED);
+        .set_flags(tsr_ast::node_flags::REPARSED);
     emit!(
         "visible/empty",
         u::find_last_visible_node(f.view(), &[]).unwrap().is_none()
@@ -317,11 +317,11 @@ fn matches_pinned_go_front_utility_observations() {
         f.node_mut(decls).unwrap().set_parent(Some(stmt));
         f.node_mut(variable)
             .unwrap()
-            .set_flags(ts_ast::node_flags::JAVA_SCRIPT_FILE);
+            .set_flags(tsr_ast::node_flags::JAVA_SCRIPT_FILE);
         f.node_mut(decls).unwrap().set_flags(flag);
         f.node_mut(stmt)
             .unwrap()
-            .set_flags(ts_ast::node_flags::AMBIENT);
+            .set_flags(tsr_ast::node_flags::AMBIENT);
         let binding = f.new_token(K::BindingElement.into());
         let pattern = f.new_token(K::ObjectBindingPattern.into());
         f.node_mut(binding).unwrap().set_parent(Some(pattern));
@@ -429,9 +429,9 @@ fn matches_pinned_go_front_utility_observations() {
             "ModuleDeclaration payload"
         )
     );
-    let name = f.new_identifier(ts_ast::JsString::from_bytes(b"x".as_slice()));
+    let name = f.new_identifier(tsr_ast::JsString::from_bytes(b"x".as_slice()));
     let question = f.new_token(K::QuestionDotToken.into());
-    for (i, flag) in [0, ts_ast::node_flags::OPTIONAL_CHAIN, u32::MAX]
+    for (i, flag) in [0, tsr_ast::node_flags::OPTIONAL_CHAIN, u32::MAX]
         .into_iter()
         .enumerate()
     {
@@ -511,8 +511,8 @@ fn matches_pinned_go_front_utility_observations() {
         .into_iter()
         .enumerate()
     {
-        let num = f.new_numeric_literal(ts_ast::JsString::from_bytes(b"1".as_slice()), 0);
-        let big = f.new_big_int_literal(ts_ast::JsString::from_bytes(b"1n".as_slice()), 0);
+        let num = f.new_numeric_literal(tsr_ast::JsString::from_bytes(b"1".as_slice()), 0);
+        let big = f.new_big_int_literal(tsr_ast::JsString::from_bytes(b"1n".as_slice()), 0);
         for (j, operand) in [Some(num), Some(big), None].into_iter().enumerate() {
             if j == 2 && i != 2 {
                 continue;
@@ -526,17 +526,17 @@ fn matches_pinned_go_front_utility_observations() {
     }
     for (i, flag) in [
         0,
-        ts_ast::modifier_flags::STATIC,
-        ts_ast::modifier_flags::ACCESSOR,
-        ts_ast::modifier_flags::PRIVATE,
-        ts_ast::modifier_flags::CONST,
+        tsr_ast::modifier_flags::STATIC,
+        tsr_ast::modifier_flags::ACCESSOR,
+        tsr_ast::modifier_flags::PRIVATE,
+        tsr_ast::modifier_flags::CONST,
         u32::MAX,
     ]
     .into_iter()
     .enumerate()
     {
         let mods = f
-            .new_list(TextRange::new(-1, -1), ts_ast::NodeSlice::empty())
+            .new_list(TextRange::new(-1, -1), tsr_ast::NodeSlice::empty())
             .unwrap();
         f.list_mut(mods).unwrap().set_modifier_flags(flag);
         let property = f.new_property_declaration(Some(mods), Some(name), None, None, None);
@@ -553,7 +553,7 @@ fn matches_pinned_go_front_utility_observations() {
             u::has_syntactic_modifier(
                 f.view(),
                 property,
-                ts_ast::modifier_flags::STATIC | ts_ast::modifier_flags::ACCESSOR
+                tsr_ast::modifier_flags::STATIC | tsr_ast::modifier_flags::ACCESSOR
             )
             .unwrap()
         );
@@ -575,7 +575,7 @@ fn matches_pinned_go_front_utility_observations() {
             u::is_enum_const(f.view(), stmt).unwrap()
         );
     }
-    let private = f.new_private_identifier(ts_ast::JsString::from_bytes(b"#x".as_slice()));
+    let private = f.new_private_identifier(tsr_ast::JsString::from_bytes(b"#x".as_slice()));
     for (i, name) in [name, private].into_iter().enumerate() {
         let id = f.new_property_declaration(None, Some(name), None, None, None);
         emit!(
@@ -583,9 +583,9 @@ fn matches_pinned_go_front_utility_observations() {
             u::is_private_identifier_class_element_declaration(f.view(), id).unwrap()
         );
     }
-    let string = f.new_string_literal(ts_ast::JsString::from_bytes(b"use strict".as_slice()), 0);
+    let string = f.new_string_literal(tsr_ast::JsString::from_bytes(b"use strict".as_slice()), 0);
     let template = f.new_no_substitution_template_literal(
-        ts_ast::JsString::from_bytes(b"use strict".as_slice()),
+        tsr_ast::JsString::from_bytes(b"use strict".as_slice()),
         0,
     );
     for (i, expression) in [string, template, a].into_iter().enumerate() {

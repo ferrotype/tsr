@@ -1,8 +1,8 @@
 //! Raw declaration inference precedes the separate widening and diagnostic
 //! step. Binding parents must consume the raw type, including its optionality.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn type_of_variable_like(&mut self, declaration: NodeId) -> Result<TypeId, Error> {
@@ -142,13 +142,13 @@ impl CheckerState {
         if no_implicit
             && kind == K::VariableDeclaration
             && !binding
-            && ts_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
+            && tsr_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
                 & mf::EXPORT
                 == 0
             && self.node(declaration)?.flags() & nf::AMBIENT == 0
         {
             let constant =
-                ts_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
+                tsr_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
                     & nf::CONSTANT
                     != 0;
             if !constant
@@ -279,11 +279,11 @@ impl CheckerState {
         ty: TypeId,
     ) -> Result<TypeId, Error> {
         let constant =
-            ts_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
+            tsr_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
                 & nf::CONSTANT
                 != 0;
         let readonly =
-            ts_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
+            tsr_ast::utilities::get_combined_modifier_flags(self.ast(declaration)?, declaration)?
                 & mf::READONLY
                 != 0
                 && !self
@@ -291,7 +291,7 @@ impl CheckerState {
                     .node(declaration)?
                     .parent()
                     .map(|parent| {
-                        ts_ast::utilities::is_parameter_property_declaration(
+                        tsr_ast::utilities::is_parameter_property_declaration(
                             self.ast(declaration)?,
                             declaration,
                             parent,

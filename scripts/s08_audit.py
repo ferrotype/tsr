@@ -65,7 +65,7 @@ def prepare(closure):
         if selector not in selectors:
             raise ValueError('obligation source anchor absent from typed closure: ' + selector)
         obligations.append(dict(id=row['id'], family=family, native_selector=selector,
-                                home='crates/ts_checker: ' + home,
+                                home='crates/tsr_checker: ' + home,
                                 original_witness_tier=tiers[row['input_witness']],
                                 acceptance_library_witness=libraries.get((row['library'], row['source_sha256'])),
                                 supplemental_fixtures=fixtures,
@@ -120,7 +120,7 @@ def prepare(closure):
     return dict(version=1, pin=subset['pin'], scope=review['scope'],
                 sources={p: digest((ROOT / p).read_bytes()) for p in (REVIEW, 'scripts/s08_audit.py',
                     'data/s07/checker-obligations.json', 'data/s07/e2-acceptance.json',
-                    'tools/s08/contracts/relations.json', 'crates/ts_checker/src/host.rs')},
+                    'tools/s08/contracts/relations.json', 'crates/tsr_checker/src/host.rs')},
                 closure_sha256=digest(canonical(closure) + b'\n'),
                 counts=dict(obligations=len(obligations), families=dict(Counter(r['family'] for r in obligations)),
                             library_obligations_loaded_by_acceptance=sum(r['acceptance_library_witness'] is not None for r in obligations),

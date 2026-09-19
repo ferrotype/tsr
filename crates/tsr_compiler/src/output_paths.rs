@@ -1,8 +1,8 @@
 //! The output-name calculation needed by option diagnostics. No files are emitted.
 use crate::{Error, Program, ProgramFile};
-use ts_core::{CompilerOptions, JsxEmit, ScriptKind};
-use ts_jsstring::JsString;
-use ts_tspath as path;
+use tsr_core::{CompilerOptions, JsxEmit, ScriptKind};
+use tsr_jsstring::JsString;
+use tsr_tspath as path;
 
 fn separator(mut directory: Vec<u8>) -> Vec<u8> {
     if !directory.is_empty() && !matches!(directory.last(), Some(b'/' | b'\\')) {
@@ -88,7 +88,7 @@ pub(crate) fn may_emit_with_force_dts(
     file: &ProgramFile,
     program: &Program,
     force_dts_emit: bool,
-) -> Result<bool, ts_arena::Error> {
+) -> Result<bool, tsr_arena::Error> {
     let source = file.bound().view().source_file()?;
     let options = program.options();
     if options.no_emit_for_js_files.is_true() && source.is_js() || source.is_declaration_file {

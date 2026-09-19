@@ -20,7 +20,7 @@ pub(crate) fn checked_arena(counter: &AtomicU64) -> Result<ArenaId, Error> {
 
 pub(crate) fn next_arena() -> ArenaId {
     checked_arena(&NEXT_ARENA).unwrap_or_else(|_| {
-        eprintln!("ts_arena: process arena-id space exhausted; refusing id reuse");
+        eprintln!("tsr_arena: process arena-id space exhausted; refusing id reuse");
         std::process::abort()
     })
 }
@@ -94,5 +94,5 @@ pub(crate) fn next_slot(len: usize) -> Result<u32, Error> {
 }
 
 pub(crate) fn allocate_slot(len: usize) -> u32 {
-    next_slot(len).unwrap_or_else(|_| panic!("ts_arena: arena slot space exhausted before reuse"))
+    next_slot(len).unwrap_or_else(|_| panic!("tsr_arena: arena slot space exhausted before reuse"))
 }

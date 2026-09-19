@@ -1,10 +1,10 @@
 //! Source imports use retained loader resolutions; grammar failures preserve the
 //! native early-return boundaries before resolving individual aliases.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, JsString, SyntaxKind as K};
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, JsString, SyntaxKind as K};
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkImportDeclaration
@@ -15,7 +15,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_import_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let clause = data.import_clause();
         let specifier = data
             .module_specifier()
@@ -45,7 +45,7 @@ impl CheckerState {
                     let data = read
                         .data_source()
                         .as_import_clause()
-                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                     let default = data.name().is_some();
                     let named = data.named_bindings();
                     let type_only = data.phase_modifier() == K::TypeKeyword;
@@ -136,7 +136,7 @@ impl CheckerState {
         let parent_read = self.node(parent)?;
         let ambient = parent_read.kind() == K::ModuleBlock
             && if let Some(module) = parent_read.parent() {
-                ts_ast::is_ambient_module(self.ast(module)?, module)?
+                tsr_ast::is_ambient_module(self.ast(module)?, module)?
             } else {
                 false
             };
@@ -153,7 +153,7 @@ impl CheckerState {
             return Ok(false);
         }
         if ambient
-            && ts_module::is_relative(self.node_text(name)?.as_bytes())
+            && tsr_module::is_relative(self.node_text(name)?.as_bytes())
             && !self.top_level_module_augmentation(node)?
         {
             self.error_at(Some(node),d::Import_or_export_declaration_in_an_ambient_module_declaration_cannot_reference_module_through_relative_module_name,vec![])?;
@@ -190,8 +190,8 @@ impl CheckerState {
         let Some(module) = read.parent() else {
             return Ok(false);
         };
-        Ok(ts_ast::is_ambient_module(self.ast(module)?, module)?
-            && ts_ast::is_module_augmentation_external(self.ast(module)?, module)?)
+        Ok(tsr_ast::is_ambient_module(self.ast(module)?, module)?
+            && tsr_ast::is_module_augmentation_external(self.ast(module)?, module)?)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkExternalModuleNameInGlobalScope
     pub(crate) fn check_external_module_name_in_global_scope(
@@ -210,8 +210,8 @@ impl CheckerState {
         }
         let mut parent = read.parent();
         while let Some(current) = parent {
-            if ts_binder::get_container_flags(self.ast(current)?, current)?.0
-                & ts_binder::ContainerFlags::IS_CONTAINER
+            if tsr_binder::get_container_flags(self.ast(current)?, current)?.0
+                & tsr_binder::ContainerFlags::IS_CONTAINER
                 != 0
             {
                 if self.node(current)?.kind() == K::SourceFile {
@@ -232,7 +232,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_import_clause()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let phase = data.phase_modifier();
         let name = data.name();
         let bindings = data.named_bindings();

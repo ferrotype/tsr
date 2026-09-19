@@ -40,7 +40,7 @@ impl CheckerState {
                                     return Err(Error::MissingLink("template inference string"));
                                 };
                                 let bytes = text.as_bytes();
-                                let number = ts_jsnum::from_string(bytes);
+                                let number = tsr_jsnum::from_string(bytes);
                                 if flags & tf::NUMBER_LIKE != 0
                                     && (bytes.is_empty()
                                         || !number.value().is_finite()
@@ -124,19 +124,19 @@ impl CheckerState {
             return Ok(left);
         }
         if r & tf::NUMBER != 0 {
-            return self.get_number_literal_type(ts_jsnum::from_string(text));
+            return self.get_number_literal_type(tsr_jsnum::from_string(text));
         }
         if l & tf::ENUM != 0 {
             return Ok(left);
         }
         if r & tf::ENUM != 0 {
-            return self.get_number_literal_type(ts_jsnum::from_string(text));
+            return self.get_number_literal_type(tsr_jsnum::from_string(text));
         }
         if l & tf::NUMBER_LITERAL != 0 {
             return Ok(left);
         }
         if r & tf::NUMBER_LITERAL != 0
-            && matches!(self.types.literal(right)?.value, LiteralValue::Number(n) if n == ts_jsnum::from_string(text))
+            && matches!(self.types.literal(right)?.value, LiteralValue::Number(n) if n == tsr_jsnum::from_string(text))
         {
             return Ok(right);
         }
@@ -188,10 +188,10 @@ impl CheckerState {
     }
 }
 
-fn template_bigint(bytes: &[u8]) -> ts_jsnum::PseudoBigInt {
+fn template_bigint(bytes: &[u8]) -> tsr_jsnum::PseudoBigInt {
     let negative = bytes.starts_with(b"-");
     let magnitude = if negative { &bytes[1..] } else { bytes };
     let mut token = magnitude.to_vec();
     token.push(b'n');
-    ts_jsnum::PseudoBigInt::new(&ts_jsnum::parse_pseudo_big_int(&token), negative)
+    tsr_jsnum::PseudoBigInt::new(&tsr_jsnum::parse_pseudo_big_int(&token), negative)
 }

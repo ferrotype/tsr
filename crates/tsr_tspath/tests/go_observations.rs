@@ -35,7 +35,7 @@ fn text(callback: impl FnOnce() -> Vec<u8> + std::panic::UnwindSafe) -> Value {
 }
 #[test]
 fn path_comparison_folding_ranges_and_failures_match_pinned_go() {
-    use ts_tspath as p;
+    use tsr_tspath as p;
     let requests: Vec<Value> =
         serde_json::from_str(include_str!("../../../data/s07/path-requests.json")).unwrap();
     let expected: Vec<Value> =

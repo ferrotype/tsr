@@ -17,9 +17,9 @@ use crate::{
 };
 use std::collections::HashMap;
 use std::sync::Arc;
-use ts_arena::{ArenaId, NodeId, SymbolId};
-use ts_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
-use ts_jsnum::{Number, PseudoBigInt};
+use tsr_arena::{ArenaId, NodeId, SymbolId};
+use tsr_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
+use tsr_jsnum::{Number, PseudoBigInt};
 
 #[path = "handles_display.rs"]
 mod display;
@@ -214,7 +214,7 @@ impl Operation<'_> {
         target: TypeRef,
         mode: crate::RelationKind,
         error_node: Option<NodeId>,
-    ) -> Result<(bool, Vec<crate::Ternary>, Option<ts_ast::Diagnostic>), Error> {
+    ) -> Result<(bool, Vec<crate::Ternary>, Option<tsr_ast::Diagnostic>), Error> {
         let source = self.check_type(source)?;
         let target = self.check_type(target)?;
         let state = self.state_mut();
@@ -319,7 +319,7 @@ impl Operation<'_> {
         Ok(self.type_ref(ty))
     }
 
-    pub fn symbol(&self, symbol: SymbolRef) -> Result<ts_ast::SymbolRef<'_>, Error> {
+    pub fn symbol(&self, symbol: SymbolRef) -> Result<tsr_ast::SymbolRef<'_>, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         self.state().symbol(symbol)
     }
@@ -327,15 +327,15 @@ impl Operation<'_> {
     pub fn symbol_declarations(
         &self,
         symbol: SymbolRef,
-    ) -> Result<ts_ast::DeclarationRead<'_>, Error> {
+    ) -> Result<tsr_ast::DeclarationRead<'_>, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         self.state().symbol_declarations(symbol)
     }
 
     pub fn symbol_table(
         &self,
-        table: ts_ast::SymbolTableId,
-    ) -> Result<ts_ast::SymbolTableRead<'_>, Error> {
+        table: tsr_ast::SymbolTableId,
+    ) -> Result<tsr_ast::SymbolTableRead<'_>, Error> {
         self.state().table(table)
     }
 
@@ -362,7 +362,7 @@ impl Operation<'_> {
         self.state_mut().type_to_string(ty, flags)
     }
 
-    pub fn global_diagnostics(&mut self) -> Result<Vec<ts_ast::Diagnostic>, Error> {
+    pub fn global_diagnostics(&mut self) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
         Ok(self
             .state_mut()
             .diagnostics_for_file(None)?
@@ -374,7 +374,7 @@ impl Operation<'_> {
     pub fn semantic_diagnostics(
         &mut self,
         source: NodeId,
-    ) -> Result<Vec<ts_ast::Diagnostic>, Error> {
+    ) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
         self.state_mut().check_source_file(source)?;
         Ok(self
             .state_mut()
@@ -389,7 +389,7 @@ impl Operation<'_> {
     pub fn recorded_suggestions(
         &mut self,
         source: NodeId,
-    ) -> Result<Vec<ts_ast::Diagnostic>, Error> {
+    ) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
         self.state_mut().check_source_file_ex(source, true)?;
         Ok(self
             .state_mut()
@@ -451,7 +451,7 @@ impl Operation<'_> {
     fn check_node(&self, n: NodeRef) -> Result<NodeId, Error> {
         self.lease().validate_identity(n.owner)?;
         if n.id.arena() != self.state().factory.id().arena() {
-            return Err(Error::Arena(ts_arena::Error::WrongOwner));
+            return Err(Error::Arena(tsr_arena::Error::WrongOwner));
         }
         self.state().factory.view().node(n.id)?;
         Ok(n.id)
@@ -657,14 +657,14 @@ impl Operation<'_> {
         let mut table = HashMap::with_capacity(members.len());
         for member in members {
             let t = self.check_type(member.r#type)?;
-            let flags = ts_ast::symbol_flags::PROPERTY
+            let flags = tsr_ast::symbol_flags::PROPERTY
                 | if member.optional {
-                    ts_ast::symbol_flags::OPTIONAL
+                    tsr_ast::symbol_flags::OPTIONAL
                 } else {
                     0
                 };
             let check_flags = if member.readonly {
-                ts_ast::check_flags::READONLY
+                tsr_ast::check_flags::READONLY
             } else {
                 0
             };
@@ -919,7 +919,7 @@ impl Operation<'_> {
     /// permits mixing checkers.
     fn check_import(&self, owner: &Arc<CheckerOwner>) -> Result<(), Error> {
         if !Arc::ptr_eq(owner, self.owner()) {
-            return Err(Error::Arena(ts_arena::Error::WrongOwner));
+            return Err(Error::Arena(tsr_arena::Error::WrongOwner));
         }
         self.lease().validate_identity(owner.identity().id())?;
         Ok(())

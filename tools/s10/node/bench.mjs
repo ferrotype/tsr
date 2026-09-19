@@ -10,7 +10,7 @@ const [samplesText = "7", iterationsText = "100"] = process.argv.slice(2);
 const samplesCount = Number(samplesText), iterations = Number(iterationsText);
 assert(Number.isSafeInteger(samplesCount) && samplesCount > 0);
 assert(Number.isSafeInteger(iterations) && iterations > 0);
-const { Parser } = createRequire(import.meta.url)(resolve("target/s10/node/ts_node.node"));
+const { Parser } = createRequire(import.meta.url)(resolve("target/s10/node/tsr_node.node"));
 const adapter = new Parser();
 const template = readFileSync("tools/s10/parser/ten-kib.ts", "utf8");
 assert.equal(Buffer.byteLength(template), 10240);

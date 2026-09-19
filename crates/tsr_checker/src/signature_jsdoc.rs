@@ -1,9 +1,9 @@
 //! JSDoc signature checks consume the parser's eager documentation and reparsed
 //! annotation edges. They never trigger lazy documentation parsing.
 use crate::{types::Set, CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     /// Parsed documentation is keyed by its logical source as well as its host.
@@ -11,9 +11,9 @@ impl CheckerState {
     pub(crate) fn eager_jsdoc_for_node(
         &self,
         node: NodeId,
-    ) -> Result<Option<ts_ast::JSDocRoots>, Error> {
+    ) -> Result<Option<tsr_ast::JSDocRoots>, Error> {
         let view = self.ast(node)?;
-        if let Some(source) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? {
+        if let Some(source) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? {
             if let Some(roots) = view.source_eager_jsdoc(source, node)? {
                 return Ok(Some(roots));
             }
@@ -43,7 +43,7 @@ impl CheckerState {
                 }
             }
             current =
-                ts_ast::utilities_tail::get_next_js_doc_comment_location(self.ast(node)?, node)?;
+                tsr_ast::utilities_tail::get_next_js_doc_comment_location(self.ast(node)?, node)?;
         }
         Ok(Vec::new())
     }
@@ -246,7 +246,10 @@ impl CheckerState {
     /// `Node.JSDoc(nil)`: eager roots when already parsed, otherwise the host
     /// parses the file's lazy JSDoc for this node.
     // port: tsc/internal/ast/ast.go:Node.JSDoc
-    pub(crate) fn jsdoc_for_node(&self, node: NodeId) -> Result<Option<ts_ast::JSDocRoots>, Error> {
+    pub(crate) fn jsdoc_for_node(
+        &self,
+        node: NodeId,
+    ) -> Result<Option<tsr_ast::JSDocRoots>, Error> {
         let view = self.ast(node)?;
         if view.node(node)?.flags() & nf::HAS_JS_DOC == 0 {
             return Ok(None);
@@ -254,7 +257,7 @@ impl CheckerState {
         if let Some(roots) = self.eager_jsdoc_for_node(node)? {
             return Ok(Some(roots));
         }
-        let Some(source) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+        let Some(source) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {
             return Ok(None);
         };
         if !view.source_file(source)?.has_lazy_jsdoc {
@@ -285,7 +288,7 @@ impl CheckerState {
     }
     // port: tsc/internal/ast/utilities.go:IsDeprecatedDeclarationWithCachedFlags
     pub(crate) fn is_deprecated_declaration(&self, node: NodeId) -> Result<bool, Error> {
-        if ts_ast::utilities::get_combined_node_flags(self.ast(node)?, node)?
+        if tsr_ast::utilities::get_combined_node_flags(self.ast(node)?, node)?
             & nf::POSSIBLY_CONTAINS_DEPRECATED_TAG
             == 0
         {
@@ -318,7 +321,7 @@ impl CheckerState {
             return Ok(());
         }
         let location = self.deprecated_suggestion_node(node)?;
-        let invoked = ts_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
+        let invoked = tsr_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
             .ok_or(Error::MissingLink("deprecated invoked expression"))?;
         let name = self.invoked_name_text(invoked)?;
         let signature = self.signature_to_string(signature)?;
@@ -398,7 +401,7 @@ impl CheckerState {
         }
     }
     // port: tsc/internal/checker/utilities.go:tryGetPropertyAccessOrIdentifierToString
-    fn invoked_name_text(&self, mut node: NodeId) -> Result<ts_ast::JsString, Error> {
+    fn invoked_name_text(&self, mut node: NodeId) -> Result<tsr_ast::JsString, Error> {
         let mut suffixes: Vec<Vec<u8>> = Vec::new();
         loop {
             let read = self.node(node)?;
@@ -409,7 +412,7 @@ impl CheckerState {
                         bytes.push(b'.');
                         bytes.extend_from_slice(&name);
                     }
-                    return Ok(ts_ast::JsString::from_bytes(bytes));
+                    return Ok(tsr_ast::JsString::from_bytes(bytes));
                 }
                 Some(K::PropertyAccessExpression) => {
                     let name = read.name().ok_or(Error::MissingLink("invoked name"))?;
@@ -425,15 +428,15 @@ impl CheckerState {
                         .and_then(|data| data.argument_expression())
                         .ok_or(Error::MissingLink("invoked element"))?;
                     let name = self.node(argument)?;
-                    if !ts_ast::utilities::is_property_name(&name) {
-                        return Ok(ts_ast::JsString::default());
+                    if !tsr_ast::utilities::is_property_name(&name) {
+                        return Ok(tsr_ast::JsString::default());
                     }
                     suffixes.push(self.index_property_name_node(argument)?.as_bytes().to_vec());
                     node = read
                         .expression()
                         .ok_or(Error::MissingLink("invoked object"))?;
                 }
-                _ => return Ok(ts_ast::JsString::default()),
+                _ => return Ok(tsr_ast::JsString::default()),
             }
         }
     }

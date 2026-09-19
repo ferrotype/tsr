@@ -441,9 +441,9 @@ mod tests {
     #[test]
     fn physical_export_keeps_obsolete_slots_raw_bytes_and_shared_subranges() {
         use crate::Factory;
-        let counters = ts_arena::Counters::new();
+        let counters = tsr_arena::Counters::new();
         let mut builder = crate::AstBuilder::new(
-            ts_jsstring::SourceText::from_bytes(&b"source"[..]),
+            tsr_jsstring::SourceText::from_bytes(&b"source"[..]),
             &counters,
         );
         let first = builder.new_node(
@@ -465,20 +465,20 @@ mod tests {
             .unwrap();
         let shared = backing.slice(1..3).unwrap();
         let full_header = builder
-            .new_list(ts_core::TextRange::new(-1, 2), backing)
+            .new_list(tsr_core::TextRange::new(-1, 2), backing)
             .unwrap();
         let sub_header = builder
-            .new_list(ts_core::TextRange::new(0, 2), shared)
+            .new_list(tsr_core::TextRange::new(0, 2), shared)
             .unwrap();
         let allocated_empty = builder.node_slice(Vec::new()).unwrap();
         let empty_header = builder
-            .new_list(ts_core::TextRange::default(), allocated_empty)
+            .new_list(tsr_core::TextRange::default(), allocated_empty)
             .unwrap();
         let nil_header = builder
-            .new_list(ts_core::TextRange::default(), crate::NodeSlice::empty())
+            .new_list(tsr_core::TextRange::default(), crate::NodeSlice::empty())
             .unwrap();
         let missing_header = builder
-            .new_list(ts_core::TextRange::default(), crate::NodeSlice::empty())
+            .new_list(tsr_core::TextRange::default(), crate::NodeSlice::empty())
             .unwrap();
         builder.mark_list_missing(missing_header).unwrap();
         let first_node = builder.node_mut(first).unwrap();

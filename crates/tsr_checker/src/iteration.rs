@@ -1,10 +1,10 @@
 //! Iteration uses one cache per checker and records deferred diagnostic inputs
 //! by identity. Reporting a cached failure repeats the native diagnostic walk.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{Diagnostic, JsString, SyntaxKind as K};
-use ts_core::Tristate;
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{Diagnostic, JsString, SyntaxKind as K};
+use tsr_core::Tristate;
+use tsr_diagnostics as d;
 
 pub(crate) const ALLOW_SYNC: u32 = 1;
 pub(crate) const ALLOW_ASYNC: u32 = 1 << 1;
@@ -154,7 +154,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let use_ = FOR_OF
             | if data.await_modifier().is_some() {
                 ALLOW_ASYNC
@@ -570,7 +570,7 @@ impl CheckerState {
             .iteration
             .pending
             .get(index)
-            .ok_or(ts_arena::Error::InvalidSlot)?;
+            .ok_or(tsr_arena::Error::InvalidSlot)?;
         let (node, input, allow_async, related) = (
             pending.node,
             pending.input,
@@ -677,7 +677,7 @@ impl CheckerState {
         if let Some(symbol) = self.lookup_symbol(
             self.builtins.globals,
             b"Symbol",
-            ts_ast::symbol_flags::VALUE,
+            tsr_ast::symbol_flags::VALUE,
         )? {
             let constructor = self.get_type_of_symbol(symbol)?;
             if let Some(ty) = self.property_type(constructor, name.as_bytes())? {
@@ -686,7 +686,7 @@ impl CheckerState {
                 }
             }
         }
-        let mut key = ts_ast::INTERNAL_SYMBOL_NAME_PREFIX.to_vec();
+        let mut key = tsr_ast::INTERNAL_SYMBOL_NAME_PREFIX.to_vec();
         key.push(b'@');
         key.extend_from_slice(name.as_bytes());
         Ok(JsString::from_bytes(key))
@@ -700,8 +700,8 @@ impl CheckerState {
         node: NodeId,
         modifier: NodeId,
     ) -> Result<bool, Error> {
-        use ts_core::{ModuleKind as M, ScriptTarget};
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        use tsr_core::{ModuleKind as M, ScriptTarget};
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("for-await source"))?;
         if !self
             .ast(source)?
@@ -711,7 +711,7 @@ impl CheckerState {
         {
             return Ok(false);
         }
-        if ts_ast::is_in_top_level_context(self.ast(node)?, node)? {
+        if tsr_ast::is_in_top_level_context(self.ast(node)?, node)? {
             let options = self.program()?.host.options();
             let module = options.emit_module_kind();
             let target = options.emit_script_target();
@@ -751,7 +751,7 @@ impl CheckerState {
             let mut current = self.node(node)?.parent();
             while let Some(function) = current {
                 let read = self.node(function)?;
-                if ts_ast::utilities::is_function_like(Some(&read)) {
+                if tsr_ast::utilities::is_function_like(Some(&read)) {
                     if read.kind() != K::Constructor {
                         diagnostic.related_information.push(std::sync::Arc::new(
                             self.diagnostic_for_node(
@@ -789,7 +789,7 @@ impl CheckerState {
             } else if read.body().is_some()
                 && self.body_function_flags(container)?.0
                 && self.program()?.host.options().emit_script_target()
-                    < ts_core::ScriptTarget::ES2018
+                    < tsr_core::ScriptTarget::ES2018
             {
                 // for..await..of in an async function or async generator function prior to ESNext requires the __asyncValues helper
                 self.check_external_emit_helpers(

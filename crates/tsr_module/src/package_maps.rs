@@ -4,10 +4,10 @@ use crate::resolver::{extension, parse_package_name, truthy, DTS, JS, JSON, TS};
 use crate::trace::trace;
 use crate::{get_conditions, Error, PackageJson, ResolvedModule, Resolver};
 use serde_json::{Map, Value};
-use ts_core::{CompilerOptions, ModuleKind, ModuleResolutionKind, TextRange};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
-use ts_tspath as path;
+use tsr_core::{CompilerOptions, ModuleKind, ModuleResolutionKind, TextRange};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
+use tsr_tspath as path;
 
 #[derive(Clone)]
 pub(super) struct Context {
@@ -462,12 +462,12 @@ impl Resolver {
             path::directory(self.options.config_file_path.as_bytes())
         } else {
             let message = if imports {
-                ts_diagnostics::The_project_root_is_ambiguous_but_is_required_to_resolve_import_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate
+                tsr_diagnostics::The_project_root_is_ambiguous_but_is_required_to_resolve_import_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate
             } else {
-                ts_diagnostics::The_project_root_is_ambiguous_but_is_required_to_resolve_export_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate
+                tsr_diagnostics::The_project_root_is_ambiguous_but_is_required_to_resolve_export_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate
             };
             return Ok(Some(ResolvedModule {
-                resolution_diagnostics: vec![ts_ast::Diagnostic::new(
+                resolution_diagnostics: vec![tsr_ast::Diagnostic::new(
                     None,
                     TextRange::default(),
                     message,
@@ -699,14 +699,14 @@ fn compare_pattern_keys(a: &[u8], b: &[u8]) -> std::cmp::Ordering {
         .then_with(|| b.len().cmp(&a.len()))
 }
 
-fn compiler_version() -> &'static ts_semver::Version {
-    static VERSION: std::sync::OnceLock<ts_semver::Version> = std::sync::OnceLock::new();
-    VERSION.get_or_init(|| ts_semver::Version::must_parse(b"7.1.0-dev"))
+fn compiler_version() -> &'static tsr_semver::Version {
+    static VERSION: std::sync::OnceLock<tsr_semver::Version> = std::sync::OnceLock::new();
+    VERSION.get_or_init(|| tsr_semver::Version::must_parse(b"7.1.0-dev"))
 }
 /// port: tsc/internal/module/util.go:IsApplicableVersionedTypesKey
 pub fn is_applicable_versioned_types_key(key: &[u8]) -> bool {
     key.strip_prefix(b"types@")
-        .and_then(ts_semver::VersionRange::parse)
+        .and_then(tsr_semver::VersionRange::parse)
         .is_some_and(|range| range.test(Some(compiler_version())))
 }
 /// Source cache state is shared by every package-directory view of the package.
@@ -714,16 +714,16 @@ pub fn is_applicable_versioned_types_key(key: &[u8]) -> bool {
 pub(super) struct VersionPaths {
     version: JsString,
     traces: Vec<crate::DiagAndArgs>,
-    paths: std::sync::OnceLock<ts_core::PathMappings>,
+    paths: std::sync::OnceLock<tsr_core::PathMappings>,
 }
 impl PackageJson {
     /// The package and module-specifier consumers share the source first-use cache.
     /// Reading the mappings here does not emit resolution trace messages.
-    pub fn version_paths(&self) -> Option<&ts_core::PathMappings> {
+    pub fn version_paths(&self) -> Option<&tsr_core::PathMappings> {
         self.selected_version_paths().map(|(_, paths)| paths)
     }
     // port: tsc/internal/packagejson/cache.go:PackageJson.GetVersionPaths
-    fn selected_version_paths(&self) -> Option<(&JsString, &ts_core::PathMappings)> {
+    fn selected_version_paths(&self) -> Option<(&JsString, &tsr_core::PathMappings)> {
         let package = self;
         let selected=package.version_paths.get_or_init(|| {
             let mut result=VersionPaths::default();
@@ -736,7 +736,7 @@ impl PackageJson {
             };
             emit(diagnostics::X_package_json_has_a_typesVersions_field_with_version_specific_path_mappings,vec!["typesVersions".into()]);
             for (version,value) in versions {
-                let Some(range)=ts_semver::VersionRange::parse(version.as_bytes()) else {
+                let Some(range)=tsr_semver::VersionRange::parse(version.as_bytes()) else {
                     emit(diagnostics::X_package_json_has_a_typesVersions_entry_0_that_is_not_a_valid_semver_range,vec![version.as_str().into()]);continue;
                 };
                 if !range.test(Some(compiler_version())) {continue;}
@@ -789,7 +789,7 @@ impl Resolver {
     pub(super) fn version_paths<'a>(
         &mut self,
         package: &'a PackageJson,
-    ) -> Option<(&'a JsString, &'a ts_core::PathMappings)> {
+    ) -> Option<(&'a JsString, &'a tsr_core::PathMappings)> {
         let result = package.selected_version_paths();
         if self.tracer.active {
             for message in &package

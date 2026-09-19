@@ -254,7 +254,7 @@ fn lazy_initializer_reentry_panics_before_locking_and_can_retry() {
                 .unwrap();
             assert_eq!(
                 message,
-                "ts_arena: lazy initializer reentered its file's lazy storage"
+                "tsr_arena: lazy initializer reentered its file's lazy storage"
             );
             assert_eq!(cached.node(0).unwrap().data, 3);
             assert_eq!(file.node(cached_token.id()).unwrap().data, 4);

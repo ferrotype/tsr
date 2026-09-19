@@ -32,9 +32,9 @@ flow, return/predicate inference, value declaration, class, enum, module and
 JavaScript/JSDoc paths. These call the P3 type/instantiation/relation machinery.
 Named unsupported branches remain and must be resolved from the full inventory.
 
-`ts_pseudochecker` ports native syntactic inference separately from semantic
-checking. `ts_transformers` implements the declaration transform used by
-`Program::declaration_diagnostics`; `ts_printer::emit_resolver` defines its checker
+`tsr_pseudochecker` ports native syntactic inference separately from semantic
+checking. `tsr_transformers` implements the declaration transform used by
+`Program::declaration_diagnostics`; `tsr_printer::emit_resolver` defines its checker
 callbacks. Output is constructed and graph-validated, rather than emulating
 only a list of expected diagnostics. The Program phase retains successful
 results; callbacks execute outside the result-cache lock.
@@ -149,7 +149,7 @@ retains all program outcomes for diagnosis.
 
 The final immutable build is `target/s08/p4-pause-build-02`. It compiled
 `p2_checker`, `p3_relations`, `p3_comparators` and `p4_inventory` with all compiler
-features and `ts_checker/storage-pilot`, without warnings. Source fingerprint:
+features and `tsr_checker/storage-pilot`, without warnings. Source fingerprint:
 `651693857c9e281fbe7e21dafb8b6d359cfcf3eb6960adc60b0e902720840bc9`.
 The `p2_checker` binary SHA-256 is
 `e0404c3f821a1712d33698bf39df6c8e9bceaed41c9779cc1f163c39d2d36949`.

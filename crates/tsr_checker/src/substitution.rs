@@ -1,7 +1,7 @@
 //! Conditional-flow constraints and the `NoInfer<T>` substitution form.
 use crate::{type_flags as tf, CheckerState, Error, MapperId, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSubstitutionType
@@ -141,7 +141,7 @@ impl CheckerState {
         let mut covariant = true;
         loop {
             let read = self.node(node)?;
-            if read.kind() == K::JSDoc || ts_ast::utilities::is_statement(self.ast(node)?, node)? {
+            if read.kind() == K::JSDoc || tsr_ast::utilities::is_statement(self.ast(node)?, node)? {
                 break;
             }
             let Some(parent) = read.parent() else { break };

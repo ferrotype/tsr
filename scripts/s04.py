@@ -360,13 +360,13 @@ def e4():
     validate_probe_inventory(probes, strict_json_loads((ROOT / "data/s04/e4-probes.json").read_text()))
     payload = json.dumps(probes, separators=(",", ":")).encode()
     env = go_environment()
-    command([sys.executable, str(ROOT / "crates/ts_jsstring/tools/generate_case_tables.py"), "--check"], env=env)
-    command([sys.executable, str(ROOT / "crates/ts_jsstring/tools/generate_go_quote.py"), "--check"], env=env)
+    command([sys.executable, str(ROOT / "crates/tsr_jsstring/tools/generate_case_tables.py"), "--check"], env=env)
+    command([sys.executable, str(ROOT / "crates/tsr_jsstring/tools/generate_go_quote.py"), "--check"], env=env)
     expected_bytes = command([str(go_oracle(upstream, env))], data=payload, env=env)
-    sys.stderr.buffer.write(command(["cargo", "test", "--package", "ts_jsstring", "--all-targets", "--locked"]))
+    sys.stderr.buffer.write(command(["cargo", "test", "--package", "tsr_jsstring", "--all-targets", "--locked"]))
     # Let Cargo select and run the artifact it just built, including when the
     # caller configured CARGO_TARGET_DIR, CARGO_BUILD_TARGET or build.target-dir.
-    actual_bytes = command(["cargo", "run", "--package", "ts_jsstring", "--example", "e4", "--release", "--locked"], data=payload)
+    actual_bytes = command(["cargo", "run", "--package", "tsr_jsstring", "--example", "e4", "--release", "--locked"], data=payload)
     expected, actual = strict_json_loads(expected_bytes), strict_json_loads(actual_bytes)
     report, failures = compare(probes, expected, actual)
     report["metrics"]["probes"] = len(probes)

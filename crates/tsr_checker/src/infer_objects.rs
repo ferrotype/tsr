@@ -2,7 +2,7 @@ use crate::{
     element_flags as ef, infer_types::InferenceRun, inference::priority as p, object_flags as of,
     type_flags as tf, CheckerState, Error, TypeId,
 };
-use ts_ast::{check_flags as cf, symbol_flags as sf};
+use tsr_ast::{check_flags as cf, symbol_flags as sf};
 
 impl CheckerState {
     // port: tsc/internal/checker/inference.go:Checker.inferFromGenericMappedTypes
@@ -127,14 +127,14 @@ impl CheckerState {
         target: TypeId,
         require_optional: bool,
         discriminants: bool,
-    ) -> Result<Option<ts_arena::SymbolId>, Error> {
+    ) -> Result<Option<tsr_arena::SymbolId>, Error> {
         for property in self.get_properties_of_type(target)? {
             let read = self.symbol(property)?;
             let name = read.name_to_owned();
-            if self.property_modifiers(property)? & ts_ast::modifier_flags::STATIC != 0 {
+            if self.property_modifiers(property)? & tsr_ast::modifier_flags::STATIC != 0 {
                 if let Some(node) = read.value_declaration() {
                     if let Some(name) = self.node(node)?.name() {
-                        if self.node(name)?.kind() == ts_ast::SyntaxKind::PrivateIdentifier {
+                        if self.node(name)?.kind() == tsr_ast::SyntaxKind::PrivateIdentifier {
                             continue;
                         }
                     }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile layout observations using an existing ts_ast rlib; no production build.
+"""Compile layout observations using an existing tsr_ast rlib; no production build.
 
 The base inventory is checked independently against normalized SchemaAPI output
 and the actual generated/handwritten Go struct embeddings. This is a diagnostic,
@@ -23,10 +23,10 @@ FIELDS = {
 }
 INPUTS = [
     "data/s03/schema/ast.json", "tools/s03/ast-export.mts",
-    "xtask/src/gen/ast.rs", "crates/ts_ast/src/data_generated.rs",
-    "crates/ts_ast/src/lib.rs", "crates/ts_ast/src/lists.rs",
-    "crates/ts_ast/src/node_kind.rs", "crates/ts_arena/src/ids.rs",
-    "crates/ts_jsstring/src/jsstring.rs", "crates/ts_ast/src/flow.rs",
+    "xtask/src/gen/ast.rs", "crates/tsr_ast/src/data_generated.rs",
+    "crates/tsr_ast/src/lib.rs", "crates/tsr_ast/src/lists.rs",
+    "crates/tsr_ast/src/node_kind.rs", "crates/tsr_arena/src/ids.rs",
+    "crates/tsr_jsstring/src/jsstring.rs", "crates/tsr_ast/src/flow.rs",
     "upstream/tools/scripts/tsc/ast.json",
     "upstream/tools/scripts/tsc/generate-go-ast.ts",
     "upstream/tsc/internal/ast/ast_generated.go", "upstream/tsc/internal/ast/ast.go",
@@ -179,7 +179,7 @@ def run(rlib, output, rustc):
     import gzip
     before = {path: sha(ROOT / path) for path in INPUTS}
     schema = json.loads((ROOT / INPUTS[0]).read_text())
-    source = (ROOT / "crates/ts_ast/src/data_generated.rs").read_text()
+    source = (ROOT / "crates/tsr_ast/src/data_generated.rs").read_text()
     go_source = "\n".join((ROOT / path).read_text() for path in [
         "upstream/tsc/internal/ast/ast_generated.go", "upstream/tsc/internal/ast/ast.go"])
     bases = base_inventory(schema, go_source)
@@ -193,7 +193,7 @@ def run(rlib, output, rustc):
     # The probe imports actual production payload types; only its replacement
     # enum/Node frame are synthetic. No approximate stand-ins for JsString/IDs.
     command = [*rustc, "--edition=2021", "-Dwarnings", "-Cpanic=abort", "-Clto=thin", str(generated),
-               "--extern", f"ts_ast={rlib}", "-L", f"dependency={rlib.parent}", "-o", str(binary)]
+               "--extern", f"tsr_ast={rlib}", "-L", f"dependency={rlib.parent}", "-o", str(binary)]
     rlib_hash = sha(rlib)
     subprocess.run(command, check=True)
     raw = subprocess.run([str(binary)], capture_output=True, text=True, check=True).stdout

@@ -17,9 +17,9 @@ and compare with:
 
 ```sh
 python3 scripts/s08_p2.py capture --spec tools/s08/p6/missing-identifier-requests.json --output target/s08/p6-missing-identifier-native-new
-cargo run -p ts_compiler --example p2_checker -- target/s08/p6-missing-identifier-native-new/requests.json target/s08/p6-missing-identifier-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p6-missing-identifier-native-new/requests.json target/s08/p6-missing-identifier-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p6-missing-identifier-native-new --actual target/s08/p6-missing-identifier-rust.json --output target/s08/p6-missing-identifier-comparison.json
-cargo test --locked -p ts_compiler --test checker_semantics missing_identifier
+cargo test --locked -p tsr_compiler --test checker_semantics missing_identifier
 ```
 
 This supplemental comparison does not certify E2 acceptance.

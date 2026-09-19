@@ -1,4 +1,4 @@
-use ts_diagnostics as diagnostics;
+use tsr_diagnostics as diagnostics;
 
 use crate::spelling::get_spelling_suggestion_for_strings;
 use crate::tables_generated::{

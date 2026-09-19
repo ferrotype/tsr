@@ -1,10 +1,10 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{
+use tsr_ast::{
     node_flags, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_diagnostics as diag;
+use tsr_core::TextRange;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseType
@@ -227,12 +227,12 @@ impl<F: ParserFactory> Parser<'_, F> {
                 self.parse_type_reference()
             }
             K::AsteriskEqualsToken => {
-                self.scan_operation(ts_scanner::Scanner::rescan_asterisk_equals_token);
+                self.scan_operation(tsr_scanner::Scanner::rescan_asterisk_equals_token);
                 self.parse_js_doc_all_type()
             }
             K::AsteriskToken => self.parse_js_doc_all_type(),
             K::QuestionQuestionToken => {
-                self.scan_operation(ts_scanner::Scanner::rescan_question_token);
+                self.scan_operation(tsr_scanner::Scanner::rescan_question_token);
                 self.parse_js_doc_nullable_type()
             }
             K::QuestionToken => self.parse_js_doc_nullable_type(),
@@ -707,7 +707,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         if let Some(last) = self.diagnostics.last_mut() {
             if last.code == diag::X_0_expected.code {
                 last.related_information
-                    .push(std::sync::Arc::new(ts_ast::Diagnostic::new(
+                    .push(std::sync::Arc::new(tsr_ast::Diagnostic::new(
                         None,
                         TextRange::new(open, open),
                         diag::The_parser_expected_to_find_a_1_to_match_the_0_token_here,
@@ -732,7 +732,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.parseTemplateHead
     pub(crate) fn parse_template_head(&mut self, tagged: bool) -> NodeId {
-        if !tagged && self.scanner.token_flags() & ts_ast::token_flags::IS_INVALID != 0 {
+        if !tagged && self.scanner.token_flags() & tsr_ast::token_flags::IS_INVALID != 0 {
             self.re_scan_template_token(false);
         }
         let pos = self.node_pos();
@@ -747,7 +747,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.getTemplateLiteralRawText
     pub(crate) fn get_template_literal_raw_text(&self, mut end_length: usize) -> JsString {
         let token = self.scanner.token_text();
-        if self.scanner.token_flags() & ts_ast::token_flags::UNTERMINATED != 0 {
+        if self.scanner.token_flags() & tsr_ast::token_flags::UNTERMINATED != 0 {
             end_length = 0;
         }
         let start = self.scanner.token_start() as usize + 1;
@@ -800,7 +800,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let node = self.factory.new_template_tail(
             JsString::default(),
             JsString::default(),
-            ts_ast::token_flags::NONE,
+            tsr_ast::token_flags::NONE,
         );
         self.finish_node(node, self.node_pos())
     }

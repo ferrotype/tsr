@@ -2,8 +2,8 @@
 //! resolution and flow links are local to the checker operation's owner.
 
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
 
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
@@ -89,7 +89,7 @@ impl CheckerState {
             if !construct
                 && (matches!(self.node(callee)?.kind().known(), Some(K::SuperKeyword))
                     || crate::external_resolution::is_import_call(self.ast(expression)?, &read)?
-                    || ts_ast::utilities_middle::is_require_call(
+                    || tsr_ast::utilities_middle::is_require_call(
                         self.ast(expression)?,
                         &self.node(expression)?,
                         true,
@@ -143,7 +143,7 @@ impl CheckerState {
             Some(K::AsExpression | K::TypeAssertionExpression)
         ) {
             let annotation = required(read.type_node(), "assertion type")?;
-            if ts_ast::utilities_middle::is_const_type_reference(
+            if tsr_ast::utilities_middle::is_const_type_reference(
                 self.ast(annotation)?,
                 &self.node(annotation)?,
             )? {
@@ -152,7 +152,7 @@ impl CheckerState {
             return self.get_type_from_type_node(annotation).map(Some);
         }
         let read = self.node(node)?;
-        if ts_ast::utilities::is_literal_expression(&read)
+        if tsr_ast::utilities::is_literal_expression(&read)
             || matches!(read.kind().known(), Some(K::TrueKeyword | K::FalseKeyword))
         {
             return self.check_expression(node).map(Some);
@@ -166,13 +166,13 @@ impl CheckerState {
         if let Some(Some(symbol)) = self.query.resolved_symbols.try_get(node) {
             return Ok(*symbol);
         }
-        let missing = ts_ast::node_is_missing(Some(&self.node(node)?));
+        let missing = tsr_ast::node_is_missing(Some(&self.node(node)?));
         let symbol = if missing {
             None
         } else {
             let name = self.node_text(node)?.into_js_string();
             let message = self.cannot_find_name_diagnostic(node)?;
-            let write_only = ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?;
+            let write_only = tsr_ast::utilities::is_write_only_access(self.ast(node)?, node)?;
             self.resolve_name(
                 Some(node),
                 name.as_bytes(),
@@ -220,7 +220,7 @@ impl CheckerState {
         if self.types.flags(ty)? & tf::VOID != 0 {
             self.error_at(
                 Some(node),
-                ts_diagnostics::An_expression_of_type_void_cannot_be_tested_for_truthiness,
+                tsr_diagnostics::An_expression_of_type_void_cannot_be_tested_for_truthiness,
                 vec![],
             )?;
         } else {
@@ -229,9 +229,9 @@ impl CheckerState {
                 self.error_at(
                     Some(node),
                     if semantics == 1 {
-                        ts_diagnostics::This_kind_of_expression_is_always_truthy
+                        tsr_diagnostics::This_kind_of_expression_is_always_truthy
                     } else {
-                        ts_diagnostics::This_kind_of_expression_is_always_falsy
+                        tsr_diagnostics::This_kind_of_expression_is_always_falsy
                     },
                     vec![],
                 )?;
@@ -298,7 +298,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_conditional_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let a = required(data.when_true(), "conditional true")?;
                 let b = required(data.when_false(), "conditional false")?;
                 self.syntactic_truthiness(a)? | self.syntactic_truthiness(b)?
@@ -318,7 +318,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_conditional_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let condition = required(data.condition(), "conditional condition")?;
         let a = required(data.when_true(), "conditional true")?;
         let b = required(data.when_false(), "conditional false")?;
@@ -336,7 +336,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_binary_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let left = required(data.left(), "binary left")?;
         let right = required(data.right(), "binary right")?;
         let op = required(data.operator_token(), "binary operator")?;
@@ -396,14 +396,14 @@ impl CheckerState {
                 if self.object_literal_equality_operand(left)?
                     || self.object_literal_equality_operand(right)?
                 {
-                    let js = self.node(left)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0;
+                    let js = self.node(left)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0;
                     if !js
                         || matches!(
                             operator.known(),
                             Some(K::EqualsEqualsEqualsToken | K::ExclamationEqualsEqualsToken)
                         )
                     {
-                        self.error_at(Some(node),ts_diagnostics::This_condition_will_always_return_0_since_JavaScript_compares_objects_by_reference_not_value,vec![JsString::from_bytes(if equals {b"false".as_slice()}else{b"true".as_slice()})])?;
+                        self.error_at(Some(node),tsr_diagnostics::This_condition_will_always_return_0_since_JavaScript_compares_objects_by_reference_not_value,vec![JsString::from_bytes(if equals {b"false".as_slice()}else{b"true".as_slice()})])?;
                     }
                 }
                 self.check_nan_equality(node, operator, left, right)?;
@@ -476,7 +476,7 @@ impl CheckerState {
             self.type_names_for_error_display(effective_left, effective_right)?;
         let mut diagnostic = self.diagnostic_for_node(
             Some(node),
-            ts_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap,
+            tsr_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap,
             vec![left_name, right_name],
         )?;
         if would_work_with_await {
@@ -484,7 +484,7 @@ impl CheckerState {
                 .related_information
                 .push(std::sync::Arc::new(self.diagnostic_for_node(
                     Some(node),
-                    ts_diagnostics::Did_you_forget_to_use_await,
+                    tsr_diagnostics::Did_you_forget_to_use_await,
                     vec![],
                 )?));
         }

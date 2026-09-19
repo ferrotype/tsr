@@ -5,8 +5,8 @@ use crate::{
     object_flags as of, type_flags as tf, variance_flags as vf, CheckerState, Error, RelationKind,
     TypeId, TypeList, VarianceFlags,
 };
-use ts_arena::SymbolId;
-use ts_ast::{modifier_flags as mf, symbol_flags as sf};
+use tsr_arena::SymbolId;
+use tsr_ast::{modifier_flags as mf, symbol_flags as sf};
 
 pub(crate) const REPORTS_UNMEASURABLE: u32 = 1 << 3;
 pub(crate) const REPORTS_UNRELIABLE: u32 = 1 << 4;

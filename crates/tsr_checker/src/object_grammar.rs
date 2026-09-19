@@ -1,9 +1,9 @@
 //! Object-member grammar preserves native early returns separately from semantic
 //! member traversal. Parsed syntax diagnostics suppress grammar diagnostics.
 use crate::{types::Map, CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarComputedPropertyName
@@ -107,7 +107,7 @@ impl CheckerState {
                 if kind_mod != K::Decorator
                     && (kind_mod != K::AsyncKeyword || kind != K::MethodDeclaration)
                 {
-                    let text = ts_scanner::get_text_of_node(self.ast(modifier)?, modifier)?;
+                    let text = tsr_scanner::get_text_of_node(self.ast(modifier)?, modifier)?;
                     self.grammar_error_node(
                         modifier,
                         d::X_0_modifier_cannot_be_used_here,
@@ -173,7 +173,7 @@ impl CheckerState {
                     .ok_or(Error::MissingLink("computed name"))?;
                 let ty = self.get_type_of_expression(expression)?;
                 self.index_property_name(ty)?
-            } else if ts_ast::utilities::is_property_name_literal(&self.node(name)?) {
+            } else if tsr_ast::utilities::is_property_name_literal(&self.node(name)?) {
                 Some(self.node_text(name)?.into_js_string())
             } else {
                 None
@@ -187,10 +187,10 @@ impl CheckerState {
                 continue;
             }
             if meaning & 2 != 0 && previous & 2 != 0 {
-                let text = ts_scanner::get_text_of_node(self.ast(name)?, name)?;
+                let text = tsr_scanner::get_text_of_node(self.ast(name)?, name)?;
                 self.grammar_error_node(name, d::Duplicate_identifier_0, vec![text])?;
             } else if meaning & 1 != 0 && previous & 1 != 0 {
-                let text = ts_scanner::get_text_of_node(self.ast(name)?, name)?;
+                let text = tsr_scanner::get_text_of_node(self.ast(name)?, name)?;
                 self.grammar_error_node(
                     name,
                     d::An_object_literal_cannot_have_multiple_properties_with_the_same_name,
@@ -253,7 +253,7 @@ impl CheckerState {
             return Ok(());
         }
         if read.body().is_none() {
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("method source"))?;
             if self
                 .ast(source)?
@@ -262,9 +262,9 @@ impl CheckerState {
                 .is_empty()
             {
                 let end = self.node(node)?.end();
-                self.add_diagnostic(ts_ast::Diagnostic::new(
+                self.add_diagnostic(tsr_ast::Diagnostic::new(
                     Some(source),
-                    ts_core::TextRange::new(i64::from(end) - 1, i64::from(end)),
+                    tsr_core::TextRange::new(i64::from(end) - 1, i64::from(end)),
                     d::X_0_expected,
                     vec![JsString::from_bytes(b"{".as_slice())],
                 ))?;

@@ -4,18 +4,18 @@
 
 use crate::{metadata, output_paths, Program, ProgramFile};
 use std::sync::{Arc, OnceLock};
-use ts_ast::{CompletedFile, NodeId, SourceFileMetaData};
-use ts_checker::{CheckerHost, Error};
-use ts_core::{CompilerOptions, ModuleKind, ResolutionMode};
-use ts_module::ResolvedModule;
-use ts_tsoptions::ParsedCommandLine;
-use ts_tspath as path;
+use tsr_ast::{CompletedFile, NodeId, SourceFileMetaData};
+use tsr_checker::{CheckerHost, Error};
+use tsr_core::{CompilerOptions, ModuleKind, ResolutionMode};
+use tsr_module::ResolvedModule;
+use tsr_tsoptions::ParsedCommandLine;
+use tsr_tspath as path;
 
 pub struct ProgramCheckerHost {
     program: Arc<Program>,
     pub(crate) known_symlinks:
         OnceLock<Result<crate::checker_module_specifiers::KnownSymlinks, Error>>,
-    common_source_directory: OnceLock<Result<Vec<u8>, ts_arena::Error>>,
+    common_source_directory: OnceLock<Result<Vec<u8>, tsr_arena::Error>>,
 }
 
 impl ProgramCheckerHost {
@@ -42,17 +42,17 @@ impl ProgramCheckerHost {
 
     fn required_file(&self, file_name: &[u8]) -> Result<&ProgramFile, Error> {
         self.file(file_name)
-            .ok_or_else(|| ts_arena::Error::WrongOwner.into())
+            .ok_or_else(|| tsr_arena::Error::WrongOwner.into())
     }
 
     fn file_metadata(&self, file: &ProgramFile) -> Result<&SourceFileMetaData, Error> {
         let source = file.bound().view().source_file()?;
         self.program
             .metadata(source.parse_options().path.as_bytes())
-            .ok_or_else(|| ts_arena::Error::InvalidGraph.into())
+            .ok_or_else(|| tsr_arena::Error::InvalidGraph.into())
     }
 
-    fn emitted_file_names(&self) -> Result<Vec<ts_jsstring::JsString>, ts_arena::Error> {
+    fn emitted_file_names(&self) -> Result<Vec<tsr_jsstring::JsString>, tsr_arena::Error> {
         let mut names = Vec::new();
         for file in self.program.files() {
             if output_paths::may_emit_with_force_dts(file, &self.program, false)? {
@@ -80,7 +80,7 @@ impl CheckerHost for ProgramCheckerHost {
     }
 
     // port: tsc/internal/compiler/program.go:Program.FileExists
-    fn file_exists(&self, file_name: &[u8]) -> Result<bool, ts_vfs::Error> {
+    fn file_exists(&self, file_name: &[u8]) -> Result<bool, tsr_vfs::Error> {
         self.program.host().file_exists(file_name)
     }
 
@@ -185,7 +185,7 @@ impl CheckerHost for ProgramCheckerHost {
         let file = self.required_file(file_name)?;
         let options = self.program.options();
         let resolution = options.module_resolution_kind();
-        if (ts_core::ModuleResolutionKind::NODE16..=ts_core::ModuleResolutionKind::NODE_NEXT)
+        if (tsr_core::ModuleResolutionKind::NODE16..=tsr_core::ModuleResolutionKind::NODE_NEXT)
             .contains(&resolution)
             || options.resolve_package_json_exports()
             || options.resolve_package_json_imports()
@@ -233,12 +233,12 @@ impl CheckerHost for ProgramCheckerHost {
     // port: tsc/internal/ast/ast.go:Node.JSDoc
     fn jsdoc(
         &self,
-        view: ts_ast::AstView<'_>,
+        view: tsr_ast::AstView<'_>,
         source: NodeId,
         parent: NodeId,
-    ) -> Result<ts_ast::JSDocRoots, Error> {
-        use ts_ast::JsDocProvider;
-        ts_parser::ParserJsDocProvider::default()
+    ) -> Result<tsr_ast::JSDocRoots, Error> {
+        use tsr_ast::JsDocProvider;
+        tsr_parser::ParserJsDocProvider::default()
             .jsdoc(view, source, parent)
             .map_err(Error::from)
     }
@@ -266,10 +266,10 @@ impl CheckerHost for ProgramCheckerHost {
             .program
             .owners
             .node_file_index(file.source())
-            .ok_or(ts_arena::Error::WrongOwner)?;
+            .ok_or(tsr_arena::Error::WrongOwner)?;
         let retained = &self.program.files()[index];
         if retained.source() != file.source() {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         Ok(output_paths::may_emit_with_force_dts(
             retained,
@@ -324,14 +324,14 @@ impl CheckerHost for ProgramCheckerHost {
         &self,
         importer: &[u8],
         target: &[u8],
-    ) -> Result<Vec<ts_checker::ModuleSpecifierPath>, Error> {
+    ) -> Result<Vec<tsr_checker::ModuleSpecifierPath>, Error> {
         self.module_specifier_paths(importer, target)
     }
     // port: tsc/internal/compiler/program.go:Program.GetPackageJsonInfo
     fn get_package_json_info(
         &self,
         file: &[u8],
-    ) -> Result<Option<Arc<ts_module::PackageJson>>, Error> {
+    ) -> Result<Option<Arc<tsr_module::PackageJson>>, Error> {
         let directory = path::directory(file);
         let result = self
             .program
@@ -345,7 +345,7 @@ impl CheckerHost for ProgramCheckerHost {
     fn get_nearest_ancestor_directory_with_package_json(
         &self,
         dir: &[u8],
-    ) -> Result<Option<ts_jsstring::JsString>, Error> {
+    ) -> Result<Option<tsr_jsstring::JsString>, Error> {
         Ok(self
             .program
             .package_resolver
@@ -354,13 +354,13 @@ impl CheckerHost for ProgramCheckerHost {
             .package_scope_untraced(dir)?
             .map(|package| package.directory.clone()))
     }
-    fn get_global_typings_cache_location(&self) -> Result<ts_jsstring::JsString, Error> {
+    fn get_global_typings_cache_location(&self) -> Result<tsr_jsstring::JsString, Error> {
         // ProgramOptions has no global typings-cache input and Resolver::new
         // constructs no global cache. Package-local @types remains supported.
-        Ok(ts_jsstring::JsString::default())
+        Ok(tsr_jsstring::JsString::default())
     }
-    fn get_output_js_file_name(&self, file: &[u8]) -> Result<ts_jsstring::JsString, Error> {
-        Ok(ts_jsstring::JsString::from_bytes(
+    fn get_output_js_file_name(&self, file: &[u8]) -> Result<tsr_jsstring::JsString, Error> {
+        Ok(tsr_jsstring::JsString::from_bytes(
             output_paths::module_specifier_output_name(
                 file,
                 &self.program,
@@ -372,8 +372,8 @@ impl CheckerHost for ProgramCheckerHost {
     fn get_output_declaration_file_name(
         &self,
         file: &[u8],
-    ) -> Result<ts_jsstring::JsString, Error> {
-        Ok(ts_jsstring::JsString::from_bytes(
+    ) -> Result<tsr_jsstring::JsString, Error> {
+        Ok(tsr_jsstring::JsString::from_bytes(
             output_paths::module_specifier_output_name(
                 file,
                 &self.program,

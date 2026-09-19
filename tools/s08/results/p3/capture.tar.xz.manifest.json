@@ -1178,11 +1178,11 @@
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
-    "captured-source/crates/ts_checker/src/indexes.rs": {
+    "captured-source/crates/tsr_checker/src/indexes.rs": {
       "bytes": 34452,
       "sha256": "8bdb6a9f5877b0cb47efc8316b3b64ddc8f96029aa728efc4309a3e0107e4f36"
     },
-    "captured-source/crates/ts_checker/src/signature_parameters.rs": {
+    "captured-source/crates/tsr_checker/src/signature_parameters.rs": {
       "bytes": 26598,
       "sha256": "3877e9bc184ce988559458e15646e0c91d1ed1b325e108204087bbd77f3eedbf"
     },

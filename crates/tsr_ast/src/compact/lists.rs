@@ -5,7 +5,7 @@
 
 use crate::NodeId;
 use std::ops::Range;
-use ts_arena::{ArenaId, Error};
+use tsr_arena::{ArenaId, Error};
 
 const PAGE_WORDS: usize = 256;
 const ESCAPE: u32 = u32::MAX;
@@ -165,9 +165,9 @@ mod tests {
     use super::*;
 
     fn owner() -> ArenaId {
-        ts_arena::StorageBuilder::<ts_arena::Node<()>>::from_source_text(
-            ts_jsstring::SourceText::default(),
-            &ts_arena::Counters::new(),
+        tsr_arena::StorageBuilder::<tsr_arena::Node<()>>::from_source_text(
+            tsr_jsstring::SourceText::default(),
+            &tsr_arena::Counters::new(),
         )
         .id()
         .arena()

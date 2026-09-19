@@ -13,7 +13,7 @@ use crate::{CheckerState, LiteralValue, TypeId};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::sync::Arc;
-use ts_ast::{JsString, SymbolTableId};
+use tsr_ast::{JsString, SymbolTableId};
 
 /// `Arc<[T]>` and `Arc<[u8]>` allocations carry the strong and weak counts.
 const ARC_HEADER: usize = 16;
@@ -78,7 +78,7 @@ impl Census {
             self.add(
                 family,
                 0,
-                ts_arena::StorageCensus::arc_slice_bytes::<T>(list.len()),
+                tsr_arena::StorageCensus::arc_slice_bytes::<T>(list.len()),
             );
         }
     }
@@ -95,7 +95,7 @@ impl Census {
             self.add(
                 family,
                 0,
-                ts_arena::StorageCensus::arc_slice_bytes::<u8>(backing.len()),
+                tsr_arena::StorageCensus::arc_slice_bytes::<u8>(backing.len()),
             );
         }
     }
@@ -139,7 +139,7 @@ impl Census {
                 "TupleData": size_of::<crate::TupleData>(), "UnionData": size_of::<crate::UnionData>(),
                 "TypeParameterData": size_of::<crate::TypeParameterData>(), "TemplateLiteralData": size_of::<crate::TemplateLiteralData>(),
                 "TypeAlias": size_of::<crate::TypeAlias>(), "Signature": size_of::<crate::Signature>(),
-                "IndexInfo": size_of::<crate::IndexInfo>(), "Symbol": size_of::<ts_ast::Symbol>(),
+                "IndexInfo": size_of::<crate::IndexInfo>(), "Symbol": size_of::<tsr_ast::Symbol>(),
                 "ValueSymbolLinks": size_of::<crate::ValueSymbolLinks>(), "OptionValueSymbolLinks": size_of::<Option<crate::ValueSymbolLinks>>(),
                 "MappedData": size_of::<crate::types::MappedData>(), "ReverseMappedData": size_of::<crate::types::ReverseMappedData>(),
                 "InstantiationExpressionData": size_of::<crate::types::InstantiationExpressionData>(),
@@ -342,7 +342,7 @@ impl CheckerState {
                 census.add(
                     "tuple",
                     0,
-                    ts_arena::StorageCensus::arc_slice_bytes::<crate::TupleElementInfo>(
+                    tsr_arena::StorageCensus::arc_slice_bytes::<crate::TupleElementInfo>(
                         data.element_infos.len(),
                     ),
                 );
@@ -388,7 +388,7 @@ impl CheckerState {
                 census.add(
                     "template_literal",
                     0,
-                    ts_arena::StorageCensus::arc_slice_bytes::<JsString>(data.texts.len()),
+                    tsr_arena::StorageCensus::arc_slice_bytes::<JsString>(data.texts.len()),
                 );
             }
             for text in data.texts.iter() {
@@ -529,7 +529,7 @@ impl CheckerState {
         );
         // The checker's synthetic AST: reserved arena pages, payload rows,
         // edges, texts and directories of `Checker.factory`.
-        let mut storage = ts_arena::StorageCensus::new(std::mem::take(&mut census.seen));
+        let mut storage = tsr_arena::StorageCensus::new(std::mem::take(&mut census.seen));
         if let Some(program) = &self.program {
             for index in 0..program.host.source_file_count() {
                 let file = program.host.source_file(index);

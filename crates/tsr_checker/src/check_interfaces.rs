@@ -3,9 +3,9 @@
 
 use crate::{ternary as tr, CheckerState, Error, RelationKind, TypeId};
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, Diagnostic, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, Diagnostic, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarInterfaceDeclaration
@@ -44,7 +44,7 @@ impl CheckerState {
                         vec![],
                     )
                 }
-                _ => return Err(ts_arena::Error::InvalidGraph.into()),
+                _ => return Err(tsr_arena::Error::InvalidGraph.into()),
             }
             // Go continues to the next clause after a clause-local error.
             self.check_heritage_clause_grammar(clause)?;
@@ -173,7 +173,7 @@ impl CheckerState {
                     .node(heritage)?
                     .expression()
                     .ok_or(Error::MissingLink("interface extends expression"))?;
-                if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
+                if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)?
                     || self.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
                 {
                     self.error_at(Some(expression), messages::An_interface_can_only_extend_an_identifier_Slashqualified_name_with_optional_type_arguments, vec![])?;

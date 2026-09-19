@@ -1,11 +1,11 @@
 use crate::{Parser, ParserFactory};
 use std::sync::Arc;
-use ts_ast::{
+use tsr_ast::{
     modifier_flags, node_flags, Diagnostic, JsString, NodeId, NodeListId, NodeSlice,
     SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_diagnostics::{self as diagnostics, Message};
+use tsr_core::TextRange;
+use tsr_diagnostics::{self as diagnostics, Message};
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.jsErrorAtRange
@@ -117,9 +117,9 @@ impl<F: ParserFactory> Parser<'_, F> {
             Some(K::Parameter | K::PropertyDeclaration | K::MethodDeclaration)
         ) {
             let question = match self.factory.node(node).data() {
-                ts_ast::NodeDataRead::ParameterDeclaration(data) => data.question_token(),
-                ts_ast::NodeDataRead::PropertyDeclaration(data) => data.postfix_token(),
-                ts_ast::NodeDataRead::MethodDeclaration(data) => data.postfix_token(),
+                tsr_ast::NodeDataRead::ParameterDeclaration(data) => data.question_token(),
+                tsr_ast::NodeDataRead::PropertyDeclaration(data) => data.postfix_token(),
+                tsr_ast::NodeDataRead::MethodDeclaration(data) => data.postfix_token(),
                 _ => unreachable!("parsed declaration payload"),
             };
             if let Some(question) = question {
@@ -201,13 +201,13 @@ impl<F: ParserFactory> Parser<'_, F> {
             }
             Some(K::ExportDeclaration | K::ImportSpecifier | K::ExportSpecifier) => {
                 let (type_only, message) = match self.factory.node(node).data() {
-                    ts_ast::NodeDataRead::ExportDeclaration(data) => {
+                    tsr_ast::NodeDataRead::ExportDeclaration(data) => {
                         (data.is_type_only(), b"export type".as_slice())
                     }
-                    ts_ast::NodeDataRead::ImportSpecifier(data) => {
+                    tsr_ast::NodeDataRead::ImportSpecifier(data) => {
                         (data.is_type_only(), b"import...type".as_slice())
                     }
-                    ts_ast::NodeDataRead::ExportSpecifier(data) => {
+                    tsr_ast::NodeDataRead::ExportSpecifier(data) => {
                         (data.is_type_only(), b"export...type".as_slice())
                     }
                     _ => unreachable!("parsed import/export payload"),
@@ -352,7 +352,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                         );
                         if modifier.flags() & node_flags::REPARSED == 0
                             && modifier.kind() != K::Decorator
-                            && ts_ast::modifier_to_flag(modifier.kind())
+                            && tsr_ast::modifier_to_flag(modifier.kind())
                                 & modifier_flags::JAVA_SCRIPT
                                 == 0
                         {
@@ -375,7 +375,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 if let Some(list) = self.node_modifiers(node) {
                     let nodes = self.factory.read_list(list).nodes();
                     if self.factory.read_nodes(nodes).iter().any(|id| {
-                        ts_ast::is_modifier_kind(
+                        tsr_ast::is_modifier_kind(
                             self.factory.node(id.expect("parsed modifier")).kind(),
                         )
                     }) {
@@ -427,7 +427,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             })
     }
     fn js_syntax_body(&self, node: NodeId) -> Option<NodeId> {
-        use ts_ast::NodeDataRead as D;
+        use tsr_ast::NodeDataRead as D;
         match self.factory.node(node).data() {
             D::MethodDeclaration(d) => d.body(),
             D::ConstructorDeclaration(d) => d.body(),
@@ -440,7 +440,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
     }
     fn js_syntax_annotation(&self, node: NodeId) -> Option<NodeId> {
-        use ts_ast::NodeDataRead as D;
+        use tsr_ast::NodeDataRead as D;
         match self.factory.node(node).data() {
             D::ParameterDeclaration(d) => d.r#type(),
             D::PropertyDeclaration(d) => d.r#type(),
@@ -460,7 +460,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
     }
     fn js_syntax_type_parameters(&self, node: NodeId) -> Option<NodeListId> {
-        use ts_ast::NodeDataRead as D;
+        use tsr_ast::NodeDataRead as D;
         match self.factory.node(node).data() {
             D::ClassDeclaration(d) => d.type_parameters(),
             D::ClassExpression(d) => d.type_parameters(),
@@ -475,7 +475,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
     }
     fn js_syntax_type_arguments(&self, node: NodeId) -> Option<NodeListId> {
-        use ts_ast::NodeDataRead as D;
+        use tsr_ast::NodeDataRead as D;
         match self.factory.node(node).data() {
             D::CallExpression(d) => d.type_arguments(),
             D::NewExpression(d) => d.type_arguments(),
@@ -489,7 +489,7 @@ impl<F: ParserFactory> Parser<'_, F> {
 }
 
 /// port: tsc/internal/ast/utilities.go:CanHaveIllegalDecorators
-fn can_have_illegal_decorators(kind: ts_ast::NodeKind) -> bool {
+fn can_have_illegal_decorators(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(
@@ -515,7 +515,7 @@ fn can_have_illegal_decorators(kind: ts_ast::NodeKind) -> bool {
     )
 }
 /// port: tsc/internal/ast/utilities.go:CanHaveDecorators
-fn can_have_decorators(kind: ts_ast::NodeKind) -> bool {
+fn can_have_decorators(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(

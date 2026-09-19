@@ -1,9 +1,9 @@
-use ts_ast::{
+use tsr_ast::{
     ExternalModuleIndicatorOptions, JsString, NodeDataRead, ParsedFile, SourceFileParseOptions,
     SyntaxKind as K,
 };
-use ts_core::{ScriptKind, Tristate};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, Tristate};
+use tsr_jsstring::SourceText;
 
 fn parse(name: &[u8], text: &[u8], kind: ScriptKind) -> ParsedFile {
     crate::parse_source_file(
@@ -337,7 +337,7 @@ fn top_level_await_reparse_keeps_discarded_allocation_counts_and_final_statement
 fn a_failed_parse_drops_its_owner_and_the_same_batch_worker_accepts_the_next_request() {
     crate::on_parser_worker(|| {
         let worker = std::thread::current().id();
-        let counters = ts_arena::Counters::default();
+        let counters = tsr_arena::Counters::default();
         let failed = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             crate::parse_source_file_with_counters(
                 SourceText::from_loaded_bytes(b"const x = 1;".as_slice()),
@@ -350,7 +350,7 @@ fn a_failed_parse_drops_its_owner_and_the_same_batch_worker_accepts_the_next_req
             )
         }));
         assert!(failed.is_err());
-        assert_eq!(counters.snapshot(), ts_arena::Counts::default());
+        assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
         let next = crate::parse_source_file_with_counters(
             SourceText::from_loaded_bytes(b"const x = 1;".as_slice()),
             ScriptKind::TS,
@@ -369,6 +369,6 @@ fn a_failed_parse_drops_its_owner_and_the_same_batch_worker_accepts_the_next_req
             .is_empty());
         assert_eq!(counters.snapshot().owners, 1);
         drop(next);
-        assert_eq!(counters.snapshot(), ts_arena::Counts::default());
+        assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
     });
 }

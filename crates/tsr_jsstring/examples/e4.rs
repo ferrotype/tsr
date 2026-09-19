@@ -3,8 +3,8 @@ use serde::de::{value::MapAccessDeserializer, MapAccess, Visitor};
 use serde::{Deserialize, Deserializer};
 use serde_json::{json, Value};
 use std::io::{self, Read};
-use ts_jsstring::{escape, helpers, line_map, lsp, scanner_positions, wtf8};
-use ts_jsstring::{
+use tsr_jsstring::{escape, helpers, line_map, lsp, scanner_positions, wtf8};
+use tsr_jsstring::{
     JsString, LiteralEscapeFlags, LspLineMap, LspPosition, PositionEncoding, PositionMap,
     QuoteChar, SourceText,
 };

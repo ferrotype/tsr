@@ -1,11 +1,11 @@
 //! Symbol visibility, declaration ordering, and reference effects for value
 //! accesses. Checks report independently from the property's resulting type.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags as cf, modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getDeclaringClass
@@ -81,14 +81,14 @@ impl CheckerState {
         }
         if let Some(declaration) = self.symbol(property)?.value_declaration() {
             let view = self.ast(declaration)?;
-            if ts_ast::utilities::is_private_identifier_class_element_declaration(
+            if tsr_ast::utilities::is_private_identifier_class_element_declaration(
                 view,
                 declaration,
             )? {
-                let class = ts_ast::utilities::get_containing_class(view, declaration)?
+                let class = tsr_ast::utilities::get_containing_class(view, declaration)?
                     .ok_or(Error::MissingLink("private property class"))?;
                 return Ok(self.node(node)?.flags() & nf::OPTIONAL_CHAIN == 0
-                    && ts_ast::utilities::is_node_descendant_of(
+                    && tsr_ast::utilities::is_node_descendant_of(
                         self.ast(node)?,
                         Some(node),
                         Some(class),
@@ -201,7 +201,7 @@ impl CheckerState {
             return Ok(true);
         }
         let mut enclosing = None;
-        let mut container = ts_ast::utilities::get_containing_class(self.ast(node)?, node)?;
+        let mut container = tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?;
         while let Some(current) = container {
             let symbol = self
                 .get_symbol_of_declaration(current)?
@@ -211,7 +211,7 @@ impl CheckerState {
                 enclosing = Some(class);
                 break;
             }
-            container = ts_ast::utilities::get_containing_class(self.ast(current)?, current)?;
+            container = tsr_ast::utilities::get_containing_class(self.ast(current)?, current)?;
         }
         if enclosing.is_none() {
             if let Some(class) = self.access_enclosing_class_from_this_parameter(node)? {
@@ -262,14 +262,14 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:isClassInstanceProperty
     fn is_class_instance_property(&self, node: NodeId) -> Result<bool, Error> {
-        use ts_ast::{
+        use tsr_ast::{
             get_element_or_property_access_name, is_bindable_static_access_expression,
             is_bindable_static_name_expression,
         };
         let view = self.ast(node)?;
         let read = view.node(node)?;
         if read.flags() & nf::JAVA_SCRIPT_FILE != 0
-            && ts_ast::utilities_tail::is_expando_property_declaration(Some(&read))
+            && tsr_ast::utilities_tail::is_expando_property_declaration(Some(&read))
         {
             let left = read
                 .data_source()
@@ -306,9 +306,9 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<Option<TypeId>, Error> {
-        let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
+        let container = tsr_ast::get_this_container(self.ast(node)?, node, false, false)?;
         let read = self.node(container)?;
-        if !ts_ast::utilities::is_function_like(Some(&read)) {
+        if !tsr_ast::utilities::is_function_like(Some(&read)) {
             return Ok(None);
         }
         let signature = self.signature_from_declaration(container)?;
@@ -351,8 +351,8 @@ impl CheckerState {
             {
                 return Ok(true);
             }
-            if ts_ast::utilities::is_class_like(&read)
-                || ts_ast::utilities::is_function_like(Some(&read))
+            if tsr_ast::utilities::is_class_like(&read)
+                || tsr_ast::utilities::is_function_like(Some(&read))
             {
                 return Ok(false);
             }
@@ -378,7 +378,7 @@ impl CheckerState {
         let self_access = view.node(left)?.kind() == K::ThisKeyword
             || match parent {
                 Some(parent) if is_entity_name_expression(view, left)? => {
-                    let first = ts_ast::utilities_middle::get_first_identifier(view, left)?;
+                    let first = tsr_ast::utilities_middle::get_first_identifier(view, left)?;
                     parent == self.resolved_value_symbol(first)?
                 }
                 _ => false,
@@ -417,7 +417,7 @@ impl CheckerState {
             return Ok(());
         }
         let write_only = match node {
-            Some(node) => ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?,
+            Some(node) => tsr_ast::utilities::is_write_only_access(self.ast(node)?, node)?,
             None => false,
         };
         if write_only && flags & sf::SET_ACCESSOR == 0 {
@@ -428,7 +428,7 @@ impl CheckerState {
             while let Some(node) = current {
                 let read = self.node(node)?;
                 // FindAncestor(node, IsFunctionLikeDeclaration): signatures and function types pass.
-                if ts_ast::utilities::is_function_like_declaration(Some(&read)) {
+                if tsr_ast::utilities::is_function_like_declaration(Some(&read)) {
                     if self.get_symbol_of_declaration(node)? == Some(property) {
                         return Ok(());
                     }
@@ -452,7 +452,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(property)?.value_declaration() else {
             return Ok(());
         };
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("property access source"))?;
         if self.source_file_read(source)?.is_declaration_file {
             return Ok(());
@@ -549,7 +549,7 @@ impl CheckerState {
                 Some(K::Block) => {
                     if let Some(parent) = read.parent() {
                         let parent = self.node(parent)?;
-                        if ts_ast::utilities::is_function_like(Some(&parent))
+                        if tsr_ast::utilities::is_function_like(Some(&parent))
                             && parent.kind() != K::ArrowFunction
                         {
                             return Ok(false);
@@ -645,7 +645,7 @@ impl CheckerState {
 }
 
 // port: tsc/internal/ast/utilities.go:IsEntityNameExpression
-fn is_entity_name_expression(view: ts_ast::AstView<'_>, mut node: NodeId) -> Result<bool, Error> {
+fn is_entity_name_expression(view: tsr_ast::AstView<'_>, mut node: NodeId) -> Result<bool, Error> {
     loop {
         let read = view.node(node)?;
         match read.kind().known() {

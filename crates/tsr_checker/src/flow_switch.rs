@@ -1,8 +1,8 @@
 //! Switch narrowing and exhaustiveness retain native source order and circularity.
 use crate::{type_facts as f, type_flags as tf, types::Map, CheckerState, Error, TypeId};
 use std::sync::Arc;
-use ts_arena::NodeId;
-use ts_ast::{FlowSwitchClauseData, JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{FlowSwitchClauseData, JsString, SyntaxKind as K};
 #[derive(Default)]
 pub(crate) struct FlowSwitches {
     pub(crate) types: Map<NodeId, Arc<[TypeId]>>,
@@ -19,7 +19,7 @@ impl CheckerState {
         let block = required(
             read.data_source()
                 .as_switch_statement()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .case_block(),
             "switch case block",
         )?;
@@ -28,7 +28,7 @@ impl CheckerState {
             block,
             read.data_source()
                 .as_case_block()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .clauses(),
         )
     }
@@ -175,7 +175,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         let statement = required(data.switch_statement, "flow switch statement")?;
         let expression = required(self.node(statement)?.expression(), "switch discriminant")?;
-        let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
+        let expression = tsr_ast::skip_parentheses(self.ast(expression)?, expression)?;
         let kind = self.node(expression)?.kind();
         if self.matching_reference(reference, expression)? {
             return self.narrow_switch_discriminant(ty, data);
@@ -420,10 +420,10 @@ impl CheckerState {
     }
 }
 fn clause_range(data: FlowSwitchClauseData, len: usize) -> Result<std::ops::Range<usize>, Error> {
-    let start = usize::try_from(data.clause_start).map_err(|_| ts_arena::Error::InvalidGraph)?;
-    let end = usize::try_from(data.clause_end).map_err(|_| ts_arena::Error::InvalidGraph)?;
+    let start = usize::try_from(data.clause_start).map_err(|_| tsr_arena::Error::InvalidGraph)?;
+    let end = usize::try_from(data.clause_end).map_err(|_| tsr_arena::Error::InvalidGraph)?;
     if start > end || end > len {
-        return Err(ts_arena::Error::InvalidGraph.into());
+        return Err(tsr_arena::Error::InvalidGraph.into());
     }
     Ok(start..end)
 }

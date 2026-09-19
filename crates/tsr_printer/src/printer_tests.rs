@@ -7,12 +7,12 @@ use crate::{
     SingleLineStringWriter, TextWriter, TypePrecedence,
 };
 use serde_json::Value;
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     token_flags, AstBuilder, Factory, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_core::{NewLineKind, TextRange};
-use ts_jsstring::{LiteralEscapeFlags, SourceText};
+use tsr_core::{NewLineKind, TextRange};
+use tsr_jsstring::{LiteralEscapeFlags, SourceText};
 
 const CASES: &str = include_str!("../../../data/s08/printer-cases.json");
 const OBSERVATIONS: &str = include_str!("../../../data/s08/printer-observations.json");
@@ -214,7 +214,7 @@ impl Builder<'_> {
                     types,
                     args,
                     if flag(v, "optional") {
-                        ts_ast::node_flags::OPTIONAL_CHAIN
+                        tsr_ast::node_flags::OPTIONAL_CHAIN
                     } else {
                         0
                     },
@@ -229,7 +229,7 @@ impl Builder<'_> {
                     question,
                     Some(argument),
                     if flag(v, "optional") {
-                        ts_ast::node_flags::OPTIONAL_CHAIN
+                        tsr_ast::node_flags::OPTIONAL_CHAIN
                     } else {
                         0
                     },
@@ -604,7 +604,7 @@ fn identifier_source_text_requires_the_same_source_file_not_just_owner() {
     let second_text = SourceText::from_bytes(&br"\u0062ar"[..]);
     let mut ast = AstBuilder::new(first_text.clone(), &counters);
     let first = ast.new_source_file(
-        ts_ast::SourceFileParseOptions {
+        tsr_ast::SourceFileParseOptions {
             file_name: JsString::from_bytes(&b"/first.ts"[..]),
             ..Default::default()
         },
@@ -613,7 +613,7 @@ fn identifier_source_text_requires_the_same_source_file_not_just_owner() {
         None,
     );
     let second = ast.new_source_file(
-        ts_ast::SourceFileParseOptions {
+        tsr_ast::SourceFileParseOptions {
             file_name: JsString::from_bytes(&b"/second.ts"[..]),
             ..Default::default()
         },

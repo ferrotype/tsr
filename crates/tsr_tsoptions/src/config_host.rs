@@ -1,7 +1,7 @@
 //! Config parsing receives an explicit filesystem and a module-resolution
 //! callback. The callback avoids a tsoptions/module dependency cycle.
-use ts_jsstring::JsString;
-use ts_vfs::{Error, FileSystem};
+use tsr_jsstring::JsString;
+use tsr_vfs::{Error, FileSystem};
 pub trait ParseConfigHost: Sync {
     fn fs(&self) -> &dyn FileSystem;
     fn current_directory(&self) -> &[u8];

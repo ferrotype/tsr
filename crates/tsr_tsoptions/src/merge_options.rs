@@ -1,6 +1,6 @@
 //! Compiler option inheritance uses Go field zero values and exact JSON tags.
 use crate::ConfigValue;
-use ts_core::CompilerOptions;
+use tsr_core::CompilerOptions;
 
 /// port: tsc/internal/tsoptions/parsinghelpers.go:mergeCompilerOptions
 pub fn merge_compiler_options(

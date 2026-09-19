@@ -1,8 +1,8 @@
 use super::*;
 use crate::{FileCache, ProgramOptions};
 use serde_json::{json, Value};
-use ts_arena::Counters;
-use ts_tsoptions::{ConfigFileSpecs, ParsedCommandLine, TsConfigSourceFile};
+use tsr_arena::Counters;
+use tsr_tsoptions::{ConfigFileSpecs, ParsedCommandLine, TsConfigSourceFile};
 
 fn bytes(value: &str) -> Vec<u8> {
     assert_eq!(value.len() % 2, 0);
@@ -34,7 +34,7 @@ fn strings(value: &Value) -> Vec<JsString> {
 fn load(request: &Value) -> Program {
     let cwd = request["cwd"].as_str().unwrap().as_bytes();
     let case_sensitive = request["case_sensitive"].as_bool().unwrap();
-    let mut fs = ts_vfs::MemoryBuilder::new(cwd, case_sensitive);
+    let mut fs = tsr_vfs::MemoryBuilder::new(cwd, case_sensitive);
     for (name, value) in request["files"].as_object().unwrap() {
         fs.insert_physical(name.as_bytes(), bytes(value.as_str().unwrap()));
     }
@@ -43,13 +43,13 @@ fn load(request: &Value) -> Program {
             fs.insert_symlink(name.as_bytes(), target.as_str().unwrap().as_bytes());
         }
     }
-    let options = ts_tsoptions::raw::compiler_options(&request["options"]).unwrap();
+    let options = tsr_tsoptions::raw::compiler_options(&request["options"]).unwrap();
     let mut config = ParsedCommandLine::new(options, strings(&request["roots"]));
     if let Some(name) = request["config_name"].as_str() {
         config.config_file = Some(Arc::new(TsConfigSourceFile::parse(
             JsString::from_bytes(name.as_bytes()),
             path::to_path(name.as_bytes(), cwd, case_sensitive),
-            ts_jsstring::SourceText::from_loaded_bytes(bytes(
+            tsr_jsstring::SourceText::from_loaded_bytes(bytes(
                 request["config_text"].as_str().unwrap(),
             )),
         )));
@@ -68,9 +68,9 @@ fn load(request: &Value) -> Program {
     Program::load(
         ProgramOptions {
             config,
-            host: Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish()))),
+            host: Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish()))),
             current_directory: JsString::from_bytes(cwd),
-            default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
+            default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
             skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
         },
         &mut FileCache::new(),

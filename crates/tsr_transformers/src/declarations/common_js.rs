@@ -1,10 +1,10 @@
 use super::{tracker::Selector, transform::Transformer, util};
 use std::collections::{HashMap, HashSet};
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, Factory, FactoryMethods, JsString, NodeId, NodeListId,
     RuntimeFactory, SyntaxKind as K,
 };
-use ts_printer::emit_resolver::DeclarationEmitResolver;
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 #[derive(Default)]
 pub(super) struct CommonJsState {
@@ -74,9 +74,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 continue;
             };
             let context = self.save_expression_context(node)?;
-            let kind = ts_ast::get_assignment_declaration_kind(self.output.view(), node)?;
+            let kind = tsr_ast::get_assignment_declaration_kind(self.output.view(), node)?;
             if assignments {
-                if common_js && kind == ts_ast::JSDeclarationKind::ModuleExports {
+                if common_js && kind == tsr_ast::JSDeclarationKind::ModuleExports {
                     let right =
                         Self::required(self.node(node).as_binary_expression().unwrap().right())?;
                     let input = Self::required(self.node(node).parent())?;
@@ -87,11 +87,11 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 }
             } else {
                 match kind {
-                    ts_ast::JSDeclarationKind::Property => self.expando_assignment(node)?,
-                    ts_ast::JSDeclarationKind::ExportsProperty if common_js => {
+                    tsr_ast::JSDeclarationKind::Property => self.expando_assignment(node)?,
+                    tsr_ast::JSDeclarationKind::ExportsProperty if common_js => {
                         let left =
                             Self::required(self.node(node).as_binary_expression().unwrap().left())?;
-                        let name = Self::required(ts_ast::get_element_or_property_access_name(
+                        let name = Self::required(tsr_ast::get_element_or_property_access_name(
                             self.output.view(),
                             left,
                         )?)?;
@@ -100,9 +100,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                             self.cjs.members.push(result);
                         }
                     }
-                    ts_ast::JSDeclarationKind::ObjectDefinePropertyExports if common_js => {
+                    tsr_ast::JSDeclarationKind::ObjectDefinePropertyExports if common_js => {
                         let args = self.list_nodes(self.node(node).argument_list());
-                        let name = *args.get(1).ok_or(ts_arena::Error::InvalidGraph)?;
+                        let name = *args.get(1).ok_or(tsr_arena::Error::InvalidGraph)?;
                         let name = self.preferred_export_name(name)?;
                         if let Some(result) = self.common_js_export(node, name)? {
                             self.cjs.members.push(result);
@@ -134,8 +134,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
         ) {
             let text = self.output.view().node_text(name)?.into_js_string();
-            if ts_scanner::is_identifier_text(text.as_bytes(), ts_core::LanguageVariant::STANDARD) {
-                let keyword = ts_scanner::string_to_token(text.as_bytes());
+            if tsr_scanner::is_identifier_text(text.as_bytes(), tsr_core::LanguageVariant::STANDARD)
+            {
+                let keyword = tsr_scanner::string_to_token(text.as_bytes());
                 if matches!(keyword, K::Unknown | K::DefaultKeyword) {
                     let parent = self.node(name).parent();
                     let result = self.output.new_identifier(text);
@@ -150,7 +151,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
     pub fn modifier_list(&mut self, flags: u32) -> Option<NodeListId> {
         let nodes =
-            ts_ast::utilities_middle::create_modifiers_from_modifier_flags(flags, |kind| {
+            tsr_ast::utilities_middle::create_modifiers_from_modifier_flags(flags, |kind| {
                 Some(self.output.new_modifier(kind))
             })?;
         let nodes = self.output.alloc_nodes(nodes);
@@ -286,7 +287,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.tracker.selector =
             Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
                 diagnostic_message:
-                    ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+                    tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
                 error_node: Some(node),
                 type_name: None,
             });
@@ -304,7 +305,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.emit
             .assign_comment_range(self.output, declaration, node);
         self.emit
-            .add_emit_flags(assignment, ts_printer::emit_flags::NO_COMMENTS);
+            .add_emit_flags(assignment, tsr_printer::emit_flags::NO_COMMENTS);
         Ok(Some(self.syntax_list(vec![declaration, assignment])))
     }
     fn common_js_class(
@@ -319,7 +320,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 self.output
                     .view()
                     .node_text(name)
-                    .map(ts_ast::NodeText::into_js_string)
+                    .map(tsr_ast::NodeText::into_js_string)
             })
             .transpose()?
             .filter(|name| !name.is_empty());
@@ -351,9 +352,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     let alias_base = if self.node(name).kind() == K::Identifier {
                         let mut bytes = vec![b'_'];
                         bytes.extend_from_slice(self.output.view().node_text(name)?.as_bytes());
-                        if ts_scanner::is_identifier_text(
+                        if tsr_scanner::is_identifier_text(
                             &bytes,
-                            ts_core::LanguageVariant::STANDARD,
+                            tsr_core::LanguageVariant::STANDARD,
                         ) {
                             bytes
                         } else {
@@ -374,7 +375,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     );
                     let export = self.named_export(Some(alias), name);
                     self.emit
-                        .add_emit_flags(export, ts_printer::emit_flags::NO_COMMENTS);
+                        .add_emit_flags(export, tsr_printer::emit_flags::NO_COMMENTS);
                     Ok(self.syntax_list(vec![namespace_declaration, import, export]))
                 } else {
                     let data = self
@@ -416,7 +417,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             } else {
                 let export = self.named_export(Some(class_name), name);
                 self.emit
-                    .add_emit_flags(export, ts_printer::emit_flags::NO_COMMENTS);
+                    .add_emit_flags(export, tsr_printer::emit_flags::NO_COMMENTS);
                 Ok(self.syntax_list(vec![declaration, export]))
             }
         }

@@ -1,15 +1,15 @@
 //! Lexical lookup with the pinned binder's optional checker callbacks.
 //! The host retains every file/checker arena referenced by its checked IDs.
 use std::ops::ControlFlow;
-use ts_arena::{Error, SymbolId};
-use ts_ast::{
+use tsr_arena::{Error, SymbolId};
+use tsr_ast::{
     internal_symbol_names as names, modifier_flags as modifiers, node_flags, symbol_flags as flags,
     utilities as u, utilities_middle as middle, AstView, ChildVisitor, DeclarationRead, JsString,
     NodeBinding, NodeDataRead, NodeId, NodeKind, NodeListId, NodeRead, NodeSlice, SymbolFlags,
     SymbolRef, SymbolTableId, SymbolTableRead, SyntaxKind as K,
 };
-use ts_core::{ScriptTarget, Tristate};
-use ts_diagnostics::{self as diagnostics, Message};
+use tsr_core::{ScriptTarget, Tristate};
+use tsr_diagnostics::{self as diagnostics, Message};
 
 /// A present source callback returning nil differs from an absent callback.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -343,7 +343,7 @@ impl NameResolver {
                 }
                 Some(K::PropertyDeclaration) => {
                     if !u::is_static(host.ast(current)?, current)? {
-                        if let Some(constructor) = ts_ast::find_constructor_declaration(
+                        if let Some(constructor) = tsr_ast::find_constructor_declaration(
                             host.ast(current)?,
                             required(host.node(current)?.parent()),
                         )? {
@@ -868,7 +868,7 @@ fn get_is_deferred_context(
         return Ok(true);
     }
     Ok(
-        ts_ast::get_immediately_invoked_function_expression(host.ast(location)?, location)?
+        tsr_ast::get_immediately_invoked_function_expression(host.ast(location)?, location)?
             .is_none(),
     )
 }

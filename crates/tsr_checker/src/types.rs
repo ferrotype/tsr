@@ -21,9 +21,9 @@ use crate::{
     object_flags, AliasId, Error, IndexInfoId, ObjectFlags, SignatureId, TypeFlags, TypeId,
 };
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{JsString, SymbolTableId};
-use ts_jsnum::{Number, PseudoBigInt};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{JsString, SymbolTableId};
+use tsr_jsnum::{Number, PseudoBigInt};
 
 /// An immutable, independently owned type list (`[]*Type` shared by reference).
 pub type TypeList = Arc<[TypeId]>;
@@ -33,7 +33,7 @@ pub type IndexInfoList = Arc<[IndexInfoId]>;
 
 /// The hash map the checker's caches use. `hashbrown` reports its exact
 /// allocation size, which the storage census charges; the hasher is `std`'s.
-pub use ts_arena::hash::FastState;
+pub use tsr_arena::hash::FastState;
 pub type Map<K, V> = hashbrown::HashMap<K, V, FastState>;
 pub(crate) type Set<T> = hashbrown::HashSet<T, FastState>;
 
@@ -523,7 +523,7 @@ pub struct TypeStore {
 }
 
 fn invalid() -> Error {
-    Error::Arena(ts_arena::Error::InvalidSlot)
+    Error::Arena(tsr_arena::Error::InvalidSlot)
 }
 
 fn row(row: u32) -> usize {
@@ -631,7 +631,7 @@ impl TypeStore {
             | object_flags::MEMBERS_RESOLVED;
         let (kind, payload_row) = self.push_payload(payload)?;
         let payload = TypeRecord::pack(kind, payload_row)?;
-        ts_arena::growth::push_frugal(
+        tsr_arena::growth::push_frugal(
             &mut self.records,
             TypeRecord {
                 flags,
@@ -647,7 +647,7 @@ impl TypeStore {
     fn push_payload(&mut self, payload: Payload) -> Result<(TypeKind, u32), Error> {
         fn push<T>(table: &mut Vec<T>, value: T) -> Result<u32, Error> {
             let row = u32::try_from(table.len()).map_err(|_| Error::IdExhausted)?;
-            ts_arena::growth::push_frugal(table, value);
+            tsr_arena::growth::push_frugal(table, value);
             Ok(row)
         }
         Ok(match payload {
@@ -706,7 +706,7 @@ impl TypeStore {
 
     pub fn push_alias(&mut self, alias: TypeAlias) -> Result<AliasId, Error> {
         let id = AliasId::next(0, self.aliases.len())?;
-        ts_arena::growth::push_frugal(&mut self.aliases, alias);
+        tsr_arena::growth::push_frugal(&mut self.aliases, alias);
         Ok(id)
     }
 

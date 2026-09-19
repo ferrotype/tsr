@@ -1,8 +1,8 @@
 //! Value declaration ordering and deferred uses of block-scoped names.
 
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, utilities as ast, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, utilities as ast, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkResolvedBlockScopedVariable
@@ -35,17 +35,17 @@ impl CheckerState {
             return Ok(());
         }
         let message = if flags & sf::BLOCK_SCOPED_VARIABLE != 0 {
-            Some(ts_diagnostics::Block_scoped_variable_0_used_before_its_declaration)
+            Some(tsr_diagnostics::Block_scoped_variable_0_used_before_its_declaration)
         } else if flags & sf::CLASS != 0 {
-            Some(ts_diagnostics::Class_0_used_before_its_declaration)
+            Some(tsr_diagnostics::Class_0_used_before_its_declaration)
         } else if flags & sf::REGULAR_ENUM != 0 || self.program()?.host.options().isolated_modules()
         {
-            Some(ts_diagnostics::Enum_0_used_before_its_declaration)
+            Some(tsr_diagnostics::Enum_0_used_before_its_declaration)
         } else {
             None
         };
         if let Some(message) = message {
-            let name = ts_scanner::declaration_name_to_string(
+            let name = tsr_scanner::declaration_name_to_string(
                 self.ast(declaration)?,
                 self.node(declaration)?.name(),
             )?;
@@ -55,7 +55,7 @@ impl CheckerState {
                 .related_information
                 .push(std::sync::Arc::new(self.diagnostic_for_node(
                     Some(declaration),
-                    ts_diagnostics::X_0_is_declared_here,
+                    tsr_diagnostics::X_0_is_declared_here,
                     vec![name],
                 )?));
             self.add_diagnostic(diagnostic)?;
@@ -368,7 +368,7 @@ impl CheckerState {
                             }
                             let read = self.node(current)?;
                             if ast::is_function_like(Some(&read))
-                                && ts_ast::get_immediately_invoked_function_expression(
+                                && tsr_ast::get_immediately_invoked_function_expression(
                                     self.ast(current)?,
                                     current,
                                 )?
@@ -405,8 +405,11 @@ impl CheckerState {
             let read = self.node(node)?;
             if node == stop
                 || ast::is_function_like(Some(&read))
-                    && (ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
-                        .is_none()
+                    && (tsr_ast::get_immediately_invoked_function_expression(
+                        self.ast(node)?,
+                        node,
+                    )?
+                    .is_none()
                         || self.body_function_flags(node)? != (false, false))
             {
                 return Ok(false);
@@ -481,7 +484,7 @@ impl CheckerState {
             }
             let read = self.node(node)?;
             if ast::is_function_like(Some(&read))
-                && ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
+                && tsr_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
                     .is_none()
             {
                 return Ok(true);
@@ -493,7 +496,8 @@ impl CheckerState {
             if let Some(parent) = parent {
                 let read = self.node(parent)?;
                 if read.kind() == K::PropertyDeclaration && read.initializer() == Some(node) {
-                    if read.modifier_flags(self.ast(parent)?)? & ts_ast::modifier_flags::STATIC != 0
+                    if read.modifier_flags(self.ast(parent)?)? & tsr_ast::modifier_flags::STATIC
+                        != 0
                     {
                         let declared = self.node(declaration)?;
                         if declared.kind() == K::MethodDeclaration {
@@ -550,7 +554,7 @@ impl CheckerState {
                         let declared = self.node(declaration)?;
                         let instance = declared.kind() == K::PropertyDeclaration
                             && declared.modifier_flags(self.ast(declaration)?)?
-                                & ts_ast::modifier_flags::STATIC
+                                & tsr_ast::modifier_flags::STATIC
                                 == 0;
                         if !instance
                             || self.containing_name_class(usage)?

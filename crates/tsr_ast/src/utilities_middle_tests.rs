@@ -1,9 +1,9 @@
 use super::*;
 use crate::{AstBuilder, Factory, FactoryMethods, Node, NodeData, TokenData};
 use std::collections::BTreeMap;
-use ts_arena::Counters;
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn text(value: &str) -> JsString {
     JsString::from_bytes(value.as_bytes())

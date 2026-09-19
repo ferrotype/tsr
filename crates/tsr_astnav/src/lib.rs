@@ -16,22 +16,22 @@
 
 use std::cmp::Ordering;
 use std::ops::ControlFlow;
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     node_flags, utilities, utilities_middle, AstView, ChildVisitor, JsDocProvider, NodeKind,
     NodeListId, NodeRead, NodeSlice, SyntaxKind as K,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
-    Storage(ts_arena::Error),
+    Storage(tsr_arena::Error),
     /// An upstream `panic`: an invariant of the tree or the scanner did not
     /// hold. The message is upstream's, so a caller can report it unchanged.
     Assertion(String),
 }
 
-impl From<ts_arena::Error> for Error {
-    fn from(error: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(error: tsr_arena::Error) -> Self {
         Self::Storage(error)
     }
 }
@@ -132,7 +132,7 @@ pub struct Navigator<'a, 'p> {
 struct Collect<'v> {
     view: AstView<'v>,
     out: Vec<Visit>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 
 impl ChildVisitor for Collect<'_> {
@@ -211,7 +211,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
             .data_source()
             .as_source_file()
             .and_then(|data| data.end_of_file_token())
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         self.end(token)
     }
 
@@ -265,7 +265,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
 
     // port: tsc/internal/astnav/tokens.go:GetStartOfNode
     pub fn get_start_of_node(&mut self, node: NodeId, include_jsdoc: bool) -> Result<i64, Error> {
-        Ok(ts_scanner::get_token_pos_of_node(
+        Ok(tsr_scanner::get_token_pos_of_node(
             self.view,
             self.source,
             node,
@@ -298,22 +298,22 @@ impl<'a, 'p> Navigator<'a, 'p> {
         full_start: i64,
         end: i64,
         parent: NodeId,
-        flags: ts_ast::TokenFlags,
+        flags: tsr_ast::TokenFlags,
     ) -> Result<NodeId, Error> {
         let (Ok(pos), Ok(end)) = (i32::try_from(full_start), i32::try_from(end)) else {
-            return Err(ts_arena::Error::InvalidTokenRange.into());
+            return Err(tsr_arena::Error::InvalidTokenRange.into());
         };
         match self.view.get_or_create_token(kind, pos, end, parent, flags) {
             Ok(token) => Ok(token.id()),
             // Upstream's two token-cache panics.
-            Err(ts_arena::Error::TokenKindMismatch { cached, requested }) => {
+            Err(tsr_arena::Error::TokenKindMismatch { cached, requested }) => {
                 Err(Error::Assertion(format!(
                     "Token cache mismatch: {} != {}",
                     kind_name(NodeKind::from_raw(cached as i16)),
                     kind_name(NodeKind::from_raw(requested as i16))
                 )))
             }
-            Err(ts_arena::Error::ReparsedParent) => Err(Error::Assertion(format!(
+            Err(tsr_arena::Error::ReparsedParent) => Err(Error::Assertion(format!(
                 "Cannot create token from reparsed node of kind {}",
                 kind_name(self.node(parent)?.kind())
             ))),
@@ -328,8 +328,8 @@ impl<'a, 'p> Navigator<'a, 'p> {
             false,
             Some(&|node: &NodeRead<'_>| {
                 utilities::is_property_name_literal(node)
-                    || ts_ast::is_keyword_kind(node.kind())
-                    || ts_ast::is_private_identifier(node)
+                    || tsr_ast::is_keyword_kind(node.kind())
+                    || tsr_ast::is_private_identifier(node)
             }),
         )
     }
@@ -391,7 +391,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
     /// token between its children that only the scanner can produce.
     fn scan_for_token(&mut self, current: NodeId, search: &TokenAt<'_>) -> Result<NodeId, Error> {
         let current_kind = self.node(current)?.kind();
-        if ts_ast::is_token_kind(current_kind) || self.should_skip_child(current)? {
+        if tsr_ast::is_token_kind(current_kind) || self.should_skip_child(current)? {
             return Ok(current);
         }
         let mut end = self.end(current)?;
@@ -404,7 +404,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
         let jsx_child = utilities::is_jsx_child(&self.node(current)?);
         let view = self.view;
         let file = view.source_file(self.source)?;
-        let mut scanner = ts_scanner::get_scanner_for_source_file(&file, search.left);
+        let mut scanner = tsr_scanner::get_scanner_for_source_file(&file, search.left);
         let mut left = search.left;
         while left < end {
             let token = scan_navigation_token(&mut scanner, jsx_child);
@@ -420,7 +420,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
                 break;
             }
             if start <= search.position && search.position < token_end {
-                if token == K::Identifier || !ts_ast::is_token_kind(token.into()) {
+                if token == K::Identifier || !tsr_ast::is_token_kind(token.into()) {
                     if utilities::is_js_doc_kind(current_kind) {
                         return Ok(current);
                     }
@@ -728,7 +728,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
                 let jsx_child = utilities::is_jsx_child(&self.node(n)?);
                 let view = self.view;
                 let file = view.source_file(self.source)?;
-                let mut scanner = ts_scanner::get_scanner_for_source_file(&file, start_pos);
+                let mut scanner = tsr_scanner::get_scanner_for_source_file(&file, start_pos);
                 let mut tokens: Vec<NodeId> = Vec::new();
                 for &visited in &rightmost_visited {
                     // Trailing tokens that occur before this node.
@@ -790,7 +790,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
         loop {
             {
                 let node = self.node(n)?;
-                if ts_ast::is_token_kind(node.kind()) && i64::from(node.pos()) == previous_end {
+                if tsr_ast::is_token_kind(node.kind()) && i64::from(node.pos()) == previous_end {
                     // A token that starts where the previous one ends.
                     return Ok(Some(n));
                 }
@@ -839,7 +839,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
             if previous_end >= self.pos(n)? && previous_end < self.end(n)? {
                 let view = self.view;
                 let file = view.source_file(self.source)?;
-                let scanner = ts_scanner::get_scanner_for_source_file(&file, previous_end);
+                let scanner = tsr_scanner::get_scanner_for_source_file(&file, previous_end);
                 let (token, full_start) = (scanner.token(), scanner.token_full_start());
                 // Compared on the full start, which includes leading trivia, as
                 // a node's position does.
@@ -885,7 +885,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
         }
         let view = self.view;
         let file = view.source_file(self.source)?;
-        let mut scanner = ts_scanner::get_scanner_for_source_file(&file, last_node_pos);
+        let mut scanner = tsr_scanner::get_scanner_for_source_file(&file, last_node_pos);
         for node in children {
             if self.reparsed(node)? {
                 continue;
@@ -930,7 +930,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
 
 // port: tsc/internal/astnav/tokens.go:scanNavigationToken
 // port: tsc/internal/astnav/tokens.go:shouldRescanLessThanLessThanToken
-fn scan_navigation_token(scanner: &mut ts_scanner::Scanner<'_>, jsx_child: bool) -> K {
+fn scan_navigation_token(scanner: &mut tsr_scanner::Scanner<'_>, jsx_child: bool) -> K {
     let token = scanner.token();
     if token == K::LessThanLessThanToken && jsx_child {
         return scanner.rescan_jsx_token(true);

@@ -5,9 +5,9 @@ use crate::{
     node_check_flags as nc, object_flags as of, type_flags as tf, CheckerState, Error, LinkStore,
     TypeAlias, TypeId, TypeSystemEntity, TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{check_flags, node_flags as nf, symbol_flags as sf, SymbolFlags, SyntaxKind as K};
-use ts_jsstring::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{check_flags, node_flags as nf, symbol_flags as sf, SymbolFlags, SyntaxKind as K};
+use tsr_jsstring::JsString;
 
 #[derive(Default)]
 pub(crate) struct QueryState {
@@ -32,7 +32,7 @@ pub(crate) struct QueryState {
     pub unused_checks: crate::types::Map<NodeId, Result<(), Error>>,
     /// `Checker.renamedBindingElementsInTypes`.
     pub renamed_binding_elements_in_types: Vec<NodeId>,
-    pub scope_changes: LinkStore<NodeId, ts_core::Tristate>,
+    pub scope_changes: LinkStore<NodeId, tsr_core::Tristate>,
     /// The union/intersection slice of deferredSymbolLinks.constituents. The containing
     /// type lives in valueSymbolLinks; no owning references back to the checker.
     pub deferred_property_write_types: LinkStore<SymbolId, Option<crate::TypeList>>,
@@ -108,7 +108,7 @@ impl CheckerState {
         }
         if read.kind() == K::SourceFile {
             let source = self.source_file_read(node)?;
-            return if ts_ast::utilities::is_external_or_common_js_module(&source) {
+            return if tsr_ast::utilities::is_external_or_common_js_module(&source) {
                 self.get_symbol_of_declaration(node)
             } else {
                 Ok(None)
@@ -136,7 +136,7 @@ impl CheckerState {
                 )
             {
                 if let Some(declaration) = parent_read.parent() {
-                    if ts_ast::is_declaration(&self.node(declaration)?) {
+                    if tsr_ast::is_declaration(&self.node(declaration)?) {
                         return self.get_symbol_of_declaration(declaration);
                     }
                 }
@@ -202,8 +202,8 @@ impl CheckerState {
                 self.symbol_at_literal_location(node)
             }
             Some(K::ThisKeyword | K::Identifier) => {
-                let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
-                if ts_ast::utilities::is_function_like(Some(&self.node(container)?)) {
+                let container = tsr_ast::get_this_container(self.ast(node)?, node, false, false)?;
+                if tsr_ast::utilities::is_function_like(Some(&self.node(container)?)) {
                     let signature = self.signature_from_declaration(container)?;
                     if let Some(this_parameter) = self.signatures.get(signature)?.this_parameter {
                         return Ok(Some(this_parameter));
@@ -488,7 +488,7 @@ impl CheckerState {
             let name = self.symbol_to_string(symbol)?;
             self.error_at(
                 Some(error_node),
-                ts_diagnostics::Type_alias_0_circularly_references_itself,
+                tsr_diagnostics::Type_alias_0_circularly_references_itself,
                 vec![name],
             )?;
             ty = self.builtins.error_type;
@@ -570,7 +570,7 @@ impl CheckerState {
                 let literal = required(
                     read.data_source()
                         .as_literal_type_node()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .literal(),
                     "literal type",
                 )?;
@@ -729,12 +729,12 @@ impl CheckerState {
             if is_union {
                 read.data_source()
                     .as_union_type_node()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .types()
             } else {
                 read.data_source()
                     .as_intersection_type_node()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .types()
             },
             "compound types",
@@ -822,13 +822,13 @@ impl CheckerState {
             Some(K::NumericLiteral) => {
                 self.check_grammar_numeric_literal(node)?;
                 let text = self.node_text(node)?;
-                self.get_number_literal_type(ts_jsnum::from_string(text.as_bytes()))?
+                self.get_number_literal_type(tsr_jsnum::from_string(text.as_bytes()))?
             }
             Some(K::BigIntLiteral) => {
                 self.check_grammar_big_int_literal(node)?;
                 let text = self.node_text(node)?;
-                self.get_big_int_literal_type(ts_jsnum::PseudoBigInt::new(
-                    &ts_jsnum::parse_pseudo_big_int(text.as_bytes()),
+                self.get_big_int_literal_type(tsr_jsnum::PseudoBigInt::new(
+                    &tsr_jsnum::parse_pseudo_big_int(text.as_bytes()),
                     false,
                 ))?
             }
@@ -914,19 +914,19 @@ impl CheckerState {
         let literal = read
             .data_source()
             .as_numeric_literal()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         // The scanner's normalized text can itself acquire a decimal point.
         // Fractional spelling is determined from the original source bytes.
-        if literal.token_flags() & ts_ast::token_flags::SCIENTIFIC != 0
-            || ts_scanner::get_text_of_node(view, node)?
+        if literal.token_flags() & tsr_ast::token_flags::SCIENTIFIC != 0
+            || tsr_scanner::get_text_of_node(view, node)?
                 .as_bytes()
                 .contains(&b'.')
-            || ts_jsnum::from_string(view.node_text(node)?.as_bytes()).value()
+            || tsr_jsnum::from_string(view.node_text(node)?.as_bytes()).value()
                 <= 9_007_199_254_740_991.0
         {
             return Ok(());
         }
-        let diagnostic = self.diagnostic_for_node(Some(node), ts_diagnostics::Numeric_literals_with_absolute_values_equal_to_2_53_or_greater_are_too_large_to_be_represented_accurately_as_integers, Vec::new())?;
+        let diagnostic = self.diagnostic_for_node(Some(node), tsr_diagnostics::Numeric_literals_with_absolute_values_equal_to_2_53_or_greater_are_too_large_to_be_represented_accurately_as_integers, Vec::new())?;
         self.add_suggestion_diagnostic(diagnostic)?;
         Ok(())
     }
@@ -950,14 +950,14 @@ impl CheckerState {
         };
         if !literal_type
             && read.flags() & nf::AMBIENT == 0
-            && self.program()?.host.options().emit_script_target() < ts_core::ScriptTarget::ES2020
+            && self.program()?.host.options().emit_script_target() < tsr_core::ScriptTarget::ES2020
         {
             let source = required(
-                ts_ast::utilities::get_source_file_of_node(view, Some(node))?,
+                tsr_ast::utilities::get_source_file_of_node(view, Some(node))?,
                 "bigint source",
             )?;
             if view.source_file(source)?.diagnostics().is_empty() {
-                self.error_at(Some(node), ts_diagnostics::BigInt_literals_are_not_available_when_targeting_lower_than_ES2020, Vec::new())?;
+                self.error_at(Some(node), tsr_diagnostics::BigInt_literals_are_not_available_when_targeting_lower_than_ES2020, Vec::new())?;
             }
         }
         Ok(())
@@ -1073,7 +1073,7 @@ impl CheckerState {
         let declaration = required(read.value_declaration(), "value declaration")?;
         if self.node(declaration)?.kind() == K::SourceFile {
             let source = self.source_file_read(declaration)?;
-            if source.script_kind == ts_core::ScriptKind::JSON {
+            if source.script_kind == tsr_core::ScriptKind::JSON {
                 let statements =
                     self.source_list(declaration, self.node(declaration)?.statement_list())?;
                 let ty = if let Some(&statement) = statements.first() {
@@ -1236,7 +1236,7 @@ impl CheckerState {
 
 // port: tsc/internal/ast/utilities.go:IsInExpressionContext
 pub(crate) fn is_in_expression_context(
-    view: ts_ast::AstView<'_>,
+    view: tsr_ast::AstView<'_>,
     node: NodeId,
 ) -> Result<bool, Error> {
     let Some(parent) = view.node(node)?.parent() else {
@@ -1274,7 +1274,7 @@ pub(crate) fn is_in_expression_context(
             let data = read
                 .data_source()
                 .as_for_statement()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             data.initializer() == Some(node)
                 && view.node(node)?.kind() != K::VariableDeclarationList
                 || data.condition() == Some(node)
@@ -1303,7 +1303,7 @@ pub(crate) fn is_in_expression_context(
 }
 
 // port: tsc/internal/ast/utilities.go:IsExpressionNode
-pub(crate) fn is_expression_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+pub(crate) fn is_expression_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     Ok(match read.kind().known() {
         Some(
@@ -1425,7 +1425,7 @@ pub(crate) fn is_expression_node(view: ts_ast::AstView<'_>, node: NodeId) -> Res
 }
 
 // port: tsc/internal/ast/utilities.go:IsPartOfTypeNode
-fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
+fn part_of_type_node(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     let kind = read.kind();
     // The kind range only; `ExpressionWithTypeArguments` is decided by its parent below.
@@ -1456,7 +1456,7 @@ fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Er
                 let heritage = view.node(parent)?;
                 let class_extends = heritage.parent().is_some_and(|grand| {
                     view.node(grand)
-                        .is_ok_and(|read| ts_ast::utilities::is_class_like(&read))
+                        .is_ok_and(|read| tsr_ast::utilities::is_class_like(&read))
                 }) && heritage
                     .data_source()
                     .as_heritage_clause()
@@ -1471,7 +1471,7 @@ fn part_of_type_node(view: ts_ast::AstView<'_>, node: NodeId) -> Result<bool, Er
 
 // port: tsc/internal/ast/utilities.go:IsThisInTypeQuery
 pub(crate) fn is_this_in_type_query(
-    view: ts_ast::AstView<'_>,
+    view: tsr_ast::AstView<'_>,
     node: NodeId,
 ) -> Result<bool, Error> {
     let read = view.node(node)?;

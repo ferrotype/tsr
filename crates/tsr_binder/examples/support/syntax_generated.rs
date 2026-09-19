@@ -3,7 +3,7 @@ use super::{hex, json, Graph, NodeDataRead, Value};
 impl Graph<'_> {
     pub(super) fn syntax_fields(
         &mut self,
-        node: &(impl ts_ast::NodeAccess + ?Sized),
+        node: &(impl tsr_ast::NodeAccess + ?Sized),
     ) -> (&'static str, Vec<Value>) {
         match node.data() {
             NodeDataRead::Token(data) => {

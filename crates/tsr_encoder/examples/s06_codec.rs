@@ -1,4 +1,4 @@
-//! S06 component adapter; parser requests use ts_parser's E1 example.
+//! S06 component adapter; parser requests use tsr_parser's E1 example.
 #[path = "support/component.rs"]
 mod component;
 #[path = "support/protocol.rs"]

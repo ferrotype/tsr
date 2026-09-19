@@ -3,12 +3,12 @@
 mod graph;
 #[path = "support/graph_stream.rs"]
 mod graph_stream;
-#[path = "../../ts_encoder/examples/support/protocol.rs"]
+#[path = "../../tsr_encoder/examples/support/protocol.rs"]
 mod protocol;
 use protocol::{fields, unhex, Session};
 use serde_json::{json, Value};
-use ts_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 fn validate(request: &Value) -> Result<(), String> {
     fields(
         request,
@@ -62,9 +62,9 @@ fn execute(s: &Session, r: &Value) {
                 force: r["force"].as_bool().unwrap(),
             },
         };
-        parsed = Some(ts_parser::parse_source_file(
+        parsed = Some(tsr_parser::parse_source_file(
             source,
-            ts_core::ScriptKind(r["script_kind"].as_i64().unwrap() as i32),
+            tsr_core::ScriptKind(r["script_kind"].as_i64().unwrap() as i32),
             options,
         ));
         Ok(())
@@ -79,7 +79,7 @@ fn execute(s: &Session, r: &Value) {
     let mut bound = None;
     if !s.stage("bind", || {
         bound =
-            Some(ts_binder::bind_source_file(&file, source).map_err(|error| error.to_string())?);
+            Some(tsr_binder::bind_source_file(&file, source).map_err(|error| error.to_string())?);
         Ok(())
     }) {
         return;
@@ -89,7 +89,7 @@ fn execute(s: &Session, r: &Value) {
     graph_stream::dump(s, "bound_graph", view.ast(), source, Some(view.result()));
     s.stage("bound_graph", || Ok(()));
     if !s.stage("repeat_bind", || {
-        ts_binder::bind_source_file(&file, source).map_err(|error| error.to_string())?;
+        tsr_binder::bind_source_file(&file, source).map_err(|error| error.to_string())?;
         Ok(())
     }) {
         return;

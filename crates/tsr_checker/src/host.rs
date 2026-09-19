@@ -2,7 +2,7 @@
 //! in `tsc/internal/checker/checker.go`; `Host` is
 //! `modulespecifiers.ModuleSpecifierGenerationHost`).
 //!
-//! The trait lives here, below `ts_compiler`, and the compiler implements it over
+//! The trait lives here, below `tsr_compiler`, and the compiler implements it over
 //! its loader (plan §3). Only members whose types already exist below the
 //! compiler are in the trait. The rest are P2 obligations, listed so none of them
 //! is quietly given a default:
@@ -12,7 +12,7 @@
 //! | `Options`, `SourceFiles`, `FileExists`, `GetSourceFile`, `IsSourceFileDefaultLibrary`, `CommonSourceDirectory`, `GetCurrentDirectory`, `UseCaseSensitiveFileNames` | In the trait; the loader already has the data |
 //! | `GetSourceFileForResolvedModule`, `GetResolvedModule`, `GetEmitModuleFormatOfFile`, `GetImpliedNodeFormatForEmit`, `GetEmitSyntaxForUsageLocation`, `GetModeForUsageLocation`, `GetDefaultResolutionModeForFile`, `SourceFileMayBeEmitted` | Implemented by the compiler's retained program adapter |
 //! | `BindSourceFiles` | Satisfied by construction: program files are `CompletedFile`s |
-//! | `GetSourceFileMetaData` | In the trait; metadata lives in `ts_ast`, as upstream |
+//! | `GetSourceFileMetaData` | In the trait; metadata lives in `tsr_ast`, as upstream |
 //! | `GetResolvedModules`, `GetPackagesMap` | P2: whole-map views; add when a caller in the closure needs them |
 //! | `GetJSXRuntimeImportSpecifier` | JSX remains outside the frozen denominator |
 //! | `GetImportHelpersImportSpecifier` | P4: checker consumes the synthetic import as its retained `tslib` reference and host-computed import resolution mode; no synthetic syntax escapes the compiler |
@@ -23,12 +23,12 @@
 
 use crate::Error;
 use std::sync::Arc;
-use ts_arena::NodeId;
-use ts_ast::{CompletedFile, SourceFileMetaData};
-use ts_core::{CompilerOptions, ModuleKind, ResolutionMode};
-use ts_jsstring::JsString;
-use ts_module::ResolvedModule;
-use ts_tsoptions::ParsedCommandLine;
+use tsr_arena::NodeId;
+use tsr_ast::{CompletedFile, SourceFileMetaData};
+use tsr_core::{CompilerOptions, ModuleKind, ResolutionMode};
+use tsr_jsstring::JsString;
+use tsr_module::ResolvedModule;
+use tsr_tsoptions::ParsedCommandLine;
 
 /// One spelling supplied by GetEachFileNameOfModule, before proximity sorting.
 #[derive(Clone, Debug)]
@@ -44,7 +44,7 @@ pub trait CheckerHost: Send + Sync {
     fn source_file_count(&self) -> usize;
     /// Program order; the checker's file index map and node ordering follow it.
     fn source_file(&self, index: usize) -> &CompletedFile;
-    fn file_exists(&self, file_name: &[u8]) -> Result<bool, ts_vfs::Error>;
+    fn file_exists(&self, file_name: &[u8]) -> Result<bool, tsr_vfs::Error>;
     fn get_source_file(&self, file_name: &[u8]) -> Option<&CompletedFile>;
     fn get_source_file_for_resolved_module(&self, file_name: &[u8]) -> Option<&CompletedFile>;
     fn get_emit_module_format_of_file(&self, file_name: &[u8]) -> Result<ModuleKind, Error>;
@@ -80,10 +80,10 @@ pub trait CheckerHost: Send + Sync {
     /// use when the file carries lazy JSDoc.
     fn jsdoc(
         &self,
-        view: ts_ast::AstView<'_>,
+        view: tsr_ast::AstView<'_>,
         source: NodeId,
         parent: NodeId,
-    ) -> Result<ts_ast::JSDocRoots, Error>;
+    ) -> Result<tsr_ast::JSDocRoots, Error>;
     fn source_file_may_be_emitted(
         &self,
         file: &CompletedFile,
@@ -112,7 +112,7 @@ pub trait CheckerHost: Send + Sync {
     fn get_package_json_info(
         &self,
         file: &[u8],
-    ) -> Result<Option<Arc<ts_module::PackageJson>>, Error>;
+    ) -> Result<Option<Arc<tsr_module::PackageJson>>, Error>;
     fn get_nearest_ancestor_directory_with_package_json(
         &self,
         dir: &[u8],

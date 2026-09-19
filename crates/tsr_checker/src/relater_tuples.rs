@@ -3,8 +3,8 @@ use crate::{
     relater::{Relater, RelationKind, BOTH},
     ternary as tr, type_flags as tf, Error, Ternary, TypeId,
 };
-use ts_ast::JsString;
-use ts_diagnostics as messages;
+use tsr_ast::JsString;
+use tsr_diagnostics as messages;
 
 impl Relater<'_> {
     // port: tsc/internal/checker/relater.go:Relater.propertiesRelatedTo
@@ -13,7 +13,7 @@ impl Relater<'_> {
         source: TypeId,
         target: TypeId,
         intersection: u32,
-        excluded: &[ts_ast::JsString],
+        excluded: &[tsr_ast::JsString],
     ) -> Result<Ternary, Error> {
         let source_tuple = self.checker.is_tuple_type(source)?;
         let target_data = self

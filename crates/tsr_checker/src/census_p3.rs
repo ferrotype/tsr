@@ -5,7 +5,7 @@ use super::Census;
 use crate::CheckerState;
 
 impl Census {
-    pub(crate) fn diagnostic(&mut self, value: &ts_ast::Diagnostic) {
+    pub(crate) fn diagnostic(&mut self, value: &tsr_ast::Diagnostic) {
         for text in [&value.source, &value.message_text, &value.message_key] {
             self.text("diagnostics", text);
         }
@@ -27,7 +27,7 @@ impl Census {
                     self.add(
                         "diagnostics",
                         0,
-                        super::ARC_HEADER + size_of::<ts_ast::Diagnostic>(),
+                        super::ARC_HEADER + size_of::<tsr_ast::Diagnostic>(),
                     );
                     self.diagnostic(diagnostic);
                 }

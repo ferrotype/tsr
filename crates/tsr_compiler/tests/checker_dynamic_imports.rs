@@ -2,12 +2,12 @@
 //! Nested property/signature displays remain part of the separate full comparison.
 use serde_json::{json, Value};
 use std::{fmt::Write as _, sync::Arc};
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId};
-use ts_ast::{Diagnostic, SyntaxKind as K};
-use ts_checker::CheckerOwner;
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
+use tsr_ast::{Diagnostic, SyntaxKind as K};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 
 fn hex(bytes: &[u8]) -> String {
     let mut text = String::new();
@@ -107,13 +107,13 @@ fn dynamic_import_result_types_and_diagnostics_match_native() {
         let id = request["id"].as_str().unwrap();
         let counters = Counters::new();
         let generation = Generation::new(&counters);
-        let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
         for (name, source) in request["files"].as_object().unwrap() {
             fs.insert_loaded(name.as_bytes(), source.as_str().unwrap().as_bytes());
         }
         let libraries = case["options"]["noLib"] == false;
-        let host: Arc<dyn ts_vfs::FileSystem> = if libraries {
-            Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish())))
+        let host: Arc<dyn tsr_vfs::FileSystem> = if libraries {
+            Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish())))
         } else {
             Arc::new(fs.finish())
         };
@@ -126,7 +126,7 @@ fn dynamic_import_result_types_and_diagnostics_match_native() {
         let program = Arc::new(
             Program::load(
                 ProgramOptions {
-                    config: ts_tsoptions::ParsedCommandLine::new(
+                    config: tsr_tsoptions::ParsedCommandLine::new(
                         CompilerOptions {
                             target: ScriptTarget::ESNEXT,
                             module,
@@ -158,7 +158,7 @@ fn dynamic_import_result_types_and_diagnostics_match_native() {
                     host,
                     current_directory: JsString::from_bytes(b"/".as_slice()),
                     default_library_path: JsString::from_bytes(if libraries {
-                        ts_bundled::LIB_PATH
+                        tsr_bundled::LIB_PATH
                     } else {
                         b"/no-default-lib"
                     }),
@@ -198,8 +198,8 @@ fn dynamic_import_result_types_and_diagnostics_match_native() {
                 other => panic!("unsupported query target {other}"),
             };
             let ty = op.get_type_at_location(node).unwrap();
-            let flags = ts_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
-                | ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE;
+            let flags = tsr_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
+                | tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE;
             let actual = op.type_to_string(ty, flags).unwrap();
             assert_eq!(
                 hex(actual.as_bytes()),

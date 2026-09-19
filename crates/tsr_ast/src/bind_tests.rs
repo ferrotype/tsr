@@ -7,9 +7,9 @@ use std::{
     },
     thread,
 };
-use ts_arena::{Counters, Error};
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, Error};
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn make_parsed(counters: &Counters, name: &[u8]) -> (ParsedFile, NodeId, NodeId) {
     let text = SourceText::from_loaded_bytes(&b"x"[..]);
@@ -34,7 +34,7 @@ fn make_parsed(counters: &Counters, name: &[u8]) -> (ParsedFile, NodeId, NodeId)
         .set_parent(Some(source));
     (builder.complete(source).unwrap(), source, child)
 }
-fn declare(builder: &mut BindBuilder<'_>, child: NodeId) -> Result<ts_arena::SymbolId, Error> {
+fn declare(builder: &mut BindBuilder<'_>, child: NodeId) -> Result<tsr_arena::SymbolId, Error> {
     let declarations = builder.declarations_mut().alloc(vec![Some(child)])?;
     let mut symbol = Symbol::new(
         symbol_flags::FUNCTION_SCOPED_VARIABLE,
@@ -330,7 +330,7 @@ fn exclusive_inline_bindings_preserve_presence_ids_and_shape_changes() {
 fn exclusive_legacy_binding_mut_keeps_foreign_id_validation_deferred() {
     let counters = Counters::new();
     let (parsed, _, child) = make_parsed(&counters, b"/deferred-binding.ts");
-    let mut foreign = ts_arena::SymbolArena::new(&counters);
+    let mut foreign = tsr_arena::SymbolArena::new(&counters);
     let symbol = foreign.push(Symbol::new(symbol_flags::FUNCTION, JsString::default()));
     let result = parsed.bind_and_publish(|builder| {
         assert_eq!(
@@ -593,7 +593,7 @@ fn binding_rejects_foreign_symbol_flow_and_ast_edges_before_publication() {
     let counters = Counters::new();
     let (foreign, _, foreign_node) = make_parsed(&counters, b"/foreign.ts");
     let _foreign = foreign.publish_unbound();
-    let mut symbols = ts_arena::SymbolArena::new(&counters);
+    let mut symbols = tsr_arena::SymbolArena::new(&counters);
     let foreign_symbol = symbols.push(Symbol::default());
     let mut flows = FlowNodes::new(&counters);
     let foreign_flow = flows.push(FlowNode::default());
@@ -694,7 +694,7 @@ fn bound_mapped_reads_and_retention_select_the_target_sources_completed_overlay(
             builder.diagnostics_mut().push(Diagnostic::new(
                 Some(b),
                 TextRange::new(0, 1),
-                ts_diagnostics::Identifier_expected,
+                tsr_diagnostics::Identifier_expected,
                 vec![],
             ));
             Ok(())

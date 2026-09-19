@@ -1,5 +1,5 @@
 use std::fmt::Write;
-use ts_jsnum::{from_string, parse_pseudo_big_int, Number};
+use tsr_jsnum::{from_string, parse_pseudo_big_int, Number};
 
 #[test]
 fn number_grammar_keeps_sign_radix_and_whitespace_distinct() {

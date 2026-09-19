@@ -1,10 +1,10 @@
 //! Import-type mode selection and portability diagnostics. Path ranking stays
 //! in the shared module-specifier generator over the retained program host.
 use crate::{node_builder::NodeBuilder, Error};
-use ts_ast::{FactoryMethods, JsString, NodeId, SymbolId, SyntaxKind as K};
-use ts_core::{ModuleKind, ModuleResolutionKind, ResolutionMode as Mode};
-use ts_nodebuilder::flags as nf;
-use ts_printer::emit_resolver::DeclarationTrackerEvent as Event;
+use tsr_ast::{FactoryMethods, JsString, NodeId, SymbolId, SyntaxKind as K};
+use tsr_core::{ModuleKind, ModuleResolutionKind, ResolutionMode as Mode};
+use tsr_nodebuilder::flags as nf;
+use tsr_printer::emit_resolver::DeclarationTrackerEvent as Event;
 
 fn through_node_modules(specifier: &JsString) -> bool {
     specifier
@@ -135,7 +135,7 @@ impl NodeBuilder<'_> {
                 let mut found = None;
                 while let Some(id) = current {
                     let read = view.node(id)?;
-                    if ts_ast::utilities_middle::is_require_call(view, &read, true)?
+                    if tsr_ast::utilities_middle::is_require_call(view, &read, true)?
                         || crate::external_resolution::is_import_call(view, &read)?
                     {
                         found = self
@@ -229,9 +229,9 @@ impl NodeBuilder<'_> {
             };
             let value = value.clone();
             self.approximate_length += name.len() + value.len() + 4;
-            let name = if ts_scanner::is_identifier_text(
+            let name = if tsr_scanner::is_identifier_text(
                 name.as_bytes(),
-                ts_core::LanguageVariant::STANDARD,
+                tsr_core::LanguageVariant::STANDARD,
             ) {
                 self.ast.new_identifier(name)
             } else {

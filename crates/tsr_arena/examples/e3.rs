@@ -1,5 +1,5 @@
 use serde_json::{json, Map, Value};
-use ts_arena::scenarios::Scenario;
+use tsr_arena::scenarios::Scenario;
 
 fn report(scenarios: &[Scenario]) -> Value {
     let mut metrics = Map::new();
@@ -52,13 +52,13 @@ fn report(scenarios: &[Scenario]) -> Value {
 }
 
 fn main() {
-    println!("{}", report(&ts_arena::scenarios::ALL));
+    println!("{}", report(&tsr_arena::scenarios::ALL));
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::scenarios::Measurement;
+    use tsr_arena::scenarios::Measurement;
 
     fn succeeds() -> Measurement {
         Measurement {

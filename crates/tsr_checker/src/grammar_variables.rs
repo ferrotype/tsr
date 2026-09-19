@@ -1,9 +1,9 @@
 //! Variable and ambient-source grammar, preserving the pin's early returns.
 use crate::{type_flags as tf, CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
-use ts_jsstring::JsString;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
+use tsr_jsstring::JsString;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarVariableDeclaration
@@ -12,7 +12,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_variable_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let name = data.name().ok_or(Error::MissingLink("variable name"))?;
         let initializer = data.initializer();
         let annotation = read.type_node();
@@ -23,7 +23,7 @@ impl CheckerState {
             .node(parent)?
             .parent()
             .ok_or(Error::MissingLink("variable statement"))?;
-        let flags = ts_ast::utilities::get_combined_node_flags(self.ast(node)?, node)?;
+        let flags = tsr_ast::utilities::get_combined_node_flags(self.ast(node)?, node)?;
         let block = flags & nf::BLOCK_SCOPED;
         let pattern = self.is_binding_pattern(name)?;
         let keyword = match block {
@@ -78,7 +78,7 @@ impl CheckerState {
                 return self.grammar_error_node(exclamation, message, vec![]);
             }
         }
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("variable source"))?;
         let filename = self
             .ast(source)?
@@ -90,7 +90,7 @@ impl CheckerState {
             .program()?
             .host
             .get_emit_module_format_of_file(filename.as_bytes())?
-            < ts_core::ModuleKind::SYSTEM
+            < tsr_core::ModuleKind::SYSTEM
             && self.node(statement)?.flags() & nf::AMBIENT == 0
             && self
                 .ast(statement)?
@@ -157,7 +157,7 @@ impl CheckerState {
         let annotation = read.type_node();
         let constant = read.modifier_flags(self.ast(node)?)? & mf::READONLY != 0
             || read.kind() == K::VariableDeclaration
-                && ts_ast::utilities::is_var_const_like(self.ast(node)?, node)?;
+                && tsr_ast::utilities::is_var_const_like(self.ast(node)?, node)?;
         // Even invalid non-const declarations resolve the initializer's enum
         // reference first; the native helper can emit a name error here.
         let literal = self.initializer_literal(initializer, true)?;
@@ -191,7 +191,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_prefix_unary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let kind = self
                     .ast(node)?
                     .node(
@@ -216,7 +216,7 @@ impl CheckerState {
                 data.argument_expression()
                     .ok_or(Error::MissingLink("ambient enum argument"))?,
                 false,
-            )? && ts_ast::is_entity_name_expression(
+            )? && tsr_ast::is_entity_name_expression(
                 self.ast(node)?,
                 data.expression()
                     .ok_or(Error::MissingLink("ambient enum expression"))?,
@@ -246,7 +246,7 @@ impl CheckerState {
             .collect();
         for node in statements {
             let read = self.node(node)?;
-            if !ts_ast::is_declaration_node(&read) && read.kind() != K::VariableStatement {
+            if !tsr_ast::is_declaration_node(&read) && read.kind() != K::VariableStatement {
                 continue;
             }
             if matches!(

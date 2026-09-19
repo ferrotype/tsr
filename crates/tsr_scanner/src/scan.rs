@@ -3,10 +3,10 @@ use crate::trivia::{is_conflict_marker_trivia, scan_conflict_marker_trivia};
 use crate::utilities::{is_digit, is_line_break, is_white_space_single_line};
 use crate::{IdentifierVariant, Scanner, TokenValue};
 use std::sync::Arc;
-use ts_ast::{token_flags as flags, CommentDirective, CommentDirectiveKind, SyntaxKind};
-use ts_core::{LanguageVariant, TextRange};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::RUNE_ERROR;
+use tsr_ast::{token_flags as flags, CommentDirective, CommentDirectiveKind, SyntaxKind};
+use tsr_core::{LanguageVariant, TextRange};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::RUNE_ERROR;
 
 impl Scanner<'_> {
     pub(crate) fn take_token(&mut self, token: SyntaxKind, width: i64) -> SyntaxKind {

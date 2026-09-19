@@ -144,7 +144,7 @@ fn last_rune_follows_go_standard_decoding() {
 #[test]
 fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
     use crate::{EmitContext, Printer, PrinterOptions};
-    use ts_ast::{AstBuilder, FactoryMethods, JsString, SyntaxKind as K};
+    use tsr_ast::{AstBuilder, FactoryMethods, JsString, SyntaxKind as K};
     struct StackWriter {
         writer: TextWriter,
         greatest_remaining: usize,
@@ -185,7 +185,7 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
             assert!(!self.panic_on_keyword, "writer panic after stack growth");
             self.writer.write_keyword(text);
         }
-        fn write_symbol(&mut self, text: &[u8], symbol: Option<ts_ast::SymbolId>) {
+        fn write_symbol(&mut self, text: &[u8], symbol: Option<tsr_ast::SymbolId>) {
             self.observe_stack();
             self.writer.write_symbol(text, symbol);
         }
@@ -233,12 +233,12 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
     std::thread::Builder::new()
         .stack_size(STACK)
         .spawn(|| {
-            let counters = ts_arena::Counters::new();
+            let counters = tsr_arena::Counters::new();
             let before = counters.snapshot();
             {
                 let emit = EmitContext::new();
                 let mut ast = AstBuilder::new(
-                    ts_jsstring::SourceText::from_bytes(b"".as_slice()),
+                    tsr_jsstring::SourceText::from_bytes(b"".as_slice()),
                     &counters,
                 );
                 let mut typ = ast.new_keyword_type_node(K::StringKeyword.into());
@@ -254,7 +254,7 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                     let element = ast.new_binding_element(None, None, Some(binding), None);
                     let nodes = ast.node_slice(vec![Some(element)]).unwrap();
                     let elements = ast
-                        .new_list(ts_core::TextRange::new(-1, -1), nodes)
+                        .new_list(tsr_core::TextRange::new(-1, -1), nodes)
                         .unwrap();
                     binding =
                         ast.new_binding_pattern(K::ArrayBindingPattern.into(), Some(elements));

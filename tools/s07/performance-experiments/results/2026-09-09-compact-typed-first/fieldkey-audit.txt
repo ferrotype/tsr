@@ -8,14 +8,14 @@ FieldKey hash_one stack union: 423 ms, 5.1806% of target sampled CPU.
 This union already includes the 258 ms nested DefaultHasher::write self samples; do not add them again.
 The other 165 ms are hash_one self samples. Sampling observations are not invocation counts.
 Top displayed caller chains after FieldKey hash_one:
-  104 ms: <ts_ast::compact::PackingContext>::encode_node -> <ts_ast::compact_generated::AstPayloadStore>::insert -> <ts_ast::storage::AstBuilder>::new_node_before_hook
-  104 ms: <ts_ast::compact::PackingContext>::encode_node -> <ts_ast::storage::AstBuilder as ts_ast::factory::Factory>::set_node_parent -> <ts_parser::state::Parser<ts_ast::storage::AstBuilder>>::override_parent_in_immediate_children
-  59 ms: <ts_ast::compact::PackingContext>::encode_flow -> <ts_ast::compact::binding::BindingWrite>::store -> <ts_ast::bind_result::BindBuilder>::set_binding_field
-  55 ms: <ts_ast::compact::PackingContext>::encode_aux -> <ts_ast::compact_generated::AstPayloadStore>::insert -> <ts_ast::storage::AstBuilder>::new_node_before_hook
-  34 ms: <ts_ast::compact_generated::AstPayloadStore>::insert -> <ts_ast::storage::AstBuilder>::new_node_before_hook -> <ts_ast::storage::AstBuilder as ts_ast::factory::Factory>::new_node
-  19 ms: <ts_ast::compact::PackingContext>::encode_symbol -> <ts_ast::compact::binding::BindingWrite>::store -> <ts_ast::bind_result::BindBuilder>::set_binding_field
-  8 ms: <ts_ast::compact::PackingContext>::encode_node -> <ts_ast::storage::AstBuilder as ts_ast::factory::Factory>::set_node_parent -> <ts_parser::state::Parser<ts_ast::storage::AstBuilder>>::unparse_expression_with_type_arguments
-  4 ms: <ts_ast::storage::AstBuilder as ts_ast::factory::Factory>::set_node_parent -> <ts_parser::state::Parser<ts_ast::storage::AstBuilder>>::override_parent_in_immediate_children -> <ts_parser::state::Parser<ts_ast::storage::AstBuilder>>::parse_call_expression_rest
+  104 ms: <tsr_ast::compact::PackingContext>::encode_node -> <tsr_ast::compact_generated::AstPayloadStore>::insert -> <tsr_ast::storage::AstBuilder>::new_node_before_hook
+  104 ms: <tsr_ast::compact::PackingContext>::encode_node -> <tsr_ast::storage::AstBuilder as tsr_ast::factory::Factory>::set_node_parent -> <tsr_parser::state::Parser<tsr_ast::storage::AstBuilder>>::override_parent_in_immediate_children
+  59 ms: <tsr_ast::compact::PackingContext>::encode_flow -> <tsr_ast::compact::binding::BindingWrite>::store -> <tsr_ast::bind_result::BindBuilder>::set_binding_field
+  55 ms: <tsr_ast::compact::PackingContext>::encode_aux -> <tsr_ast::compact_generated::AstPayloadStore>::insert -> <tsr_ast::storage::AstBuilder>::new_node_before_hook
+  34 ms: <tsr_ast::compact_generated::AstPayloadStore>::insert -> <tsr_ast::storage::AstBuilder>::new_node_before_hook -> <tsr_ast::storage::AstBuilder as tsr_ast::factory::Factory>::new_node
+  19 ms: <tsr_ast::compact::PackingContext>::encode_symbol -> <tsr_ast::compact::binding::BindingWrite>::store -> <tsr_ast::bind_result::BindBuilder>::set_binding_field
+  8 ms: <tsr_ast::compact::PackingContext>::encode_node -> <tsr_ast::storage::AstBuilder as tsr_ast::factory::Factory>::set_node_parent -> <tsr_parser::state::Parser<tsr_ast::storage::AstBuilder>>::unparse_expression_with_type_arguments
+  4 ms: <tsr_ast::storage::AstBuilder as tsr_ast::factory::Factory>::set_node_parent -> <tsr_parser::state::Parser<tsr_ast::storage::AstBuilder>>::override_parent_in_immediate_children -> <tsr_parser::state::Parser<tsr_ast::storage::AstBuilder>>::parse_call_expression_rest
   Other chains: 36 ms.
 
 memcmp is not all text-pool work:

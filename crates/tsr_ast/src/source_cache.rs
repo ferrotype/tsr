@@ -4,7 +4,7 @@ use std::{
     panic::{catch_unwind, resume_unwind, AssertUnwindSafe},
     sync::{Arc, Mutex, OnceLock},
 };
-use ts_arena::Error;
+use tsr_arena::Error;
 
 thread_local! { static INITIALIZING: RefCell<Vec<usize>> = const { RefCell::new(Vec::new()) }; }
 

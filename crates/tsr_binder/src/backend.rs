@@ -1,8 +1,8 @@
 //! The existing binder can cross explicit checked boundaries while its hot
 //! paths migrate to local handles. One exclusive scope spans the whole bind.
-use ts_arena::Error;
-use ts_ast::local_bind::LocalBind;
-use ts_ast::{
+use tsr_arena::Error;
+use tsr_ast::local_bind::LocalBind;
+use tsr_ast::{
     AstView, BindBuilder, BindResult, DeclarationLists, Diagnostic, FlowData, FlowId, FlowList,
     FlowListId, FlowLists, FlowNode, FlowNodes, NodeId, NodeRead, PatternAmbientModule, SymbolId,
     SymbolTable, SymbolTableId, SymbolTableMut, SymbolTables, SymbolsMut, SymbolsRead,

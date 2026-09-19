@@ -2,8 +2,8 @@
 //! This does not produce diagnostics or infer file order from Program.files().
 use crate::paths::remove_prefixes;
 use serde_json::{json, Value};
-use ts_ast::Diagnostic;
-use ts_compiler::{
+use tsr_ast::Diagnostic;
+use tsr_compiler::{
     diagnostic_writer::{category, flattened, DiagnosticWriter, FormattingOptions},
     Program,
 };
@@ -14,7 +14,7 @@ pub struct InputFile<'a> {
     pub content: &'a [u8],
 }
 fn library(name: &[u8]) -> bool {
-    let name = ts_tspath::base_name(name);
+    let name = tsr_tspath::base_name(name);
     name.starts_with(b"lib.") && name.ends_with(b".d.ts")
 }
 fn config(name: &[u8]) -> bool {
@@ -32,7 +32,7 @@ fn new_line(out: &mut Vec<u8>, first: &mut bool) {
 fn rune_count(mut bytes: &[u8]) -> usize {
     let mut n = 0;
     while !bytes.is_empty() {
-        let (_, w) = ts_jsstring::wtf8::decode_utf8(bytes);
+        let (_, w) = tsr_jsstring::wtf8::decode_utf8(bytes);
         bytes = &bytes[w..];
         n += 1;
     }
@@ -40,7 +40,7 @@ fn rune_count(mut bytes: &[u8]) -> usize {
 }
 fn whitespace_prefix(out: &mut Vec<u8>, mut bytes: &[u8]) {
     while !bytes.is_empty() {
-        let (r, w) = ts_jsstring::wtf8::decode_utf8(bytes);
+        let (r, w) = tsr_jsstring::wtf8::decode_utf8(bytes);
         if matches!(r, 9 | 10 | 12 | 13 | 32) {
             out.extend_from_slice(&bytes[..w]);
         } else {
@@ -52,8 +52,8 @@ fn whitespace_prefix(out: &mut Vec<u8>, mut bytes: &[u8]) {
 fn folded_literal_width(bytes: &[u8], literal: &[u8]) -> Option<usize> {
     let mut offset = 0;
     for &byte in literal {
-        let (_, width) = ts_jsstring::wtf8::decode_utf8(&bytes[offset..]);
-        if width == 0 || !ts_jsstring::equal_fold(&bytes[offset..offset + width], &[byte]) {
+        let (_, width) = tsr_jsstring::wtf8::decode_utf8(&bytes[offset..]);
+        if width == 0 || !tsr_jsstring::equal_fold(&bytes[offset..offset + width], &[byte]) {
             return None;
         }
         offset += width;
@@ -199,7 +199,7 @@ pub fn render(
         let mut file_errors = Vec::new();
         for &d in &sorted {
             if let Some(file) = state.writer.file(d)? {
-                if ts_tspath::compare_paths(
+                if tsr_tspath::compare_paths(
                     &remove_prefixes(file.name()),
                     &remove_prefixes(input.name),
                     b"",
@@ -217,7 +217,7 @@ pub fn render(
         state
             .out
             .extend_from_slice(format!(" ({} errors) ====", file_errors.len()).as_bytes());
-        let starts = ts_jsstring::line_map::compute_ecma_line_starts(input.content);
+        let starts = tsr_jsstring::line_map::compute_ecma_line_starts(input.content);
         // Native lineDelimiter is CR?LF, unlike ComputeECMALineStarts. Keep that
         // distinction even for CR-only and Unicode line separators.
         let lines: Vec<_> = input

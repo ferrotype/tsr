@@ -2,9 +2,9 @@
 //! selection because its extra type resolutions are observable only on failure.
 
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{Diagnostic, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::NodeId;
+use tsr_ast::{Diagnostic, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.maybeAddMissingAwaitInfo
@@ -44,7 +44,7 @@ impl CheckerState {
         ty: TypeId,
         construct: bool,
     ) -> Result<(), Error> {
-        let expression = ts_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
+        let expression = tsr_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
             .ok_or(Error::MissingLink("invocation expression"))?;
         let awaited = self.awaited_type(ty)?;
         let missing_await = match awaited {
@@ -83,7 +83,7 @@ impl CheckerState {
                         )?;
                         let detail =
                             self.diagnostic_for_node(Some(target), no_signatures, vec![part_text])?;
-                        diagnostic = Some(ts_ast::Diagnostic::chain(
+                        diagnostic = Some(tsr_ast::Diagnostic::chain(
                             Some(std::sync::Arc::new(detail)),
                             if construct {
                                 messages::Not_all_constituents_of_type_0_are_constructable
@@ -133,7 +133,7 @@ impl CheckerState {
                 .flatten()
             {
                 Some(symbol) => {
-                    self.symbol(symbol)?.flags() & ts_ast::symbol_flags::GET_ACCESSOR != 0
+                    self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::GET_ACCESSOR != 0
                 }
                 None => false,
             }
@@ -148,7 +148,7 @@ impl CheckerState {
             messages::This_expression_is_not_callable
         };
         let mut diagnostic =
-            ts_ast::Diagnostic::chain(diagnostic.map(std::sync::Arc::new), head, vec![]);
+            tsr_ast::Diagnostic::chain(diagnostic.map(std::sync::Arc::new), head, vec![]);
         if let Some(related) = self.module_invocation_error_related(ty, construct)? {
             diagnostic
                 .related_information
@@ -170,14 +170,14 @@ impl CheckerState {
                 == 1
         {
             let view = self.ast(node)?;
-            let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                 .ok_or(Error::MissingLink("invocation source"))?;
             let source_data = view.source_file(source)?;
             let text = source_data.text();
-            let end = ts_scanner::skip_trivia_ex(
+            let end = tsr_scanner::skip_trivia_ex(
                 text.as_bytes(),
                 i64::from(view.node(expression)?.end()),
-                Some(&ts_scanner::SkipTriviaOptions {
+                Some(&tsr_scanner::SkipTriviaOptions {
                     stop_after_line_break: true,
                     ..Default::default()
                 }),
@@ -208,7 +208,7 @@ impl CheckerState {
         relation: RelationKind,
         error_node: Option<NodeId>,
         expression: Option<NodeId>,
-        head: Option<&'static ts_diagnostics::Message>,
+        head: Option<&'static tsr_diagnostics::Message>,
     ) -> Result<bool, Error> {
         let mut diagnostics = Vec::new();
         let result = self.collect_expression_relation_errors(
@@ -237,7 +237,7 @@ impl CheckerState {
         relation: RelationKind,
         error_node: Option<NodeId>,
         expression: Option<NodeId>,
-        head: Option<&'static ts_diagnostics::Message>,
+        head: Option<&'static tsr_diagnostics::Message>,
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
         if self.is_type_related_to(source, target, relation)? {
@@ -268,11 +268,11 @@ impl CheckerState {
         source: TypeId,
         target: TypeId,
         relation: RelationKind,
-        head: Option<&'static ts_diagnostics::Message>,
+        head: Option<&'static tsr_diagnostics::Message>,
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
         if self.call_target_has_conditional(target)?
-            || self.program()?.host.options().no_check == ts_core::Tristate::TRUE
+            || self.program()?.host.options().no_check == tsr_core::Tristate::TRUE
         {
             return Ok(false);
         }
@@ -314,7 +314,7 @@ impl CheckerState {
                 self.elaborate_call_arrow(node, source, target, relation, output)
             }
             Some(K::AsExpression) => {
-                if ts_ast::utilities_middle::is_const_assertion(self.ast(node)?, &read)? {
+                if tsr_ast::utilities_middle::is_const_assertion(self.ast(node)?, &read)? {
                     let inner = read
                         .expression()
                         .ok_or(Error::MissingLink("const assertion expression"))?;
@@ -327,7 +327,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let operator = data
                     .operator_token()
                     .ok_or(Error::MissingLink("elaborated binary operator"))?;

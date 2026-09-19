@@ -43,7 +43,7 @@
   ],
   "groups": [
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "",
       "target": "config_source_parity",
       "tests": [
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "package": "ts_semver",
+      "package": "tsr_semver",
       "prefix": "",
       "target": "source_parity",
       "tests": [
@@ -62,7 +62,7 @@
       ]
     },
     {
-      "package": "ts_module",
+      "package": "tsr_module",
       "prefix": "package_json::tests::",
       "target": "lib",
       "tests": [
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "package": "ts_module",
+      "package": "tsr_module",
       "prefix": "trace::tests::",
       "target": "lib",
       "tests": [
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "package": "ts_module",
+      "package": "tsr_module",
       "prefix": "",
       "target": "config_resolver",
       "tests": [
@@ -89,7 +89,7 @@
       ]
     },
     {
-      "package": "ts_module",
+      "package": "tsr_module",
       "prefix": "",
       "target": "config_mappers",
       "tests": [
@@ -98,7 +98,7 @@
       ]
     },
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "tests::",
       "target": "lib",
       "tests": [
@@ -109,7 +109,7 @@
       ]
     },
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "boundary_tests::",
       "target": "lib",
       "tests": [
@@ -119,7 +119,7 @@
       ]
     },
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "include_reason::tests::",
       "target": "lib",
       "tests": [
@@ -128,7 +128,7 @@
       ]
     },
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "",
       "target": "verify_options",
       "tests": [
@@ -136,7 +136,7 @@
       ]
     },
     {
-      "package": "ts_tspath",
+      "package": "tsr_tspath",
       "prefix": "",
       "target": "go_observations",
       "tests": [
@@ -144,7 +144,7 @@
       ]
     },
     {
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "prefix": "program_diagnostics::tests::",
       "target": "lib",
       "tests": [

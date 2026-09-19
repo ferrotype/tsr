@@ -3,7 +3,7 @@
 // upstream: tsc/internal/api/encoder/encoder_generated.go
 // upstream: tsc/internal/api/encoder/decoder_generated.go
 use crate::{decoder::Decoder, string_table::StringTable, walk::Edge, DataType};
-use ts_ast::{AstView, FactoryMethods, NodeAccess, NodeId, NodeKind, SyntaxKind};
+use tsr_ast::{AstView, FactoryMethods, NodeAccess, NodeId, NodeKind, SyntaxKind};
 // upstream: tsc/internal/api/encoder/encoder_generated.go:getNodeDataType
 pub(crate) fn data_type(kind: NodeKind) -> DataType {
     match kind.known() {

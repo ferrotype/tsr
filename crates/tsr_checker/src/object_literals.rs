@@ -1,11 +1,11 @@
 //! Object literals are checked in source order. Spread chunks allocate their
 //! native intermediate objects, and deferred members keep the source schedule.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags as cf, node_flags as nf, symbol_flags as sf, SymbolTable, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 #[derive(Default)]
 struct ObjectChunk {
@@ -75,7 +75,7 @@ impl CheckerState {
             }
         }
         self.defer_checker_node(node)?;
-        let destructuring = ts_ast::is_assignment_target(self.ast(node)?, node)?;
+        let destructuring = tsr_ast::is_assignment_target(self.ast(node)?, node)?;
         self.check_object_literal_grammar(node, destructuring)?;
         let context = self.contextual_expression_type(node)?;
         let inference = self.call_inference_at_node(node)?;

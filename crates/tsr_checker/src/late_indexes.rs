@@ -1,8 +1,8 @@
 //! Explicit and late-bound index signatures share the native declaration order.
 //! Computed members aggregate their siblings; an explicit index takes priority.
 use crate::{type_flags as tf, CheckerState, Error, IndexInfoId, TypeId, UnionReduction};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, SymbolTableId, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, SymbolTableId, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getIndexInfosOfIndexSymbol

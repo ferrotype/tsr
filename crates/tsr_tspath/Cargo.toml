@@ -1,5 +1,5 @@
 [package]
-name = "ts_tspath"
+name = "tsr_tspath"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,8 +7,8 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-ts_core = { version = "0.1.0", path = "../ts_core" }
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true

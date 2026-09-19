@@ -6,7 +6,7 @@ and validator; the Rust endpoint is the production checker and printer.
 
 ```sh
 python3 scripts/s08_p2.py capture --spec tools/s08/p3b/requests.json --output target/s08/p3b-native
-cargo run -p ts_compiler --example p2_checker -- target/s08/p3b-native/requests.json target/s08/p3b-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p3b-native/requests.json target/s08/p3b-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p3b-native --actual target/s08/p3b-rust.json --output target/s08/p3b-comparison.json
 ```
 

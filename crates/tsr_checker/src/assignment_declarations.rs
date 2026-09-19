@@ -1,8 +1,8 @@
 //! JavaScript assignment declarations use their whole declaration set, including
 //! constructor flow, prototype writes and CommonJS export initialization order.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{JSDeclarationKind as J, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{JSDeclarationKind as J, SyntaxKind as K};
 
 #[derive(Clone, Copy, Default)]
 pub(crate) enum ThisAssignment {
@@ -66,7 +66,7 @@ impl CheckerState {
     pub(crate) fn declaring_constructor(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             let container =
-                ts_ast::get_this_container(self.ast(declaration)?, declaration, false, false)?;
+                tsr_ast::get_this_container(self.ast(declaration)?, declaration, false, false)?;
             if self.node(container)?.kind() == K::Constructor {
                 return Ok(Some(container));
             }
@@ -98,7 +98,7 @@ impl CheckerState {
         {
             let read = self.node(declaration)?;
             if read.kind() != K::BinaryExpression
-                || ts_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
+                || tsr_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
                     != J::ThisProperty
             {
                 all_this = false;
@@ -107,7 +107,7 @@ impl CheckerState {
             let data = read
                 .data_source()
                 .as_binary_expression()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             let left = data
                 .left()
                 .ok_or(Error::MissingLink("this declaration left"))?;
@@ -174,7 +174,7 @@ impl CheckerState {
                     }
                 }
                 if let Some(assigned) = self.assignment_declaration_initializer_type(declaration)? {
-                    if (ts_ast::get_assignment_declaration_kind(
+                    if (tsr_ast::get_assignment_declaration_kind(
                         self.ast(declaration)?,
                         declaration,
                     )? != J::ExportsProperty
@@ -204,7 +204,7 @@ impl CheckerState {
         }
         let ty = self.widened_type(ty.expect("assignment declaration type"))?;
         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            if self.node(declaration)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0 {
+            if self.node(declaration)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0 {
                 let filtered = self.filter_type(ty, &mut |checker, ty| {
                     Ok(checker.types.flags(ty)? & !tf::NULLABLE != 0)
                 })?;
@@ -230,7 +230,7 @@ impl CheckerState {
             let mut right = binary
                 .right()
                 .ok_or(Error::MissingLink("assignment declaration right"))?;
-            let kind = ts_ast::get_assignment_declaration_kind(self.ast(node)?, node)?;
+            let kind = tsr_ast::get_assignment_declaration_kind(self.ast(node)?, node)?;
             let ty = if matches!(kind, J::ModuleExports | J::ExportsProperty) {
                 while let Some(binary) = self
                     .ast(right)?
@@ -328,7 +328,7 @@ impl CheckerState {
             if self.matching_reference(property, node)? {
                 return Ok(true);
             }
-            if ts_ast::utilities::is_function_like(Some(&self.node(node)?)) {
+            if tsr_ast::utilities::is_function_like(Some(&self.node(node)?)) {
                 continue;
             }
             pending.extend(self.source_children(node)?.into_iter().rev());

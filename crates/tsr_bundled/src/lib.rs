@@ -1,7 +1,7 @@
 //! Pinned embedded standard library bytes; these bypass BOM decoding.
 use std::sync::Arc;
-use ts_jsstring::JsString;
-use ts_vfs::{Entries, Error, FileContent, FileInfo, FileSystem, SnapshotId};
+use tsr_jsstring::JsString;
+use tsr_vfs::{Entries, Error, FileContent, FileInfo, FileSystem, SnapshotId};
 pub const LIB_PATH: &[u8] = b"bundled:///libs";
 pub const COPYRIGHT: &str =
     include_str!("../../../upstream/tsc/internal/bundled/CopyrightNotice.txt");

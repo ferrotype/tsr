@@ -1,5 +1,5 @@
 use crate::{mapper::Mapper, object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getInferredTypeParameterConstraint

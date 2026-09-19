@@ -1,8 +1,8 @@
 //! Assertion overlap is deferred on the same source queue as function bodies.
 use crate::{CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkAssertion
@@ -15,7 +15,7 @@ impl CheckerState {
             .type_node()
             .ok_or(Error::MissingLink("assertion type"))?;
         if read.kind() == K::TypeAssertionExpression {
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("assertion source"))?;
             let file = self.source_file_read(source)?;
             if file.file_name().ends_with(b".mts") || file.file_name().ends_with(b".cts") {
@@ -30,14 +30,14 @@ impl CheckerState {
                 && self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE == 0
             {
                 let read = self.node(node)?;
-                let start = ts_scanner::skip_trivia(
+                let start = tsr_scanner::skip_trivia(
                     self.source_file_read(source)?.text().as_bytes(),
                     i64::from(read.pos()),
                 );
                 let end = i64::from(self.node(expression)?.pos());
-                self.add_diagnostic(ts_ast::Diagnostic::new(
+                self.add_diagnostic(tsr_ast::Diagnostic::new(
                     Some(source),
-                    ts_core::TextRange::new(start, end),
+                    tsr_core::TextRange::new(start, end),
                     d::This_syntax_is_not_allowed_when_erasableSyntaxOnly_is_enabled,
                     vec![],
                 ))?;
@@ -45,7 +45,7 @@ impl CheckerState {
         }
         let ty = self.check_expression_ex(expression, self.expression_mode)?;
         self.check_source_element(annotation)?;
-        if ts_ast::utilities_middle::is_const_type_reference(
+        if tsr_ast::utilities_middle::is_const_type_reference(
             self.ast(annotation)?,
             &self.node(annotation)?,
         )? {

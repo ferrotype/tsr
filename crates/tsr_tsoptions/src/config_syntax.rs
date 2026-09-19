@@ -1,8 +1,8 @@
 //! Config syntax ownership and the exact tsoptions property/range operations.
-use ts_ast::{AstFile, Diagnostic, NodeDataRead, NodeId, SourceFileParseOptions, SyntaxKind as K};
-use ts_core::{ScriptKind, TextRange};
-use ts_diagnostics::Message;
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::{AstFile, Diagnostic, NodeDataRead, NodeId, SourceFileParseOptions, SyntaxKind as K};
+use tsr_core::{ScriptKind, TextRange};
+use tsr_diagnostics::Message;
+use tsr_jsstring::{JsString, SourceText};
 
 #[derive(Clone, Debug)]
 pub struct TsConfigSourceFile {
@@ -14,7 +14,7 @@ impl TsConfigSourceFile {
     /// Input is already filesystem-loaded text, matching ParseSourceFile.
     /// port: tsc/internal/tsoptions/tsconfigparsing.go:NewTsconfigSourceFileFromFilePath
     pub fn parse(file_name: JsString, path: JsString, source: SourceText) -> Self {
-        let parsed = ts_parser::parse_source_file(
+        let parsed = tsr_parser::parse_source_file(
             source,
             ScriptKind::JSON,
             SourceFileParseOptions {
@@ -154,7 +154,7 @@ pub fn diagnostic_for_node(
     let view = config.file.view();
     let node = view.node(node).expect("config diagnostic node owner");
     let source = view.source_file(config.root).expect("config source file");
-    let start = ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(node.pos()));
+    let start = tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(node.pos()));
     Diagnostic::new(
         Some(config.root),
         TextRange::new(start, i64::from(node.end())),
@@ -195,7 +195,7 @@ mod tests {
         let diagnostic = diagnostic_for_node(
             &config,
             selected,
-            ts_diagnostics::Unknown_compiler_option_0,
+            tsr_diagnostics::Unknown_compiler_option_0,
             vec![],
         );
         assert_eq!(

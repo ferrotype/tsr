@@ -1,8 +1,8 @@
 use crate::ParserJsDocProvider;
 use std::sync::Arc;
-use ts_ast::{node_flags, JsDocProvider, JsString, NodeId, ParsedFile, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_ast::{node_flags, JsDocProvider, JsString, NodeId, ParsedFile, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 fn parse(name: &[u8], text: &[u8], kind: ScriptKind) -> ParsedFile {
     crate::parse_source_file(
@@ -47,7 +47,7 @@ fn empty_jsdoc_comment_has_the_pinned_non_nil_backing() {
     let list = view
         .list(doc.data_source().as_js_doc().unwrap().comment().unwrap())
         .unwrap();
-    assert_eq!(list.loc(), ts_core::TextRange::new(0, 4));
+    assert_eq!(list.loc(), tsr_core::TextRange::new(0, 4));
     assert!(!list.nodes().is_nil());
     assert!(view.node_slice(list.nodes()).unwrap().is_empty());
 }
@@ -73,12 +73,12 @@ fn leading_jsdoc_link_preserves_nil_text_slice() {
         .unwrap();
     let parts = view.node_slice(comment.nodes()).unwrap();
     let leading = view.node(parts.at(0).unwrap()).unwrap();
-    assert_eq!(leading.range(), ts_core::TextRange::new(0, 4));
+    assert_eq!(leading.range(), tsr_core::TextRange::new(0, 4));
     let text = leading.data_source().as_js_doc_text().unwrap().text();
     assert!(text.is_nil());
     assert!(view.text_slice(text).unwrap().is_empty());
     let link = view.node(parts.at(1).unwrap()).unwrap();
-    assert_eq!(link.kind(), ts_ast::SyntaxKind::JSDocLink);
+    assert_eq!(link.kind(), tsr_ast::SyntaxKind::JSDocLink);
     assert!(link.data_source().as_js_doc_link().unwrap().text().is_nil());
 }
 
@@ -142,7 +142,7 @@ fn ordinary_nodes_and_empty_flagged_comments_have_distinct_cache_paths() {
         .source_eager_jsdoc(root, parent)
         .unwrap()
         .is_none());
-    ts_ast::Factory::add_node_flags(file.builder_mut(), parent, node_flags::HAS_JS_DOC);
+    tsr_ast::Factory::add_node_flags(file.builder_mut(), parent, node_flags::HAS_JS_DOC);
     assert!(provider
         .jsdoc(file.view(), root, parent)
         .unwrap()

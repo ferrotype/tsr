@@ -2,14 +2,14 @@ use crate::resolver::{is_relative, mangle_scoped, DTS, JS, JSON, TS};
 use crate::trace::{extensions_text, joined, trace};
 use crate::{Error, PackageId, PackageJson, ResolvedModule, Resolver};
 use std::collections::BTreeSet;
-use ts_core::{CompilerOptions, ModuleKind, ModuleResolutionKind};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
-use ts_tspath as path;
+use tsr_core::{CompilerOptions, ModuleKind, ModuleResolutionKind};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
+use tsr_tspath as path;
 pub const INFERRED_TYPES_CONTAINING_FILE: &[u8] = b"__inferred type names__.ts";
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ResolvedTypeReferenceDirective {
-    pub resolution_diagnostics: Vec<ts_ast::Diagnostic>,
+    pub resolution_diagnostics: Vec<tsr_ast::Diagnostic>,
     pub primary: bool,
     pub resolved_file_name: JsString,
     pub original_path: JsString,

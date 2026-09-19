@@ -5,11 +5,11 @@ use crate::{
     enums::{EnumEvaluation, EnumValue},
     CheckerState, Error,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as messages;
-use ts_jsnum::Number;
-use ts_jsstring::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as messages;
+use tsr_jsnum::Number;
+use tsr_jsstring::JsString;
 
 impl CheckerState {
     // port: tsc/internal/evaluator/evaluator.go:NewEvaluator
@@ -115,7 +115,7 @@ impl CheckerState {
                 result.is_syntactically_string = true;
             }
             Some(K::NumericLiteral) => {
-                result.value = Some(EnumValue::Number(ts_jsnum::from_string(
+                result.value = Some(EnumValue::Number(tsr_jsnum::from_string(
                     self.node_text(expression)?.as_bytes(),
                 )));
             }
@@ -127,7 +127,7 @@ impl CheckerState {
                 let root = read
                     .expression()
                     .ok_or(Error::MissingLink("enum access expression"))?;
-                if ts_ast::is_entity_name_expression(self.ast(root)?, root)? {
+                if tsr_ast::is_entity_name_expression(self.ast(root)?, root)? {
                     return self.evaluate_enum_entity(expression, location);
                 }
             }
@@ -210,7 +210,7 @@ impl CheckerState {
                         == Some(symbol)
                 {
                     return Ok(EnumEvaluation {
-                        value: Some(EnumValue::Number(ts_jsnum::from_string(text.as_bytes()))),
+                        value: Some(EnumValue::Number(tsr_jsnum::from_string(text.as_bytes()))),
                         ..Default::default()
                     });
                 }
@@ -232,7 +232,7 @@ impl CheckerState {
                     let read = self.node(declaration)?;
                     if read.kind() == K::VariableDeclaration
                         && read.type_node().is_none()
-                        && ts_ast::utilities::get_combined_node_flags(
+                        && tsr_ast::utilities::get_combined_node_flags(
                             self.ast(declaration)?,
                             declaration,
                         )? & nf::CONSTANT
@@ -276,7 +276,7 @@ impl CheckerState {
             let argument = data
                 .argument_expression()
                 .ok_or(Error::MissingLink("enum element argument"))?;
-            if ts_ast::is_entity_name_expression(self.ast(root)?, root)?
+            if tsr_ast::is_entity_name_expression(self.ast(root)?, root)?
                 && matches!(
                     self.node(argument)?.kind().known(),
                     Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
@@ -338,7 +338,7 @@ impl CheckerState {
     }
 
     pub(crate) fn enum_source_file(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        Ok(ts_ast::utilities::get_source_file_of_node(
+        Ok(tsr_ast::utilities::get_source_file_of_node(
             self.ast(node)?,
             Some(node),
         )?)

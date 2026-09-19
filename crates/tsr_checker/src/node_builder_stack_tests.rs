@@ -5,11 +5,11 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
 };
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_ast::{AstBuilder, Factory, FactoryHooks, NodeId};
-use ts_jsstring::SourceText;
-use ts_nodebuilder::flags as nf;
-use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_ast::{AstBuilder, Factory, FactoryHooks, NodeId};
+use tsr_jsstring::SourceText;
+use tsr_nodebuilder::flags as nf;
+use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 struct ObservedHooks {
     inner: Arc<dyn FactoryHooks>,
@@ -79,8 +79,8 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                     .map(|_| {
                         checker
                             .new_symbol(
-                                ts_ast::symbol_flags::TYPE_ALIAS,
-                                ts_ast::JsString::from_bytes(b"n".as_slice()),
+                                tsr_ast::symbol_flags::TYPE_ALIAS,
+                                tsr_ast::JsString::from_bytes(b"n".as_slice()),
                             )
                             .unwrap()
                     })
@@ -142,7 +142,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                     // stack. Trigger only when a hook observes a grown segment.
                     observe(builder, &largest_stack, Some(STACK));
                     builder.type_node(ty)?;
-                    Ok(ts_ast::JsString::default())
+                    Ok(tsr_ast::JsString::default())
                 })
                 .unwrap();
             }));
@@ -153,7 +153,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
             );
             assert!(matches!(
                 owner.operation(),
-                Err(Error::Arena(ts_arena::Error::Retired))
+                Err(Error::Arena(tsr_arena::Error::Retired))
             ));
             drop(owner);
             assert_eq!(

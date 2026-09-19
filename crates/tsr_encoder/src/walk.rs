@@ -1,7 +1,7 @@
 //! Explicit traversal frames preserve VisitEachChild order and defer JSDoc until
 //! ordinary descendants have completed, without consuming the native call stack.
-use ts_arena::Error;
-use ts_ast::{AstView, JsDocProvider, NodeId, NodeListId};
+use tsr_arena::Error;
+use tsr_ast::{AstView, JsDocProvider, NodeId, NodeListId};
 #[derive(Clone, Copy)]
 pub(crate) enum Edge {
     Node(NodeId),

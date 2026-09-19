@@ -54,7 +54,7 @@ def validate_output(output, cases, mode, scope="AST ownership"):
 
 
 def measure(root, invoke, prefix, options, env, cases, mode):
-    command = [*prefix, "test", "--package", "ts_ast", "--lib", "--locked",
+    command = [*prefix, "test", "--package", "tsr_ast", "--lib", "--locked",
                *options, "storage_tests::", "--", "--test-threads=1", "--nocapture"]
     try:
         validate_output(invoke(root, command, env), cases, mode)

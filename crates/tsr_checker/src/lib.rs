@@ -26,8 +26,8 @@
 //!
 //! - Program initialization, checker-local source-symbol merges, primitive and
 //!   anonymous-object source queries, and bounded source checking with structured
-//!   diagnostics. Type display builds syntax through `ts_nodebuilder` and prints
-//!   it through `ts_printer`.
+//!   diagnostics. Type display builds syntax through `tsr_nodebuilder` and prints
+//!   it through `tsr_printer`.
 //!
 //! Source arrays/tuples, full relations/body checking, loaded generic library
 //! operations and declaration emit remain pending. Unported branches return
@@ -299,10 +299,10 @@ pub(crate) use value_links::ValueSymbolLinks;
 /// through unchanged; the checker adds the failures only it can observe.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
-    Host(ts_vfs::Error),
-    Arena(ts_arena::Error),
-    Printer(ts_printer::Error),
-    Pseudo(ts_pseudochecker::Error),
+    Host(tsr_vfs::Error),
+    Arena(tsr_arena::Error),
+    Printer(tsr_printer::Error),
+    Pseudo(tsr_pseudochecker::Error),
     /// The same thread asked for a second operation on an owner whose operation
     /// it already holds. Detected before waiting; ordinary contention waits.
     Reentry,
@@ -320,29 +320,29 @@ pub enum Error {
     MissingLink(&'static str),
 }
 
-impl From<ts_vfs::Error> for Error {
-    fn from(error: ts_vfs::Error) -> Self {
+impl From<tsr_vfs::Error> for Error {
+    fn from(error: tsr_vfs::Error) -> Self {
         Self::Host(error)
     }
 }
 
-impl From<ts_arena::Error> for Error {
-    fn from(error: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(error: tsr_arena::Error) -> Self {
         match error {
-            ts_arena::Error::Reentry => Self::Reentry,
+            tsr_arena::Error::Reentry => Self::Reentry,
             error => Self::Arena(error),
         }
     }
 }
 
-impl From<ts_printer::Error> for Error {
-    fn from(error: ts_printer::Error) -> Self {
+impl From<tsr_printer::Error> for Error {
+    fn from(error: tsr_printer::Error) -> Self {
         Self::Printer(error)
     }
 }
 
-impl From<ts_pseudochecker::Error> for Error {
-    fn from(error: ts_pseudochecker::Error) -> Self {
+impl From<tsr_pseudochecker::Error> for Error {
+    fn from(error: tsr_pseudochecker::Error) -> Self {
         Self::Pseudo(error)
     }
 }

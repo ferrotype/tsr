@@ -1,15 +1,15 @@
 //! S06 component adapter; parse requests require the parser's E1 adapter.
 #[path = "codec.rs"]
 mod codec;
-#[path = "../../../ts_ast/examples/support/factory.rs"]
+#[path = "../../../tsr_ast/examples/support/factory.rs"]
 mod factory;
 use crate::protocol;
 use protocol::{fields, hex, unhex, Session};
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_ast::{AstView, ChildVisitor, NodeId, NodeKind, NodeListId, NodeSlice};
+use tsr_arena::Counters;
+use tsr_ast::{AstView, ChildVisitor, NodeId, NodeKind, NodeListId, NodeSlice};
 
 pub fn validate(request: &Value) -> Result<(), String> {
     let op = request["op"].as_str().ok_or("invalid operation")?;
@@ -144,7 +144,7 @@ pub fn execute(session: &Session, request: &Value) {
         "path" => {
             session.stage("path",||{
             let path=unhex(&request["path_hex"])?;
-            session.observe("path","path",json!({"encoded_root_length":ts_core::path::encoded_root_length(&path),"normalized_hex":hex(&ts_core::path::normalize(&path)),"declaration_file":ts_core::path::is_declaration_file_name(&path)}));
+            session.observe("path","path",json!({"encoded_root_length":tsr_core::path::encoded_root_length(&path),"normalized_hex":hex(&tsr_core::path::normalize(&path)),"declaration_file":tsr_core::path::is_declaration_file_name(&path)}));
             Ok(())
         });
         }
@@ -166,7 +166,7 @@ pub fn execute(session: &Session, request: &Value) {
             let mut tree = None;
             if !session.stage("decode",||{
                 let raw=unhex(&request["wire_hex"])?;
-                let result=if request["entrypoint"]=="nodes" {ts_encoder::decode_nodes(&raw,&Counters::new())} else {ts_encoder::decode_source_file(&raw,&Counters::new())};
+                let result=if request["entrypoint"]=="nodes" {tsr_encoder::decode_nodes(&raw,&Counters::new())} else {tsr_encoder::decode_source_file(&raw,&Counters::new())};
                 let decoded=result.map_err(|error|error.to_string())?;
                 let root=decoded.root.map(|id|{
                     let node=decoded.builder.view().node(id).expect("decoded root owner");

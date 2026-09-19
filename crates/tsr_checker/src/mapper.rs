@@ -7,7 +7,7 @@ use crate::{CheckerState, Error, MapperId, TypeId, TypeList};
 #[derive(Clone, Debug)]
 pub(crate) enum Mapper {
     DeferredArguments {
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
         sources: TypeList,
     },
     Inference {
@@ -167,7 +167,7 @@ impl CheckerState {
     pub(crate) fn mapper(&self, id: MapperId) -> Result<&Mapper, Error> {
         id.index(0)
             .and_then(|index| self.instantiation.mappers.get(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     // port: tsc/internal/checker/mapper.go:newTypeMapper

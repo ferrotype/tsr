@@ -29,7 +29,7 @@ checker or `.errors.txt` parity and do not emit E2 metrics.
 
 ```sh
 python3 scripts/s08_p5_errors.py capture --output target/s08/p5-errors-new
-cargo run -p ts_compiler --example p5_errors -- target/s08/p5-errors-new/requests.json target/s08/p5-errors-rust-new.json
+cargo run -p tsr_compiler --example p5_errors -- target/s08/p5-errors-new/requests.json target/s08/p5-errors-rust-new.json
 python3 scripts/s08_p5_errors.py compare --native target/s08/p5-errors-new --actual target/s08/p5-errors-rust-new.json
 ```
 

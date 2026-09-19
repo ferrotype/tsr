@@ -99,7 +99,7 @@ def rust_artifact(messages):
         raise ValueError("Cargo did not complete the diagnostic build")
     candidates = [row for row in rows if row["reason"] == "compiler-artifact"
                   and Path(row.get("manifest_path", "")).resolve() == RUST / "Cargo.toml"
-                  and row.get("target", {}).get("name") == "ts_cpu_profile"
+                  and row.get("target", {}).get("name") == "tsr_cpu_profile"
                   and row["target"].get("kind") == ["bin"]]
     if len(candidates) != 1:
         raise ValueError("Cargo must report exactly one diagnostic executable")
@@ -150,7 +150,7 @@ def main():
               "registry_lock": registry_lock()}
     profile, overrides = symbol_configuration(env)
     build_rust = ["cargo", "+" + stable, "build", "--release", "--locked",
-                  "--manifest-path", str(RUST / "Cargo.toml"), "--bin", "ts_cpu_profile",
+                  "--manifest-path", str(RUST / "Cargo.toml"), "--bin", "tsr_cpu_profile",
                   "--target", host, "--message-format=json-render-diagnostics", *overrides]
     messages = command(build_rust, cwd=RUST, env=env)
     (output / "rust-cargo-messages.ndjson").write_bytes(messages)

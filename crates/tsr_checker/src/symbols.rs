@@ -8,8 +8,8 @@
 //! the checker's `SymbolTables`, so their storage is disposed with the owner.
 
 use crate::{CheckerState, Error};
-use ts_arena::SymbolId;
-use ts_ast::{
+use tsr_arena::SymbolId;
+use tsr_ast::{
     symbol_flags, CheckFlags, DeclarationRead, DeclarationSlice, JsString, Symbol, SymbolFlags,
     SymbolRef, SymbolTable, SymbolTableId, SymbolTableRead,
 };
@@ -43,7 +43,7 @@ impl NameBuf {
 /// `tables` mutably can still read a name in place.
 pub(crate) fn split_symbol<'a>(
     program: Option<&'a crate::program::ProgramContext>,
-    symbols: &'a ts_arena::SymbolArena<Symbol>,
+    symbols: &'a tsr_arena::SymbolArena<Symbol>,
     id: SymbolId,
 ) -> Result<SymbolRef<'a>, Error> {
     if id.arena() == symbols.id() {
@@ -88,14 +88,14 @@ impl CheckerState {
 
     pub(crate) fn symbol_mut(&mut self, id: SymbolId) -> Result<&mut Symbol, Error> {
         if id.arena() != self.symbols.id() {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         Ok(self.symbols.get_mut(id)?)
     }
 
     /// `ast.GetSymbolId`: the lazily assigned runtime identity cache keys use.
     pub(crate) fn symbol_runtime_id(&self, id: SymbolId) -> Result<u64, Error> {
-        Ok(ts_ast::runtime_symbol_id(&self.symbol(id)?))
+        Ok(tsr_ast::runtime_symbol_id(&self.symbol(id)?))
     }
 
     /// Allocates a member table owned by this checker.

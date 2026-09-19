@@ -42,7 +42,7 @@ own correctness evidence and measurements.
 
 The candidate must retain both routes' behavior, preserve full frozen graphs at
 one and eight workers, and record direct/fallback counts from the same immutable
-normal executable. The `ts_bench --binding-paths` diagnostic runs after the measured
+normal executable. The `tsr_bench --binding-paths` diagnostic runs after the measured
 endpoint and uses a separate protocol; normal benchmark output is unchanged.
 
 The experiment runner freezes actual binaries, source/configuration inventories

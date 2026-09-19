@@ -3,8 +3,8 @@
 //! only through this builder's checked view; no checker-local type ID escapes.
 
 use super::{Error, Operation, TypeRef};
-use ts_arena::{ArenaId, NodeId};
-use ts_ast::AstView;
+use tsr_arena::{ArenaId, NodeId};
+use tsr_ast::AstView;
 
 pub struct TypeNodeBuilder<'operation> {
     owner: ArenaId,
@@ -17,9 +17,9 @@ impl Operation<'_> {
         &mut self,
         symbol: super::SymbolRef,
         enclosing: Option<NodeId>,
-        meaning: ts_ast::SymbolFlags,
+        meaning: tsr_ast::SymbolFlags,
         flags: crate::SymbolFormatFlags,
-    ) -> Result<ts_ast::JsString, Error> {
+    ) -> Result<tsr_ast::JsString, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         self.state_mut()
             .symbol_to_string_at(symbol, enclosing, meaning, flags)
@@ -42,7 +42,7 @@ impl Operation<'_> {
         ty: TypeRef,
         enclosing: Option<NodeId>,
         flags: crate::TypeFormatFlags,
-    ) -> Result<ts_ast::JsString, Error> {
+    ) -> Result<tsr_ast::JsString, Error> {
         let ty = self.check_type(ty)?;
         self.state_mut().type_to_string_at(ty, enclosing, flags)
     }
@@ -57,11 +57,11 @@ impl TypeNodeBuilder<'_> {
         &mut self,
         ty: TypeRef,
         enclosing: Option<NodeId>,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
     ) -> Result<Option<NodeId>, Error> {
         if ty.owner != self.owner {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         self.builder.checker.types.get(ty.id)?;
         self.builder
@@ -74,7 +74,7 @@ impl TypeNodeBuilder<'_> {
         self.builder.ast.view()
     }
 
-    pub fn emit_context(&self) -> &ts_printer::EmitContext {
+    pub fn emit_context(&self) -> &tsr_printer::EmitContext {
         &self.builder.emit
     }
 }
@@ -83,9 +83,9 @@ impl TypeNodeBuilder<'_> {
 mod tests {
     use super::*;
     use std::sync::Arc;
-    use ts_arena::{CheckerIdentity, Counters, Generation};
-    use ts_nodebuilder::{flags as nf, internal_flags as inf};
-    use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    use tsr_arena::{CheckerIdentity, Counters, Generation};
+    use tsr_nodebuilder::{flags as nf, internal_flags as inf};
+    use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
     fn owner(counters: &Counters) -> Arc<crate::CheckerOwner> {
         Arc::new(
@@ -152,7 +152,7 @@ mod tests {
         let (foreign_type, foreign_symbol) = {
             let mut op = foreign.operation().unwrap();
             let symbol = op
-                .new_symbol(ts_ast::symbol_flags::VARIABLE, b"foreign", 0)
+                .new_symbol(tsr_ast::symbol_flags::VARIABLE, b"foreign", 0)
                 .unwrap();
             (
                 op.builtin_type("stringType").unwrap(),
@@ -168,16 +168,16 @@ mod tests {
         );
         assert!(matches!(
             op.type_to_string_at(foreign_type, None, 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner))
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
         ));
         assert!(matches!(
             op.symbol_to_string_at(foreign_symbol, None, 0, 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner))
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
         ));
         let mut builder = op.node_builder();
         assert!(matches!(
             builder.type_to_type_node(foreign_type, None, 0, 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner))
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
         ));
         let node = builder
             .type_to_type_node(local_type, None, 0, 0)

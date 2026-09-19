@@ -2,8 +2,8 @@
 //! table before resolving bases and signatures so recursive typeof reads see it.
 
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::SymbolId;
-use ts_ast::{internal_symbol_names as names, symbol_flags as sf, JsString, SymbolTable};
+use tsr_arena::SymbolId;
+use tsr_ast::{internal_symbol_names as names, symbol_flags as sf, JsString, SymbolTable};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.resolveAnonymousTypeMembers

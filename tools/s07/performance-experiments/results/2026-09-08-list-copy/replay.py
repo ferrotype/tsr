@@ -322,7 +322,7 @@ def check_code_review(members, builds):
                 and binary["bytes"] == builds[role]["inventory"][artifact["path"]]["bytes"]
                 and binary["manifest_sha256"] == CAPTURE["source_manifest_sha256"][role],
                 "code review did not inspect the frozen normal binary")
-        source = builds[role]["source_fingerprint"]["files"]["crates/ts_binder/src/containers.rs"]
+        source = builds[role]["source_fingerprint"]["files"]["crates/tsr_binder/src/containers.rs"]
         require(binary["frozen_containers_sha256"] == source
                 and sha(members[prefix + role + "-containers.rs"]) == source,
                 "code review source differs from frozen candidate/control")

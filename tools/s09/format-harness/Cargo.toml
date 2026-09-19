@@ -10,16 +10,16 @@ description = "S09-3 formatter port: answers the native format oracle's requests
 [dependencies]
 serde_json = "1"
 sha2 = "0.10"
-ts_api = { version = "0.1.0", path = "../../../crates/ts_api" }
-ts_arena = { version = "0.1.0", path = "../../../crates/ts_arena" }
-ts_ast = { version = "0.1.0", path = "../../../crates/ts_ast" }
-ts_astnav = { version = "0.1.0", path = "../../../crates/ts_astnav" }
-ts_core = { version = "0.1.0", path = "../../../crates/ts_core" }
-ts_encoder = { version = "0.1.0", path = "../../../crates/ts_encoder" }
-ts_format = { version = "0.1.0", path = "../../../crates/ts_format" }
-ts_jsstring = { version = "0.1.0", path = "../../../crates/ts_jsstring" }
-ts_parser = { version = "0.1.0", path = "../../../crates/ts_parser" }
-ts_printer = { version = "0.1.0", path = "../../../crates/ts_printer" }
+tsr_api = { version = "0.1.0", path = "../../../crates/tsr_api" }
+tsr_arena = { version = "0.1.0", path = "../../../crates/tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../../../crates/tsr_ast" }
+tsr_astnav = { version = "0.1.0", path = "../../../crates/tsr_astnav" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_encoder = { version = "0.1.0", path = "../../../crates/tsr_encoder" }
+tsr_format = { version = "0.1.0", path = "../../../crates/tsr_format" }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../../../crates/tsr_parser" }
+tsr_printer = { version = "0.1.0", path = "../../../crates/tsr_printer" }
 
 [lints]
 workspace = true

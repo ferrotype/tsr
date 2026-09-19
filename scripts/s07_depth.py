@@ -25,8 +25,8 @@ def digest(path):
 
 def inputs():
     paths = [CASES, Path(__file__), ROOT/'Cargo.lock', ROOT/'Cargo.toml', ROOT/'rust-toolchain.toml']
-    for name in ('ts_binder','ts_parser','ts_scanner','ts_ast','ts_arena','ts_core',
-                 'ts_diagnostics','ts_jsstring','ts_jsnum','ts_unicode'):
+    for name in ('tsr_binder','tsr_parser','tsr_scanner','tsr_ast','tsr_arena','tsr_core',
+                 'tsr_diagnostics','tsr_jsstring','tsr_jsnum','tsr_unicode'):
         crate = ROOT/'crates'/name
         if crate.is_dir():
             paths += list(crate.rglob('*.rs')) + [crate/'Cargo.toml']
@@ -80,9 +80,9 @@ def native_rows(output, inventory):
 
 
 def native_capture(output, env, inventory):
-    cargo = command(['cargo','test','--locked','--release','-p','ts_binder','--lib','--no-run','--message-format=json'],cwd=ROOT,env=env)
+    cargo = command(['cargo','test','--locked','--release','-p','tsr_binder','--lib','--no-run','--message-format=json'],cwd=ROOT,env=env)
     artifacts = [strict_json_loads(line) for line in cargo.splitlines() if line.strip()]
-    binaries = [row['executable'] for row in artifacts if row.get('reason') == 'compiler-artifact' and row.get('profile',{}).get('test') and row.get('target',{}).get('name') == 'ts_binder' and row.get('executable')]
+    binaries = [row['executable'] for row in artifacts if row.get('reason') == 'compiler-artifact' and row.get('profile',{}).get('test') and row.get('target',{}).get('name') == 'tsr_binder' and row.get('executable')]
     if len(binaries) != 1:
         raise ValueError('Cargo did not identify one binder test executable')
     binary = output/'depth-tests'

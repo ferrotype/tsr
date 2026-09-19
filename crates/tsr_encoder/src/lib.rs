@@ -1,7 +1,7 @@
 //! Pinned protocol-8 serialization, decoding and generated layout metadata.
 //! Node indexing uses the source file's owned cache and an explicit JSDoc provider.
 
-use ts_ast::SyntaxKind;
+use tsr_ast::SyntaxKind;
 
 // port: tsc/internal/api/encoder/encoder.go:init#1
 const _: () = assert!(

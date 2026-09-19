@@ -1,7 +1,7 @@
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_ast::{AstBuilder, JsString, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::{AstBuilder, JsString, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 
 #[test]
 fn invalid_source_file_names_keep_go_quoted_panic_payloads() {

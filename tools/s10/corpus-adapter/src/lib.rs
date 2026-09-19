@@ -2,9 +2,9 @@
 //! Reuses S08's actual query walker and diagnostic schedule over Session.
 use serde_json::Value;
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_checker::CheckerOwner;
-use ts_embed::{FileCache, Program, ProgramOptions, Session};
+use tsr_arena::Counters;
+use tsr_checker::CheckerOwner;
+use tsr_embed::{FileCache, Program, ProgramOptions, Session};
 
 #[path = "../../../s08/p5/baseline/mod.rs"]
 mod baseline;
@@ -19,7 +19,7 @@ mod paths;
 
 /// The external executable supplies the public API constructor explicitly.
 pub type LoadSession =
-    fn(ProgramOptions, &mut FileCache, &Counters) -> Result<Session, ts_compiler::Error>;
+    fn(ProgramOptions, &mut FileCache, &Counters) -> Result<Session, tsr_compiler::Error>;
 
 struct Embedding {
     load: LoadSession,
@@ -32,7 +32,7 @@ impl executor::Hooks for Embedding {
         options: ProgramOptions,
         cache: &mut FileCache,
         counters: &Counters,
-    ) -> Result<Arc<Program>, ts_compiler::Error> {
+    ) -> Result<Arc<Program>, tsr_compiler::Error> {
         let session = (self.load)(options, cache, counters)?;
         let program = session.program().clone();
         self.session = Some(session);
@@ -43,7 +43,7 @@ impl executor::Hooks for Embedding {
         &mut self,
         program: Arc<Program>,
         _counters: &Counters,
-    ) -> Result<Arc<CheckerOwner>, ts_checker::Error> {
+    ) -> Result<Arc<CheckerOwner>, tsr_checker::Error> {
         let session = self.session.as_ref().expect("loader created session");
         assert!(Arc::ptr_eq(session.program(), &program));
         session.checker().cloned()

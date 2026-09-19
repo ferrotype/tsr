@@ -7,7 +7,7 @@ fn main() {
     let mut raw = Vec::new();
     std::io::stdin().read_to_end(&mut raw).unwrap();
     let requests = serde_json::from_slice(&raw).unwrap();
-    let prepared = ts_checker::storage_pilot::Prepared::new(&requests).unwrap();
+    let prepared = tsr_checker::storage_pilot::Prepared::new(&requests).unwrap();
     let live_before = ALLOCATOR.allocated();
     let requested_before = ALLOCATOR.total_allocated();
     let result = prepared.execute().unwrap();

@@ -3,9 +3,9 @@ use crate::{
     relater::{Relater, RelationKind},
     type_flags as tf, CheckerState, Error, TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SymbolFlags, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, JsString, SymbolFlags, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:isExcessPropertyCheckTarget
@@ -48,7 +48,7 @@ impl CheckerState {
             let key = if late {
                 self.builtins.es_symbol_type
             } else {
-                self.get_string_literal_type(ts_ast::JsString::from_bytes(name))?
+                self.get_string_literal_type(tsr_ast::JsString::from_bytes(name))?
             };
             if self.applicable_index_info(ty, key)?.is_some()
                 || late
@@ -248,12 +248,12 @@ impl Relater<'_> {
             .ok_or(Error::MissingLink("No errorNode in hasExcessProperties"))?;
         let error_read = self.checker.node(error_node)?;
         let jsx_error = jsx
-            || ts_ast::is_jsx_attributes(&error_read)
-            || ts_ast::utilities_middle::is_jsx_opening_like_element(&error_read)
+            || tsr_ast::is_jsx_attributes(&error_read)
+            || tsr_ast::utilities_middle::is_jsx_opening_like_element(&error_read)
             || error_read
                 .parent()
                 .map(|parent| {
-                    Ok::<_, Error>(ts_ast::utilities_middle::is_jsx_opening_like_element(
+                    Ok::<_, Error>(tsr_ast::utilities_middle::is_jsx_opening_like_element(
                         &self.checker.node(parent)?,
                     ))
                 })
@@ -272,13 +272,13 @@ impl Relater<'_> {
         let declaration_read = view.node(declaration)?;
         let mut suggestion = None;
         if let Some(literal) = object_literal_declaration {
-            if ts_ast::utilities::is_object_literal_element(&declaration_read)
-                && ts_ast::utilities::find_ancestor(view, Some(declaration), |node| {
+            if tsr_ast::utilities::is_object_literal_element(&declaration_read)
+                && tsr_ast::utilities::find_ancestor(view, Some(declaration), |node| {
                     node.id() == literal
                 })?
                 .is_some()
-                && ts_ast::utilities::get_source_file_of_node(view, Some(literal))?
-                    == ts_ast::utilities::get_source_file_of_node(
+                && tsr_ast::utilities::get_source_file_of_node(view, Some(literal))?
+                    == tsr_ast::utilities::get_source_file_of_node(
                         self.checker.ast(error_node)?,
                         Some(error_node),
                     )?
@@ -354,7 +354,7 @@ impl CheckerState {
             }
         }
         let failure = std::cell::Cell::new(None);
-        let result = ts_scanner::get_spelling_suggestion(
+        let result = tsr_scanner::get_spelling_suggestion(
             name,
             candidates.iter(),
             |entry| entry.0.as_bytes(),

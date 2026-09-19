@@ -6,8 +6,8 @@
 use crate::{CheckerOptions, CheckerState, Error, LiteralValue, TypeId, TypeKind};
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_ast::JsString;
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_ast::JsString;
 
 enum Action {
     Intrinsic(u32, JsString),

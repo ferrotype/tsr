@@ -3,9 +3,9 @@ use crate::name_resolver::{
     kind, node_symbol, required, required_symbol, source_file, Hook, NameResolver,
     NoNameResolverHooks, ResolverHost, ResolverOptions,
 };
-use ts_arena::{Error, SymbolId};
-use ts_ast::{symbol_flags as flags, JsString, NodeId, SymbolFlags, SyntaxKind as K};
-use ts_diagnostics::Message;
+use tsr_arena::{Error, SymbolId};
+use tsr_ast::{symbol_flags as flags, JsString, NodeId, SymbolFlags, SyntaxKind as K};
+use tsr_diagnostics::Message;
 
 /// Optional checker callbacks. Returned identities belong to ResolverHost;
 /// Hook::Value(None) is authoritative where the source callback returns nil.
@@ -141,10 +141,10 @@ impl ReferenceResolver {
         let mut location = Some(reference);
         if start_in_declaration_container {
             if let Some(parent) = host.node(reference)?.parent() {
-                if ts_ast::is_declaration(&host.node(parent)?)
+                if tsr_ast::is_declaration(&host.node(parent)?)
                     && host.node(parent)?.name() == Some(reference)
                 {
-                    location = ts_ast::get_declaration_container(host.ast(parent)?, parent)?;
+                    location = tsr_ast::get_declaration_container(host.ast(parent)?, parent)?;
                 }
             }
         }
@@ -212,7 +212,7 @@ impl ReferenceResolver {
     ) -> Result<Option<NodeId>, Error> {
         for declaration in host.declarations(symbol)?.iter().rev() {
             let node = required(declaration);
-            if ts_ast::is_alias_symbol_declaration(host.ast(node)?, node)? {
+            if tsr_ast::is_alias_symbol_declaration(host.ast(node)?, node)? {
                 return Ok(Some(node));
             }
         }
@@ -311,7 +311,7 @@ impl ReferenceResolver {
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
         if let Some(symbol) = self.get_referenced_value_symbol(host, hooks, node, false)? {
-            if ts_ast::is_non_local_alias(Some(&host.symbol(symbol)?), flags::VALUE)
+            if tsr_ast::is_non_local_alias(Some(&host.symbol(symbol)?), flags::VALUE)
                 && !Self::is_type_only_alias_declaration(host, hooks, Some(symbol))?
             {
                 return Self::get_declaration_of_alias_symbol(host, symbol);

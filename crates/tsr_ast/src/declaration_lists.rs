@@ -1,7 +1,7 @@
 //! Binding-owned declaration slice headers and shared backing storage.
 use crate::{compact::lists::EdgePages, NodeId};
 use std::ops::Range;
-use ts_arena::{ArenaId, AuxId, Counters, Error, OwnedArena};
+use tsr_arena::{ArenaId, AuxId, Counters, Error, OwnedArena};
 
 /// A copied Go declaration-slice header. Nil, length and capacity are separate;
 /// replacing a header does not replace the backing seen through other headers.
@@ -434,8 +434,8 @@ fn declaration_growth_capacity(len: usize, old: usize) -> Result<usize, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::{Node, StorageBuilder};
-    use ts_jsstring::SourceText;
+    use tsr_arena::{Node, StorageBuilder};
+    use tsr_jsstring::SourceText;
 
     fn arena(counters: &Counters) -> ArenaId {
         StorageBuilder::<Node<()>>::from_source_text(SourceText::default(), counters)

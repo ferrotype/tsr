@@ -3,7 +3,7 @@ use crate::{
     NodeId, NodeKind, NodeList, NodeListId, NodeListRead, NodeRead, NodeSlice, NodeSliceRead,
     SyntaxKind, VisitContext, VisitorMethods,
 };
-use ts_core::TextRange;
+use tsr_core::TextRange;
 
 /// Exclusive list and source-file operations needed by transformations. Source
 /// metadata creation belongs to a complete builder, not a lazy JSDoc transaction.
@@ -248,8 +248,8 @@ impl<'a> NodeVisitor<'a> {
             factory: factory.map_or_else(
                 || {
                     VisitorFactory::Owned(Box::new(AstBuilder::new(
-                        ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
-                        &ts_arena::Counters::new(),
+                        tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+                        &tsr_arena::Counters::new(),
                     )))
                 },
                 VisitorFactory::Borrowed,

@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-const { Parser, parseAndEncode } = createRequire(import.meta.url)(resolve("target/s10/node/ts_node.node"));
+const { Parser, parseAndEncode } = createRequire(import.meta.url)(resolve("target/s10/node/tsr_node.node"));
 const fixtures = JSON.parse(readFileSync("tools/s10/parser/fixtures.json", "utf8"));
 const options = [
   { id: "jsx-module", source: [...Buffer.from("const x = <div/>;")], name: [...Buffer.from("/a.tsx")], kind: 4, jsx: true },

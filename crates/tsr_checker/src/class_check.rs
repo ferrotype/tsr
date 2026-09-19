@@ -2,9 +2,9 @@
 //! Unported emit/decorator operations remain explicit boundaries.
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkClassDeclaration
@@ -193,7 +193,7 @@ impl CheckerState {
                     .node(reference)?
                     .expression()
                     .ok_or(Error::MissingLink("class implements expression"))?;
-                if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
+                if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)?
                     || self.node(expression)?.flags() & nf::OPTIONAL_CHAIN != 0
                 {
                     self.error_at(Some(expression), messages::A_class_can_only_implement_an_identifier_Slashqualified_name_with_optional_type_arguments, vec![])?;
@@ -346,18 +346,18 @@ impl CheckerState {
         node: NodeId,
         ty: TypeId,
         base: TypeId,
-        message: &'static ts_diagnostics::Message,
+        message: &'static tsr_diagnostics::Message,
     ) -> Result<(), Error> {
         let mut issued = false;
         for member in self.source_list(node, self.node(node)?.member_list())? {
-            if ts_ast::utilities::is_static(self.ast(member)?, member)? {
+            if tsr_ast::utilities::is_static(self.ast(member)?, member)? {
                 continue;
             }
             let Some(declared) = self.get_symbol_of_declaration(member)? else {
                 continue;
             };
             let name = self.symbol(declared)?.name_to_owned();
-            if name.as_bytes() == ts_ast::internal_symbol_names::COMPUTED {
+            if name.as_bytes() == tsr_ast::internal_symbol_names::COMPUTED {
                 continue;
             }
             let property = self.constituent_property(ty, name.as_bytes(), false)?;
@@ -379,7 +379,7 @@ impl CheckerState {
                     let name = self.symbol_to_string(declared)?;
                     let source = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
                     let target = self.type_to_string(base, crate::type_display::DEFAULT_FLAGS)?;
-                    self.add_diagnostic(ts_ast::Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), messages::Property_0_in_type_1_is_not_assignable_to_the_same_property_in_base_type_2, vec![name, source, target]))?;
+                    self.add_diagnostic(tsr_ast::Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), messages::Property_0_in_type_1_is_not_assignable_to_the_same_property_in_base_type_2, vec![name, source, target]))?;
                     issued = true;
                 }
             }
@@ -458,7 +458,7 @@ impl CheckerState {
                     continue;
                 }
             }
-            let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+            let text = tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
             self.error_at(Some(name), messages::Property_0_has_no_initializer_and_is_not_definitely_assigned_in_the_constructor, vec![text])?;
         }
         Ok(())
@@ -483,7 +483,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameterListsIdentical
     pub(crate) fn check_class_or_interface_type_parameters_identical(
         &mut self,
-        symbol: ts_arena::SymbolId,
+        symbol: tsr_arena::SymbolId,
     ) -> Result<(), Error> {
         let declarations = self.symbol_declarations(symbol)?.to_vec();
         if declarations.len() == 1 || !self.query.type_parameters_checked.insert(symbol) {

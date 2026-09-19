@@ -1,14 +1,14 @@
 //! Checked semantic reads borrow their physical owner and its compact payloads.
 use crate::compact::{CompactContext, FieldKey, StoredNode};
 use crate::{AstStorageData, Node, NodeDataRead, NodeDataSource, NodeId};
-use ts_arena::{AuxId, FileId, StorageOwner, StorageRead, StorageTransaction, StorageView};
-use ts_jsstring::SourceText;
+use tsr_arena::{AuxId, FileId, StorageOwner, StorageRead, StorageTransaction, StorageView};
+use tsr_jsstring::SourceText;
 
 /// A node read borrows its physical owner. Lazy payload references cannot outlive
 /// the read's publication guard. Escaping requires `RetainedNode`.
 ///
 /// ```compile_fail
-/// use ts_ast::{AstFile, NodeId};
+/// use tsr_ast::{AstFile, NodeId};
 /// fn escaped_text<'owner>(file: &'owner AstFile, lazy: NodeId) -> &'owner [u8] {
 ///     let read = file.view().node(lazy).unwrap();
 ///     read.as_identifier().unwrap().text()
@@ -16,7 +16,7 @@ use ts_jsstring::SourceText;
 /// ```
 ///
 /// ```compile_fail
-/// use ts_ast::{AstFile, NodeId};
+/// use tsr_ast::{AstFile, NodeId};
 /// fn escaped_payload<'owner>(file: &'owner AstFile, lazy: NodeId) -> &'owner [u8] {
 ///     let read = file.view().node(lazy).unwrap();
 ///     read.data_source().as_identifier().unwrap().text()
@@ -270,8 +270,8 @@ impl<'a> NodeRead<'a> {
             _ => self.owned_record().unwrap().end(),
         }
     }
-    pub fn range(&self) -> ts_core::TextRange {
-        ts_core::TextRange::new(i64::from(self.pos()), i64::from(self.end()))
+    pub fn range(&self) -> tsr_core::TextRange {
+        tsr_core::TextRange::new(i64::from(self.pos()), i64::from(self.end()))
     }
     pub fn data(&self) -> NodeDataRead<'_> {
         match self.core_header() {
@@ -372,7 +372,7 @@ impl crate::NodeAccess for NodeRead<'_> {
     fn end(&self) -> i32 {
         self.end()
     }
-    fn range(&self) -> ts_core::TextRange {
+    fn range(&self) -> tsr_core::TextRange {
         self.range()
     }
     fn data(&self) -> NodeDataRead<'_> {

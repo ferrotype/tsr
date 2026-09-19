@@ -5,8 +5,8 @@ use crate::{
     modifier_flags, node_flags, AstView, NodeId, NodeKind, NodeRead, SourceFileRead,
     SourceFileState, SyntaxKind as K,
 };
-use ts_arena::Error;
-use ts_core::TextRange;
+use tsr_arena::Error;
+use tsr_core::TextRange;
 
 /// port: tsc/internal/ast/utilities.go:IsObjectBindingOrAssignmentElement
 pub fn is_object_binding_or_assignment_element(node: &(impl NodeAccess + ?Sized)) -> bool {
@@ -551,10 +551,10 @@ pub fn is_source_file_js(file: &SourceFileState) -> bool {
 /// port: tsc/internal/ast/utilities.go:IsCheckJSEnabledForFile
 pub fn is_check_js_enabled_for_file(
     file: &SourceFileState,
-    options: &ts_core::CompilerOptions,
+    options: &tsr_core::CompilerOptions,
 ) -> bool {
     file.check_js_directive
-        .map_or(options.check_js == ts_core::Tristate::TRUE, |directive| {
+        .map_or(options.check_js == tsr_core::Tristate::TRUE, |directive| {
             directive.enabled
         })
 }
@@ -688,7 +688,7 @@ fn reverse_access_kind(access: AccessKind) -> AccessKind {
 
 /// port: tsc/internal/ast/utilities.go:IsJsonSourceFile
 pub fn is_json_source_file(file: &SourceFileState) -> bool {
-    file.script_kind == ts_core::ScriptKind::JSON
+    file.script_kind == tsr_core::ScriptKind::JSON
 }
 
 /// port: tsc/internal/ast/utilities.go:IsExternalModule

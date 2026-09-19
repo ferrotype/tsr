@@ -46,7 +46,7 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
         expected = f"wasm-opt version {pin['wasm_opt_version']} (version_{pin['wasm_opt_version']})"
         if optimizer_version != expected:
             raise ValueError('wasm-opt differs from the pinned release')
-    command = ['cargo', 'build', '--locked', '--release', '--target', pin['wasm_target'], '-p', 'ts_wasm']
+    command = ['cargo', 'build', '--locked', '--release', '--target', pin['wasm_target'], '-p', 'tsr_wasm']
     if checker or corpus:
         command += ['--features', 'corpus' if corpus else 'checker']
     env = dict(build_environment(), CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS=pin['wasm_rustflags'])
@@ -56,7 +56,7 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
     subprocess.run(command, cwd=ROOT, env=env, check=True)
     output = ROOT / 'target/s10' / mode
     output.mkdir(parents=True, exist_ok=True)
-    original = ROOT / 'target' / pin['wasm_target'] / 'release/ts_wasm.wasm'
+    original = ROOT / 'target' / pin['wasm_target'] / 'release/tsr_wasm.wasm'
     subprocess.run([str(bindgen), '--target', 'no-modules', '--remove-name-section', '--remove-producers-section', '--out-dir', str(output),
                     '--out-name', mode, str(original)], cwd=ROOT, check=True)
     post_link = None
@@ -115,15 +115,15 @@ def build_consumer():
 
 def build_node():
     before = sources()
-    command = ['cargo', 'build', '--locked', '--release', '-p', 'ts_node']
+    command = ['cargo', 'build', '--locked', '--release', '-p', 'tsr_node']
     subprocess.run(command, cwd=ROOT, env=build_environment(), check=True)
     if sources() != before:
         raise ValueError('source changed while building Node adapter')
-    name = 'libts_node.dylib' if sys.platform == 'darwin' else 'ts_node.dll' if sys.platform == 'win32' else 'libts_node.so'
+    name = 'libtsr_node.dylib' if sys.platform == 'darwin' else 'tsr_node.dll' if sys.platform == 'win32' else 'libtsr_node.so'
     original = ROOT / 'target/release' / name
     directory = ROOT / 'target/s10/node'
     directory.mkdir(parents=True, exist_ok=True)
-    binary = directory / 'ts_node.node'
+    binary = directory / 'tsr_node.node'
     binary.write_bytes(original.read_bytes())
     record = {'sources': before, 'command': command, 'binary_sha256': digest(binary),
               'rustc': subprocess.check_output(['rustc', '--version'], env=build_environment(), text=True).strip()}

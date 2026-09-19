@@ -1,13 +1,13 @@
 //! Frozen codec constructions; no serialization algorithms live in this adapter.
 use crate::protocol::{hex, Session};
 use serde_json::{json, Value};
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, ContentMapperSourceFileInfo, EagerJsDocProvider, ExternalModuleIndicatorOptions,
     FactoryMethods, FileReference, JsString, MappedDiagnosticDirective, NodeId, NodeKind,
     SourceFileParseOptions, SourceHash, SpanSegment, SyntaxKind,
 };
-use ts_core::{LanguageVariant, ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{LanguageVariant, ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 pub fn scenario(name: &str) -> bool {
     matches!(
         name,
@@ -270,7 +270,7 @@ fn bytes(s: &Session, stage: &str, data: &[u8]) {
 pub fn execute(s: &Session, r: &Value) {
     let mut encoded = Vec::new();
     if !s.stage("encode", || {
-        let mut f = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+        let mut f = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
         let name = r["scenario"].as_str().expect("validated codec");
         if let Some(syntax) = name.strip_prefix("parsed-js/") {
             let text = match syntax {
@@ -278,7 +278,7 @@ pub fn execute(s: &Session, r: &Value) {
                 "import" => b"/** @import {Foo} from \"bar\" */ const x=0;".as_slice(),
                 _ => unreachable!("validated parsed-JS scenario"),
             };
-            let parsed = ts_parser::parse_source_file(
+            let parsed = tsr_parser::parse_source_file(
                 SourceText::from_loaded_bytes(text),
                 ScriptKind::JS,
                 SourceFileParseOptions {
@@ -287,10 +287,10 @@ pub fn execute(s: &Session, r: &Value) {
                     ..Default::default()
                 },
             );
-            encoded = ts_encoder::encode_source_file(
+            encoded = tsr_encoder::encode_source_file(
                 parsed.view(),
                 parsed.root(),
-                &mut ts_parser::ParserJsDocProvider::default(),
+                &mut tsr_parser::ParserJsDocProvider::default(),
             )
             .map_err(|e| e.to_string())?
             .bytes;
@@ -317,9 +317,9 @@ pub fn execute(s: &Session, r: &Value) {
         };
         let mut provider = EagerJsDocProvider::default();
         let result = if let Some(sf) = sf {
-            ts_encoder::encode_source_file(f.view(), sf, &mut provider)
+            tsr_encoder::encode_source_file(f.view(), sf, &mut provider)
         } else {
-            ts_encoder::encode_node(f.view(), root, None, &mut provider)
+            tsr_encoder::encode_node(f.view(), root, None, &mut provider)
         };
         encoded = result.map_err(|e| e.to_string())?.bytes;
         bytes(s, "encode", &encoded);
@@ -329,7 +329,7 @@ pub fn execute(s: &Session, r: &Value) {
     }
     let mut tree = None;
     if !s.stage("decode", || {
-        let decoded = ts_encoder::decode_nodes(&encoded, &ts_arena::Counters::new())
+        let decoded = tsr_encoder::decode_nodes(&encoded, &tsr_arena::Counters::new())
             .map_err(|e| e.to_string())?;
         let root = decoded.root.map(|id| {
             let node = decoded.builder.view().node(id).unwrap();
@@ -355,9 +355,9 @@ pub fn execute(s: &Session, r: &Value) {
             .root
             .is_some_and(|id| view.node(id).unwrap().kind() == SyntaxKind::SourceFile)
         {
-            ts_encoder::encode_source_file(view, tree.root.unwrap(), &mut provider)
+            tsr_encoder::encode_source_file(view, tree.root.unwrap(), &mut provider)
         } else {
-            ts_encoder::encode_optional_node(view, tree.root, None, &mut provider)
+            tsr_encoder::encode_optional_node(view, tree.root, None, &mut provider)
         };
         bytes(s, "reencode", &result.map_err(|e| e.to_string())?.bytes);
         Ok(())

@@ -3,7 +3,7 @@ use crate::{
     element_flags as ef, signature_flags as sg, type_flags as tf, CheckerState, Error, SignatureId,
     TypeId,
 };
-use ts_arena::SymbolId;
+use tsr_arena::SymbolId;
 
 impl CheckerState {
     pub(crate) fn strict_function_types(&self) -> bool {
@@ -250,7 +250,7 @@ impl CheckerState {
                 || self.types.tuple(self.types.target(ty)?)?.combined_flags & ef::VARIABLE != 0
                 || index < self.types.tuple(self.types.target(ty)?)?.fixed_length as usize
             {
-                let index = self.get_number_literal_type(ts_jsnum::Number::new(index as f64))?;
+                let index = self.get_number_literal_type(tsr_jsnum::Number::new(index as f64))?;
                 return self
                     .get_indexed_access_type(ty, index, 0, None, None)
                     .map(Some);
@@ -359,7 +359,7 @@ impl CheckerState {
         &mut self,
         signature: SignatureId,
         position: usize,
-    ) -> Result<Option<ts_arena::NodeId>, Error> {
+    ) -> Result<Option<tsr_arena::NodeId>, Error> {
         let sig = self.signatures.get(signature)?;
         let rest = sig.flags & sg::HAS_REST_PARAMETER != 0;
         let parameters = sig.parameters.clone().unwrap_or_else(|| [].into());
@@ -384,12 +384,12 @@ impl CheckerState {
             return Ok(None);
         };
         let read = self.node(declaration)?;
-        if read.kind() == ts_ast::SyntaxKind::NamedTupleMember {
+        if read.kind() == tsr_ast::SyntaxKind::NamedTupleMember {
             return Ok(Some(declaration));
         }
-        if read.kind() == ts_ast::SyntaxKind::Parameter {
+        if read.kind() == tsr_ast::SyntaxKind::Parameter {
             if let Some(name) = read.name() {
-                if self.node(name)?.kind() == ts_ast::SyntaxKind::Identifier {
+                if self.node(name)?.kind() == tsr_ast::SyntaxKind::Identifier {
                     return Ok(Some(declaration));
                 }
             }
@@ -476,7 +476,7 @@ impl CheckerState {
         &mut self,
         signature: SignatureId,
         position: usize,
-    ) -> Result<ts_ast::JsString, Error> {
+    ) -> Result<tsr_ast::JsString, Error> {
         let sig = self.signatures.get(signature)?;
         let parameters = sig.parameters.clone().unwrap_or_else(|| [].into());
         let count = parameters.len() - usize::from(sig.flags & sg::HAS_REST_PARAMETER != 0);
@@ -506,7 +506,7 @@ impl CheckerState {
         info: crate::TupleElementInfo,
         rest: SymbolId,
         index: usize,
-    ) -> Result<ts_ast::JsString, Error> {
+    ) -> Result<tsr_ast::JsString, Error> {
         if let Some(node) = info.labeled_declaration {
             let name = self
                 .ast(node)?
@@ -516,23 +516,23 @@ impl CheckerState {
             return Ok(self.node_text(name)?.into_js_string());
         }
         if let Some(declaration) = self.symbol(rest)?.value_declaration() {
-            if self.node(declaration)?.kind() == ts_ast::SyntaxKind::Parameter {
+            if self.node(declaration)?.kind() == tsr_ast::SyntaxKind::Parameter {
                 return self.tuple_label_from_binding(declaration, index, info.flags);
             }
         }
         let mut name = self.symbol(rest)?.name_bytes().to_vec();
         name.extend_from_slice(format!("_{index}").as_bytes());
-        Ok(ts_ast::JsString::from_bytes(name))
+        Ok(tsr_ast::JsString::from_bytes(name))
     }
 
     // port: tsc/internal/checker/relater.go:Checker.getTupleElementLabelFromBindingElement
     fn tuple_label_from_binding(
         &self,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
         index: usize,
         flags: crate::ElementFlags,
-    ) -> Result<ts_ast::JsString, Error> {
-        use ts_ast::SyntaxKind as K;
+    ) -> Result<tsr_ast::JsString, Error> {
+        use tsr_ast::SyntaxKind as K;
         let read = self.node(node)?;
         let rest = match read.kind().known() {
             Some(K::Parameter) => read
@@ -560,7 +560,7 @@ impl CheckerState {
                 } else if flags & ef::FIXED == 0 {
                     text.extend_from_slice(b"_n");
                 }
-                return Ok(ts_ast::JsString::from_bytes(text));
+                return Ok(tsr_ast::JsString::from_bytes(text));
             }
             if name_read.kind() == K::ArrayBindingPattern && rest {
                 let elements = self.source_list(name, name_read.element_list())?;
@@ -583,7 +583,7 @@ impl CheckerState {
                 }
             }
         }
-        Ok(ts_ast::JsString::from_bytes(
+        Ok(tsr_ast::JsString::from_bytes(
             format!("arg_{index}").into_bytes(),
         ))
     }
@@ -629,7 +629,7 @@ impl CheckerState {
         &mut self,
         signature: SignatureId,
     ) -> Result<Vec<SymbolId>, Error> {
-        use ts_ast::{check_flags as cf, symbol_flags as sf, JsString};
+        use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString};
         let sig = self.signatures.get(signature)?;
         let parameters = sig.parameters.clone().unwrap_or_else(|| [].into());
         if sig.flags & sg::HAS_REST_PARAMETER == 0 {

@@ -2,11 +2,11 @@ use super::*;
 use crate::bound_input::BoundInputOptions;
 
 fn fixture(text: &[u8]) -> (BoundChecker, NodeId) {
-    let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(
-        ts_jsstring::SourceText::from_loaded_bytes(text),
-        ts_core::ScriptKind::TS,
-        ts_ast::SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(b"/fixture.ts".as_slice()),
+    let file = tsr_binder::bind_parsed_file(tsr_parser::parse_source_file(
+        tsr_jsstring::SourceText::from_loaded_bytes(text),
+        tsr_core::ScriptKind::TS,
+        tsr_ast::SourceFileParseOptions {
+            file_name: tsr_ast::JsString::from_bytes(b"/fixture.ts".as_slice()),
             ..Default::default()
         },
     ))

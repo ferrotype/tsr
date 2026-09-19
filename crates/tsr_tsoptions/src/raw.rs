@@ -2,11 +2,11 @@
 //! masquerade as tsconfig interpretation: targets/module kinds are numeric,
 //! tristates preserve the source boolean/null interpretation, and unknown fields are rejected.
 use serde_json::Value;
-use ts_core::{
+use tsr_core::{
     CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, ModuleResolutionKind, NewLineKind,
     ScriptTarget, Tristate,
 };
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     ExpectedObject,

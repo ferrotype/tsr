@@ -14,7 +14,7 @@ mismatch is accepted by changing a baseline or loosening a comparator.
 
 | Sprint requirement | Concrete deliverable | Independent acceptance |
 | --- | --- | --- |
-| S05-1 token scanning | `ts_scanner`, lexical modes, comment directives, Go token-dump adapter and frozen inputs | Every frozen file/operation produces the same token kind, full/start/end byte positions, flags, text/value bytes, directives and diagnostics |
+| S05-1 token scanning | `tsr_scanner`, lexical modes, comment directives, Go token-dump adapter and frozen inputs | Every frozen file/operation produces the same token kind, full/start/end byte positions, flags, text/value bytes, directives and diagnostics |
 | S05-2 diagnostic/value bytes | Structured scanner diagnostics and byte-preserving literal cooking | Explicit malformed, WTF-8, BOM-decoded, escape and rescan cases; E4's scanner criteria consume this producer |
 | S05-3 regexp | Slash rescan envelope, regexp grammar/recovery and pinned property tables | Real `ReScanSlashToken(true)` calls, flag/target matrix, all property aliases and Unicode predicate checks |
 | S05-4 rescans/JSDoc | Every scanner-only rescan and JSX/JSDoc entry point, state/configuration transitions | Frozen action traces exercise the entry points explicitly, including omitted/false/true regexp error settings |
@@ -38,7 +38,7 @@ checker-created literal types, printing, E1, full E4, E7, or performance gates.
 
 ## Runtime boundaries and costs
 
-Add `ts_scanner` with small modules grouped around invariants:
+Add `tsr_scanner` with small modules grouped around invariants:
 
 - `lib.rs` and `state.rs`: public configuration, state transitions, token views,
   diagnostics and snapshot ownership.
@@ -53,7 +53,7 @@ Add `ts_scanner` with small modules grouped around invariants:
 - `utilities.rs`: the source-independent scanner helpers supported in S05;
   reuse the existing S04 line/position implementations rather than copying them.
 
-Use the existing `ts_ast::SyntaxKind` and `ts_diagnostics::Message` identities.
+Use the existing `tsr_ast::SyntaxKind` and `tsr_diagnostics::Message` identities.
 Add the real token flags and comment-directive value types at the AST boundary,
 with the pinned numeric values. Small target/language-variant definitions must
 remain reusable by S06, without importing a fictitious compiler-options API.
@@ -127,7 +127,7 @@ English formatting is additional evidence, not a replacement for those fields.
 
 ### Numbers
 
-Implement the required `ts_jsnum` slice: `FromString`, `Number.String`,
+Implement the required `tsr_jsnum` slice: `FromString`, `Number.String`,
 `ParsePseudoBigInt`, and the directly used validation/conversion helpers.
 Document arithmetic and other future jsnum operations as unimplemented.
 Port the Go grammar before calling a Rust float parser: signs, radix prefixes,
@@ -162,7 +162,7 @@ second-byte radix branch panics on invalid base-0 input. Probe both directly.
 Number-string whitespace uses its own pinned `unicode.Zs` set: U+0085 and U+200B
 must not become numeric whitespace just because the scanner skips them.
 
-Rejected alternative: vendoring a Ryu port inside `ts_jsnum` would make this
+Rejected alternative: vendoring a Ryu port inside `tsr_jsnum` would make this
 repository maintain and audit the formatter fork without adding a required
 capability over pinned `ryu-js`; the Go differential oracle remains necessary
 with either choice. Likewise, hand-written arbitrary-precision conversion
@@ -201,7 +201,7 @@ The separate generator is `scripts/s05_tables.py`, exposed through
 `python3 scripts/s05.py tables` for verification and
 `python3 scripts/s05.py tables --write-manifest` for deliberate regeneration.
 It writes `data/s05/tables.json`, `data/s05/tables-manifest.json` and
-`crates/ts_scanner/src/tables_generated.rs`. The manifest records the upstream
+`crates/tsr_scanner/src/tables_generated.rs`. The manifest records the upstream
 pin, named input/output hashes, effective Go version and Unicode authorities;
 the generator reads the shared Go pin and workspace rustfmt edition.
 `cargo xtask run scanner` verifies drift through the same code. This is not part

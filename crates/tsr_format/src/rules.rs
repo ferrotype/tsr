@@ -7,7 +7,7 @@ use crate::{
     rulecontext as c,
     settings::SemicolonPreference,
 };
-use ts_ast::SyntaxKind as K;
+use tsr_ast::SyntaxKind as K;
 
 fn kinds(first: K, last: K) -> impl Iterator<Item = K> {
     (first as u16..=last as u16).filter_map(K::from_u16)

@@ -152,8 +152,8 @@ Validation paths can also perform lookups: **the rows overlap and must not be
 added**. New-node edge validation and remaining hook work are explicitly
 partitioned; the entire construction hook is not validation.
 
-The main access path is in [AST storage](../crates/ts_ast/src/storage.rs) and
-[arena storage](../crates/ts_arena/src/file.rs). It selects the binding overlay,
+The main access path is in [AST storage](../crates/tsr_ast/src/storage.rs) and
+[arena storage](../crates/tsr_arena/src/file.rs). It selects the binding overlay,
 resolves the arena and retrieves a checked page/slot. Binding leaf samples also
 land in `binding_for_node`, node-ID extraction, result branching, page-directory
 access and hash-table probing. Their repeated execution is a measured cost;
@@ -161,8 +161,8 @@ this profile does not isolate how much is arithmetic, cache misses or branch
 behavior.
 
 Binding traversal reaches these reads through
-[`Binder::n`, symbol/locals access](../crates/ts_binder/src/state.rs),
-[`BindBuilder`](../crates/ts_ast/src/bind_result.rs) and AST utilities. Final
+[`Binder::n`, symbol/locals access](../crates/tsr_binder/src/state.rs),
+[`BindBuilder`](../crates/tsr_ast/src/bind_result.rs) and AST utilities. Final
 binding validation is a much smaller measured path. In parsing, both core
 validation and new-node construction have measurable costs that warrant a
 separate experiment after the binder access path.
@@ -201,7 +201,7 @@ necessary here: `systemstack` samples may lack the user-level caller frames.
    mutation boundaries permit it. Avoid cloning entire payloads to work around
    borrowing. Measure lookup frequency and pipeline time before and after.
 2. **Prototype a cheaper checked access path for a known owner.** Use the existing
-   [branded core-arena pattern](../crates/ts_arena/src/scope.rs) as an invariant
+   [branded core-arena pattern](../crates/tsr_arena/src/scope.rs) as an invariant
    reference. A binder-facing path must still observe binding overlays and
    support lazy/mapped/foreign-owner fallbacks. Inspect optimized code for
    repeated arena selection, ID decoding and result/borrow dispatch; retain safe

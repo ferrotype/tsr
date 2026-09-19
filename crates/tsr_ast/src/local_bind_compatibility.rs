@@ -8,7 +8,7 @@ use crate::{
     FlowLists, FlowNode, FlowNodes, NodeBinding, NodeId, NodeRead, PatternAmbientModule, SymbolId,
     SymbolTable, SymbolTableId, SymbolTableMut, SymbolTables,
 };
-use ts_arena::Error;
+use tsr_arena::Error;
 
 impl LocalBind<'_, '_> {
     pub fn result(&self) -> &BindResult {
@@ -266,9 +266,9 @@ mod tests {
     use crate::{
         AstBuilder, FactoryMethods, JsString, ParsedFile, SourceFileParseOptions, SyntaxKind,
     };
-    use ts_arena::Counters;
-    use ts_core::TextRange;
-    use ts_jsstring::SourceText;
+    use tsr_arena::Counters;
+    use tsr_core::TextRange;
+    use tsr_jsstring::SourceText;
 
     fn parsed(counters: &Counters) -> (ParsedFile, NodeId, NodeId, NodeId) {
         let text = SourceText::from_loaded_bytes(b"x".as_slice());
@@ -364,7 +364,7 @@ mod tests {
         let mut foreign_flows = FlowNodes::new(&counters);
         let foreign_flow = foreign_flows.push(FlowNode::new(crate::flow_flags::START));
         let foreign_owner =
-            ts_arena::StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &counters);
+            tsr_arena::StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &counters);
         let wrong_owner = NodeId::from_parts(foreign_owner.id().arena(), u32::MAX).unwrap();
         let missing = NodeId::from_parts(source.arena(), u32::MAX).unwrap();
         parsed

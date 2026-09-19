@@ -5,7 +5,7 @@ import json
 
 MARKER = '// S07-bis untimed owner census: staged access-only observer.'
 ADDITIONS = {
-'crates/ts_arena/src/arena.rs': '''
+'crates/tsr_arena/src/arena.rs': '''
 #[cfg(feature = "owner-census")]
 impl<T> Arena<T> {
     pub(crate) fn owner_census(&self) -> [usize; 5] {
@@ -14,7 +14,7 @@ impl<T> Arena<T> {
     }
 }
 ''',
-'crates/ts_arena/src/owned.rs': '''
+'crates/tsr_arena/src/owned.rs': '''
 #[cfg(feature = "owner-census")]
 impl<T> OwnedArena<T> {
     pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() }
@@ -24,7 +24,7 @@ impl<T> SymbolArena<T> {
     pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() }
 }
 ''',
-'crates/ts_arena/src/file.rs': '''
+'crates/tsr_arena/src/file.rs': '''
 #[cfg(feature = "owner-census")]
 impl<N: NodeRecord, S> StorageView<'_, N, S> {
     pub fn owner_census(&self) -> [[usize; 5]; 2] {
@@ -35,7 +35,7 @@ impl<N: NodeRecord, S> StorageView<'_, N, S> {
     }
 }
 ''',
-'crates/ts_arena/src/lazy.rs': '''
+'crates/tsr_arena/src/lazy.rs': '''
 #[cfg(feature = "owner-census")]
 impl<N: NodeRecord> LazyArena<N> {
     pub(crate) fn owner_census(&self) -> [usize; 4] {
@@ -46,7 +46,7 @@ impl<N: NodeRecord> LazyArena<N> {
     }
 }
 ''',
-'crates/ts_arena/src/node_slots.rs': '''
+'crates/tsr_arena/src/node_slots.rs': '''
 #[cfg(feature = "owner-census")]
 impl<T> NodeSlots<T> {
     pub fn owner_census(&self) -> [usize; 6] {
@@ -55,7 +55,7 @@ impl<T> NodeSlots<T> {
     }
 }
 ''',
-'crates/ts_ast/src/storage.rs': '''
+'crates/tsr_ast/src/storage.rs': '''
 #[cfg(feature = "owner-census")]
 impl<'a> AstView<'a> {
     pub fn owner_census_nodes(self) -> impl Iterator<Item = &'a Node> { self.0.core_nodes() }
@@ -64,19 +64,19 @@ impl<'a> AstView<'a> {
     pub fn owner_census_lazy(self) -> [usize; 4] { self.0.owner_census_lazy() }
 }
 ''',
-'crates/ts_ast/src/symbols.rs': '''
+'crates/tsr_ast/src/symbols.rs': '''
 #[cfg(feature = "owner-census")]
 impl SymbolTables { pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() } }
 #[cfg(feature = "owner-census")]
 impl DeclarationLists { pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() } }
 ''',
-'crates/ts_ast/src/flow.rs': '''
+'crates/tsr_ast/src/flow.rs': '''
 #[cfg(feature = "owner-census")]
 impl FlowNodes { pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() } }
 #[cfg(feature = "owner-census")]
 impl FlowLists { pub fn owner_census(&self) -> [usize; 5] { self.0.owner_census() } }
 ''',
-'crates/ts_ast/src/bind_result.rs': '''
+'crates/tsr_ast/src/bind_result.rs': '''
 #[cfg(feature = "owner-census")]
 impl BindResult {
     pub fn owner_census_maps(&self) -> [[usize; 2]; 2] {
@@ -98,7 +98,7 @@ def apply(stage):
         if MARKER in originals[name]:
             raise ValueError('observer marker already exists')
         changes[name] = originals[name] + '\n' + MARKER + '\n' + addition
-    for crate, declaration in [('ts_ast', 'owner-census = ["ts_arena/owner-census"]'), ('ts_arena', 'owner-census = []')]:
+    for crate, declaration in [('tsr_ast', 'owner-census = ["tsr_arena/owner-census"]'), ('tsr_arena', 'owner-census = []')]:
         name = f'crates/{crate}/Cargo.toml'
         original = (stage / name).read_text()
         if original.count('[features]\n') != 1 or 'owner-census' in original:

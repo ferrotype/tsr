@@ -1,8 +1,8 @@
 //! Export-star traversal has query-local cycle tracking. Published export maps
 //! and type-only provenance belong to the checker, never to bound symbols.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     internal_symbol_names as names, symbol_flags as sf, JsString, SymbolTable, SymbolTableId,
 };
 
@@ -33,7 +33,7 @@ impl CheckerState {
             return Ok(None);
         };
         if !dont_resolve_alias
-            && ts_ast::is_non_local_alias(
+            && tsr_ast::is_non_local_alias(
                 Some(&self.symbol(symbol)?),
                 sf::VALUE | sf::TYPE | sf::NAMESPACE,
             )
@@ -187,7 +187,7 @@ impl CheckerState {
                     let data = read
                         .data_source()
                         .as_export_declaration()
-                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                     let name = data
                         .module_specifier()
                         .ok_or(Error::MissingLink("export-star module specifier"))?;
@@ -221,7 +221,7 @@ impl CheckerState {
                         continue;
                     }
                     for declaration in collision.duplicates {
-                        self.error_at(Some(declaration),ts_diagnostics::Module_0_has_already_exported_a_member_named_1_Consider_explicitly_re_exporting_to_resolve_the_ambiguity,vec![collision.specifier.clone(),name.clone()])?;
+                        self.error_at(Some(declaration),tsr_diagnostics::Module_0_has_already_exported_a_member_named_1_Consider_explicitly_re_exporting_to_resolve_the_ambiguity,vec![collision.specifier.clone(),name.clone()])?;
                     }
                 }
                 self.extend_module_exports(symbols, nested, None)?;
@@ -259,7 +259,7 @@ impl CheckerState {
                     table.insert(
                         JsString::from_bytes(name),
                         ExportCollision {
-                            specifier: ts_scanner::get_text_of_node(
+                            specifier: tsr_scanner::get_text_of_node(
                                 self.ast(specifier)?,
                                 specifier,
                             )?,

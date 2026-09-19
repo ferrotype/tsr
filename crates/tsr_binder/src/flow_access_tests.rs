@@ -6,17 +6,17 @@ use crate::{
     Binder,
 };
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_ast::{flow_flags as F, FlowList, FlowLists, FlowNode, FlowNodes, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::{flow_flags as F, FlowList, FlowLists, FlowNode, FlowNodes, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
-fn parsed() -> ts_ast::ParsedFile {
-    ts_parser::parse_source_file(
+fn parsed() -> tsr_ast::ParsedFile {
+    tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(b"x;".as_slice()),
         ScriptKind::TS,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(b"/flow-access.ts".as_slice()),
+            file_name: tsr_ast::JsString::from_bytes(b"/flow-access.ts".as_slice()),
             ..Default::default()
         },
     )

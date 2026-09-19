@@ -1,9 +1,9 @@
 use super::*;
 use crate::{AstBuilder, FactoryMethods, JsString};
 use std::collections::BTreeMap;
-use ts_arena::Counters;
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn base() -> Diagnostic {
     let mut diagnostic = Diagnostic::external(
@@ -59,16 +59,16 @@ fn source_diagnostic_order_and_equality_discriminators() {
     ]
     .into();
     let file_name = |id| names.get(&id).copied().ok_or("missing source file");
-    static ADHOC_A: ts_diagnostics::Message = ts_diagnostics::Message {
+    static ADHOC_A: tsr_diagnostics::Message = tsr_diagnostics::Message {
         code: -1,
-        category: ts_diagnostics::Category::Error,
+        category: tsr_diagnostics::Category::Error,
         key: "-1",
         text: "a",
         reports_unnecessary: false,
         reports_deprecated: false,
         elided_in_compatibility_pyramid: false,
     };
-    static ADHOC_Z: ts_diagnostics::Message = ts_diagnostics::Message {
+    static ADHOC_Z: tsr_diagnostics::Message = tsr_diagnostics::Message {
         text: "z",
         ..ADHOC_A
     };

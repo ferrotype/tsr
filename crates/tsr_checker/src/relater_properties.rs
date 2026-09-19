@@ -5,8 +5,8 @@ use crate::{
     relater::{Relater, RelationKind, BOTH, SOURCE},
     ternary as tr, type_flags as tf, CheckerState, Error, IndexInfoId, Ternary, TypeId,
 };
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isValidOverrideOf
@@ -167,7 +167,7 @@ impl Relater<'_> {
         target: TypeId,
         optional_only: bool,
         intersection: u32,
-        excluded: &[ts_ast::JsString],
+        excluded: &[tsr_ast::JsString],
     ) -> Result<Ternary, Error> {
         if self.kind == RelationKind::Identity {
             return self.properties_identical(source, target);
@@ -319,7 +319,7 @@ impl Relater<'_> {
                 if self.report_errors {
                     let name = self.checker.symbol_to_string(target)?;
                     if s & t & mf::PRIVATE != 0 {
-                        self.report_error(ts_diagnostics::Types_have_separate_declarations_of_a_private_property_0, vec![name]);
+                        self.report_error(tsr_diagnostics::Types_have_separate_declarations_of_a_private_property_0, vec![name]);
                     } else {
                         let (private, public) = if s & mf::PRIVATE != 0 {
                             (source_object, target_object)
@@ -333,7 +333,7 @@ impl Relater<'_> {
                             .checker
                             .type_to_string(public, crate::type_display::DEFAULT_FLAGS)?;
                         self.report_error(
-                            ts_diagnostics::Property_0_is_private_in_type_1_but_not_in_type_2,
+                            tsr_diagnostics::Property_0_is_private_in_type_1_but_not_in_type_2,
                             vec![name, private, public],
                         );
                     }
@@ -358,7 +358,7 @@ impl Relater<'_> {
                     let target = self
                         .checker
                         .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
-                    self.report_error(ts_diagnostics::Property_0_is_protected_but_type_1_is_not_a_class_derived_from_2, vec![name, source, target]);
+                    self.report_error(tsr_diagnostics::Property_0_is_protected_but_type_1_is_not_a_class_derived_from_2, vec![name, source, target]);
                 }
                 return Ok(tr::FALSE);
             }
@@ -372,7 +372,7 @@ impl Relater<'_> {
                     .checker
                     .type_to_string(target_object, crate::type_display::DEFAULT_FLAGS)?;
                 self.report_error(
-                    ts_diagnostics::Property_0_is_protected_in_type_1_but_public_in_type_2,
+                    tsr_diagnostics::Property_0_is_protected_in_type_1_but_public_in_type_2,
                     vec![name, source, target],
                 );
             }
@@ -408,7 +408,7 @@ impl Relater<'_> {
             if self.report_errors {
                 let name = self.checker.symbol_to_string(target)?;
                 self.report_error(
-                    ts_diagnostics::Types_of_property_0_are_incompatible,
+                    tsr_diagnostics::Types_of_property_0_are_incompatible,
                     vec![name],
                 );
             }
@@ -428,7 +428,7 @@ impl Relater<'_> {
                     .checker
                     .type_to_string(target_object, crate::type_display::DEFAULT_FLAGS)?;
                 self.report_error(
-                    ts_diagnostics::Property_0_is_optional_in_type_1_but_required_in_type_2,
+                    tsr_diagnostics::Property_0_is_optional_in_type_1_but_required_in_type_2,
                     vec![name, source, target],
                 );
             }
@@ -532,7 +532,7 @@ impl Relater<'_> {
                         .checker
                         .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
                     self.report_error(
-                        ts_diagnostics::Index_signature_for_type_0_is_missing_in_type_1,
+                        tsr_diagnostics::Index_signature_for_type_0_is_missing_in_type_1,
                         vec![key, source],
                     );
                 }
@@ -573,7 +573,7 @@ impl Relater<'_> {
                     if self.report_errors {
                         let name = self.checker.symbol_to_string(property)?;
                         self.report_error(
-                            ts_diagnostics::Property_0_is_incompatible_with_index_signature,
+                            tsr_diagnostics::Property_0_is_incompatible_with_index_signature,
                             vec![name],
                         );
                     }
@@ -619,7 +619,7 @@ impl Relater<'_> {
                 .type_to_string(source_info.key_type, crate::type_display::DEFAULT_FLAGS)?;
             if source_info.key_type == target_info.key_type {
                 self.report_error(
-                    ts_diagnostics::X_0_index_signatures_are_incompatible,
+                    tsr_diagnostics::X_0_index_signatures_are_incompatible,
                     vec![source_name],
                 );
             } else {
@@ -627,7 +627,7 @@ impl Relater<'_> {
                     .checker
                     .type_to_string(target_info.key_type, crate::type_display::DEFAULT_FLAGS)?;
                 self.report_error(
-                    ts_diagnostics::X_0_and_1_index_signatures_are_incompatible,
+                    tsr_diagnostics::X_0_and_1_index_signatures_are_incompatible,
                     vec![source_name, target_name],
                 );
             }

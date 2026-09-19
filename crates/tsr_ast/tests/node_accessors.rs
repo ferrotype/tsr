@@ -2,9 +2,9 @@ use std::{
     collections::BTreeMap,
     panic::{catch_unwind, AssertUnwindSafe},
 };
-use ts_ast::*;
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_ast::*;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn outcome(action: impl FnOnce() -> String) -> String {
     match catch_unwind(AssertUnwindSafe(action)) {
@@ -356,7 +356,7 @@ fn hex(bytes: &[u8]) -> String {
 
 #[test]
 fn matches_pinned_go_node_accessor_observations() {
-    let mut f = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+    let mut f = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
     let a = f.new_identifier(JsString::from_bytes(&b"a"[..]));
     let b = f.new_identifier(JsString::from_bytes(&b"b"[..]));
     let q = f.new_token(SyntaxKind::QuestionToken.into());
@@ -1121,7 +1121,7 @@ fn source_check(
 #[test]
 fn matches_pinned_go_source_file_accessor_observations() {
     let string = |bytes: &[u8]| JsString::from_bytes(bytes);
-    let mut f = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+    let mut f = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
     let a = f.new_identifier(string(b"a"));
     let b = f.new_identifier(string(b"b"));
     let opts = SourceFileParseOptions {
@@ -1141,7 +1141,7 @@ fn matches_pinned_go_source_file_accessor_observations() {
     let mut actual = BTreeMap::new();
     source_check(&mut actual, "source/plain", &f, source, source, [a, b]);
     for kind in [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 100] {
-        f.source_file_mut(source).unwrap().script_kind = ts_core::ScriptKind(kind);
+        f.source_file_mut(source).unwrap().script_kind = tsr_core::ScriptKind(kind);
         actual.insert(
             format!("source/IsJS/{kind}"),
             format!("value:{}", f.view().source_file(source).unwrap().is_js()),

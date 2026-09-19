@@ -2,8 +2,8 @@
 use crate::need;
 use crate::{backend::Backend, Binder};
 use std::ops::ControlFlow;
-use ts_ast::local_bind::{BindEdges, BindList, BindSlice, LocalChildVisitor};
-use ts_ast::{local_bind::BindNode, SyntaxKind as K};
+use tsr_ast::local_bind::{BindEdges, BindList, BindSlice, LocalChildVisitor};
+use tsr_ast::{local_bind::BindNode, SyntaxKind as K};
 
 #[derive(Clone, Copy)]
 enum Child<'scope> {
@@ -56,13 +56,13 @@ impl<'scope> Binder<'_, 'scope, '_> {
                         .expect("binder flow and target belong to result");
                 }
                 self.check_local_contextual_identifier(node);
-                if flags & ts_ast::node_flags::THIS_NODE_HAS_ERROR != 0 {
+                if flags & tsr_ast::node_flags::THIS_NODE_HAS_ERROR != 0 {
                     let Backend::Local(local) = &mut self.builder else {
                         unreachable!("local binder scope");
                     };
                     local.set_flags(
                         node,
-                        flags | ts_ast::node_flags::THIS_NODE_OR_ANY_SUB_NODES_HAS_ERROR,
+                        flags | tsr_ast::node_flags::THIS_NODE_OR_ANY_SUB_NODES_HAS_ERROR,
                     );
                     self.seen_parse_error = true;
                 }

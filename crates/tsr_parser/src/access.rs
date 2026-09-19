@@ -1,8 +1,8 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind};
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind};
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseLeftHandSideExpressionOrHigher
@@ -266,7 +266,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 let loc = self.factory.read_list(types).loc();
                 let loc = TextRange::new(
                     loc.pos() - 1,
-                    ts_scanner::skip_trivia(self.source_text, loc.end()) + 1,
+                    tsr_scanner::skip_trivia(self.source_text, loc.end()) + 1,
                 );
                 self.parse_error_at_range(loc, diagnostics::An_instantiation_expression_cannot_be_followed_by_a_property_access, vec![]);
             }

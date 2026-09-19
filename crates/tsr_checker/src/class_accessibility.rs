@@ -1,8 +1,8 @@
 //! Constructor accessibility is checked against the lexical class and its
 //! non-mixin bases, separately from structural signature compatibility.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, SignatureId, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getConstructorAccessibilityError
@@ -35,7 +35,7 @@ impl CheckerState {
             }
             if modifiers & mf::PROTECTED != 0 {
                 if let Some(containing) =
-                    ts_ast::utilities::get_containing_class(self.ast(node)?, node)?
+                    tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?
                 {
                     let containing_symbol = self
                         .get_symbol_of_declaration(containing)?
@@ -61,12 +61,12 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isNodeWithinClass
     // port: tsc/internal/checker/checker.go:Checker.forEachEnclosingClass
     pub(crate) fn node_within_class(&self, node: NodeId, class: NodeId) -> Result<bool, Error> {
-        let mut containing = ts_ast::utilities::get_containing_class(self.ast(node)?, node)?;
+        let mut containing = tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?;
         while let Some(current) = containing {
             if current == class {
                 return Ok(true);
             }
-            containing = ts_ast::utilities::get_containing_class(self.ast(current)?, current)?;
+            containing = tsr_ast::utilities::get_containing_class(self.ast(current)?, current)?;
         }
         Ok(false)
     }

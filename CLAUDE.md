@@ -77,7 +77,7 @@ python3 scripts/s09_format.py compare --ops nav --limit 2000 --output "$SCRATCH/
 Disagreeing inputs land in `failures.ndjson` with both observations. Changing
 `tools/s09/format_oracle/*.go` or the script makes `data/s09/format-probes.json`
 stale: `freeze` rewrites it and `verify` must reproduce it, about ten minutes
-each. `fixtures --freeze` rewrites the insertion rows the `ts_api` tests read.
+each. `fixtures --freeze` rewrites the insertion rows the `tsr_api` tests read.
 A comparison that reports full parity on its first run has to be mutation
 checked before it is believed.
 

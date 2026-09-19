@@ -6,10 +6,10 @@
 use crate::{
     signature_flags as sg, type_flags as tf, types::Map, CheckerState, Error, SignatureId, TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, Diagnostic, SyntaxKind as K};
-use ts_core::{TextRange, Tristate};
-use ts_diagnostics as messages;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, Diagnostic, SyntaxKind as K};
+use tsr_core::{TextRange, Tristate};
+use tsr_diagnostics as messages;
 
 #[derive(Clone, Copy)]
 enum ContextStatus {
@@ -52,7 +52,7 @@ impl CheckerState {
         &mut self,
         function: NodeId,
     ) -> Result<bool, Error> {
-        if self.program()?.host.options().emit_script_target() < ts_core::ScriptTarget::ES2016 {
+        if self.program()?.host.options().emit_script_target() < tsr_core::ScriptTarget::ES2016 {
             return Ok(false);
         }
         let view = self.ast(function)?;
@@ -62,13 +62,14 @@ impl CheckerState {
         if view.node(body)?.kind() != K::Block {
             return Ok(false);
         }
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(function))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(function))?
             .ok_or(Error::MissingLink("function strict source"))?;
         let statements: Vec<_> = view
             .node_slice(view.node(body)?.statements(view)?)?
             .iter()
             .collect();
-        let Some(directive) = ts_binder::find_use_strict_prologue(view, source, &statements) else {
+        let Some(directive) = tsr_binder::find_use_strict_prologue(view, source, &statements)
+        else {
             return Ok(false);
         };
         let mut non_simple = Vec::new();
@@ -160,7 +161,7 @@ impl CheckerState {
                 self.check_computed_property_name(name)?;
             }
         }
-        let bindable = if !ts_ast::has_dynamic_name(self.ast(function)?, Some(function))? {
+        let bindable = if !tsr_ast::has_dynamic_name(self.ast(function)?, Some(function))? {
             true
         } else if let Some(name) = self.late_name(function)? {
             let ty = self.late_name_type(name)?;
@@ -193,7 +194,7 @@ impl CheckerState {
         self.check_full_signature_arity(function)?;
         let body_missing = match body {
             None => true,
-            Some(body) => ts_ast::node_is_missing(Some(&self.node(body)?)),
+            Some(body) => tsr_ast::node_is_missing(Some(&self.node(body)?)),
         };
         if annotation.is_none() && body_missing {
             let read = self.node(function)?;
@@ -206,8 +207,8 @@ impl CheckerState {
                     .strict_option_value(self.program()?.host.options().no_implicit_any)
             {
                 let name =
-                    ts_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
-                self.error_at(Some(function), messages::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type, vec![name, ts_ast::JsString::from_bytes(b"any".as_slice())])?;
+                    tsr_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
+                self.error_at(Some(function), messages::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type, vec![name, tsr_ast::JsString::from_bytes(b"any".as_slice())])?;
             }
         }
         if annotation.is_none() && !body_missing && self.body_function_flags(function)?.1 {
@@ -220,11 +221,12 @@ impl CheckerState {
         } else {
             let read = self.node(function)?;
             if kind == K::MethodDeclaration
-                && read.modifier_flags(self.ast(function)?)? & ts_ast::modifier_flags::ABSTRACT != 0
+                && read.modifier_flags(self.ast(function)?)? & tsr_ast::modifier_flags::ABSTRACT
+                    != 0
                 && body.is_some()
             {
                 let name =
-                    ts_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
+                    tsr_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
                 self.error_at(
                     Some(function),
                     messages::Method_0_cannot_have_an_implementation_because_it_is_marked_abstract,
@@ -235,7 +237,7 @@ impl CheckerState {
             let read = self.node(function)?;
             if let Some(name) = read.name() {
                 if self.node(name)?.kind() == K::PrivateIdentifier
-                    && ts_ast::utilities::get_containing_class(self.ast(function)?, function)?
+                    && tsr_ast::utilities::get_containing_class(self.ast(function)?, function)?
                         .is_none()
                 {
                     self.error_at(
@@ -264,9 +266,9 @@ impl CheckerState {
             let start = if loc.pos() == loc.end() {
                 loc.pos()
             } else {
-                let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+                let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                     .ok_or(Error::MissingLink("constructor type parameter source"))?;
-                ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos())
+                tsr_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos())
             };
             grammar_error = self.grammar_error_range(
                 node,
@@ -300,7 +302,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkNodeDeferred
     pub(crate) fn defer_checker_node(&mut self, function: NodeId) -> Result<(), Error> {
         let source =
-            ts_ast::utilities::get_source_file_of_node(self.ast(function)?, Some(function))?
+            tsr_ast::utilities::get_source_file_of_node(self.ast(function)?, Some(function))?
                 .ok_or(Error::MissingLink("deferred function source"))?;
         if matches!(
             self.source_checks.get(&source),
@@ -1117,7 +1119,7 @@ impl CheckerState {
         let mut current = self.node(node)?.parent();
         while let Some(node) = current {
             let read = self.node(node)?;
-            if ts_ast::utilities::is_function_like(Some(&read))
+            if tsr_ast::utilities::is_function_like(Some(&read))
                 || read.kind() == K::ClassStaticBlockDeclaration
             {
                 return Ok(Some(node));
@@ -1138,7 +1140,8 @@ impl CheckerState {
             .iter()
             .flatten()
             .collect();
-        let restore_flow = ts_ast::utilities::is_function_or_module_block(self.ast(block)?, block)?;
+        let restore_flow =
+            tsr_ast::utilities::is_function_or_module_block(self.ast(block)?, block)?;
         let saved_disabled = self.flow.disabled;
         let result: Result<(), Error> = (|| {
             for statement in statements {
@@ -1209,7 +1212,7 @@ impl CheckerState {
                     .is_empty()
             {
                 let source =
-                    ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+                    tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                         .ok_or(Error::MissingLink("throw source"))?;
                 if self
                     .ast(source)?
@@ -1240,7 +1243,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("ambient statement parent"))?;
         let parent_read = self.node(parent)?;
         let (key, diagnostic) = if !self.body_checks.ambient_reported.contains_key(&node)
-            && ts_ast::utilities::is_function_like(Some(&parent_read))
+            && tsr_ast::utilities::is_function_like(Some(&parent_read))
         {
             (
                 node,

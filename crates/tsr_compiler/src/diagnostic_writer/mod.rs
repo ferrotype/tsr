@@ -3,8 +3,8 @@
 //! span translation remains an explicit boundary until the spanmap port exists.
 use crate::{Error, Program};
 use std::{collections::HashMap, sync::Arc};
-use ts_ast::{Diagnostic, NodeId, SourceFileRead};
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::{Diagnostic, NodeId, SourceFileRead};
+use tsr_jsstring::{JsString, SourceText};
 mod pretty;
 
 type Result<T> = std::result::Result<T, Error>;
@@ -60,7 +60,7 @@ impl File {
             .saturating_sub(1);
         Ok((
             line,
-            ts_jsstring::line_map::utf16_len(&self.text.as_bytes()[self.lines[line] as usize..pos])
+            tsr_jsstring::line_map::utf16_len(&self.text.as_bytes()[self.lines[line] as usize..pos])
                 as usize,
         ))
     }
@@ -94,7 +94,7 @@ impl<'a> DiagnosticWriter<'a> {
             .program
             .owners
             .node_file_index(id)
-            .ok_or(ts_arena::Error::WrongOwner)?;
+            .ok_or(tsr_arena::Error::WrongOwner)?;
         Ok(self.program.files()[index]
             .bound()
             .view()
@@ -130,7 +130,7 @@ impl<'a> DiagnosticWriter<'a> {
         };
         let file = Arc::new(File {
             name,
-            lines: ts_jsstring::line_map::compute_ecma_line_starts(text.as_bytes()),
+            lines: tsr_jsstring::line_map::compute_ecma_line_starts(text.as_bytes()),
             text,
             supplemental: source.is_content_mapper_supplemental(),
             stable_identity: !original && source.canonical_source_file().is_none(),
@@ -158,17 +158,17 @@ impl<'a> DiagnosticWriter<'a> {
             names
                 .get(&id)
                 .map(JsString::as_bytes)
-                .ok_or(ts_arena::Error::WrongOwner)
+                .ok_or(tsr_arena::Error::WrongOwner)
         };
         let mut sorted: Vec<_> = diagnostics.iter().collect();
-        ts_core::sort_like_go(&mut sorted, &mut |a, b| {
-            ts_ast::compare_diagnostics(a, b, &name).expect("validated diagnostic files")
+        tsr_core::sort_like_go(&mut sorted, &mut |a, b| {
+            tsr_ast::compare_diagnostics(a, b, &name).expect("validated diagnostic files")
         });
         Ok(sorted)
     }
     fn relative_name(&self, name: &[u8]) -> Vec<u8> {
-        if ts_tspath::encoded_root_length(name) > 0 {
-            ts_tspath::relative_to_directory_or_url(
+        if tsr_tspath::encoded_root_length(name) > 0 {
+            tsr_tspath::relative_to_directory_or_url(
                 &self.options.current_directory,
                 name,
                 false,
@@ -293,7 +293,7 @@ fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
         .or_else(|| {
             std::str::from_utf8(d.message_key.as_bytes())
                 .ok()
-                .and_then(ts_diagnostics::by_key)
+                .and_then(tsr_diagnostics::by_key)
         })
         .ok_or(Error::Unsupported("unknown diagnostic localization key"))?;
     let bytes = message.text.as_bytes();
@@ -363,7 +363,7 @@ fn valid_argument(bytes: &[u8]) -> Vec<u8> {
     let mut offset = 0;
     let mut invalid = false;
     while offset < bytes.len() {
-        let (rune, width) = ts_jsstring::wtf8::decode_utf8(&bytes[offset..]);
+        let (rune, width) = tsr_jsstring::wtf8::decode_utf8(&bytes[offset..]);
         if rune == 0xfffd && width == 1 {
             if !invalid {
                 out.extend_from_slice(b"\xef\xbf\xbd");

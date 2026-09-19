@@ -5,9 +5,9 @@ use super::{
     Generation, ModulePath,
 };
 use crate::Error;
-use ts_core::{ModuleResolutionKind, PathMappings, ResolutionMode as Mode};
-use ts_module::package_json::Value;
-use ts_tspath as path;
+use tsr_core::{ModuleResolutionKind, PathMappings, ResolutionMode as Mode};
+use tsr_module::package_json::Value;
+use tsr_tspath as path;
 
 #[derive(Clone, Copy)]
 struct Parts {
@@ -245,7 +245,7 @@ impl Generation<'_> {
             } else if has_extension(file, &[b".mjs", b".mts", b".d.mts"]) {
                 import_mode = Mode::ESNEXT;
             }
-            let conditions = ts_module::get_conditions(self.options(), import_mode);
+            let conditions = tsr_module::get_conditions(self.options(), import_mode);
             if let Some(exports) = package.contents.get("exports") {
                 let found = self.package_exports(file, root, &name, exports, &conditions)?;
                 if !found.is_empty() {
@@ -334,7 +334,7 @@ impl Generation<'_> {
         directory: &[u8],
         name: &[u8],
         exports: &Value,
-        conditions: &[ts_ast::JsString],
+        conditions: &[tsr_ast::JsString],
     ) -> Result<Vec<u8>, Error> {
         if subpaths(exports) {
             for (key, value) in exports.as_object().expect("subpaths object") {
@@ -391,7 +391,7 @@ impl Generation<'_> {
         let Some(imports) = package.contents.get("imports").and_then(Value::as_object) else {
             return Ok(vec![]);
         };
-        let conditions = ts_module::get_conditions(self.options(), self.mode);
+        let conditions = tsr_module::get_conditions(self.options(), self.mode);
         for (key, value) in imports {
             let key = key.as_bytes();
             if key == b"#" || key == b"#/" || !key.starts_with(b"#") {
@@ -434,7 +434,7 @@ impl Generation<'_> {
         directory: &[u8],
         name: &[u8],
         value: &Value,
-        conditions: &[ts_ast::JsString],
+        conditions: &[tsr_ast::JsString],
         mode: Matching,
         is_imports: bool,
         prefer_ts: bool,
@@ -455,7 +455,7 @@ impl Generation<'_> {
         directory: &[u8],
         name: &[u8],
         value: &Value,
-        conditions: &[ts_ast::JsString],
+        conditions: &[tsr_ast::JsString],
         mode: Matching,
         is_imports: bool,
         prefer_ts: bool,
@@ -465,12 +465,12 @@ impl Generation<'_> {
                 let output = if is_imports {
                     self.host.get_output_js_file_name(target)?
                 } else {
-                    ts_ast::JsString::default()
+                    tsr_ast::JsString::default()
                 };
                 let declaration = if is_imports {
                     self.host.get_output_declaration_file_name(target)?
                 } else {
-                    ts_ast::JsString::default()
+                    tsr_ast::JsString::default()
                 };
                 let pattern = path::absolute(&path::combine(directory, &[text.as_bytes()]), b"");
                 let swapped = if ts_file(target) {
@@ -598,7 +598,7 @@ impl Generation<'_> {
                         || conditions
                             .iter()
                             .any(|value| value.as_bytes() == key.as_bytes())
-                        || types && ts_module::is_applicable_versioned_types_key(key.as_bytes())
+                        || types && tsr_module::is_applicable_versioned_types_key(key.as_bytes())
                     {
                         let found = self.package_mapping(
                             target, directory, name, value, conditions, mode, is_imports, prefer_ts,

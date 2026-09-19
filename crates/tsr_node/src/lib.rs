@@ -3,9 +3,9 @@ use napi::bindgen_prelude::Buffer;
 use napi_derive::napi;
 use std::sync::mpsc::{self, Sender};
 use std::thread::JoinHandle;
-use ts_ast::SourceFileParseOptions;
-use ts_core::ScriptKind;
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::SourceFileParseOptions;
+use tsr_core::ScriptKind;
+use tsr_jsstring::{JsString, SourceText};
 
 struct Input {
     source: SourceText,
@@ -32,7 +32,7 @@ impl Input {
             options: SourceFileParseOptions {
                 file_name: JsString::from_bytes(name.as_ref()),
                 path: JsString::from_bytes(name.as_ref()),
-                external_module_indicator_options: ts_ast::ExternalModuleIndicatorOptions {
+                external_module_indicator_options: tsr_ast::ExternalModuleIndicatorOptions {
                     jsx,
                     force,
                 },
@@ -42,7 +42,7 @@ impl Input {
 
     fn execute(self) -> Result<Vec<u8>, String> {
         std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            ts_embed::parse_and_encode(self.source, self.kind, self.options)
+            tsr_embed::parse_and_encode(self.source, self.kind, self.options)
         }))
         .map_err(|_| "parser panicked; request storage discarded".to_owned())?
         .map_err(|error| error.to_string())
@@ -111,7 +111,7 @@ impl Parser {
             .spawn(move || {
                 // The outer owner joins the scoped production parser worker.
                 // Its reserved stack and nested-parser contract stay unchanged.
-                ts_parser::on_parser_worker(move || {
+                tsr_parser::on_parser_worker(move || {
                     while let Ok(request) = receiver.recv() {
                         #[cfg(feature = "worker-probe")]
                         let started = request.measure.then(std::time::Instant::now);

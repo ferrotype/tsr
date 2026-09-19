@@ -1,8 +1,8 @@
 //! Destructuring writes use indexed reads and flow narrowing before relating each target.
 use crate::{access_flags as af, type_facts as facts, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{Factory, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{Factory, SyntaxKind as K};
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -19,14 +19,14 @@ impl CheckerState {
             Some(K::ShorthandPropertyAssignment) => read
                 .data_source()
                 .as_shorthand_property_assignment()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .object_assignment_initializer()
                 .is_some(),
             Some(K::BinaryExpression) => {
                 let token = required(
                     read.data_source()
                         .as_binary_expression()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .operator_token(),
                     "assignment default operator",
                 )?;
@@ -50,7 +50,7 @@ impl CheckerState {
             let initializer = read
                 .data_source()
                 .as_shorthand_property_assignment()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .object_assignment_initializer();
             if let Some(initializer) = initializer {
                 if self.options.strict_null_checks {
@@ -72,7 +72,7 @@ impl CheckerState {
                 self.node(target)?
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .left(),
                 "assignment default target",
             )?;
@@ -100,7 +100,7 @@ impl CheckerState {
             .node(node)?
             .data_source()
             .as_object_literal_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .properties();
         let properties = self.source_list(node, list)?;
         if self.options.strict_null_checks && properties.is_empty() {
@@ -125,7 +125,7 @@ impl CheckerState {
         source: TypeId,
         properties: &[NodeId],
         index: usize,
-        list: Option<ts_ast::NodeListId>,
+        list: Option<tsr_ast::NodeListId>,
         right_is_this: bool,
     ) -> Result<(), Error> {
         let read = self.node(property)?;
@@ -182,7 +182,7 @@ impl CheckerState {
                     return Ok(());
                 }
                 if self.program()?.host.options().emit_script_target()
-                    < ts_core::ScriptTarget::ES2018
+                    < tsr_core::ScriptTarget::ES2018
                 {
                     self.check_external_emit_helpers(property, crate::external_emit_helpers::REST)?;
                 }
@@ -221,7 +221,7 @@ impl CheckerState {
             .node(node)?
             .data_source()
             .as_array_literal_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .elements();
         let elements = self.source_list(node, list)?;
         let use_ = crate::iteration::ALLOW_SYNC | crate::iteration::DESTRUCTURING_FLAG;
@@ -232,7 +232,7 @@ impl CheckerState {
             Some(node),
         )?;
         let mut in_bounds = if self.program()?.host.options().no_unchecked_indexed_access
-            == ts_core::Tristate::TRUE
+            == tsr_core::Tristate::TRUE
         {
             None
         } else {
@@ -278,14 +278,14 @@ impl CheckerState {
         mut element_type: TypeId,
         mode: u32,
         elements: &[NodeId],
-        list: Option<ts_ast::NodeListId>,
+        list: Option<tsr_ast::NodeListId>,
     ) -> Result<(), Error> {
         let read = self.node(element)?;
         if read.kind() == K::OmittedExpression {
             return Ok(());
         }
         if read.kind() != K::SpreadElement {
-            let key = self.get_number_literal_type(ts_jsnum::Number::new(index as f64))?;
+            let key = self.get_number_literal_type(tsr_jsnum::Number::new(index as f64))?;
             if self.is_array_like_type(source)? {
                 let default = self.assignment_has_default(element)?;
                 let flags = af::EXPRESSION_POSITION | if default { af::ALLOW_MISSING } else { 0 };
@@ -314,7 +314,7 @@ impl CheckerState {
                     self.node(target)?
                         .data_source()
                         .as_binary_expression()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .operator_token(),
                     "rest default operator",
                 )?;

@@ -5,21 +5,21 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, TypeId, TypeList, TypeSystemEntity,
     TypeSystemPropertyName,
 };
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getThisType
-    pub(crate) fn type_from_this_node(&mut self, node: ts_arena::NodeId) -> Result<TypeId, Error> {
+    pub(crate) fn type_from_this_node(&mut self, node: tsr_arena::NodeId) -> Result<TypeId, Error> {
         let view = self.ast(node)?;
-        let container = ts_ast::get_this_container(view, node, false, false)?;
+        let container = tsr_ast::get_this_container(view, node, false, false)?;
         let read = view.node(container)?;
         if let Some(parent) = read.parent() {
             if matches!(
                 view.node(parent)?.kind().known(),
                 Some(K::ClassDeclaration | K::ClassExpression | K::InterfaceDeclaration)
-            ) && read.modifier_flags(view)? & ts_ast::modifier_flags::STATIC == 0
+            ) && read.modifier_flags(view)? & tsr_ast::modifier_flags::STATIC == 0
                 && (read.kind() != K::Constructor
-                    || ts_ast::utilities::is_node_descendant_of(view, Some(node), read.body())?)
+                    || tsr_ast::utilities::is_node_descendant_of(view, Some(node), read.body())?)
             {
                 let symbol = self
                     .get_symbol_of_declaration(parent)?
@@ -32,7 +32,7 @@ impl CheckerState {
                     .unwrap_or(self.builtins.error_type));
             }
         }
-        self.error_at(Some(node), ts_diagnostics::A_this_type_is_available_only_in_a_non_static_member_of_a_class_or_interface, vec![])?;
+        self.error_at(Some(node), tsr_diagnostics::A_this_type_is_available_only_in_a_non_static_member_of_a_class_or_interface, vec![])?;
         Ok(self.builtins.error_type)
     }
 
@@ -137,7 +137,7 @@ impl CheckerState {
                     continue;
                 }
                 if !self.is_valid_base_type(base)? {
-                    self.error_at(Some(base_node), ts_diagnostics::An_interface_can_only_extend_an_object_type_or_intersection_of_object_types_with_statically_known_members, vec![])?;
+                    self.error_at(Some(base_node), tsr_diagnostics::An_interface_can_only_extend_an_object_type_or_intersection_of_object_types_with_statically_known_members, vec![])?;
                 } else if ty == base || self.has_base_type(base, ty)? {
                     self.report_circular_base_type(node, ty)?;
                 } else {
@@ -159,14 +159,14 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.reportCircularBaseType
     pub(crate) fn report_circular_base_type(
         &mut self,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
         ty: TypeId,
     ) -> Result<(), Error> {
         let text =
             self.type_to_string(ty, crate::type_format_flags::WRITE_ARRAY_AS_GENERIC_TYPE)?;
         self.error_at(
             Some(node),
-            ts_diagnostics::Type_0_recursively_references_itself_as_a_base_type,
+            tsr_diagnostics::Type_0_recursively_references_itself_as_a_base_type,
             vec![text],
         )?;
         Ok(())

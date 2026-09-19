@@ -3,7 +3,7 @@
 //! exists. Parsing them from editor configuration and converting to and from
 //! the protocol's options belong to the language service and are not ported.
 
-use ts_core::Tristate;
+use tsr_core::Tristate;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum IndentStyle {

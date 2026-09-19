@@ -8,8 +8,8 @@ use crate::{
     TypePredicateKind,
 };
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::JsString;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TypePredicate {
@@ -103,7 +103,7 @@ impl SignatureStore {
         min_argument_count: i32,
     ) -> Result<SignatureId, Error> {
         let id = SignatureId::next(0, self.signatures.len())?;
-        ts_arena::growth::push_frugal(
+        tsr_arena::growth::push_frugal(
             &mut self.signatures,
             Signature {
                 flags,
@@ -136,7 +136,7 @@ impl SignatureStore {
         components: Option<Arc<[NodeId]>>,
     ) -> Result<IndexInfoId, Error> {
         let id = IndexInfoId::next(0, self.index_infos.len())?;
-        ts_arena::growth::push_frugal(
+        tsr_arena::growth::push_frugal(
             &mut self.index_infos,
             IndexInfo {
                 key_type,
@@ -155,38 +155,38 @@ impl SignatureStore {
         predicate: TypePredicate,
     ) -> Result<TypePredicateId, Error> {
         let id = TypePredicateId::next(0, self.predicates.len())?;
-        ts_arena::growth::push_frugal(&mut self.predicates, predicate);
+        tsr_arena::growth::push_frugal(&mut self.predicates, predicate);
         Ok(id)
     }
 
     pub fn get(&self, id: SignatureId) -> Result<&Signature, Error> {
         id.index(0)
             .and_then(|index| self.signatures.get(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     pub(crate) fn get_mut(&mut self, id: SignatureId) -> Result<&mut Signature, Error> {
         id.index(0)
             .and_then(|index| self.signatures.get_mut(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     pub fn index_info(&self, id: IndexInfoId) -> Result<&IndexInfo, Error> {
         id.index(0)
             .and_then(|index| self.index_infos.get(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     pub(crate) fn index_info_mut(&mut self, id: IndexInfoId) -> Result<&mut IndexInfo, Error> {
         id.index(0)
             .and_then(|index| self.index_infos.get_mut(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     pub fn predicate(&self, id: TypePredicateId) -> Result<&TypePredicate, Error> {
         id.index(0)
             .and_then(|index| self.predicates.get(index))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
 
     #[cfg(any(test, feature = "storage-pilot"))]

@@ -1,12 +1,12 @@
 use crate::ParserFactory;
 use std::collections::HashSet;
-use ts_ast::{
+use tsr_ast::{
     node_flags, Diagnostic, JsString, NodeId, NodeListId, NodeSlice, SourceFileParseOptions,
     SyntaxKind,
 };
-use ts_core::{LanguageVariant, ScriptKind, TextRange};
-use ts_jsstring::SourceText;
-use ts_scanner::{Checkpoint, CommentRange, Scanner};
+use tsr_core::{LanguageVariant, ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
+use tsr_scanner::{Checkpoint, CommentRange, Scanner};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
@@ -251,7 +251,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
     /// port: tsc/internal/parser/parser.go:Parser.skipRangeTrivia
     pub(crate) fn skip_range_trivia(&self, loc: TextRange) -> TextRange {
         TextRange::new(
-            ts_scanner::skip_trivia(self.source_text, loc.pos()),
+            tsr_scanner::skip_trivia(self.source_text, loc.pos()),
             loc.end(),
         )
     }
@@ -336,46 +336,46 @@ pub(crate) fn get_language_variant(kind: ScriptKind) -> LanguageVariant {
     }
 }
 
-pub(crate) use ts_ast::modifier_to_flag;
+pub(crate) use tsr_ast::modifier_to_flag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// The source forwards through payload interfaces, independently of header kind.
     /// port: tsc/internal/ast/ast.go:Node.Modifiers
     pub(crate) fn node_modifiers(&self, node: NodeId) -> Option<NodeListId> {
         match self.factory.node(node).data() {
-            ts_ast::NodeDataRead::VariableStatement(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ParameterDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::MissingDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::FunctionDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ClassDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ClassExpression(data) => data.modifiers(),
-            ts_ast::NodeDataRead::InterfaceDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::TypeAliasDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::EnumMember(data) => data.modifiers(),
-            ts_ast::NodeDataRead::EnumDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ImportDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ExportAssignment(data) => data.modifiers(),
-            ts_ast::NodeDataRead::NamespaceExportDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ConstructorDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::GetAccessorDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::SetAccessorDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::IndexSignatureDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::MethodSignatureDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::MethodDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::PropertySignatureDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::PropertyDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ClassStaticBlockDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::BinaryExpression(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ArrowFunction(data) => data.modifiers(),
-            ts_ast::NodeDataRead::FunctionExpression(data) => data.modifiers(),
-            ts_ast::NodeDataRead::PropertyAssignment(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ShorthandPropertyAssignment(data) => data.modifiers(),
-            ts_ast::NodeDataRead::FunctionTypeNode(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ConstructorTypeNode(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ModuleDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ImportEqualsDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::ExportDeclaration(data) => data.modifiers(),
-            ts_ast::NodeDataRead::TypeParameterDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::VariableStatement(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ParameterDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::MissingDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::FunctionDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ClassDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ClassExpression(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::InterfaceDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::TypeAliasDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::EnumMember(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::EnumDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ImportDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ExportAssignment(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::NamespaceExportDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ConstructorDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::GetAccessorDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::SetAccessorDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::IndexSignatureDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::MethodSignatureDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::MethodDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::PropertySignatureDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::PropertyDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ClassStaticBlockDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::BinaryExpression(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ArrowFunction(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::FunctionExpression(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::PropertyAssignment(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ShorthandPropertyAssignment(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::FunctionTypeNode(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ConstructorTypeNode(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ModuleDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ImportEqualsDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::ExportDeclaration(data) => data.modifiers(),
+            tsr_ast::NodeDataRead::TypeParameterDeclaration(data) => data.modifiers(),
             _ => None,
         }
     }

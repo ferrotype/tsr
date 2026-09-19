@@ -2,9 +2,9 @@
 //! `checkDeleteExpressionMustBeOptional` in `tsc/internal/checker/checker.go`).
 
 use crate::{type_facts, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkDeleteExpression
@@ -15,9 +15,9 @@ impl CheckerState {
             .expression()
             .ok_or(Error::MissingLink("delete operand"))?;
         self.check_expression(operand)?;
-        let expression = ts_ast::skip_parentheses(self.ast(operand)?, operand)?;
+        let expression = tsr_ast::skip_parentheses(self.ast(operand)?, operand)?;
         let read = self.node(expression)?;
-        if !ts_ast::utilities::is_access_expression(&read) {
+        if !tsr_ast::utilities::is_access_expression(&read) {
             self.error_at(
                 Some(expression),
                 d::The_operand_of_a_delete_operator_must_be_a_property_reference,
@@ -31,7 +31,7 @@ impl CheckerState {
                 .as_property_access_expression()
                 .and_then(|access| access.name())
                 .ok_or(Error::MissingLink("property access name"))?;
-            if ts_ast::is_private_identifier(&self.node(name)?) {
+            if tsr_ast::is_private_identifier(&self.node(name)?) {
                 self.error_at(
                     Some(expression),
                     d::The_operand_of_a_delete_operator_cannot_be_a_private_identifier,

@@ -36,7 +36,7 @@
 use std::cell::{Cell, OnceCell, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::rc::{Rc, Weak};
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 mod relation_keys;
 mod type_link;
@@ -307,7 +307,7 @@ pub struct Signature {
     pub(crate) target: Option<Rc<Signature>>,
     /// The declaration of each parameter, where there is one: the labels of a
     /// rest tuple built from these parameters (`getNameableDeclarationAtPosition`).
-    pub(crate) parameter_declarations: Vec<Option<ts_arena::NodeId>>,
+    pub(crate) parameter_declarations: Vec<Option<tsr_arena::NodeId>>,
 }
 
 impl Signature {

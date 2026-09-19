@@ -1,11 +1,11 @@
 use super::*;
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     Factory, FactoryMethods, NodeData, NodeId, NodeKind, NodeList, NodeListRead, NodeMut, NodeRead,
     NodeSliceRead, SyntaxKind,
 };
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 struct RecordingFactory {
     inner: AstBuilder,

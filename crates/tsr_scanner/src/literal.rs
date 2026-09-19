@@ -1,6 +1,6 @@
 use crate::{escape_flags, Scanner, TokenValue};
-use ts_ast::{token_flags as flags, SyntaxKind};
-use ts_diagnostics as diagnostics;
+use tsr_ast::{token_flags as flags, SyntaxKind};
+use tsr_diagnostics as diagnostics;
 
 impl<'src> Scanner<'src> {
     /// port: tsc/internal/scanner/scanner.go:Scanner.scanString

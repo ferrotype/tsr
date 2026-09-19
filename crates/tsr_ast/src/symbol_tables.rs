@@ -10,11 +10,11 @@
 use std::collections::HashMap;
 use std::hash::BuildHasher;
 use std::ops::Range;
-use ts_arena::hash::FastState;
+use tsr_arena::hash::FastState;
 
 use hashbrown::HashTable;
-use ts_arena::{ArenaId, AuxId, Counters, Error, OwnedArena, SymbolId};
-use ts_jsstring::JsString;
+use tsr_arena::{ArenaId, AuxId, Counters, Error, OwnedArena, SymbolId};
+use tsr_jsstring::JsString;
 
 /// Owned construction input. Stored tables expose borrowed byte keys instead.
 pub type SymbolTable = HashMap<JsString, Option<SymbolId>>;
@@ -695,7 +695,7 @@ impl<'a> IntoIterator for &'a SymbolTableMut<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::SymbolArena;
+    use tsr_arena::SymbolArena;
 
     fn js(bytes: &[u8]) -> JsString {
         JsString::from_bytes(bytes)

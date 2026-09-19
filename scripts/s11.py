@@ -46,14 +46,14 @@ def inventory(values, label):
 
 
 def rust_binary():
-    raw = command(["cargo", "build", "-p", "ts_testhost", "--locked", "--message-format=json"])
+    raw = command(["cargo", "build", "-p", "tsr_testhost", "--locked", "--message-format=json"])
     binaries = []
     for line in raw.splitlines():
         item = strict_json_loads(line)
-        if item.get("reason") == "compiler-artifact" and item["target"]["name"] == "ts_testhost" and item.get("executable"):
+        if item.get("reason") == "compiler-artifact" and item["target"]["name"] == "tsr_testhost" and item.get("executable"):
             binaries.append(Path(item["executable"]))
     if len(binaries) != 1:
-        raise ValueError("Cargo did not report exactly one ts_testhost executable")
+        raise ValueError("Cargo did not report exactly one tsr_testhost executable")
     return binaries[0]
 
 
@@ -251,7 +251,7 @@ def hook_rows():
     cases = strict_json_loads((ROOT / "data/s11/hook-cases.json").read_bytes())
     inventory([case["id"] for case in cases], "internal cases")
     tests = inventory([case["test"] for case in cases], "internal test names")
-    output = command(["cargo", "test", "-p", "ts_testhost", "--locked", "--lib", "session::tests::", "--", "--color=never"])
+    output = command(["cargo", "test", "-p", "tsr_testhost", "--locked", "--lib", "session::tests::", "--", "--color=never"])
     (REPORTS / "internal-hook.stdout").write_bytes(output)
     outcomes = re.findall(r"^test (session::tests::\w+) \.\.\. (\w+)$", output.decode(), re.MULTILINE)
     if len(outcomes) != len(tests) or set(name for name, _ in outcomes) != set(tests):

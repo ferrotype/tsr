@@ -1,9 +1,9 @@
 //! Pinned vfsmatch patterns. Matching borrows path bytes and performs no path
 //! concatenation on directory-entry checks.
 use std::collections::BTreeSet;
-use ts_jsstring::{equal_fold, helpers::to_lower_go, wtf8::decode_utf8, JsString};
-use ts_tspath as path;
-use ts_vfs::{Error, FileSystem};
+use tsr_jsstring::{equal_fold, helpers::to_lower_go, wtf8::decode_utf8, JsString};
+use tsr_tspath as path;
+use tsr_vfs::{Error, FileSystem};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Usage {
@@ -393,19 +393,19 @@ fn base_paths(path: &[u8], includes: &[JsString], case_sensitive: bool) -> Vec<V
     let mut bases: Vec<_> = includes
         .iter()
         .map(|s| {
-            let absolute = if ts_tspath::encoded_root_length(s.as_bytes()) > 0 {
+            let absolute = if tsr_tspath::encoded_root_length(s.as_bytes()) > 0 {
                 s.as_bytes().to_vec()
             } else {
-                ts_tspath::normalize(&ts_tspath::combine(path, &[s.as_bytes()])).into_owned()
+                tsr_tspath::normalize(&tsr_tspath::combine(path, &[s.as_bytes()])).into_owned()
             };
             include_base_path(&absolute)
         })
         .collect();
-    bases.sort_by(|a, b| ts_tspath::compare_paths(a, b, path, case_sensitive));
+    bases.sort_by(|a, b| tsr_tspath::compare_paths(a, b, path, case_sensitive));
     for base in bases {
         if result
             .iter()
-            .all(|existing| !ts_tspath::contains_path(existing, &base, path, case_sensitive))
+            .all(|existing| !tsr_tspath::contains_path(existing, &base, path, case_sensitive))
         {
             result.push(base);
         }
@@ -502,9 +502,9 @@ pub fn read_directory(
     includes: &[JsString],
     depth: isize,
 ) -> Result<Vec<JsString>, Error> {
-    let path = ts_tspath::normalize(path);
-    let current = ts_tspath::normalize(current_directory);
-    let absolute = ts_tspath::combine(&current, &[&path]);
+    let path = tsr_tspath::normalize(path);
+    let current = tsr_tspath::normalize(current_directory);
+    let absolute = tsr_tspath::combine(&current, &[&path]);
     let case_sensitive = host.use_case_sensitive_file_names();
     let files = Matcher::new(includes, excludes, &absolute, case_sensitive, Usage::Files);
     let results = vec![Vec::new(); files.includes.len().max(1)];
@@ -523,7 +523,7 @@ pub fn read_directory(
         results,
     };
     for base in base_paths(&path, includes, case_sensitive) {
-        visitor.visit(&base, &ts_tspath::combine(&current, &[&base]), depth, b"")?;
+        visitor.visit(&base, &tsr_tspath::combine(&current, &[&base]), depth, b"")?;
     }
     Ok(visitor.results.into_iter().flatten().collect())
 }

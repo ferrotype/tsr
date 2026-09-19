@@ -6,11 +6,11 @@ use crate::{
     Binder,
 };
 use std::sync::Arc;
-use ts_ast::{
+use tsr_ast::{
     internal_symbol_names as names, modifier_flags as mf, symbol_flags as sf, JsString, NodeId,
     SymbolId, SymbolTableId, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.declareSymbol
@@ -206,7 +206,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 if a::is_global_scope_augmentation(&self.n(self.node_id(node))) {
                     return JsString::from_bytes(names::GLOBAL);
                 }
-                let pattern = ts_core::pattern::Pattern::parse(module_name.as_bytes());
+                let pattern = tsr_core::pattern::Pattern::parse(module_name.as_bytes());
                 if pattern.is_valid() && pattern.star_index >= 0 {
                     if let Some(attributes) =
                         target_payload!(self, node, as_module_declaration, "module payload"; node: attributes).0
@@ -251,7 +251,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
                     .expect("computed literal graph")
                 {
                     let (operator, operand) = target_payload!(self, expression, as_prefix_unary_expression, "prefix payload"; scalar: operator, node: operand);
-                    let token = ts_scanner::token_to_string(operator.known().unwrap_or(K::Unknown));
+                    let token =
+                        tsr_scanner::token_to_string(operator.known().unwrap_or(K::Unknown));
                     return JsString::from_bytes(
                         [token.as_bytes(), self.target_text(need(operand)).as_bytes()].concat(),
                     );
@@ -273,7 +274,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.getDisplayName
     pub fn display_name(&self, node: BindingNode<'scope>) -> JsString {
         if let Some(name) = self.node_name(node) {
-            return checked(ts_scanner::declaration_name_to_string(
+            return checked(tsr_scanner::declaration_name_to_string(
                 self.view(),
                 Some(self.node_id(name)),
             ));

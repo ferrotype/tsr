@@ -1,10 +1,10 @@
 //! Dynamic imports check their own arguments and return a promise of the
 //! resolved module namespace. They never use ordinary call-signature resolution.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // Native NewChecker has separate reporting and non-reporting global resolvers.

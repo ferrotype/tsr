@@ -3,7 +3,7 @@
 
 use super::NodeBuilder;
 use crate::{type_flags as tf, Error, TypeId};
-use ts_ast::{symbol_flags as sf, AstView, FactoryMethods, NodeId, SyntaxKind as K};
+use tsr_ast::{symbol_flags as sf, AstView, FactoryMethods, NodeId, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     /// Moves a reference's entity names onto an import type qualifier or a type name.
@@ -19,7 +19,7 @@ impl NodeBuilder<'_> {
             .node(reference)?
             .data_source()
             .as_type_reference_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .type_arguments();
         let read = view.node(root)?;
         let kind = read.kind();
@@ -37,7 +37,7 @@ impl NodeBuilder<'_> {
             .map(|data| (data.type_name(), data.type_arguments()));
         if kind == K::ImportType {
             let (is_type_of, argument, attributes, mut qualifier) =
-                import.ok_or(ts_arena::Error::InvalidGraph)?;
+                import.ok_or(tsr_arena::Error::InvalidGraph)?;
             for id in ids {
                 qualifier = Some(match qualifier {
                     Some(left) => self.ast.new_qualified_name(Some(left), Some(id)),
@@ -50,8 +50,8 @@ impl NodeBuilder<'_> {
         }
         if kind == K::TypeReference {
             let (type_name, root_arguments) =
-                reference_root.ok_or(ts_arena::Error::InvalidGraph)?;
-            if self.flags & ts_nodebuilder::flags::USE_INSTANTIATION_EXPRESSIONS != 0 {
+                reference_root.ok_or(tsr_arena::Error::InvalidGraph)?;
+            if self.flags & tsr_nodebuilder::flags::USE_INSTANTIATION_EXPRESSIONS != 0 {
                 if let Some(list) = root_arguments {
                     if !self.ast.view().list(list)?.nodes().is_empty() {
                         return Err(Error::Unsupported(
@@ -93,7 +93,8 @@ impl NodeBuilder<'_> {
                 return Ok(Some(parent_name));
             }
             let name = self.checker.symbol(symbol)?.name_to_owned();
-            if ts_scanner::is_identifier_text(name.as_bytes(), ts_core::LanguageVariant::STANDARD) {
+            if tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
+            {
                 let member = self.ast.new_identifier(name);
                 let reference = self.ast.new_type_reference_node(Some(member), None);
                 return self
@@ -118,7 +119,7 @@ impl NodeBuilder<'_> {
             };
             let object = if kind == K::ImportType {
                 let (argument, attributes, qualifier, arguments) =
-                    import.ok_or(ts_arena::Error::InvalidGraph)?;
+                    import.ok_or(tsr_arena::Error::InvalidGraph)?;
                 // Native code sets IsTypeOf on the import type it just built.
                 self.ast
                     .new_import_type_node(true, argument, attributes, qualifier, arguments)
@@ -209,7 +210,7 @@ fn access_stack(view: AstView<'_>, reference: NodeId) -> Result<Vec<NodeId>, Err
         let name = node
             .data_source()
             .as_qualified_name()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         ids.push(
             name.right()
                 .ok_or(Error::MissingLink("access stack right"))?,

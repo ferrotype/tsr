@@ -1,15 +1,15 @@
 //! Duplicate and subsequent declaration checks preserve native first-declaration authority.
 use crate::{CheckerState, Error, RelationKind, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkVarDeclaredNamesNotShadowed
     pub(crate) fn check_var_names_not_shadowed(&mut self, node: NodeId) -> Result<(), Error> {
-        use ts_ast::node_flags as nf;
-        if ts_ast::utilities::get_combined_node_flags(self.ast(node)?, node)? & nf::BLOCK_SCOPED
+        use tsr_ast::node_flags as nf;
+        if tsr_ast::utilities::get_combined_node_flags(self.ast(node)?, node)? & nf::BLOCK_SCOPED
             != 0
-            || ts_ast::utilities::is_part_of_parameter_declaration(self.ast(node)?, node)?
+            || tsr_ast::utilities::is_part_of_parameter_declaration(self.ast(node)?, node)?
         {
             return Ok(());
         }
@@ -36,7 +36,7 @@ impl CheckerState {
         let Some(declaration) = self.symbol(local)?.value_declaration() else {
             return Ok(());
         };
-        if ts_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
+        if tsr_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
             & nf::BLOCK_SCOPED
             == 0
         {
@@ -66,7 +66,7 @@ impl CheckerState {
                     Some(K::ModuleBlock | K::ModuleDeclaration | K::SourceFile) => true,
                     Some(K::Block) => match read.parent() {
                         Some(parent) => {
-                            ts_ast::utilities::is_function_like(Some(&self.node(parent)?))
+                            tsr_ast::utilities::is_function_like(Some(&self.node(parent)?))
                         }
                         None => false,
                     },
@@ -90,13 +90,13 @@ impl CheckerState {
         let mut instance = crate::types::Map::default();
         let mut static_names = crate::types::Map::default();
         let mut private = crate::types::Map::default();
-        let ambient = self.node(node)?.flags() & ts_ast::node_flags::AMBIENT != 0;
+        let ambient = self.node(node)?.flags() & tsr_ast::node_flags::AMBIENT != 0;
         for member in members {
             let read = self.node(member)?;
             if read.kind() == K::Constructor {
                 let parameters = self.source_list(member, read.parameter_list())?;
                 for parameter in parameters {
-                    if ts_ast::utilities::is_parameter_property_declaration(
+                    if tsr_ast::utilities::is_parameter_property_declaration(
                         self.ast(parameter)?,
                         parameter,
                         member,
@@ -220,7 +220,7 @@ impl CheckerState {
         for member in self.source_list(node, self.node(node)?.member_list())? {
             if self.node(member)?.kind() == K::Constructor {
                 for parameter in self.source_list(member, self.node(member)?.parameter_list())? {
-                    if !ts_ast::utilities::is_parameter_property_declaration(
+                    if !tsr_ast::utilities::is_parameter_property_declaration(
                         self.ast(parameter)?,
                         parameter,
                         member,
@@ -296,7 +296,7 @@ impl CheckerState {
                 .flatten()
             {
                 if declaration != node
-                    && ts_ast::utilities_middle::is_variable_like(&self.node(declaration)?)
+                    && tsr_ast::utilities_middle::is_variable_like(&self.node(declaration)?)
                     && !self.declaration_flags_identical(declaration, node)?
                 {
                     mismatch = true;
@@ -308,7 +308,7 @@ impl CheckerState {
         }
         if mismatch {
             let name = self.node(node)?.name();
-            let text = ts_scanner::declaration_name_to_string(self.ast(node)?, name)?;
+            let text = tsr_scanner::declaration_name_to_string(self.ast(node)?, name)?;
             self.error_at(
                 name,
                 d::All_declarations_of_0_must_have_identical_modifiers,
@@ -380,7 +380,7 @@ impl CheckerState {
         } else {
             d::Subsequent_variable_declarations_must_have_the_same_type_Variable_0_must_be_of_type_1_but_here_has_type_2
         };
-        let name_text = ts_scanner::declaration_name_to_string(self.ast(next)?, name)?;
+        let name_text = tsr_scanner::declaration_name_to_string(self.ast(next)?, name)?;
         let a = self.type_to_string(first_type, crate::type_display::DEFAULT_FLAGS)?;
         let b = self.type_to_string(next_type, crate::type_display::DEFAULT_FLAGS)?;
         if let Some(index) = self.error_at(name, message, vec![name_text.clone(), a, b])? {

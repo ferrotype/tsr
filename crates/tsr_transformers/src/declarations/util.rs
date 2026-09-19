@@ -1,4 +1,4 @@
-use ts_ast::{modifier_flags as mf, AstView, NodeAccess, NodeId, SyntaxKind as K};
+use tsr_ast::{modifier_flags as mf, AstView, NodeAccess, NodeId, SyntaxKind as K};
 
 // port: tsc/internal/transformers/declarations/util.go:canHaveLiteralInitializer
 pub(super) fn can_have_literal_initializer(
@@ -57,7 +57,7 @@ pub(super) fn is_enclosing_declaration(node: &(impl NodeAccess + ?Sized)) -> boo
                 | K::MappedType
                 | K::VariableDeclaration
         )
-    ) || ts_ast::utilities::is_function_like(Some(node))
+    ) || tsr_ast::utilities::is_function_like(Some(node))
 }
 // port: tsc/internal/transformers/declarations/util.go:maskModifierFlags
 pub(super) fn mask_modifier_flags(flags: u32, mask: u32, additions: u32) -> u32 {
@@ -76,12 +76,12 @@ pub(super) fn mask_modifier_flags(flags: u32, mask: u32, additions: u32) -> u32 
 pub(super) fn unwrap_parenthesized_expression(
     view: AstView<'_>,
     mut node: NodeId,
-) -> Result<NodeId, ts_arena::Error> {
+) -> Result<NodeId, tsr_arena::Error> {
     while view.node(node)?.kind() == K::ParenthesizedExpression {
         node = view
             .node(node)?
             .expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
     }
     Ok(node)
 }
@@ -91,7 +91,7 @@ pub(super) fn leftmost_expression(
     view: AstView<'_>,
     mut node: NodeId,
     stop_at_calls: bool,
-) -> Result<NodeId, ts_arena::Error> {
+) -> Result<NodeId, tsr_arena::Error> {
     loop {
         let read = view.node(node)?;
         let next = match read.kind().known() {
@@ -123,6 +123,6 @@ pub(super) fn leftmost_expression(
             ) => read.expression(),
             _ => return Ok(node),
         };
-        node = next.ok_or(ts_arena::Error::InvalidGraph)?;
+        node = next.ok_or(tsr_arena::Error::InvalidGraph)?;
     }
 }

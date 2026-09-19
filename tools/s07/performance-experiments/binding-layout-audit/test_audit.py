@@ -11,7 +11,7 @@ class InventoryTests(unittest.TestCase):
         cls.schema = json.loads((audit.ROOT / "data/s03/schema/ast.json").read_text())
         cls.go = "\n".join((audit.ROOT / path).read_text() for path in [
             "upstream/tsc/internal/ast/ast_generated.go", "upstream/tsc/internal/ast/ast.go"])
-        cls.data = (audit.ROOT / "crates/ts_ast/src/data_generated.rs").read_text()
+        cls.data = (audit.ROOT / "crates/tsr_ast/src/data_generated.rs").read_text()
 
     def test_transitive_partition_is_not_total_base_count(self):
         observed = audit.base_inventory(self.schema, self.go)

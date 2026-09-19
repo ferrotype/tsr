@@ -1,10 +1,10 @@
 use crate::{Parser, ParserFactory};
-use ts_ast::{
+use tsr_ast::{
     token_flags, AstBuilder, Diagnostic, Factory, FactoryMethods, NodeId, RuntimeFactory,
     SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 impl Parser<'_, AstBuilder> {
     /// port: tsc/internal/parser/parser.go:Parser.parseJSONText
@@ -90,7 +90,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let pos = if self.node_is_missing(Some(node)) {
             loc.pos()
         } else {
-            ts_scanner::skip_trivia(self.source_text, loc.pos())
+            tsr_scanner::skip_trivia(self.source_text, loc.pos())
         };
         TextRange::new(pos, loc.end())
     }

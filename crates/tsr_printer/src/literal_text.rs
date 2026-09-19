@@ -1,11 +1,11 @@
 //! Literal text (`getLiteralText` and `canUseOriginalText` in
 //! `tsc/internal/printer/utilities.go`): a parsed literal prints its source
 //! bytes when they can be reached and are valid; a synthesized one prints its
-//! canonical or escaped form. The escape worker itself is `ts_jsstring::escape`.
+//! canonical or escaped form. The escape worker itself is `tsr_jsstring::escape`.
 
 use crate::{Error, Session};
-use ts_ast::{token_flags, NodeId, NodeRead, SyntaxKind as K};
-use ts_jsstring::{escape::escape_string_with_flags, LiteralEscapeFlags, QuoteChar};
+use tsr_ast::{token_flags, NodeId, NodeRead, SyntaxKind as K};
+use tsr_jsstring::{escape::escape_string_with_flags, LiteralEscapeFlags, QuoteChar};
 
 /// `getLiteralTextFlags`; the bit layout is shared with the escape worker.
 pub type LiteralTextFlags = LiteralEscapeFlags;
@@ -19,10 +19,10 @@ pub(crate) fn can_use_original_text(node: &NodeRead<'_>, flags: LiteralTextFlags
     // A synthetic node has no original text, nor does a node without a parent as
     // the containing source file cannot be found. Unterminated literals lose
     // their original text when the caller asked for proper termination.
-    if ts_ast::utilities::node_is_synthesized(node)
+    if tsr_ast::utilities::node_is_synthesized(node)
         || node.parent().is_none()
         || flags.contains(LiteralEscapeFlags::TERMINATE_UNTERMINATED_LITERALS)
-            && ts_ast::utilities_middle::is_unterminated_literal(node)
+            && tsr_ast::utilities_middle::is_unterminated_literal(node)
     {
         return false;
     }
@@ -57,7 +57,7 @@ impl Session<'_, '_> {
         let read = self.node(node)?;
         if use_source && can_use_original_text(&read, flags) {
             if let Some(text) = self.source_text() {
-                return Ok(ts_scanner::get_text_of_node_from_source_text(
+                return Ok(tsr_scanner::get_text_of_node_from_source_text(
                     self.view,
                     text,
                     Some(node),
@@ -154,7 +154,7 @@ impl Session<'_, '_> {
                     .ok_or(Error::MissingNode("regular expression payload"))?;
                 let text = literal.text();
                 if flags.contains(LiteralEscapeFlags::TERMINATE_UNTERMINATED_LITERALS)
-                    && ts_ast::utilities_middle::is_unterminated_literal(&read)
+                    && tsr_ast::utilities_middle::is_unterminated_literal(&read)
                 {
                     let mut out = text.to_vec();
                     out.extend_from_slice(if text.last() == Some(&b'\\') {
@@ -185,7 +185,7 @@ impl Session<'_, '_> {
         if self.printer.emit_context.emit_flags(node) & crate::emit_flags::NO_ASCII_ESCAPING != 0 {
             flags = union(flags, LiteralEscapeFlags::NEVER_ASCII_ESCAPE);
         }
-        if self.printer.options.target >= ts_core::ScriptTarget::ES2021 {
+        if self.printer.options.target >= tsr_core::ScriptTarget::ES2021 {
             flags = union(flags, LiteralEscapeFlags::ALLOW_NUMERIC_SEPARATOR);
         }
         self.get_literal_text(node, self.current_source.is_some(), flags)

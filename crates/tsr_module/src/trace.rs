@@ -1,7 +1,7 @@
 //! Source trace callbacks retain the diagnostic identity and typed arguments.
 //! Rendering belongs to the host; source strings keep their original bytes.
-use ts_diagnostics::Message;
-use ts_jsstring::JsString;
+use tsr_diagnostics::Message;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TraceArg {
@@ -173,7 +173,7 @@ impl crate::Resolver {
                 }
                 trace!(
                     self,
-                    ts_diagnostics::Expected_type_of_0_field_in_package_json_to_be_1_got_2,
+                    tsr_diagnostics::Expected_type_of_0_field_in_package_json_to_be_1_got_2,
                     name,
                     expected,
                     field.state.actual_type
@@ -182,7 +182,7 @@ impl crate::Resolver {
         }
         trace!(
             self,
-            ts_diagnostics::X_package_json_does_not_have_a_0_field,
+            tsr_diagnostics::X_package_json_does_not_have_a_0_field,
             name
         );
         false
@@ -199,15 +199,15 @@ impl crate::Resolver {
         if field.is_empty() {
             trace!(
                 self,
-                ts_diagnostics::X_package_json_had_a_falsy_0_field,
+                tsr_diagnostics::X_package_json_had_a_falsy_0_field,
                 name
             );
             return None;
         }
-        let path = ts_tspath::resolve(info.directory.as_bytes(), &[field]);
+        let path = tsr_tspath::resolve(info.directory.as_bytes(), &[field]);
         trace!(
             self,
-            ts_diagnostics::X_package_json_has_0_field_1_that_references_2,
+            tsr_diagnostics::X_package_json_has_0_field_1_that_references_2,
             name,
             field,
             &path

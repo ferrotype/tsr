@@ -44,7 +44,7 @@ pub(crate) struct InferenceContext {
     pub non_fixing_mapper: MapperId,
     pub return_mapper: Option<MapperId>,
     pub outer_return_mapper: Option<MapperId>,
-    pub intra_expression_sites: Vec<(ts_arena::NodeId, TypeId)>,
+    pub intra_expression_sites: Vec<(tsr_arena::NodeId, TypeId)>,
     pub inferred_type_parameters: Vec<TypeId>,
     pub comparer: Option<crate::RelationFrameId>,
 }
@@ -58,7 +58,7 @@ impl CheckerState {
     pub(crate) fn inference_context(&self, id: InferenceId) -> Result<&InferenceContext, Error> {
         id.index(0)
             .and_then(|i| self.inference.contexts.get(i))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
     pub(crate) fn inference_context_mut(
         &mut self,
@@ -66,7 +66,7 @@ impl CheckerState {
     ) -> Result<&mut InferenceContext, Error> {
         id.index(0)
             .and_then(|i| self.inference.contexts.get_mut(i))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
     // port: tsc/internal/checker/inference.go:Checker.newInferenceContext
     pub(crate) fn new_inference_context(
@@ -201,7 +201,7 @@ impl CheckerState {
     pub(crate) fn add_intra_expression_inference_site(
         &mut self,
         context: InferenceId,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
         ty: TypeId,
     ) -> Result<(), Error> {
         self.inference_context_mut(context)?
@@ -216,7 +216,7 @@ impl CheckerState {
             .intra_expression_sites
             .clone();
         for (node, ty) in sites {
-            let contextual = if self.node(node)?.kind() == ts_ast::SyntaxKind::MethodDeclaration {
+            let contextual = if self.node(node)?.kind() == tsr_ast::SyntaxKind::MethodDeclaration {
                 self.contextual_property_type_with_flags(node, 2)?
             } else {
                 self.contextual_expression_type_ex(node, 2)?

@@ -8,19 +8,19 @@
   "limits": "Reuses earlier verified per-owner distribution; compiled current widths do not make it a current allocation census. Reproduction needs original paths and Rust1.97.1; the archive includes the exact frozen source inputs and census bytes used by the model.",
   "member_count": 16,
   "members": {
-    "target/s07-bis/construction-access-candidate/source/crates/ts_ast/src/compact/mod.rs": {
+    "target/s07-bis/construction-access-candidate/source/crates/tsr_ast/src/compact/mod.rs": {
       "bytes": 10177,
       "sha256": "0cc03ec281cedd22fd8933a5485465a4ba4684349e9246538e1592c7f53939db"
     },
-    "target/s07-bis/construction-access-candidate/source/crates/ts_ast/src/compact/pages.rs": {
+    "target/s07-bis/construction-access-candidate/source/crates/tsr_ast/src/compact/pages.rs": {
       "bytes": 2151,
       "sha256": "865963a98a1bbf8be02d6c3df2a5958ddf4121bcaa6da36c1c98659c4278c77b"
     },
-    "target/s07-bis/construction-access-candidate/source/crates/ts_ast/src/compact_generated.rs": {
+    "target/s07-bis/construction-access-candidate/source/crates/tsr_ast/src/compact_generated.rs": {
       "bytes": 814702,
       "sha256": "94a9757e78f318843bcbeaf52a102da4ff848786890c26b5c358d10823348190"
     },
-    "target/s07-bis/construction-access-candidate/source/crates/ts_ast/src/node_kind.rs": {
+    "target/s07-bis/construction-access-candidate/source/crates/tsr_ast/src/node_kind.rs": {
       "bytes": 2318,
       "sha256": "fc59513b515a452eb6f7ba793f1a3592ce628cca2c79585ddc152dcde6909dd6"
     },

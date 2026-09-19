@@ -3,9 +3,9 @@
 //! this phase supplies diagnostics and their owning source files separately.
 use serde_json::Value;
 use std::sync::Arc;
-use ts_core::{CompilerOptions, Tristate};
-use ts_jsstring::{JsString, SourceText};
-use ts_tsoptions::{ConfigValue, ParsedCommandLine, TsConfigSourceFile};
+use tsr_core::{CompilerOptions, Tristate};
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tsoptions::{ConfigValue, ParsedCommandLine, TsConfigSourceFile};
 
 #[path = "../../s07/config/host.rs"]
 mod host;
@@ -28,7 +28,7 @@ pub(super) fn parse(
         .ok_or("missing config parse directory")?;
     // parseTestCaseContentWithSettings always uses a case-sensitive config VFS,
     // independently of the compiler host's useCaseSensitiveFileNames option.
-    let mut fs = ts_vfs::MemoryBuilder::new(cwd.as_bytes(), true);
+    let mut fs = tsr_vfs::MemoryBuilder::new(cwd.as_bytes(), true);
     let mut config_text = None;
     for input in inputs {
         let path = super::observation::bytes(
@@ -63,14 +63,14 @@ pub(super) fn parse(
     // BOM/encoding conversion. Inherited configs still load through the VFS.
     let source = TsConfigSourceFile::parse(
         JsString::from_bytes(name.as_bytes()),
-        ts_tspath::to_path(name.as_bytes(), cwd.as_bytes(), true),
+        tsr_tspath::to_path(name.as_bytes(), cwd.as_bytes(), true),
         SourceText::from_loaded_bytes(config_text),
     );
     Ok(Some(
-        ts_tsoptions::parse_json_source_file_config_file_content(
+        tsr_tsoptions::parse_json_source_file_config_file_content(
             source,
             &host,
-            &ts_tspath::directory(name.as_bytes()),
+            &tsr_tspath::directory(name.as_bytes()),
             &CompilerOptions {
                 run_external_code: if loading["options"]["runExternalCode"] == true {
                     Tristate::TRUE

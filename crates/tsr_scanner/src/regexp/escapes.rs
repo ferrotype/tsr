@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
-use ts_core::ScriptTarget;
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::{code_point_to_surrogate_pair, decode_utf8, encode_rune, RUNE_ERROR};
+use tsr_core::ScriptTarget;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::{code_point_to_surrogate_pair, decode_utf8, encode_rune, RUNE_ERROR};
 
 use crate::{escape_flags, IdentifierVariant};
 

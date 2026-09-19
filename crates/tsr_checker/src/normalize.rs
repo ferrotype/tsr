@@ -101,8 +101,8 @@ impl CheckerState {
                     if !matches!(
                         self.node(expression)?.kind().known(),
                         Some(
-                            ts_ast::SyntaxKind::Identifier
-                                | ts_ast::SyntaxKind::PropertyAccessExpression
+                            tsr_ast::SyntaxKind::Identifier
+                                | tsr_ast::SyntaxKind::PropertyAccessExpression
                         )
                     ) {
                         return Ok(None);

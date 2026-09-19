@@ -3,9 +3,9 @@
 use crate::{
     iteration::IterationTypes, type_flags as tf, CheckerState, Error, RelationKind, TypeId,
 };
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, Diagnostic, JsString};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, Diagnostic, JsString};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getIterationTypesOfIterableFast
@@ -50,7 +50,7 @@ impl CheckerState {
             if self.iteration_is_reference(ty, target)? {
                 let arguments = self.get_type_arguments(ty)?;
                 let [yield_type, return_type, next_type] = arguments.as_ref() else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 };
                 return self.resolved_iteration_types(
                     *yield_type,
@@ -78,7 +78,7 @@ impl CheckerState {
             if self.iteration_is_reference(ty, target)? {
                 let arguments = self.get_type_arguments(ty)?;
                 let [yield_type] = arguments.as_ref() else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 };
                 let options = self.program()?.host.options();
                 let return_type =
@@ -234,7 +234,7 @@ impl CheckerState {
             }
             return Ok(IterationTypes::default());
         }
-        let method_type = method_type.ok_or(ts_arena::Error::InvalidGraph)?;
+        let method_type = method_type.ok_or(tsr_arena::Error::InvalidGraph)?;
         if signatures.len() == 1 {
             if let Some(method_symbol) = self.types.get(method_type)?.symbol {
                 for global_name in if asynchronous {
@@ -350,7 +350,7 @@ impl CheckerState {
             if self.iteration_is_reference(ty, target)? {
                 let arguments = self.get_type_arguments(ty)?;
                 let [argument] = arguments.as_ref() else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 };
                 return Ok(IterationTypes {
                     yield_type: yield_.then_some(*argument),

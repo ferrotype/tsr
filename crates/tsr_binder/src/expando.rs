@@ -1,6 +1,6 @@
 use crate::state::ExpandoAssignmentInfo;
 use crate::{ast as a, checked, need, Binder};
-use ts_ast::{
+use tsr_ast::{
     internal_symbol_names as names, node_flags as nf, symbol_flags as sf, JsString, NodeId,
     SymbolId, SymbolTable, SymbolTableId, SyntaxKind as K,
 };

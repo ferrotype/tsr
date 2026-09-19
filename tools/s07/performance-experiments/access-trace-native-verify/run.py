@@ -114,7 +114,7 @@ def build(output):
     write_json(output / 'declaration.json', {'version': 1, 'command': argv, 'tool_inputs': inputs,
         'configuration': configurations, 'diagnostic_only': True})
     messages = captured_command(argv, source, env, output, 'cargo')
-    binary = cargo_executable(messages, source / 'Cargo.toml', 'ts_s07_access_trace_native_verify', 'bin', [])
+    binary = cargo_executable(messages, source / 'Cargo.toml', 'tsr_s07_access_trace_native_verify', 'bin', [])
     copy(binary, output / 'artifacts/native-verifier')
     (output / 'artifacts/native-verifier').chmod(0o755)
     if sys.platform == 'darwin':

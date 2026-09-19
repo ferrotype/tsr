@@ -1,10 +1,10 @@
 //! Import and re-export aliases preserve the immediate symbol when requested;
 //! pure alias chains are collapsed by the existing shared resolution stack.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
 impl CheckerState {
     pub(crate) fn shorthand_ambient_module(&self, symbol: SymbolId) -> Result<bool, Error> {
         let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
@@ -87,13 +87,13 @@ impl CheckerState {
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
         let root = if self.node(node)?.kind() == K::BindingElement {
-            ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?
+            tsr_ast::utilities::get_root_declaration(self.ast(node)?, node)?
         } else {
             node
         };
         let read = self.node(root)?;
         if read.kind() != K::VariableDeclaration
-            || !ts_ast::utilities::is_in_js_file(Some(&read))
+            || !tsr_ast::utilities::is_in_js_file(Some(&read))
             || read.type_node().is_some()
         {
             return Ok(None);
@@ -108,11 +108,11 @@ impl CheckerState {
             return Ok(None);
         };
         let view = self.ast(statement)?;
-        if view.node(statement)?.modifier_flags(view)? & ts_ast::modifier_flags::EXPORT != 0 {
+        if view.node(statement)?.modifier_flags(view)? & tsr_ast::modifier_flags::EXPORT != 0 {
             return Ok(None);
         }
         let view = self.ast(initializer)?;
-        if !ts_ast::utilities_middle::is_require_call(view, &view.node(initializer)?, true)? {
+        if !tsr_ast::utilities_middle::is_require_call(view, &view.node(initializer)?, true)? {
             return Ok(None);
         }
         let arguments = self.source_list(initializer, self.node(initializer)?.argument_list())?;
@@ -205,7 +205,7 @@ impl CheckerState {
             return Ok(false);
         };
         let state = self.source_file_read(file)?;
-        Ok(ts_ast::utilities::is_json_source_file(&state)
+        Ok(tsr_ast::utilities::is_json_source_file(&state)
             || state.file_name().ends_with(b".d.json.ts"))
     }
     // port: tsc/internal/checker/checker.go:Checker.canHaveSyntheticDefault
@@ -283,7 +283,7 @@ impl CheckerState {
                 .is_none());
         }
         let file = file.ok_or(Error::MissingLink("synthetic module file"))?;
-        if self.node(file)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE == 0 {
+        if self.node(file)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE == 0 {
             return Ok(self
                 .member_symbol(self.symbol(module)?.exports(), names::EXPORT_EQUALS)?
                 .is_some());
@@ -301,7 +301,7 @@ impl CheckerState {
             return Ok(!read
                 .data_source()
                 .as_export_assignment()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .is_export_equals());
         }
         if matches!(
@@ -310,7 +310,7 @@ impl CheckerState {
         ) {
             return Ok(true);
         }
-        Ok(read.modifier_flags(self.ast(node)?)? & ts_ast::modifier_flags::DEFAULT != 0)
+        Ok(read.modifier_flags(self.ast(node)?)? & tsr_ast::modifier_flags::DEFAULT != 0)
     }
     // port: tsc/internal/checker/checker.go:Checker.getTargetOfModuleDefault
     fn target_of_module_default(
@@ -420,7 +420,7 @@ impl CheckerState {
         let Some(mut symbol) = self.resolve_external_module_symbol(Some(module), true)? else {
             return Ok(None);
         };
-        if ts_ast::is_non_local_alias(
+        if tsr_ast::is_non_local_alias(
             Some(&self.symbol(symbol)?),
             sf::VALUE | sf::TYPE | sf::NAMESPACE,
         ) {
@@ -442,7 +442,7 @@ impl CheckerState {
             .parent()
             .ok_or(Error::MissingLink("module reference parent"))?;
         let namespace_import = if self.node(parent)?.kind() == K::ImportDeclaration {
-            ts_ast::utilities_middle::get_namespace_declaration_node(self.ast(parent)?, parent)?
+            tsr_ast::utilities_middle::get_namespace_declaration_node(self.ast(parent)?, parent)?
         } else {
             None
         };
@@ -592,7 +592,7 @@ impl CheckerState {
             self.error_at(
                 Some(name),
                 d::Named_imports_from_a_JSON_file_into_an_ECMAScript_module_are_not_allowed_when_module_is_set_to_0,
-                vec![ts_ast::JsString::from_bytes(crate::emit_checks::module_kind_text(kind))],
+                vec![tsr_ast::JsString::from_bytes(crate::emit_checks::module_kind_text(kind))],
             )?;
         } else if result.is_none() {
             self.error_no_module_member(module, target, node, name)?;
@@ -612,7 +612,8 @@ impl CheckerState {
         }
         let module_name = self.fully_qualified_name(module, Some(node))?;
         let name_text = self.node_text(name)?.into_js_string();
-        let declaration_name = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+        let declaration_name =
+            tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
         if self.node(name)?.kind() == K::Identifier {
             let suggestion = self.suggested_module_member(name, target)?;
             if let Some(suggestion) = suggestion {
@@ -664,7 +665,7 @@ impl CheckerState {
                                 d::X_0_can_only_be_imported_by_using_a_default_import,
                                 vec![declaration_name],
                             )?;
-                        } else if self.node(name)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE
+                        } else if self.node(name)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE
                             != 0
                         {
                             self.error_at(Some(name),d::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import,vec![declaration_name])?;
@@ -770,7 +771,7 @@ impl CheckerState {
         let value_declaration = value.value_declaration();
         let members = ty.members();
         let exports = value.exports();
-        let mut declarations: Vec<Option<ts_arena::NodeId>> = Vec::new();
+        let mut declarations: Vec<Option<tsr_arena::NodeId>> = Vec::new();
         for declaration in self
             .symbol_declarations(value_symbol)?
             .iter()

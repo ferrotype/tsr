@@ -1,7 +1,7 @@
 //! Checker projections consumed by declaration transformation. The transformer
 //! owns output syntax; the resolver never returns unretained checker syntax.
 use crate::EmitContext;
-use ts_ast::{AstBuilder, AstView, JsString, NodeId, SymbolFlags, SymbolId};
+use tsr_ast::{AstBuilder, AstView, JsString, NodeId, SymbolFlags, SymbolId};
 
 // Source: tsc/internal/printer/emitresolver.go:SymbolAccessibility
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -37,7 +37,7 @@ impl SymbolAccessibilityResult {
 
 #[derive(Clone, Debug)]
 pub enum ConstantValue {
-    Number(ts_jsnum::Number),
+    Number(tsr_jsnum::Number),
     String(JsString),
 }
 
@@ -95,7 +95,7 @@ pub trait DeclarationSymbolTracker {
 /// Declaration-only projection of `printer.EmitResolver`. Unavailable
 /// projections return a named error; they never stand in for a successful phase.
 pub trait DeclarationEmitResolver {
-    type Error: From<ts_arena::Error>;
+    type Error: From<tsr_arena::Error>;
 
     fn unsupported(operation: &'static str) -> Self::Error;
     fn ast(&self, node: NodeId) -> Result<AstView<'_>, Self::Error>;
@@ -268,8 +268,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Self::Error> {
         Err(Self::unsupported("CreateTypeOfDeclaration"))
@@ -284,8 +284,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Self::Error> {
         Err(Self::unsupported("CreateReturnTypeOfSignatureDeclaration"))
@@ -300,8 +300,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Vec<NodeId>, Self::Error> {
         Err(Self::unsupported(
@@ -327,8 +327,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Self::Error> {
         Err(Self::unsupported("CreateTypeOfExpression"))
@@ -343,8 +343,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Vec<NodeId>, Self::Error> {
         Err(Self::unsupported("CreateLateBoundIndexSignatures"))
@@ -359,8 +359,8 @@ pub trait DeclarationEmitResolver {
         _emit: &mut EmitContext,
         _node: NodeId,
         _enclosing: NodeId,
-        _flags: ts_nodebuilder::Flags,
-        _internal_flags: ts_nodebuilder::InternalFlags,
+        _flags: tsr_nodebuilder::Flags,
+        _internal_flags: tsr_nodebuilder::InternalFlags,
         _tracker: &mut dyn DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Self::Error> {
         Err(Self::unsupported("TryJSTypeNodeToTypeNode"))

@@ -7,9 +7,9 @@ use crate::{
     Builtins, Error, LinkStore, ResolutionStack, SignatureStore, TypeId, TypeStore,
     ValueSymbolLinks,
 };
-use ts_arena::{CheckerIdentity, Counters, NodeId, SymbolArena, SymbolId};
-use ts_ast::{AstBuilder, DeclarationLists, Symbol, SymbolTables};
-use ts_jsstring::SourceText;
+use tsr_arena::{CheckerIdentity, Counters, NodeId, SymbolArena, SymbolId};
+use tsr_ast::{AstBuilder, DeclarationLists, Symbol, SymbolTables};
+use tsr_jsstring::SourceText;
 
 /// The compiler options the P1 constructors read. `strictNullChecks` and
 /// `exactOptionalPropertyTypes` are upstream's effective values

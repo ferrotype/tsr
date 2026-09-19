@@ -2,16 +2,16 @@
 //! tree preserves source order and errors; identity checks use the checker.
 use super::NodeBuilder;
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, SignatureId, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
-use ts_printer::emit_resolver::DeclarationTrackerEvent as Event;
-use ts_pseudochecker::{
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_printer::emit_resolver::DeclarationTrackerEvent as Event;
+use tsr_pseudochecker::{
     PseudoObjectElementData as E, PseudoParameter, PseudoType, PseudoTypeData as P,
 };
 
-impl ts_pseudochecker::Host for CheckerState {
+impl tsr_pseudochecker::Host for CheckerState {
     type Error = Error;
-    fn ast(&self, node: NodeId) -> Result<ts_ast::AstView<'_>, Error> {
+    fn ast(&self, node: NodeId) -> Result<tsr_ast::AstView<'_>, Error> {
         self.ast(node)
     }
     fn raw_symbol_declarations(&self, node: NodeId) -> Result<Option<Vec<NodeId>>, Error> {
@@ -25,8 +25,8 @@ impl ts_pseudochecker::Host for CheckerState {
 }
 
 impl CheckerState {
-    pub(crate) fn pseudo_checker(&self) -> ts_pseudochecker::PseudoChecker {
-        ts_pseudochecker::PseudoChecker::new(
+    pub(crate) fn pseudo_checker(&self) -> tsr_pseudochecker::PseudoChecker {
+        tsr_pseudochecker::PseudoChecker::new(
             self.options.strict_null_checks,
             self.options.exact_optional_property_types,
         )
@@ -34,7 +34,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getRegularTypeOfExpression
     pub(crate) fn regular_type_of_expression(&mut self, mut node: NodeId) -> Result<TypeId, Error> {
-        if ts_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(
+        if tsr_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(
             self.ast(node)?,
             node,
         )? {
@@ -498,7 +498,7 @@ impl NodeBuilder<'_> {
         let data = read
             .data_source()
             .as_type_predicate_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         let predicate = self.checker.signatures.predicate(predicate)?.clone();
         use crate::TypePredicateKind as PK;

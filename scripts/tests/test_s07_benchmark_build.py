@@ -16,7 +16,7 @@ import s07_benchmark as benchmark
 
 class CargoArtifacts(unittest.TestCase):
     def artifact(self):
-        manifest = Path("/benchmark/crates/ts_bench/Cargo.toml")
+        manifest = Path("/benchmark/crates/tsr_bench/Cargo.toml")
         executable = "/configured-output/native/release/ts-bench"
         return manifest, {
             "reason": "compiler-artifact", "manifest_path": str(manifest),
@@ -82,13 +82,13 @@ class CargoConfiguration(unittest.TestCase):
         toolchain = (benchmark.ROOT / "rust-toolchain.toml").read_bytes()
         with tempfile.TemporaryDirectory(prefix="s07-cargo-native-") as temporary:
             root = Path(temporary)
-            crate = root / "crates/ts_bench"
+            crate = root / "crates/tsr_bench"
             (crate / "src").mkdir(parents=True)
             (root / ".cargo").mkdir()
             (root / "cargo-home").mkdir()
             (root / "rust-toolchain.toml").write_bytes(toolchain)
             (root / "Cargo.toml").write_text('''[workspace]
-members=["crates/ts_bench"]
+members=["crates/tsr_bench"]
 resolver="2"
 [profile.release]
 panic="unwind"
@@ -96,7 +96,7 @@ lto="fat"
 codegen-units=1
 ''')
             (crate / "Cargo.toml").write_text('''[package]
-name="ts_bench"
+name="tsr_bench"
 version="0.1.0"
 edition="2021"
 [features]
@@ -120,7 +120,7 @@ target="intentionally-not-a-real-target"
 panic="abort"
 lto=false
 codegen-units=16
-[profile.release.package.ts_bench]
+[profile.release.package.tsr_bench]
 opt-level=0
 debug=true
 debug-assertions=true
@@ -171,7 +171,7 @@ codegen-units=64
                 # occupies the configured cache. Native builds must not reuse
                 # or mutate it, regardless of Cargo's source-root freshness.
                 diagnostic = root / "diagnostic-source"
-                diagnostic_crate = diagnostic / "crates/ts_bench"
+                diagnostic_crate = diagnostic / "crates/tsr_bench"
                 (diagnostic_crate / "src").mkdir(parents=True)
                 for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml"):
                     (diagnostic / name).write_bytes((root / name).read_bytes())
@@ -179,7 +179,7 @@ codegen-units=64
                 (diagnostic_crate / "src/main.rs").write_text('fn main() { println!("diagnostic copy"); }')
                 configured = root / "configured-output"
                 messages = execute(["cargo", "+"+stable, "build", "--release", "--locked",
-                                    "--offline", "--package", "ts_bench", "--bin", "ts-bench",
+                                    "--offline", "--package", "tsr_bench", "--bin", "ts-bench",
                                     "--target", host, "--target-dir", str(configured),
                                     "--message-format=json-render-diagnostics",
                                     *benchmark.release_configuration(env)], cwd=diagnostic, env=env)
@@ -240,7 +240,7 @@ codegen-units=64
                 build_directories.append(Path(args[args.index("--target-dir")+1]))
                 self.assertTrue(build_directories[-1].is_dir())
                 _, artifact = CargoArtifacts().artifact()
-                artifact.update(manifest_path=str(root / "crates/ts_bench/Cargo.toml"),
+                artifact.update(manifest_path=str(root / "crates/tsr_bench/Cargo.toml"),
                                 executable=str(external), filenames=[str(external)])
                 return b"\n".join(json.dumps(row).encode() for row in
                                   (artifact, {"reason": "build-finished", "success": True}))

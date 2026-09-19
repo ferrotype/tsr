@@ -5,7 +5,7 @@ use crate::{
 };
 use hashbrown::HashMap;
 use std::sync::{Arc, OnceLock};
-use ts_jsstring::{PositionMap, SourceText};
+use tsr_jsstring::{PositionMap, SourceText};
 
 /// Exclusive construction owns the same storage later transferred into a file.
 /// Read views cannot retain this unpublished owner; mutation requires `&mut self`.
@@ -141,14 +141,14 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// whether a failed operation permits retaining the exclusive builder.
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let mut builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let id = builder.push(Node::new(0, ()));
     /// let escaped = builder.with_core_scope(|scope| scope.check(id).unwrap());
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let mut first = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let mut second = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let id = first.push(Node::new(0, ()));
@@ -160,7 +160,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let mut builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let id = builder.push(Node::new(0, ()));
     /// builder.with_core_scope(|mut scope| {
@@ -172,7 +172,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let mut builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let id = builder.push(Node::new(0, ()));
     /// builder.with_core_scope(|mut scope| {
@@ -184,7 +184,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let mut builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// builder.with_core_scope(|scope| {
     ///     builder.push(Node::new(0, ()));
@@ -229,7 +229,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// halves borrow this builder; neither can grow storage or escape its owner.
     ///
     /// ```compile_fail
-    /// use ts_arena::{Node, NodeId, StorageBuilder};
+    /// use tsr_arena::{Node, NodeId, StorageBuilder};
     /// fn grow(builder: &mut StorageBuilder<Node<()>>, id: NodeId) {
     ///     let (mut nodes, data) = builder.split_core_mut();
     ///     let node = nodes.get_mut(id).unwrap();
@@ -239,7 +239,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Node, StorageBuilder};
+    /// use tsr_arena::{Node, StorageBuilder};
     /// fn dispose(mut builder: StorageBuilder<Node<()>>) {
     ///     let (_, data) = builder.split_core_mut();
     ///     let source = data.source();
@@ -311,7 +311,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     /// identities. The operation cannot return a view borrowing this group table.
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// let builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     /// let escaped = StorageBuilder::with_group_views(&[&builder], |views| views[0]);
     /// println!("{:?}", escaped.id());
@@ -655,7 +655,7 @@ impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
     /// identities require general routing through `node` instead.
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, Node, StorageBuilder};
+    /// use tsr_arena::{Counters, Node, StorageBuilder};
     /// fn escaped() -> &'static Node<()> {
     ///     let mut builder = StorageBuilder::<Node<()>>::new(std::sync::Arc::from(&b""[..]), &Counters::new());
     ///     let id = builder.push(Node::new(0, ()));

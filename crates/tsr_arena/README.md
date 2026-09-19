@@ -1,4 +1,4 @@
-# ts_arena
+# tsr_arena
 
 Storage and ownership primitives follow the accepted
 [ownership contract](../../docs/design/ownership.md). `StorageBuilder<R, S>`
@@ -93,10 +93,10 @@ Each scenario compares final counts to its starting baseline and records a
 nonzero observed peak. Separate payload-drop assertions check actual destruction.
 
 ```sh
-cargo test -p ts_arena --all-features
-cargo test -p ts_arena --release --lib
-cargo run -p ts_arena --release --features harness --example e3
-cargo clippy -p ts_arena --all-targets --all-features -- -D warnings
+cargo test -p tsr_arena --all-features
+cargo test -p tsr_arena --release --lib
+cargo run -p tsr_arena --release --features harness --example e3
+cargo clippy -p tsr_arena --all-targets --all-features -- -D warnings
 ```
 
 The example emits its measured JSON envelope on stdout; diagnostics and expected
@@ -114,7 +114,7 @@ dependency retention, registry/reentry integration or real API handle behavior.
 In particular generation validation is not a publication gate: atomic retirement
 versus response/registry commitment remains later integration work.
 
-The S06 foundation adds AST/list/text-slice tests in `ts_ast::storage_tests`.
+The S06 foundation adds AST/list/text-slice tests in `tsr_ast::storage_tests`.
 Those cases exercise pre-publication lazy data, transfer to a worker without a
 `Sync` requirement on exclusive binder payloads, mapped retention, staged-list
 rollback and first-use contention. Running the old seven-scenario example alone

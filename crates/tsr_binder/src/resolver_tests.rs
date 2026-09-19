@@ -3,10 +3,10 @@ use super::*;
 use crate::reference_resolver::{
     NoReferenceResolverHooks, ReferenceResolver, ReferenceResolverHooks,
 };
-use ts_arena::{Counters, SymbolArena};
-use ts_ast::{AstFile, BindBuilder, BindResult, SourceFileParseOptions, Symbol};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, SymbolArena};
+use tsr_ast::{AstFile, BindBuilder, BindResult, SourceFileParseOptions, Symbol};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 struct Host {
     file: AstFile,
@@ -20,7 +20,7 @@ impl Host {
         setup: impl FnOnce(&mut BindBuilder<'_>) -> T,
     ) -> (Self, T) {
         let counters = Counters::new();
-        let parsed = ts_parser::parse_source_file_with_counters(
+        let parsed = tsr_parser::parse_source_file_with_counters(
             SourceText::from_loaded_bytes(text.as_bytes()),
             if js { ScriptKind::JS } else { ScriptKind::TS },
             SourceFileParseOptions {

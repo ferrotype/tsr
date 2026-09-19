@@ -1,16 +1,16 @@
 use crate::api_error as error;
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_ast::Diagnostic;
-use ts_compiler::diagnostic_writer::DiagnosticWriter;
-use ts_embed::{FileCache, ProgramOptions, Session};
-use ts_jsstring::JsString;
+use tsr_arena::Counters;
+use tsr_ast::Diagnostic;
+use tsr_compiler::diagnostic_writer::DiagnosticWriter;
+use tsr_embed::{FileCache, ProgramOptions, Session};
+use tsr_jsstring::JsString;
 use wasm_bindgen::prelude::*;
 
 /// Explicit input snapshot. No method can fall back to the native filesystem.
 #[wasm_bindgen]
 pub struct MemoryHost {
-    builder: ts_vfs::MemoryBuilder,
+    builder: tsr_vfs::MemoryBuilder,
     cwd: JsString,
     roots: Vec<JsString>,
 }
@@ -20,7 +20,7 @@ impl MemoryHost {
     #[wasm_bindgen(constructor)]
     pub fn new(cwd: &[u8], case_sensitive: bool) -> Self {
         Self {
-            builder: ts_vfs::MemoryBuilder::new(cwd, case_sensitive),
+            builder: tsr_vfs::MemoryBuilder::new(cwd, case_sensitive),
             cwd: JsString::from_bytes(cwd),
             roots: Vec::new(),
         }
@@ -43,18 +43,18 @@ impl MemoryHost {
     }
 
     /// Consume this snapshot. `options` uses the compiler's numeric-enum JSON
-    /// wire format (`ts_tsoptions::raw`), not tsconfig string-valued enums.
+    /// wire format (`tsr_tsoptions::raw`), not tsconfig string-valued enums.
     pub fn compile(self, options: &str) -> Result<WasmSession, JsValue> {
         let options = serde_json::from_str(options).map_err(error)?;
-        let options = ts_tsoptions::raw::compiler_options(&options)
+        let options = tsr_tsoptions::raw::compiler_options(&options)
             .map_err(|value| error(format!("compiler options: {value:?}")))?;
         let counters = Counters::new();
         let session = Session::load(
             ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(options, self.roots),
-                host: Arc::new(ts_bundled::BundledFs::new(Arc::new(self.builder.finish()))),
+                config: tsr_tsoptions::ParsedCommandLine::new(options, self.roots),
+                host: Arc::new(tsr_bundled::BundledFs::new(Arc::new(self.builder.finish()))),
                 current_directory: self.cwd,
-                default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
+                default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
             },
             &mut FileCache::new(),
@@ -106,7 +106,7 @@ impl WasmSession {
             .map_err(error)?;
         let sources = DiagnosticWriter::new(
             program,
-            ts_compiler::diagnostic_writer::FormattingOptions::default(),
+            tsr_compiler::diagnostic_writer::FormattingOptions::default(),
         );
         let rows: Result<Vec<_>, _> = values
             .iter()
@@ -131,9 +131,9 @@ impl WasmSession {
             return Err(error("position outside source"));
         }
         let byte = source.position_map().utf16_to_utf8(position as isize);
-        let mut provider = ts_parser::ParserJsDocProvider::default();
+        let mut provider = tsr_parser::ParserJsDocProvider::default();
         let mut navigator =
-            ts_astnav::Navigator::new(file.bound().view().ast(), file.source(), &mut provider);
+            tsr_astnav::Navigator::new(file.bound().view().ast(), file.source(), &mut provider);
         let node = navigator
             .get_token_at_position(byte as i64)
             .map_err(error)?;
@@ -142,8 +142,8 @@ impl WasmSession {
         operation
             .type_to_string(
                 typ,
-                ts_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
-                    | ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+                tsr_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
+                    | tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
             )
             .map(|text| text.as_bytes().to_vec())
             .map_err(error)

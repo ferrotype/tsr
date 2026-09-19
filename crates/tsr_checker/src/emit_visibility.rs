@@ -1,9 +1,9 @@
 //! Declaration visibility is checker-owned state. Marking an alias changes only
 //! the resolver's links, never the published source tree.
 use crate::{CheckerState, Error, LinkStore};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_printer::emit_resolver::SymbolAccessibilityResult;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_printer::emit_resolver::SymbolAccessibilityResult;
 
 #[derive(Default)]
 pub(crate) struct EmitState {
@@ -73,29 +73,29 @@ impl CheckerState {
                 if read.kind() == K::VariableDeclaration {
                     if let Some(name) = read.name() {
                         let name = view.node(name)?;
-                        if ts_ast::utilities::is_binding_pattern(&name)
+                        if tsr_ast::utilities::is_binding_pattern(&name)
                             && name.elements(view)?.is_empty()
                         {
                             return Ok(false);
                         }
                     }
                 }
-                if ts_ast::is_ambient_module(view, node)?
-                    && ts_ast::is_module_augmentation_external(view, node)?
+                if tsr_ast::is_ambient_module(view, node)?
+                    && tsr_ast::is_module_augmentation_external(view, node)?
                     || parent.is_some()
-                        && ts_ast::is_implicitly_exported_js_doc_declaration(view, node)?
+                        && tsr_ast::is_implicitly_exported_js_doc_declaration(view, node)?
                 {
                     return Ok(true);
                 }
-                let container = ts_ast::get_declaration_container(view, node)?
+                let container = tsr_ast::get_declaration_container(view, node)?
                     .ok_or(Error::MissingLink("declaration visibility container"))?;
                 let parent_read = view.node(container)?;
-                if ts_ast::utilities::get_combined_modifier_flags(view, node)? & mf::EXPORT == 0
+                if tsr_ast::utilities::get_combined_modifier_flags(view, node)? & mf::EXPORT == 0
                     && !(read.kind() != K::ImportEqualsDeclaration
                         && parent_read.kind() != K::SourceFile
                         && parent_read.flags() & nf::AMBIENT != 0)
                 {
-                    return Ok(ts_ast::utilities_middle::is_global_source_file(
+                    return Ok(tsr_ast::utilities_middle::is_global_source_file(
                         view, container,
                     )?);
                 }
@@ -142,7 +142,7 @@ impl CheckerState {
                     && read
                         .data_source()
                         .as_export_declaration()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .module_specifier()
                         .is_none()
                 {
@@ -179,8 +179,8 @@ impl CheckerState {
             return Ok(false);
         }
         Ok(matches!(
-            ts_ast::get_assignment_declaration_kind(view, node)?,
-            ts_ast::JSDeclarationKind::ModuleExports | ts_ast::JSDeclarationKind::ExportsProperty
+            tsr_ast::get_assignment_declaration_kind(view, node)?,
+            tsr_ast::JSDeclarationKind::ModuleExports | tsr_ast::JSDeclarationKind::ExportsProperty
         ))
     }
 
@@ -270,7 +270,7 @@ impl CheckerState {
                 if let Some(data) = read.data_source().as_import_equals_declaration() {
                     if let Some(reference) = data.module_reference() {
                         if self.node(reference)?.kind() != K::ExternalModuleReference {
-                            let first = ts_ast::utilities_middle::get_first_identifier(
+                            let first = tsr_ast::utilities_middle::get_first_identifier(
                                 self.ast(reference)?,
                                 reference,
                             )?;
@@ -303,7 +303,7 @@ impl CheckerState {
     }
 
     fn emit_unexported_in_visible_parent(&mut self, node: NodeId) -> Result<bool, Error> {
-        if ts_ast::utilities::has_syntactic_modifier(self.ast(node)?, node, mf::EXPORT)? {
+        if tsr_ast::utilities::has_syntactic_modifier(self.ast(node)?, node, mf::EXPORT)? {
             return Ok(false);
         }
         self.emit_declaration_visible(self.emit_parent(node, 1)?)
@@ -338,7 +338,7 @@ impl CheckerState {
                 }
             }
             if statement.is_none()
-                && ts_ast::utilities_middle::is_late_visibility_painted_statement(
+                && tsr_ast::utilities_middle::is_late_visibility_painted_statement(
                     &self.node(declaration)?,
                 )
                 && self.emit_unexported_in_visible_parent(declaration)?
@@ -363,7 +363,7 @@ impl CheckerState {
                     }
                 }
                 if statement.is_none() && flags & sf::BLOCK_SCOPED_VARIABLE != 0 {
-                    let root = ts_ast::utilities::walk_up_binding_elements_and_patterns(
+                    let root = tsr_ast::utilities::walk_up_binding_elements_and_patterns(
                         self.ast(declaration)?,
                         declaration,
                     )?
@@ -377,7 +377,7 @@ impl CheckerState {
                     if self.node(variable)?.kind() != K::VariableStatement {
                         return Ok(None);
                     }
-                    if ts_ast::utilities::has_syntactic_modifier(
+                    if tsr_ast::utilities::has_syntactic_modifier(
                         self.ast(variable)?,
                         variable,
                         mf::EXPORT,

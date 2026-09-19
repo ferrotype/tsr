@@ -10,9 +10,9 @@ use crate::{
 };
 use serde_json::{json, Map, Value};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId, SymbolId};
-use ts_ast::{check_flags, symbol_flags, JsString, SymbolFlags, SyntaxKind};
-use ts_jsnum::{Number, PseudoBigInt};
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId, SymbolId};
+use tsr_ast::{check_flags, symbol_flags, JsString, SymbolFlags, SyntaxKind};
+use tsr_jsnum::{Number, PseudoBigInt};
 
 #[derive(Clone, Copy)]
 enum Root {
@@ -471,7 +471,7 @@ impl Started<'_> {
                 }
                 Action::Anonymous(symbol, members) => {
                     let symbol = symbol.map(|index| symbol_root(&roots, index)).transpose()?;
-                    let mut table = ts_ast::SymbolTable::with_capacity(members.len());
+                    let mut table = tsr_ast::SymbolTable::with_capacity(members.len());
                     for member in members {
                         let t = type_root(&roots, member.r#type)?;
                         let flags = symbol_flags::PROPERTY

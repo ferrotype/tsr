@@ -32,9 +32,9 @@ impl InitializationGuard {
             "{}",
             match domain {
                 InitializationDomain::Lazy =>
-                    "ts_arena: lazy initializer reentered its file's lazy storage",
+                    "tsr_arena: lazy initializer reentered its file's lazy storage",
                 InitializationDomain::Binding =>
-                    "ts_ast: reentrant binding of the same source file",
+                    "tsr_ast: reentrant binding of the same source file",
             }
         );
     }

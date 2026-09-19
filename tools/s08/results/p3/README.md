@@ -29,8 +29,8 @@ acceptance denominator or thresholds were changed.
 Extract `capture.tar.xz` into a temporary directory. Build the examples:
 
 ```sh
-cargo build -p ts_compiler -p ts_checker \
-  --features ts_checker/storage-pilot,ts_compiler/relation-probe \
+cargo build -p tsr_compiler -p tsr_checker \
+  --features tsr_checker/storage-pilot,tsr_compiler/relation-probe \
   --example p2_checker --example p3_relations \
   --example p3_comparators --example storage_families
 ```

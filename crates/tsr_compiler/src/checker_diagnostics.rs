@@ -1,10 +1,10 @@
 //! Program diagnostic selection and directives surround the checker operation.
 use crate::{Error, Program, ProgramFile};
 use std::collections::BTreeMap;
-use ts_ast::{CommentDirective, CommentDirectiveKind, Diagnostic, SourceFileRead};
-use ts_checker::Operation;
-use ts_core::{ScriptKind, Tristate};
-use ts_jsstring::scanner_positions::compute_line_of_position;
+use tsr_ast::{CommentDirective, CommentDirectiveKind, Diagnostic, SourceFileRead};
+use tsr_checker::Operation;
+use tsr_core::{ScriptKind, Tristate};
+use tsr_jsstring::scanner_positions::compute_line_of_position;
 
 impl Program {
     /// Rejects a file handle that this program does not retain.
@@ -15,9 +15,9 @@ impl Program {
         let source = file.bound().view().source_file()?;
         let retained = self
             .file(source.parse_options().path.as_bytes())
-            .ok_or(ts_arena::Error::WrongOwner)?;
+            .ok_or(tsr_arena::Error::WrongOwner)?;
         if retained.source() != file.source() {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         Ok(source)
     }
@@ -51,7 +51,7 @@ impl Program {
             .check_js_directive
             .map_or(options.check_js.is_true(), |directive| directive.enabled);
         Ok(!(js && checked
-            || ts_ast::utilities_middle::is_plain_js_file(Some(&source), options.check_js)))
+            || tsr_ast::utilities_middle::is_plain_js_file(Some(&source), options.check_js)))
     }
 
     /// Bind and checker diagnostics after per-file selection and directive filtering.
@@ -68,7 +68,7 @@ impl Program {
         let source = file.bound().view().source_file()?;
         let mut diagnostics = source.bind_diagnostics().to_vec();
         diagnostics.extend(operation.semantic_diagnostics(file.source())?);
-        if ts_ast::utilities_middle::is_plain_js_file(Some(&source), self.options().check_js) {
+        if tsr_ast::utilities_middle::is_plain_js_file(Some(&source), self.options().check_js) {
             diagnostics
                 .retain(|diagnostic| super::plain_js_errors::is_plain_js_error(diagnostic.code));
             return Ok(diagnostics);
@@ -88,7 +88,7 @@ impl Program {
                 diagnostics.push(Diagnostic::new(
                     Some(file.source()),
                     directive.loc,
-                    ts_diagnostics::Unused_ts_expect_error_directive,
+                    tsr_diagnostics::Unused_ts_expect_error_directive,
                     Vec::new(),
                 ));
             }
@@ -184,7 +184,7 @@ fn comment_or_blank_line(text: &[u8], mut pos: usize) -> bool {
 
 // port: tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives
 fn apply_mapped_directives(
-    source_id: ts_ast::NodeId,
+    source_id: tsr_ast::NodeId,
     source: &SourceFileRead<'_>,
     diagnostics: Vec<Diagnostic>,
 ) -> Result<Vec<Diagnostic>, Error> {
@@ -218,7 +218,7 @@ fn apply_mapped_directives(
                 Some(source_id),
                 directive.original_range,
                 directive.source.clone(),
-                ts_diagnostics::Category::Error as i32,
+                tsr_diagnostics::Category::Error as i32,
                 directive.unused_code,
                 directive.unused_message_text.clone(),
             ));

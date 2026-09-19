@@ -4,12 +4,12 @@ use crate::errors::hex;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_ast::Diagnostic;
-use ts_compiler::{
+use tsr_ast::Diagnostic;
+use tsr_compiler::{
     diagnostic_writer::{DiagnosticWriter, FormattingOptions},
     FileCache, Program, ProgramOptions,
 };
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -72,12 +72,12 @@ fn unhex(s: &str) -> Result<Vec<u8>> {
         .collect()
 }
 
-fn diagnostic(spec: &Spec, ids: &[ts_ast::NodeId]) -> Result<Diagnostic> {
+fn diagnostic(spec: &Spec, ids: &[tsr_ast::NodeId]) -> Result<Diagnostic> {
     let mut d = Diagnostic::external(
         spec.file
             .map(|i| ids.get(i).copied().ok_or("diagnostic file index"))
             .transpose()?,
-        ts_core::TextRange::new(spec.pos, spec.end),
+        tsr_core::TextRange::new(spec.pos, spec.end),
         JsString::from_bytes(unhex(&spec.source_hex)?),
         spec.category,
         spec.code,
@@ -107,17 +107,17 @@ fn run(case: &Case) -> Result<Value> {
         .iter()
         .map(|f| Ok((unhex(&f.name_hex)?, unhex(&f.content_hex)?)))
         .collect::<Result<_>>()?;
-    let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     for (name, text) in &files {
         fs.insert_loaded(name, text.as_slice());
     }
-    let counters = ts_arena::Counters::new();
+    let counters = tsr_arena::Counters::new();
     let program = Program::load(
         ProgramOptions {
-            config: ts_tsoptions::ParsedCommandLine::new(
-                ts_core::CompilerOptions {
-                    no_lib: ts_core::Tristate::TRUE,
-                    allow_non_ts_extensions: ts_core::Tristate::TRUE,
+            config: tsr_tsoptions::ParsedCommandLine::new(
+                tsr_core::CompilerOptions {
+                    no_lib: tsr_core::Tristate::TRUE,
+                    allow_non_ts_extensions: tsr_core::Tristate::TRUE,
                     ..Default::default()
                 },
                 files

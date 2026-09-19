@@ -2,10 +2,10 @@
 //! collisions. Flags belong to the checker and never mutate published syntax.
 
 use crate::{external_emit_helpers as eh, node_check_flags as nc, CheckerState, Error, LinkStore};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_core::{ModuleKind, ScriptTarget};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_core::{ModuleKind, ScriptTarget};
+use tsr_diagnostics as d;
 
 #[derive(Default)]
 pub(crate) struct EmitCheckState {
@@ -52,7 +52,7 @@ impl CheckerState {
                 Some(K::Block) => match parent {
                     Some(parent) => {
                         let read = self.node(parent)?;
-                        !ts_ast::utilities::is_function_like(Some(&read))
+                        !tsr_ast::utilities::is_function_like(Some(&read))
                             && read.kind() != K::ClassStaticBlockDeclaration
                     }
                     None => true,
@@ -102,7 +102,9 @@ impl CheckerState {
         let mut scope = self.enclosing_emit_block_scope(parent)?;
         while let Some(node) = scope {
             if self.node(node)?.kind() != K::SourceFile
-                || ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(node)?)
+                || tsr_ast::utilities::is_external_or_common_js_module(
+                    &self.source_file_read(node)?,
+                )
             {
                 *self.emit_checks.node_flags.get_or_default(node) |=
                     nc::CONTAINS_SUPER_PROPERTY_IN_STATIC_INITIALIZER;
@@ -239,7 +241,7 @@ impl CheckerState {
         {
             return Ok(false);
         }
-        let root = ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
+        let root = tsr_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
         if self.node(root)?.kind() == K::Parameter {
             let parent = self
                 .ast(root)?
@@ -250,7 +252,7 @@ impl CheckerState {
             let read = body
                 .map(|node| self.ast(node)?.node(node).map_err(Error::from))
                 .transpose()?;
-            if ts_ast::node_is_missing(read.as_ref()) {
+            if tsr_ast::node_is_missing(read.as_ref()) {
                 return Ok(false);
             }
         }
@@ -272,13 +274,13 @@ impl CheckerState {
         let class = matches!(kind.known(), Some(K::ClassDeclaration | K::ClassExpression));
         let module = kind == K::ModuleDeclaration;
         let instantiated = !module
-            || ts_ast::get_module_instance_state(self.ast(node)?, node)?
-                == ts_ast::ModuleInstanceState::Instantiated;
+            || tsr_ast::get_module_instance_state(self.ast(node)?, node)?
+                == tsr_ast::ModuleInstanceState::Instantiated;
         let format = self.module_emit_format(node)?;
         let container = self.emit_declaration_container(node)?;
         let top_level_module = if let Some(container) = container {
             self.node(container)?.kind() == K::SourceFile
-                && ts_ast::utilities::is_external_or_common_js_module(
+                && tsr_ast::utilities::is_external_or_common_js_module(
                     &self.source_file_read(container)?,
                 )
         } else {
@@ -291,7 +293,7 @@ impl CheckerState {
             && format == ModuleKind::COMMON_JS
             && self.need_emit_collision_check(node, name, b"Object")?;
         if instantiated && top_level_module && (require_exports || object) {
-            let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+            let text = tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
             self.emit_skipped_error(
                 name,
                 d::Duplicate_identifier_0_Compiler_reserves_name_1_in_top_level_scope_of_a_module,
@@ -305,7 +307,7 @@ impl CheckerState {
         {
             let container = container.ok_or(Error::MissingLink("Promise declaration container"))?;
             if self.node(container)?.flags() & nf::HAS_ASYNC_FUNCTIONS != 0 {
-                let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+                let text = tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
                 self.emit_skipped_error(name,d::Duplicate_identifier_0_Compiler_reserves_name_1_in_top_level_scope_of_a_module_containing_async_functions,vec![text.clone(),text])?;
             }
         }
@@ -344,7 +346,7 @@ impl CheckerState {
     }
 
     fn emit_declaration_container(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let root = ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
+        let root = tsr_ast::utilities::get_root_declaration(self.ast(node)?, node)?;
         let mut current = root;
         loop {
             let read = self.node(current)?;
@@ -407,7 +409,8 @@ impl CheckerState {
         if collision {
             if let Some(name) = self.node(node)?.name() {
                 if self.node(name)?.kind() == K::Identifier {
-                    let text = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+                    let text =
+                        tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
                     self.emit_skipped_error(node,d::Duplicate_identifier_0_Compiler_reserves_name_1_when_emitting_super_references_in_static_initializers,vec![text,JsString::from_bytes(b"Reflect".as_slice())])?;
                 }
             }

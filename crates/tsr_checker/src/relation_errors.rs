@@ -5,9 +5,9 @@ use crate::{
     type_flags as tf, type_format_flags as fmt, CheckerState, Error, Ternary, TypeId,
 };
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{Diagnostic, JsString};
-use ts_diagnostics::{self as messages, Message};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{Diagnostic, JsString};
+use tsr_diagnostics::{self as messages, Message};
 
 #[derive(Clone, PartialEq, Eq)]
 pub(crate) struct ErrorEntry {
@@ -389,8 +389,8 @@ impl CheckerState {
         };
         let view = self.ast(declaration)?;
         Ok(
-            ts_ast::utilities::is_private_identifier_class_element_declaration(view, declaration)?
-                && ts_ast::utilities::is_static(view, declaration)?,
+            tsr_ast::utilities::is_private_identifier_class_element_declaration(view, declaration)?
+                && tsr_ast::utilities::is_static(view, declaration)?,
         )
     }
 
@@ -594,20 +594,21 @@ impl Relater<'_> {
         &mut self,
         source: TypeId,
         target: TypeId,
-        first: ts_arena::SymbolId,
+        first: tsr_arena::SymbolId,
         require_optional: bool,
     ) -> Result<(), Error> {
         // Give a specific error when private names have the same description.
         if let Some(declaration) = self.checker.symbol(first)?.value_declaration() {
             let view = self.checker.ast(declaration)?;
             if let Some(name) = view.node(declaration)?.name() {
-                if view.node(name)?.kind() == ts_ast::SyntaxKind::PrivateIdentifier {
+                if view.node(name)?.kind() == tsr_ast::SyntaxKind::PrivateIdentifier {
                     if let Some(source_symbol) = self.checker.types.get(source)?.symbol {
-                        if self.checker.symbol(source_symbol)?.flags() & ts_ast::symbol_flags::CLASS
+                        if self.checker.symbol(source_symbol)?.flags()
+                            & tsr_ast::symbol_flags::CLASS
                             != 0
                         {
                             let description = view.node_text(name)?.into_js_string();
-                            let key = ts_binder::get_symbol_name_for_private_identifier(
+                            let key = tsr_binder::get_symbol_name_for_private_identifier(
                                 &self.checker.symbol(source_symbol)?,
                                 description.as_bytes(),
                             );
@@ -654,8 +655,8 @@ impl Relater<'_> {
                 continue;
             }
             if require_optional
-                || read.flags() & ts_ast::symbol_flags::OPTIONAL == 0
-                    && read.check_flags() & ts_ast::check_flags::PARTIAL == 0
+                || read.flags() & tsr_ast::symbol_flags::OPTIONAL == 0
+                    && read.check_flags() & tsr_ast::check_flags::PARTIAL == 0
             {
                 let name = read.name_to_owned();
                 if self
@@ -749,7 +750,7 @@ impl crate::CheckerState {
             }
         }
         let failure = std::cell::Cell::new(None);
-        let suggestion = ts_scanner::get_spelling_suggestion(
+        let suggestion = tsr_scanner::get_spelling_suggestion(
             name.as_bytes(),
             candidates.iter(),
             |entry| entry.1.as_bytes(),

@@ -11,9 +11,9 @@ use crate::{
     SourceNodeSliceRead, SourceTextSlice, SourceTextSliceRead,
 };
 use std::{collections::BTreeMap, ops::Deref, sync::OnceLock};
-use ts_arena::Error;
-use ts_core::{LanguageVariant, ScriptKind, TextRange, Tristate};
-use ts_jsstring::{PositionMap, SourceText};
+use tsr_arena::Error;
+use tsr_core::{LanguageVariant, ScriptKind, TextRange, Tristate};
+use tsr_jsstring::{PositionMap, SourceText};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SourceFileParseOptions {
@@ -201,7 +201,7 @@ impl SourceFileState {
     /// port: tsc/internal/ast/ast.go:SourceFile.ECMALineMap
     pub fn ecma_line_map(&self) -> &[i32] {
         self.ecma_line_map
-            .get_or_init(|| ts_jsstring::line_map::compute_ecma_line_starts(self.text.as_bytes()))
+            .get_or_init(|| tsr_jsstring::line_map::compute_ecma_line_starts(self.text.as_bytes()))
     }
     /// port: tsc/internal/ast/ast.go:SourceFile.ParseOptions
     pub fn parse_options(&self) -> &SourceFileParseOptions {
@@ -626,10 +626,10 @@ impl AstBuilder {
     ) -> NodeId {
         let name = options.file_name.as_bytes();
         assert!(
-            ts_core::path::encoded_root_length(name) != 0
-                && name == ts_core::path::normalize(name).as_ref(),
+            tsr_core::path::encoded_root_length(name) != 0
+                && name == tsr_core::path::normalize(name).as_ref(),
             "fileName should be normalized and absolute: {}",
-            ts_jsstring::go_quote(name)
+            tsr_jsstring::go_quote(name)
         );
         let state = SourceFileState::new(options, text);
         self.new_source_file_with_state(state, statements, end_of_file_token)

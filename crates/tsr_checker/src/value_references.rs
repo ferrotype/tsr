@@ -4,9 +4,9 @@ use crate::{
     flow_assignments::AssignmentKind, node_check_flags as nc, type_facts as f, type_flags as tf,
     CheckerState, Error, TypeId, TypeSystemEntity, TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, what: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(what))
 }
@@ -99,7 +99,7 @@ impl CheckerState {
             return Ok(ty);
         };
         ty = self.narrowable_reference_type(ty, node, self.expression_mode)?;
-        let root = ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
+        let root = tsr_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
         let parameter = self.node(root)?.kind() == K::Parameter;
         let declaration_container = self.control_flow_container_or_none(declaration)?;
         let mut container = self.control_flow_container(node)?;
@@ -114,7 +114,7 @@ impl CheckerState {
             if !matches!(
                 read.kind().known(),
                 Some(K::FunctionExpression | K::ArrowFunction)
-            ) && !ts_ast::utilities::is_object_literal_or_class_expression_method_or_accessor(
+            ) && !tsr_ast::utilities::is_object_literal_or_class_expression_method_or_accessor(
                 self.ast(container)?,
                 container,
             )? {
@@ -135,7 +135,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_variable_declaration()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let list = required(read.parent(), "uninitialized declaration list")?;
                 let statement = required(self.node(list)?.parent(), "uninitialized statement")?;
                 !matches!(
@@ -277,8 +277,8 @@ impl CheckerState {
         while let Some(node) = ancestor {
             if self.node(node)?.kind() == K::BindingElement {
                 return Ok(
-                    ts_ast::utilities::get_root_declaration(self.ast(node)?, node)?
-                        == ts_ast::utilities::get_root_declaration(
+                    tsr_ast::utilities::get_root_declaration(self.ast(node)?, node)?
+                        == tsr_ast::utilities::get_root_declaration(
                             self.ast(declaration)?,
                             declaration,
                         )?,
@@ -379,7 +379,7 @@ impl CheckerState {
                 Some(K::Block) => {
                     if let Some(parent) = parent {
                         let read = self.node(parent)?;
-                        if ts_ast::utilities::is_function_like(Some(&read))
+                        if tsr_ast::utilities::is_function_like(Some(&read))
                             && read.kind() != K::ArrowFunction
                         {
                             return Ok(false);
@@ -439,7 +439,7 @@ impl CheckerState {
             .verbatim_module_syntax
             .is_true()
             || self.in_type_query(node)?
-            || !ts_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
+            || !tsr_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
         {
             return Ok(());
         }

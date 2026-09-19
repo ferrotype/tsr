@@ -3,7 +3,7 @@ use super::{binder_graph, Loaded};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::io::Write;
-use ts_ast::CompletedFile;
+use tsr_ast::CompletedFile;
 
 fn normalize(value: &mut Value, path: &str, names: &mut Vec<Value>) {
     match value {

@@ -1,12 +1,12 @@
 use crate::{Parser, ParsingContext};
 use std::{collections::HashMap, sync::Arc};
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     node_flags, AstBuilder, Diagnostic, Factory, NodeId, ParsedFile, RuntimeFactory,
     SourceFileParseOptions, SyntaxKind,
 };
-use ts_core::{ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 
 /// Parse already loaded source bytes. BOM decoding belongs to SourceText's
 /// loader constructor. The returned owner remains mutable for the binder.
@@ -71,7 +71,7 @@ pub fn parse_isolated_entity_name(source: SourceText) -> Option<ParsedFile> {
 impl Parser<'_, AstBuilder> {
     /// port: tsc/internal/parser/parser.go:Parser.parseSourceFileWorker
     pub(crate) fn parse_source_file_worker(&mut self) -> NodeId {
-        let declaration = ts_core::path::is_declaration_file_name(self.opts.file_name.as_bytes());
+        let declaration = tsr_core::path::is_declaration_file_name(self.opts.file_name.as_bytes());
         if declaration {
             self.context_flags |= node_flags::AMBIENT;
         }
@@ -131,12 +131,12 @@ impl Parser<'_, AstBuilder> {
     pub(crate) fn finish_source_file(&mut self, root: NodeId, declaration: bool) {
         let pragmas = super::pragmas::get_comment_pragmas(self.source_text);
         let pragmas = if pragmas.is_empty() {
-            ts_ast::PragmaSlice::empty()
+            tsr_ast::PragmaSlice::empty()
         } else {
             self.factory.source_pragmas(pragmas).expect("owned pragmas")
         };
         let comments = if self.scanner.comment_directives().is_empty() {
-            ts_ast::CommentSlice::empty()
+            tsr_ast::CommentSlice::empty()
         } else {
             self.factory
                 .source_comments(self.scanner.comment_directives().to_vec())

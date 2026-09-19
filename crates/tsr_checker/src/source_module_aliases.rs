@@ -1,10 +1,10 @@
 //! Source checks for internal import aliases and local named exports.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -17,7 +17,7 @@ impl CheckerState {
         symbol: SymbolId,
     ) -> Result<bool, Error> {
         if self.symbol(symbol)?.flags() & sf::ALIAS != 0
-            && ts_ast::is_variable_declaration_initialized_to_require(self.ast(node)?, node)?
+            && tsr_ast::is_variable_declaration_initialized_to_require(self.ast(node)?, node)?
         {
             self.check_source_alias_symbol(node)?;
             Ok(true)
@@ -36,7 +36,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_export_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let specifier = data.module_specifier();
         let clause = data.export_clause();
         let type_only = data.is_type_only();
@@ -78,7 +78,7 @@ impl CheckerState {
                     }
                     let in_block = self.node(parent)?.kind() == K::ModuleBlock;
                     let external = in_block
-                        && ts_ast::is_ambient_module(
+                        && tsr_ast::is_ambient_module(
                             self.ast(parent)?,
                             required(self.node(parent)?.parent(), "export module parent")?,
                         )?;
@@ -111,7 +111,7 @@ impl CheckerState {
         let export_equals = if let Some(module) = module {
             self.member_symbol(
                 self.symbol(module)?.exports(),
-                ts_ast::internal_symbol_names::EXPORT_EQUALS,
+                tsr_ast::internal_symbol_names::EXPORT_EQUALS,
             )?
             .is_some()
         } else {
@@ -128,7 +128,7 @@ impl CheckerState {
             self.check_source_alias_symbol(clause)?;
             self.check_module_export_name(self.node(clause)?.name(), true)?;
         }
-        if self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS {
+        if self.module_emit_format(node)? == tsr_core::ModuleKind::COMMON_JS {
             self.check_external_emit_helpers(
                 node,
                 if clause.is_some() {
@@ -149,7 +149,7 @@ impl CheckerState {
         let export_equals = read
             .data_source()
             .as_export_assignment()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .is_export_equals();
         let ambient = read.flags() & nf::AMBIENT != 0;
         let javascript = read.flags() & nf::JAVA_SCRIPT_FILE != 0;
@@ -204,7 +204,7 @@ impl CheckerState {
         let illegal_default = !export_equals
             && !ambient
             && verbatim
-            && self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS;
+            && self.module_emit_format(node)? == tsr_core::ModuleKind::COMMON_JS;
         if self.node(expression)?.kind() == K::Identifier {
             if let Some(symbol) =
                 self.resolve_entity_name_at(expression, sf::ALL, true, true, Some(node))?
@@ -271,7 +271,7 @@ impl CheckerState {
             let ty = self.get_type_from_type_node(annotation)?;
             self.check_assignable_at(expression_type, ty, expression)?;
         }
-        if ambient && !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        if ambient && !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             self.grammar_error_node(expression,d::The_expression_of_an_export_assignment_must_be_an_identifier_or_qualified_name_in_an_ambient_context,vec![])?;
         }
         if export_equals {
@@ -280,13 +280,13 @@ impl CheckerState {
                 .program()?
                 .host
                 .get_implied_node_format_for_emit(file.as_bytes())?;
-            if module_kind >= ts_core::ModuleKind::ES2015
-                && module_kind != ts_core::ModuleKind::PRESERVE
-                && ((ambient && implied == ts_core::ModuleKind::ESNEXT)
-                    || (!ambient && implied != ts_core::ModuleKind::COMMON_JS))
+            if module_kind >= tsr_core::ModuleKind::ES2015
+                && module_kind != tsr_core::ModuleKind::PRESERVE
+                && ((ambient && implied == tsr_core::ModuleKind::ESNEXT)
+                    || (!ambient && implied != tsr_core::ModuleKind::COMMON_JS))
             {
                 self.grammar_error_node(node,d::Export_assignment_cannot_be_used_when_targeting_ECMAScript_modules_Consider_using_export_default_or_another_module_format_instead,vec![])?;
-            } else if module_kind == ts_core::ModuleKind::SYSTEM && !ambient {
+            } else if module_kind == tsr_core::ModuleKind::SYSTEM && !ambient {
                 self.grammar_error_node(
                     node,
                     d::Export_assignment_is_not_supported_when_module_flag_is_system,
@@ -303,7 +303,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_export_specifier()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let name = required(data.name(), "export specifier name")?;
         let property = data.property_name();
         let type_only = data.is_type_only();
@@ -314,13 +314,13 @@ impl CheckerState {
         let declaration_data = read
             .data_source()
             .as_export_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let external = declaration_data.module_specifier().is_some();
         let declaration_type_only = declaration_data.is_type_only();
         self.check_module_export_name(property, external)?;
         self.check_module_export_name(Some(name), true)?;
         if external {
-            if self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS
+            if self.module_emit_format(node)? == tsr_core::ModuleKind::COMMON_JS
                 && self
                     .ast(property.unwrap_or(name))?
                     .node_text(property.unwrap_or(name))?
@@ -358,9 +358,9 @@ impl CheckerState {
                 let first = self.symbol_declarations(symbol)?.iter().flatten().next();
                 if let Some(first) = first {
                     if let Some(container) =
-                        ts_ast::get_declaration_container(self.ast(first)?, first)?
+                        tsr_ast::get_declaration_container(self.ast(first)?, first)?
                     {
-                        ts_ast::utilities_middle::is_global_source_file(
+                        tsr_ast::utilities_middle::is_global_source_file(
                             self.ast(container)?,
                             container,
                         )?
@@ -409,7 +409,7 @@ impl CheckerState {
             {
                 self.mark_module_export_referenced(node)?;
                 if let Some(symbol) = symbol {
-                    if ts_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
+                    if tsr_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
                         && !self.module_aliases.type_only.contains_key(&symbol)
                     {
                         self.mark_module_alias_referenced(symbol)?;
@@ -435,10 +435,10 @@ impl CheckerState {
             self.grammar_error_node(name, d::Identifier_expected, vec![])?;
         } else if matches!(
             self.program()?.host.options().emit_module_kind(),
-            ts_core::ModuleKind::ES2015 | ts_core::ModuleKind::ES2020
+            tsr_core::ModuleKind::ES2015 | tsr_core::ModuleKind::ES2020
         ) {
             let source = required(
-                ts_ast::utilities::get_source_file_of_node(self.ast(name)?, Some(name))?,
+                tsr_ast::utilities::get_source_file_of_node(self.ast(name)?, Some(name))?,
                 "export-name source",
             )?;
             if !self.source_file_read(source)?.is_declaration_file {
@@ -455,7 +455,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_import_equals_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let reference = required(data.module_reference(), "import equals reference")?;
         let name = required(data.name(), "import equals name")?;
         let type_only = data.is_type_only();
@@ -496,7 +496,7 @@ impl CheckerState {
                 {
                     self.mark_module_export_referenced(node)?;
                 }
-                if (ts_core::ModuleKind::ES2015..=ts_core::ModuleKind::ESNEXT)
+                if (tsr_core::ModuleKind::ES2015..=tsr_core::ModuleKind::ESNEXT)
                     .contains(&self.program()?.host.options().emit_module_kind())
                     && !type_only
                     && !ambient
@@ -522,7 +522,7 @@ impl CheckerState {
         if target != self.builtins.unknown_symbol {
             let flags = self.module_symbol_flags(target, false, false)?;
             if flags & sf::VALUE != 0 {
-                let first = ts_ast::utilities_middle::get_first_identifier(
+                let first = tsr_ast::utilities_middle::get_first_identifier(
                     self.ast(reference)?,
                     reference,
                 )?;
@@ -531,7 +531,7 @@ impl CheckerState {
                 {
                     if self.symbol(resolved)?.flags() & sf::NAMESPACE == 0 {
                         let text =
-                            ts_scanner::declaration_name_to_string(self.ast(first)?, Some(first))?;
+                            tsr_scanner::declaration_name_to_string(self.ast(first)?, Some(first))?;
                         self.error_at(
                             Some(first),
                             d::Module_0_is_hidden_by_a_local_declaration_with_the_same_name,
@@ -680,14 +680,14 @@ impl CheckerState {
             let reference = required(
                 read.data_source()
                     .as_import_equals_declaration()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .module_reference(),
                 "referenced import alias target",
             )?;
             if self.node(reference)?.kind() != K::ExternalModuleReference {
                 let target = self.resolve_alias(symbol)?;
                 if self.symbol(target)?.flags() & sf::VALUE != 0 {
-                    let first = ts_ast::utilities_middle::get_first_identifier(
+                    let first = tsr_ast::utilities_middle::get_first_identifier(
                         self.ast(reference)?,
                         reference,
                     )?;

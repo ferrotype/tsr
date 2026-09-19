@@ -13,7 +13,7 @@
 
 use crate::types::FastState;
 use std::marker::PhantomData;
-use ts_arena::{ArenaId, NodeId, SymbolId};
+use tsr_arena::{ArenaId, NodeId, SymbolId};
 
 const PAGE_SIZE: usize = 256;
 

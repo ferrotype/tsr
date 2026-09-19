@@ -1,6 +1,6 @@
 use super::{graph, protocol::Session};
 use serde_json::{json, Value};
-use ts_ast::{AstView, BindResult, NodeId};
+use tsr_ast::{AstView, BindResult, NodeId};
 
 pub fn dump(
     s: &Session,

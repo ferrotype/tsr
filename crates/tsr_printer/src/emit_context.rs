@@ -8,7 +8,7 @@ use std::sync::{
     atomic::{AtomicU32, Ordering},
     Arc, Mutex, MutexGuard,
 };
-use ts_ast::{node_flags, Factory, FactoryHooks, FactoryMethods, JsString, NodeAccess, NodeId};
+use tsr_ast::{node_flags, Factory, FactoryHooks, FactoryMethods, JsString, NodeAccess, NodeId};
 
 /// Native `GeneratedIdentifierFlags` (`generatedidentifierflags.go`).
 pub mod generated_identifier_flags {
@@ -54,8 +54,8 @@ pub struct AutoGenerateInfo {
 /// `SynthesizedComment` retains output-only comments separately from source ranges.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SynthesizedComment {
-    pub kind: ts_ast::SyntaxKind,
-    pub loc: ts_core::TextRange,
+    pub kind: tsr_ast::SyntaxKind,
+    pub loc: tsr_core::TextRange,
     pub has_leading_new_line: bool,
     pub has_trailing_new_line: bool,
     pub text: JsString,
@@ -63,11 +63,11 @@ pub struct SynthesizedComment {
 
 #[derive(Debug, Default)]
 struct SideTables {
-    emit_flags: HashMap<NodeId, EmitFlags, ts_arena::hash::FastState>,
-    original: HashMap<NodeId, NodeId, ts_arena::hash::FastState>,
-    comment_ranges: HashMap<NodeId, ts_core::TextRange, ts_arena::hash::FastState>,
-    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, ts_arena::hash::FastState>,
-    auto_generate: HashMap<NodeId, AutoGenerateInfo, ts_arena::hash::FastState>,
+    emit_flags: HashMap<NodeId, EmitFlags, tsr_arena::hash::FastState>,
+    original: HashMap<NodeId, NodeId, tsr_arena::hash::FastState>,
+    comment_ranges: HashMap<NodeId, tsr_core::TextRange, tsr_arena::hash::FastState>,
+    leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, tsr_arena::hash::FastState>,
+    auto_generate: HashMap<NodeId, AutoGenerateInfo, tsr_arena::hash::FastState>,
 }
 impl SideTables {
     fn set_original(&mut self, node: NodeId, original: NodeId) {
@@ -139,9 +139,9 @@ impl EmitContext {
     /// Structural bytes of the side tables: table allocations and comment
     /// list capacities.
     pub fn structural_bytes(&self) -> usize {
-        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+        self.structural_bytes_with(&mut tsr_arena::StorageCensus::default())
     }
-    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> usize {
+    pub fn structural_bytes_with(&self, census: &mut tsr_arena::StorageCensus) -> usize {
         let tables = self.tables();
         let header = census.allocation(
             Arc::as_ptr(&self.tables) as usize,
@@ -236,15 +236,15 @@ impl EmitContext {
     }
 
     // port: tsc/internal/printer/emitcontext.go:EmitContext.CommentRange
-    pub fn comment_range(&self, node: NodeId) -> Option<ts_core::TextRange> {
+    pub fn comment_range(&self, node: NodeId) -> Option<tsr_core::TextRange> {
         self.tables().comment_ranges.get(&node).copied()
     }
-    pub fn comment_range_of(&self, factory: &dyn Factory, node: NodeId) -> ts_core::TextRange {
+    pub fn comment_range_of(&self, factory: &dyn Factory, node: NodeId) -> tsr_core::TextRange {
         self.comment_range(node)
             .unwrap_or_else(|| factory.node(node).range())
     }
     // port: tsc/internal/printer/emitcontext.go:EmitContext.SetCommentRange
-    pub fn set_comment_range(&mut self, node: NodeId, range: ts_core::TextRange) {
+    pub fn set_comment_range(&mut self, node: NodeId, range: tsr_core::TextRange) {
         self.tables().comment_ranges.insert(node, range);
     }
     // port: tsc/internal/printer/emitcontext.go:EmitContext.AssignCommentRange
@@ -257,7 +257,7 @@ impl EmitContext {
     pub fn add_synthetic_leading_comment(
         &mut self,
         node: NodeId,
-        kind: ts_ast::SyntaxKind,
+        kind: tsr_ast::SyntaxKind,
         text: JsString,
         has_trailing_new_line: bool,
     ) -> NodeId {
@@ -267,7 +267,7 @@ impl EmitContext {
             .or_default()
             .push(SynthesizedComment {
                 kind,
-                loc: ts_core::TextRange::new(-1, -1),
+                loc: tsr_core::TextRange::new(-1, -1),
                 has_leading_new_line: false,
                 has_trailing_new_line,
                 text,
@@ -311,7 +311,7 @@ impl EmitContext {
             node = next;
             if matches!(
                 factory.node(node).kind().known(),
-                Some(ts_ast::SyntaxKind::Identifier | ts_ast::SyntaxKind::PrivateIdentifier)
+                Some(tsr_ast::SyntaxKind::Identifier | tsr_ast::SyntaxKind::PrivateIdentifier)
             ) {
                 let Some(info) = self.auto_generate_info(node) else {
                     break;
@@ -462,12 +462,12 @@ impl FactoryHooks for EmitHooks {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_ast::AstBuilder;
+    use tsr_ast::AstBuilder;
     #[test]
     fn census_charges_shared_comment_and_generated_name_text_once() {
-        let counters = ts_arena::Counters::new();
+        let counters = tsr_arena::Counters::new();
         let mut ast = AstBuilder::new(
-            ts_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
+            tsr_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
             &counters,
         );
         let mut emit = EmitContext::new();
@@ -483,12 +483,12 @@ mod tests {
         );
         emit.add_synthetic_leading_comment(
             node,
-            ts_ast::SyntaxKind::SingleLineCommentTrivia,
+            tsr_ast::SyntaxKind::SingleLineCommentTrivia,
             text.clone(),
             false,
         );
         let all = emit.structural_bytes();
-        let mut census = ts_arena::StorageCensus::default();
+        let mut census = tsr_arena::StorageCensus::default();
         let text_bytes = census.text(text.backing_bytes());
         assert_eq!(emit.structural_bytes_with(&mut census), all - text_bytes);
         assert_eq!(emit.clone().structural_bytes_with(&mut census), 0);
@@ -496,10 +496,10 @@ mod tests {
 
     #[test]
     fn generated_name_identity_survives_clone_and_update_hooks() {
-        let counters = ts_arena::Counters::new();
+        let counters = tsr_arena::Counters::new();
         let mut emit = EmitContext::new();
         let mut ast = AstBuilder::with_hooks(
-            ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+            tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]),
             &counters,
             emit.factory_hooks(),
         );
@@ -548,13 +548,13 @@ mod tests {
 #[cfg(test)]
 mod original_overwrite_tests {
     use super::*;
-    use ts_ast::{AstBuilder, FactoryMethods};
+    use tsr_ast::{AstBuilder, FactoryMethods};
     #[test]
     fn replacing_original_keeps_local_emit_metadata() {
         let mut emit = EmitContext::new();
         let mut ast = AstBuilder::with_hooks(
-            ts_jsstring::SourceText::default(),
-            &ts_arena::Counters::new(),
+            tsr_jsstring::SourceText::default(),
+            &tsr_arena::Counters::new(),
             emit.factory_hooks(),
         );
         let first = ast.new_identifier(JsString::from_bytes(b"a".as_slice()));
@@ -574,15 +574,15 @@ mod original_overwrite_tests {
 #[cfg(test)]
 mod retention_tests {
     use super::*;
-    use ts_ast::{AstBuilder, FactoryMethods};
+    use tsr_ast::{AstBuilder, FactoryMethods};
 
     #[test]
     fn metadata_pruning_requires_original_and_generated_name_dependencies() {
         let mut emit = EmitContext::new();
         let shared = emit.clone();
         let mut ast = AstBuilder::with_hooks(
-            ts_jsstring::SourceText::default(),
-            &ts_arena::Counters::new(),
+            tsr_jsstring::SourceText::default(),
+            &tsr_arena::Counters::new(),
             emit.factory_hooks(),
         );
         let source = ast.new_identifier(JsString::from_bytes(b"source".as_slice()));
@@ -591,10 +591,10 @@ mod retention_tests {
         let cloned = ast.clone_identifier(generated);
         let garbage = ast.new_identifier(JsString::from_bytes(b"garbage".as_slice()));
         emit.set_emit_flags(garbage, crate::emit_flags::NO_COMMENTS);
-        emit.set_comment_range(cloned, ts_core::TextRange::new(1, 2));
+        emit.set_comment_range(cloned, tsr_core::TextRange::new(1, 2));
         emit.add_synthetic_leading_comment(
             cloned,
-            ts_ast::SyntaxKind::MultiLineCommentTrivia,
+            tsr_ast::SyntaxKind::MultiLineCommentTrivia,
             JsString::from_bytes(b"keep".as_slice()),
             false,
         );
@@ -614,7 +614,7 @@ mod retention_tests {
         assert_eq!(shared.node_for_generated_name(&ast, cloned), source);
         assert_eq!(
             shared.comment_range(cloned),
-            Some(ts_core::TextRange::new(1, 2))
+            Some(tsr_core::TextRange::new(1, 2))
         );
         assert_eq!(
             shared.synthetic_leading_comments(cloned)[0].text.as_bytes(),

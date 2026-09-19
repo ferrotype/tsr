@@ -6,9 +6,9 @@
 //! port stores the length and borrows the tail instead of copying each write.
 
 use crate::emit_text_writer::{decode_last_rune, EmitTextWriter};
-use ts_ast::SymbolId;
-use ts_jsstring::line_map::{compute_ecma_line_starts_seq, utf16_len};
-use ts_scanner::is_white_space_like;
+use tsr_ast::SymbolId;
+use tsr_jsstring::line_map::{compute_ecma_line_starts_seq, utf16_len};
+use tsr_scanner::is_white_space_like;
 
 const DEFAULT_INDENT_SIZE: isize = 4;
 

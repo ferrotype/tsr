@@ -2,10 +2,10 @@
 //! the native resolution stack and preserve the separate setter write type.
 
 use crate::{CheckerState, Error, TypeId, TypeSystemPropertyName};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as messages;
-use ts_jsstring::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as messages;
+use tsr_jsstring::JsString;
 
 impl CheckerState {
     pub(crate) fn declaration_of_kind(
@@ -339,7 +339,7 @@ impl CheckerState {
         let Some(parent) = self.parent_of_symbol(symbol)? else {
             return Ok(None);
         };
-        if self.symbol(parent)?.flags() & ts_ast::symbol_flags::CLASS == 0 {
+        if self.symbol(parent)?.flags() & tsr_ast::symbol_flags::CLASS == 0 {
             return Ok(None);
         }
         let class = self.get_declared_type_of_symbol(parent)?;
@@ -381,7 +381,7 @@ impl CheckerState {
             self.set_node_links_for_private_identifier_scope(node)?;
         }
         if modifiers & mf::ABSTRACT != 0 && initializer.is_some() {
-            let name = ts_scanner::declaration_name_to_string(self.ast(node)?, Some(name))?;
+            let name = tsr_scanner::declaration_name_to_string(self.ast(node)?, Some(name))?;
             self.error_at(
                 Some(node),
                 messages::Property_0_cannot_have_an_initializer_because_it_is_marked_abstract,
@@ -429,7 +429,7 @@ impl CheckerState {
         name: NodeId,
         message: &'static messages::Message,
     ) -> Result<bool, Error> {
-        if !ts_ast::is_dynamic_name(self.ast(name)?, name)? {
+        if !tsr_ast::is_dynamic_name(self.ast(name)?, name)? {
             return Ok(false);
         }
         let read = self.node(name)?;
@@ -443,7 +443,7 @@ impl CheckerState {
         }
         .ok_or(Error::MissingLink("dynamic name expression"))?;
         // isLateBindableName evaluates only syntactic entity names.
-        if ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        if tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             let ty = self.late_name_type(name)?;
             if self.types.flags(ty)?
                 & (crate::type_flags::STRING_OR_NUMBER_LITERAL
@@ -456,9 +456,9 @@ impl CheckerState {
         let expression = if computed {
             expression
         } else {
-            ts_ast::skip_parentheses(self.ast(expression)?, expression)?
+            tsr_ast::skip_parentheses(self.ast(expression)?, expression)?
         };
-        if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             return self.grammar_error_node(name, message, vec![]);
         }
         Ok(false)

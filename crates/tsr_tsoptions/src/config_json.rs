@@ -1,7 +1,7 @@
 //! Compact JSON at the pinned core.StringifyJson / json.Marshal boundary.
 use crate::ConfigValue;
 use std::collections::BTreeSet;
-use ts_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
+use tsr_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum JsonError {
@@ -72,7 +72,7 @@ fn append_worker(result: &mut Vec<u8>, value: &ConfigValue, depth: usize) -> Res
             if *value == 0.0 && value.is_sign_negative() {
                 result.extend_from_slice(b"-0");
             } else {
-                result.extend_from_slice(ts_jsnum::Number::new(*value).to_string().as_bytes());
+                result.extend_from_slice(tsr_jsnum::Number::new(*value).to_string().as_bytes());
             }
         }
         ConfigValue::String(value) => append_string(result, value.as_bytes()),

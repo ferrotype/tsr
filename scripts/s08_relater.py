@@ -48,7 +48,7 @@ def method():
 def sources():
     result = {}
     for pattern in ("crates/**/*.rs", "crates/**/Cargo.toml", "Cargo.*", "rust-toolchain*", ".cargo/**/*",
-                    "tools/s08/relater-prototype/**/*", "crates/ts_compiler/examples/p7_relater.rs", "crates/ts_compiler/examples/p3/mod.rs",
+                    "tools/s08/relater-prototype/**/*", "crates/tsr_compiler/examples/p7_relater.rs", "crates/tsr_compiler/examples/p3/mod.rs",
                     "scripts/s08_relater.py", "scripts/s08_measurement.py", "scripts/s07_benchmark.py", "scripts/s07_benchmark_stats.py", "scripts/s07_benchmark_measure.py",
                     "scripts/s04.py", "scripts/s04_common.py", "scripts/s08_oracle.py",
                     "data/s08/relater-fixtures.json", "data/s08/supplemental-observations.json.xz", "tools/s08/contracts/relations.json",
@@ -86,7 +86,7 @@ def build(directory):
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "bin").mkdir(exist_ok=True)
     env = native_environment()
-    manifest = ROOT / "crates/ts_compiler/Cargo.toml"
+    manifest = ROOT / "crates/tsr_compiler/Cargo.toml"
     binaries = {}
     for mode, features in MODES.items():
         args = ["cargo", "build", "--release", "--locked", "--example", "p7_relater", "--features", ",".join(features),

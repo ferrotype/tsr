@@ -6,8 +6,8 @@ mod types;
 pub use lookup::{could_already_refer_to_undefined_type, is_in_const_context};
 pub use types::*;
 
-use ts_arena::NodeId;
-use ts_ast::{AstView, NodeKind};
+use tsr_arena::NodeId;
+use tsr_ast::{AstView, NodeKind};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
@@ -29,7 +29,7 @@ impl std::error::Error for Error {}
 /// uses raw declaration symbols, preserving the pinned pseudochecker's boundary
 /// around semantic symbol merging and late-bound names.
 pub trait Host {
-    type Error: From<Error> + From<ts_arena::Error>;
+    type Error: From<Error> + From<tsr_arena::Error>;
     fn ast(&self, node: NodeId) -> Result<AstView<'_>, Self::Error>;
     fn raw_symbol_declarations(&self, node: NodeId) -> Result<Option<Vec<NodeId>>, Self::Error>;
 }

@@ -2,7 +2,7 @@
 # status/experiments.toml). Each producer emits only the metrics its implemented scenarios
 # measure; a missing metric keeps its criterion pending. Runs in parallel with S03.
 id = "S04"
-title = "Contract leaves: ts_jsstring and ts_arena"
+title = "Contract leaves: tsr_jsstring and tsr_arena"
 goal = "The two leaf crates implement the accepted text and ownership contracts, and every design-note fixture that needs no scanner, parser or checker passes in the E3 and E4 harnesses."
 exit = [
   "sprint.S02.done == 1",
@@ -23,42 +23,42 @@ exit = [
 
 [[item]]
 id = "S04-1"
-title = "ts_jsstring: JsString with Utf8, Wtf8 and Raw classification, BOM decoding, sentinel-aware iteration and byte-slice reclassification (docs/design/text.md, sections 1 and 2)"
+title = "tsr_jsstring: JsString with Utf8, Wtf8 and Raw classification, BOM decoding, sentinel-aware iteration and byte-slice reclassification (docs/design/text.md, sections 1 and 2)"
 kind = "task"
 required = true
 done_when = ["exp.E4.source_decoding.pass == 1", "exp.E4.slice_validity.pass == 1"]
 
 [[item]]
 id = "S04-2"
-title = "ts_jsstring helpers with Go's replacements: ToLowerJS, ToUpperJS, TruncateByRunes, LowerFirstChar and literal escaping"
+title = "tsr_jsstring helpers with Go's replacements: ToLowerJS, ToUpperJS, TruncateByRunes, LowerFirstChar and literal escaping"
 kind = "task"
 required = true
 done_when = ["exp.E4.helper_semantics.pass == 1"]
 
 [[item]]
 id = "S04-3"
-title = "ts_jsstring position maps: PositionMap for the API, the LSP converters, the ECMAScript and LSP line maps and the scanner's line/character conversion, each with its own rounding, clamping and panic behavior"
+title = "tsr_jsstring position maps: PositionMap for the API, the LSP converters, the ECMAScript and LSP line maps and the scanner's line/character conversion, each with its own rounding, clamping and panic behavior"
 kind = "task"
 required = true
 done_when = ["exp.E4.utf8_positions.pass == 1", "exp.E4.utf16_positions.pass == 1"]
 
 [[item]]
 id = "S04-4"
-title = "ts_arena ids and owners: NonZeroU64 NodeId and SymbolId, the never-reused arena counter with checked exhaustion, file, bundle and scratch owners, leases and release-mode import validation (docs/design/ownership.md, sections 2.1 to 2.3)"
+title = "tsr_arena ids and owners: NonZeroU64 NodeId and SymbolId, the never-reused arena counter with checked exhaustion, file, bundle and scratch owners, leases and release-mode import validation (docs/design/ownership.md, sections 2.1 to 2.3)"
 kind = "task"
 required = true
 done_when = ["exp.E3.id_exhaustion.pass == 1", "exp.E3.wrong_owner_rejected.pass == 1", "exp.E3.stale_and_recycled_ids_rejected.pass == 1"]
 
 [[item]]
 id = "S04-5"
-title = "ts_arena lazy storage: paged lazy arena published under one RwLock with miss recheck and page growth (section 2.4)"
+title = "tsr_arena lazy storage: paged lazy arena published under one RwLock with miss recheck and page growth (section 2.4)"
 kind = "task"
 required = true
 done_when = ["exp.E3.concurrent_lazy_storage.pass == 1"]
 
 [[item]]
 id = "S04-6"
-title = "ts_arena bundles: BundleOwner with non-owning cyclic links, released in every order"
+title = "tsr_arena bundles: BundleOwner with non-owning cyclic links, released in every order"
 kind = "task"
 required = true
 done_when = ["exp.E3.mapper_bundle_disposal.pass == 1"]

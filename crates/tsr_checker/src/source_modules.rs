@@ -1,11 +1,11 @@
 //! Source namespace and local alias checks. External module resolution and
 //! augmentation remain explicit boundaries until their host closure is ported.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -36,13 +36,13 @@ impl CheckerState {
     pub(crate) fn check_module_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.node(node)?;
         let body = read.body();
-        let global = ts_ast::utilities::is_global_scope_augmentation(&read);
+        let global = tsr_ast::utilities::is_global_scope_augmentation(&read);
         let ambient = read.flags() & nf::AMBIENT != 0;
         let name = required(read.name(), "namespace name")?;
         let data = read
             .data_source()
             .as_module_declaration()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let keyword = data.keyword();
         let attributes = data.attributes();
         if let Some(body) = body {
@@ -57,7 +57,7 @@ impl CheckerState {
         if let Some(attributes) = attributes {
             self.check_import_attributes_type(attributes)?;
         }
-        let external = ts_ast::is_ambient_module(self.ast(node)?, node)?;
+        let external = tsr_ast::is_ambient_module(self.ast(node)?, node)?;
         let context = if external {
             d::An_ambient_module_declaration_is_only_allowed_at_the_top_level_in_a_file
         } else {
@@ -97,7 +97,7 @@ impl CheckerState {
                 )?;
             }
             let source = required(
-                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
+                tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
                 "namespace source",
             )?;
             if isolated
@@ -119,7 +119,7 @@ impl CheckerState {
                 let real_class_or_function = read.kind() == K::ClassDeclaration
                     || read.kind() == K::FunctionDeclaration && read.body().is_some();
                 if real_class_or_function && read.flags() & nf::AMBIENT == 0 {
-                    let declaration_source = ts_ast::utilities::get_source_file_of_node(
+                    let declaration_source = tsr_ast::utilities::get_source_file_of_node(
                         self.ast(declaration)?,
                         Some(declaration),
                     )?;
@@ -138,7 +138,7 @@ impl CheckerState {
                     .modifier_flags(self.ast(node)?)?
                     & mf::EXPORT
                     != 0
-                && self.module_emit_format(node)? == ts_core::ModuleKind::COMMON_JS
+                && self.module_emit_format(node)? == tsr_core::ModuleKind::COMMON_JS
             {
                 let modifiers = self.source_list(node, self.node(node)?.modifiers())?;
                 let mut export_modifier = None;
@@ -156,7 +156,7 @@ impl CheckerState {
             }
         }
         if external {
-            if ts_ast::is_module_augmentation_external(self.ast(node)?, node)? {
+            if tsr_ast::is_module_augmentation_external(self.ast(node)?, node)? {
                 if let Some(attributes) = attributes {
                     self.error_at(
                         Some(attributes),
@@ -175,10 +175,10 @@ impl CheckerState {
                 }
             } else {
                 let parent = required(self.node(node)?.parent(), "ambient module parent")?;
-                if ts_ast::utilities_middle::is_global_source_file(self.ast(parent)?, parent)? {
+                if tsr_ast::utilities_middle::is_global_source_file(self.ast(parent)?, parent)? {
                     if global {
                         self.error_at(Some(name),d::Augmentations_for_the_global_scope_can_only_be_directly_nested_in_external_modules_or_ambient_module_declarations,vec![])?;
-                    } else if ts_module::is_relative(self.node_text(name)?.as_bytes()) {
+                    } else if tsr_module::is_relative(self.node_text(name)?.as_bytes()) {
                         self.error_at(
                             Some(name),
                             d::Ambient_module_declaration_cannot_specify_relative_module_name,
@@ -194,9 +194,9 @@ impl CheckerState {
     }
     // port: tsc/internal/checker/checker.go:isInstantiatedModule
     fn instantiated_module(&self, node: NodeId) -> Result<bool, Error> {
-        let state = ts_ast::get_module_instance_state(self.ast(node)?, node)?;
-        Ok(state == ts_ast::ModuleInstanceState::Instantiated
-            || state == ts_ast::ModuleInstanceState::ConstEnumOnly
+        let state = tsr_ast::get_module_instance_state(self.ast(node)?, node)?;
+        Ok(state == tsr_ast::ModuleInstanceState::Instantiated
+            || state == tsr_ast::ModuleInstanceState::ConstEnumOnly
                 && self.program()?.host.options().should_preserve_const_enums())
     }
     pub(crate) fn check_module_name_collision(
@@ -269,7 +269,7 @@ impl CheckerState {
                 };
                 if let Some(message) = message {
                     let text =
-                        ts_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
+                        tsr_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
                     self.error_at(name, message, vec![text])?;
                 }
             }
@@ -290,9 +290,9 @@ impl CheckerState {
                 | K::PropertySignature,
             ) => Ok(1),
             Some(K::ModuleDeclaration) => Ok(
-                if ts_ast::is_ambient_module(self.ast(node)?, node)?
-                    || ts_ast::get_module_instance_state(self.ast(node)?, node)?
-                        != ts_ast::ModuleInstanceState::NonInstantiated
+                if tsr_ast::is_ambient_module(self.ast(node)?, node)?
+                    || tsr_ast::get_module_instance_state(self.ast(node)?, node)?
+                        != tsr_ast::ModuleInstanceState::NonInstantiated
                 {
                     2 | 4
                 } else {
@@ -353,7 +353,7 @@ impl CheckerState {
         }
         let exports = self.symbol(symbol)?.exports();
         if let Some(export_equals) =
-            self.member_symbol(exports, ts_ast::internal_symbol_names::EXPORT_EQUALS)?
+            self.member_symbol(exports, tsr_ast::internal_symbol_names::EXPORT_EQUALS)?
         {
             let shadowed = if self.symbol(export_equals)?.flags()
                 & (sf::NAMESPACE_MODULE | sf::ALIAS)
@@ -380,7 +380,7 @@ impl CheckerState {
         let entries = self.module_table_entries(exports)?;
         for (name, symbol) in entries {
             let Some(symbol) = symbol else { continue };
-            if name.as_bytes() == ts_ast::internal_symbol_names::EXPORT_STAR {
+            if name.as_bytes() == tsr_ast::internal_symbol_names::EXPORT_STAR {
                 continue;
             }
             let flags = self.symbol(symbol)?.flags();
@@ -406,8 +406,10 @@ impl CheckerState {
             if count > 1 {
                 let mut all_exports_properties = true;
                 for &declaration in declarations.iter().flatten() {
-                    if ts_ast::get_assignment_declaration_kind(self.ast(declaration)?, declaration)?
-                        != ts_ast::JSDeclarationKind::ExportsProperty
+                    if tsr_ast::get_assignment_declaration_kind(
+                        self.ast(declaration)?,
+                        declaration,
+                    )? != tsr_ast::JSDeclarationKind::ExportsProperty
                     {
                         all_exports_properties = false;
                         break;
@@ -437,7 +439,8 @@ impl CheckerState {
         };
         for (_, symbol) in self.module_table_entries(exports)? {
             if let Some(symbol) = symbol {
-                if self.symbol(symbol)?.name_bytes() != ts_ast::internal_symbol_names::EXPORT_EQUALS
+                if self.symbol(symbol)?.name_bytes()
+                    != tsr_ast::internal_symbol_names::EXPORT_EQUALS
                     && self.module_symbol_flags(symbol, false, false)? & kind != 0
                 {
                     return Ok(true);
@@ -463,7 +466,7 @@ impl CheckerState {
         if symbol == self.builtins.global_this_symbol {
             // resolveAnonymousTypeMembers exposes runtime globals, excluding
             // lexical declarations and modules declared only by ambient names.
-            let mut members = ts_ast::SymbolTable::default();
+            let mut members = tsr_ast::SymbolTable::default();
             for (_, property) in self.table(exports)? {
                 let Some(property) = property else { continue };
                 let read = self.symbol(property)?;
@@ -477,7 +480,7 @@ impl CheckerState {
                     for declaration in declarations.iter() {
                         if !declaration
                             .map(|node| {
-                                ts_ast::is_ambient_module(self.ast(node)?, node)
+                                tsr_ast::is_ambient_module(self.ast(node)?, node)
                                     .map_err(Error::from)
                             })
                             .transpose()?
@@ -512,7 +515,7 @@ impl CheckerState {
         let Some(expression) = expression else {
             return Ok(false);
         };
-        if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             return Ok(false);
         }
         let Some(symbol) = self.get_symbol_of_declaration(node)? else {

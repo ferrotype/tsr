@@ -1,13 +1,13 @@
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     AstBuilder, Factory, FactoryMethods, JsString, RuntimeFactory, SourceFileParseOptions,
 };
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 #[test]
 fn clone_and_update_bound_js_match_go_without_rebinding() {
-    let parsed = ts_parser::parse_source_file(
+    let parsed = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(
             b"exports.x = this; async function f() { return this; }".as_slice(),
         ),

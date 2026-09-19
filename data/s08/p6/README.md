@@ -83,7 +83,7 @@ PY
 
 For each specification under `tools/s08/p6/dynamic-imports*.json`, use the
 existing `scripts/s08_p2.py capture --spec ... --output <fresh-directory>`, run
-`cargo run --locked -p ts_compiler --example p2_checker -- <requests> <output>`,
+`cargo run --locked -p tsr_compiler --example p2_checker -- <requests> <output>`,
 and compare through `scripts/s08_p2.py compare`. Regenerate the integration-test
 projection from authenticated native captures with the helper above.
 

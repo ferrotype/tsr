@@ -2,10 +2,10 @@
 //! syntactic annotation validation, and tracker fallback diagnostics.
 use super::NodeBuilder;
 use crate::{object_flags as of, type_flags as tf, Error, SignatureId, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags, symbol_flags as sf, SyntaxKind as K};
-use ts_nodebuilder::flags as nf;
-use ts_pseudochecker::{PseudoType, PseudoTypeData as P};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags, symbol_flags as sf, SyntaxKind as K};
+use tsr_nodebuilder::flags as nf;
+use tsr_pseudochecker::{PseudoType, PseudoTypeData as P};
 
 impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeForExpression
@@ -46,7 +46,7 @@ impl NodeBuilder<'_> {
             None => match symbol {
                 None => match declaration {
                     Some(decl)
-                        if ts_ast::utilities_middle::is_variable_like(
+                        if tsr_ast::utilities_middle::is_variable_like(
                             &self.checker.node(decl)?,
                         ) =>
                     {
@@ -106,7 +106,7 @@ impl NodeBuilder<'_> {
                 && self.checker.types.get(ty)?.symbol == symbol
             {
                 let same_file = if let (Some(enclosing), Some(symbol)) = (self.enclosing, symbol) {
-                    let file = ts_ast::utilities::get_source_file_of_node(
+                    let file = tsr_ast::utilities::get_source_file_of_node(
                         self.checker.ast(enclosing)?,
                         Some(enclosing),
                     )?;
@@ -118,7 +118,7 @@ impl NodeBuilder<'_> {
                         .collect();
                     let mut same = false;
                     for node in declarations {
-                        if ts_ast::utilities::get_source_file_of_node(
+                        if tsr_ast::utilities::get_source_file_of_node(
                             self.checker.ast(node)?,
                             Some(node),
                         )? == file
@@ -139,7 +139,7 @@ impl NodeBuilder<'_> {
                 Some(decl) => {
                     let read = self.checker.node(decl)?;
                     matches!(read.kind().known(), Some(K::GetAccessor | K::SetAccessor))
-                        || ts_ast::utilities_tail::has_inferred_type(&read)
+                        || tsr_ast::utilities_tail::has_inferred_type(&read)
                             && read.flags() & node_flags::SYNTHESIZED == 0
                             && self.checker.types.get(ty)?.object_flags & of::REQUIRES_WIDENING == 0
                 }
@@ -203,9 +203,9 @@ impl NodeBuilder<'_> {
                                 && self.non_missing_undefined(ty)?
                                 && !self.non_missing_undefined(from)?
                             {
-                                pseudo = ts_pseudochecker::union(vec![
+                                pseudo = tsr_pseudochecker::union(vec![
                                     pseudo,
-                                    ts_pseudochecker::undefined(),
+                                    tsr_pseudochecker::undefined(),
                                 ]);
                             }
                         }
@@ -216,7 +216,7 @@ impl NodeBuilder<'_> {
                     let add = if requires_undefined {
                         match self.pseudo_type_to_type(&pseudo)? {
                             Some(from) => !self.non_missing_undefined(from)?,
-                            None => !ts_pseudochecker::could_already_refer_to_undefined_type(
+                            None => !tsr_pseudochecker::could_already_refer_to_undefined_type(
                                 self.checker,
                                 &pseudo,
                             )?,
@@ -226,7 +226,7 @@ impl NodeBuilder<'_> {
                     };
                     if add {
                         pseudo =
-                            ts_pseudochecker::union(vec![pseudo, ts_pseudochecker::undefined()]);
+                            tsr_pseudochecker::union(vec![pseudo, tsr_pseudochecker::undefined()]);
                         if self.pseudo_type_equivalent(&pseudo, Some(ty), false, report)? {
                             reported_fallback = false;
                             return self.pseudo_node_with_fallback(&pseudo, ty).map(Some);
@@ -325,7 +325,7 @@ impl NodeBuilder<'_> {
                         {
                             if !self.pseudo_return_matches_predicate(&pseudo, predicate)? {
                                 if !self.suppress_inference_fallback {
-                                    self.report(ts_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(decl));
+                                    self.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(decl));
                                 }
                                 return Ok(None);
                             }
@@ -386,13 +386,13 @@ impl NodeBuilder<'_> {
                 if !self.suppress_inference_fallback {
                     if error_nodes.is_empty() {
                         self.report(
-                            ts_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(
+                            tsr_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(
                                 *expression,
                             ),
                         );
                     } else {
                         for &node in error_nodes {
-                            self.report(ts_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(node));
+                            self.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(node));
                         }
                     }
                 }
@@ -404,7 +404,7 @@ impl NodeBuilder<'_> {
                 } else {
                     if !self.suppress_inference_fallback {
                         self.report(
-                            ts_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(
+                            tsr_printer::emit_resolver::DeclarationTrackerEvent::InferenceFallback(
                                 *type_node,
                             ),
                         );

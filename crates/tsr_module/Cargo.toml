@@ -1,5 +1,5 @@
 [package]
-name = "ts_module"
+name = "tsr_module"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,14 +7,14 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-ts_semver = { version = "0.1.0", path = "../ts_semver" }
-ts_ast = { version = "0.1.0", path = "../ts_ast" }
-ts_core = { version = "0.1.0", path = "../ts_core" }
-ts_tspath = { version = "0.1.0", path = "../ts_tspath" }
-ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
-ts_tsoptions = { version = "0.1.0", path = "../ts_tsoptions" }
-ts_diagnostics = { version = "0.1.0", path = "../ts_diagnostics" }
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+tsr_semver = { version = "0.1.0", path = "../tsr_semver" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 serde = "1"
 serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
 

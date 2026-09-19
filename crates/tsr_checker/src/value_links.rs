@@ -4,7 +4,7 @@
 //! page. The type mapper field arrives with instantiation (P3).
 
 use crate::TypeId;
-use ts_arena::SymbolId;
+use tsr_arena::SymbolId;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct ValueSymbolLinks {

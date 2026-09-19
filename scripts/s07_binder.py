@@ -455,7 +455,7 @@ def build_oracle():
 
 
 def rust_binary():
-    output = command(["cargo", "build", "--package", "ts_binder", "--example", "binder", "--release", "--locked", "--message-format=json"], cwd=ROOT)
+    output = command(["cargo", "build", "--package", "tsr_binder", "--example", "binder", "--release", "--locked", "--message-format=json"], cwd=ROOT)
     items = [strict_json_loads(line) for line in output.splitlines() if line.strip()]
     binaries = [item["executable"] for item in items if item.get("reason") == "compiler-artifact" and item.get("target", {}).get("name") == "binder" and item.get("executable")]
     if len(binaries) != 1:

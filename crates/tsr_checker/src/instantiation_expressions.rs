@@ -2,9 +2,9 @@
 //! signatures while preserving object members. Each union constituent decides
 //! independently whether its signatures accept the supplied argument list.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, SignatureId, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, Diagnostic, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, Diagnostic, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 struct Resolution {
     node: NodeId,
@@ -58,7 +58,7 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("instantiation binary operator"))?;
                     let right = data.right();
                     if self.node(operator)?.kind() == K::InstanceOfKeyword
-                        && ts_ast::utilities::is_node_descendant_of(
+                        && tsr_ast::utilities::is_node_descendant_of(
                             self.ast(node)?,
                             Some(node),
                             right,
@@ -103,17 +103,17 @@ impl CheckerState {
         };
         if let Some(error) = error {
             let view = self.ast(node)?;
-            let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                 .ok_or(Error::MissingLink("instantiation source"))?;
             let range = view
                 .list(list.ok_or(Error::MissingLink("instantiation arguments"))?)?
                 .loc();
             let start =
-                ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), range.pos());
+                tsr_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), range.pos());
             let text = self.type_to_string(error, crate::type_display::DEFAULT_FLAGS)?;
             self.add_diagnostic(Diagnostic::new(
                 Some(source),
-                ts_core::TextRange::new(start, range.end()),
+                tsr_core::TextRange::new(start, range.end()),
                 d::Type_0_has_no_signatures_for_which_the_type_argument_list_is_applicable,
                 vec![text],
             ))?;

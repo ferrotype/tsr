@@ -7,10 +7,10 @@
 
 use super::{NodeBuilder, SerializedKey};
 use crate::{CheckerOptions, CheckerState, Error, TypeId};
-use ts_arena::{CheckerIdentity, Counters, Counts, Generation};
-use ts_ast::{AstBuilder, AstFile, FactoryMethods, JsString, NodeId};
-use ts_jsstring::SourceText;
-use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+use tsr_arena::{CheckerIdentity, Counters, Counts, Generation};
+use tsr_ast::{AstBuilder, AstFile, FactoryMethods, JsString, NodeId};
+use tsr_jsstring::SourceText;
+use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 fn state(counters: &Counters) -> CheckerState {
     let identity = CheckerIdentity::new(Generation::new(counters), counters);
@@ -42,7 +42,7 @@ fn print(builder: &NodeBuilder<'_>, node: NodeId) -> Result<JsString, Error> {
 /// `{ <name>: <property type> }` as an anonymous object type.
 fn object(checker: &mut CheckerState, name: &[u8], property_type: TypeId) -> TypeId {
     let property = checker
-        .new_symbol(ts_ast::symbol_flags::PROPERTY, JsString::from_bytes(name))
+        .new_symbol(tsr_ast::symbol_flags::PROPERTY, JsString::from_bytes(name))
         .unwrap();
     checker
         .value_symbol_links
@@ -50,7 +50,7 @@ fn object(checker: &mut CheckerState, name: &[u8], property_type: TypeId) -> Typ
         .resolved_type = Some(property_type);
     let symbol = checker
         .new_symbol(
-            ts_ast::symbol_flags::TYPE_LITERAL,
+            tsr_ast::symbol_flags::TYPE_LITERAL,
             JsString::from_bytes(b"__type".as_slice()),
         )
         .unwrap();

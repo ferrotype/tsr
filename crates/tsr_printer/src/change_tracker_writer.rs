@@ -11,13 +11,13 @@ use crate::emit_text_writer::decode_last_rune;
 use crate::{EmitContext, EmitTextWriter, Error, Printer, PrinterOptions, TextWriter};
 use std::collections::HashMap;
 use std::ops::ControlFlow;
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, ChildVisitor, FactoryMethods, NodeData, NodeId, NodeListId, NodeSlice,
     SourceFileParseOptions, SymbolId, SyntaxKind as K,
 };
-use ts_core::{NewLineKind, TextRange};
-use ts_jsstring::SourceText;
-use ts_scanner::is_white_space_like;
+use tsr_core::{NewLineKind, TextRange};
+use tsr_jsstring::SourceText;
+use tsr_scanner::is_white_space_like;
 
 pub struct ChangeTrackerWriter {
     inner: TextWriter,
@@ -68,7 +68,7 @@ impl ChangeTrackerWriter {
 
     // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.setLastNonTriviaPosition
     fn set_last_non_trivia_position(&mut self, s: &[u8], force: bool) {
-        if force || ts_scanner::skip_trivia(s, 0) != s.len() as i64 {
+        if force || tsr_scanner::skip_trivia(s, 0) != s.len() as i64 {
             self.last_non_trivia_position = self.inner.get_text_pos() as i64;
             // Trim trailing whitespace.
             let mut pos = s.len();
@@ -326,6 +326,6 @@ pub fn create_synthetic_source_file(
     builder.adopt_source(source.clone())?;
     let file = builder.new_source_file(parse_options, source, Some(statements), Some(end_of_file));
     builder.node_mut(file)?.set_range(TextRange::new(0, length));
-    ts_ast::set_parent_in_children(builder, file);
+    tsr_ast::set_parent_in_children(builder, file);
     Ok(file)
 }

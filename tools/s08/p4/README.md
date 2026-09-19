@@ -75,7 +75,7 @@ files. Its native comparison is separate from the full inventory and E2.
 
 ```sh
 python3 scripts/s08_p2.py capture --spec tools/s08/p4/review-regressions.json --output target/s08/p4-review-native
-cargo run -p ts_compiler --example p2_checker -- target/s08/p4-review-native/requests.json target/s08/p4-review-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p4-review-native/requests.json target/s08/p4-review-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p4-review-native --actual target/s08/p4-review-rust.json --output target/s08/p4-review-comparison.json
 ```
 

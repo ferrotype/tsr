@@ -1,9 +1,9 @@
 use super::{diagnostics, graph, load, owner, panic_error, queries, text, view, Error, Result};
 use serde_json::{json, Value};
 use std::sync::{Arc, Barrier};
-use ts_arena::{Counters, Generation};
-use ts_checker::{CheckerOwner, SymbolRef, TypeRef};
-use ts_compiler::{FileCache, Program};
+use tsr_arena::{Counters, Generation};
+use tsr_checker::{CheckerOwner, SymbolRef, TypeRef};
+use tsr_compiler::{FileCache, Program};
 struct Observed {
     row: Value,
     symbol: SymbolRef,

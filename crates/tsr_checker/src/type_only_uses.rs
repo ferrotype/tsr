@@ -1,14 +1,14 @@
 //! Syntax predicates shared by value resolution and const-enum use checks.
 //! Parent context distinguishes names in type syntax from evaluated expressions.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsValidTypeOnlyAliasUseSite
     pub(crate) fn valid_type_only_alias_use_site(&self, node: NodeId) -> Result<bool, Error> {
         if self.node(node)?.flags() & (nf::AMBIENT | nf::JS_DOC) != 0
-            || ts_ast::is_part_of_type_query(self.ast(node)?, node)?
+            || tsr_ast::is_part_of_type_query(self.ast(node)?, node)?
         {
             return Ok(true);
         }

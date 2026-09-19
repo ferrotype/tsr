@@ -3,9 +3,9 @@ use crate::{
     type_facts as f, type_flags as tf, CheckerState, Error, LiteralValue, RelationKind, TypeId,
     UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::{JsString, NodeKind, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, NodeKind, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isTypeAssignableToKindEx
@@ -59,7 +59,7 @@ impl CheckerState {
                 || flags & (tf::VOID | tf::UNDEFINED | tf::NULL | tf::ANY_OR_UNKNOWN) != 0
                 || flags & tf::STRING_LITERAL != 0 && matches!(&c.types.literal(t)?.value, LiteralValue::String(s) if s.is_empty())
                 || flags & tf::NUMBER_LITERAL != 0 && matches!(&c.types.literal(t)?.value, LiteralValue::Number(n) if n.value() == 0.0)
-                || flags & tf::BIG_INT_LITERAL != 0 && matches!(&c.types.literal(t)?.value, LiteralValue::BigInt(n) if *n == ts_jsnum::PseudoBigInt::default()) { t }
+                || flags & tf::BIG_INT_LITERAL != 0 && matches!(&c.types.literal(t)?.value, LiteralValue::BigInt(n) if *n == tsr_jsnum::PseudoBigInt::default()) { t }
             else { c.builtins.never_type };
             Ok(Some(result))
         })?.ok_or(Error::MissingLink("falsy union"))
@@ -75,14 +75,14 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         // Shared source rules precede the operator result. Calls/enum guards are
         // a separate source check; unresolved dependencies remain explicit.
-        if ts_ast::utilities::is_logical_or_coalescing_binary_operator(operator) {
+        if tsr_ast::utilities::is_logical_or_coalescing_binary_operator(operator) {
             let mut parent = match self.node(left)?.parent() {
                 Some(parent) => self.node(parent)?.parent(),
                 None => None,
             };
             while let Some(node) = parent {
                 if self.node(node)?.kind() != K::ParenthesizedExpression
-                    && !ts_ast::utilities::is_logical_or_coalescing_binary_expression(
+                    && !tsr_ast::utilities::is_logical_or_coalescing_binary_expression(
                         self.ast(node)?,
                         node,
                     )?
@@ -108,7 +108,7 @@ impl CheckerState {
                         .node(node)?
                         .data_source()
                         .as_if_statement()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .then_statement(),
                     _ => None,
                 };
@@ -156,7 +156,7 @@ impl CheckerState {
                     self.get_union_type_ex(&[non_null, b], UnionReduction::Subtype, None, None)?
                 }
             }
-            _ => return Err(ts_arena::Error::InvalidGraph.into()),
+            _ => return Err(tsr_arena::Error::InvalidGraph.into()),
         };
         if matches!(
             operator.known(),
@@ -276,7 +276,7 @@ impl CheckerState {
 
 fn operator_text(kind: NodeKind) -> JsString {
     JsString::from_bytes(
-        ts_scanner::token_to_string(
+        tsr_scanner::token_to_string(
             kind.known()
                 .expect("operator dispatch checked the syntax kind"),
         )

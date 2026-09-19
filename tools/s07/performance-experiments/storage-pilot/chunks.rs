@@ -487,7 +487,7 @@ impl<const CHUNK: usize> Published<CHUNK> {
     /// cannot outlive the owner or coexist with mutable construction.
     ///
     /// ```compile_fail
-    /// use ts_s07_storage_pilot::chunks::{Builder, NodeRef};
+    /// use tsr_s07_storage_pilot::chunks::{Builder, NodeRef};
     /// fn escape() -> &'static [u32] {
     ///     let mut builder = Builder::<4>::new(1, 1);
     ///     let frame = builder.begin().unwrap();

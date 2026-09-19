@@ -1,6 +1,6 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{Parser, ParserFactory};
-use ts_ast::{modifier_flags, SyntaxKind as K};
+use tsr_ast::{modifier_flags, SyntaxKind as K};
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.scanTypeMemberStart
@@ -12,7 +12,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             return true;
         }
         let mut identifier = false;
-        while ts_ast::is_modifier_kind(self.token.into()) {
+        while tsr_ast::is_modifier_kind(self.token.into()) {
             identifier = true;
             self.next_token();
         }
@@ -39,7 +39,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         if self.token == K::AtToken {
             return true;
         }
-        while ts_ast::is_modifier_kind(self.token.into()) {
+        while tsr_ast::is_modifier_kind(self.token.into()) {
             identifier = self.token;
             if is_class_member_modifier(identifier) {
                 return true;
@@ -57,7 +57,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             return true;
         }
         if identifier != K::Unknown {
-            if !ts_ast::is_keyword_kind(identifier.into())
+            if !tsr_ast::is_keyword_kind(identifier.into())
                 || matches!(identifier, K::SetKeyword | K::GetKeyword)
             {
                 return true;
@@ -268,7 +268,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     pub(crate) fn is_start_of_parameter(&mut self, jsdoc: bool) -> bool {
         self.token == K::DotDotDotToken
             || self.is_binding_identifier_or_private_identifier_or_pattern()
-            || ts_ast::is_modifier_kind(self.token.into())
+            || tsr_ast::is_modifier_kind(self.token.into())
             || self.token == K::AtToken
             || self.is_start_of_type(!jsdoc)
     }

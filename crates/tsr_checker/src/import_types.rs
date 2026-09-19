@@ -1,9 +1,9 @@
 //! Literal import types use the same retained module resolution as source
 //! imports. Qualifier links preserve each immediate alias identity.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromImportTypeNode
     pub(crate) fn type_from_import_node(&mut self, node: NodeId) -> Result<TypeId, Error> {
@@ -14,7 +14,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_import_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let argument = data
             .argument()
             .ok_or(Error::MissingLink("import type argument"))?;
@@ -100,7 +100,7 @@ impl CheckerState {
                             .ok_or(Error::MissingLink("immediate import namespace"))?;
                         for declaration in self.symbol_declarations(immediate)?.iter().flatten() {
                             if self.node(declaration)?.flags()
-                                & ts_ast::node_flags::JAVA_SCRIPT_FILE
+                                & tsr_ast::node_flags::JAVA_SCRIPT_FILE
                                 != 0
                             {
                                 return Err(Error::Unsupported(
@@ -111,7 +111,7 @@ impl CheckerState {
                     }
                     let name = self.fully_qualified_name(namespace, None)?;
                     let member =
-                        ts_scanner::declaration_name_to_string(self.ast(current)?, Some(current))?;
+                        tsr_scanner::declaration_name_to_string(self.ast(current)?, Some(current))?;
                     self.error_at(
                         Some(current),
                         d::Namespace_0_has_no_exported_member_1,
@@ -165,7 +165,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_import_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let argument = data
             .argument()
             .ok_or(Error::MissingLink("import type argument"))?;

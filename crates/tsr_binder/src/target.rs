@@ -1,7 +1,7 @@
 //! Local syntax identities stay branded through dispatch and recursive walks.
 //! Unmigrated helpers cross the explicit raw-ID boundary below.
 use crate::{backend::Backend, Binder};
-use ts_ast::{
+use tsr_ast::{
     local_bind::{BindEdges, BindList, BindNode},
     NodeId, NodeKind, NodeListId, NodeSlice,
 };
@@ -247,7 +247,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 crate::checked(local.get_name_of_declaration(Some(node))).map(BindingNode::Local)
             }
             BindingNode::Checked(node) => {
-                crate::checked(ts_ast::get_name_of_declaration(self.view(), Some(node)))
+                crate::checked(tsr_ast::get_name_of_declaration(self.view(), Some(node)))
                     .map(|name| self.binding_node(name))
             }
         }
@@ -260,7 +260,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 };
                 crate::checked(local.has_dynamic_name(Some(node)))
             }
-            node => crate::checked(ts_ast::has_dynamic_name(
+            node => crate::checked(tsr_ast::has_dynamic_name(
                 self.view(),
                 node.map(|node| self.node_id(node)),
             )),
@@ -275,7 +275,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 local.is_ambient_module(node)
             }
             BindingNode::Checked(node) => {
-                crate::checked(ts_ast::is_ambient_module(self.view(), node))
+                crate::checked(tsr_ast::is_ambient_module(self.view(), node))
             }
         }
     }
@@ -292,7 +292,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 local.has_syntactic_modifier(node, flags)
             }
             BindingNode::Checked(node) => crate::checked(
-                ts_ast::utilities::has_syntactic_modifier(self.view(), node, flags),
+                tsr_ast::utilities::has_syntactic_modifier(self.view(), node, flags),
             ),
         }
     }
@@ -305,11 +305,11 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 local.get_combined_modifier_flags(node)
             }
             BindingNode::Checked(node) => crate::checked(
-                ts_ast::utilities::get_combined_modifier_flags(self.view(), node),
+                tsr_ast::utilities::get_combined_modifier_flags(self.view(), node),
             ),
         }
     }
-    pub(crate) fn target_text(&self, node: BindingNode<'scope>) -> ts_ast::JsString {
+    pub(crate) fn target_text(&self, node: BindingNode<'scope>) -> tsr_ast::JsString {
         match node {
             BindingNode::Local(node) => {
                 let Backend::Local(local) = &self.builder else {
@@ -318,7 +318,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 // Label/name paths require identifier text. Other text shapes keep
                 // the public text helper's checked shape and failure contract.
                 let read = local.node(node);
-                if read.kind() == ts_ast::SyntaxKind::Identifier {
+                if read.kind() == tsr_ast::SyntaxKind::Identifier {
                     if let Some(identifier) = read.as_identifier() {
                         return identifier.text_owned();
                     }
@@ -348,15 +348,15 @@ macro_rules! target_predicates {
 }
 impl<'scope> Binder<'_, 'scope, '_> {
     target_predicates! {
-        target_is_dotted_name => is_dotted_name in ts_ast,
-        target_is_entity_name_expression => is_entity_name_expression in ts_ast,
-        target_is_left_hand_side_expression => is_left_hand_side_expression in ts_ast,
-        target_is_push_or_unshift_identifier => is_push_or_unshift_identifier in ts_ast,
-        target_is_outermost_optional_chain => is_outermost_optional_chain in ts_ast::utilities,
-        target_is_expression_of_optional_chain_root => is_expression_of_optional_chain_root in ts_ast::utilities,
-        target_is_logical_expression => is_logical_expression in ts_ast::utilities,
-        target_is_logical_or_coalescing_assignment_expression => is_logical_or_coalescing_assignment_expression in ts_ast::utilities,
-        target_is_nullish_coalesce => is_nullish_coalesce in ts_ast::utilities,
+        target_is_dotted_name => is_dotted_name in tsr_ast,
+        target_is_entity_name_expression => is_entity_name_expression in tsr_ast,
+        target_is_left_hand_side_expression => is_left_hand_side_expression in tsr_ast,
+        target_is_push_or_unshift_identifier => is_push_or_unshift_identifier in tsr_ast,
+        target_is_outermost_optional_chain => is_outermost_optional_chain in tsr_ast::utilities,
+        target_is_expression_of_optional_chain_root => is_expression_of_optional_chain_root in tsr_ast::utilities,
+        target_is_logical_expression => is_logical_expression in tsr_ast::utilities,
+        target_is_logical_or_coalescing_assignment_expression => is_logical_or_coalescing_assignment_expression in tsr_ast::utilities,
+        target_is_nullish_coalesce => is_nullish_coalesce in tsr_ast::utilities,
     }
     pub(crate) fn target_skip_parentheses(&self, node: BindingNode<'scope>) -> BindingNode<'scope> {
         match node {
@@ -367,7 +367,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 BindingNode::Local(local.skip_parentheses(node))
             }
             BindingNode::Checked(node) => BindingNode::Checked(
-                ts_ast::skip_parentheses(self.view(), node)
+                tsr_ast::skip_parentheses(self.view(), node)
                     .expect("retained parenthesized expression"),
             ),
         }
@@ -380,7 +380,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 };
                 local.is_optional_chain(node)
             }
-            BindingNode::Checked(node) => ts_ast::utilities::is_optional_chain(&self.n(node)),
+            BindingNode::Checked(node) => tsr_ast::utilities::is_optional_chain(&self.n(node)),
         }
     }
     pub(crate) fn target_is_optional_chain_root(&self, node: BindingNode<'scope>) -> bool {
@@ -391,7 +391,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 };
                 local.is_optional_chain_root(node)
             }
-            BindingNode::Checked(node) => ts_ast::utilities::is_optional_chain_root(&self.n(node)),
+            BindingNode::Checked(node) => tsr_ast::utilities::is_optional_chain_root(&self.n(node)),
         }
     }
 }

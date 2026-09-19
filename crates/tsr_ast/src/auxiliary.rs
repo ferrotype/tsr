@@ -2,8 +2,8 @@
 use crate::compact::{lists::CompactNodes, CompactSlice, CoreStore, RowPages, StoredNode};
 use crate::{AstStorageData, NodeList, NodeSlice};
 use hashbrown::HashMap;
-use ts_arena::{ArenaId, AuxId, AuxiliaryRead, Error, StorageRead, StorageView};
-use ts_core::TextRange;
+use tsr_arena::{ArenaId, AuxId, AuxiliaryRead, Error, StorageRead, StorageView};
+use tsr_core::TextRange;
 
 const COLD: u32 = 0;
 const LIST: u32 = 1;
@@ -37,7 +37,7 @@ pub(crate) struct AuxStore {
     lists: RowPages<ListRow>,
     backings: RowPages<BackingRow>,
     cold: Vec<AstStorageData>,
-    foreign: HashMap<u32, AuxId, ts_arena::hash::FastState>,
+    foreign: HashMap<u32, AuxId, tsr_arena::hash::FastState>,
 }
 
 pub(crate) enum AuxValue<'a> {
@@ -343,7 +343,7 @@ impl AuxStore {
     /// allocation extent is not exposed.
     pub(crate) fn structural_bytes_with(
         &self,
-        census: &mut ts_arena::StorageCensus,
+        census: &mut tsr_arena::StorageCensus,
     ) -> (usize, usize) {
         let mut known = self.lists.structural_bytes()
             + self.backings.structural_bytes()
@@ -385,7 +385,7 @@ impl AuxStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::{Counters, StorageBuilder};
+    use tsr_arena::{Counters, StorageBuilder};
 
     #[test]
     fn compact_auxiliary_layouts_and_full_local_slot_are_preserved() {
@@ -396,7 +396,7 @@ mod tests {
         assert_eq!(std::mem::size_of::<AuxStore>(), 120);
         assert_eq!(std::mem::size_of::<AstStorageData>(), 40);
         let builder =
-            StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
+            StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
         let owner = builder.view().auxiliary_arena();
         let mut store = AuxStore::default();
         for nodes in [
@@ -419,8 +419,8 @@ mod tests {
     #[test]
     fn cold_promotion_releases_foreign_escape_and_preserves_the_header_once() {
         let counters = Counters::new();
-        let first = StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &counters);
-        let second = StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &counters);
+        let first = StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &counters);
+        let second = StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &counters);
         let owner = first.view().auxiliary_arena();
         let foreign = AuxId::from_parts(second.view().auxiliary_arena(), u32::MAX).unwrap();
         let nodes = NodeSlice {
@@ -460,7 +460,7 @@ mod tests {
     #[test]
     fn wide_backing_and_rejected_mutation_do_not_truncate_or_promote() {
         let builder =
-            StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
+            StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
         let owner = builder.view().auxiliary_arena();
         let mut store = AuxStore::default();
         let mut ordinary = store.push(
@@ -496,7 +496,7 @@ mod tests {
     #[test]
     fn local_list_descriptors_preserve_nil_missing_and_slice_offsets() {
         let builder =
-            StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
+            StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &Counters::new());
         let owner = builder.view().auxiliary_arena();
         let mut store = AuxStore::default();
         for nodes in [
@@ -541,8 +541,8 @@ mod tests {
     #[test]
     fn local_list_eligibility_rejects_foreign_and_promoted_links_but_allows_metadata() {
         let counters = Counters::new();
-        let first = StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &counters);
-        let second = StorageBuilder::<ts_arena::Node<()>>::new(Vec::new().into(), &counters);
+        let first = StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &counters);
+        let second = StorageBuilder::<tsr_arena::Node<()>>::new(Vec::new().into(), &counters);
         let owner = first.view().auxiliary_arena();
         let mut store = AuxStore::default();
         let text = store.push(AstStorageData::Text(Box::new([])), owner);

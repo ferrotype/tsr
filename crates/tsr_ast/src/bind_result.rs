@@ -11,7 +11,7 @@ use std::{
     panic::{catch_unwind, resume_unwind, AssertUnwindSafe},
     sync::OnceLock,
 };
-use ts_arena::{Error, InitializationDomain, InitializationGuard, SymbolId};
+use tsr_arena::{Error, InitializationDomain, InitializationGuard, SymbolId};
 
 #[path = "local_bind.rs"]
 pub mod local_bind;
@@ -31,7 +31,7 @@ pub struct NodeBinding {
 
 #[derive(Clone, Debug, Default)]
 pub struct PatternAmbientModule {
-    pub pattern: ts_core::pattern::Pattern,
+    pub pattern: tsr_core::pattern::Pattern,
     pub symbol: Option<SymbolId>,
 }
 
@@ -888,7 +888,7 @@ impl BoundFile {
             .0
             .view()
             .for_node_owner(self.source)
-            .and_then(ts_arena::StorageView::owner_retention)
+            .and_then(tsr_arena::StorageView::owner_retention)
             .expect("retained source identity");
         BoundView {
             ast: AstView(parsed, Some(&self.result)),
@@ -984,7 +984,7 @@ impl AstFile {
 /// arenas exactly as the file handle does.
 #[derive(Clone, Debug)]
 pub struct SharedBoundFile {
-    owner: Arc<ts_arena::StorageOwner<crate::compact::StoredNode>>,
+    owner: Arc<tsr_arena::StorageOwner<crate::compact::StoredNode>>,
     result: Arc<BindResult>,
 }
 impl SharedBoundFile {
@@ -1024,7 +1024,7 @@ impl BoundFile {
 /// completed syntax only: there is no promise of a second, pristine parsed AST.
 ///
 /// ```compile_fail
-/// fn parsed(file: &ts_ast::CompletedFile) { file.parsed_file(); }
+/// fn parsed(file: &tsr_ast::CompletedFile) { file.parsed_file(); }
 /// ```
 #[derive(Clone, Debug)]
 pub struct CompletedFile {

@@ -1,7 +1,7 @@
 use crate::{parse_flags, Parser, ParserFactory, ParsingContext};
-use ts_ast::{modifier_flags, node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_diagnostics as diag;
+use tsr_ast::{modifier_flags, node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseDeclaration

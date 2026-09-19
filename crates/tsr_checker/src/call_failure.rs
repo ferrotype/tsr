@@ -6,9 +6,9 @@ use crate::{
     TypeId, UnionReduction,
 };
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{Diagnostic, JsString, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{Diagnostic, JsString, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getCandidateForOverloadFailure
@@ -339,7 +339,7 @@ impl CheckerState {
         }
         for declaration in declarations {
             let read = self.node(declaration)?;
-            if ts_ast::utilities::is_function_like(Some(&read)) {
+            if tsr_ast::utilities::is_function_like(Some(&read)) {
                 if let Some(body) = read.body() {
                     if self.node(body)?.pos() != self.node(body)?.end() {
                         let signature = self.signature_from_declaration(declaration)?;
@@ -404,17 +404,18 @@ impl CheckerState {
             (below,above)=>(messages::Expected_0_type_arguments_but_got_1,vec![string(below.or(above).ok_or(Error::MissingLink("overload type arity range"))?),string(count)]),
         };
         let view = self.ast(node)?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::MissingLink("type arity source"))?;
         let list = view
             .node(node)?
             .type_argument_list()
             .ok_or(Error::MissingLink("type arity list"))?;
         let loc = view.list(list)?.loc();
-        let start = ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos());
+        let start =
+            tsr_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos());
         self.add_diagnostic(Diagnostic::new(
             Some(source),
-            ts_core::TextRange::new(start, loc.end()),
+            tsr_core::TextRange::new(start, loc.end()),
             message,
             args,
         ))?;

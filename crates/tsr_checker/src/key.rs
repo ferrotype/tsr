@@ -15,7 +15,7 @@
 //! bytes; keys only have to be unique within one checker.
 
 use crate::TypeId;
-use ts_arena::NodeId;
+use tsr_arena::NodeId;
 
 /// The key bytes upstream hashes.
 pub type CacheKey = Box<[u8]>;

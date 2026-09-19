@@ -1,6 +1,6 @@
 //! Values crossing the Go config parser's `any` boundary. Text stays byte exact;
 //! arrays and object insertion order preserve source traversal and diagnostics.
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum ConfigValue {

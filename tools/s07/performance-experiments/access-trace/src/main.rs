@@ -1,8 +1,8 @@
 //! Untimed access capture over the exact retained parse/bind workload.
-#[path = "../../../../../crates/ts_binder/examples/support/graph.rs"]
+#[path = "../../../../../crates/tsr_binder/examples/support/graph.rs"]
 mod binder_graph;
 #[allow(dead_code)]
-#[path = "../../../../../crates/ts_bench/src/workload_graph.rs"]
+#[path = "../../../../../crates/tsr_bench/src/workload_graph.rs"]
 mod workload_graph;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -13,8 +13,8 @@ use std::{
     path::Path,
     thread,
 };
-use ts_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 #[global_allocator]
 static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
 #[derive(Deserialize)]
@@ -30,7 +30,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 fn preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error>> {
     let inputs: Vec<Input> = serde_json::from_slice(&fs::read(path)?)?;
@@ -50,7 +50,7 @@ fn preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error>> {
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect()
@@ -82,7 +82,7 @@ fn loaded_digest(inputs: &[Loaded]) -> String {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 5 {
-        return Err("usage: ts_s07_bis_access_trace INPUTS.json SUMMARY.json GRAPHS.ndjson PAYLOAD_LIMIT (binary trace on stdout)".into());
+        return Err("usage: tsr_s07_bis_access_trace INPUTS.json SUMMARY.json GRAPHS.ndjson PAYLOAD_LIMIT (binary trace on stdout)".into());
     }
     let inputs = preload(Path::new(&args[1]))?;
     let payload_limit: u64 = args[4]
@@ -92,8 +92,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let loaded_input_sha256 = loaded_digest(&inputs);
     let loaded_bytes: usize = inputs.iter().map(|input| input.source.len()).sum();
     let files = thread::scope(|scope| {
-        ts_parser::spawn_parser_worker(scope, || {
-            use ts_ast::access_trace as trace;
+        tsr_parser::spawn_parser_worker(scope, || {
+            use tsr_ast::access_trace as trace;
             trace::start(Box::new(io::stdout()), payload_limit).expect("start trace");
             let mut files = Vec::with_capacity(inputs.len());
             let (mut node_total, mut symbol_total) = (0u64, 0u64);
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 trace::context(ordinal, 0);
                 trace::event(1, 0, index as u64, input.source.len() as u64, 0, 0);
                 trace::event(2, 0, 0, 0, 0, 0);
-                let parsed = ts_parser::parse_source_file(
+                let parsed = tsr_parser::parse_source_file(
                     input.source.clone(),
                     input.script_kind,
                     input.options.clone(),
@@ -121,12 +121,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 );
                 trace::event(4, 0, 0, 0, 0, 0);
                 trace::context(ordinal, 1);
-                ts_ast::access_trace_state::export(parsed.view());
+                tsr_ast::access_trace_state::export(parsed.view());
                 trace::context(ordinal, 0);
                 trace::event(5, 0, 0, 0, 0, 0);
                 trace::event(6, 0, 0, 0, 0, 0);
                 trace::context(ordinal, 2);
-                let file = ts_binder::bind_parsed_file(parsed)
+                let file = tsr_binder::bind_parsed_file(parsed)
                     .expect("frozen workload binding must complete");
                 trace::context(ordinal, 0);
                 let view = file.view();

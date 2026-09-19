@@ -1,5 +1,5 @@
 //! Append-only string pairs preserve Go's wire order; equal strings are not interned.
-use ts_ast::{NodeKind, SyntaxKind};
+use tsr_ast::{NodeKind, SyntaxKind};
 
 pub(crate) struct StringTable<'a> {
     text: &'a [u8],

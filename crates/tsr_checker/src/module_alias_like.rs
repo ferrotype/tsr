@@ -1,13 +1,13 @@
 //! CommonJS assignments share alias targets with explicit exports; arbitrary
 //! expressions yield no alias rather than inventing a named declaration.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
-use ts_core::ModuleKind;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
+use tsr_core::ModuleKind;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isCommonJSRequire
     pub(crate) fn is_common_js_require(&mut self, node: NodeId) -> Result<bool, Error> {
-        if !ts_ast::utilities_middle::is_require_call(self.ast(node)?, &self.node(node)?, true)? {
+        if !tsr_ast::utilities_middle::is_require_call(self.ast(node)?, &self.node(node)?, true)? {
             return Ok(false);
         }
         let expression = self
@@ -41,7 +41,7 @@ impl CheckerState {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             let read = self.node(declaration)?;
             if read.kind() == kind {
-                return Ok(read.flags() & ts_ast::node_flags::AMBIENT != 0);
+                return Ok(read.flags() & tsr_ast::node_flags::AMBIENT != 0);
             }
         }
         Ok(false)
@@ -55,10 +55,10 @@ impl CheckerState {
             return Ok(namespace);
         };
         let read = self.node(declaration)?;
-        if read.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE == 0
+        if read.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE == 0
             || read.kind() != K::VariableDeclaration
             || self.program()?.host.options().module_resolution_kind()
-                == ts_core::ModuleResolutionKind::BUNDLER
+                == tsr_core::ModuleResolutionKind::BUNDLER
         {
             return Ok(namespace);
         }
@@ -87,8 +87,8 @@ impl CheckerState {
             let ty = self.check_expression_cached(expression)?;
             return Ok(self.types.get(ty)?.symbol);
         }
-        if !ts_ast::utilities::is_entity_name(&read)
-            && !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
+        if !tsr_ast::utilities::is_entity_name(&read)
+            && !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)?
         {
             return Ok(None);
         }
@@ -147,7 +147,7 @@ impl CheckerState {
             .node(node)?
             .parent()
             .ok_or(Error::MissingLink("namespace export parent"))?;
-        if !ts_ast::utilities::can_have_symbol(&self.node(parent)?) {
+        if !tsr_ast::utilities::can_have_symbol(&self.node(parent)?) {
             return Ok(None);
         }
         let raw = self
@@ -169,7 +169,7 @@ impl CheckerState {
             .node(node)?
             .initializer()
             .ok_or(Error::MissingLink("require declaration initializer"))?;
-        if !ts_ast::utilities_middle::is_require_call(
+        if !tsr_ast::utilities_middle::is_require_call(
             self.ast(initializer)?,
             &self.node(initializer)?,
             true,

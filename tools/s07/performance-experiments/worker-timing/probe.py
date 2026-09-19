@@ -127,16 +127,16 @@ def build(control, control_sha, output):
     members = sorted(str(path.parent.relative_to(workspace)) for path in (workspace / "crates").glob("*/Cargo.toml"))
     manifest.write_text("\n".join("members = " + json.dumps(members) if line.startswith("members = ") else line
                                  for line in original_manifest.splitlines()) + "\n")
-    parser_manifest = workspace / "crates/ts_parser/Cargo.toml"
+    parser_manifest = workspace / "crates/tsr_parser/Cargo.toml"
     parser_before = parser_manifest.read_text()
-    if tomllib.loads(parser_before)["dev-dependencies"]["ts_encoder"]["path"] != "../ts_encoder":
+    if tomllib.loads(parser_before)["dev-dependencies"]["tsr_encoder"]["path"] != "../tsr_encoder":
         raise ValueError("frozen parser test-only encoder dependency changed")
     parser_manifest.write_text(patches.replace_once(parser_before,
-        'ts_encoder = { path = "../ts_encoder", version = "0.1.0" }\n', ""))
-    (output / "patches/ts_parser-Cargo.toml.patch").write_text("".join(difflib.unified_diff(
+        'tsr_encoder = { path = "../tsr_encoder", version = "0.1.0" }\n', ""))
+    (output / "patches/tsr_parser-Cargo.toml.patch").write_text("".join(difflib.unified_diff(
         parser_before.splitlines(keepends=True), parser_manifest.read_text().splitlines(keepends=True),
-        fromfile="frozen/ts_parser/Cargo.toml", tofile="instrumented/ts_parser/Cargo.toml")))
-    patch_file(workspace / "crates/ts_bench/src/main.rs", patches.rust, output / "patches")
+        fromfile="frozen/tsr_parser/Cargo.toml", tofile="instrumented/tsr_parser/Cargo.toml")))
+    patch_file(workspace / "crates/tsr_bench/src/main.rs", patches.rust, output / "patches")
     patch_file(workspace / "tools/s07/benchmark/main.go", patches.go, output / "patches")
     env = native_environment()
     build_directory = work / "cargo-target"
@@ -155,11 +155,11 @@ def build(control, control_sha, output):
             (control / "source" / name).read_text().splitlines(keepends=True),
             (workspace / name).read_text().splitlines(keepends=True), fromfile="frozen/" + name,
             tofile="instrumented/" + name)))
-    argv = ["cargo", "+" + stable, "build", "--release", "--offline", "--locked", "-p", "ts_bench", "--bin", "ts-bench",
+    argv = ["cargo", "+" + stable, "build", "--release", "--offline", "--locked", "-p", "tsr_bench", "--bin", "ts-bench",
             "--target", host, "--message-format=json-render-diagnostics", *overrides,
             "--target-dir", str(build_directory), "--config", "build.build-dir=" + json.dumps(str(build_directory))]
     messages = run(argv, workspace, env, output, "rust-build")
-    binary = cargo_executable(messages, workspace / "crates/ts_bench/Cargo.toml", "ts-bench", "bin", [])
+    binary = cargo_executable(messages, workspace / "crates/tsr_bench/Cargo.toml", "ts-bench", "bin", [])
     if not binary.resolve().is_relative_to(build_directory):
         raise ValueError("Cargo worker diagnostic artifact escaped its isolated build directory")
     shutil.copyfile(binary, output / "artifacts/rust-worker-timing")

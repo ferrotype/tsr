@@ -5,7 +5,7 @@ use crate::symbols::{DeclarationSlice, Symbol, SymbolTableId, SymbolTables};
 use crate::{JsString, NodeId};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
-use ts_arena::{ArenaId, AuxId, Counters, Error, SymbolArena, SymbolId};
+use tsr_arena::{ArenaId, AuxId, Counters, Error, SymbolArena, SymbolId};
 
 #[derive(Debug, Default)]
 #[repr(C)]
@@ -264,7 +264,7 @@ impl<'a> SymbolsRead<'a> {
 /// It cannot escape the bound file that retains its record and name pool.
 ///
 /// ```compile_fail,E0515
-/// use ts_ast::{BoundFile, SymbolId, SymbolRead};
+/// use tsr_ast::{BoundFile, SymbolId, SymbolRead};
 /// fn escape<'a>(file: BoundFile, id: SymbolId) -> SymbolRead<'a> {
 ///     file.view().symbol(id).unwrap()
 /// }
@@ -273,7 +273,7 @@ impl<'a> SymbolsRead<'a> {
 /// A selected name also keeps construction storage borrowed while it is used.
 ///
 /// ```compile_fail,E0502
-/// use ts_ast::{BindBuilder, Symbol, SymbolId};
+/// use tsr_ast::{BindBuilder, Symbol, SymbolId};
 /// fn grow(builder: &mut BindBuilder<'_>, id: SymbolId, new_symbol: Symbol) {
 ///     let name = builder.symbols().get(id).unwrap().name_bytes();
 ///     builder.symbols_mut().push(new_symbol);
@@ -653,7 +653,7 @@ mod tests {
     use super::*;
     use crate::{existing_runtime_symbol_id, runtime_symbol_id, DeclarationLists, SymbolTable};
     use std::sync::Barrier;
-    use ts_arena::OwnedArena;
+    use tsr_arena::OwnedArena;
 
     #[test]
     fn compact_links_roundtrip_full_slots_foreign_owners_and_nil_overwrites() {

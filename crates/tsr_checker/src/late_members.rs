@@ -2,8 +2,8 @@
 //! resolution; completion and declaration links are published only on success.
 
 use crate::{type_flags as tf, CheckerState, Error, LinkStore, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags as cf, internal_symbol_names as names, modifier_flags as mf, node_flags as nf,
     symbol_flags as sf, JsString, SymbolTable, SymbolTableId, SyntaxKind as K,
 };
@@ -212,7 +212,7 @@ impl CheckerState {
         };
         match expression {
             Some(expression)
-                if ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? =>
+                if tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? =>
             {
                 Ok(Some(name))
             }
@@ -327,7 +327,7 @@ impl CheckerState {
                 }
                 declarations.extend(self.symbol_declarations(target)?.iter().flatten());
                 let display = if self.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0 {
-                    ts_scanner::declaration_name_to_string(self.ast(name_node)?, Some(name_node))?
+                    tsr_scanner::declaration_name_to_string(self.ast(name_node)?, Some(name_node))?
                 } else {
                     name.clone()
                 };
@@ -335,7 +335,7 @@ impl CheckerState {
                     let name = self.node(node)?.name().unwrap_or(node);
                     self.error_at(
                         Some(name),
-                        ts_diagnostics::Duplicate_identifier_0,
+                        tsr_diagnostics::Duplicate_identifier_0,
                         vec![display.clone()],
                     )?;
                 }
@@ -501,7 +501,7 @@ impl CheckerState {
                         &mut Vec::new(),
                     )?
             {
-                self.error_at(Some(node), ts_diagnostics::A_computed_property_name_must_be_of_type_string_number_symbol_or_any, Vec::new())?;
+                self.error_at(Some(node), tsr_diagnostics::A_computed_property_name_must_be_of_type_string_number_symbol_or_any, Vec::new())?;
             }
             Ok(ty)
         })();

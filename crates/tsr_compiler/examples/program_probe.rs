@@ -5,8 +5,8 @@ use std::{
     io::Write,
     panic::{catch_unwind, AssertUnwindSafe},
 };
-use ts_compiler as ts_compiler_error;
-use ts_compiler::{FileCache, Program, ProgramOptions};
+use tsr_compiler as ts_compiler_error;
+use tsr_compiler::{FileCache, Program, ProgramOptions};
 #[path = "../../../tools/s07/program/rust_observation.rs"]
 mod observation;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let requests: Vec<Value> = serde_json::from_slice(&std::fs::read(&args[1])?)?;
     let mut output = std::io::BufWriter::new(std::fs::File::create(&args[2])?);
-    let counters = ts_arena::Counters::new();
+    let counters = tsr_arena::Counters::new();
     let mut cache = FileCache::new();
     for (index, request) in requests.iter().enumerate() {
         let id = request["id"].as_str().ok_or("missing ID")?;

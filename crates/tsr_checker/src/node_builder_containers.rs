@@ -3,8 +3,8 @@
 use super::{left_meaning, NameQuery};
 use crate::node_builder::NodeBuilder;
 use crate::{type_flags as tf, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     // port: tsc/internal/checker/symbolaccessibility.go:Checker.getAliasForSymbolInContainer
@@ -20,7 +20,7 @@ impl NodeBuilder<'_> {
             if let Some(export) = self
                 .checker
                 .table(exports)?
-                .get(ts_ast::internal_symbol_names::EXPORT_EQUALS)
+                .get(tsr_ast::internal_symbol_names::EXPORT_EQUALS)
                 .flatten()
             {
                 if self.checker.module_symbols_same_reference(export, symbol)? {
@@ -63,9 +63,9 @@ impl NodeBuilder<'_> {
         let mut node = Some(declaration);
         while let Some(current) = node {
             let read = self.checker.node(current)?;
-            if ts_ast::is_ambient_module(self.checker.ast(current)?, current)?
+            if tsr_ast::is_ambient_module(self.checker.ast(current)?, current)?
                 || read.kind() == K::SourceFile
-                    && ts_ast::utilities::is_external_or_common_js_module(
+                    && tsr_ast::utilities::is_external_or_common_js_module(
                         &self.checker.source_file_read(current)?,
                     )
             {
@@ -95,7 +95,7 @@ impl NodeBuilder<'_> {
                     if let Some(export) = self
                         .checker
                         .table(exports)?
-                        .get(ts_ast::internal_symbol_names::EXPORT_EQUALS)
+                        .get(tsr_ast::internal_symbol_names::EXPORT_EQUALS)
                         .flatten()
                     {
                         if self
@@ -161,7 +161,7 @@ impl NodeBuilder<'_> {
         let Some(enclosing) = query.enclosing else {
             return Ok(vec![]);
         };
-        let source = ts_ast::utilities::get_source_file_of_node(
+        let source = tsr_ast::utilities::get_source_file_of_node(
             self.checker.ast(enclosing)?,
             Some(enclosing),
         )?
@@ -184,7 +184,7 @@ impl NodeBuilder<'_> {
             .collect();
         let mut result = vec![];
         for import in imports {
-            if ts_ast::utilities::node_is_synthesized(&self.checker.node(import)?) {
+            if tsr_ast::utilities::node_is_synthesized(&self.checker.node(import)?) {
                 continue;
             }
             if let Some(module) = self
@@ -292,10 +292,10 @@ impl NodeBuilder<'_> {
             let Some(parent) = read.parent() else {
                 continue;
             };
-            if !ts_ast::is_ambient_module(self.checker.ast(declaration)?, declaration)? {
+            if !tsr_ast::is_ambient_module(self.checker.ast(declaration)?, declaration)? {
                 let read = self.checker.node(parent)?;
                 let external = read.kind() == K::SourceFile
-                    && ts_ast::utilities::is_external_or_common_js_module(
+                    && tsr_ast::utilities::is_external_or_common_js_module(
                         &self.checker.source_file_read(parent)?,
                     )
                     || read.kind() == K::ModuleDeclaration
@@ -347,21 +347,21 @@ impl NodeBuilder<'_> {
                     .ok_or(Error::MissingLink("class assignment left"))?;
                 let left_node = view.node(left)?;
                 if view.node(operator)?.kind() != K::EqualsToken
-                    || !ts_ast::utilities::is_access_expression(&left_node)
+                    || !tsr_ast::utilities::is_access_expression(&left_node)
                 {
                     continue;
                 }
                 let target = left_node
                     .expression()
                     .ok_or(Error::MissingLink("class assignment target"))?;
-                if !ts_ast::is_entity_name_expression(view, target)? {
+                if !tsr_ast::is_entity_name_expression(view, target)? {
                     continue;
                 }
-                if ts_ast::is_module_exports_access_expression(view, left)?
-                    || ts_ast::is_exports_identifier(view, target)?
+                if tsr_ast::is_module_exports_access_expression(view, left)?
+                    || tsr_ast::is_exports_identifier(view, target)?
                 {
                     let source =
-                        ts_ast::utilities::get_source_file_of_node(view, Some(declaration))?;
+                        tsr_ast::utilities::get_source_file_of_node(view, Some(declaration))?;
                     let Some(source) = source else {
                         continue;
                     };

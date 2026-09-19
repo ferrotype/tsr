@@ -1,8 +1,8 @@
 //! Contextual object properties preserve intersections, mapped substitutions,
 //! and index signatures without reducing the contextual union prematurely.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{check_flags as cf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeOfPropertyOfType
@@ -238,7 +238,7 @@ impl CheckerState {
             return Ok(None);
         };
         let name = self.node(element)?.name();
-        let dynamic = ts_ast::has_dynamic_name(self.ast(element)?, Some(element))?;
+        let dynamic = tsr_ast::has_dynamic_name(self.ast(element)?, Some(element))?;
         let late = if dynamic {
             match self.late_name(element)? {
                 Some(name) => {

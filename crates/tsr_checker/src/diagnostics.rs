@@ -3,10 +3,10 @@
 
 use crate::{program::ProgramContext, types::Map, CheckerState, Error};
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{AstView, Diagnostic, JsString};
-use ts_core::TextRange;
-use ts_diagnostics::{self as messages, Message};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{AstView, Diagnostic, JsString};
+use tsr_core::TextRange;
+use tsr_diagnostics::{self as messages, Message};
 
 #[derive(Default)]
 struct DiagnosticBucket {
@@ -34,7 +34,7 @@ impl DiagnosticStore {
         let key = (path.clone(), diagnostic.loc, diagnostic.code);
         if let Some(indices) = self.locations.get(&key) {
             for &index in indices {
-                if ts_ast::equal_diagnostics(&self.entries[index], &diagnostic, file_name)? {
+                if tsr_ast::equal_diagnostics(&self.entries[index], &diagnostic, file_name)? {
                     return Ok(index);
                 }
             }
@@ -66,7 +66,7 @@ impl DiagnosticStore {
         };
         if !bucket.sorted {
             bucket.indices.sort_by(|&left, &right| {
-                ts_ast::compare_diagnostics(&self.entries[left], &self.entries[right], file_name)
+                tsr_ast::compare_diagnostics(&self.entries[left], &self.entries[right], file_name)
                     .expect("diagnostic source owners were validated at admission")
             });
             bucket.sorted = true;
@@ -103,7 +103,7 @@ fn file_name<'a>(
 ) -> Result<&'a [u8], Error> {
     let view = match factory.node(file) {
         Ok(_) => factory,
-        Err(ts_arena::Error::WrongOwner) => program
+        Err(tsr_arena::Error::WrongOwner) => program
             .ok_or(Error::Unsupported("diagnostic without a checker program"))?
             .ast(file)?,
         Err(error) => return Err(error.into()),
@@ -141,11 +141,11 @@ impl CheckerState {
     ) -> Result<Diagnostic, Error> {
         let (file, range) = if let Some(node) = node {
             let view = self.ast(node)?;
-            let file = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+            let file = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                 .ok_or(Error::MissingLink("diagnostic node source file"))?;
             (
                 Some(file),
-                ts_scanner::get_error_range_for_node(view, file, node)?,
+                tsr_scanner::get_error_range_for_node(view, file, node)?,
             )
         } else {
             (None, TextRange::default())
@@ -248,7 +248,7 @@ impl CheckerState {
         node: Option<NodeId>,
     ) -> Result<Option<NodeId>, Error> {
         node.map(|node| {
-            Ok(ts_ast::get_name_of_declaration(self.ast(node)?, Some(node))?.or(Some(node)))
+            Ok(tsr_ast::get_name_of_declaration(self.ast(node)?, Some(node))?.or(Some(node)))
         })
         .transpose()
         .map(Option::flatten)
@@ -291,8 +291,8 @@ impl CheckerState {
             let name = |file| file_name(self.factory.view(), self.program.as_ref(), file);
             let mut duplicate = false;
             for existing in info {
-                if ts_ast::compare_diagnostics(existing, &leading, &name)?.is_eq()
-                    || ts_ast::compare_diagnostics(existing, &following, &name)?.is_eq()
+                if tsr_ast::compare_diagnostics(existing, &leading, &name)?.is_eq()
+                    || tsr_ast::compare_diagnostics(existing, &following, &name)?.is_eq()
                 {
                     duplicate = true;
                     break;

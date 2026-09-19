@@ -1,5 +1,5 @@
 [package]
-name = "ts_s07_access_trace_native_verify"
+name = "tsr_s07_access_trace_native_verify"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.96"

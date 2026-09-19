@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::decode_rune;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::decode_rune;
 
 use super::{Atom, ClassSetExpressionType, RegExpParser, STACK_RED_ZONE, STACK_SEGMENT};
 

@@ -1,19 +1,19 @@
 //! Both production entry points must expose the same completed graph. These
 //! comparisons supplement the independent Go corpus; they are not Go evidence.
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::{Counters, Error};
-use ts_ast::{
+use tsr_arena::{Counters, Error};
+use tsr_ast::{
     node_flags, AstBuilder, AstView, BindError, ContentMapperSourceFileInfo, FactoryMethods,
     JsString, NodeId, ParsedFile, SourceFileParseOptions, SyntaxKind,
 };
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 #[path = "../examples/support/graph.rs"]
 mod graph;
 
 fn parse(bytes: &[u8], kind: ScriptKind, counters: &Counters) -> ParsedFile {
-    ts_parser::parse_source_file_with_counters(
+    tsr_parser::parse_source_file_with_counters(
         SourceText::from_loaded_bytes(bytes),
         kind,
         SourceFileParseOptions {
@@ -183,7 +183,7 @@ fn completed_nodes_and_symbols_retain_storage_and_preassigned_identity() {
     );
     let source = parsed.root();
     let statement = first_statement(parsed.view(), source);
-    let identity = ts_ast::runtime_node_id(&parsed.view().node(statement).unwrap());
+    let identity = tsr_ast::runtime_node_id(&parsed.view().node(statement).unwrap());
     let completed = crate::bind_parsed_file(parsed).unwrap();
     assert!(completed.bound_in_place());
     let node = completed.retain_node(statement).unwrap();
@@ -192,7 +192,7 @@ fn completed_nodes_and_symbols_retain_storage_and_preassigned_identity() {
     let name = symbol.symbol().name_to_owned();
     drop(completed);
     assert_eq!(node.node().kind(), SyntaxKind::ExpressionStatement);
-    assert_eq!(ts_ast::runtime_node_id(&node.node()), identity);
+    assert_eq!(tsr_ast::runtime_node_id(&node.node()), identity);
     assert!(node
         .file()
         .view()
@@ -220,7 +220,7 @@ fn consuming_initializer_error_and_panic_drop_partial_binding() {
         );
         let source = parsed.root();
         let outcome = catch_unwind(AssertUnwindSafe(|| {
-            ts_parser::on_parser_worker(|| {
+            tsr_parser::on_parser_worker(|| {
                 parsed.bind_and_publish(|builder| {
                     crate::initialize_binding(builder);
                     builder.node_mut(source)?.set_flags(node_flags::UNREACHABLE);
@@ -300,7 +300,7 @@ fn same_arena_sources_select_compatibility_and_reject_sibling_writes() {
         None,
         None,
     );
-    let completed = ts_parser::on_parser_worker(|| {
+    let completed = tsr_parser::on_parser_worker(|| {
         parsed.bind_and_publish(|builder| {
             assert!(matches!(builder.node_mut(second), Err(Error::WrongOwner)));
             assert!(matches!(
@@ -385,11 +385,11 @@ fn unrestricted_parent_and_payload_edits_still_require_core_validation() {
             let mut parsed = parse(b"local;", ScriptKind::TS, &counters);
             let root = parsed.root();
             let statement = first_statement(parsed.view(), root);
-            let corrupt = |node: &mut ts_ast::Node| {
+            let corrupt = |node: &mut tsr_ast::Node| {
                 if parent_edge {
                     node.set_parent(Some(foreign_root));
                 } else {
-                    let ts_ast::NodeData::ExpressionStatement(data) = node.data_mut() else {
+                    let tsr_ast::NodeData::ExpressionStatement(data) = node.data_mut() else {
                         panic!("fixture statement must have an expression payload")
                     };
                     data.expression = Some(foreign_root);
@@ -398,7 +398,7 @@ fn unrestricted_parent_and_payload_edits_still_require_core_validation() {
             if before_binding {
                 corrupt(&mut parsed.builder_mut().node_mut(statement).unwrap());
             }
-            let outcome = ts_parser::on_parser_worker(|| {
+            let outcome = tsr_parser::on_parser_worker(|| {
                 parsed.bind_and_publish(|builder| {
                     if !before_binding {
                         let mut node = builder.node_mut(statement)?;
@@ -433,7 +433,7 @@ fn preserved_core_proof_does_not_skip_binding_result_validation() {
         let foreign_counts = counters.snapshot();
         let parsed = parse(b"let local = 1;", ScriptKind::TS, &counters);
         let root = parsed.root();
-        let outcome = ts_parser::on_parser_worker(|| {
+        let outcome = tsr_parser::on_parser_worker(|| {
             parsed.bind_and_publish(|builder| {
                 crate::initialize_binding(builder);
                 builder.set_node_flags(root, node_flags::UNREACHABLE)?;
@@ -441,16 +441,16 @@ fn preserved_core_proof_does_not_skip_binding_result_validation() {
                     "indicator" => builder.set_common_js_module_indicator(Some(foreign_root)),
                     "symbol" => builder.binding_mut(root)?.symbol = Some(foreign_symbol),
                     "flow" => {
-                        builder.flows_mut().push(ts_ast::FlowNode::new_ex(
-                            ts_ast::flow_flags::ASSIGNMENT,
-                            Some(ts_ast::FlowData::Ast(foreign_root)),
+                        builder.flows_mut().push(tsr_ast::FlowNode::new_ex(
+                            tsr_ast::flow_flags::ASSIGNMENT,
+                            Some(tsr_ast::FlowData::Ast(foreign_root)),
                             None,
                         ));
                     }
-                    "diagnostic" => builder.diagnostics_mut().push(ts_ast::Diagnostic::new(
+                    "diagnostic" => builder.diagnostics_mut().push(tsr_ast::Diagnostic::new(
                         Some(foreign_root),
-                        ts_core::TextRange::new(0, 1),
-                        ts_diagnostics::Identifier_expected,
+                        tsr_core::TextRange::new(0, 1),
+                        tsr_diagnostics::Identifier_expected,
                         vec![],
                     )),
                     _ => unreachable!(),

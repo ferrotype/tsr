@@ -5,8 +5,8 @@ use crate::{
     access_flags as af, element_flags as ef, type_flags as tf, CheckerState, Error, InferenceId,
     TupleElementInfo, TypeId,
 };
-use ts_arena::NodeId;
-use ts_ast::{Factory, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{Factory, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkSpreadExpression
@@ -235,7 +235,7 @@ impl CheckerState {
                     .unwrap_or(self.builtins.unknown_type)
                 } else {
                     let key = self
-                        .get_number_literal_type(ts_jsnum::Number::new((index - start) as f64))?;
+                        .get_number_literal_type(tsr_jsnum::Number::new((index - start) as f64))?;
                     self.get_indexed_access_type(rest, key, af::CONTEXTUAL, None, None)?
                 };
                 let ty = self.check_call_argument_ex(argument, contextual, context, mode)?;

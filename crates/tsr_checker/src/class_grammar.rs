@@ -1,8 +1,8 @@
 //! Class heritage grammar preserves the first invalid clause and exact list ranges.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.grammarErrorAtPos
@@ -14,7 +14,7 @@ impl CheckerState {
         message: &'static d::Message,
         args: Vec<JsString>,
     ) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("grammar range source"))?;
         if !self
             .ast(source)?
@@ -24,9 +24,9 @@ impl CheckerState {
         {
             return Ok(false);
         }
-        self.add_diagnostic(ts_ast::Diagnostic::new(
+        self.add_diagnostic(tsr_ast::Diagnostic::new(
             Some(source),
-            ts_core::TextRange::new(start, end),
+            tsr_core::TextRange::new(start, end),
             message,
             args,
         ))?;
@@ -47,9 +47,9 @@ impl CheckerState {
         if !view.node_slice(read.nodes())?.is_empty() {
             return Ok(false);
         }
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::MissingLink("type argument source"))?;
-        let end = ts_scanner::skip_trivia(
+        let end = tsr_scanner::skip_trivia(
             view.source_file(source)?.text().as_bytes(),
             read.loc().end(),
         ) + 1;
@@ -77,8 +77,8 @@ impl CheckerState {
             let view = self.ast(clause)?;
             let read = view.list(list)?;
             if view.node_slice(read.nodes())?.is_empty() {
-                let text = ts_scanner::token_to_string(
-                    token.known().ok_or(ts_arena::Error::InvalidGraph)?,
+                let text = tsr_scanner::token_to_string(
+                    token.known().ok_or(tsr_arena::Error::InvalidGraph)?,
                 );
                 return self.grammar_error_range_with_args(
                     clause,
@@ -152,7 +152,7 @@ impl CheckerState {
                     }
                     implements = true;
                 } else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 }
                 self.check_heritage_clause_grammar(clause)?;
             }

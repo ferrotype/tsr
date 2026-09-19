@@ -7,7 +7,7 @@ use crate::{
     target::BindingNode,
     Binder,
 };
-use ts_ast::{
+use tsr_ast::{
     local_bind::BindSymbol, DeclarationSlice, JsString, NodeId, Symbol, SymbolId, SymbolRead,
     SymbolTableId,
 };

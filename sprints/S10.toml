@@ -13,7 +13,7 @@ exit = [
 
 [[item]]
 id = "S10-1"
-title = "ts_wasm: wasm32-unknown-unknown build of the parser and the checker slice with a portable in-memory host"
+title = "tsr_wasm: wasm32-unknown-unknown build of the parser and the checker slice with a portable in-memory host"
 kind = "task"
 required = true
 done_when = ["exp.E7.portable_host.pass == 1", "exp.E7.checker_parity.pass == 1"]
@@ -27,7 +27,7 @@ done_when = ["exp.E7.parser_artifact_size.pass == 1", "exp.E7.parse_throughput.p
 
 [[item]]
 id = "S10-3"
-title = "ts_embed crate API and a separate Rust consumer running the subset with repeated create, query and drop operations"
+title = "tsr_embed crate API and a separate Rust consumer running the subset with repeated create, query and drop operations"
 kind = "task"
 required = true
 done_when = ["exp.E8.rust_consumer_parity.pass == 1", "exp.E8.lifetime_checks.pass == 1"]

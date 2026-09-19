@@ -2,14 +2,14 @@
 //! keep their short-circuit order while source-element checks still run.
 
 use crate::{element_flags as ef, type_flags as tf, CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTypeOperatorNode
     fn check_unique_type_operator(&mut self, node: NodeId) -> Result<(), Error> {
-        use ts_ast::{modifier_flags as mf, node_flags as nf};
-        use ts_diagnostics as d;
+        use tsr_ast::{modifier_flags as mf, node_flags as nf};
+        use tsr_diagnostics as d;
         let read = self.node(node)?;
         let annotation = read
             .type_node()
@@ -51,7 +51,7 @@ impl CheckerState {
             self.error_at(
                 Some(annotation),
                 d::X_0_expected,
-                vec![ts_ast::JsString::from_bytes(b"symbol".as_slice())],
+                vec![tsr_ast::JsString::from_bytes(b"symbol".as_slice())],
             )?;
         }
         self.check_source_element(annotation)?;
@@ -83,7 +83,7 @@ impl CheckerState {
             )
         ) || read.type_node() != Some(node)
         {
-            self.error_at(Some(node), ts_diagnostics::A_type_predicate_is_only_allowed_in_return_type_position_for_functions_and_methods, vec![])?;
+            self.error_at(Some(node), tsr_diagnostics::A_type_predicate_is_only_allowed_in_return_type_position_for_functions_and_methods, vec![])?;
             return Ok(());
         }
         let signature = self.signature_from_declaration(parent)?;
@@ -116,7 +116,7 @@ impl CheckerState {
             }
             self.error_at(
                 name,
-                ts_diagnostics::Cannot_find_parameter_0,
+                tsr_diagnostics::Cannot_find_parameter_0,
                 vec![data.parameter_name],
             )?;
         } else {
@@ -128,7 +128,7 @@ impl CheckerState {
             {
                 self.error_at(
                     name,
-                    ts_diagnostics::A_type_predicate_cannot_reference_a_rest_parameter,
+                    tsr_diagnostics::A_type_predicate_cannot_reference_a_rest_parameter,
                     vec![],
                 )?;
             } else if let Some(source) = data.t {
@@ -141,7 +141,7 @@ impl CheckerState {
                     None,
                 )?;
                 if let Some(diagnostic) = diagnostic {
-                    self.add_diagnostic(ts_ast::Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), ts_diagnostics::A_type_predicate_s_type_must_be_assignable_to_its_parameter_s_type, vec![]))?;
+                    self.add_diagnostic(tsr_ast::Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), tsr_diagnostics::A_type_predicate_s_type_must_be_assignable_to_its_parameter_s_type, vec![]))?;
                 }
             }
         }
@@ -187,8 +187,8 @@ impl CheckerState {
                 ) {
                     self.grammar_error_first_token(
                         node,
-                        ts_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types,
-                        vec![ts_ast::JsString::from_bytes(b"symbol".as_slice())],
+                        tsr_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types,
+                        vec![tsr_ast::JsString::from_bytes(b"symbol".as_slice())],
                     )?;
                 }
                 self.check_source_element(annotation)
@@ -209,7 +209,7 @@ impl CheckerState {
                         if !self.is_array_like_type(ty)? {
                             self.error_at(
                                 Some(element),
-                                ts_diagnostics::A_rest_element_type_must_be_an_array_type,
+                                tsr_diagnostics::A_rest_element_type_must_be_an_array_type,
                                 vec![],
                             )?;
                             break;
@@ -227,16 +227,16 @@ impl CheckerState {
                         let repeated = seen_rest;
                         seen_rest = true;
                         repeated.then_some(
-                            ts_diagnostics::A_rest_element_cannot_follow_another_rest_element,
+                            tsr_diagnostics::A_rest_element_cannot_follow_another_rest_element,
                         )
                     } else if flags & ef::OPTIONAL != 0 {
                         seen_optional = true;
                         seen_rest.then_some(
-                            ts_diagnostics::An_optional_element_cannot_follow_a_rest_element,
+                            tsr_diagnostics::An_optional_element_cannot_follow_a_rest_element,
                         )
                     } else {
                         (flags & ef::REQUIRED != 0 && seen_optional).then_some(
-                            ts_diagnostics::A_required_element_cannot_follow_an_optional_element,
+                            tsr_diagnostics::A_required_element_cannot_follow_an_optional_element,
                         )
                     };
                     if let Some(diagnostic) = diagnostic {
@@ -268,16 +268,16 @@ impl CheckerState {
                 if data.dot_dot_dot_token().is_some() && data.question_token().is_some() {
                     self.grammar_error_node(
                         node,
-                        ts_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest,
+                        tsr_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest,
                         vec![],
                     )?;
                 }
                 match self.node(annotation)?.kind().known() {
                     Some(K::OptionalType) => {
-                        self.grammar_error_node(annotation, ts_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type, vec![])?;
+                        self.grammar_error_node(annotation, tsr_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type, vec![])?;
                     }
                     Some(K::RestType) => {
-                        self.grammar_error_node(annotation, ts_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type, vec![])?;
+                        self.grammar_error_node(annotation, tsr_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type, vec![])?;
                     }
                     _ => {}
                 }
@@ -315,14 +315,14 @@ impl CheckerState {
         if self.node(node)?.body().is_some() {
             let (asynchronous, generator) = self.body_function_flags(node)?;
             let target = self.program()?.host.options().emit_script_target();
-            if asynchronous && generator && target < ts_core::ScriptTarget::ES2018 {
+            if asynchronous && generator && target < tsr_core::ScriptTarget::ES2018 {
                 // Async generators prior to ES2018 require the __await and __asyncGenerator helpers
                 self.check_external_emit_helpers(
                     node,
                     crate::external_emit_helpers::ASYNC_GENERATOR_INCLUDES,
                 )?;
             }
-            if asynchronous && !generator && target < ts_core::ScriptTarget::ES2017 {
+            if asynchronous && !generator && target < tsr_core::ScriptTarget::ES2017 {
                 self.check_external_emit_helpers(node, crate::external_emit_helpers::AWAITER)?;
             }
         }
@@ -338,9 +338,9 @@ impl CheckerState {
             if options.strict_option_value(options.no_implicit_any) {
                 let kind = self.node(node)?.kind();
                 let diagnostic = if kind == K::CallSignature {
-                    Some(ts_diagnostics::Call_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type)
+                    Some(tsr_diagnostics::Call_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type)
                 } else if kind == K::ConstructSignature {
-                    Some(ts_diagnostics::Construct_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type)
+                    Some(tsr_diagnostics::Construct_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type)
                 } else {
                     None
                 };
@@ -381,7 +381,7 @@ impl CheckerState {
             let initializer = data.initializer();
             if rest.is_some()
                 && index + 1 == parameters.len()
-                && read.flags() & ts_ast::node_flags::AMBIENT == 0
+                && read.flags() & tsr_ast::node_flags::AMBIENT == 0
             {
                 let owner = read
                     .parent()
@@ -394,23 +394,23 @@ impl CheckerState {
                 // Native reports the comma and still checks optionality and
                 // initializers on the same rest parameter.
                 self.check_grammar_trailing_comma(owner, list,
-                    ts_diagnostics::A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma)?;
+                    tsr_diagnostics::A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma)?;
             }
             let diagnostic = if let Some(rest) = rest {
                 if index + 1 != parameters.len() {
                     Some((
                         Some(rest),
-                        ts_diagnostics::A_rest_parameter_must_be_last_in_a_parameter_list,
+                        tsr_diagnostics::A_rest_parameter_must_be_last_in_a_parameter_list,
                     ))
                 } else if question.is_some() {
                     Some((
                         question,
-                        ts_diagnostics::A_rest_parameter_cannot_be_optional,
+                        tsr_diagnostics::A_rest_parameter_cannot_be_optional,
                     ))
                 } else if initializer.is_some() {
                     Some((
                         name,
-                        ts_diagnostics::A_rest_parameter_cannot_have_an_initializer,
+                        tsr_diagnostics::A_rest_parameter_cannot_have_an_initializer,
                     ))
                 } else {
                     None
@@ -418,17 +418,17 @@ impl CheckerState {
             } else if let Some(question) = question {
                 optional = true;
                 // A reparsed '?' token indicates a bracketed name in a @param tag.
-                let reparsed = self.node(question)?.flags() & ts_ast::node_flags::REPARSED != 0;
+                let reparsed = self.node(question)?.flags() & tsr_ast::node_flags::REPARSED != 0;
                 initializer.filter(|_| !reparsed).map(|_| {
                     (
                         name,
-                        ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer,
+                        tsr_diagnostics::Parameter_cannot_have_question_mark_and_initializer,
                     )
                 })
             } else if optional && initializer.is_none() {
                 Some((
                     name,
-                    ts_diagnostics::A_required_parameter_cannot_follow_an_optional_parameter,
+                    tsr_diagnostics::A_required_parameter_cannot_follow_an_optional_parameter,
                 ))
             } else {
                 None
@@ -455,7 +455,7 @@ impl CheckerState {
             let at = at.ok_or(Error::MissingLink("index parameter name"))?;
             self.grammar_error_node(
                 at,
-                ts_diagnostics::An_index_signature_must_have_exactly_one_parameter,
+                tsr_diagnostics::An_index_signature_must_have_exactly_one_parameter,
                 vec![],
             )?;
             return Ok(());
@@ -464,7 +464,7 @@ impl CheckerState {
             self.check_grammar_trailing_comma(
                 node,
                 list,
-                ts_diagnostics::An_index_signature_cannot_have_a_trailing_comma,
+                tsr_diagnostics::An_index_signature_cannot_have_a_trailing_comma,
             )?;
         }
         let read = self.ast(parameters[0])?.node(parameters[0])?;
@@ -477,27 +477,27 @@ impl CheckerState {
         let diagnostic = if data.dot_dot_dot_token().is_some() {
             Some((
                 data.dot_dot_dot_token(),
-                ts_diagnostics::An_index_signature_cannot_have_a_rest_parameter,
+                tsr_diagnostics::An_index_signature_cannot_have_a_rest_parameter,
             ))
         } else if read.modifiers().is_some() {
             Some((
                 name,
-                ts_diagnostics::An_index_signature_parameter_cannot_have_an_accessibility_modifier,
+                tsr_diagnostics::An_index_signature_parameter_cannot_have_an_accessibility_modifier,
             ))
         } else if data.question_token().is_some() {
             Some((
                 data.question_token(),
-                ts_diagnostics::An_index_signature_parameter_cannot_have_a_question_mark,
+                tsr_diagnostics::An_index_signature_parameter_cannot_have_a_question_mark,
             ))
         } else if data.initializer().is_some() {
             Some((
                 name,
-                ts_diagnostics::An_index_signature_parameter_cannot_have_an_initializer,
+                tsr_diagnostics::An_index_signature_parameter_cannot_have_an_initializer,
             ))
         } else if annotation.is_none() {
             Some((
                 name,
-                ts_diagnostics::An_index_signature_parameter_must_have_a_type_annotation,
+                tsr_diagnostics::An_index_signature_parameter_must_have_a_type_annotation,
             ))
         } else {
             None
@@ -524,20 +524,20 @@ impl CheckerState {
         }
         if literal_key || self.is_generic_type(ty)? {
             let name = name.ok_or(Error::MissingLink("index parameter name"))?;
-            self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
+            self.grammar_error_node(name, tsr_diagnostics::An_index_signature_parameter_type_cannot_be_a_literal_type_or_generic_type_Consider_using_a_mapped_object_type_instead, vec![])?;
             return Ok(());
         }
         for &ty in types.iter() {
             if !self.is_valid_index_key_type(ty)? {
                 let name = name.ok_or(Error::MissingLink("index parameter name"))?;
-                self.grammar_error_node(name, ts_diagnostics::An_index_signature_parameter_type_must_be_string_number_symbol_or_a_template_literal_type, vec![])?;
+                self.grammar_error_node(name, tsr_diagnostics::An_index_signature_parameter_type_must_be_string_number_symbol_or_a_template_literal_type, vec![])?;
                 return Ok(());
             }
         }
         if self.node(node)?.type_node().is_none() {
             self.grammar_error_node(
                 node,
-                ts_diagnostics::An_index_signature_must_have_a_type_annotation,
+                tsr_diagnostics::An_index_signature_must_have_a_type_annotation,
                 vec![],
             )?;
         }
@@ -562,7 +562,7 @@ impl CheckerState {
         Ok(false)
     }
     // port: tsc/internal/checker/checker.go:Checker.checkInferType
-    pub(crate) fn check_infer_type(&mut self, node: ts_arena::NodeId) -> Result<(), Error> {
+    pub(crate) fn check_infer_type(&mut self, node: tsr_arena::NodeId) -> Result<(), Error> {
         let mut current = node;
         let mut valid = false;
         while let Some(parent) = self.node(current)?.parent() {
@@ -578,7 +578,7 @@ impl CheckerState {
             current = parent;
         }
         if !valid {
-            self.error_at(Some(node), ts_diagnostics::X_infer_declarations_are_only_permitted_in_the_extends_clause_of_a_conditional_type, Vec::new())?;
+            self.error_at(Some(node), tsr_diagnostics::X_infer_declarations_are_only_permitted_in_the_extends_clause_of_a_conditional_type, Vec::new())?;
         }
         let parameter = self
             .ast(node)?
@@ -615,7 +615,7 @@ impl CheckerState {
                 for node in declarations {
                     self.error_at(
                         self.node(node)?.name(),
-                        ts_diagnostics::All_declarations_of_0_must_have_identical_constraints,
+                        tsr_diagnostics::All_declarations_of_0_must_have_identical_constraints,
                         vec![name.clone()],
                     )?;
                 }
@@ -627,7 +627,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.areTypeParametersIdentical
     pub(crate) fn type_parameter_declarations_identical(
         &mut self,
-        declarations: &[ts_arena::NodeId],
+        declarations: &[tsr_arena::NodeId],
         parameter: crate::TypeId,
     ) -> Result<bool, Error> {
         let symbol = self

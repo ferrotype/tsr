@@ -2,7 +2,7 @@
 use crate::flow_access::BindingFlow;
 use crate::target::{target_payload, BindingNode};
 use crate::{need, Binder};
-use ts_ast::{flow_flags as F, node_flags, utilities as u, SyntaxKind as K};
+use tsr_ast::{flow_flags as F, node_flags, utilities as u, SyntaxKind as K};
 
 impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.bindAssignmentTargetFlow
@@ -129,7 +129,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             target_payload!(self, node, as_binary_expression; node: operator_token);
         let operator = self.node_kind(need(expression_operator_token));
         if u::is_logical_or_coalescing_binary_operator(operator)
-            || ts_ast::is_logical_or_coalescing_assignment_operator(operator)
+            || tsr_ast::is_logical_or_coalescing_assignment_operator(operator)
         {
             if self.is_top_level_logical_expression(node) {
                 let post = self.create_branch_label();
@@ -174,7 +174,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         }
         self.current_flow = Some(self.finish_flow_label(pre_right));
         self.bind_optional_target(expression_operator_token);
-        if ts_ast::is_logical_or_coalescing_assignment_operator(operator) {
+        if tsr_ast::is_logical_or_coalescing_assignment_operator(operator) {
             self.do_with_conditional_branches(
                 Self::bind_optional_target,
                 expression_right,
@@ -511,7 +511,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 let (binary_operator_token, binary_right, binary_left) = target_payload!(self, node, as_binary_expression; node: operator_token, node: right, node: left);
                 let operator = self.node_kind(need(binary_operator_token));
                 operator == K::CommaToken && self.is_narrowable_reference(need(binary_right))
-                    || ts_ast::is_assignment_operator(operator)
+                    || tsr_ast::is_assignment_operator(operator)
                         && self.target_is_left_hand_side_expression(need(binary_left))
             }
             _ => false,

@@ -1,6 +1,6 @@
 use crate::flow_access::BindingFlow;
 use std::collections::HashSet;
-use ts_ast::{
+use tsr_ast::{
     AstView, BindBuilder, JsString, NodeId, NodeRead, SymbolId, SymbolTable, SymbolTableId,
 };
 
@@ -164,13 +164,13 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             .node_locals(node)
             .expect("binder node is retained")
     }
-    pub fn table(&self, table: SymbolTableId) -> ts_ast::SymbolTableRead<'_> {
+    pub fn table(&self, table: SymbolTableId) -> tsr_ast::SymbolTableRead<'_> {
         self.builder
             .tables()
             .get(table)
             .expect("binder symbol table belongs to result")
     }
-    pub fn table_mut(&mut self, table: SymbolTableId) -> ts_ast::SymbolTableMut<'_> {
+    pub fn table_mut(&mut self, table: SymbolTableId) -> tsr_ast::SymbolTableMut<'_> {
         self.builder
             .table_mut(table)
             .expect("binder symbol table belongs to result")
@@ -181,7 +181,7 @@ impl<'build, 'scope, 'ast> Binder<'build, 'scope, 'ast> {
             return table;
         }
         assert!(
-            ts_ast::is_locals_container(&self.n(node)),
+            tsr_ast::is_locals_container(&self.n(node)),
             "locals-container payload required"
         );
         let table = self.builder.alloc_table(SymbolTable::default());

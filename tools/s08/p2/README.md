@@ -7,7 +7,7 @@ diagnostic filters are injected.
 
 ```sh
 python3 scripts/s08_p2.py capture --output target/s08/p2-native-programs
-cargo run -p ts_compiler --example p2_checker -- target/s08/p2-native-programs/requests.json target/s08/p2-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p2-native-programs/requests.json target/s08/p2-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p2-native-programs --actual target/s08/p2-rust.json --output target/s08/p2-comparison.json
 ```
 

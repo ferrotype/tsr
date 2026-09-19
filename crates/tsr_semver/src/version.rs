@@ -115,12 +115,12 @@ impl fmt::Display for ParseError {
             Self::InvalidVersion(input) => write!(
                 f,
                 "Could not parse version string from {}",
-                ts_jsstring::go_quote(input)
+                tsr_jsstring::go_quote(input)
             ),
             Self::ComponentOverflow(input) => write!(
                 f,
                 "strconv.ParseUint: parsing {}: value out of range",
-                ts_jsstring::go_quote(input)
+                tsr_jsstring::go_quote(input)
             ),
         }
     }

@@ -1,9 +1,9 @@
 //! JavaScript JSDoc elaboration through the production AST factory.
 use crate::{JSDocInfo, Parser, ParserFactory, ParsingContext};
-use ts_ast::SyntaxKind as K;
-use ts_ast::{node_flags, FactoryMethods, JsString, NodeData, NodeDataRead, NodeId, NodeListId};
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_ast::SyntaxKind as K;
+use tsr_ast::{node_flags, FactoryMethods, JsString, NodeData, NodeDataRead, NodeId, NodeListId};
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 struct ClassLikeFields {
     heritage: Option<NodeListId>,
@@ -24,7 +24,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/reparser.go:Parser.addDeepCloneReparse
     fn add_deep_clone_reparse(&mut self, node: Option<NodeId>) -> Option<NodeId> {
-        let cloned = ts_ast::deep_clone_reparse(&mut self.factory, node);
+        let cloned = tsr_ast::deep_clone_reparse(&mut self.factory, node);
         if let Some(node) = cloned {
             self.reparsed_clones.push(node);
         }
@@ -42,7 +42,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     fn check_non_identifier_name(&mut self, name: Option<NodeId>) -> Option<NodeId> {
         let name = name?;
         if self.factory.node(name).kind() == K::Identifier
-            && !ts_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
+            && !tsr_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
         {
             let loc = self.factory.node(name).range();
             let loc = if loc.is_empty() {
@@ -151,7 +151,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                     panic!("import clause");
                 }
                 let modifiers = self.node_modifiers(tag);
-                let modifiers = ts_ast::deep_clone_reparse_modifiers(&mut self.factory, modifiers);
+                let modifiers = tsr_ast::deep_clone_reparse_modifiers(&mut self.factory, modifiers);
                 let specifier = self.add_deep_clone_reparse(specifier);
                 let attributes = self.add_deep_clone_reparse(attributes);
                 let node = self.factory.new_js_import_declaration(
@@ -192,11 +192,11 @@ impl<F: ParserFactory> Parser<'_, F> {
         tag: NodeId,
         modifiers: Option<NodeListId>,
     ) -> NodeId {
-        let modifiers = ts_ast::deep_clone_reparse_modifiers(&mut self.factory, modifiers);
+        let modifiers = tsr_ast::deep_clone_reparse_modifiers(&mut self.factory, modifiers);
         let signature = match self.factory.node(fun).kind().known() {
             Some(K::FunctionDeclaration | K::MethodDeclaration) => {
                 let name = self.check_non_identifier_name(self.jsdoc_name(fun));
-                let name = ts_ast::deep_clone_reparse(&mut self.factory, name);
+                let name = tsr_ast::deep_clone_reparse(&mut self.factory, name);
                 if self.factory.node(fun).kind() == K::FunctionDeclaration {
                     self.factory.new_function_declaration(
                         modifiers, None, name, None, None, None, None, None,
@@ -271,17 +271,18 @@ impl<F: ParserFactory> Parser<'_, F> {
                         }
                     }
                     let name = if self.factory.node(name).kind() == K::Identifier
-                        && !ts_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
+                        && !tsr_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
                     {
                         let text = self.jsdoc_text(name);
                         let mut result = Vec::new();
                         let mut pos = 0;
                         while pos < text.len() {
-                            let (ch, len) = ts_jsstring::wtf8::decode_utf8(&text.as_bytes()[pos..]);
+                            let (ch, len) =
+                                tsr_jsstring::wtf8::decode_utf8(&text.as_bytes()[pos..]);
                             let valid = if pos == 0 {
-                                ts_scanner::is_identifier_start(ch)
+                                tsr_scanner::is_identifier_start(ch)
                             } else {
-                                ts_scanner::is_identifier_part(ch)
+                                tsr_scanner::is_identifier_part(ch)
                             };
                             if valid {
                                 let c = char::from_u32(ch as u32).expect("valid identifier rune");
@@ -368,7 +369,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                     name = self.jsdoc_qualified_name(name).1;
                 }
                 name = if self.factory.node(name).kind() == K::Identifier
-                    && !ts_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
+                    && !tsr_scanner::is_valid_identifier(self.jsdoc_text(name).as_bytes())
                 {
                     let new = self.factory.new_string_literal(self.jsdoc_text(name), 0);
                     self.add_transformed_reparse(new, name)
@@ -420,7 +421,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         for i in 0..nodes.len() {
             let id = self.factory.read_nodes(nodes).at(i);
             comments.push(
-                ts_ast::deep_clone_reparse(&mut self.factory, id).expect("cloned JSDoc comment"),
+                tsr_ast::deep_clone_reparse(&mut self.factory, id).expect("cloned JSDoc comment"),
             );
         }
         let list = self.new_node_list(loc, comments);
@@ -486,7 +487,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                     .expect("type parameter");
                 let node = if let Some(constraint) = constraint.filter(|_| i == 0) {
                     let mods = self.node_modifiers(param);
-                    let mods = ts_ast::deep_clone_reparse_modifiers(&mut self.factory, mods);
+                    let mods = tsr_ast::deep_clone_reparse_modifiers(&mut self.factory, mods);
                     let name = self.check_non_identifier_name(self.jsdoc_name(param));
                     let name = self.add_deep_clone_reparse(name);
                     let constraint = self.add_deep_clone_reparse(self.jsdoc_type(constraint));
@@ -733,10 +734,10 @@ impl<F: ParserFactory> Parser<'_, F> {
         }
         .expect("tag name")
     }
-    fn reparse_list_nodes(&self, list: Option<NodeListId>) -> ts_ast::NodeSlice {
+    fn reparse_list_nodes(&self, list: Option<NodeListId>) -> tsr_ast::NodeSlice {
         list.map_or_else(Default::default, |id| self.factory.read_list(id).nodes())
     }
-    fn reparse_declarations(&self, node: NodeId) -> ts_ast::NodeSlice {
+    fn reparse_declarations(&self, node: NodeId) -> tsr_ast::NodeSlice {
         let list = self
             .factory
             .node(node)
@@ -1359,7 +1360,7 @@ impl<F: ParserFactory> Parser<'_, F> {
 }
 
 /// port: tsc/internal/ast/utilities.go:IsFunctionLikeKind
-fn is_function_like_kind(kind: ts_ast::NodeKind) -> bool {
+fn is_function_like_kind(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(
@@ -1374,7 +1375,7 @@ fn is_function_like_kind(kind: ts_ast::NodeKind) -> bool {
     ) || is_function_like_declaration_kind(kind)
 }
 /// port: tsc/internal/ast/utilities.go:isFunctionLikeDeclarationKind
-fn is_function_like_declaration_kind(kind: ts_ast::NodeKind) -> bool {
+fn is_function_like_declaration_kind(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(
@@ -1423,7 +1424,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 .data_source()
                 .as_binary_expression()
                 .expect("binary expression");
-            if !ts_ast::is_assignment_operator(
+            if !tsr_ast::is_assignment_operator(
                 self.factory
                     .node(data.operator_token().expect("binary operator"))
                     .kind(),
@@ -1441,7 +1442,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                     .expression()
                     .expect("partially emitted inner");
             }
-            if !ts_ast::is_left_hand_side_expression_kind(self.factory.node(left).kind()) {
+            if !tsr_ast::is_left_hand_side_expression_kind(self.factory.node(left).kind()) {
                 break;
             }
             node = data.right().expect("assignment right operand");

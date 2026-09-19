@@ -4,7 +4,7 @@ use crate::{
     target::BindingNode,
     Binder,
 };
-use ts_ast::{
+use tsr_ast::{
     local_bind::{BindFlow, BindFlowList},
     FlowData, FlowId, FlowList, FlowListId, FlowNode, FlowNodeRead,
 };

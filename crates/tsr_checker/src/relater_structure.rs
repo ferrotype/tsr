@@ -204,7 +204,7 @@ impl Relater<'_> {
                         .value_declaration()
                     {
                         Some(node) => {
-                            self.checker.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE
+                            self.checker.node(node)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE
                                 != 0
                         }
                         None => false,

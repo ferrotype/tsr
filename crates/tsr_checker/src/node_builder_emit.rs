@@ -1,8 +1,8 @@
 //! Request serialization into the transformer's retained output owner.
 use super::NodeBuilder;
 use crate::{type_flags as tf, Error, LiteralValue};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, Factory, FactoryMethods, JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, Factory, FactoryMethods, JsString, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.CreateLateBoundIndexSignatures
@@ -19,7 +19,7 @@ impl NodeBuilder<'_> {
         let members = self.checker.members_of_symbol(symbol)?;
         let index_symbol = self
             .checker
-            .member_symbol(members, ts_ast::internal_symbol_names::INDEX)?;
+            .member_symbol(members, tsr_ast::internal_symbol_names::INDEX)?;
         let instances = self.checker.index_infos_of_symbol(index_symbol, members)?;
         let mut result = Vec::new();
         for (is_static, indexes) in [(true, statics), (false, instances)] {
@@ -60,7 +60,7 @@ impl NodeBuilder<'_> {
                                 .node(name)?
                                 .expression()
                                 .ok_or(Error::MissingLink("late index expression"))?;
-                            let first = ts_ast::utilities_middle::get_first_identifier(
+                            let first = tsr_ast::utilities_middle::get_first_identifier(
                                 self.checker.ast(expression)?,
                                 expression,
                             )?;
@@ -112,7 +112,7 @@ impl NodeBuilder<'_> {
                         .node(node)?
                         .data_source()
                         .as_index_signature_declaration()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .to_owned();
                     let mut modifiers = vec![self.ast.new_modifier(K::StaticKeyword.into())];
                     if let Some(list) = data.modifiers {
@@ -140,7 +140,7 @@ impl NodeBuilder<'_> {
 
     pub(super) fn retain_source_node(&mut self, node: NodeId) -> Result<(), Error> {
         let source =
-            ts_ast::utilities::get_source_file_of_node(self.checker.ast(node)?, Some(node))?
+            tsr_ast::utilities::get_source_file_of_node(self.checker.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("serialization source owner"))?;
         let program = self.checker.program()?;
         for index in 0..program.host.source_file_count() {
@@ -150,7 +150,7 @@ impl NodeBuilder<'_> {
                 return Ok(());
             }
         }
-        Err(ts_arena::Error::WrongOwner.into())
+        Err(tsr_arena::Error::WrongOwner.into())
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations

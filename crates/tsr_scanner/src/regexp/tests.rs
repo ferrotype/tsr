@@ -1,7 +1,7 @@
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
-use ts_ast::SyntaxKind;
-use ts_core::ScriptTarget;
+use tsr_ast::SyntaxKind;
+use tsr_core::ScriptTarget;
 
 use crate::{Scanner, ScannerDiagnostic};
 
@@ -86,7 +86,7 @@ fn false_reporting_skips_grammar_but_keeps_unterminated_diagnostic() {
     assert_eq!(errors.len(), 1);
     assert_eq!(
         errors[0].message,
-        ts_diagnostics::Unterminated_regular_expression_literal
+        tsr_diagnostics::Unterminated_regular_expression_literal
     );
 }
 

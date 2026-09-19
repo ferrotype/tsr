@@ -251,19 +251,19 @@ no production layout or new timing result is selected by this amendment.
 | The 257 MB residual is mostly disappearing map controls and Vec/Arc headers | Unproved. The residual is after Arc-header estimates; inline fields, known backing capacity and page directories are already counted. Reconcile remaining bucket/control and other storage, then remeasure the redesigned owner; neither write it off nor impose it as a permanent fixed cost |
 
 The identifier contract also includes observations before a parser range exists:
-[factory hooks](../crates/ts_ast/src/factory.rs) can see new nodes before
-[parser finishing](../crates/ts_parser/src/state.rs) assigns the final range.
-[Range mutation](../crates/ts_ast/src/lib.rs) is independent of
-[observable text](../crates/ts_ast/src/node_text.rs). Unicode escapes, JSX names,
+[factory hooks](../crates/tsr_ast/src/factory.rs) can see new nodes before
+[parser finishing](../crates/tsr_parser/src/state.rs) assigns the final range.
+[Range mutation](../crates/tsr_ast/src/lib.rs) is independent of
+[observable text](../crates/tsr_ast/src/node_text.rs). Unicode escapes, JSX names,
 arbitrary factory identifiers, reparsed clones, foreign owners, synthetic
 positions and subsequent range edits therefore remain explicit fallback tests.
 
 The runtime-ID counterexample is a live path through
-[module binding](../crates/ts_binder/src/modules.rs) into
-[`module_instance_state_cached`](../crates/ts_ast/src/binder_helpers.rs), with
-another consumer in [ambient-module declarations](../crates/ts_binder/src/declarations.rs).
+[module binding](../crates/tsr_binder/src/modules.rs) into
+[`module_instance_state_cached`](../crates/tsr_ast/src/binder_helpers.rs), with
+another consumer in [ambient-module declarations](../crates/tsr_binder/src/declarations.rs).
 This establishes nonzero-capable consumers, not their workload frequency.
-The [binding-result validator](../crates/ts_ast/src/bind_result.rs) separately
+The [binding-result validator](../crates/tsr_ast/src/bind_result.rs) separately
 checks symbol/table/flow references, next-container links and result graphs;
 narrow inline setters must preserve those obligations while avoiding another
 whole syntax scan.

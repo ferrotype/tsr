@@ -1,7 +1,7 @@
 //! Shared symbol modifiers, identity and write types for structural properties.
 use crate::{ternary as tr, type_flags as tf, CheckerState, Error, Ternary, TypeId};
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:getDeclarationModifierFlagsFromSymbol

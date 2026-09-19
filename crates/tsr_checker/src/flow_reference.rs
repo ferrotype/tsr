@@ -1,7 +1,7 @@
 //! Reference equivalence is symbol based, with source-qualified property paths.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
 }
@@ -42,7 +42,7 @@ impl CheckerState {
             return Ok(false);
         };
         Ok(
-            ts_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
+            tsr_ast::utilities::get_combined_node_flags(self.ast(declaration)?, declaration)?
                 & nf::CONSTANT
                 != 0,
         )
@@ -149,7 +149,7 @@ impl CheckerState {
                 }
                 Some(K::ObjectBindingPattern | K::ArrayBindingPattern) => {
                     let parent = required(node_parent, "constant binding root")?;
-                    let root = ts_ast::utilities::get_root_declaration(self.ast(parent)?, parent)?;
+                    let root = tsr_ast::utilities::get_root_declaration(self.ast(parent)?, parent)?;
                     let read = self.node(root)?;
                     let is_parameter = read.kind() == K::Parameter;
                     let is_variable = read.kind() == K::VariableDeclaration;
@@ -161,7 +161,10 @@ impl CheckerState {
                     if is_parameter || is_variable && is_catch {
                         return Ok(!self.some_binding_symbol_assigned(root)?);
                     }
-                    Ok(is_variable && ts_ast::utilities::is_var_const_like(self.ast(root)?, root)?)
+                    Ok(
+                        is_variable
+                            && tsr_ast::utilities::is_var_const_like(self.ast(root)?, root)?,
+                    )
                 }
                 _ => Ok(false),
             }
@@ -194,7 +197,7 @@ impl CheckerState {
             let binary = read
                 .data_source()
                 .as_binary_expression()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             let left = required(binary.left(), "target binary left")?;
             let right = required(binary.right(), "target binary right")?;
             let operator = self
@@ -202,7 +205,7 @@ impl CheckerState {
                 .node(required(binary.operator_token(), "target binary operator")?)?
                 .kind();
             return Ok(
-                ts_ast::is_assignment_expression(self.ast(target)?, target, false)?
+                tsr_ast::is_assignment_expression(self.ast(target)?, target, false)?
                     && self.matching_reference(source, left)?
                     || operator == K::CommaToken && self.matching_reference(source, right)?,
             );
@@ -219,7 +222,7 @@ impl CheckerState {
                 let source_data = read
                     .data_source()
                     .as_meta_property()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 Ok(source_data.keyword_token() == target_data.keyword_token()
                     && self
                         .ast(source)?
@@ -305,7 +308,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_qualified_name()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let left = required(data.left(), "qualified left")?;
                 let right = required(data.right(), "qualified right")?;
                 let target_read = self.node(target)?;
@@ -325,7 +328,7 @@ impl CheckerState {
                 let binary = read
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let right = required(binary.right(), "source comma right")?;
                 let operator = self
                     .ast(source)?
@@ -350,7 +353,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_element_access_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let argument = required(data.argument_expression(), "element name argument")?;
                 let read = self.node(argument)?;
                 if matches!(
@@ -359,7 +362,7 @@ impl CheckerState {
                 ) {
                     return Ok(Some(self.node_text(argument)?.into_js_string()));
                 }
-                if ts_ast::is_entity_name_expression(self.ast(argument)?, argument)? {
+                if tsr_ast::is_entity_name_expression(self.ast(argument)?, argument)? {
                     let Some(symbol) = self.resolve_entity_name(argument, sf::VALUE, true)? else {
                         return Ok(None);
                     };

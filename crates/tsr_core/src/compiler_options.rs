@@ -1,6 +1,6 @@
 //! Immutable-input compiler option values from the pinned core package.
 use crate::{ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ModuleKind(pub i32);

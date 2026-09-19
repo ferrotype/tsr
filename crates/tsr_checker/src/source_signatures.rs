@@ -6,8 +6,8 @@ use crate::{
     signature_flags as sg, CheckerState, Error, MapperId, SignatureId, TypeId, TypeSystemEntity,
     TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSingleCallSignature
@@ -158,7 +158,7 @@ impl CheckerState {
         let asserts = data.asserts_modifier().is_some();
         let annotation = data.r#type();
         let text = if this {
-            ts_ast::JsString::default()
+            tsr_ast::JsString::default()
         } else {
             self.node_text(name)?.into_js_string()
         };
@@ -212,7 +212,7 @@ impl CheckerState {
                 continue;
             };
             let read = self.node(declaration)?;
-            if !ts_ast::utilities::is_function_like(Some(&read)) {
+            if !tsr_ast::utilities::is_function_like(Some(&read)) {
                 continue;
             }
             if index > 0 && read.body().is_some() {
@@ -282,7 +282,8 @@ impl CheckerState {
                 )
             );
         if java_script
-            && ts_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?.is_none()
+            && tsr_ast::get_immediately_invoked_function_expression(self.ast(node)?, node)?
+                .is_none()
         {
             let mut untyped = true;
             for &parameter in &nodes {
@@ -302,19 +303,19 @@ impl CheckerState {
             let mut symbol = self
                 .get_symbol_of_declaration(parameter)?
                 .ok_or(Error::MissingLink("parameter symbol"))?;
-            if self.symbol(symbol)?.flags() & ts_ast::symbol_flags::PROPERTY != 0 {
+            if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::PROPERTY != 0 {
                 let name = self
                     .ast(parameter)?
                     .node(parameter)?
                     .name()
                     .ok_or(Error::MissingLink("parameter property name"))?;
                 if self.node(name)?.kind() == K::Identifier {
-                    let text = ts_ast::JsString::from_bytes(self.symbol(symbol)?.name_bytes());
+                    let text = tsr_ast::JsString::from_bytes(self.symbol(symbol)?.name_bytes());
                     symbol = self
                         .resolve_name(
                             Some(parameter),
                             text.as_bytes(),
-                            ts_ast::symbol_flags::VALUE,
+                            tsr_ast::symbol_flags::VALUE,
                             None,
                             false,
                         )?
@@ -352,7 +353,7 @@ impl CheckerState {
         let kind = self.node(node)?.kind();
         if this_parameter.is_none() && matches!(kind.known(), Some(K::GetAccessor | K::SetAccessor))
         {
-            let bindable = if !ts_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
+            let bindable = if !tsr_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
                 true
             } else if let Some(name) = self.late_name(node)? {
                 let ty = self.late_name_type(name)?;
@@ -455,7 +456,7 @@ impl CheckerState {
             }
             let read = self.node(node)?;
             if let Some(body) = read.body() {
-                if !ts_ast::node_is_missing(Some(&self.node(body)?)) {
+                if !tsr_ast::node_is_missing(Some(&self.node(body)?)) {
                     return self.return_type_from_body(node);
                 }
             }
@@ -480,17 +481,17 @@ impl CheckerState {
                 if let Some(annotation) = annotation {
                     self.error_at(
                         Some(annotation),
-                        ts_diagnostics::Return_type_annotation_circularly_references_itself,
+                        tsr_diagnostics::Return_type_annotation_circularly_references_itself,
                         vec![],
                     )?;
                 } else if no_implicit_any {
-                    let name = ts_ast::get_name_of_declaration(self.ast(node)?, Some(node))?;
+                    let name = tsr_ast::get_name_of_declaration(self.ast(node)?, Some(node))?;
                     if let Some(name) = name {
                         let text =
-                            ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
-                        self.error_at(Some(name), ts_diagnostics::X_0_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions, vec![text])?;
+                            tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+                        self.error_at(Some(name), tsr_diagnostics::X_0_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions, vec![text])?;
                     } else {
-                        self.error_at(Some(node), ts_diagnostics::Function_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions, vec![])?;
+                        self.error_at(Some(node), tsr_diagnostics::Function_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions, vec![])?;
                     }
                 }
             }
@@ -696,7 +697,7 @@ impl CheckerState {
         if let Some(annotation) = self.full_signature_type_node(function)? {
             let ty = self.get_type_from_type_node(annotation)?;
             if self.contextual_signature_for_type(function, ty)?.is_none() {
-                self.error_at(Some(annotation),ts_diagnostics::A_JSDoc_type_tag_on_a_function_must_have_a_signature_with_the_correct_number_of_arguments,vec![])?;
+                self.error_at(Some(annotation),tsr_diagnostics::A_JSDoc_type_tag_on_a_function_must_have_a_signature_with_the_correct_number_of_arguments,vec![])?;
             }
         }
         Ok(())

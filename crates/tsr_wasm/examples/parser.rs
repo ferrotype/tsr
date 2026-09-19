@@ -11,8 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let kind = i32::try_from(input["kind"].as_i64().ok_or("script kind")?)?;
         let jsx = input["jsx"].as_bool().unwrap_or(false);
         let force = input["force"].as_bool().unwrap_or(false);
-        let counts = ts_wasm::parse(&source, &name, kind, jsx, force);
-        let bytes = ts_wasm::parse_and_encode(&source, &name, kind, jsx, force)
+        let counts = tsr_wasm::parse(&source, &name, kind, jsx, force);
+        let bytes = tsr_wasm::parse_and_encode(&source, &name, kind, jsx, force)
             .expect("native parser control must encode");
         serde_json::to_writer(&mut output, &json!({"counts":counts,"bytes":bytes}))?;
         output.write_all(b"\n")?;

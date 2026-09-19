@@ -1,21 +1,21 @@
 use crate::trace::{extensions_text, trace};
 use serde_json::Value;
 use std::{collections::BTreeMap, sync::Arc};
-use ts_core::{CompilerOptions, ModuleKind, ModuleResolutionKind};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
-use ts_tspath as path;
-use ts_vfs::FileSystem;
+use tsr_core::{CompilerOptions, ModuleKind, ModuleResolutionKind};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
+use tsr_tspath as path;
+use tsr_vfs::FileSystem;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
-    Host(ts_vfs::Error),
+    Host(tsr_vfs::Error),
     MutableHost,
     Unsupported(&'static str),
     MalformedPackageJson(JsString),
 }
-impl From<ts_vfs::Error> for Error {
-    fn from(value: ts_vfs::Error) -> Self {
+impl From<tsr_vfs::Error> for Error {
+    fn from(value: tsr_vfs::Error) -> Self {
         Self::Host(value)
     }
 }
@@ -34,7 +34,7 @@ pub struct PackageId {
 }
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ResolvedModule {
-    pub resolution_diagnostics: Vec<ts_ast::Diagnostic>,
+    pub resolution_diagnostics: Vec<tsr_ast::Diagnostic>,
     pub resolved_file_name: JsString,
     pub original_path: JsString,
     pub extension: JsString,
@@ -139,7 +139,7 @@ impl Resolver {
     pub fn package_json(
         &mut self,
         directory: &[u8],
-    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
+    ) -> Result<Option<Arc<PackageJson>>, tsr_vfs::Error> {
         let file = path::combine(directory, &[b"package.json"]);
         let key = path::to_path(
             &file,
@@ -202,7 +202,7 @@ impl Resolver {
     pub fn package_scope(
         &mut self,
         directory: &[u8],
-    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
+    ) -> Result<Option<Arc<PackageJson>>, tsr_vfs::Error> {
         for dir in path::ancestors(directory) {
             if let Some(info) = self.package_json(&dir)? {
                 return Ok(Some(info));
@@ -215,7 +215,7 @@ impl Resolver {
     pub fn package_scope_untraced(
         &mut self,
         directory: &[u8],
-    ) -> Result<Option<Arc<PackageJson>>, ts_vfs::Error> {
+    ) -> Result<Option<Arc<PackageJson>>, tsr_vfs::Error> {
         let previous = self.tracer.active;
         self.tracer.active = false;
         let result = self.package_scope(directory);

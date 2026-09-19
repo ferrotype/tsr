@@ -3,8 +3,8 @@
 //! cache or eliminates a constituent.
 
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameters
@@ -24,13 +24,13 @@ impl CheckerState {
                 seen_default = true;
                 self.check_default_references(default, &nodes[index..])?;
             } else if seen_default {
-                self.error_at(Some(parameter), ts_diagnostics::Required_type_parameters_may_not_follow_optional_type_parameters, vec![])?;
+                self.error_at(Some(parameter), tsr_diagnostics::Required_type_parameters_may_not_follow_optional_type_parameters, vec![])?;
             }
             let symbol = self.get_symbol_of_declaration(parameter)?;
             for &previous in &nodes[..index] {
                 if self.get_symbol_of_declaration(previous)? == symbol {
-                    let text = ts_scanner::declaration_name_to_string(self.ast(parameter)?, name)?;
-                    self.error_at(name, ts_diagnostics::Duplicate_identifier_0, vec![text])?;
+                    let text = tsr_scanner::declaration_name_to_string(self.ast(parameter)?, name)?;
+                    self.error_at(name, tsr_diagnostics::Duplicate_identifier_0, vec![text])?;
                 }
             }
         }
@@ -45,7 +45,7 @@ impl CheckerState {
                 for &parameter in later {
                     let parameter_symbol = self.get_symbol_of_declaration(parameter)?;
                     if self.types.get(ty)?.symbol == parameter_symbol {
-                        self.error_at(Some(node), ts_diagnostics::Type_parameter_defaults_can_only_reference_previously_declared_type_parameters, vec![])?;
+                        self.error_at(Some(node), tsr_diagnostics::Type_parameter_defaults_can_only_reference_previously_declared_type_parameters, vec![])?;
                     }
                 }
             }
@@ -67,7 +67,7 @@ impl CheckerState {
         let constraint = data.constraint();
         let default = data.default_type();
         if let Some(expression) = data.expression() {
-            self.grammar_error_first_token(expression, ts_diagnostics::Type_expected, vec![])?;
+            self.grammar_error_first_token(expression, tsr_diagnostics::Type_expected, vec![])?;
         }
         if let Some(constraint) = constraint {
             self.check_source_element(constraint)?;
@@ -85,7 +85,7 @@ impl CheckerState {
             let name = self.type_to_string(ty, crate::type_format_flags::NONE)?;
             self.error_at(
                 default,
-                ts_diagnostics::Type_parameter_0_has_a_circular_default,
+                tsr_diagnostics::Type_parameter_0_has_a_circular_default,
                 vec![name],
             )?;
         }
@@ -122,7 +122,7 @@ impl CheckerState {
         ) {
             self.error_at(
                 Some(name),
-                ts_diagnostics::Type_parameter_name_cannot_be_0,
+                tsr_diagnostics::Type_parameter_name_cannot_be_0,
                 vec![text],
             )?;
         }
@@ -132,7 +132,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeParameterDeferred
     pub(crate) fn check_type_parameter_deferred(&mut self, node: NodeId) -> Result<(), Error> {
-        use ts_ast::modifier_flags as mf;
+        use tsr_ast::modifier_flags as mf;
         let parent = self
             .ast(node)?
             .node(node)?
@@ -167,7 +167,7 @@ impl CheckerState {
                 & (crate::object_flags::ANONYMOUS | crate::object_flags::MAPPED)
                 == 0
             {
-                self.error_at(Some(node), ts_diagnostics::Variance_annotations_are_only_supported_in_type_aliases_for_object_function_constructor_and_mapped_types, vec![])?;
+                self.error_at(Some(node), tsr_diagnostics::Variance_annotations_are_only_supported_in_type_aliases_for_object_function_constructor_and_mapped_types, vec![])?;
                 return Ok(());
             }
         }
@@ -184,7 +184,7 @@ impl CheckerState {
             let source = self.create_marker_type(parent_symbol, parameter, source)?;
             let target = self.create_marker_type(parent_symbol, parameter, target)?;
             self.variance.checked_parameter = Some(parameter);
-            let result = self.check_type_related_ex(source, target, crate::RelationKind::Assignable, Some(node), Some(ts_diagnostics::Type_0_is_not_assignable_to_type_1_as_implied_by_variance_annotation));
+            let result = self.check_type_related_ex(source, target, crate::RelationKind::Assignable, Some(node), Some(tsr_diagnostics::Type_0_is_not_assignable_to_type_1_as_implied_by_variance_annotation));
             // The pin retains this parameter after the check (its saved value is
             // the current parameter), which also controls later marker display.
             self.variance.checked_parameter = Some(parameter);
@@ -206,7 +206,7 @@ impl CheckerState {
             target,
             crate::RelationKind::Assignable,
             node,
-            Some(ts_diagnostics::Type_0_does_not_satisfy_the_constraint_1),
+            Some(tsr_diagnostics::Type_0_does_not_satisfy_the_constraint_1),
         )?;
         if let Some(diagnostic) = diagnostic {
             self.add_diagnostic(diagnostic)?;
@@ -219,23 +219,23 @@ impl CheckerState {
     pub(crate) fn check_type_reference_node(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_grammar_type_arguments(node)?;
         let read = self.node(node)?;
-        if read.kind() == ts_ast::SyntaxKind::TypeReference
-            && read.flags() & ts_ast::node_flags::JS_DOC == 0
+        if read.kind() == tsr_ast::SyntaxKind::TypeReference
+            && read.flags() & tsr_ast::node_flags::JS_DOC == 0
         {
             if let (Some(name), Some(arguments)) = (read.name(), read.type_argument_list()) {
                 let end = self.node(name)?.end();
                 let list = self.ast(node)?.list(arguments)?;
                 if i64::from(end) != list.loc().pos() {
                     let view = self.ast(node)?;
-                    let source_id = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+                    let source_id = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                         .ok_or(Error::MissingLink("type reference source"))?;
                     let source = view.source_file(source_id)?;
-                    if ts_scanner::scan_token_at_position(view, source_id, i64::from(end))?
-                        == ts_ast::SyntaxKind::DotToken
+                    if tsr_scanner::scan_token_at_position(view, source_id, i64::from(end))?
+                        == tsr_ast::SyntaxKind::DotToken
                     {
                         let start =
-                            ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(end));
-                        self.grammar_error_range(node, start, start + 1, ts_diagnostics::JSDoc_types_can_only_be_used_inside_documentation_comments)?;
+                            tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(end));
+                        self.grammar_error_range(node, start, start + 1, tsr_diagnostics::JSDoc_types_can_only_be_used_inside_documentation_comments)?;
                     }
                 }
             }

@@ -3,8 +3,8 @@ use crate::{
     type_facts as f, type_flags as tf, CheckerState, Error, RelationKind, TypeId, TypePredicateId,
     TypePredicateKind,
 };
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getNarrowedType
     pub(crate) fn narrowed_flow_type(
@@ -71,7 +71,7 @@ impl CheckerState {
         let key = if self.types.flags(ty)? & tf::UNION != 0 {
             self.flow_key_property_name(ty)?
         } else {
-            ts_ast::JsString::default()
+            tsr_ast::JsString::default()
         };
         let narrowed = self
             .map_type(candidate, &mut |state, part| {
@@ -166,7 +166,7 @@ impl CheckerState {
         let expression = read
             .expression()
             .ok_or(Error::MissingLink("predicate call expression"))?;
-        let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
+        let expression = tsr_ast::skip_parentheses(self.ast(expression)?, expression)?;
         let read = self.node(expression)?;
         if matches!(
             read.kind().known(),
@@ -175,7 +175,7 @@ impl CheckerState {
             let target = read
                 .expression()
                 .ok_or(Error::MissingLink("predicate this argument"))?;
-            return Ok(Some(ts_ast::skip_parentheses(self.ast(target)?, target)?));
+            return Ok(Some(tsr_ast::skip_parentheses(self.ast(target)?, target)?));
         }
         Ok(None)
     }
@@ -231,7 +231,7 @@ impl CheckerState {
         expression: NodeId,
     ) -> Result<TypeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            let expression = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
+            let expression = tsr_ast::skip_parentheses(self.ast(expression)?, expression)?;
             let read = self.node(expression)?;
             if read.kind() == K::FalseKeyword {
                 return Ok(self.builtins.unreachable_never_type);
@@ -270,7 +270,7 @@ impl CheckerState {
         assume: bool,
     ) -> Result<TypeId, Error> {
         if self.flow_has_matching_argument(call, reference)? {
-            let call_chain = self.node(call)?.flags() & ts_ast::node_flags::OPTIONAL_CHAIN != 0;
+            let call_chain = self.node(call)?.flags() & tsr_ast::node_flags::OPTIONAL_CHAIN != 0;
             if assume || !call_chain {
                 if let Some(signature) = self.effects_signature(call)? {
                     if let Some(predicate) = self.type_predicate_of_signature(signature)? {

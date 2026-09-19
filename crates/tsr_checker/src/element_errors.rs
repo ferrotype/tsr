@@ -2,9 +2,9 @@
 //! provenance rather than replacing a failed aggregate relation with a summary.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
 use std::sync::Arc;
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, Diagnostic, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, Diagnostic, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:Checker.elaborateObjectLiteral
@@ -109,7 +109,7 @@ impl CheckerState {
             {
                 continue;
             }
-            let name = self.get_number_literal_type(ts_jsnum::Number::new(index as f64))?;
+            let name = self.get_number_literal_type(tsr_jsnum::Number::new(index as f64))?;
             let check = self.effective_expression_check_node(element)?;
             reported = self.elaborate_element_error(
                 source,
@@ -139,7 +139,7 @@ impl CheckerState {
                 return Ok(node);
             }
             if read.kind() == K::ParenthesizedExpression
-                && read.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
+                && read.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0
                 && read.type_node().is_some()
             {
                 return Ok(node);
@@ -335,7 +335,7 @@ impl CheckerState {
     }
 
     fn elaboration_in_default_library(&self, node: NodeId) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("elaboration declaration source"))?;
         let source = self.source_file_read(source)?;
         Ok(self

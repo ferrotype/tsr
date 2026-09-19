@@ -1,13 +1,13 @@
 //! Borrowed program views plus one explicit operation-owned transient arena.
 use crate::{Program, ProgramFile};
 use std::collections::HashMap;
-use ts_arena::{ArenaId, Counters, Error, SymbolArena, SymbolId};
-use ts_ast::{
+use tsr_arena::{ArenaId, Counters, Error, SymbolArena, SymbolId};
+use tsr_ast::{
     AstView, DeclarationRead, NodeBinding, NodeId, Symbol, SymbolFlags, SymbolRef, SymbolTableId,
     SymbolTableRead,
 };
-use ts_binder::name_resolver::ResolverHost;
-use ts_jsstring::JsString;
+use tsr_binder::name_resolver::ResolverHost;
+use tsr_jsstring::JsString;
 #[derive(Default)]
 pub(crate) struct OwnerIndex {
     nodes: HashMap<ArenaId, usize>,

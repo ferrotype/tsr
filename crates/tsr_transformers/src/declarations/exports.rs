@@ -1,8 +1,8 @@
 use super::{transform::Transformer, util};
-use ts_ast::{
+use tsr_ast::{
     node_flags as nf, Factory, FactoryMethods, JsString, NodeId, RuntimeFactory, SyntaxKind as K,
 };
-use ts_printer::{
+use tsr_printer::{
     emit_resolver::DeclarationEmitResolver, generated_identifier_flags as gif, AutoGenerateOptions,
 };
 
@@ -27,7 +27,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         clippy::unnecessary_wraps,
         reason = "Returns the optional modifier-list slot expected by all factory declaration constructors, including an allocated empty list"
     )]
-    pub fn declare_modifiers(&mut self) -> Option<ts_ast::NodeListId> {
+    pub fn declare_modifiers(&mut self) -> Option<tsr_ast::NodeListId> {
         let modifiers = if self.needs_declare {
             vec![Some(self.output.new_token(K::DeclareKeyword.into()))]
         } else {
@@ -149,7 +149,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         self.has_scope_marker = true;
         if self.node(expression).kind() == K::Identifier
             && matches!(
-                parent.and_then(ts_ast::NodeKind::known),
+                parent.and_then(tsr_ast::NodeKind::known),
                 Some(K::SourceFile | K::ModuleBlock)
             )
         {
@@ -165,7 +165,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         let declaration = if self.node(unwrapped).kind() == K::ClassExpression {
             let modifiers = self.declare_modifiers();
             self.class_expression_declaration(unwrapped, name, modifiers)?
-        } else if ts_ast::utilities::is_function_like(Some(&self.node(unwrapped))) {
+        } else if tsr_ast::utilities::is_function_like(Some(&self.node(unwrapped))) {
             self.function_expression_declaration(
                 unwrapped,
                 name,
@@ -180,7 +180,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             self.tracker.selector = super::tracker::Selector::fixed(
                 super::diagnostics::SymbolAccessibilityDiagnostic {
                     diagnostic_message:
-                        ts_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+                        tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
                     error_node: Some(input),
                     type_name: None,
                 },
@@ -189,7 +189,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             let result: Result<NodeId, R::Error> = (|| {
                 let literal =
                     util::unwrap_parenthesized_expression(self.output.view(), expression)?;
-                let initializer = if ts_ast::utilities_tail::is_primitive_literal_value(
+                let initializer = if tsr_ast::utilities_tail::is_primitive_literal_value(
                     self.output.view(),
                     &self.node(literal),
                     true,
@@ -228,7 +228,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             self.output
                 .new_export_assignment(None, is_export_equals, None, Some(name));
         self.emit
-            .add_emit_flags(assignment, ts_printer::emit_flags::NO_COMMENTS);
+            .add_emit_flags(assignment, tsr_printer::emit_flags::NO_COMMENTS);
         Ok(self.syntax_list(vec![assignment, declaration]))
     }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformFunctionLikeToDeclaration

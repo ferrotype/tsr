@@ -1,10 +1,10 @@
 use crate::{Parser, ParserFactory};
 use std::ops::ControlFlow;
-use ts_ast::{
+use tsr_ast::{
     modifier_flags, node_flags, subtree_flags, AstBuilder, ChildVisitor, Factory, JsString, NodeId,
     NodeListId, NodeSlice, RuntimeFactory, SyntaxKind as K,
 };
-use ts_core::{ScriptKind, Tristate};
+use tsr_core::{ScriptKind, Tristate};
 
 #[derive(Default)]
 struct CollectedReferences {
@@ -140,21 +140,21 @@ impl Parser<'_, AstBuilder> {
             }
         }
         let imports = if collected.imports.is_empty() {
-            ts_ast::SourceNodeSlice::empty()
+            tsr_ast::SourceNodeSlice::empty()
         } else {
             self.factory
                 .source_nodes(collected.imports)
                 .expect("owned module references")
         };
         let augmentations = if collected.augmentations.is_empty() {
-            ts_ast::SourceNodeSlice::empty()
+            tsr_ast::SourceNodeSlice::empty()
         } else {
             self.factory
                 .source_nodes(collected.augmentations)
                 .expect("owned augmentations")
         };
         let ambient_names = if collected.ambient_names.is_empty() {
-            ts_ast::SourceTextSlice::empty()
+            tsr_ast::SourceTextSlice::empty()
         } else {
             self.factory
                 .source_strings(collected.ambient_names)
@@ -566,7 +566,7 @@ fn is_external_module_name_relative(name: &[u8]) -> bool {
         || name.starts_with(b"../")
         || name.starts_with(b".\\")
         || name.starts_with(b"..\\")
-        || ts_core::path::encoded_root_length(name) > 0
+        || tsr_core::path::encoded_root_length(name) > 0
 }
 
 // Exact membership of core/nodemodules.go:UnprefixedNodeCoreModules at the source pin.

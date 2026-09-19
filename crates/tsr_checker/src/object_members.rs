@@ -7,8 +7,8 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, IndexInfoId, MapperId, SignatureId,
     TypeId,
 };
-use ts_arena::SymbolId;
-use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SymbolTable};
+use tsr_arena::SymbolId;
+use tsr_ast::{internal_symbol_names as names, symbol_flags as sf, SymbolTable};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.resolveStructuredTypeMembers
@@ -88,7 +88,7 @@ impl CheckerState {
 
     pub(crate) fn member_symbol(
         &self,
-        table: Option<ts_ast::SymbolTableId>,
+        table: Option<tsr_ast::SymbolTableId>,
         name: &[u8],
     ) -> Result<Option<SymbolId>, Error> {
         match table {

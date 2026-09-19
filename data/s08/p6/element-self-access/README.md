@@ -39,7 +39,7 @@ request = strict_json_loads((ROOT/'tools/s08/p6/element-self-access-requests.jso
 driver = (ROOT/'tools/s08/p6/semantic_diagnostics_oracle_test.go').read_text()
 run_overlay(ROOT/'target/s08/p6-element-self-access-native-new', 'checker', driver, request, 'TestS08P6SemanticDiagnostics')
 PY
-cargo test --locked -p ts_compiler --test checker_semantics self_type_access
+cargo test --locked -p tsr_compiler --test checker_semantics self_type_access
 ```
 
 This supplemental comparison does not certify E2 acceptance.

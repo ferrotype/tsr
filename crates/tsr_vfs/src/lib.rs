@@ -6,8 +6,8 @@ use std::{
         Arc,
     },
 };
-use ts_jsstring::{JsString, SourceText};
-use ts_tspath as path;
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tspath as path;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {

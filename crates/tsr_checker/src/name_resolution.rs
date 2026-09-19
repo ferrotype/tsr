@@ -2,45 +2,45 @@
 //! is scoped to one operation; cached checker links are updated after the walk.
 
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     symbol_flags as sf, AstView, DeclarationRead, JsString, NodeBinding, SymbolFlags, SymbolRef,
     SymbolTableId, SymbolTableRead,
 };
-use ts_binder::name_resolver::{
+use tsr_binder::name_resolver::{
     Hook, NameResolver, NameResolverHooks, ResolvedName, ResolverHost, ResolverOptions,
 };
-use ts_core::Tristate;
-use ts_diagnostics::Message;
+use tsr_core::Tristate;
+use tsr_diagnostics::Message;
 
 struct ReadHost<'a>(&'a CheckerState);
-fn arena(error: Error) -> ts_arena::Error {
+fn arena(error: Error) -> tsr_arena::Error {
     match error {
         Error::Arena(error) => error,
-        _ => ts_arena::Error::InvalidGraph,
+        _ => tsr_arena::Error::InvalidGraph,
     }
 }
 impl ResolverHost for ReadHost<'_> {
-    fn ast(&self, node: NodeId) -> Result<AstView<'_>, ts_arena::Error> {
+    fn ast(&self, node: NodeId) -> Result<AstView<'_>, tsr_arena::Error> {
         self.0.ast(node).map_err(arena)
     }
-    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, ts_arena::Error> {
+    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error> {
         self.0.checker_node_binding(node).map_err(arena)
     }
-    fn symbol(&self, id: SymbolId) -> Result<SymbolRef<'_>, ts_arena::Error> {
+    fn symbol(&self, id: SymbolId) -> Result<SymbolRef<'_>, tsr_arena::Error> {
         self.0.symbol(id).map_err(arena)
     }
-    fn table(&self, id: SymbolTableId) -> Result<SymbolTableRead<'_>, ts_arena::Error> {
+    fn table(&self, id: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error> {
         self.0.table(id).map_err(arena)
     }
-    fn declarations(&self, id: SymbolId) -> Result<DeclarationRead<'_>, ts_arena::Error> {
+    fn declarations(&self, id: SymbolId) -> Result<DeclarationRead<'_>, tsr_arena::Error> {
         self.0.symbol_declarations(id).map_err(arena)
     }
     fn new_transient_symbol(
         &mut self,
         _: SymbolFlags,
         _: JsString,
-    ) -> Result<SymbolId, ts_arena::Error> {
+    ) -> Result<SymbolId, tsr_arena::Error> {
         // The binder creates only a missing arguments symbol. NewChecker
         // always installs its own before this resolver can run.
         unreachable!("initialized checker resolver already has argumentsSymbol")
@@ -74,7 +74,7 @@ impl Hooks<'_> {
         table: Option<SymbolTableId>,
         name: &[u8],
         meaning: SymbolFlags,
-    ) -> Result<Option<SymbolId>, ts_arena::Error> {
+    ) -> Result<Option<SymbolId>, tsr_arena::Error> {
         let result = (|| {
             let Some(table) = table else { return Ok(None) };
             let table_id = table;
@@ -117,7 +117,7 @@ impl Hooks<'_> {
                 }
             }
             let failure = std::cell::Cell::new(None);
-            let result = ts_scanner::get_spelling_suggestion(
+            let result = tsr_scanner::get_spelling_suggestion(
                 name,
                 candidates.iter(),
                 |entry| entry.0.as_bytes(),
@@ -138,7 +138,7 @@ impl Hooks<'_> {
         })();
         self.capture(result)
     }
-    fn capture<T>(&mut self, result: Result<T, Error>) -> Result<T, ts_arena::Error> {
+    fn capture<T>(&mut self, result: Result<T, Error>) -> Result<T, tsr_arena::Error> {
         result.map_err(|error| {
             self.failure = Some(error);
             arena(error)
@@ -149,14 +149,14 @@ impl NameResolverHooks for Hooks<'_> {
     fn get_symbol_of_declaration(
         &mut self,
         node: NodeId,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         let result = (|| {
             let Some(raw) = self.state.raw_declaration_symbol(node)? else {
                 return Ok(Hook::Value(None));
             };
             let symbol = self.state.symbol(raw)?;
             let symbol = if symbol.flags() & sf::CLASS_MEMBER != 0
-                && symbol.name_bytes() == ts_ast::internal_symbol_names::COMPUTED
+                && symbol.name_bytes() == tsr_ast::internal_symbol_names::COMPUTED
             {
                 self.state
                     .late_members
@@ -179,7 +179,7 @@ impl NameResolverHooks for Hooks<'_> {
         table: Option<SymbolTableId>,
         name: &[u8],
         meaning: SymbolFlags,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         let result = self.state.lookup_symbol(table, name, meaning);
         if matches!(
             result,
@@ -210,7 +210,7 @@ impl NameResolverHooks for Hooks<'_> {
         location: Option<NodeId>,
         message: &'static Message,
         args: &[JsString],
-    ) -> Result<(), ts_arena::Error> {
+    ) -> Result<(), tsr_arena::Error> {
         self.effects
             .push(Effect::Error(location, message, args.to_vec()));
         Ok(())
@@ -219,14 +219,14 @@ impl NameResolverHooks for Hooks<'_> {
         &mut self,
         symbol: SymbolId,
         meaning: SymbolFlags,
-    ) -> Result<(), ts_arena::Error> {
+    ) -> Result<(), tsr_arena::Error> {
         self.effects.push(Effect::Referenced(symbol, meaning));
         Ok(())
     }
     fn get_requires_scope_change_cache(
         &mut self,
         node: NodeId,
-    ) -> Result<Tristate, ts_arena::Error> {
+    ) -> Result<Tristate, tsr_arena::Error> {
         for effect in self.effects.iter().rev() {
             if let Effect::Scope(id, value) = effect {
                 if *id == node {
@@ -246,7 +246,7 @@ impl NameResolverHooks for Hooks<'_> {
         &mut self,
         node: NodeId,
         value: Tristate,
-    ) -> Result<(), ts_arena::Error> {
+    ) -> Result<(), tsr_arena::Error> {
         self.effects.push(Effect::Scope(node, value));
         Ok(())
     }
@@ -256,7 +256,7 @@ impl NameResolverHooks for Hooks<'_> {
         name: &[u8],
         property: NodeId,
         result: Option<SymbolId>,
-    ) -> Result<bool, ts_arena::Error> {
+    ) -> Result<bool, tsr_arena::Error> {
         if self.suggestion {
             return Ok(false);
         }
@@ -281,7 +281,7 @@ impl NameResolverHooks for Hooks<'_> {
         name: &[u8],
         meaning: SymbolFlags,
         message: &'static Message,
-    ) -> Result<(), ts_arena::Error> {
+    ) -> Result<(), tsr_arena::Error> {
         self.effects.push(Effect::Failed(
             location,
             JsString::from_bytes(name),
@@ -294,7 +294,7 @@ impl NameResolverHooks for Hooks<'_> {
     fn on_successfully_resolved_symbol(
         &mut self,
         resolution: ResolvedName,
-    ) -> Result<(), ts_arena::Error> {
+    ) -> Result<(), tsr_arena::Error> {
         if !self.suggestion {
             self.effects.push(Effect::Resolved(resolution));
         }
@@ -332,7 +332,7 @@ impl CheckerState {
         dont_resolve_alias: bool,
         location: Option<NodeId>,
     ) -> Result<Option<SymbolId>, Error> {
-        use ts_ast::{internal_symbol_names as names, SyntaxKind as K};
+        use tsr_ast::{internal_symbol_names as names, SyntaxKind as K};
         let read = self.node(name)?;
         if read.pos() == read.end() {
             return Ok(None);
@@ -340,7 +340,7 @@ impl CheckerState {
         let symbol = if read.kind() == K::Identifier {
             let text = self.node_text(name)?.into_js_string();
             let message = if meaning == sf::NAMESPACE || read.pos() < 0 {
-                ts_diagnostics::Cannot_find_namespace_0
+                tsr_diagnostics::Cannot_find_namespace_0
             } else {
                 self.cannot_find_name_diagnostic(name)?
             };
@@ -612,12 +612,12 @@ impl CheckerState {
     ) -> Result<Option<SymbolId>, Error> {
         match self.lookup_symbol(table, name, meaning) {
             Err(Error::Unsupported("getSymbolFlags: alias resolution")) => {
-                let table = table.ok_or(ts_arena::Error::InvalidGraph)?;
+                let table = table.ok_or(tsr_arena::Error::InvalidGraph)?;
                 let symbol = self
                     .table(table)?
                     .get(name)
                     .flatten()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let symbol = self.get_merged_symbol(symbol);
                 let flags = self.module_symbol_flags(symbol, false, false)?;
                 Ok((flags & meaning != 0).then_some(symbol))
@@ -647,17 +647,17 @@ impl CheckerState {
         if meaning & sf::VALUE == sf::VALUE {
             if let Some(last) = resolution.last_location {
                 let view = self.ast(last)?;
-                if view.node(last)?.kind() == ts_ast::SyntaxKind::SourceFile
-                    && ts_ast::utilities::is_external_or_common_js_module(&view.source_file(last)?)
+                if view.node(last)?.kind() == tsr_ast::SyntaxKind::SourceFile
+                    && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(last)?)
                 {
-                    if self.node(location)?.flags() & ts_ast::node_flags::JS_DOC == 0 {
+                    if self.node(location)?.flags() & tsr_ast::node_flags::JS_DOC == 0 {
                         let merged = self.get_merged_symbol(resolution.symbol);
                         let declarations = self.symbol_declarations(merged)?.to_vec();
                         let mut umd = !declarations.is_empty();
                         for declaration in declarations.into_iter().flatten() {
                             let kind = self.node(declaration)?.kind();
-                            if kind != ts_ast::SyntaxKind::NamespaceExportDeclaration
-                                && !(kind == ts_ast::SyntaxKind::SourceFile
+                            if kind != tsr_ast::SyntaxKind::NamespaceExportDeclaration
+                                && !(kind == tsr_ast::SyntaxKind::SourceFile
                                     && self
                                         .program()?
                                         .bound(declaration)?
@@ -671,7 +671,7 @@ impl CheckerState {
                         }
                         if umd {
                             let name = self.symbol(resolution.symbol)?.name_to_owned();
-                            let diagnostic = self.diagnostic_for_node(Some(location), ts_diagnostics::X_0_refers_to_a_UMD_global_but_the_current_file_is_a_module_Consider_adding_an_import_instead, vec![name])?;
+                            let diagnostic = self.diagnostic_for_node(Some(location), tsr_diagnostics::X_0_refers_to_a_UMD_global_but_the_current_file_is_a_module_Consider_adding_an_import_instead, vec![name])?;
                             let error = !self
                                 .program()?
                                 .host
@@ -706,10 +706,10 @@ impl CheckerState {
                                     if matches!(
                                         self.node(declaration)?.kind().known(),
                                         Some(
-                                            ts_ast::SyntaxKind::ImportSpecifier
-                                                | ts_ast::SyntaxKind::ImportClause
-                                                | ts_ast::SyntaxKind::NamespaceImport
-                                                | ts_ast::SyntaxKind::ImportEqualsDeclaration
+                                            tsr_ast::SyntaxKind::ImportSpecifier
+                                                | tsr_ast::SyntaxKind::ImportClause
+                                                | tsr_ast::SyntaxKind::NamespaceImport
+                                                | tsr_ast::SyntaxKind::ImportEqualsDeclaration
                                         )
                                     ) {
                                         let view = self.ast(declaration)?;
@@ -719,7 +719,7 @@ impl CheckerState {
                                         )? {
                                             self.error_at(
                                                 Some(declaration),
-                                                ts_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled,
+                                                tsr_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled,
                                                 vec![name.clone()],
                                             )?;
                                         }
@@ -752,20 +752,20 @@ impl CheckerState {
                 let exported = matches!(
                     self.node(declaration)?.kind().known(),
                     Some(
-                        ts_ast::SyntaxKind::ExportSpecifier
-                            | ts_ast::SyntaxKind::ExportDeclaration
-                            | ts_ast::SyntaxKind::NamespaceExport
+                        tsr_ast::SyntaxKind::ExportSpecifier
+                            | tsr_ast::SyntaxKind::ExportDeclaration
+                            | tsr_ast::SyntaxKind::NamespaceExport
                     )
                 );
                 let name = self.symbol(resolution.symbol)?.name_to_owned();
-                let primary = self.error_at(Some(location), if exported {ts_diagnostics::X_0_cannot_be_used_as_a_value_because_it_was_exported_using_export_type} else {ts_diagnostics::X_0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type},vec![name.clone()])?;
+                let primary = self.error_at(Some(location), if exported {tsr_diagnostics::X_0_cannot_be_used_as_a_value_because_it_was_exported_using_export_type} else {tsr_diagnostics::X_0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type},vec![name.clone()])?;
                 if let Some(primary) = primary {
                     let related = self.diagnostic_for_node(
                         Some(declaration),
                         if exported {
-                            ts_diagnostics::X_0_was_exported_here
+                            tsr_diagnostics::X_0_was_exported_here
                         } else {
-                            ts_diagnostics::X_0_was_imported_here
+                            tsr_diagnostics::X_0_was_imported_here
                         },
                         vec![name],
                     )?;

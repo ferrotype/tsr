@@ -1,9 +1,9 @@
 //! Declaration-emit module specifiers. The checker supplies lexical module
 //! identity; path ranking uses only the immutable program host's retained data.
 use crate::{CheckerHost, Error, ModuleSpecifierPath};
-use ts_ast::{JsString, NodeId};
-use ts_core::{CompilerOptions, ResolutionMode as Mode};
-use ts_tspath as path;
+use tsr_ast::{JsString, NodeId};
+use tsr_core::{CompilerOptions, ResolutionMode as Mode};
+use tsr_tspath as path;
 
 #[path = "module_specifiers_packages.rs"]
 mod packages;

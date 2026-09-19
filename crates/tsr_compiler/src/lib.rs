@@ -21,7 +21,7 @@ pub use cache::{FileCache, ProgramFile};
 pub use checker_host::ProgramCheckerHost;
 pub use loader::{Error, Program, ProgramOptions, Resolution, TypeResolution};
 pub use resolver_host::ProgramResolverHost;
-pub use ts_ast::SourceFileMetaData;
+pub use tsr_ast::SourceFileMetaData;
 
 #[cfg(test)]
 mod boundary_tests;

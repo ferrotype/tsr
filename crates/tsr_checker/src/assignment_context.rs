@@ -1,8 +1,8 @@
 //! Assignment declarations obtain context only from independent annotations;
 //! asking their inferred left-hand type would reenter the same initializer.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/ast/precedence.go:GetLeftmostExpression
@@ -119,7 +119,7 @@ impl CheckerState {
                             .symbol
                             .map(|symbol| {
                                 self.symbol(symbol).map(|symbol| {
-                                    ts_binder::get_symbol_name_for_private_identifier(
+                                    tsr_binder::get_symbol_name_for_private_identifier(
                                         &symbol,
                                         text.as_bytes(),
                                     )

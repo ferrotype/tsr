@@ -1,8 +1,8 @@
 //! Trivia advancement and lazy comment ranges over source bytes.
 
-use ts_ast::SyntaxKind;
-use ts_core::TextRange;
-use ts_jsstring::wtf8::decode_utf8;
+use tsr_ast::SyntaxKind;
+use tsr_core::TextRange;
+use tsr_jsstring::wtf8::decode_utf8;
 
 use crate::utilities::{decode_last_utf8, is_line_break, is_white_space_like};
 

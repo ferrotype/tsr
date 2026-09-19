@@ -4,7 +4,7 @@ use crate::{
     StorageSymbolRef, StorageView, SymbolId,
 };
 use std::{collections::BTreeMap, marker::PhantomData};
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 /// An owning membership table. Raw imports check owner and published slot in release.
 pub struct StorageScope<N: NodeRecord, S = ()> {
@@ -58,7 +58,7 @@ impl<N: NodeRecord, S> StorageScope<N, S> {
     /// local handles that cannot escape or be used with a different arena.
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, StorageBuilder, Node, StorageScope};
+    /// use tsr_arena::{Counters, StorageBuilder, Node, StorageScope};
     /// let counters = Counters::new();
     /// let mut builder = StorageBuilder::<Node<u32>>::new(std::sync::Arc::from(&b"x"[..]), &counters);
     /// let id = builder.push(Node::new(1, 7));
@@ -68,7 +68,7 @@ impl<N: NodeRecord, S> StorageScope<N, S> {
     /// ```
     ///
     /// ```compile_fail
-    /// use ts_arena::{Counters, StorageBuilder, Node, StorageScope};
+    /// use tsr_arena::{Counters, StorageBuilder, Node, StorageScope};
     /// let counters = Counters::new();
     /// let mut first = StorageBuilder::<Node<u32>>::new(std::sync::Arc::from(&b"x"[..]), &counters);
     /// let mut second = StorageBuilder::<Node<u32>>::new(std::sync::Arc::from(&b"y"[..]), &counters);

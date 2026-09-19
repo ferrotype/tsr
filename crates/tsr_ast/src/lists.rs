@@ -4,8 +4,8 @@ use std::{
     ops::{Deref, Range},
     sync::Arc,
 };
-use ts_arena::{AuxId, Error};
-use ts_core::TextRange;
+use tsr_arena::{AuxId, Error};
+use tsr_core::TextRange;
 
 /// An immutable list identity. The referenced header remains mutable only while
 /// its file or lazy graph is under exclusive construction.
@@ -164,7 +164,7 @@ pub enum AstStorageData {
 /// A semantic list header retains its borrowed owner or lazy publication guard.
 ///
 /// ```compile_fail
-/// use ts_ast::{AstFile, NodeListId, NodeListRead};
+/// use tsr_ast::{AstFile, NodeListId, NodeListRead};
 /// fn escape(file: &AstFile, list: NodeListId) -> NodeListRead<'static> {
 ///     file.view().list(list).unwrap()
 /// }
@@ -195,7 +195,7 @@ impl std::fmt::Debug for NodeListRead<'_> {
 
 pub struct NodeSliceRead<'a> {
     pub(crate) record: Option<AuxRead<'a>>,
-    pub(crate) compact: Option<(&'a crate::compact::lists::EdgePages, ts_arena::ArenaId)>,
+    pub(crate) compact: Option<(&'a crate::compact::lists::EdgePages, tsr_arena::ArenaId)>,
     pub(crate) start: usize,
     pub(crate) len: usize,
 }
@@ -265,7 +265,7 @@ enum NodeSliceIter<'a> {
     Full(std::iter::Copied<std::slice::Iter<'a, Option<NodeId>>>),
     Compact {
         edges: &'a crate::compact::lists::EdgePages,
-        owner: ts_arena::ArenaId,
+        owner: tsr_arena::ArenaId,
         range: std::ops::Range<usize>,
     },
 }
@@ -333,7 +333,7 @@ impl std::iter::FusedIterator for NodeSliceIter<'_> {}
 /// Text references cannot escape the read that holds their lazy backing guard.
 ///
 /// ```compile_fail
-/// use ts_ast::{AstFile, JsString, TextSlice};
+/// use tsr_ast::{AstFile, JsString, TextSlice};
 /// fn escape<'a>(file: &'a AstFile, text: TextSlice) -> &'a [JsString] {
 ///     &file.view().text_slice(text).unwrap()
 /// }

@@ -1,5 +1,5 @@
 [package]
-name = "ts_compiler"
+name = "tsr_compiler"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,12 +7,12 @@ license.workspace = true
 publish.workspace = true
 
 [features]
-relation-probe = ["ts_checker/relation-probe"]
+relation-probe = ["tsr_checker/relation-probe"]
 # S08 P7 measurement executables (`data/s08/checker-workload.json`): the normal
 # timing binary has neither; phase timing adds nested exclusive clocks;
 # allocation adds the counting allocator wrapper.
 s08-phase-timer = []
-s08-allocation = ["ts_checker/storage-pilot"]
+s08-allocation = ["tsr_checker/storage-pilot"]
 
 [[example]]
 name = "p3_relations"
@@ -32,29 +32,29 @@ required-features = ["s08-allocation"]
 
 [dependencies]
 stacker = "=0.1.25"
-ts_core = { version = "0.1.0", path = "../ts_core" }
-ts_tspath = { version = "0.1.0", path = "../ts_tspath" }
-ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
-ts_bundled = { version = "0.1.0", path = "../ts_bundled" }
-ts_tsoptions = { version = "0.1.0", path = "../ts_tsoptions" }
-ts_module = { version = "0.1.0", path = "../ts_module" }
-ts_arena = { version = "0.1.0", path = "../ts_arena" }
-ts_ast = { version = "0.1.0", path = "../ts_ast" }
-ts_parser = { version = "0.1.0", path = "../ts_parser" }
-ts_scanner = { version = "0.1.0", path = "../ts_scanner" }
-ts_binder = { version = "0.1.0", path = "../ts_binder" }
-ts_transformers = { version = "0.1.0", path = "../ts_transformers" }
-ts_printer = { version = "0.1.0", path = "../ts_printer" }
-ts_checker = { version = "0.1.0", path = "../ts_checker" }
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
-ts_diagnostics = { version = "0.1.0", path = "../ts_diagnostics" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+tsr_bundled = { version = "0.1.0", path = "../tsr_bundled" }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_module = { version = "0.1.0", path = "../tsr_module" }
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
+tsr_binder = { version = "0.1.0", path = "../tsr_binder" }
+tsr_transformers = { version = "0.1.0", path = "../tsr_transformers" }
+tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }
-ts_nodebuilder = { version = "0.1.0", path = "../ts_nodebuilder" }
+tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
 serde_json = "1"
 sha2 = "0.10"
 mimalloc = "=0.1.48"

@@ -420,10 +420,10 @@ cached result will remain live after that caller disappears.
 
 ## Code and contract references
 
-Implementation examples: [borrow/retention](../crates/ts_arena/src/refs.rs),
-[brands](../crates/ts_arena/src/scope.rs),
-[publication and reentry](../crates/ts_arena/src/lazy.rs),
-[lazy position maps](../crates/ts_arena/src/file.rs),
+Implementation examples: [borrow/retention](../crates/tsr_arena/src/refs.rs),
+[brands](../crates/tsr_arena/src/scope.rs),
+[publication and reentry](../crates/tsr_arena/src/lazy.rs),
+[lazy position maps](../crates/tsr_arena/src/file.rs),
 [panic comparison](../scripts/s04.py),
 [ownership measurement](../scripts/s04_ownership.py), and
 [metric scope checks](../xtask/src/tests.rs).

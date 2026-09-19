@@ -6,8 +6,8 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, SignatureId, TypeId,
     TypePredicateId, UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getReturnTypeFromBody
@@ -114,7 +114,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkAwaitedType
     fn awaited_body_return_type(&mut self, ty: TypeId, node: NodeId) -> Result<TypeId, Error> {
-        let awaited = self.awaited_type_no_alias_ex(ty, Some(node), Some(ts_diagnostics::The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member), &[])?
+        let awaited = self.awaited_type_no_alias_ex(ty, Some(node), Some(tsr_diagnostics::The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member), &[])?
             .unwrap_or(self.builtins.error_type);
         self.unwrap_awaited_type(awaited)
     }
@@ -142,7 +142,7 @@ impl CheckerState {
                 crate::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
                     | crate::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
             )?;
-            self.error_at(Some(annotation), ts_diagnostics::The_return_type_of_an_async_function_or_method_must_be_the_global_Promise_T_type_Did_you_mean_to_write_Promise_0, vec![text])?;
+            self.error_at(Some(annotation), tsr_diagnostics::The_return_type_of_an_async_function_or_method_must_be_the_global_Promise_T_type_Did_you_mean_to_write_Promise_0, vec![text])?;
             return Ok(());
         }
         self.awaited_body_return_type(returned, function)?;
@@ -159,11 +159,11 @@ impl CheckerState {
         let import =
             crate::external_resolution::is_import_call(self.ast(function)?, &self.node(function)?)?;
         if promise == self.builtins.unknown_type {
-            self.error_at(Some(function), if import { ts_diagnostics::A_dynamic_import_call_returns_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option } else { ts_diagnostics::An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option }, vec![])?;
+            self.error_at(Some(function), if import { tsr_diagnostics::A_dynamic_import_call_returns_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option } else { tsr_diagnostics::An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option }, vec![])?;
             return Ok(self.builtins.error_type);
         }
         if self.global_promise_constructor_symbol(true)?.is_none() {
-            self.error_at(Some(function), if import { ts_diagnostics::A_dynamic_import_call_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option } else { ts_diagnostics::An_async_function_or_method_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option }, vec![])?;
+            self.error_at(Some(function), if import { tsr_diagnostics::A_dynamic_import_call_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option } else { tsr_diagnostics::An_async_function_or_method_in_ES5_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option }, vec![])?;
         }
         Ok(promise)
     }
@@ -448,7 +448,7 @@ impl CheckerState {
             }
         }
         if let Some(call) =
-            ts_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
+            tsr_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
         {
             return self.contextual_expression_type_ex(call, context_flags);
         }
@@ -507,7 +507,7 @@ impl CheckerState {
         let mut current = self.node(node)?.parent();
         while let Some(node) = current {
             let read = self.node(node)?;
-            if ts_ast::utilities::is_function_like(Some(&read)) {
+            if tsr_ast::utilities::is_function_like(Some(&read)) {
                 return Ok(Some(node));
             }
             current = read.parent();

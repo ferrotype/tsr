@@ -1,9 +1,9 @@
 //! Tagged templates resolve ordinary call signatures after inserting the
 //! TemplateStringsArray argument. Substitutions keep their own source nodes.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, SignatureId, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTaggedTemplateExpression
@@ -45,7 +45,7 @@ impl CheckerState {
         &mut self,
         node: NodeId,
     ) -> Result<SignatureId, Error> {
-        let tag = ts_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
+        let tag = tsr_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
             .ok_or(Error::MissingLink("template tag"))?;
         let ty = self.check_expression(tag)?;
         let apparent = self.apparent_type(ty)?;
@@ -150,7 +150,7 @@ impl CheckerState {
             .ok_or(Error::MissingLink("tagged template literal"))?;
         let read = self.node(template)?;
         if read.kind() != K::TemplateExpression {
-            return Ok(ts_ast::utilities_middle::is_unterminated_literal(&read));
+            return Ok(tsr_ast::utilities_middle::is_unterminated_literal(&read));
         }
         let spans = read
             .data_source()
@@ -170,7 +170,7 @@ impl CheckerState {
             .literal()
             .ok_or(Error::MissingLink("template final literal"))?;
         let read = self.node(literal)?;
-        Ok(ts_ast::node_is_missing(Some(&read))
-            || ts_ast::utilities_middle::is_unterminated_literal(&read))
+        Ok(tsr_ast::node_is_missing(Some(&read))
+            || tsr_ast::utilities_middle::is_unterminated_literal(&read))
     }
 }

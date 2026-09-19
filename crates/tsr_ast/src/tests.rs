@@ -1,6 +1,6 @@
 use std::ops::ControlFlow;
 
-use ts_arena::Counters;
+use tsr_arena::Counters;
 
 use crate::*;
 
@@ -40,7 +40,7 @@ impl ChildVisitor for Record {
 
 fn ids() -> (AstBuilder, [NodeId; 4]) {
     let mut builder = AstBuilder::new(
-        ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+        tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]),
         &Counters::default(),
     );
     let ids = std::array::from_fn(|_| builder.new_token(SyntaxKind::Unknown.into()));
@@ -115,7 +115,7 @@ fn optional_schema_kind_is_a_go_scalar_and_flags_keep_all_bits() {
 fn visitor_preserves_list_boundary_order_and_short_circuits() {
     let (mut builder, [left, operator, right, type_node]) = ids();
     let list = builder
-        .new_list(ts_core::TextRange::new(-1, -1), NodeSlice::empty())
+        .new_list(tsr_core::TextRange::new(-1, -1), NodeSlice::empty())
         .unwrap();
     let binary: NodeData = BinaryExpressionData {
         modifiers: Some(list),
@@ -152,7 +152,7 @@ fn visitor_preserves_list_boundary_order_and_short_circuits() {
 fn default_clause_can_have_nil_expression_despite_required_schema_property() {
     let (mut builder, _) = ids();
     let statements = builder
-        .new_list(ts_core::TextRange::new(-1, -1), NodeSlice::empty())
+        .new_list(tsr_core::TextRange::new(-1, -1), NodeSlice::empty())
         .unwrap();
     let node = Node::new(
         SyntaxKind::DefaultClause,
@@ -175,7 +175,7 @@ fn jsdoc_visit_order_is_runtime_dependent_and_mapping_keeps_factory_order() {
     let (mut builder, [tag, name, typ, replacement]) = ids();
     let comments = builder.node_slice(vec![Some(tag)]).unwrap();
     let comment = builder
-        .new_list(ts_core::TextRange::new(-1, -1), comments)
+        .new_list(tsr_core::TextRange::new(-1, -1), comments)
         .unwrap();
     for is_name_first in [false, true] {
         let data: NodeData = JSDocParameterOrPropertyTagData {
@@ -255,7 +255,7 @@ fn mapping_preserves_special_source_file_and_statement_roles() {
         .node_slice(vec![Some(then_statement), Some(else_statement)])
         .unwrap();
     let statements = builder
-        .new_list(ts_core::TextRange::new(-1, -1), edges)
+        .new_list(tsr_core::TextRange::new(-1, -1), edges)
         .unwrap();
     struct Roles(Vec<ChildRole>);
     impl ChildMapper for Roles {

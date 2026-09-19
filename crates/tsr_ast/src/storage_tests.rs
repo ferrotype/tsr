@@ -6,9 +6,9 @@ use std::{
         Arc, Barrier, Mutex,
     },
 };
-use ts_arena::{Counters, Error};
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, Error};
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn builder(counters: &Counters) -> AstBuilder {
     AstBuilder::new(
@@ -202,7 +202,7 @@ fn compact_syntax_backings_span_pages_and_keep_imported_and_lazy_context() {
                 transaction.node_mut(root)?.set_parent(Some(lazy_root));
                 assert!(matches!(
                     transaction.storage.aux(nodes.backing.unwrap())?,
-                    ts_arena::AuxiliaryRead::Lazy(record)
+                    tsr_arena::AuxiliaryRead::Lazy(record)
                         if matches!(&*record, AstStorageData::Nodes(_))
                 ));
                 Ok(vec![root])
@@ -1318,7 +1318,7 @@ fn storage_retained_imported_metadata_is_readable_and_cannot_be_mutated_by_anoth
 fn storage_source_file_hooks_observe_initialized_metadata_and_keep_transaction_authority() {
     struct SourceHooks {
         original: Mutex<Option<NodeId>>,
-        seen: Mutex<Vec<(ts_core::ScriptKind, i64)>>,
+        seen: Mutex<Vec<(tsr_core::ScriptKind, i64)>>,
     }
     impl FactoryHooks for SourceHooks {
         fn on_create(&self, factory: &mut dyn Factory, node: NodeId) {
@@ -1328,17 +1328,17 @@ fn storage_source_file_hooks_observe_initialized_metadata_and_keep_transaction_a
             let state = factory.read_source_file(node).unwrap();
             assert_eq!(state.file_name(), b"/source.ts");
             assert!(state.text().is_empty());
-            assert_eq!(state.script_kind, ts_core::ScriptKind::UNKNOWN);
+            assert_eq!(state.script_kind, tsr_core::ScriptKind::UNKNOWN);
             assert_eq!(state.node_count, 0);
             drop(state);
             let original = *self.original.lock().unwrap();
             if let Some(original) = original {
                 let state = factory.mut_source_file(original).unwrap();
-                state.script_kind = ts_core::ScriptKind::TSX;
+                state.script_kind = tsr_core::ScriptKind::TSX;
                 state.node_count = 999;
             }
             let state = factory.mut_source_file(node).unwrap();
-            state.script_kind = ts_core::ScriptKind::JS;
+            state.script_kind = tsr_core::ScriptKind::JS;
             state.node_count = 23;
             if original.is_none() {
                 *self.original.lock().unwrap() = Some(node);
@@ -1362,13 +1362,13 @@ fn storage_source_file_hooks_observe_initialized_metadata_and_keep_transaction_a
     let cloned = factory.clone_source_file(original);
     assert_eq!(
         &*hooks.seen.lock().unwrap(),
-        &[(ts_core::ScriptKind::TSX, 23)]
+        &[(tsr_core::ScriptKind::TSX, 23)]
     );
     {
         let mut borrowed = BorrowedFactory(&mut factory);
         assert_eq!(
             borrowed.read_source_file(cloned).unwrap().script_kind,
-            ts_core::ScriptKind::TSX
+            tsr_core::ScriptKind::TSX
         );
         borrowed.mut_source_file(cloned).unwrap().node_count = 24;
     }

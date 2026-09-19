@@ -186,7 +186,7 @@ impl CheckerState {
                     // greater than 1M we deem the union type too complex to represent.
                     self.error_at(
                         self.current_node,
-                        ts_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,
+                        tsr_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,
                         vec![],
                     )?;
                     return Ok(None);

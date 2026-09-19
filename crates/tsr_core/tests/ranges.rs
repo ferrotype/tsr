@@ -1,4 +1,4 @@
-use ts_core::TextRange;
+use tsr_core::TextRange;
 
 #[test]
 fn range_positions_narrow_before_length_subtraction() {

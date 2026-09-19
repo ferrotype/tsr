@@ -5,9 +5,9 @@ use crate::{
     object_flags as of, signature_flags as sg, type_flags as tf, CheckerState, Error, SignatureId,
     TypeId, TypeList, TypeSystemEntity, TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     pub(crate) fn class_declaration(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
@@ -337,7 +337,7 @@ impl CheckerState {
             let text = self.type_to_string(reduced, crate::type_display::DEFAULT_FLAGS)?;
             let message = messages::Base_constructor_return_type_0_is_not_an_object_type_or_intersection_of_object_types_with_statically_known_members;
             let diagnostic = if chain.is_some() {
-                ts_ast::Diagnostic::chain(chain, message, vec![text])
+                tsr_ast::Diagnostic::chain(chain, message, vec![text])
             } else {
                 self.diagnostic_for_node(Some(expression), message, vec![text])?
             };

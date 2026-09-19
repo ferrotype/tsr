@@ -3,22 +3,22 @@
 //! entries. Cache hits import published storage before cloning its syntax.
 use super::{class_emit::SymbolIdentity, NodeBuilder};
 use crate::{object_flags as of, type_flags as tf, types::Map, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, AstFile};
-use ts_printer::EmitContext;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, AstFile};
+use tsr_printer::EmitContext;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) struct SerializedKey {
     pub enclosing: Option<NodeId>,
     pub ty: TypeId,
-    pub flags: ts_nodebuilder::Flags,
-    pub internal_flags: ts_nodebuilder::InternalFlags,
+    pub flags: tsr_nodebuilder::Flags,
+    pub internal_flags: tsr_nodebuilder::InternalFlags,
 }
 #[derive(Clone)]
 pub(super) struct TrackedSymbol {
     pub symbol: SymbolId,
     pub enclosing: Option<NodeId>,
-    pub meaning: ts_ast::SymbolFlags,
+    pub meaning: tsr_ast::SymbolFlags,
 }
 #[derive(Clone)]
 pub(super) struct SerializedType {
@@ -37,13 +37,13 @@ struct CachedType {
 pub(super) struct SpecifierKey {
     pub symbol: SymbolId,
     pub file: NodeId,
-    pub mode: ts_core::ResolutionMode,
+    pub mode: tsr_core::ResolutionMode,
 }
 
 #[derive(Default)]
 pub(crate) struct CachedBuilder {
     emit: EmitContext,
-    specifiers: Map<SpecifierKey, ts_ast::JsString>,
+    specifiers: Map<SpecifierKey, tsr_ast::JsString>,
     entries: Map<SerializedKey, CachedType>,
     identifiers: Map<NodeId, Option<SymbolId>>,
     /// Nested diagnostic display shares emit metadata. Sweep only after the
@@ -107,7 +107,7 @@ impl CachedBuilder {
     pub(crate) fn census(
         &self,
         census: &mut crate::census::Census,
-        storage: &mut ts_arena::StorageCensus,
+        storage: &mut tsr_arena::StorageCensus,
     ) {
         census.add(
             "display_cache",
@@ -148,7 +148,7 @@ impl CachedBuilder {
 }
 
 impl<'a> NodeBuilder<'a> {
-    pub(super) fn cached_module_specifier(&self, key: SpecifierKey) -> Option<ts_ast::JsString> {
+    pub(super) fn cached_module_specifier(&self, key: SpecifierKey) -> Option<tsr_ast::JsString> {
         if self.cached {
             self.checker.display_builder.specifiers.get(&key)
         } else {
@@ -160,7 +160,7 @@ impl<'a> NodeBuilder<'a> {
     pub(super) fn cache_module_specifier(
         &mut self,
         key: SpecifierKey,
-        specifier: ts_ast::JsString,
+        specifier: tsr_ast::JsString,
     ) {
         // Keys refer only to the checker-retained program and symbol graph;
         // values own bytes, never syntax from a transient display frame.
@@ -177,9 +177,9 @@ impl<'a> NodeBuilder<'a> {
     // port: tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilder
     pub(crate) fn with_cached(
         checker: &'a mut CheckerState,
-        flags: ts_nodebuilder::Flags,
-        action: impl FnOnce(&mut Self) -> Result<ts_ast::JsString, Error>,
-    ) -> Result<ts_ast::JsString, Error> {
+        flags: tsr_nodebuilder::Flags,
+        action: impl FnOnce(&mut Self) -> Result<tsr_ast::JsString, Error>,
+    ) -> Result<tsr_ast::JsString, Error> {
         let emit = checker.display_builder.emit.clone();
         let mut builder = Self::with_emit(checker, flags, emit);
         builder.cached = true;
@@ -267,7 +267,7 @@ impl<'a> NodeBuilder<'a> {
         }
         self.truncating |= value.truncating;
         self.approximate_length += value.added_length;
-        Ok(ts_ast::deep_clone_node(&mut self.ast, Some(value.node)))
+        Ok(tsr_ast::deep_clone_node(&mut self.ast, Some(value.node)))
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNodeOrCircularityElision
@@ -276,9 +276,9 @@ impl<'a> NodeBuilder<'a> {
             return self.type_node(ty);
         }
         if self.visited.contains(&ty) {
-            if self.flags & ts_nodebuilder::flags::ALLOW_ANONYMOUS_IDENTIFIER == 0 {
+            if self.flags & tsr_nodebuilder::flags::ALLOW_ANONYMOUS_IDENTIFIER == 0 {
                 self.encountered_error = true;
-                self.report(ts_printer::emit_resolver::DeclarationTrackerEvent::CyclicStructure);
+                self.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::CyclicStructure);
             }
             return Ok(self.elided_type());
         }

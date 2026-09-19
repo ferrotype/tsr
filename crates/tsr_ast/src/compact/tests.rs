@@ -1,7 +1,7 @@
 use super::*;
 use crate::{AstBuilder, Factory, FactoryMethods, NodeData, SyntaxKind, TokenData};
-use ts_arena::Counters;
-use ts_core::TextRange;
+use tsr_arena::Counters;
+use tsr_core::TextRange;
 
 #[test]
 fn physical_header_is_24_bytes_and_typed_pages_keep_addresses_during_growth() {
@@ -155,7 +155,7 @@ fn escape_overwrites_clear_only_the_changed_field_for_every_reference_namespace(
     let foreign = AstBuilder::new(SourceText::default(), &counters);
     let nodes = owner.id().arena();
     let auxiliary = owner.view().0.auxiliary_arena();
-    let symbols = ts_arena::SymbolArena::<crate::Symbol>::new(&counters);
+    let symbols = tsr_arena::SymbolArena::<crate::Symbol>::new(&counters);
     let tables = crate::SymbolTables::new(&counters);
     let flows = crate::FlowNodes::new(&counters);
     let mut store = CoreStore::default();

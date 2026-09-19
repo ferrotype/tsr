@@ -1,8 +1,8 @@
 //! Unary expression checks preserve native literal fast paths and error recovery.
 use crate::{type_facts as facts, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.maybeTypeOfKindConsideringBaseConstraint
@@ -59,15 +59,15 @@ impl CheckerState {
             if kind == K::NumericLiteral
                 && matches!(operator.known(), Some(K::PlusToken | K::MinusToken))
             {
-                let n = ts_jsnum::from_string(self.node_text(operand)?.as_bytes()).value();
-                let literal = self.get_number_literal_type(ts_jsnum::Number::new(
+                let n = tsr_jsnum::from_string(self.node_text(operand)?.as_bytes()).value();
+                let literal = self.get_number_literal_type(tsr_jsnum::Number::new(
                     if operator == K::MinusToken { -n } else { n },
                 ))?;
                 return self.get_fresh_type_of_literal_type(literal);
             }
             if kind == K::BigIntLiteral && operator == K::MinusToken {
-                let n = ts_jsnum::PseudoBigInt::new(
-                    &ts_jsnum::parse_pseudo_big_int(self.node_text(operand)?.as_bytes()),
+                let n = tsr_jsnum::PseudoBigInt::new(
+                    &tsr_jsnum::parse_pseudo_big_int(self.node_text(operand)?.as_bytes()),
                     true,
                 );
                 let literal = self.get_big_int_literal_type(n)?;
@@ -77,7 +77,7 @@ impl CheckerState {
                 Some(K::PlusToken | K::MinusToken | K::TildeToken) => {
                     self.check_non_null_type(ty, operand)?;
                     let token = JsString::from_bytes(
-                        ts_scanner::token_to_string(operator.known().expect("unary operator arm"))
+                        tsr_scanner::token_to_string(operator.known().expect("unary operator arm"))
                             .as_bytes(),
                     );
                     if self.maybe_type_with_constraint(ty, tf::ES_SYMBOL_LIKE)? {

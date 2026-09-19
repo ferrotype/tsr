@@ -3,7 +3,7 @@ use crate::{
     glob::{SpecMatcher, Usage},
     ConfigValue, ParsedCommandLine,
 };
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, Default)]
 pub struct ConfigFileSpecs {
@@ -31,7 +31,7 @@ impl ConfigFileSpecs {
         if matcher.matches(file) {
             return true;
         }
-        if !ts_tspath::has_extension(file) {
+        if !tsr_tspath::has_extension(file) {
             let mut trailing = file.to_vec();
             if !trailing.ends_with(b"/") {
                 trailing.push(b'/');
@@ -42,9 +42,9 @@ impl ConfigFileSpecs {
     }
     /// port: tsc/internal/tsoptions/tsconfigparsing.go:configFileSpecs.getMatchedFileSpec
     pub fn matched_file_spec(&self, file: &[u8], cwd: &[u8], case_sensitive: bool) -> &[u8] {
-        let file = ts_tspath::to_path(file, cwd, case_sensitive);
+        let file = tsr_tspath::to_path(file, cwd, case_sensitive);
         for (index, spec) in self.validated_files.iter().enumerate() {
-            if ts_tspath::to_path(spec.as_bytes(), cwd, case_sensitive) == file {
+            if tsr_tspath::to_path(spec.as_bytes(), cwd, case_sensitive) == file {
                 return self.files_before_substitution[index].as_bytes();
             }
         }

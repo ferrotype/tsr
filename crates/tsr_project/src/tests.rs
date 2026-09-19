@@ -1,7 +1,7 @@
 use super::*;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::Barrier;
-use ts_checker::{type_flags, RetainedType};
+use tsr_checker::{type_flags, RetainedType};
 
 thread_local! {
     // Inject callback behavior into the real OnceLock initialization closure.
@@ -73,15 +73,15 @@ fn initializer_panic_retires_generation_and_prevents_retry() {
         panic.downcast_ref::<&str>(),
         Some(&"injected checker initializer panic")
     );
-    assert_eq!(pool.generation().validate(), Err(ts_arena::Error::Retired));
+    assert_eq!(pool.generation().validate(), Err(tsr_arena::Error::Retired));
     assert!(INITIALIZING.with(|active| active.borrow().is_empty()));
     assert!(matches!(
         pool.acquire(CheckerSlot::Query(0)),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     assert!(matches!(
         pool.acquire(CheckerSlot::Api),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     // OnceLock did not publish a partial owner; the reservation also unwound.
     let slots = pool.slots.lock().unwrap();
@@ -119,11 +119,11 @@ fn idle_replacement_retains_the_old_checker_but_rejects_its_types() {
         let operation = replacement.operation().unwrap();
         assert_eq!(
             operation.import_type(&retained),
-            Err(Error::Arena(ts_arena::Error::WrongOwner))
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
         );
         assert_eq!(
             operation.type_flags(old_type),
-            Err(Error::Arena(ts_arena::Error::WrongOwner))
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
         );
     }
     {
@@ -222,7 +222,7 @@ fn panic_retires_shared_snapshots_but_not_a_fresh_pool() {
     for snapshot in [&first, &second] {
         assert_eq!(
             snapshot.project().pool().generation().validate(),
-            Err(ts_arena::Error::Retired)
+            Err(tsr_arena::Error::Retired)
         );
         for slot in [
             CheckerSlot::Diagnostics,
@@ -231,17 +231,17 @@ fn panic_retires_shared_snapshots_but_not_a_fresh_pool() {
         ] {
             assert!(matches!(
                 snapshot.project().pool().acquire(slot),
-                Err(Error::Arena(ts_arena::Error::Retired))
+                Err(Error::Arena(tsr_arena::Error::Retired))
             ));
         }
     }
     assert!(matches!(
         query.resume(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     assert!(matches!(
         retained.owner().operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     let fresh_api = fresh.acquire(CheckerSlot::Api).unwrap();
     assert!(fresh_api.operation().is_ok());
@@ -282,7 +282,7 @@ fn callback_resume_rechecks_retirement_after_permit_release() {
     pool.generation().retire();
     assert!(matches!(
         checker.resume(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     drop(checker);
     drop(pool);

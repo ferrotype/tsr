@@ -1,6 +1,6 @@
 //! Shared type operations used by the production relations and discriminants.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_ast::{check_flags as cf, symbol_flags as sf, JsString, SymbolTable};
+use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString, SymbolTable};
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:Checker.getEffectiveConstraintOfIntersection
@@ -68,7 +68,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getNonMissingTypeOfSymbol
     pub(crate) fn non_missing_symbol_type(
         &mut self,
-        symbol: ts_arena::SymbolId,
+        symbol: tsr_arena::SymbolId,
     ) -> Result<TypeId, Error> {
         let ty = self.get_type_of_symbol(symbol)?;
         self.remove_missing_type(ty, self.symbol(symbol)?.flags() & sf::OPTIONAL != 0)
@@ -91,17 +91,17 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.createSymbolWithType
     pub(crate) fn create_symbol_with_type(
         &mut self,
-        source: ts_arena::SymbolId,
+        source: tsr_arena::SymbolId,
         ty: TypeId,
-    ) -> Result<ts_arena::SymbolId, Error> {
+    ) -> Result<tsr_arena::SymbolId, Error> {
         self.clone_symbol_with_type(source, Some(ty))
     }
 
     pub(crate) fn clone_symbol_with_type(
         &mut self,
-        source: ts_arena::SymbolId,
+        source: tsr_arena::SymbolId,
         ty: Option<TypeId>,
-    ) -> Result<ts_arena::SymbolId, Error> {
+    ) -> Result<tsr_arena::SymbolId, Error> {
         let read = self.symbol(source)?;
         let flags = read.flags();
         let name = read.name_to_owned();

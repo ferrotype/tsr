@@ -2,15 +2,15 @@
 use std::fmt::Write;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Arc, Mutex};
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     clone_node, deep_clone_node, deep_clone_reparse, get_binary_operator_precedence, node_flags,
     AstBuilder, CheckJsDirective, CommentRange, Factory, FactoryHooks, FactoryMethods, JsString,
     NodeId, NodeKind, NodeSlice, NodeVisitor, NodeVisitorHooks, SourceFileParseOptions, SourceHash,
     SyntaxKind,
 };
-use ts_core::{ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 
 #[derive(Debug)]
 pub struct Witness {
@@ -448,7 +448,7 @@ pub fn run(scenario: &str, s: &Sink) {
             let identifier = ident(&mut f, b"x");
             let outer = f.new_computed_property_name(Some(this));
             let before = f.view().subtree_facts(outer);
-            if let ts_ast::NodeData::ComputedPropertyName(data) =
+            if let tsr_ast::NodeData::ComputedPropertyName(data) =
                 f.node_mut(outer).unwrap().data_mut()
             {
                 data.expression = Some(identifier);
@@ -605,7 +605,7 @@ pub fn run(scenario: &str, s: &Sink) {
             let b = f.new_token(SyntaxKind::Unknown.into());
             let c = f.new_token(SyntaxKind::Unknown.into());
             let table =
-                ts_ast::NodeIndexCache::new(vec![None, Some(a), Some(b), Some(a), Some(c), None]);
+                tsr_ast::NodeIndexCache::new(vec![None, Some(a), Some(b), Some(a), Some(c), None]);
             let (outcome, message) = capture(|| {
                 table.get_index(f.view(), None).unwrap();
             });
@@ -616,9 +616,9 @@ pub fn run(scenario: &str, s: &Sink) {
                 message
             };
             emit(s, "nil-query", vec![], vec![], vec![outcome, class]);
-            let ai = ts_ast::runtime_node_id(&f.node(a));
-            let bi = ts_ast::runtime_node_id(&f.node(b));
-            let ci = ts_ast::runtime_node_id(&f.node(c));
+            let ai = tsr_ast::runtime_node_id(&f.node(a));
+            let bi = tsr_ast::runtime_node_id(&f.node(b));
+            let ci = tsr_ast::runtime_node_id(&f.node(c));
             emit(
                 s,
                 "after-sort",
@@ -661,7 +661,7 @@ pub fn run(scenario: &str, s: &Sink) {
             let state = f.view().source_file(sf).unwrap();
             let result = state.node_index_cache(|| {
                 calls.set(calls.get() + 1);
-                ts_ast::NodeIndexCache::new(vec![])
+                tsr_ast::NodeIndexCache::new(vec![])
             });
             emit(
                 s,
@@ -735,7 +735,7 @@ impl FactoryHooks for SourceFileHooks {
             hi: u64::try_from(phase).unwrap(),
             lo: u64::try_from(phase + 1).unwrap(),
         };
-        state.diagnostics = vec![ts_ast::Diagnostic::external(
+        state.diagnostics = vec![tsr_ast::Diagnostic::external(
             None,
             TextRange::default(),
             JsString::from_bytes(b"hook".as_slice()),

@@ -4,8 +4,8 @@ use crate::{
     object_flags as of, type_facts as facts, type_flags as tf, CheckerState, Error, RelationKind,
     TypeId, TypePredicateKind,
 };
-use ts_arena::NodeId;
-use ts_ast::{NodeKind, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{NodeKind, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.narrowTypeByPrivateIdentifierInInExpression
@@ -31,7 +31,7 @@ impl CheckerState {
         let declaration = read
             .value_declaration()
             .ok_or(Error::MissingLink("private property declaration"))?;
-        let target = if ts_ast::utilities::is_static(self.ast(declaration)?, declaration)? {
+        let target = if tsr_ast::utilities::is_static(self.ast(declaration)?, declaration)? {
             self.get_type_of_symbol(class)?
         } else {
             self.get_declared_type_of_symbol(class)?

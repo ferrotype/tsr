@@ -332,7 +332,7 @@ pub struct StorageRead<'a, T> {
 /// physical owner's store; a lazy guard keeps its own published page alive.
 ///
 /// ```compile_fail
-/// use ts_arena::{AuxId, AuxiliaryRead, Node, StorageBuilder};
+/// use tsr_arena::{AuxId, AuxiliaryRead, Node, StorageBuilder};
 /// fn escape(builder: StorageBuilder<Node<()>>, id: AuxId) -> AuxiliaryRead<'static, Node<()>> {
 ///     let owner = builder.finish();
 ///     owner.view().aux(id).unwrap()

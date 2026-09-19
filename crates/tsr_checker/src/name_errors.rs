@@ -1,9 +1,9 @@
 //! Missing names run contextual meaning diagnostics before lexical spelling
 //! suggestions. Resolution side effects are dispatched after the lexical borrow.
 use crate::{type_flags as tf, CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getCannotFindNameDiagnosticForName
     pub(crate) fn cannot_find_name_diagnostic(
@@ -34,7 +34,7 @@ impl CheckerState {
         location: Option<NodeId>,
         name: &[u8],
         property: NodeId,
-        result: Option<ts_arena::SymbolId>,
+        result: Option<tsr_arena::SymbolId>,
     ) -> Result<(), Error> {
         if let Some(location) = location {
             if result.is_none() && self.missing_name_prefix(location, name)? {
@@ -51,7 +51,7 @@ impl CheckerState {
             false
         };
         let property_name =
-            ts_scanner::declaration_name_to_string(self.ast(property)?, property_name)?;
+            tsr_scanner::declaration_name_to_string(self.ast(property)?, property_name)?;
         self.error_at(location,if in_type{d::Type_of_instance_member_variable_0_cannot_reference_identifier_1_declared_in_the_constructor}else{d::Initializer_of_instance_member_variable_0_cannot_reference_identifier_1_declared_in_the_constructor},vec![property_name,JsString::from_bytes(name)])?;
         Ok(())
     }
@@ -59,14 +59,14 @@ impl CheckerState {
     pub(crate) fn check_parameter_initializer_name(
         &mut self,
         location: NodeId,
-        result: ts_arena::SymbolId,
+        result: tsr_arena::SymbolId,
         meaning: u32,
         declaration: NodeId,
     ) -> Result<(), Error> {
         let candidate = self.late_bound_symbol(result)?;
         let candidate = self.get_merged_symbol(candidate);
         let name = self.node(declaration)?.name();
-        let name = ts_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
+        let name = tsr_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
         if Some(candidate) == self.get_symbol_of_declaration(declaration)? {
             self.error_at(
                 Some(location),
@@ -76,7 +76,7 @@ impl CheckerState {
         } else if let Some(value) = self.symbol(candidate)?.value_declaration() {
             if self.node(value)?.pos() > self.node(declaration)?.pos() {
                 let root =
-                    ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
+                    tsr_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
                 let parent = self
                     .ast(root)?
                     .node(root)?
@@ -92,7 +92,7 @@ impl CheckerState {
                     && self.lookup_symbol_resolving(locals, candidate_name.as_bytes(), meaning)?
                         == Some(candidate)
                 {
-                    let reference = ts_scanner::declaration_name_to_string(
+                    let reference = tsr_scanner::declaration_name_to_string(
                         self.ast(location)?,
                         Some(location),
                     )?;
@@ -140,7 +140,7 @@ impl CheckerState {
             if self.node(location)?.kind() == K::Identifier
                 && self.node_text(location)?.as_bytes() == name
             {
-                ts_scanner::declaration_name_to_string(self.ast(location)?, Some(location))?
+                tsr_scanner::declaration_name_to_string(self.ast(location)?, Some(location))?
             } else {
                 JsString::from_bytes(name)
             }
@@ -158,8 +158,8 @@ impl CheckerState {
         if let Some(suggestion) = self.resolve_name_suggestion(location, name, meaning)? {
             let value = self.symbol(suggestion)?.value_declaration();
             let global = if let Some(value) = value {
-                ts_ast::is_ambient_module(self.ast(value)?, value)?
-                    && ts_ast::utilities::is_global_scope_augmentation(&self.node(value)?)
+                tsr_ast::is_ambient_module(self.ast(value)?, value)?
+                    && tsr_ast::utilities::is_global_scope_augmentation(&self.node(value)?)
             } else {
                 false
             };
@@ -219,7 +219,7 @@ impl CheckerState {
             }
             current = read.parent();
         }
-        let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
+        let container = tsr_ast::get_this_container(self.ast(node)?, node, false, false)?;
         let mut location = container;
         while let Some(parent) = self.node(location)?.parent() {
             if matches!(
@@ -247,7 +247,7 @@ impl CheckerState {
                         .ast(location)?
                         .node(location)?
                         .modifier_flags(self.ast(location)?)?
-                        & ts_ast::modifier_flags::STATIC
+                        & tsr_ast::modifier_flags::STATIC
                         == 0
                 {
                     let instance = self.get_declared_type_of_symbol(symbol)?;
@@ -296,13 +296,13 @@ impl CheckerState {
                         read.expression()
                     };
                     if let Some(expression) = expression {
-                        if ts_ast::is_entity_name_expression(self.ast(expression)?, expression)?
+                        if tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)?
                             && self
                                 .resolve_entity_name(expression, sf::INTERFACE, true)?
                                 .is_some()
                         {
                             let text =
-                                ts_scanner::get_text_of_node(self.ast(expression)?, expression)?;
+                                tsr_scanner::get_text_of_node(self.ast(expression)?, expression)?;
                             self.error_at(
                                 Some(node),
                                 d::Cannot_extend_an_interface_0_Did_you_mean_implements,
@@ -428,7 +428,7 @@ impl CheckerState {
                                 let kind = clause
                                     .data_source()
                                     .as_heritage_clause()
-                                    .ok_or(ts_arena::Error::InvalidGraph)?
+                                    .ok_or(tsr_arena::Error::InvalidGraph)?
                                     .token();
                                 let owner = clause
                                     .parent()
@@ -481,22 +481,22 @@ impl CheckerState {
     pub(crate) fn is_unchecked_js_suggestion(
         &mut self,
         node: Option<NodeId>,
-        suggestion: Option<ts_arena::SymbolId>,
+        suggestion: Option<tsr_arena::SymbolId>,
         exclude_classes: bool,
     ) -> Result<bool, Error> {
         let Some(node) = node else {
             return Ok(false);
         };
         let view = self.ast(node)?;
-        let Some(file_id) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+        let Some(file_id) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {
             return Ok(false);
         };
         let file = view.source_file(file_id)?;
-        if self.program()?.host.options().check_js != ts_core::Tristate::UNKNOWN
+        if self.program()?.host.options().check_js != tsr_core::Tristate::UNKNOWN
             || file.check_js_directive.is_some()
             || !matches!(
                 file.script_kind,
-                ts_core::ScriptKind::JS | ts_core::ScriptKind::JSX
+                tsr_core::ScriptKind::JS | tsr_core::ScriptKind::JSX
             )
         {
             return Ok(false);
@@ -507,12 +507,12 @@ impl CheckerState {
         if let Some(suggestion) = suggestion {
             if let Some(first) = self.symbol_declarations(suggestion)?.first().flatten() {
                 declaration_file =
-                    ts_ast::utilities::get_source_file_of_node(self.ast(first)?, Some(first))?;
+                    tsr_ast::utilities::get_source_file_of_node(self.ast(first)?, Some(first))?;
             }
             suggestion_is_class = self.symbol(suggestion)?.flags() & sf::CLASS != 0;
             if let Some(value) = self.symbol(suggestion)?.value_declaration() {
                 let read = self.node(value)?;
-                if ts_ast::utilities::is_class_like(&read) {
+                if tsr_ast::utilities::is_class_like(&read) {
                     suggestion_has_no_extends_or_decorators = !self
                         .class_heritage_nodes(value, K::ExtendsKeyword)?
                         .is_empty()
@@ -522,7 +522,7 @@ impl CheckerState {
         }
         let foreign_global = match declaration_file {
             Some(declaration_file) if declaration_file != file_id => {
-                ts_ast::utilities_middle::is_global_source_file(
+                tsr_ast::utilities_middle::is_global_source_file(
                     self.ast(declaration_file)?,
                     declaration_file,
                 )?
@@ -580,7 +580,7 @@ impl CheckerState {
     fn maybe_mapped_type(
         &mut self,
         node: NodeId,
-        symbol: ts_arena::SymbolId,
+        symbol: tsr_arena::SymbolId,
     ) -> Result<bool, Error> {
         let view = self.ast(node)?;
         let mut current = node;

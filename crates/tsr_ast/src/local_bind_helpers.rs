@@ -5,7 +5,7 @@ impl<'scope> LocalBind<'scope, '_> {
     pub fn get_name_of_declaration(
         &self,
         node: Option<BindNode<'scope>>,
-    ) -> Result<Option<BindNode<'scope>>, ts_arena::Error> {
+    ) -> Result<Option<BindNode<'scope>>, tsr_arena::Error> {
         match crate::declaration_helpers::name(self, node).unwrap_or_else(|never| match never {}) {
             crate::declaration_helpers::Name::Resolved(name) => Ok(name),
             crate::declaration_helpers::Name::Assignment(node) => {
@@ -23,7 +23,7 @@ impl<'scope> LocalBind<'scope, '_> {
     pub fn has_dynamic_name(
         &self,
         node: Option<BindNode<'scope>>,
-    ) -> Result<bool, ts_arena::Error> {
+    ) -> Result<bool, tsr_arena::Error> {
         Ok(self.get_name_of_declaration(node)?.is_some_and(|name| {
             crate::declaration_helpers::dynamic_name(self, name)
                 .unwrap_or_else(|never| match never {})

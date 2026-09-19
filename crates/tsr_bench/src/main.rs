@@ -1,6 +1,6 @@
 //! Native parse-and-bind driver. Inputs and workers are provisioned before the
 //! measured phase; every completed file remains owned through its endpoint.
-#[path = "../../ts_binder/examples/support/graph.rs"]
+#[path = "../../tsr_binder/examples/support/graph.rs"]
 mod binder_graph;
 mod workload_graph;
 use serde::{Deserialize, Serialize};
@@ -13,8 +13,8 @@ use std::{
     thread,
     time::Instant,
 };
-use ts_ast::{CompletedFile, ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_ast::{CompletedFile, ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 
 #[cfg(feature = "allocation")]
 #[global_allocator]
@@ -36,7 +36,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 #[derive(Serialize)]
 struct Report {
@@ -90,15 +90,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!(
             "{}",
             serde_json::json!({
-                "owned_construction_node": std::mem::size_of::<ts_ast::Node>(),
-                "owned_construction_payload": std::mem::size_of::<ts_ast::NodeData>(),
-                "owned_binding_snapshot": std::mem::size_of::<ts_ast::NodeBinding>(),
-                "auxiliary": std::mem::size_of::<ts_ast::AstStorageData>(),
+                "owned_construction_node": std::mem::size_of::<tsr_ast::Node>(),
+                "owned_construction_payload": std::mem::size_of::<tsr_ast::NodeData>(),
+                "owned_binding_snapshot": std::mem::size_of::<tsr_ast::NodeBinding>(),
+                "auxiliary": std::mem::size_of::<tsr_ast::AstStorageData>(),
                 "retained_core_total": "unavailable: use allocator and RSS captures; construction sizes do not describe compact headers and rows",
-                "node_list": std::mem::size_of::<ts_ast::NodeList>(),
-                "symbol": std::mem::size_of::<ts_ast::Symbol>(),
-                "flow_node": std::mem::size_of::<ts_ast::FlowNode>(),
-                "flow_list": std::mem::size_of::<ts_ast::FlowList>(),
+                "node_list": std::mem::size_of::<tsr_ast::NodeList>(),
+                "symbol": std::mem::size_of::<tsr_ast::Symbol>(),
+                "flow_node": std::mem::size_of::<tsr_ast::FlowNode>(),
+                "flow_list": std::mem::size_of::<tsr_ast::FlowList>(),
                 "js_string": std::mem::size_of::<JsString>(),
             })
         );
@@ -116,7 +116,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         local_binding_paths || args.len() == 4 && graph_argument == Some("--binding-paths");
     if args.len() != 3 && !graph_mode && !binding_paths {
         return Err(
-            "usage: ts_bench INPUTS.json WORKERS (1 or 8) [--graphs | --graph-records=INDEX | --binding-paths | --local-binding-paths]"
+            "usage: tsr_bench INPUTS.json WORKERS (1 or 8) [--graphs | --graph-records=INDEX | --binding-paths | --local-binding-paths]"
                 .into(),
         );
     }
@@ -149,7 +149,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect::<io::Result<_>>()?;
@@ -171,7 +171,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let ready = &ready;
             let finished = &finished;
             let release = &release;
-            handles.push(ts_parser::spawn_parser_worker(scope, move || {
+            handles.push(tsr_parser::spawn_parser_worker(scope, move || {
                 let mut retained: Vec<CompletedFile> =
                     Vec::with_capacity(file_count.div_ceil(workers));
                 let mut failure = None;
@@ -182,12 +182,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                         let input = &inputs[index];
-                        let parsed = ts_parser::parse_source_file(
+                        let parsed = tsr_parser::parse_source_file(
                             input.source.clone(),
                             input.script_kind,
                             input.options.clone(),
                         );
-                        ts_binder::bind_parsed_file(parsed).expect("workload binding must complete")
+                        tsr_binder::bind_parsed_file(parsed)
+                            .expect("workload binding must complete")
                     }));
                     match outcome {
                         Ok(file) => retained.push(file),

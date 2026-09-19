@@ -69,7 +69,7 @@ class UtilityTests(unittest.TestCase):
         def invoke(args, root, prefix, *, timeout=300):
             invocations.append(args)
             if args[0]=='cargo':
-                rows=[{'reason':'compiler-artifact','executable':'/'+target,'target':{'name':'ts_ast' if target=='lib' else target,'kind':['lib'] if target=='lib' else ['test']},'profile':{'test':True}} for target in ('lib','utilities_front','utilities_tail','node_accessors')]
+                rows=[{'reason':'compiler-artifact','executable':'/'+target,'target':{'name':'tsr_ast' if target=='lib' else target,'kind':['lib'] if target=='lib' else ['test']},'profile':{'test':True}} for target in ('lib','utilities_front','utilities_tail','node_accessors')]
                 raw=b'\n'.join(json.dumps(row).encode() for row in rows)
             elif '--list' in args:
                 raw=''.join(name+': test\n' for group in data['groups'] if '/'+group['target']==args[0] for name in group['tests']).encode()
@@ -104,7 +104,7 @@ class UtilityTests(unittest.TestCase):
             self.assertEqual(run.call_args.kwargs['timeout'], 300)
 
     def test_timeout_preserves_partial_output_and_cannot_become_success(self):
-        for stdout, stderr in ((b'cargo artifact', b'Compiling ts_checker'), (None, None)):
+        for stdout, stderr in ((b'cargo artifact', b'Compiling tsr_checker'), (None, None)):
             error = subprocess.TimeoutExpired(['cargo', 'test'], 1800, output=stdout, stderr=stderr)
             with self.subTest(stdout=stdout), tempfile.TemporaryDirectory() as temporary, \
                     patch.object(utility.subprocess, 'run', side_effect=error):

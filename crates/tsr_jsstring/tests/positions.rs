@@ -1,9 +1,9 @@
 use std::panic::catch_unwind;
 
-use ts_jsstring::line_map::*;
-use ts_jsstring::lsp::*;
-use ts_jsstring::scanner_positions::*;
-use ts_jsstring::PositionMap;
+use tsr_jsstring::line_map::*;
+use tsr_jsstring::lsp::*;
+use tsr_jsstring::scanner_positions::*;
+use tsr_jsstring::PositionMap;
 
 #[test]
 fn lsp_scans_compare_signed_line_bounds_before_indexing() {

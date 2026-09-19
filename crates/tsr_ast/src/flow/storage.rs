@@ -4,7 +4,7 @@ use super::{FlowData, FlowFlags, FlowId, FlowList, FlowListId, FlowNode};
 use crate::NodeId;
 use std::collections::HashMap;
 use std::ops::{Deref, DerefMut};
-use ts_arena::{ArenaId, Counters, Error, OwnedArena};
+use tsr_arena::{ArenaId, Counters, Error, OwnedArena};
 
 const NONE: u32 = 0;
 const AST: u32 = 1;
@@ -141,7 +141,7 @@ impl FlowNodes {
         let slot = u32::try_from(self.len())
             .ok()
             .and_then(|len| len.checked_add(1))
-            .expect("ts_arena: arena slot space exhausted before reuse");
+            .expect("tsr_arena: arena slot space exhausted before reuse");
         let record = pack_node(slot, value, &mut self.references, &mut self.outlined);
         FlowId(self.records.push(record))
     }
@@ -413,7 +413,7 @@ impl FlowLists {
         let slot = u32::try_from(self.len())
             .ok()
             .and_then(|len| len.checked_add(1))
-            .expect("ts_arena: arena slot space exhausted before reuse");
+            .expect("tsr_arena: arena slot space exhausted before reuse");
         let record = pack_list(slot, value, &mut self.references);
         FlowListId(self.records.push(record))
     }
@@ -551,7 +551,7 @@ mod tests {
     use crate::{
         AstBuilder, FactoryMethods, FlowReduceLabelData, FlowSwitchClauseData, SyntaxKind,
     };
-    use ts_jsstring::SourceText;
+    use tsr_jsstring::SourceText;
 
     #[test]
     fn physical_records_and_narrow_writes_keep_independent_flags_payloads_and_links() {

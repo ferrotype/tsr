@@ -34,7 +34,7 @@ pub use indent::{
 };
 pub use scanner::TextRangeWithKind;
 pub use settings::{EditorSettings, FormatCodeSettings, IndentStyle, SemicolonPreference};
-pub use ts_astnav::Error;
+pub use tsr_astnav::Error;
 pub use util::get_line_start_position_for_position;
 
 /// `debug.Assert(condition)`: upstream panics with this message.
@@ -49,24 +49,24 @@ pub(crate) fn debug_assert(condition: bool) -> Result<(), Error> {
 /// What every formatter entry point works over: the file's view, its
 /// `SourceFile` node and the JSDoc the navigation needs.
 pub struct FormatFile<'a, 'p> {
-    pub view: ts_ast::AstView<'a>,
-    pub source: ts_arena::NodeId,
-    pub jsdoc: &'p mut dyn ts_ast::JsDocProvider,
+    pub view: tsr_ast::AstView<'a>,
+    pub source: tsr_arena::NodeId,
+    pub jsdoc: &'p mut dyn tsr_ast::JsDocProvider,
 }
 
 impl<'a> FormatFile<'a, '_> {
-    pub(crate) fn node(&self, id: ts_arena::NodeId) -> Result<ts_ast::NodeRead<'a>, Error> {
+    pub(crate) fn node(&self, id: tsr_arena::NodeId) -> Result<tsr_ast::NodeRead<'a>, Error> {
         Ok(self.view.node(id)?)
     }
 
-    pub(crate) fn navigator(&mut self) -> ts_astnav::Navigator<'a, '_> {
-        ts_astnav::Navigator::new(self.view, self.source, self.jsdoc)
+    pub(crate) fn navigator(&mut self) -> tsr_astnav::Navigator<'a, '_> {
+        tsr_astnav::Navigator::new(self.view, self.source, self.jsdoc)
     }
 
     /// `scanner.GetECMALineOfPosition`, over the file's cached line map.
     pub(crate) fn line_of(&self, position: i64) -> Result<i64, Error> {
         let file = self.view.source_file(self.source)?;
-        Ok(ts_jsstring::scanner_positions::compute_line_of_position(
+        Ok(tsr_jsstring::scanner_positions::compute_line_of_position(
             file.ecma_line_map(),
             position as isize,
         ) as i64)
@@ -96,8 +96,8 @@ impl<'a> FormatFile<'a, '_> {
     }
 
     /// `scanner.GetTokenPosOfNode(node, file, false)`.
-    pub(crate) fn token_pos(&mut self, node: ts_arena::NodeId) -> Result<i64, Error> {
-        Ok(ts_scanner::get_token_pos_of_node(
+    pub(crate) fn token_pos(&mut self, node: tsr_arena::NodeId) -> Result<i64, Error> {
+        Ok(tsr_scanner::get_token_pos_of_node(
             self.view,
             self.source,
             node,

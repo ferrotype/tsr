@@ -77,13 +77,13 @@ fn state(owner: &proto::BoundChecker) -> Value {
 }
 
 struct Roots {
-    declarations: BTreeMap<String, ts_arena::NodeId>,
+    declarations: BTreeMap<String, tsr_arena::NodeId>,
     types: BTreeMap<String, Rc<proto::TypeCell>>,
 }
 
 fn lookup(
     owner: &proto::BoundChecker,
-    source: ts_arena::NodeId,
+    source: tsr_arena::NodeId,
     actions: &[Value],
 ) -> Result<Roots> {
     let mut roots = Roots {

@@ -1,9 +1,9 @@
 //! Await diagnostics share the promise adoption algorithm with async returns.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
-use ts_core::{ModuleKind as M, ScriptTarget};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_core::{ModuleKind as M, ScriptTarget};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkAwaitExpression
@@ -65,16 +65,16 @@ impl CheckerState {
             )?;
             has_error = true;
         } else if self.node(node)?.flags() & nf::AWAIT_CONTEXT == 0 {
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("await source"))?;
             let file = self.source_file_read(source)?;
             if file.diagnostics().is_empty() {
-                let range = ts_scanner::get_range_of_token_at_position(
+                let range = tsr_scanner::get_range_of_token_at_position(
                     self.ast(source)?,
                     source,
                     i64::from(self.node(node)?.pos()),
                 )?;
-                if ts_ast::is_in_top_level_context(self.ast(node)?, node)? {
+                if tsr_ast::is_in_top_level_context(self.ast(node)?, node)? {
                     let module = self.program()?.host.options().emit_module_kind();
                     let target = self.program()?.host.options().emit_script_target();
                     let file = self.source_file_read(source)?;
@@ -88,7 +88,7 @@ impl CheckerState {
                         } else {
                             d::X_await_using_statements_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module
                         };
-                        self.add_diagnostic(ts_ast::Diagnostic::new(
+                        self.add_diagnostic(tsr_ast::Diagnostic::new(
                             Some(source),
                             range,
                             message,
@@ -109,7 +109,7 @@ impl CheckerState {
                         false
                     };
                     if common_js {
-                        self.add_diagnostic(ts_ast::Diagnostic::new(Some(source),range,d::The_current_file_is_a_CommonJS_module_and_cannot_use_await_at_the_top_level,vec![]))?;
+                        self.add_diagnostic(tsr_ast::Diagnostic::new(Some(source),range,d::The_current_file_is_a_CommonJS_module_and_cannot_use_await_at_the_top_level,vec![]))?;
                         has_error = true;
                     } else if !(node_module
                         || matches!(module, M::ES2022 | M::ESNEXT | M::PRESERVE | M::SYSTEM))
@@ -120,7 +120,7 @@ impl CheckerState {
                         } else {
                             d::Top_level_await_using_statements_are_only_allowed_when_the_module_option_is_set_to_es2022_esnext_system_node16_node18_node20_nodenext_or_preserve_and_the_target_option_is_set_to_es2017_or_higher
                         };
-                        self.add_diagnostic(ts_ast::Diagnostic::new(
+                        self.add_diagnostic(tsr_ast::Diagnostic::new(
                             Some(source),
                             range,
                             message,
@@ -135,7 +135,7 @@ impl CheckerState {
                         d::X_await_using_statements_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules
                     };
                     let mut diagnostic =
-                        ts_ast::Diagnostic::new(Some(source), range, message, vec![]);
+                        tsr_ast::Diagnostic::new(Some(source), range, message, vec![]);
                     has_error = true;
                     if let Some(container) = container {
                         let read = self.node(container)?;

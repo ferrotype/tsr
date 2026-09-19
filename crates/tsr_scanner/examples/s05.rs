@@ -9,10 +9,10 @@ use std::sync::{Arc, Mutex};
 use serde::de::{self, MapAccess, SeqAccess, Visitor};
 use serde::{Deserialize, Deserializer};
 use serde_json::{json, Map, Value};
-use ts_ast::SyntaxKind;
-use ts_core::{LanguageVariant, ScriptTarget};
-use ts_jsnum::Number;
-use ts_scanner::{Checkpoint, DiagnosticArgument, ErrorCallback, Scanner, ScannerDiagnostic};
+use tsr_ast::SyntaxKind;
+use tsr_core::{LanguageVariant, ScriptTarget};
+use tsr_jsnum::Number;
+use tsr_scanner::{Checkpoint, DiagnosticArgument, ErrorCallback, Scanner, ScannerDiagnostic};
 
 const MAX_RECORD: usize = 32 * 1024 * 1024;
 const MAX_SOURCE: usize = 4 * 1024 * 1024;
@@ -297,7 +297,7 @@ impl Request {
             return Err("unclosed checkpoints".into());
         }
         if decode {
-            source = ts_jsstring::SourceText::from_bytes(source)
+            source = tsr_jsstring::SourceText::from_bytes(source)
                 .as_bytes()
                 .to_vec();
         }
@@ -470,9 +470,9 @@ fn execute<'a>(
         "identifier_point" => {
             let ch = integer("point") as i32;
             return json!([
-                ts_scanner::is_identifier_start(ch),
-                ts_scanner::is_identifier_part(ch),
-                ts_scanner::is_identifier_part_ex(ch, LanguageVariant::JSX)
+                tsr_scanner::is_identifier_start(ch),
+                tsr_scanner::is_identifier_part(ch),
+                tsr_scanner::is_identifier_part_ex(ch, LanguageVariant::JSX)
             ]);
         }
         "identifier_block" => {
@@ -484,54 +484,56 @@ fn execute<'a>(
             for i in 0..count {
                 let ch = first + i as i32;
                 let mask = 1 << (i % 8);
-                if ts_scanner::is_identifier_start(ch) {
+                if tsr_scanner::is_identifier_start(ch) {
                     start[i / 8] |= mask;
                 }
-                if ts_scanner::is_identifier_part(ch) {
+                if tsr_scanner::is_identifier_part(ch) {
                     part[i / 8] |= mask;
                 }
-                if ts_scanner::is_identifier_part_ex(ch, LanguageVariant::JSX) {
+                if tsr_scanner::is_identifier_part_ex(ch, LanguageVariant::JSX) {
                     jsx[i / 8] |= mask;
                 }
             }
             return json!({"start_hex":hex(&start),"part_hex":hex(&part),"jsx_hex":hex(&jsx)});
         }
-        "equal_fold" => return json!(ts_scanner::equal_fold(s.text(), raw())),
-        "identifier_token" => return json!(ts_scanner::get_identifier_token(s.text()) as u16),
-        "valid_identifier" => return json!(ts_scanner::is_valid_identifier(s.text())),
+        "equal_fold" => return json!(tsr_scanner::equal_fold(s.text(), raw())),
+        "identifier_token" => return json!(tsr_scanner::get_identifier_token(s.text()) as u16),
+        "valid_identifier" => return json!(tsr_scanner::is_valid_identifier(s.text())),
         "identifier_text" => {
-            return json!(ts_scanner::is_identifier_text(
+            return json!(tsr_scanner::is_identifier_text(
                 s.text(),
                 LanguageVariant(integer("variant") as i32)
             ));
         }
-        "intrinsic_jsx_name" => return json!(ts_scanner::is_intrinsic_jsx_name(s.text())),
-        "string_to_token" => return json!(ts_scanner::string_to_token(s.text()) as u16),
+        "intrinsic_jsx_name" => return json!(tsr_scanner::is_intrinsic_jsx_name(s.text())),
+        "string_to_token" => return json!(tsr_scanner::string_to_token(s.text()) as u16),
         "token_to_string" => {
-            return json!(hex(ts_scanner::token_to_string(
+            return json!(hex(tsr_scanner::token_to_string(
                 SyntaxKind::from_u16(integer("kind") as u16).expect("validated kind")
             )
             .as_bytes()));
         }
         "keyword_suggestions" => {
-            let mut values = ts_scanner::get_viable_keyword_suggestions();
+            let mut values = tsr_scanner::get_viable_keyword_suggestions();
             values.sort_unstable();
             return json!(values
                 .into_iter()
                 .map(|value| hex(value.as_bytes()))
                 .collect::<Vec<_>>());
         }
-        "shebang" => return json!(hex(ts_scanner::get_shebang(s.text()))),
+        "shebang" => return json!(hex(tsr_scanner::get_shebang(s.text()))),
         "normalize_jsdoc" => {
-            return json!(hex(&ts_scanner::normalize_jsdoc_type_source_text(s.text())));
+            return json!(hex(&tsr_scanner::normalize_jsdoc_type_source_text(
+                s.text()
+            )));
         }
         "skip_trivia" => {
-            let options = ts_scanner::SkipTriviaOptions {
+            let options = tsr_scanner::SkipTriviaOptions {
                 stop_after_line_break: flag("stop_after_line_break"),
                 stop_at_comments: flag("stop_at_comments"),
                 in_jsdoc: flag("in_jsdoc"),
             };
-            return json!(ts_scanner::skip_trivia_ex(
+            return json!(tsr_scanner::skip_trivia_ex(
                 s.text(),
                 integer("pos"),
                 flag("options").then_some(&options)
@@ -539,20 +541,20 @@ fn execute<'a>(
         }
         "comment_ranges" => {
             let values: Vec<_> = if flag("trailing") {
-                ts_scanner::get_trailing_comment_ranges(s.text(), integer("pos")).collect()
+                tsr_scanner::get_trailing_comment_ranges(s.text(), integer("pos")).collect()
             } else {
-                ts_scanner::get_leading_comment_ranges(s.text(), integer("pos")).collect()
+                tsr_scanner::get_leading_comment_ranges(s.text(), integer("pos")).collect()
             };
             return Value::Array(values.into_iter().map(|value|json!({"start":value.loc.pos(),"end":value.loc.end(),"kind":value.kind as u16,"trailing_newline":value.has_trailing_new_line})).collect());
         }
-        "number_from_string" => return number(ts_jsnum::from_string(s.text())),
+        "number_from_string" => return number(tsr_jsnum::from_string(s.text())),
         "number_format" => {
             return number(Number::new(f64::from_bits(
                 u64::from_str_radix(action["bits"].as_str().expect("validated bits"), 16)
                     .expect("validated bits"),
             )));
         }
-        "pseudo_bigint" => return json!(hex(&ts_jsnum::parse_pseudo_big_int(s.text()))),
+        "pseudo_bigint" => return json!(hex(&tsr_jsnum::parse_pseudo_big_int(s.text()))),
         _ => unreachable!("validated operation"),
     };
     snapshot(s, kind)

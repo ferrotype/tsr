@@ -1,9 +1,9 @@
 //! Constructor-specific super-call ordering after signature, body and overload
 //! checking. These traversals intentionally exclude nested function bodies.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkConstructorDeclaration
@@ -12,7 +12,7 @@ impl CheckerState {
         let Some(body) = read.body() else {
             return Ok(());
         };
-        if !ts_ast::node_is_present(Some(&self.node(body)?)) {
+        if !tsr_ast::node_is_present(Some(&self.node(body)?)) {
             return Ok(());
         }
         let class = read
@@ -48,7 +48,7 @@ impl CheckerState {
             let members = self.source_list(class, self.node(class)?.member_list())?;
             for member in members {
                 let read = self.node(member)?;
-                if ts_ast::utilities::is_private_identifier_class_element_declaration(
+                if tsr_ast::utilities::is_private_identifier_class_element_declaration(
                     self.ast(member)?,
                     member,
                 )? || read.kind() == K::PropertyDeclaration
@@ -77,7 +77,7 @@ impl CheckerState {
         if !requires_root {
             return Ok(());
         }
-        let parent = ts_ast::utilities::walk_up_parenthesized_expressions(
+        let parent = tsr_ast::utilities::walk_up_parenthesized_expressions(
             self.ast(call)?,
             self.node(call)?.parent(),
         )?;
@@ -152,7 +152,7 @@ impl CheckerState {
             if self.constructor_super_call(node)? {
                 return Ok(Some(node));
             }
-            if ts_ast::utilities::is_function_like(Some(&self.node(node)?)) {
+            if tsr_ast::utilities::is_function_like(Some(&self.node(node)?)) {
                 continue;
             }
             pending.extend(self.source_children(node)?.into_iter().rev());

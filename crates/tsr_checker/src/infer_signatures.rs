@@ -2,7 +2,7 @@ use crate::{
     infer_types::InferenceRun, inference::priority as p, signature_flags as sg, CheckerState,
     Error, SignatureId, TypeId,
 };
-use ts_ast::SyntaxKind as K;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeParametersForMapper
@@ -99,7 +99,7 @@ impl CheckerState {
             arguments.push(self.inferred_type(context, index)?);
         }
         let javascript = match self.signatures.get(contextual)?.declaration {
-            Some(node) => self.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0,
+            Some(node) => self.node(node)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0,
             None => false,
         };
         self.signature_instantiation(signature, &arguments, javascript)

@@ -5,10 +5,10 @@ use crate::{
     OptionKind, TsConfigSourceFile, COMPILER_OPTIONS, ROOT_OPTIONS, TYPE_ACQUISITION_OPTIONS,
 };
 use std::sync::Arc;
-use ts_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_diagnostics::{self as d, Message};
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_diagnostics::{self as d, Message};
+use tsr_jsstring::{JsString, SourceText};
 
 #[derive(Debug)]
 pub struct ConfigText {
@@ -22,7 +22,7 @@ pub fn parse_config_file_text_to_json(
     path: JsString,
     text: SourceText,
 ) -> ConfigText {
-    ts_parser::on_parser_worker(|| {
+    tsr_parser::on_parser_worker(|| {
         let source = Arc::new(TsConfigSourceFile::parse(file_name, path, text));
         let (value, mut diagnostics) = convert_config_file_to_object(&source, None);
         if let Some(first) = source
@@ -118,7 +118,7 @@ pub fn convert_config_file_to_object(
     let root_options = notifier.as_ref().map(|_| &ROOT_DECLARATION);
     if view.node(expression).expect("JSON root expression").kind() != K::ObjectLiteralExpression {
         let source = view.source_file(config.root).expect("JSON source");
-        let name = if ts_tspath::base_name(source.file_name()) == b"jsconfig.json" {
+        let name = if tsr_tspath::base_name(source.file_name()) == b"jsconfig.json" {
             b"jsconfig.json".as_slice()
         } else {
             b"tsconfig.json".as_slice()
@@ -171,7 +171,7 @@ fn convert_value(
         Some(K::NumericLiteral) => {
             return (
                 ConfigValue::Number(
-                    ts_jsnum::from_string(view.node_text(node).expect("JSON number").as_bytes())
+                    tsr_jsnum::from_string(view.node_text(node).expect("JSON number").as_bytes())
                         .value(),
                 ),
                 vec![],
@@ -186,7 +186,7 @@ fn convert_value(
                 if view.node(operand).expect("unary JSON operand").kind() == K::NumericLiteral {
                     return (
                         ConfigValue::Number(
-                            -ts_jsnum::from_string(
+                            -tsr_jsnum::from_string(
                                 view.node_text(operand).expect("JSON number").as_bytes(),
                             )
                             .value(),

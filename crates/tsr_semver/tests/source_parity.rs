@@ -3,7 +3,7 @@
 use std::cmp::Ordering;
 
 use serde_json::Value;
-use ts_semver::{try_parse_version, try_parse_version_range, ParseError, Version, VersionRange};
+use tsr_semver::{try_parse_version, try_parse_version_range, ParseError, Version, VersionRange};
 
 fn requests() -> Vec<Vec<u8>> {
     let rows: Vec<Value> =

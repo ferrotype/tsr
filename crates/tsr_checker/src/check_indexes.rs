@@ -5,8 +5,8 @@ use crate::{
     object_flags as of, type_flags as tf, type_format_flags as ff, CheckerState, Error,
     IndexInfoId, TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{internal_symbol_names as names, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn check_source_index_constraints(
@@ -48,13 +48,13 @@ impl CheckerState {
             None => None,
         };
         if let Some(declaration) = declaration {
-            if ts_ast::utilities::is_class_like(&self.node(declaration)?) {
+            if tsr_ast::utilities::is_class_like(&self.node(declaration)?) {
                 let members =
                     self.source_list(declaration, self.node(declaration)?.member_list())?;
                 for member in members {
                     // Only process instance properties against instance index signatures
                     // and static properties against static index signatures.
-                    if ts_ast::utilities::is_static(self.ast(member)?, member)? != is_static_index
+                    if tsr_ast::utilities::is_static(self.ast(member)?, member)? != is_static_index
                         || self.has_bindable_name(member)?
                     {
                         continue;
@@ -112,7 +112,7 @@ impl CheckerState {
                                 info.key_type,
                                 info.value_type,
                             ])?;
-                            self.error_at(Some(error), ts_diagnostics::X_0_index_type_1_is_not_assignable_to_2_index_type_3, args)?;
+                            self.error_at(Some(error), tsr_diagnostics::X_0_index_type_1_is_not_assignable_to_2_index_type_3, args)?;
                         }
                     }
                 }
@@ -187,14 +187,14 @@ impl CheckerState {
                     ])?);
                     let mut diagnostic = self.diagnostic_for_node(
                         Some(error),
-                        ts_diagnostics::Property_0_of_type_1_is_not_assignable_to_2_index_type_3,
+                        tsr_diagnostics::Property_0_of_type_1_is_not_assignable_to_2_index_type_3,
                         args,
                     )?;
                     if let Some(computed) = computed.filter(|&node| node != error) {
                         diagnostic.related_information.push(std::sync::Arc::new(
                             self.diagnostic_for_node(
                                 Some(computed),
-                                ts_diagnostics::X_0_is_declared_here,
+                                tsr_diagnostics::X_0_is_declared_here,
                                 vec![name],
                             )?,
                         ));
@@ -327,7 +327,7 @@ impl CheckerState {
                     let args = self.index_error_type_names(&[ty])?;
                     self.error_at(
                         Some(node),
-                        ts_diagnostics::Duplicate_index_signature_for_type_0,
+                        tsr_diagnostics::Duplicate_index_signature_for_type_0,
                         args,
                     )?;
                 }
@@ -336,7 +336,10 @@ impl CheckerState {
         Ok(())
     }
 
-    fn index_error_type_names(&mut self, types: &[TypeId]) -> Result<Vec<ts_ast::JsString>, Error> {
+    fn index_error_type_names(
+        &mut self,
+        types: &[TypeId],
+    ) -> Result<Vec<tsr_ast::JsString>, Error> {
         types
             .iter()
             .map(|&ty| {
@@ -350,7 +353,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.hasBindableName
     pub(crate) fn has_bindable_name(&mut self, node: NodeId) -> Result<bool, Error> {
-        if !ts_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
+        if !tsr_ast::has_dynamic_name(self.ast(node)?, Some(node))? {
             return Ok(true);
         }
         match self.late_name(node)? {

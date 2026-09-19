@@ -6,7 +6,7 @@ use crate::{
 impl CheckerState {
     // port: tsc/internal/checker/inference.go:Checker.createEmptyObjectTypeFromStringLiteral
     pub(crate) fn empty_object_from_literal(&mut self, ty: TypeId) -> Result<TypeId, Error> {
-        let mut members = ts_ast::SymbolTable::default();
+        let mut members = tsr_ast::SymbolTable::default();
         for part in self.distributed_types(ty)? {
             if self.types.flags(part)? & tf::STRING_LITERAL == 0 {
                 continue;
@@ -14,7 +14,7 @@ impl CheckerState {
             let crate::LiteralValue::String(name) = self.types.literal(part)?.value.clone() else {
                 return Err(Error::MissingLink("literal property name"));
             };
-            let property = self.new_symbol(ts_ast::symbol_flags::PROPERTY, name.clone())?;
+            let property = self.new_symbol(tsr_ast::symbol_flags::PROPERTY, name.clone())?;
             self.value_symbol_links
                 .get_or_default(property)
                 .resolved_type = Some(self.builtins.any_type);
@@ -59,7 +59,7 @@ impl CheckerState {
                         .ast(node)?
                         .node(node)?
                         .modifier_flags(self.ast(node)?)?
-                        & ts_ast::modifier_flags::CONST
+                        & tsr_ast::modifier_flags::CONST
                         != 0
                     {
                         return Ok(true);

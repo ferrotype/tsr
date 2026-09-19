@@ -1,5 +1,5 @@
 use crate::JsString;
-use ts_core::ResolutionMode;
+use tsr_core::ResolutionMode;
 
 /// Program-supplied file context, separate from immutable syntax storage.
 /// Mirrors the SourceFileMetaData record in tsc/internal/ast/ast.go.

@@ -1,8 +1,8 @@
 use crate::*;
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::{AuxId, Counters, Error};
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::{AuxId, Counters, Error};
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn builder() -> AstBuilder {
     AstBuilder::new(SourceText::default(), &Counters::new())

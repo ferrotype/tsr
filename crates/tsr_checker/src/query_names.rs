@@ -1,7 +1,7 @@
 //! Symbol queries share ordinary expression resolution, including cached access symbols.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{check_flags as cf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString, SyntaxKind as K};
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -13,11 +13,11 @@ impl CheckerState {
     ) -> Result<Option<SymbolId>, Error> {
         let read = self.node(name)?;
         let parent = required(read.parent(), "name query parent")?;
-        if self.node(parent)?.name() == Some(name) && ts_ast::is_declaration(&self.node(parent)?) {
+        if self.node(parent)?.name() == Some(name) && tsr_ast::is_declaration(&self.node(parent)?) {
             return self.get_symbol_of_declaration(parent);
         }
         if self.node(parent)?.kind() == K::ExportAssignment
-            && ts_ast::is_entity_name_expression(self.ast(name)?, name)?
+            && tsr_ast::is_entity_name_expression(self.ast(name)?, name)?
         {
             if let Some(symbol) = self.resolve_entity_name(
                 name,
@@ -38,7 +38,7 @@ impl CheckerState {
             }
             if let Some(import) = self.node(top)?.parent() {
                 if self.node(import)?.kind() == K::ImportEqualsDeclaration {
-                    if self.node(name)?.kind()==K::Identifier && ts_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(self.ast(name)?,name)? {name=required(self.node(name)?.parent(),"import name parent")?;}
+                    if self.node(name)?.kind()==K::Identifier && tsr_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(self.ast(name)?,name)? {name=required(self.node(name)?.parent(),"import name parent")?;}
                     let parent = required(self.node(name)?.parent(), "import name parent")?;
                     let meaning = if self.node(name)?.kind() == K::Identifier
                         || self.node(parent)?.kind() == K::QualifiedName
@@ -61,7 +61,7 @@ impl CheckerState {
                 }
             }
         }
-        while ts_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(
+        while tsr_ast::utilities_middle::is_right_side_of_qualified_name_or_property_access(
             self.ast(name)?,
             name,
         )? {
@@ -112,7 +112,7 @@ impl CheckerState {
                 {
                     meaning |= sf::VALUE;
                 }
-                if ts_ast::is_entity_name_expression(self.ast(name)?, name)? {
+                if tsr_ast::is_entity_name_expression(self.ast(name)?, name)? {
                     if let Some(symbol) =
                         self.resolve_entity_name(name, meaning | sf::ALIAS, true)?
                     {
@@ -123,11 +123,11 @@ impl CheckerState {
         }
         if self.expression_node(name)? {
             let read = self.node(name)?;
-            if ts_ast::node_is_missing(Some(&read)) {
+            if tsr_ast::node_is_missing(Some(&read)) {
                 return Ok(None);
             }
             let jsdoc =
-                ts_ast::utilities_tail::is_js_doc_name_reference_context(self.ast(name)?, name)?;
+                tsr_ast::utilities_tail::is_js_doc_name_reference_context(self.ast(name)?, name)?;
             match read.kind().known() {
                 Some(K::Identifier) => {
                     if jsdoc {
@@ -250,7 +250,7 @@ impl CheckerState {
         }
         let symbol = self.new_symbol_ex(
             sf::PROPERTY,
-            JsString::from_bytes(ts_ast::internal_symbol_names::INDEX),
+            JsString::from_bytes(tsr_ast::internal_symbol_names::INDEX),
             cf::INDEX_SYMBOL,
         )?;
         let value_declaration = declarations[0];
@@ -272,7 +272,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_qualified_name()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 (required(data.right(), "unresolved right")?, data.left())
             }
             Some(K::PropertyAccessExpression) => {

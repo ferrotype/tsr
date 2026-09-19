@@ -3,8 +3,8 @@
 //! by the checker and are resolved in the pinned checker's order.
 
 use crate::{object_flags as of, type_flags as tf, AliasId, CheckerState, Error, MapperId, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{check_flags as cf, symbol_flags as sf, JsString, SymbolTable, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString, SymbolTable, SyntaxKind as K};
 
 pub(crate) const INCLUDE_READONLY: u32 = 1;
 pub(crate) const EXCLUDE_READONLY: u32 = 2;
@@ -850,13 +850,13 @@ impl CheckerState {
             let node_id = node;
             let node = view.node(node)?;
             if read.flags() & sf::PROPERTY != 0
-                && node.modifier_flags(view)? & ts_ast::modifier_flags::READONLY != 0
+                && node.modifier_flags(view)? & tsr_ast::modifier_flags::READONLY != 0
             {
                 return Ok(true);
             }
             if read.flags() & sf::VARIABLE != 0
-                && ts_ast::utilities::get_combined_node_flags(view, node_id)?
-                    & ts_ast::node_flags::CONSTANT
+                && tsr_ast::utilities::get_combined_node_flags(view, node_id)?
+                    & tsr_ast::node_flags::CONSTANT
                     != 0
             {
                 return Ok(true);
@@ -936,7 +936,7 @@ impl CheckerState {
             let mapped = self.type_to_string(mapped, crate::type_display::DEFAULT_FLAGS)?;
             self.error_at(
                 self.current_node,
-                ts_diagnostics::Type_of_property_0_circularly_references_itself_in_mapped_type_1,
+                tsr_diagnostics::Type_of_property_0_circularly_references_itself_in_mapped_type_1,
                 vec![name, mapped],
             )?;
         }
@@ -1033,7 +1033,7 @@ impl CheckerState {
         if let Some(&member) = self.source_list(node, data.members())?.first() {
             self.error_at(
                 Some(member),
-                ts_diagnostics::A_mapped_type_may_not_declare_properties_or_methods,
+                tsr_diagnostics::A_mapped_type_may_not_declare_properties_or_methods,
                 vec![],
             )?;
         }
@@ -1045,7 +1045,7 @@ impl CheckerState {
             if options.strict_option_value(options.no_implicit_any) {
                 self.error_at(
                     Some(node),
-                    ts_diagnostics::Mapped_object_type_implicitly_has_an_any_template_type,
+                    tsr_diagnostics::Mapped_object_type_implicitly_has_an_any_template_type,
                     vec![],
                 )?;
             }

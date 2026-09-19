@@ -1,10 +1,10 @@
 use crate::ConfigValue;
-use ts_core::CompilerOptions;
-use ts_jsstring::JsString;
+use tsr_core::CompilerOptions;
+use tsr_jsstring::JsString;
 const TEMPLATE: &[u8] = b"${configDir}";
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:startsWithConfigDirTemplate
 pub fn starts_with_config_dir(value: &[u8]) -> bool {
-    ts_jsstring::helpers::to_lower_go(value).starts_with(b"${configdir}")
+    tsr_jsstring::helpers::to_lower_go(value).starts_with(b"${configdir}")
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:getSubstitutedPathWithConfigDirTemplate
 pub fn substitute_path(value: &[u8], base: &[u8]) -> JsString {
@@ -16,7 +16,7 @@ pub fn substitute_path(value: &[u8], base: &[u8]) -> JsString {
     {
         result.splice(index..index + TEMPLATE.len(), b"./".iter().copied());
     }
-    JsString::from_bytes(ts_tspath::absolute(&result, base))
+    JsString::from_bytes(tsr_tspath::absolute(&result, base))
 }
 pub fn substitute_strings(values: &mut [JsString], base: &[u8]) {
     for value in values {
@@ -64,9 +64,9 @@ pub(crate) fn inherited_specs(
     let ConfigValue::Array(Some(values)) = value else {
         return value.clone();
     };
-    let relative = ts_tspath::relative_from_directory(
+    let relative = tsr_tspath::relative_from_directory(
         base,
-        &ts_tspath::directory(extended),
+        &tsr_tspath::directory(extended),
         b"",
         case_sensitive,
     );
@@ -78,11 +78,11 @@ pub(crate) fn inherited_specs(
                     return value.clone();
                 };
                 if starts_with_config_dir(value.as_bytes())
-                    || ts_tspath::encoded_root_length(value.as_bytes()) > 0
+                    || tsr_tspath::encoded_root_length(value.as_bytes()) > 0
                 {
                     ConfigValue::String(value.clone())
                 } else {
-                    ConfigValue::String(JsString::from_bytes(ts_tspath::combine(
+                    ConfigValue::String(JsString::from_bytes(tsr_tspath::combine(
                         &relative,
                         &[value.as_bytes()],
                     )))

@@ -2,13 +2,13 @@ use super::{
     diagnostics::{diagnostic_for_node, isolated_declaration_error},
     transform::Transformer,
 };
-use ts_ast::{NodeId, SymbolId, SyntaxKind as K};
-use ts_printer::emit_resolver::DeclarationEmitResolver;
+use tsr_ast::{NodeId, SymbolId, SyntaxKind as K};
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     fn source_of(&self, node: NodeId) -> Result<NodeId, R::Error> {
         Ok(
-            ts_ast::utilities::get_source_file_of_node(self.resolver.ast(node)?, Some(node))?
-                .ok_or(ts_arena::Error::InvalidGraph)?,
+            tsr_ast::utilities::get_source_file_of_node(self.resolver.ast(node)?, Some(node))?
+                .ok_or(tsr_arena::Error::InvalidGraph)?,
         )
     }
     // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.ReportInferenceFallback
@@ -39,7 +39,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.isBoundExpando
     fn bound_expando(&mut self, node: NodeId) -> Result<bool, R::Error> {
         if self.node(node).kind() != K::BinaryExpression
-            || !ts_ast::utilities_tail::is_expando_property_declaration(Some(&self.node(node)))
+            || !tsr_ast::utilities_tail::is_expando_property_declaration(Some(&self.node(node)))
         {
             return Ok(false);
         }
@@ -64,7 +64,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         for property in self.resolver.properties_of_container_function(node)? {
             if let Some(declaration) = self.resolver.symbol_value_declaration(property)? {
                 let view = self.resolver.ast(declaration)?;
-                if ts_ast::utilities_tail::is_expando_property_declaration(Some(
+                if tsr_ast::utilities_tail::is_expando_property_declaration(Some(
                     &view.node(declaration)?,
                 )) {
                     let target = if view.node(declaration)?.kind() == K::BinaryExpression {
@@ -72,11 +72,11 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                             .as_binary_expression()
                             .unwrap()
                             .left()
-                            .ok_or(ts_arena::Error::InvalidGraph)?
+                            .ok_or(tsr_arena::Error::InvalidGraph)?
                     } else {
                         declaration
                     };
-                    self.diagnostic(target, ts_diagnostics::Assigning_properties_to_functions_without_declaring_them_is_not_supported_with_isolatedDeclarations_Add_an_explicit_declaration_for_the_properties_assigned_to_this_function, vec![])?;
+                    self.diagnostic(target, tsr_diagnostics::Assigning_properties_to_functions_without_declaring_them_is_not_supported_with_isolatedDeclarations_Add_an_explicit_declaration_for_the_properties_assigned_to_this_function, vec![])?;
                 }
             }
         }
@@ -101,8 +101,8 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 if self.source_of(declaration)? == containing {
                     continue;
                 }
-                let mut diagnostic = diagnostic_for_node(self.resolver.ast(declaration)?, Some(declaration), ts_diagnostics::Declaration_augments_declaration_in_another_file_This_cannot_be_serialized, vec![])?;
-                let related = diagnostic_for_node(self.resolver.ast(primary)?, Some(primary), ts_diagnostics::This_is_the_declaration_being_augmented_Consider_moving_the_augmenting_declaration_into_the_same_file, vec![])?;
+                let mut diagnostic = diagnostic_for_node(self.resolver.ast(declaration)?, Some(declaration), tsr_diagnostics::Declaration_augments_declaration_in_another_file_This_cannot_be_serialized, vec![])?;
+                let related = diagnostic_for_node(self.resolver.ast(primary)?, Some(primary), tsr_diagnostics::This_is_the_declaration_being_augmented_Consider_moving_the_augmenting_declaration_into_the_same_file, vec![])?;
                 diagnostic
                     .related_information
                     .push(std::sync::Arc::new(related));

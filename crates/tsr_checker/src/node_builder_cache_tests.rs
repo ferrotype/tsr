@@ -1,10 +1,10 @@
 //! Cache roots, request-frame rotation and metadata retention across display calls.
 use super::{NodeBuilder, SerializedKey};
 use crate::{CheckerOptions, CheckerState, Error};
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_ast::{AstBuilder, AstFile, FactoryMethods, JsString, NodeId, SyntaxKind as K};
-use ts_jsstring::SourceText;
-use ts_printer::{emit_flags, EmitTextWriter, Printer, PrinterOptions, TextWriter};
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_ast::{AstBuilder, AstFile, FactoryMethods, JsString, NodeId, SyntaxKind as K};
+use tsr_jsstring::SourceText;
+use tsr_printer::{emit_flags, EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 fn state(counters: &Counters) -> CheckerState {
     let identity = CheckerIdentity::new(Generation::new(counters), counters);
@@ -63,7 +63,7 @@ fn cached_object_survives_rotation_without_retaining_repeat_output() {
         let scope = scope(&counters);
         let property = checker
             .new_symbol(
-                ts_ast::symbol_flags::PROPERTY,
+                tsr_ast::symbol_flags::PROPERTY,
                 JsString::from_bytes(b"a".as_slice()),
             )
             .unwrap();
@@ -73,7 +73,7 @@ fn cached_object_survives_rotation_without_retaining_repeat_output() {
             .resolved_type = Some(checker.builtins.number_type);
         let object_symbol = checker
             .new_symbol(
-                ts_ast::symbol_flags::TYPE_LITERAL,
+                tsr_ast::symbol_flags::TYPE_LITERAL,
                 JsString::from_bytes(b"__type".as_slice()),
             )
             .unwrap();
@@ -180,7 +180,7 @@ fn cache_hits_restore_length_symbols_and_generated_identifier_metadata() {
     let ty = checker.builtins.string_type;
     let symbol = checker
         .new_symbol(
-            ts_ast::symbol_flags::TYPE_ALIAS,
+            tsr_ast::symbol_flags::TYPE_ALIAS,
             JsString::from_bytes(b"X".as_slice()),
         )
         .unwrap();
@@ -199,13 +199,13 @@ fn cache_hits_restore_length_symbols_and_generated_identifier_metadata() {
                     first.is_none(),
                     "a completed cache entry must bypass transformation"
                 );
-                builder.track_symbol(symbol, ts_ast::symbol_flags::TYPE)?;
+                builder.track_symbol(symbol, tsr_ast::symbol_flags::TYPE)?;
                 builder.approximate_length += 17;
                 builder.truncating = true;
                 let name = builder.emit.new_generated_name_for_node_ex(
                     &mut builder.ast,
                     scope.root().unwrap(),
-                    ts_printer::AutoGenerateOptions::default(),
+                    tsr_printer::AutoGenerateOptions::default(),
                 );
                 builder.id_to_symbol.insert(name, Some(symbol));
                 builder
@@ -275,7 +275,7 @@ fn nested_error_and_diagnostic_frames_do_not_publish_or_sweep_outer_metadata() {
         assert_eq!(outer.emit.emit_flags(root), emit_flags::NO_ASCII_ESCAPING);
         assert_eq!(outer.checker.display_builder.active, 1);
         outer.visit_transform_type(ty, |outer, _| {
-            outer.report(ts_printer::emit_resolver::DeclarationTrackerEvent::CyclicStructure);
+            outer.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::CyclicStructure);
             Ok(root)
         })?;
         assert!(outer.serialized.is_empty());

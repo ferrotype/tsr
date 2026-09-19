@@ -6,14 +6,14 @@
 
 use crate::{CheckerState, Error};
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, symbol_flags as sf, Diagnostic, SymbolFlags,
     SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_diagnostics as d;
-use ts_jsstring::JsString;
+use tsr_core::TextRange;
+use tsr_diagnostics as d;
+use tsr_jsstring::JsString;
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
@@ -33,7 +33,7 @@ impl CheckerState {
         node: NodeId,
     ) -> Result<(), Error> {
         let file = required(
-            ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
+            tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
             "unused identifier source file",
         )?;
         self.query
@@ -157,7 +157,7 @@ impl CheckerState {
         if self.unused_is_error(kind)? {
             self.add_diagnostic(diagnostic)?;
         } else {
-            diagnostic.category = ts_diagnostics::Category::Suggestion as i32;
+            diagnostic.category = tsr_diagnostics::Category::Suggestion as i32;
             self.add_suggestion_diagnostic(diagnostic)?;
         }
         Ok(())
@@ -217,7 +217,7 @@ impl CheckerState {
                             continue;
                         };
                         if !self.is_referenced(symbol)
-                            && ts_ast::utilities::has_syntactic_modifier(
+                            && tsr_ast::utilities::has_syntactic_modifier(
                                 self.ast(parameter)?,
                                 parameter,
                                 mf::PRIVATE,
@@ -256,7 +256,7 @@ impl CheckerState {
         let read = self.symbol(symbol)?;
         if let Some(declaration) = read.value_declaration() {
             let view = self.ast(declaration)?;
-            if ts_ast::utilities::is_private_identifier_class_element_declaration(
+            if tsr_ast::utilities::is_private_identifier_class_element_declaration(
                 view,
                 declaration,
             )? {
@@ -304,7 +304,7 @@ impl CheckerState {
                 let kind = view.node(declaration)?.kind();
                 match kind.known() {
                     Some(K::VariableDeclaration | K::Parameter | K::BindingElement) => {
-                        let root = ts_ast::utilities::get_root_declaration(view, declaration)?;
+                        let root = tsr_ast::utilities::get_root_declaration(view, declaration)?;
                         let parent =
                             required(view.node(root)?.parent(), "root declaration parent")?;
                         if !variable_parents.contains(&parent) {
@@ -326,7 +326,7 @@ impl CheckerState {
                     }
                     _ => {
                         if kind != K::TypeParameter
-                            && !ts_ast::is_ambient_module(view, declaration)?
+                            && !tsr_ast::is_ambient_module(view, declaration)?
                         {
                             self.report_unused_local(declaration, name.clone())?;
                         }
@@ -364,7 +364,7 @@ impl CheckerState {
         let list = read
             .data_source()
             .as_variable_declaration_list()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .declarations();
         self.source_list(node, list)
     }
@@ -414,7 +414,7 @@ impl CheckerState {
                 continue;
             };
             let parent = required(read.parent(), "declaration parent")?;
-            if ts_ast::utilities::is_parameter_property_declaration(view, declaration, parent)?
+            if tsr_ast::utilities::is_parameter_property_declaration(view, declaration, parent)?
                 || self.is_this_parameter(declaration)?
             {
                 continue;
@@ -492,7 +492,7 @@ impl CheckerState {
         let grandparent = view.node(parent)?.parent();
         let for_in_or_of = grandparent
             .map(|g| {
-                Ok::<_, Error>(ts_ast::utilities::is_for_in_or_of_statement(Some(
+                Ok::<_, Error>(tsr_ast::utilities::is_for_in_or_of_statement(Some(
                     &view.node(g)?,
                 )))
             })
@@ -501,7 +501,7 @@ impl CheckerState {
         let candidate = read.kind() == K::Parameter
             || read.kind() == K::VariableDeclaration
                 && (for_in_or_of
-                    || ts_ast::utilities::get_combined_node_flags(view, node)? & nf::USING != 0)
+                    || tsr_ast::utilities::get_combined_node_flags(view, node)? & nf::USING != 0)
             || read.kind() == K::BindingElement
                 && !(parent_kind == K::ObjectBindingPattern && read.property_name().is_none());
         if candidate && self.is_identifier_that_starts_with_underscore(Some(name))? {
@@ -518,7 +518,7 @@ impl CheckerState {
         let named_bindings = read
             .data_source()
             .as_import_clause()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .named_bindings();
         if let Some(bindings) = named_bindings {
             let bindings_read = view.node(bindings)?;
@@ -624,7 +624,7 @@ impl CheckerState {
         }
         if all_unreferenced {
             let file = required(
-                ts_ast::utilities::get_source_file_of_node(view, Some(node))?,
+                tsr_ast::utilities::get_source_file_of_node(view, Some(node))?,
                 "type parameter source file",
             )?;
             let loc = self.range_of_type_parameters(file, view.list(list)?.loc())?;
@@ -652,7 +652,7 @@ impl CheckerState {
     fn range_of_type_parameters(&self, file: NodeId, list: TextRange) -> Result<TextRange, Error> {
         let view = self.ast(file)?;
         let text = view.source().as_bytes();
-        let end = ts_scanner::skip_trivia(text, list.end()) + 1;
+        let end = tsr_scanner::skip_trivia(text, list.end()) + 1;
         Ok(TextRange::new(list.pos() - 1, end.min(text.len() as i64)))
     }
 
@@ -661,7 +661,7 @@ impl CheckerState {
         let declarations = self.symbol_declarations(symbol)?.to_vec();
         let mut file = None;
         for declaration in declarations.into_iter().flatten() {
-            let current = ts_ast::utilities::get_source_file_of_node(
+            let current = tsr_ast::utilities::get_source_file_of_node(
                 self.ast(declaration)?,
                 Some(declaration),
             )?;
@@ -696,10 +696,10 @@ impl CheckerState {
             }
             let view = self.ast(node)?;
             let wrapping = required(
-                ts_ast::utilities::walk_up_binding_elements_and_patterns(view, node)?,
+                tsr_ast::utilities::walk_up_binding_elements_and_patterns(view, node)?,
                 "renamed binding wrapper",
             )?;
-            if !ts_ast::utilities::is_part_of_parameter_declaration(view, wrapping)? {
+            if !tsr_ast::utilities::is_part_of_parameter_declaration(view, wrapping)? {
                 return Err(Error::MissingLink(
                     "Only parameter declaration should be checked here",
                 ));
@@ -711,20 +711,20 @@ impl CheckerState {
                 name,
                 d::X_0_is_an_unused_renaming_of_1_Did_you_intend_to_use_it_as_a_type_annotation,
                 vec![
-                    ts_scanner::declaration_name_to_string(view, name)?,
-                    ts_scanner::declaration_name_to_string(view, property_name)?,
+                    tsr_scanner::declaration_name_to_string(view, name)?,
+                    tsr_scanner::declaration_name_to_string(view, property_name)?,
                 ],
             )?;
             let wrapping_read = view.node(wrapping)?;
             if wrapping_read.type_node().is_none() {
                 // entire parameter does not have type annotation, suggest adding an annotation
-                let file = ts_ast::utilities::get_source_file_of_node(view, Some(wrapping))?;
+                let file = tsr_ast::utilities::get_source_file_of_node(view, Some(wrapping))?;
                 let end = wrapping_read.end();
                 diagnostic.related_information.push(Arc::new(Diagnostic::new(
                     file,
                     TextRange::new(i64::from(end), i64::from(end)),
                     d::We_can_only_write_a_type_for_0_by_adding_a_type_for_the_entire_parameter_here,
-                    vec![ts_scanner::declaration_name_to_string(view, property_name)?],
+                    vec![tsr_scanner::declaration_name_to_string(view, property_name)?],
                 )));
             }
             self.add_diagnostic(diagnostic)?;

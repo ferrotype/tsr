@@ -15,7 +15,7 @@ fn original_config_diagnostics_reach_the_baseline_executor() {
     for (request, expected) in requests.iter().zip(expected) {
         let actual = executor::observe(
             request,
-            &mut ts_compiler::FileCache::new(),
+            &mut tsr_compiler::FileCache::new(),
             &mut executor::NoHooks,
             |_, _, _, _, _| panic!("diagnostic-only request must not run a baseline walker"),
         );
@@ -53,15 +53,15 @@ fn inherited_config_diagnostics_keep_their_source_during_formatting() {
     request["error_baseline_requested"] = true.into();
     let result = executor::observe(
         &request,
-        &mut ts_compiler::FileCache::new(),
+        &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |program, _, _, diagnostics, _| {
             let sorted = program
                 .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
                 .unwrap();
-            let mut writer = ts_compiler::diagnostic_writer::DiagnosticWriter::new(
+            let mut writer = tsr_compiler::diagnostic_writer::DiagnosticWriter::new(
                 program,
-                ts_compiler::diagnostic_writer::FormattingOptions::default(),
+                tsr_compiler::diagnostic_writer::FormattingOptions::default(),
             );
             assert_eq!(sorted.len(), 8);
             for diagnostic in &sorted {
@@ -95,7 +95,7 @@ fn config_include_specs_reach_program_diagnostics() {
     .unwrap();
     let result = executor::observe(
         &request,
-        &mut ts_compiler::FileCache::new(),
+        &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |program, _, _, diagnostics, _| {
             let sorted = program
@@ -122,7 +122,7 @@ fn original_config_text_is_not_decoded_as_a_filesystem_read() {
     request["error_inputs"][0]["content_hex"] = executor::diagnostics::hex(text).into();
     let result = executor::observe(
         &request,
-        &mut ts_compiler::FileCache::new(),
+        &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |program, _, _, _, _| {
             let config = program.config().config_file.as_ref().unwrap();
@@ -155,7 +155,7 @@ fn missing_original_config_is_an_explicit_capture_failure() {
     request["error_inputs"].as_array_mut().unwrap().remove(0);
     let result = executor::observe(
         &request,
-        &mut ts_compiler::FileCache::new(),
+        &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
         |_, _, _, _, _| panic!("config failure must stop loading"),
     );

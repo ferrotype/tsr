@@ -2,9 +2,9 @@
 //! checker-owned fake blocks expose the native parameter/type-parameter locals.
 use super::{names::NameAccess, NodeBuilder};
 use crate::{Error, MapperId, SignatureId, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{FactoryMethods, JsString, SymbolTable, SymbolTableId, SyntaxKind as K};
-use ts_nodebuilder::flags as nf;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{FactoryMethods, JsString, SymbolTable, SymbolTableId, SyntaxKind as K};
+use tsr_nodebuilder::flags as nf;
 
 #[derive(Default)]
 pub(super) struct TypeParameterNames {
@@ -219,7 +219,7 @@ impl NodeBuilder<'_> {
                     return Ok(());
                 }
                 if read.kind() != K::BindingElement {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 }
                 if let Some(name) = read.name() {
                     if matches!(
@@ -281,12 +281,12 @@ impl NodeBuilder<'_> {
                 let shadow = match self.checker.resolve_name(
                     self.enclosing,
                     name.as_bytes(),
-                    ts_ast::symbol_flags::TYPE,
+                    tsr_ast::symbol_flags::TYPE,
                     None,
                     false,
                 )? {
                     Some(found) => {
-                        self.checker.symbol(found)?.flags() & ts_ast::symbol_flags::TYPE_PARAMETER
+                        self.checker.symbol(found)?.flags() & tsr_ast::symbol_flags::TYPE_PARAMETER
                             != 0
                             && Some(found) != symbol
                     }

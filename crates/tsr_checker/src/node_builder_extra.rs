@@ -248,7 +248,7 @@ impl NodeBuilder<'_> {
         self.flags &= !nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME;
         let result = (|| {
             let modifier_flags = self.checker.type_parameter_modifiers(ty)?;
-            let modifiers = ts_ast::utilities_middle::create_modifiers_from_modifier_flags(
+            let modifiers = tsr_ast::utilities_middle::create_modifiers_from_modifier_flags(
                 modifier_flags,
                 |kind| Some(self.ast.new_modifier(kind)),
             )
@@ -365,7 +365,7 @@ impl NodeBuilder<'_> {
             for &parameter in expanded {
                 if Some(&parameter) != expanded.last()
                     && self.checker.symbol(parameter)?.check_flags()
-                        & ts_ast::check_flags::REST_PARAMETER
+                        & tsr_ast::check_flags::REST_PARAMETER
                         != 0
                 {
                     non_trailing_rest = true;
@@ -469,12 +469,12 @@ impl NodeBuilder<'_> {
             .expression()
             .ok_or(Error::MissingLink("computed index name"))?;
         Ok(
-            ts_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)?
+            tsr_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)?
                 && self
                     .checker
                     .emit_entity_visible_ex(expression, enclosing, false)?
                     .accessibility
-                    == ts_printer::emit_resolver::SymbolAccessibility::Accessible,
+                    == tsr_printer::emit_resolver::SymbolAccessibility::Accessible,
         )
     }
 
@@ -534,9 +534,9 @@ impl NodeBuilder<'_> {
                         } else {
                             None
                         };
-                        let postfix = postfix.map(|node| ts_ast::clone_node(&mut self.ast, node));
+                        let postfix = postfix.map(|node| tsr_ast::clone_node(&mut self.ast, node));
                         let value = if let Some(node) = value_node {
-                            ts_ast::deep_clone_node(&mut self.ast, Some(node))
+                            tsr_ast::deep_clone_node(&mut self.ast, Some(node))
                                 .ok_or(Error::MissingLink("index value clone"))?
                         } else {
                             let symbol = self
@@ -652,7 +652,7 @@ impl NodeBuilder<'_> {
         let Some(declaration) = declaration else {
             let name = self.checker.symbol_to_string(symbol)?;
             self.report(
-                ts_printer::emit_resolver::DeclarationTrackerEvent::NonSerializableProperty(name),
+                tsr_printer::emit_resolver::DeclarationTrackerEvent::NonSerializableProperty(name),
             );
             return Ok(());
         };
@@ -666,7 +666,7 @@ impl NodeBuilder<'_> {
         if self.checker.node(declaration)?.kind() == K::BinaryExpression {
             if let Some(access) = read.data_source().as_element_access_expression() {
                 if let Some(argument) = access.argument_expression() {
-                    if ts_ast::is_property_access_entity_name_expression(
+                    if tsr_ast::is_property_access_entity_name_expression(
                         self.checker.ast(argument)?,
                         argument,
                         false,
@@ -753,7 +753,7 @@ impl NodeBuilder<'_> {
                                 .ast(node)?
                                 .node(node)?
                                 .modifier_flags(self.checker.ast(node)?)
-                                .map(|flags| flags & ts_ast::modifier_flags::ACCESSOR != 0)
+                                .map(|flags| flags & tsr_ast::modifier_flags::ACCESSOR != 0)
                                 .map_err(Error::from)
                         })
                         .transpose()?
@@ -865,7 +865,7 @@ impl NodeBuilder<'_> {
             .as_type_reference_node()
             .and_then(|data| data.type_name())
             .ok_or(Error::MissingLink("mapped wrapper variable"))?;
-        let name = ts_ast::clone_node(&mut self.ast, name);
+        let name = tsr_ast::clone_node(&mut self.ast, name);
         let parameter =
             self.ast
                 .new_type_parameter_declaration(None, Some(name), constraint, None, None);

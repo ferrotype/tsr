@@ -12,6 +12,6 @@ input bytes, partial Version fields after errors, error classes/messages,
 canonical formatting, nil ordering, and complete comparison/range-test matrices.
 The manifest fingerprints source, producer inputs, requests and observations.
 
-`cargo test -p ts_semver` compares the public Rust API with these observations.
+`cargo test -p tsr_semver` compares the public Rust API with these observations.
 This establishes the helper operations covered by the frozen inputs; it does not
 certify module-resolution behavior or the full compiler.

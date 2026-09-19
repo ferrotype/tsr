@@ -2,7 +2,7 @@
 //! location and attributes, without creating a synthetic import or diagnostics.
 use super::{is_import_call, ExternalModuleReference};
 use crate::{CheckerState, Error, TypeId};
-use ts_ast::{JsString, NodeId, SymbolId, SyntaxKind as K};
+use tsr_ast::{JsString, NodeId, SymbolId, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.resolveExternalModule
@@ -66,12 +66,12 @@ impl CheckerState {
                 }
             }
         }
-        if ts_ast::is_variable_declaration_initialized_to_bare_or_accessed_require(view, location)?
+        if tsr_ast::is_variable_declaration_initialized_to_bare_or_accessed_require(view, location)?
         {
             let mut current = node.initializer();
             while let Some(id) = current {
                 let read = view.node(id)?;
-                if ts_ast::utilities_middle::is_require_call(view, &read, true)? {
+                if tsr_ast::utilities_middle::is_require_call(view, &read, true)? {
                     return Ok(self.source_list(id, read.argument_list())?.first().copied());
                 }
                 current = read.expression();

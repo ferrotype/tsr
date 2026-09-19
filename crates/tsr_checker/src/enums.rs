@@ -5,11 +5,11 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, LinkStore, LiteralValue, NumberKey,
     TypeAlias, TypeId, UnionReduction,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as messages;
-use ts_jsnum::Number;
-use ts_jsstring::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as messages;
+use tsr_jsnum::Number;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum EnumValue {
@@ -24,9 +24,9 @@ impl EnumValue {
             Self::Number(_) => self.text(),
             Self::String(text) => {
                 let mut result = vec![b'"'];
-                result.extend_from_slice(&ts_jsstring::escape::escape_string(
+                result.extend_from_slice(&tsr_jsstring::escape::escape_string(
                     text.as_bytes(),
-                    ts_jsstring::QuoteChar::Double,
+                    tsr_jsstring::QuoteChar::Double,
                 ));
                 result.push(b'"');
                 JsString::from_bytes(result)
@@ -118,7 +118,7 @@ impl CheckerState {
             return Ok(());
         }
         let declarations = self.symbol_declarations(symbol)?.to_vec();
-        let is_const = ts_ast::utilities::is_enum_const(self.ast(declaration)?, declaration)?;
+        let is_const = tsr_ast::utilities::is_enum_const(self.ast(declaration)?, declaration)?;
         let mut missing_initializer = false;
         for node in declarations.iter().copied().flatten() {
             let read = self.node(node)?;
@@ -128,7 +128,7 @@ impl CheckerState {
             let name = read.name();
             let members = self.source_list(node, read.member_list())?;
             if declarations.len() > 1
-                && ts_ast::utilities::is_enum_const(self.ast(node)?, node)? != is_const
+                && tsr_ast::utilities::is_enum_const(self.ast(node)?, node)? != is_const
             {
                 self.error_at(
                     name,
@@ -179,7 +179,7 @@ impl CheckerState {
                     continue;
                 }
                 for member in self.source_list(declaration, read.member_list())? {
-                    if ts_ast::has_dynamic_name(self.ast(member)?, Some(member))? {
+                    if tsr_ast::has_dynamic_name(self.ast(member)?, Some(member))? {
                         continue;
                     }
                     let member_symbol = self
@@ -384,7 +384,7 @@ impl CheckerState {
         let initializer = read.initializer();
         let name_read = self.node(name)?;
         if name_read.kind() == K::ComputedPropertyName
-            && ts_ast::has_dynamic_name(self.ast(member)?, Some(member))?
+            && tsr_ast::has_dynamic_name(self.ast(member)?, Some(member))?
         {
             self.error_at(
                 Some(name),
@@ -405,7 +405,7 @@ impl CheckerState {
                 let text_read = self.node_text(text_node)?;
                 let text = text_read.as_bytes();
                 !matches!(text, b"Infinity" | b"-Infinity" | b"NaN")
-                    && ts_jsnum::from_string(text).to_string().as_bytes() == text
+                    && tsr_jsnum::from_string(text).to_string().as_bytes() == text
             };
             if numeric {
                 self.error_at(
@@ -419,7 +419,7 @@ impl CheckerState {
             return self.compute_constant_enum_member_value(member);
         }
         let ambient = self.node(parent)?.flags() & nf::AMBIENT != 0;
-        if ambient && !ts_ast::utilities::is_enum_const(self.ast(parent)?, parent)? {
+        if ambient && !tsr_ast::utilities::is_enum_const(self.ast(parent)?, parent)? {
             return Ok(EnumEvaluation::default());
         }
         let Some(auto) = auto else {
@@ -467,7 +467,7 @@ impl CheckerState {
         let initializer = read
             .initializer()
             .ok_or(Error::MissingLink("enum member initializer"))?;
-        let is_const = ts_ast::utilities::is_enum_const(self.ast(parent)?, parent)?;
+        let is_const = tsr_ast::utilities::is_enum_const(self.ast(parent)?, parent)?;
         let result = self.evaluate_enum_expression(initializer, Some(member))?;
         if let Some(value) = &result.value {
             if is_const {
@@ -528,7 +528,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let members = self.symbol(symbol)?.exports();
         self.set_structured_type_members(ty, members, &[], &[], &[])?;
-        let index = self.member_symbol(members, ts_ast::internal_symbol_names::INDEX)?;
+        let index = self.member_symbol(members, tsr_ast::internal_symbol_names::INDEX)?;
         let indexes = if let Some(index) = index {
             self.index_infos_of_symbol(Some(index), members)?
         } else {
@@ -766,7 +766,7 @@ impl CheckerState {
         let verbatim = options.verbatim_module_syntax.is_true();
         let mut check = isolated;
         if !check && verbatim && allowed {
-            let first = ts_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
+            let first = tsr_ast::utilities_middle::get_first_identifier(self.ast(node)?, node)?;
             let name = self.node_text(first)?.into_js_string();
             check = self
                 .resolve_name_ex(Some(node), name.as_bytes(), sf::ALIAS, None, false, true)?
@@ -782,7 +782,7 @@ impl CheckerState {
                 .symbol(symbol)?
                 .value_declaration()
                 .ok_or(Error::MissingLink("const enum declaration"))?;
-            let source = ts_ast::utilities::get_source_file_of_node(
+            let source = tsr_ast::utilities::get_source_file_of_node(
                 self.ast(declaration)?,
                 Some(declaration),
             )?

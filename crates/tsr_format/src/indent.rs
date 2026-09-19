@@ -4,20 +4,23 @@ use crate::lsutil::position_belongs_to_node;
 use crate::settings::{FormatCodeSettings, IndentStyle};
 use crate::util::{get_line_start_position_for_position, range_is_on_one_line};
 use crate::{debug_assert, Error, FormatFile};
-use ts_arena::NodeId;
-use ts_ast::{utilities, utilities_middle, NodeListId, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_jsstring::wtf8::decode_utf8;
-use ts_scanner::CommentRange;
+use tsr_arena::NodeId;
+use tsr_ast::{utilities, utilities_middle, NodeListId, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_jsstring::wtf8::decode_utf8;
+use tsr_scanner::CommentRange;
 
 /// Upstream's "no actual indentation" answer is `-1`; here it is `None`.
 type Actual = Option<i64>;
 
-fn kind_of(file: &FormatFile<'_, '_>, node: NodeId) -> Result<ts_ast::NodeKind, Error> {
+fn kind_of(file: &FormatFile<'_, '_>, node: NodeId) -> Result<tsr_ast::NodeKind, Error> {
     Ok(file.node(node)?.kind())
 }
 
-fn parent_kind(file: &FormatFile<'_, '_>, node: NodeId) -> Result<Option<ts_ast::NodeKind>, Error> {
+fn parent_kind(
+    file: &FormatFile<'_, '_>,
+    node: NodeId,
+) -> Result<Option<tsr_ast::NodeKind>, Error> {
     match file.node(node)?.parent() {
         Some(parent) => Ok(Some(kind_of(file, parent)?)),
         None => Ok(None),
@@ -161,7 +164,7 @@ pub fn get_indentation(
 }
 
 // port: tsc/internal/format/span.go:isStringOrRegularExpressionOrTemplateLiteral
-pub(crate) fn is_string_or_regular_expression_or_template_literal(kind: ts_ast::NodeKind) -> bool {
+pub(crate) fn is_string_or_regular_expression_or_template_literal(kind: tsr_ast::NodeKind) -> bool {
     kind == K::StringLiteral
         || kind == K::RegularExpressionLiteral
         || utilities_middle::is_template_literal_kind(kind)
@@ -251,10 +254,10 @@ pub(crate) fn get_range_of_enclosing_comment(
     let length = text.len() as i64;
     let trailing = preceding_end
         .into_iter()
-        .flat_map(|end| ts_scanner::get_trailing_comment_ranges(text, end));
+        .flat_map(|end| tsr_scanner::get_trailing_comment_ranges(text, end));
     // port: tsc/internal/format/indent.go:getLeadingCommentRangesOfNode
     let leading = (token_kind != K::JsxText)
-        .then(|| ts_scanner::get_leading_comment_ranges(text, token_pos))
+        .then(|| tsr_scanner::get_leading_comment_ranges(text, token_pos))
         .into_iter()
         .flatten();
     for comment in trailing.chain(leading) {
@@ -283,7 +286,7 @@ fn get_block_indent(
         let text = state.text().as_bytes();
         while current > 0 {
             let (ch, size) = decode_utf8(&text[current as usize..]);
-            if !ts_scanner::is_white_space_like(ch) {
+            if !tsr_scanner::is_white_space_like(ch) {
                 break;
             }
             current -= size as i64;
@@ -541,7 +544,7 @@ fn get_actual_indentation_for_node(
     // is the source file, whose children are not indented unless the user did
     // it, or when parent and child are on different lines.
     let read = file.node(current)?;
-    let use_actual_indentation = (ts_ast::is_declaration(&read)
+    let use_actual_indentation = (tsr_ast::is_declaration(&read)
         || utilities::is_statement_but_not_declaration(&read))
         && (kind_of(file, parent)? == K::SourceFile || !parent_and_child_share_line);
 
@@ -569,7 +572,7 @@ fn is_argument_and_start_line_overlaps_expression_being_called(
     if read.kind() != K::CallExpression || !arguments(file, parent)?.contains(&child) {
         return Ok(false);
     }
-    let expression = read.expression().ok_or(ts_arena::Error::InvalidGraph)?;
+    let expression = read.expression().ok_or(tsr_arena::Error::InvalidGraph)?;
     let expression_end = i64::from(file.node(expression)?.end());
     Ok(file.line_of(expression_end)? == child_start_line)
 }
@@ -709,7 +712,7 @@ pub(crate) fn find_first_non_whitespace_character_and_column(
             )));
         };
         let (ch, size) = decode_utf8(rest);
-        if !ts_scanner::is_white_space_single_line(ch) {
+        if !tsr_scanner::is_white_space_single_line(ch) {
             break;
         }
         if ch == i32::from(b'\t') {
@@ -872,7 +875,7 @@ fn get_visual_list_range(
         None => list.pos(),
     };
     let state = file.view.source_file(file.source)?;
-    let scanner = ts_scanner::get_scanner_for_source_file(&state, list.end());
+    let scanner = tsr_scanner::get_scanner_for_source_file(&state, list.end());
     let next_start = if scanner.token() == K::EndOfFile {
         list.end()
     } else {
@@ -895,7 +898,7 @@ fn get_containing_list_or_parent_start(
 }
 
 // port: tsc/internal/format/indent.go:isControlFlowEndingStatement
-fn is_control_flow_ending_statement(kind: ts_ast::NodeKind, parent: ts_ast::NodeKind) -> bool {
+fn is_control_flow_ending_statement(kind: tsr_ast::NodeKind, parent: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(K::ReturnStatement | K::ThrowStatement | K::ContinueStatement | K::BreakStatement)
@@ -1003,9 +1006,9 @@ pub fn node_will_indent_child(
                 {
                     let state = file.view.source_file(file.source)?;
                     let text = state.text().as_bytes();
-                    let parent_start = ts_scanner::skip_trivia(text, i64::from(parent_read.pos()));
+                    let parent_start = tsr_scanner::skip_trivia(text, i64::from(parent_read.pos()));
                     let child_start =
-                        ts_scanner::skip_trivia(text, i64::from(file.node(child)?.pos()));
+                        tsr_scanner::skip_trivia(text, i64::from(file.node(child)?.pos()));
                     return Ok(file.line_of(parent_start)? != file.line_of(child_start)?);
                 }
             }
@@ -1088,14 +1091,14 @@ pub(crate) fn child_is_unindented_branch_of_conditional_expression(
     }
     let condition = conditional
         .condition()
-        .ok_or(ts_arena::Error::InvalidGraph)?;
+        .ok_or(tsr_arena::Error::InvalidGraph)?;
     let condition_end_line = file.line_of(i64::from(file.node(condition)?.end()))?;
     if when_true == Some(child) {
         return Ok(child_start_line == condition_end_line);
     }
     // On the `whenFalse` side the `whenTrue` side decides: if that one was
     // indented, `whenFalse` must be too.
-    let when_true = when_true.ok_or(ts_arena::Error::InvalidGraph)?;
+    let when_true = when_true.ok_or(tsr_arena::Error::InvalidGraph)?;
     let true_start_line = get_start_line_for_node(file, when_true)?;
     let true_end_line = file.line_of(i64::from(file.node(when_true)?.end()))?;
     Ok(condition_end_line == true_start_line && true_end_line == child_start_line)

@@ -16,7 +16,7 @@
       "start_line": 92,
       "end_line": 92,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -29,7 +29,7 @@
       "start_line": 93,
       "end_line": 93,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -42,7 +42,7 @@
       "start_line": 95,
       "end_line": 101,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -55,7 +55,7 @@
       "start_line": 111,
       "end_line": 113,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -68,7 +68,7 @@
       "start_line": 115,
       "end_line": 118,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -81,7 +81,7 @@
       "start_line": 120,
       "end_line": 130,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -94,7 +94,7 @@
       "start_line": 132,
       "end_line": 138,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -107,7 +107,7 @@
       "start_line": 148,
       "end_line": 150,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -120,7 +120,7 @@
       "start_line": 152,
       "end_line": 297,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -133,7 +133,7 @@
       "start_line": 301,
       "end_line": 360,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -146,7 +146,7 @@
       "start_line": 362,
       "end_line": 372,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -159,7 +159,7 @@
       "start_line": 374,
       "end_line": 376,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -172,7 +172,7 @@
       "start_line": 378,
       "end_line": 417,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -185,7 +185,7 @@
       "start_line": 419,
       "end_line": 424,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -198,7 +198,7 @@
       "start_line": 426,
       "end_line": 431,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -211,7 +211,7 @@
       "start_line": 433,
       "end_line": 452,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -224,7 +224,7 @@
       "start_line": 454,
       "end_line": 458,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -237,7 +237,7 @@
       "start_line": 460,
       "end_line": 465,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -250,7 +250,7 @@
       "start_line": 467,
       "end_line": 469,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -263,7 +263,7 @@
       "start_line": 471,
       "end_line": 473,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -276,7 +276,7 @@
       "start_line": 475,
       "end_line": 477,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -289,7 +289,7 @@
       "start_line": 479,
       "end_line": 497,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -302,7 +302,7 @@
       "start_line": 499,
       "end_line": 507,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -315,7 +315,7 @@
       "start_line": 509,
       "end_line": 512,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -328,7 +328,7 @@
       "start_line": 514,
       "end_line": 518,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -341,7 +341,7 @@
       "start_line": 520,
       "end_line": 525,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -354,7 +354,7 @@
       "start_line": 527,
       "end_line": 532,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -367,7 +367,7 @@
       "start_line": 534,
       "end_line": 536,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -380,7 +380,7 @@
       "start_line": 538,
       "end_line": 545,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -393,7 +393,7 @@
       "start_line": 547,
       "end_line": 565,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -406,7 +406,7 @@
       "start_line": 567,
       "end_line": 575,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -419,7 +419,7 @@
       "start_line": 577,
       "end_line": 750,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -432,7 +432,7 @@
       "start_line": 752,
       "end_line": 757,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -445,7 +445,7 @@
       "start_line": 759,
       "end_line": 770,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -458,7 +458,7 @@
       "start_line": 772,
       "end_line": 774,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -471,7 +471,7 @@
       "start_line": 776,
       "end_line": 819,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -484,7 +484,7 @@
       "start_line": 821,
       "end_line": 826,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -497,7 +497,7 @@
       "start_line": 828,
       "end_line": 842,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -510,7 +510,7 @@
       "start_line": 844,
       "end_line": 848,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -523,7 +523,7 @@
       "start_line": 850,
       "end_line": 861,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -536,7 +536,7 @@
       "start_line": 863,
       "end_line": 878,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -549,7 +549,7 @@
       "start_line": 880,
       "end_line": 882,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -562,7 +562,7 @@
       "start_line": 884,
       "end_line": 886,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -575,7 +575,7 @@
       "start_line": 888,
       "end_line": 896,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -588,7 +588,7 @@
       "start_line": 898,
       "end_line": 912,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -601,7 +601,7 @@
       "start_line": 914,
       "end_line": 925,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -614,7 +614,7 @@
       "start_line": 927,
       "end_line": 933,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -627,7 +627,7 @@
       "start_line": 935,
       "end_line": 946,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -640,7 +640,7 @@
       "start_line": 948,
       "end_line": 977,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -653,7 +653,7 @@
       "start_line": 979,
       "end_line": 991,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -666,7 +666,7 @@
       "start_line": 993,
       "end_line": 1006,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -679,7 +679,7 @@
       "start_line": 1008,
       "end_line": 1016,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -692,7 +692,7 @@
       "start_line": 1018,
       "end_line": 1025,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -705,7 +705,7 @@
       "start_line": 1027,
       "end_line": 1033,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -718,7 +718,7 @@
       "start_line": 1035,
       "end_line": 1041,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -731,7 +731,7 @@
       "start_line": 1046,
       "end_line": 1056,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -744,7 +744,7 @@
       "start_line": 1058,
       "end_line": 1076,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -757,7 +757,7 @@
       "start_line": 1078,
       "end_line": 1086,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -770,7 +770,7 @@
       "start_line": 1088,
       "end_line": 1094,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -783,7 +783,7 @@
       "start_line": 1096,
       "end_line": 1121,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -796,7 +796,7 @@
       "start_line": 1123,
       "end_line": 1143,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -809,7 +809,7 @@
       "start_line": 1145,
       "end_line": 1162,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -822,7 +822,7 @@
       "start_line": 1164,
       "end_line": 1170,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -835,7 +835,7 @@
       "start_line": 1172,
       "end_line": 1195,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -848,7 +848,7 @@
       "start_line": 1197,
       "end_line": 1217,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -861,7 +861,7 @@
       "start_line": 1219,
       "end_line": 1225,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -874,7 +874,7 @@
       "start_line": 1227,
       "end_line": 1236,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -887,7 +887,7 @@
       "start_line": 1238,
       "end_line": 1244,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -900,7 +900,7 @@
       "start_line": 1246,
       "end_line": 1259,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -913,7 +913,7 @@
       "start_line": 1261,
       "end_line": 1272,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -926,7 +926,7 @@
       "start_line": 1274,
       "end_line": 1292,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -939,7 +939,7 @@
       "start_line": 1294,
       "end_line": 1304,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -952,7 +952,7 @@
       "start_line": 1309,
       "end_line": 1329,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -965,7 +965,7 @@
       "start_line": 1331,
       "end_line": 1338,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -978,7 +978,7 @@
       "start_line": 1340,
       "end_line": 1350,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -991,7 +991,7 @@
       "start_line": 1353,
       "end_line": 1358,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1004,7 +1004,7 @@
       "start_line": 1360,
       "end_line": 1372,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1017,7 +1017,7 @@
       "start_line": 1374,
       "end_line": 1379,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1030,7 +1030,7 @@
       "start_line": 1381,
       "end_line": 1390,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1043,7 +1043,7 @@
       "start_line": 1392,
       "end_line": 1399,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1056,7 +1056,7 @@
       "start_line": 1401,
       "end_line": 1408,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1069,7 +1069,7 @@
       "start_line": 1410,
       "end_line": 1418,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1082,7 +1082,7 @@
       "start_line": 1420,
       "end_line": 1426,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1095,7 +1095,7 @@
       "start_line": 1428,
       "end_line": 1434,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1108,7 +1108,7 @@
       "start_line": 1436,
       "end_line": 1439,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1121,7 +1121,7 @@
       "start_line": 1441,
       "end_line": 1447,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1134,7 +1134,7 @@
       "start_line": 1449,
       "end_line": 1455,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1147,7 +1147,7 @@
       "start_line": 1457,
       "end_line": 1463,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1160,7 +1160,7 @@
       "start_line": 1465,
       "end_line": 1474,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1173,7 +1173,7 @@
       "start_line": 1479,
       "end_line": 1626,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1186,7 +1186,7 @@
       "start_line": 1628,
       "end_line": 1644,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1199,7 +1199,7 @@
       "start_line": 1646,
       "end_line": 1743,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1212,7 +1212,7 @@
       "start_line": 1745,
       "end_line": 1747,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1225,7 +1225,7 @@
       "start_line": 1749,
       "end_line": 1753,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1238,7 +1238,7 @@
       "start_line": 1755,
       "end_line": 1759,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1251,7 +1251,7 @@
       "start_line": 1761,
       "end_line": 1765,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1264,7 +1264,7 @@
       "start_line": 1767,
       "end_line": 1778,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1277,7 +1277,7 @@
       "start_line": 1780,
       "end_line": 1788,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1290,7 +1290,7 @@
       "start_line": 1790,
       "end_line": 1798,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1303,7 +1303,7 @@
       "start_line": 1800,
       "end_line": 1806,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1316,7 +1316,7 @@
       "start_line": 1808,
       "end_line": 1816,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1329,7 +1329,7 @@
       "start_line": 1818,
       "end_line": 1820,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1342,7 +1342,7 @@
       "start_line": 1822,
       "end_line": 1848,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1355,7 +1355,7 @@
       "start_line": 1850,
       "end_line": 1856,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1368,7 +1368,7 @@
       "start_line": 1858,
       "end_line": 1870,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1381,7 +1381,7 @@
       "start_line": 1872,
       "end_line": 1884,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1394,7 +1394,7 @@
       "start_line": 1886,
       "end_line": 1914,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1407,7 +1407,7 @@
       "start_line": 1916,
       "end_line": 1944,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1420,7 +1420,7 @@
       "start_line": 1946,
       "end_line": 1959,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1433,7 +1433,7 @@
       "start_line": 1961,
       "end_line": 1969,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1446,7 +1446,7 @@
       "start_line": 1971,
       "end_line": 1975,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1459,7 +1459,7 @@
       "start_line": 1977,
       "end_line": 1979,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1472,7 +1472,7 @@
       "start_line": 1981,
       "end_line": 1983,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1485,7 +1485,7 @@
       "start_line": 1985,
       "end_line": 1996,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1498,7 +1498,7 @@
       "start_line": 1998,
       "end_line": 2005,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1511,7 +1511,7 @@
       "start_line": 2007,
       "end_line": 2013,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1524,7 +1524,7 @@
       "start_line": 2015,
       "end_line": 2094,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1537,7 +1537,7 @@
       "start_line": 2096,
       "end_line": 2115,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1550,7 +1550,7 @@
       "start_line": 2117,
       "end_line": 2146,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1563,7 +1563,7 @@
       "start_line": 2148,
       "end_line": 2157,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1576,7 +1576,7 @@
       "start_line": 2159,
       "end_line": 2163,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1589,7 +1589,7 @@
       "start_line": 2165,
       "end_line": 2173,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1602,7 +1602,7 @@
       "start_line": 2175,
       "end_line": 2194,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1615,7 +1615,7 @@
       "start_line": 2196,
       "end_line": 2211,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1628,7 +1628,7 @@
       "start_line": 2213,
       "end_line": 2219,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1641,7 +1641,7 @@
       "start_line": 2221,
       "end_line": 2239,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1654,7 +1654,7 @@
       "start_line": 2241,
       "end_line": 2281,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1667,7 +1667,7 @@
       "start_line": 2283,
       "end_line": 2301,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1680,7 +1680,7 @@
       "start_line": 2303,
       "end_line": 2309,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1693,7 +1693,7 @@
       "start_line": 2311,
       "end_line": 2334,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1706,7 +1706,7 @@
       "start_line": 2336,
       "end_line": 2341,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1719,7 +1719,7 @@
       "start_line": 2343,
       "end_line": 2358,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1732,7 +1732,7 @@
       "start_line": 2360,
       "end_line": 2366,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1745,7 +1745,7 @@
       "start_line": 2368,
       "end_line": 2383,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1758,7 +1758,7 @@
       "start_line": 2385,
       "end_line": 2410,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1771,7 +1771,7 @@
       "start_line": 2412,
       "end_line": 2418,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1784,7 +1784,7 @@
       "start_line": 2420,
       "end_line": 2434,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1797,7 +1797,7 @@
       "start_line": 2436,
       "end_line": 2462,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1810,7 +1810,7 @@
       "start_line": 2464,
       "end_line": 2470,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1823,7 +1823,7 @@
       "start_line": 2472,
       "end_line": 2483,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1836,7 +1836,7 @@
       "start_line": 2485,
       "end_line": 2493,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1849,7 +1849,7 @@
       "start_line": 2496,
       "end_line": 2509,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1862,7 +1862,7 @@
       "start_line": 2511,
       "end_line": 2516,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1875,7 +1875,7 @@
       "start_line": 2518,
       "end_line": 2529,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1888,7 +1888,7 @@
       "start_line": 2531,
       "end_line": 2533,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1901,7 +1901,7 @@
       "start_line": 2535,
       "end_line": 2540,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1914,7 +1914,7 @@
       "start_line": 2542,
       "end_line": 2558,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1927,7 +1927,7 @@
       "start_line": 2560,
       "end_line": 2569,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1940,7 +1940,7 @@
       "start_line": 2580,
       "end_line": 2622,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1953,7 +1953,7 @@
       "start_line": 2624,
       "end_line": 2640,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1966,7 +1966,7 @@
       "start_line": 2642,
       "end_line": 2653,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1979,7 +1979,7 @@
       "start_line": 2655,
       "end_line": 2671,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -1992,7 +1992,7 @@
       "start_line": 2673,
       "end_line": 2686,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2005,7 +2005,7 @@
       "start_line": 2688,
       "end_line": 2706,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2018,7 +2018,7 @@
       "start_line": 2708,
       "end_line": 2722,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2031,7 +2031,7 @@
       "start_line": 2724,
       "end_line": 2726,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2044,7 +2044,7 @@
       "start_line": 2728,
       "end_line": 2730,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2057,7 +2057,7 @@
       "start_line": 2732,
       "end_line": 2735,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2070,7 +2070,7 @@
       "start_line": 2740,
       "end_line": 2742,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2083,7 +2083,7 @@
       "start_line": 2744,
       "end_line": 2746,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2096,7 +2096,7 @@
       "start_line": 2748,
       "end_line": 2754,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2109,7 +2109,7 @@
       "start_line": 2756,
       "end_line": 2759,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2122,7 +2122,7 @@
       "start_line": 2761,
       "end_line": 2775,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2135,7 +2135,7 @@
       "start_line": 2777,
       "end_line": 2787,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2148,7 +2148,7 @@
       "start_line": 2789,
       "end_line": 2794,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2161,7 +2161,7 @@
       "start_line": 2796,
       "end_line": 2798,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2174,7 +2174,7 @@
       "start_line": 2800,
       "end_line": 2802,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2187,7 +2187,7 @@
       "start_line": 25,
       "end_line": 352,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2200,7 +2200,7 @@
       "start_line": 354,
       "end_line": 378,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2213,7 +2213,7 @@
       "start_line": 380,
       "end_line": 383,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2226,7 +2226,7 @@
       "start_line": 385,
       "end_line": 408,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2239,7 +2239,7 @@
       "start_line": 410,
       "end_line": 415,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2252,7 +2252,7 @@
       "start_line": 417,
       "end_line": 424,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2265,7 +2265,7 @@
       "start_line": 426,
       "end_line": 440,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2278,7 +2278,7 @@
       "start_line": 442,
       "end_line": 448,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2291,7 +2291,7 @@
       "start_line": 450,
       "end_line": 461,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2304,7 +2304,7 @@
       "start_line": 463,
       "end_line": 465,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2317,7 +2317,7 @@
       "start_line": 467,
       "end_line": 483,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2330,7 +2330,7 @@
       "start_line": 485,
       "end_line": 495,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2343,7 +2343,7 @@
       "start_line": 497,
       "end_line": 506,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2356,7 +2356,7 @@
       "start_line": 37,
       "end_line": 42,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2369,7 +2369,7 @@
       "start_line": 44,
       "end_line": 51,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2382,7 +2382,7 @@
       "start_line": 53,
       "end_line": 61,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2395,7 +2395,7 @@
       "start_line": 63,
       "end_line": 71,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2408,7 +2408,7 @@
       "start_line": 73,
       "end_line": 81,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2421,7 +2421,7 @@
       "start_line": 83,
       "end_line": 105,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2434,7 +2434,7 @@
       "start_line": 107,
       "end_line": 132,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2447,7 +2447,7 @@
       "start_line": 134,
       "end_line": 136,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2460,7 +2460,7 @@
       "start_line": 138,
       "end_line": 149,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2473,7 +2473,7 @@
       "start_line": 151,
       "end_line": 188,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2486,7 +2486,7 @@
       "start_line": 190,
       "end_line": 200,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2499,7 +2499,7 @@
       "start_line": 202,
       "end_line": 207,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2512,7 +2512,7 @@
       "start_line": 209,
       "end_line": 238,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2525,7 +2525,7 @@
       "start_line": 240,
       "end_line": 249,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     },
@@ -2538,7 +2538,7 @@
       "start_line": 251,
       "end_line": 262,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": []
     }
@@ -2553,10 +2553,10 @@
       "start_line": 1532,
       "end_line": 1534,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 284
         }
       ],
@@ -2585,7 +2585,7 @@
       "start_line": 1525,
       "end_line": 1525,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -2612,10 +2612,10 @@
       "start_line": 487,
       "end_line": 493,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 572
         }
       ],
@@ -2656,10 +2656,10 @@
       "start_line": 265,
       "end_line": 271,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 61
         }
       ],
@@ -2712,7 +2712,7 @@
       "start_line": 220,
       "end_line": 220,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -2751,7 +2751,7 @@
       "start_line": 213,
       "end_line": 213,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -2790,10 +2790,10 @@
       "start_line": 1062,
       "end_line": 1068,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 612
         }
       ],
@@ -2834,7 +2834,7 @@
       "start_line": 195,
       "end_line": 195,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -2873,7 +2873,7 @@
       "start_line": 214,
       "end_line": 214,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -2900,10 +2900,10 @@
       "start_line": 311,
       "end_line": 385,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 129
         }
       ],
@@ -3208,7 +3208,7 @@
       "start_line": 212,
       "end_line": 212,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -3259,10 +3259,10 @@
       "start_line": 751,
       "end_line": 775,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 213
         }
       ],
@@ -3327,10 +3327,10 @@
       "start_line": 879,
       "end_line": 893,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 530
         }
       ],
@@ -3371,10 +3371,10 @@
       "start_line": 954,
       "end_line": 964,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 272
         }
       ],
@@ -3415,7 +3415,7 @@
       "start_line": 249,
       "end_line": 255,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -3442,7 +3442,7 @@
       "start_line": 257,
       "end_line": 263,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -3493,7 +3493,7 @@
       "start_line": 215,
       "end_line": 215,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -3532,14 +3532,14 @@
       "start_line": 211,
       "end_line": 211,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 22
         },
         {
-          "file": "crates/ts_parser/src/state.rs",
+          "file": "crates/tsr_parser/src/state.rs",
           "line": 360
         }
       ],
@@ -3568,10 +3568,10 @@
       "start_line": 988,
       "end_line": 998,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 290
         }
       ],
@@ -3600,10 +3600,10 @@
       "start_line": 210,
       "end_line": 210,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 17
         }
       ],
@@ -3788,10 +3788,10 @@
       "start_line": 218,
       "end_line": 218,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 563
         }
       ],
@@ -3832,7 +3832,7 @@
       "start_line": 194,
       "end_line": 194,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -3883,10 +3883,10 @@
       "start_line": 1070,
       "end_line": 1092,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 325
         }
       ],
@@ -3915,10 +3915,10 @@
       "start_line": 1038,
       "end_line": 1044,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 607
         }
       ],
@@ -3947,10 +3947,10 @@
       "start_line": 1112,
       "end_line": 1124,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 342
         }
       ],
@@ -4003,10 +4003,10 @@
       "start_line": 582,
       "end_line": 594,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 437
         }
       ],
@@ -4035,10 +4035,10 @@
       "start_line": 596,
       "end_line": 602,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 592
         }
       ],
@@ -4103,7 +4103,7 @@
       "start_line": 241,
       "end_line": 247,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -4646,10 +4646,10 @@
       "start_line": 273,
       "end_line": 309,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_text.rs",
+          "file": "crates/tsr_ast/src/node_text.rs",
           "line": 74
         }
       ],
@@ -4954,10 +4954,10 @@
       "start_line": 629,
       "end_line": 687,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 176
         }
       ],
@@ -5010,10 +5010,10 @@
       "start_line": 495,
       "end_line": 517,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/node_accessors.rs",
+          "file": "crates/tsr_ast/src/node_accessors.rs",
           "line": 389
         }
       ],
@@ -5042,7 +5042,7 @@
       "start_line": 1213,
       "end_line": 1213,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -5189,7 +5189,7 @@
       "start_line": 2772,
       "end_line": 2774,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -5216,7 +5216,7 @@
       "start_line": 2895,
       "end_line": 2900,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -5243,10 +5243,10 @@
       "start_line": 2713,
       "end_line": 2715,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/source_file.rs",
+          "file": "crates/tsr_ast/src/source_file.rs",
           "line": 279
         }
       ],
@@ -5287,10 +5287,10 @@
       "start_line": 2701,
       "end_line": 2703,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/source_file.rs",
+          "file": "crates/tsr_ast/src/source_file.rs",
           "line": 184
         }
       ],
@@ -5319,7 +5319,7 @@
       "start_line": 2883,
       "end_line": 2885,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -5346,7 +5346,7 @@
       "start_line": 2776,
       "end_line": 2778,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -5373,11 +5373,11 @@
       "start_line": 1938,
       "end_line": 1940,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 665
         }
       ],
@@ -5429,11 +5429,11 @@
       "start_line": 2949,
       "end_line": 2951,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1099
         }
       ],
@@ -5461,11 +5461,11 @@
       "start_line": 4003,
       "end_line": 4005,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1605
         }
       ],
@@ -5517,11 +5517,11 @@
       "start_line": 8278,
       "end_line": 8280,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3371
         }
       ],
@@ -5549,11 +5549,11 @@
       "start_line": 9900,
       "end_line": 9906,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 5622
         }
       ],
@@ -5605,11 +5605,11 @@
       "start_line": 3762,
       "end_line": 3764,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1494
         }
       ],
@@ -5673,11 +5673,11 @@
       "start_line": 1942,
       "end_line": 1944,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 670
         }
       ],
@@ -5705,11 +5705,11 @@
       "start_line": 4299,
       "end_line": 4301,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1739
         }
       ],
@@ -5749,11 +5749,11 @@
       "start_line": 2094,
       "end_line": 2096,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 754
         }
       ],
@@ -5781,11 +5781,11 @@
       "start_line": 2145,
       "end_line": 2147,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 785
         }
       ],
@@ -5813,11 +5813,11 @@
       "start_line": 3541,
       "end_line": 3543,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1422
         }
       ],
@@ -5845,11 +5845,11 @@
       "start_line": 752,
       "end_line": 754,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 217
         }
       ],
@@ -5877,11 +5877,11 @@
       "start_line": 5244,
       "end_line": 5246,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 2128
         }
       ],
@@ -5909,11 +5909,11 @@
       "start_line": 2768,
       "end_line": 2770,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1025
         }
       ],
@@ -5977,11 +5977,11 @@
       "start_line": 8185,
       "end_line": 8187,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3332
         }
       ],
@@ -6009,11 +6009,11 @@
       "start_line": 2953,
       "end_line": 2955,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1104
         }
       ],
@@ -6041,11 +6041,11 @@
       "start_line": 2043,
       "end_line": 2045,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 723
         }
       ],
@@ -6085,11 +6085,11 @@
       "start_line": 4007,
       "end_line": 4009,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1610
         }
       ],
@@ -6129,11 +6129,11 @@
       "start_line": 2186,
       "end_line": 2188,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 798
         }
       ],
@@ -6161,11 +6161,11 @@
       "start_line": 638,
       "end_line": 640,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 184
         }
       ],
@@ -6241,11 +6241,11 @@
       "start_line": 2243,
       "end_line": 2245,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 829
         }
       ],
@@ -6273,11 +6273,11 @@
       "start_line": 2325,
       "end_line": 2327,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 861
         }
       ],
@@ -6305,11 +6305,11 @@
       "start_line": 6467,
       "end_line": 6469,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 2597
         }
       ],
@@ -6337,11 +6337,11 @@
       "start_line": 10052,
       "end_line": 10058,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 5992
         }
       ],
@@ -6381,11 +6381,11 @@
       "start_line": 2463,
       "end_line": 2465,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 924
         }
       ],
@@ -6413,11 +6413,11 @@
       "start_line": 8083,
       "end_line": 8085,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3282
         }
       ],
@@ -6469,11 +6469,11 @@
       "start_line": 2861,
       "end_line": 2863,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1069
         }
       ],
@@ -6501,11 +6501,11 @@
       "start_line": 3636,
       "end_line": 3638,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1451
         }
       ],
@@ -6533,11 +6533,11 @@
       "start_line": 1824,
       "end_line": 1826,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 604
         }
       ],
@@ -6565,11 +6565,11 @@
       "start_line": 1887,
       "end_line": 1889,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 642
         }
       ],
@@ -6597,11 +6597,11 @@
       "start_line": 4649,
       "end_line": 4651,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1873
         }
       ],
@@ -6629,11 +6629,11 @@
       "start_line": 3806,
       "end_line": 3808,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1507
         }
       ],
@@ -6661,11 +6661,11 @@
       "start_line": 662,
       "end_line": 664,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 188
         }
       ],
@@ -6705,11 +6705,11 @@
       "start_line": 4196,
       "end_line": 4198,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1692
         }
       ],
@@ -6761,11 +6761,11 @@
       "start_line": 8025,
       "end_line": 8027,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3254
         }
       ],
@@ -6853,11 +6853,11 @@
       "start_line": 3612,
       "end_line": 3614,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1447
         }
       ],
@@ -6885,11 +6885,11 @@
       "start_line": 2321,
       "end_line": 2323,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 857
         }
       ],
@@ -6917,11 +6917,11 @@
       "start_line": 4977,
       "end_line": 4979,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 2015
         }
       ],
@@ -6949,11 +6949,11 @@
       "start_line": 5717,
       "end_line": 5719,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 2305
         }
       ],
@@ -6981,11 +6981,11 @@
       "start_line": 1744,
       "end_line": 1746,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 575
         }
       ],
@@ -7025,11 +7025,11 @@
       "start_line": 1690,
       "end_line": 1692,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 547
         }
       ],
@@ -7057,11 +7057,11 @@
       "start_line": 8079,
       "end_line": 8081,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3277
         }
       ],
@@ -7089,7 +7089,7 @@
       "start_line": 9324,
       "end_line": 9326,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7272,7 +7272,7 @@
       "start_line": 9160,
       "end_line": 9162,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7347,7 +7347,7 @@
       "start_line": 9368,
       "end_line": 9370,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7386,7 +7386,7 @@
       "start_line": 9104,
       "end_line": 9106,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7425,7 +7425,7 @@
       "start_line": 9108,
       "end_line": 9110,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7464,7 +7464,7 @@
       "start_line": 9120,
       "end_line": 9122,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7491,7 +7491,7 @@
       "start_line": 9292,
       "end_line": 9294,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7518,7 +7518,7 @@
       "start_line": 9356,
       "end_line": 9358,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7557,7 +7557,7 @@
       "start_line": 9456,
       "end_line": 9458,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7596,7 +7596,7 @@
       "start_line": 9256,
       "end_line": 9258,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7623,7 +7623,7 @@
       "start_line": 9424,
       "end_line": 9426,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7662,7 +7662,7 @@
       "start_line": 9068,
       "end_line": 9070,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7689,7 +7689,7 @@
       "start_line": 9364,
       "end_line": 9366,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7740,7 +7740,7 @@
       "start_line": 9228,
       "end_line": 9230,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7791,7 +7791,7 @@
       "start_line": 9756,
       "end_line": 9758,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7818,7 +7818,7 @@
       "start_line": 9244,
       "end_line": 9246,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7857,7 +7857,7 @@
       "start_line": 9132,
       "end_line": 9134,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7884,7 +7884,7 @@
       "start_line": 9080,
       "end_line": 9082,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7911,7 +7911,7 @@
       "start_line": 9076,
       "end_line": 9078,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7950,7 +7950,7 @@
       "start_line": 9168,
       "end_line": 9170,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -7977,7 +7977,7 @@
       "start_line": 9344,
       "end_line": 9346,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8052,7 +8052,7 @@
       "start_line": 9180,
       "end_line": 9182,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8079,7 +8079,7 @@
       "start_line": 9040,
       "end_line": 9042,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8106,7 +8106,7 @@
       "start_line": 9064,
       "end_line": 9066,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8133,7 +8133,7 @@
       "start_line": 9764,
       "end_line": 9766,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8160,7 +8160,7 @@
       "start_line": 9464,
       "end_line": 9466,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8199,7 +8199,7 @@
       "start_line": 9300,
       "end_line": 9302,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8226,7 +8226,7 @@
       "start_line": 9128,
       "end_line": 9130,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8265,7 +8265,7 @@
       "start_line": 9376,
       "end_line": 9378,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8292,7 +8292,7 @@
       "start_line": 9748,
       "end_line": 9750,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8367,7 +8367,7 @@
       "start_line": 9156,
       "end_line": 9158,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8430,7 +8430,7 @@
       "start_line": 9332,
       "end_line": 9334,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8469,7 +8469,7 @@
       "start_line": 9328,
       "end_line": 9330,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8568,7 +8568,7 @@
       "start_line": 9360,
       "end_line": 9362,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8607,7 +8607,7 @@
       "start_line": 9284,
       "end_line": 9286,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8634,7 +8634,7 @@
       "start_line": 9048,
       "end_line": 9050,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8661,7 +8661,7 @@
       "start_line": 9420,
       "end_line": 9422,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8688,7 +8688,7 @@
       "start_line": 9744,
       "end_line": 9746,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8799,7 +8799,7 @@
       "start_line": 9100,
       "end_line": 9102,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8826,7 +8826,7 @@
       "start_line": 9116,
       "end_line": 9118,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8853,7 +8853,7 @@
       "start_line": 9188,
       "end_line": 9190,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8880,7 +8880,7 @@
       "start_line": 9788,
       "end_line": 9790,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8907,7 +8907,7 @@
       "start_line": 9144,
       "end_line": 9146,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8958,7 +8958,7 @@
       "start_line": 9072,
       "end_line": 9074,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -8985,11 +8985,11 @@
       "start_line": 8691,
       "end_line": 9030,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3566
         }
       ],
@@ -9029,11 +9029,11 @@
       "start_line": 1883,
       "end_line": 1885,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 637
         }
       ],
@@ -9109,11 +9109,11 @@
       "start_line": 4192,
       "end_line": 4194,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1687
         }
       ],
@@ -9165,11 +9165,11 @@
       "start_line": 3469,
       "end_line": 3471,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1397
         }
       ],
@@ -9197,11 +9197,11 @@
       "start_line": 4889,
       "end_line": 4891,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 1981
         }
       ],
@@ -9229,11 +9229,11 @@
       "start_line": 2317,
       "end_line": 2319,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 852
         }
       ],
@@ -9261,11 +9261,11 @@
       "start_line": 8538,
       "end_line": 8540,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 3485
         }
       ],
@@ -9293,11 +9293,11 @@
       "start_line": 1740,
       "end_line": 1742,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/runtime_generated.rs",
+          "file": "crates/tsr_ast/src/runtime_generated.rs",
           "line": 570
         }
       ],
@@ -9337,7 +9337,7 @@
       "start_line": 105,
       "end_line": 110,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -9388,10 +9388,10 @@
       "start_line": 218,
       "end_line": 230,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic.rs",
+          "file": "crates/tsr_ast/src/diagnostic.rs",
           "line": 31
         }
       ],
@@ -9432,10 +9432,10 @@
       "start_line": 70,
       "end_line": 75,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/flow.rs",
+          "file": "crates/tsr_ast/src/flow.rs",
           "line": 78
         }
       ],
@@ -9464,10 +9464,10 @@
       "start_line": 50,
       "end_line": 56,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/flow.rs",
+          "file": "crates/tsr_ast/src/flow.rs",
           "line": 63
         }
       ],
@@ -9496,11 +9496,11 @@
       "start_line": 369,
       "end_line": 375,
       "kind": "generated",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [
         {
-          "file": "crates/ts_ast/src/node_kind.rs",
+          "file": "crates/tsr_ast/src/node_kind.rs",
           "line": 46
         }
       ],
@@ -9528,10 +9528,10 @@
       "start_line": 72,
       "end_line": 77,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 99
         }
       ],
@@ -9560,10 +9560,10 @@
       "start_line": 1911,
       "end_line": 1913,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 597
         }
       ],
@@ -9616,10 +9616,10 @@
       "start_line": 911,
       "end_line": 919,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 579
         }
       ],
@@ -9672,7 +9672,7 @@
       "start_line": 2547,
       "end_line": 2554,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -9699,10 +9699,10 @@
       "start_line": 1547,
       "end_line": 1579,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 417
         }
       ],
@@ -9743,10 +9743,10 @@
       "start_line": 1180,
       "end_line": 1194,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 997
         }
       ],
@@ -9775,10 +9775,10 @@
       "start_line": 1738,
       "end_line": 1740,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 688
         }
       ],
@@ -9843,10 +9843,10 @@
       "start_line": 2639,
       "end_line": 2653,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 727
         }
       ],
@@ -9875,7 +9875,7 @@
       "start_line": 2538,
       "end_line": 2545,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -9914,10 +9914,10 @@
       "start_line": 1407,
       "end_line": 1421,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 338
         }
       ],
@@ -9958,10 +9958,10 @@
       "start_line": 57,
       "end_line": 59,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 176
         }
       ],
@@ -10170,10 +10170,10 @@
       "start_line": 1892,
       "end_line": 1905,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 707
         }
       ],
@@ -10214,7 +10214,7 @@
       "start_line": 61,
       "end_line": 63,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -10325,10 +10325,10 @@
       "start_line": 53,
       "end_line": 55,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 172
         }
       ],
@@ -10393,10 +10393,10 @@
       "start_line": 2371,
       "end_line": 2373,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 898
         }
       ],
@@ -10425,10 +10425,10 @@
       "start_line": 1453,
       "end_line": 1465,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 554
         }
       ],
@@ -10481,10 +10481,10 @@
       "start_line": 22,
       "end_line": 32,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/runtime_id.rs",
+          "file": "crates/tsr_ast/src/runtime_id.rs",
           "line": 8
         }
       ],
@@ -10513,10 +10513,10 @@
       "start_line": 861,
       "end_line": 869,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 674
         }
       ],
@@ -10569,10 +10569,10 @@
       "start_line": 34,
       "end_line": 44,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 50
         }
       ],
@@ -10601,10 +10601,10 @@
       "start_line": 46,
       "end_line": 51,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/symbols.rs",
+          "file": "crates/tsr_ast/src/symbols.rs",
           "line": 168
         }
       ],
@@ -10645,10 +10645,10 @@
       "start_line": 1602,
       "end_line": 1605,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 593
         }
       ],
@@ -10713,10 +10713,10 @@
       "start_line": 1044,
       "end_line": 1046,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 970
         }
       ],
@@ -10745,10 +10745,10 @@
       "start_line": 1036,
       "end_line": 1038,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 962
         }
       ],
@@ -10849,10 +10849,10 @@
       "start_line": 479,
       "end_line": 481,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 371
         }
       ],
@@ -10881,10 +10881,10 @@
       "start_line": 1658,
       "end_line": 1660,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 602
         }
       ],
@@ -10949,10 +10949,10 @@
       "start_line": 178,
       "end_line": 180,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 152
         }
       ],
@@ -10981,10 +10981,10 @@
       "start_line": 4476,
       "end_line": 4483,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 862
         }
       ],
@@ -11037,10 +11037,10 @@
       "start_line": 604,
       "end_line": 606,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 980
         }
       ],
@@ -11069,10 +11069,10 @@
       "start_line": 166,
       "end_line": 168,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 316
         }
       ],
@@ -11149,10 +11149,10 @@
       "start_line": 717,
       "end_line": 719,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 803
         }
       ],
@@ -11181,10 +11181,10 @@
       "start_line": 315,
       "end_line": 317,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 342
         }
       ],
@@ -11225,10 +11225,10 @@
       "start_line": 539,
       "end_line": 552,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 46
         }
       ],
@@ -11257,10 +11257,10 @@
       "start_line": 531,
       "end_line": 533,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 379
         }
       ],
@@ -11301,10 +11301,10 @@
       "start_line": 2514,
       "end_line": 2520,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities_middle.rs",
+          "file": "crates/tsr_ast/src/utilities_middle.rs",
           "line": 414
         }
       ],
@@ -11333,7 +11333,7 @@
       "start_line": 1302,
       "end_line": 1307,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -11360,10 +11360,10 @@
       "start_line": 653,
       "end_line": 655,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 447
         }
       ],
@@ -11392,10 +11392,10 @@
       "start_line": 132,
       "end_line": 138,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 86
         }
       ],
@@ -11424,10 +11424,10 @@
       "start_line": 1638,
       "end_line": 1646,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 266
         }
       ],
@@ -11456,10 +11456,10 @@
       "start_line": 1620,
       "end_line": 1622,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 200
         }
       ],
@@ -11488,10 +11488,10 @@
       "start_line": 1907,
       "end_line": 1909,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1021
         }
       ],
@@ -11520,10 +11520,10 @@
       "start_line": 4178,
       "end_line": 4189,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 745
         }
       ],
@@ -11564,10 +11564,10 @@
       "start_line": 383,
       "end_line": 385,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1114
         }
       ],
@@ -11596,10 +11596,10 @@
       "start_line": 1686,
       "end_line": 1688,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 529
         }
       ],
@@ -11652,10 +11652,10 @@
       "start_line": 1690,
       "end_line": 1692,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 534
         }
       ],
@@ -11720,10 +11720,10 @@
       "start_line": 170,
       "end_line": 172,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 477
         }
       ],
@@ -11752,10 +11752,10 @@
       "start_line": 518,
       "end_line": 521,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 492
         }
       ],
@@ -11808,10 +11808,10 @@
       "start_line": 498,
       "end_line": 501,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 487
         }
       ],
@@ -11840,10 +11840,10 @@
       "start_line": 1716,
       "end_line": 1718,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 878
         }
       ],
@@ -11884,10 +11884,10 @@
       "start_line": 2526,
       "end_line": 2528,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities_middle.rs",
+          "file": "crates/tsr_ast/src/utilities_middle.rs",
           "line": 425
         }
       ],
@@ -11916,10 +11916,10 @@
       "start_line": 292,
       "end_line": 308,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 157
         }
       ],
@@ -11948,10 +11948,10 @@
       "start_line": 4226,
       "end_line": 4236,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 816
         }
       ],
@@ -11980,10 +11980,10 @@
       "start_line": 1298,
       "end_line": 1300,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 509
         }
       ],
@@ -12084,10 +12084,10 @@
       "start_line": 1817,
       "end_line": 1827,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 689
         }
       ],
@@ -12116,10 +12116,10 @@
       "start_line": 1934,
       "end_line": 1936,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 524
         }
       ],
@@ -12148,14 +12148,14 @@
       "start_line": 411,
       "end_line": 413,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 63
         },
         {
-          "file": "crates/ts_parser/src/expressions.rs",
+          "file": "crates/tsr_parser/src/expressions.rs",
           "line": 489
         }
       ],
@@ -12196,10 +12196,10 @@
       "start_line": 244,
       "end_line": 254,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1122
         }
       ],
@@ -12240,10 +12240,10 @@
       "start_line": 240,
       "end_line": 242,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1043
         }
       ],
@@ -12272,10 +12272,10 @@
       "start_line": 232,
       "end_line": 234,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 549
         }
       ],
@@ -12304,10 +12304,10 @@
       "start_line": 1720,
       "end_line": 1732,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 609
         }
       ],
@@ -12336,10 +12336,10 @@
       "start_line": 1334,
       "end_line": 1336,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 411
         }
       ],
@@ -12368,7 +12368,7 @@
       "start_line": 2657,
       "end_line": 2663,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -12395,10 +12395,10 @@
       "start_line": 387,
       "end_line": 389,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1052
         }
       ],
@@ -12439,10 +12439,10 @@
       "start_line": 600,
       "end_line": 602,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 845
         }
       ],
@@ -12471,10 +12471,10 @@
       "start_line": 566,
       "end_line": 570,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 854
         }
       ],
@@ -12515,10 +12515,10 @@
       "start_line": 344,
       "end_line": 355,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1086
         }
       ],
@@ -12619,10 +12619,10 @@
       "start_line": 362,
       "end_line": 364,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1103
         }
       ],
@@ -12651,10 +12651,10 @@
       "start_line": 375,
       "end_line": 380,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1109
         }
       ],
@@ -12707,10 +12707,10 @@
       "start_line": 608,
       "end_line": 610,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 987
         }
       ],
@@ -12739,10 +12739,10 @@
       "start_line": 1813,
       "end_line": 1815,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 789
         }
       ],
@@ -12783,10 +12783,10 @@
       "start_line": 1799,
       "end_line": 1804,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 626
         }
       ],
@@ -12815,10 +12815,10 @@
       "start_line": 4271,
       "end_line": 4286,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 833
         }
       ],
@@ -12847,10 +12847,10 @@
       "start_line": 767,
       "end_line": 770,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1157
         }
       ],
@@ -12879,10 +12879,10 @@
       "start_line": 260,
       "end_line": 269,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 22
         }
       ],
@@ -12911,10 +12911,10 @@
       "start_line": 310,
       "end_line": 313,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 184
         }
       ],
@@ -12943,10 +12943,10 @@
       "start_line": 2797,
       "end_line": 2809,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities_middle.rs",
+          "file": "crates/tsr_ast/src/utilities_middle.rs",
           "line": 752
         }
       ],
@@ -12987,10 +12987,10 @@
       "start_line": 335,
       "end_line": 341,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 1071
         }
       ],
@@ -13019,10 +13019,10 @@
       "start_line": 1048,
       "end_line": 1051,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 974
         }
       ],
@@ -13099,10 +13099,10 @@
       "start_line": 323,
       "end_line": 329,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 347
         }
       ],
@@ -13131,10 +13131,10 @@
       "start_line": 331,
       "end_line": 333,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 355
         }
       ],
@@ -13175,10 +13175,10 @@
       "start_line": 751,
       "end_line": 753,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities.rs",
+          "file": "crates/tsr_ast/src/utilities.rs",
           "line": 457
         }
       ],
@@ -13207,10 +13207,10 @@
       "start_line": 2874,
       "end_line": 2879,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 799
         }
       ],
@@ -13239,10 +13239,10 @@
       "start_line": 2588,
       "end_line": 2590,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/utilities_middle.rs",
+          "file": "crates/tsr_ast/src/utilities_middle.rs",
           "line": 488
         }
       ],
@@ -13271,14 +13271,14 @@
       "start_line": 66,
       "end_line": 68,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 31
         },
         {
-          "file": "crates/ts_parser/src/expressions.rs",
+          "file": "crates/tsr_parser/src/expressions.rs",
           "line": 476
         }
       ],
@@ -13307,14 +13307,14 @@
       "start_line": 71,
       "end_line": 73,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 35
         },
         {
-          "file": "crates/ts_parser/src/expressions.rs",
+          "file": "crates/tsr_parser/src/expressions.rs",
           "line": 485
         }
       ],
@@ -13343,10 +13343,10 @@
       "start_line": 829,
       "end_line": 831,
       "kind": "source",
-      "planned_crate": "ts_ast",
+      "planned_crate": "tsr_ast",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/binder_helpers.rs",
+          "file": "crates/tsr_ast/src/binder_helpers.rs",
           "line": 40
         }
       ],
@@ -13411,7 +13411,7 @@
       "start_line": 547,
       "end_line": 565,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -13894,7 +13894,7 @@
       "start_line": 2542,
       "end_line": 2558,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -13957,7 +13957,7 @@
       "start_line": 2744,
       "end_line": 2746,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -14020,7 +14020,7 @@
       "start_line": 1008,
       "end_line": 1016,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -14059,7 +14059,7 @@
       "start_line": 2535,
       "end_line": 2540,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -14098,7 +14098,7 @@
       "start_line": 577,
       "end_line": 750,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -14869,7 +14869,7 @@
       "start_line": 2360,
       "end_line": 2366,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -14896,7 +14896,7 @@
       "start_line": 1238,
       "end_line": 1244,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15055,7 +15055,7 @@
       "start_line": 1822,
       "end_line": 1848,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15214,7 +15214,7 @@
       "start_line": 2241,
       "end_line": 2281,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15241,7 +15241,7 @@
       "start_line": 2472,
       "end_line": 2483,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15268,7 +15268,7 @@
       "start_line": 1246,
       "end_line": 1259,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15391,7 +15391,7 @@
       "start_line": 2007,
       "end_line": 2013,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15430,7 +15430,7 @@
       "start_line": 1985,
       "end_line": 1996,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15469,7 +15469,7 @@
       "start_line": 1977,
       "end_line": 1979,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15496,7 +15496,7 @@
       "start_line": 927,
       "end_line": 933,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15523,7 +15523,7 @@
       "start_line": 2436,
       "end_line": 2462,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15550,7 +15550,7 @@
       "start_line": 2117,
       "end_line": 2146,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15577,7 +15577,7 @@
       "start_line": 2148,
       "end_line": 2157,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15604,7 +15604,7 @@
       "start_line": 1646,
       "end_line": 1743,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15667,7 +15667,7 @@
       "start_line": 948,
       "end_line": 977,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15694,7 +15694,7 @@
       "start_line": 1046,
       "end_line": 1056,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15721,7 +15721,7 @@
       "start_line": 1800,
       "end_line": 1806,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15832,7 +15832,7 @@
       "start_line": 2311,
       "end_line": 2334,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15859,7 +15859,7 @@
       "start_line": 1479,
       "end_line": 1626,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15886,7 +15886,7 @@
       "start_line": 1981,
       "end_line": 1983,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15913,7 +15913,7 @@
       "start_line": 1058,
       "end_line": 1076,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15940,7 +15940,7 @@
       "start_line": 1035,
       "end_line": 1041,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15967,7 +15967,7 @@
       "start_line": 2303,
       "end_line": 2309,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -15994,7 +15994,7 @@
       "start_line": 2221,
       "end_line": 2239,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16021,7 +16021,7 @@
       "start_line": 1850,
       "end_line": 1856,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16060,7 +16060,7 @@
       "start_line": 1872,
       "end_line": 1884,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16087,7 +16087,7 @@
       "start_line": 1749,
       "end_line": 1753,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16162,7 +16162,7 @@
       "start_line": 1745,
       "end_line": 1747,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16309,7 +16309,7 @@
       "start_line": 1767,
       "end_line": 1778,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16348,7 +16348,7 @@
       "start_line": 1164,
       "end_line": 1170,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16375,7 +16375,7 @@
       "start_line": 1027,
       "end_line": 1033,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16414,7 +16414,7 @@
       "start_line": 863,
       "end_line": 878,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16441,7 +16441,7 @@
       "start_line": 850,
       "end_line": 861,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16468,7 +16468,7 @@
       "start_line": 1088,
       "end_line": 1094,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16507,7 +16507,7 @@
       "start_line": 2159,
       "end_line": 2163,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16534,7 +16534,7 @@
       "start_line": 1916,
       "end_line": 1944,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16561,7 +16561,7 @@
       "start_line": 1886,
       "end_line": 1914,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16588,7 +16588,7 @@
       "start_line": 1219,
       "end_line": 1225,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16615,7 +16615,7 @@
       "start_line": 914,
       "end_line": 925,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16642,7 +16642,7 @@
       "start_line": 993,
       "end_line": 1006,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16669,7 +16669,7 @@
       "start_line": 1946,
       "end_line": 1959,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16696,7 +16696,7 @@
       "start_line": 844,
       "end_line": 848,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16723,7 +16723,7 @@
       "start_line": 2343,
       "end_line": 2358,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16762,7 +16762,7 @@
       "start_line": 2496,
       "end_line": 2509,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16801,7 +16801,7 @@
       "start_line": 1808,
       "end_line": 1816,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16864,7 +16864,7 @@
       "start_line": 884,
       "end_line": 886,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16891,7 +16891,7 @@
       "start_line": 880,
       "end_line": 882,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16918,7 +16918,7 @@
       "start_line": 2175,
       "end_line": 2194,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16945,7 +16945,7 @@
       "start_line": 2283,
       "end_line": 2301,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -16984,7 +16984,7 @@
       "start_line": 1761,
       "end_line": 1765,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17011,7 +17011,7 @@
       "start_line": 776,
       "end_line": 819,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17038,7 +17038,7 @@
       "start_line": 1018,
       "end_line": 1025,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17065,7 +17065,7 @@
       "start_line": 828,
       "end_line": 842,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17092,7 +17092,7 @@
       "start_line": 1755,
       "end_line": 1759,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17131,7 +17131,7 @@
       "start_line": 2464,
       "end_line": 2470,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17158,7 +17158,7 @@
       "start_line": 2385,
       "end_line": 2410,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17197,7 +17197,7 @@
       "start_line": 2368,
       "end_line": 2383,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17248,7 +17248,7 @@
       "start_line": 2412,
       "end_line": 2418,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17275,7 +17275,7 @@
       "start_line": 1197,
       "end_line": 1217,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17302,7 +17302,7 @@
       "start_line": 2485,
       "end_line": 2493,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17329,7 +17329,7 @@
       "start_line": 2213,
       "end_line": 2219,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17356,7 +17356,7 @@
       "start_line": 2196,
       "end_line": 2211,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17383,7 +17383,7 @@
       "start_line": 979,
       "end_line": 991,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17470,7 +17470,7 @@
       "start_line": 752,
       "end_line": 757,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17497,7 +17497,7 @@
       "start_line": 1961,
       "end_line": 1969,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17524,7 +17524,7 @@
       "start_line": 772,
       "end_line": 774,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17575,7 +17575,7 @@
       "start_line": 759,
       "end_line": 770,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17602,7 +17602,7 @@
       "start_line": 2096,
       "end_line": 2115,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17629,7 +17629,7 @@
       "start_line": 1123,
       "end_line": 1143,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17656,7 +17656,7 @@
       "start_line": 1971,
       "end_line": 1975,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17683,7 +17683,7 @@
       "start_line": 2015,
       "end_line": 2094,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17710,7 +17710,7 @@
       "start_line": 1261,
       "end_line": 1272,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17737,7 +17737,7 @@
       "start_line": 2336,
       "end_line": 2341,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17764,7 +17764,7 @@
       "start_line": 1172,
       "end_line": 1195,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17803,7 +17803,7 @@
       "start_line": 1858,
       "end_line": 1870,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17830,7 +17830,7 @@
       "start_line": 1309,
       "end_line": 1329,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17857,7 +17857,7 @@
       "start_line": 1331,
       "end_line": 1338,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17884,7 +17884,7 @@
       "start_line": 1392,
       "end_line": 1399,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17911,7 +17911,7 @@
       "start_line": 1401,
       "end_line": 1408,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17938,7 +17938,7 @@
       "start_line": 1410,
       "end_line": 1418,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -17965,7 +17965,7 @@
       "start_line": 1457,
       "end_line": 1463,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18064,7 +18064,7 @@
       "start_line": 1374,
       "end_line": 1379,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18103,7 +18103,7 @@
       "start_line": 1441,
       "end_line": 1447,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18130,7 +18130,7 @@
       "start_line": 1420,
       "end_line": 1426,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18157,7 +18157,7 @@
       "start_line": 1428,
       "end_line": 1434,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18184,7 +18184,7 @@
       "start_line": 1436,
       "end_line": 1439,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18211,7 +18211,7 @@
       "start_line": 527,
       "end_line": 532,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18262,7 +18262,7 @@
       "start_line": 471,
       "end_line": 473,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18601,7 +18601,7 @@
       "start_line": 2740,
       "end_line": 2742,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18712,7 +18712,7 @@
       "start_line": 514,
       "end_line": 518,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18751,7 +18751,7 @@
       "start_line": 479,
       "end_line": 497,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18862,7 +18862,7 @@
       "start_line": 499,
       "end_line": 507,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18925,7 +18925,7 @@
       "start_line": 509,
       "end_line": 512,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -18964,7 +18964,7 @@
       "start_line": 467,
       "end_line": 469,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19027,7 +19027,7 @@
       "start_line": 475,
       "end_line": 477,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19078,7 +19078,7 @@
       "start_line": 419,
       "end_line": 424,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19105,7 +19105,7 @@
       "start_line": 1628,
       "end_line": 1644,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19144,7 +19144,7 @@
       "start_line": 378,
       "end_line": 417,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19207,7 +19207,7 @@
       "start_line": 821,
       "end_line": 826,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19246,7 +19246,7 @@
       "start_line": 426,
       "end_line": 431,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19273,7 +19273,7 @@
       "start_line": 148,
       "end_line": 150,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19564,7 +19564,7 @@
       "start_line": 433,
       "end_line": 452,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19735,7 +19735,7 @@
       "start_line": 152,
       "end_line": 297,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19786,7 +19786,7 @@
       "start_line": 1790,
       "end_line": 1798,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19849,7 +19849,7 @@
       "start_line": 2732,
       "end_line": 2735,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -19912,7 +19912,7 @@
       "start_line": 2728,
       "end_line": 2730,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20083,7 +20083,7 @@
       "start_line": 1998,
       "end_line": 2005,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20110,7 +20110,7 @@
       "start_line": 567,
       "end_line": 575,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20425,7 +20425,7 @@
       "start_line": 301,
       "end_line": 360,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20536,7 +20536,7 @@
       "start_line": 362,
       "end_line": 372,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20575,7 +20575,7 @@
       "start_line": 1227,
       "end_line": 1236,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20602,7 +20602,7 @@
       "start_line": 1465,
       "end_line": 1474,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20629,7 +20629,7 @@
       "start_line": 1340,
       "end_line": 1350,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20656,7 +20656,7 @@
       "start_line": 1145,
       "end_line": 1162,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20695,7 +20695,7 @@
       "start_line": 898,
       "end_line": 912,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20722,7 +20722,7 @@
       "start_line": 1274,
       "end_line": 1292,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20773,7 +20773,7 @@
       "start_line": 1294,
       "end_line": 1304,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20800,7 +20800,7 @@
       "start_line": 2165,
       "end_line": 2173,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20851,7 +20851,7 @@
       "start_line": 520,
       "end_line": 525,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20902,7 +20902,7 @@
       "start_line": 454,
       "end_line": 458,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -20989,7 +20989,7 @@
       "start_line": 460,
       "end_line": 465,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21064,7 +21064,7 @@
       "start_line": 534,
       "end_line": 536,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21103,7 +21103,7 @@
       "start_line": 132,
       "end_line": 138,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21250,7 +21250,7 @@
       "start_line": 935,
       "end_line": 946,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21301,7 +21301,7 @@
       "start_line": 1780,
       "end_line": 1788,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21364,7 +21364,7 @@
       "start_line": 888,
       "end_line": 896,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21403,7 +21403,7 @@
       "start_line": 2580,
       "end_line": 2622,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21430,7 +21430,7 @@
       "start_line": 374,
       "end_line": 376,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21457,7 +21457,7 @@
       "start_line": 2560,
       "end_line": 2569,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21508,7 +21508,7 @@
       "start_line": 120,
       "end_line": 130,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21535,7 +21535,7 @@
       "start_line": 2642,
       "end_line": 2653,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21622,7 +21622,7 @@
       "start_line": 111,
       "end_line": 113,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21649,7 +21649,7 @@
       "start_line": 1096,
       "end_line": 1121,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21688,7 +21688,7 @@
       "start_line": 2756,
       "end_line": 2759,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21727,7 +21727,7 @@
       "start_line": 1078,
       "end_line": 1086,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21754,7 +21754,7 @@
       "start_line": 2673,
       "end_line": 2686,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21781,7 +21781,7 @@
       "start_line": 2796,
       "end_line": 2798,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21820,7 +21820,7 @@
       "start_line": 2800,
       "end_line": 2802,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21847,7 +21847,7 @@
       "start_line": 1449,
       "end_line": 1455,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21874,7 +21874,7 @@
       "start_line": 2531,
       "end_line": 2533,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21901,7 +21901,7 @@
       "start_line": 1818,
       "end_line": 1820,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -21928,7 +21928,7 @@
       "start_line": 2708,
       "end_line": 2722,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22051,7 +22051,7 @@
       "start_line": 2655,
       "end_line": 2671,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22138,7 +22138,7 @@
       "start_line": 2688,
       "end_line": 2706,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22165,7 +22165,7 @@
       "start_line": 2624,
       "end_line": 2640,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22276,7 +22276,7 @@
       "start_line": 2724,
       "end_line": 2726,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22315,7 +22315,7 @@
       "start_line": 2777,
       "end_line": 2787,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22342,7 +22342,7 @@
       "start_line": 2789,
       "end_line": 2794,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22381,7 +22381,7 @@
       "start_line": 1353,
       "end_line": 1358,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22408,7 +22408,7 @@
       "start_line": 115,
       "end_line": 118,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22435,7 +22435,7 @@
       "start_line": 2511,
       "end_line": 2516,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22486,7 +22486,7 @@
       "start_line": 538,
       "end_line": 545,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22561,7 +22561,7 @@
       "start_line": 2518,
       "end_line": 2529,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22588,7 +22588,7 @@
       "start_line": 450,
       "end_line": 461,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22615,7 +22615,7 @@
       "start_line": 25,
       "end_line": 352,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22642,7 +22642,7 @@
       "start_line": 442,
       "end_line": 448,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22681,7 +22681,7 @@
       "start_line": 410,
       "end_line": 415,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22744,7 +22744,7 @@
       "start_line": 417,
       "end_line": 424,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22819,7 +22819,7 @@
       "start_line": 426,
       "end_line": 440,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22930,7 +22930,7 @@
       "start_line": 385,
       "end_line": 408,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -22993,7 +22993,7 @@
       "start_line": 354,
       "end_line": 378,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23020,7 +23020,7 @@
       "start_line": 467,
       "end_line": 483,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23047,7 +23047,7 @@
       "start_line": 463,
       "end_line": 465,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23074,7 +23074,7 @@
       "start_line": 497,
       "end_line": 506,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23101,7 +23101,7 @@
       "start_line": 485,
       "end_line": 495,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23128,7 +23128,7 @@
       "start_line": 134,
       "end_line": 136,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23167,7 +23167,7 @@
       "start_line": 138,
       "end_line": 149,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23218,7 +23218,7 @@
       "start_line": 53,
       "end_line": 61,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23269,7 +23269,7 @@
       "start_line": 63,
       "end_line": 71,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23296,7 +23296,7 @@
       "start_line": 83,
       "end_line": 105,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23359,7 +23359,7 @@
       "start_line": 44,
       "end_line": 51,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23398,7 +23398,7 @@
       "start_line": 73,
       "end_line": 81,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23425,7 +23425,7 @@
       "start_line": 107,
       "end_line": 132,
       "kind": "source",
-      "planned_crate": "ts_binder",
+      "planned_crate": "tsr_binder",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23452,7 +23452,7 @@
       "start_line": 24,
       "end_line": 29,
       "kind": "source",
-      "planned_crate": "ts_collections",
+      "planned_crate": "tsr_collections",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23491,7 +23491,7 @@
       "start_line": 16,
       "end_line": 22,
       "kind": "source",
-      "planned_crate": "ts_collections",
+      "planned_crate": "tsr_collections",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23518,7 +23518,7 @@
       "start_line": 13,
       "end_line": 22,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23569,7 +23569,7 @@
       "start_line": 46,
       "end_line": 50,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23596,7 +23596,7 @@
       "start_line": 195,
       "end_line": 200,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23635,7 +23635,7 @@
       "start_line": 338,
       "end_line": 340,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23662,7 +23662,7 @@
       "start_line": 330,
       "end_line": 332,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23689,7 +23689,7 @@
       "start_line": 382,
       "end_line": 387,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23716,7 +23716,7 @@
       "start_line": 228,
       "end_line": 236,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23743,7 +23743,7 @@
       "start_line": 402,
       "end_line": 407,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23938,7 +23938,7 @@
       "start_line": 411,
       "end_line": 416,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -23965,7 +23965,7 @@
       "start_line": 190,
       "end_line": 197,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24016,7 +24016,7 @@
       "start_line": 18,
       "end_line": 20,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24055,7 +24055,7 @@
       "start_line": 10,
       "end_line": 16,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24094,7 +24094,7 @@
       "start_line": 45,
       "end_line": 50,
       "kind": "source",
-      "planned_crate": "ts_core",
+      "planned_crate": "tsr_core",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24121,7 +24121,7 @@
       "start_line": 2587,
       "end_line": 2653,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24148,10 +24148,10 @@
       "start_line": 2213,
       "end_line": 2221,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [
         {
-          "file": "crates/ts_scanner/src/identifier.rs",
+          "file": "crates/tsr_scanner/src/identifier.rs",
           "line": 28
         }
       ],
@@ -24180,7 +24180,7 @@
       "start_line": 2520,
       "end_line": 2523,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24207,10 +24207,10 @@
       "start_line": 2262,
       "end_line": 2264,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [
         {
-          "file": "crates/ts_scanner/src/identifier.rs",
+          "file": "crates/tsr_scanner/src/identifier.rs",
           "line": 79
         }
       ],
@@ -24239,7 +24239,7 @@
       "start_line": 122,
       "end_line": 127,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24326,7 +24326,7 @@
       "start_line": 22,
       "end_line": 24,
       "kind": "source",
-      "planned_crate": "ts_scanner",
+      "planned_crate": "tsr_scanner",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [
@@ -24353,7 +24353,7 @@
       "start_line": 45,
       "end_line": 54,
       "kind": "source",
-      "planned_crate": "ts_tspath",
+      "planned_crate": "tsr_tspath",
       "rust_mappings": [],
       "rust_generated_provenance": [],
       "call_sites": [

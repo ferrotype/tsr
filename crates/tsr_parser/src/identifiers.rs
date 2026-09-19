@@ -1,7 +1,7 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{Parser, ParserFactory};
-use ts_ast::{FactoryMethods, JsString, NodeId, SyntaxKind};
-use ts_diagnostics::{self as diagnostics, Message};
+use tsr_ast::{FactoryMethods, JsString, NodeId, SyntaxKind};
+use tsr_diagnostics::{self as diagnostics, Message};
 
 impl<F: ParserFactory> Parser<'_, F> {
     pub(crate) fn token_value(&self) -> JsString {

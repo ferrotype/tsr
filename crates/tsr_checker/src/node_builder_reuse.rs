@@ -2,14 +2,14 @@
 //! tracking. Source syntax is retained before a transformed child is published.
 use super::NodeBuilder;
 use crate::{object_flags as of, type_flags as tf, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     node_flags as af, symbol_flags as sf, Factory, FactoryMethods, JsString, NodeListId,
     NodeVisitor, NodeVisitorHooks, SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_nodebuilder::{flags as nf, internal_flags as inf};
-use ts_printer::{
+use tsr_core::TextRange;
+use tsr_nodebuilder::{flags as nf, internal_flags as inf};
+use tsr_printer::{
     emit_flags as ef,
     emit_resolver::{DeclarationTrackerEvent as Event, SymbolAccessibility},
 };
@@ -258,7 +258,7 @@ impl NodeBuilder<'_> {
         let equivalent = if annotation == ty {
             true
         } else if let Some(host) = host.or(self.enclosing) {
-            ts_ast::utilities_middle::has_question_token(
+            tsr_ast::utilities_middle::has_question_token(
                 self.checker.ast(host)?,
                 &self.checker.node(host)?,
             )? && self
@@ -288,14 +288,17 @@ impl NodeBuilder<'_> {
         };
         let kind = self.ast.view().node(result)?.kind();
         let identifier = !(is_method && text.as_bytes() == b"new")
-            && ts_scanner::is_identifier_text(text.as_bytes(), ts_core::LanguageVariant::STANDARD);
+            && tsr_scanner::is_identifier_text(
+                text.as_bytes(),
+                tsr_core::LanguageVariant::STANDARD,
+            );
         let string = !identifier
             && (kind == K::StringLiteral
-                || ts_jsnum::from_string(text.as_bytes())
+                || tsr_jsnum::from_string(text.as_bytes())
                     .to_string()
                     .as_bytes()
                     != text.as_bytes()
-                || ts_jsnum::from_string(text.as_bytes()).value() < 0.0);
+                || tsr_jsnum::from_string(text.as_bytes()).value() < 0.0);
         let renamed = if identifier && kind != K::Identifier {
             Some(self.ast.new_identifier(text))
         } else if string && kind != K::StringLiteral {
@@ -327,12 +330,12 @@ impl NodeBuilder<'_> {
         let same_file =
             enclosing_file.is_some() && self.reuse_source_file(original)? == enclosing_file;
         let read = self.ast.view().node(result)?;
-        if !ts_ast::utilities::node_is_synthesized(&read)
+        if !tsr_ast::utilities::node_is_synthesized(&read)
             || read.flags() & af::SYNTHESIZED == 0
             || !same_file
         {
             let previous = result;
-            result = ts_ast::clone_node(&mut self.ast, result);
+            result = tsr_ast::clone_node(&mut self.ast, result);
             self.ast.set_node_range(result, TextRange::new(-1, -1));
             if let Some(&symbol) = self.identifier_symbol(previous) {
                 self.id_to_symbol.insert(result, symbol);
@@ -368,7 +371,7 @@ impl NodeBuilder<'_> {
         } else {
             self.checker.ast(node)?
         };
-        Ok(ts_ast::utilities::get_source_file_of_node(
+        Ok(tsr_ast::utilities::get_source_file_of_node(
             view,
             Some(node),
         )?)
@@ -396,12 +399,12 @@ impl NodeBuilder<'_> {
                 .node(name)?
                 .data_source()
                 .as_qualified_name()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .right()
                 .ok_or(Error::MissingLink("qualified parameter name"))?;
         }
         if matches!(kind.known(), Some(K::Identifier | K::QualifiedName)) {
-            let result = ts_ast::deep_clone_node(&mut self.ast, Some(name))
+            let result = tsr_ast::deep_clone_node(&mut self.ast, Some(name))
                 .ok_or(Error::MissingLink("parameter name clone"))?;
             self.emit.set_emit_flags(result, ef::NO_ASCII_ESCAPING);
             self.id_to_symbol.insert(result, symbol);
@@ -454,7 +457,7 @@ impl NodeBuilder<'_> {
                 .node(result)?
                 .data_source()
                 .as_binding_element()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             result = self.ast.update_binding_element(
                 result,
@@ -464,8 +467,8 @@ impl NodeBuilder<'_> {
                 None,
             );
         }
-        if !ts_ast::utilities::node_is_synthesized(&self.ast.view().node(result)?) {
-            result = ts_ast::deep_clone_node(&mut self.ast, Some(result))
+        if !tsr_ast::utilities::node_is_synthesized(&self.ast.view().node(result)?) {
+            result = tsr_ast::deep_clone_node(&mut self.ast, Some(result))
                 .ok_or(Error::MissingLink("binding name clone"))?;
         }
         self.emit
@@ -478,11 +481,11 @@ impl NodeBuilder<'_> {
     fn reuse_children(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
         use std::ops::ControlFlow;
         struct Collector<'a> {
-            view: ts_ast::AstView<'a>,
+            view: tsr_ast::AstView<'a>,
             nodes: Vec<NodeId>,
-            error: Option<ts_arena::Error>,
+            error: Option<tsr_arena::Error>,
         }
-        impl ts_ast::ChildVisitor for Collector<'_> {
+        impl tsr_ast::ChildVisitor for Collector<'_> {
             fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
                 self.nodes.push(node);
                 ControlFlow::Continue(())
@@ -496,7 +499,7 @@ impl NodeBuilder<'_> {
                     }
                 }
             }
-            fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> ControlFlow<()> {
+            fn visit_node_slice(&mut self, nodes: tsr_ast::NodeSlice) -> ControlFlow<()> {
                 match self.view.node_slice(nodes) {
                     Ok(nodes) => {
                         self.nodes.extend(nodes.iter().flatten());
@@ -549,7 +552,7 @@ impl NodeBuilder<'_> {
                 result
             };
             v.factory_mut()
-                .set_list_location(result, ts_core::TextRange::new(-1, -1));
+                .set_list_location(result, tsr_core::TextRange::new(-1, -1));
             Some(result)
         };
         let mut visitor = NodeVisitor::new(
@@ -632,14 +635,14 @@ impl NodeBuilder<'_> {
                             | K::NoSubstitutionTemplateLiteral
                     )
                 )
-                .then(|| view.node_text(e).map(ts_ast::NodeText::into_js_string))
+                .then(|| view.node_text(e).map(tsr_ast::NodeText::into_js_string))
                 .transpose()?)
             }
             Some(K::JsxNamespacedName) => {
                 let d = read
                     .data_source()
                     .as_jsx_namespaced_name()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let ns = d.namespace().ok_or(Error::MissingLink("JSX namespace"))?;
                 let name = d.name().ok_or(Error::MissingLink("JSX name"))?;
                 let mut text = view.node_text(ns)?.as_bytes().to_vec();
@@ -663,7 +666,7 @@ impl NodeBuilder<'_> {
         let Some(expression) = expression else {
             return Ok(false);
         };
-        if !ts_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)? {
+        if !tsr_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)? {
             return Ok(false);
         }
         let ty = self.checker.late_name_type(node)?;
@@ -679,12 +682,12 @@ impl NodeBuilder<'_> {
             return Ok(false);
         };
         Ok(read.kind() != K::SourceFile
-            && !ts_ast::utilities::is_binding_pattern(&read)
-            && ts_ast::is_declaration(&view.node(parent)?)
+            && !tsr_ast::utilities::is_binding_pattern(&read)
+            && tsr_ast::is_declaration(&view.node(parent)?)
             && view.node(parent)?.name() == Some(node))
     }
     pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
-        let first = ts_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
+        let first = tsr_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let text = self.checker.node_text(first)?.into_js_string();
         let symbol = self.checker.resolve_name(
             self.enclosing,
@@ -767,15 +770,15 @@ impl NodeBuilder<'_> {
     ) -> Result<(bool, NodeId), Error> {
         let enclosing = override_enclosing.or(self.enclosing);
         let leftmost =
-            ts_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
+            tsr_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let view = self.checker.ast(leftmost)?;
         let read = view.node(leftmost)?;
         let js = read.flags() & af::JAVA_SCRIPT_FILE != 0;
         let parent = read.parent();
         if js
-            && (ts_ast::is_exports_identifier(view, leftmost)?
+            && (tsr_ast::is_exports_identifier(view, leftmost)?
                 || parent
-                    .map(|p| ts_ast::is_module_exports_access_expression(view, p))
+                    .map(|p| tsr_ast::is_module_exports_access_expression(view, p))
                     .transpose()?
                     .unwrap_or(false)
                 || parent
@@ -788,7 +791,7 @@ impl NodeBuilder<'_> {
                         let (Some(left), Some(right)) = (d.left(), d.right()) else {
                             return Ok(false);
                         };
-                        Ok::<_, ts_arena::Error>(
+                        Ok::<_, tsr_arena::Error>(
                             view.node(left)?.kind() == K::Identifier
                                 && view.node(right)?.kind() == K::Identifier
                                 && view.node_text(left)?.as_bytes() == b"module"
@@ -798,14 +801,14 @@ impl NodeBuilder<'_> {
                     .transpose()?
                     .unwrap_or(false))
         {
-            let cloned = ts_ast::deep_clone_node(&mut self.ast, Some(node))
+            let cloned = tsr_ast::deep_clone_node(&mut self.ast, Some(node))
                 .ok_or(Error::MissingLink("JS entity clone"))?;
             return Ok((true, self.set_reused_text_range(cloned, node)?));
         }
         let meaning = self.checker.emit_entity_meaning(node)?;
         if self.checker.node_text(leftmost)?.as_bytes() == b"this" {
             let container =
-                ts_ast::get_this_container(self.checker.ast(leftmost)?, leftmost, false, false)?;
+                tsr_ast::get_this_container(self.checker.ast(leftmost)?, leftmost, false, false)?;
             let symbol = self.checker.get_symbol_of_declaration(container)?;
             let bad = self
                 .checker
@@ -860,7 +863,7 @@ impl NodeBuilder<'_> {
                 if at != Some(self.checker.builtins.unknown_symbol) {
                     self.report(Event::InferenceFallback(node));
                 }
-                let cloned = ts_ast::deep_clone_node(&mut self.ast, Some(node))
+                let cloned = tsr_ast::deep_clone_node(&mut self.ast, Some(node))
                     .ok_or(Error::MissingLink("entity mismatch clone"))?;
                 return Ok((true, self.set_reused_text_range(cloned, node)?));
             }
@@ -871,7 +874,7 @@ impl NodeBuilder<'_> {
             let read = self.checker.symbol(symbol)?;
             if read.flags() & sf::FUNCTION_SCOPED_VARIABLE != 0 {
                 if let Some(declaration) = read.value_declaration() {
-                    if ts_ast::utilities::is_part_of_parameter_declaration(
+                    if tsr_ast::utilities::is_part_of_parameter_declaration(
                         self.checker.ast(declaration)?,
                         declaration,
                     )? || self.checker.node(declaration)?.kind() == K::JSDocParameterTag
@@ -902,7 +905,7 @@ impl NodeBuilder<'_> {
             }
             Ok((bad, self.reuse_attach_symbol(leftmost, node, Some(symbol))?))
         } else {
-            let cloned = ts_ast::deep_clone_node(&mut self.ast, Some(node))
+            let cloned = tsr_ast::deep_clone_node(&mut self.ast, Some(node))
                 .ok_or(Error::MissingLink("unresolved entity clone"))?;
             Ok((bad, self.set_reused_text_range(cloned, node)?))
         }
@@ -970,7 +973,7 @@ impl NodeBuilder<'_> {
         }
     }
     fn reuse_type_reference(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        if ts_ast::utilities_middle::is_const_type_reference(
+        if tsr_ast::utilities_middle::is_const_type_reference(
             self.checker.ast(node)?,
             &self.checker.node(node)?,
         )? {
@@ -997,7 +1000,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_type_reference_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         let name = data
             .type_name
@@ -1022,7 +1025,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_type_query_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         let name = data
             .expr_name
@@ -1045,7 +1048,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_indexed_access_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         let object = data
             .object_type
@@ -1066,7 +1069,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_type_operator_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         let Some(ty) = self.reuse_simple_type(
             data.r#type
@@ -1091,7 +1094,7 @@ impl NodeBuilder<'_> {
         }
         let state = self.reuse_start_scope()?;
         let read = self.checker.node(node)?;
-        let function = ts_ast::utilities::is_function_like(Some(&read));
+        let function = tsr_ast::utilities::is_function_like(Some(&read));
         let result = if function {
             let signature = self.checker.signature_from_declaration(node)?;
             let signature = self.checker.signatures.get(signature)?.clone();
@@ -1107,7 +1110,7 @@ impl NodeBuilder<'_> {
             let parameter = read
                 .data_source()
                 .as_mapped_type_node()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .type_parameter()
                 .ok_or(Error::MissingLink("reused mapped parameter"))?;
             let symbol = self
@@ -1123,15 +1126,15 @@ impl NodeBuilder<'_> {
         };
         let mut result = result;
         if result == Some(node)
-            && !ts_ast::utilities::node_is_synthesized(&self.ast.view().node(node)?)
+            && !tsr_ast::utilities::node_is_synthesized(&self.ast.view().node(node)?)
         {
-            result = ts_ast::deep_clone_node(&mut self.ast, result);
+            result = tsr_ast::deep_clone_node(&mut self.ast, result);
         }
         result = result
             .map(|r| self.set_reused_text_range(r, node))
             .transpose()?;
         if self.reuse_had_error() {
-            if ts_ast::utilities::is_type_node(&self.checker.node(node)?)
+            if tsr_ast::utilities::is_type_node(&self.checker.node(node)?)
                 && self.checker.node(node)?.kind() != K::TypePredicate
             {
                 self.reuse_end_scope(state)?;
@@ -1140,7 +1143,7 @@ impl NodeBuilder<'_> {
                     .ok_or(Error::MissingLink("recovery type"))?;
                 return self.type_node(ty).map(Some);
             }
-            let clone = ts_ast::clone_node(&mut self.ast, node);
+            let clone = tsr_ast::clone_node(&mut self.ast, node);
             return self.set_reused_text_range(clone, node).map(Some);
         }
         Ok(result)
@@ -1198,7 +1201,7 @@ impl NodeBuilder<'_> {
             let data = read
                 .data_source()
                 .as_type_parameter_declaration()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             let (_, name) = self.reuse_track_entity(
                 data.name
@@ -1238,7 +1241,7 @@ impl NodeBuilder<'_> {
                 .node(node)?
                 .data_source()
                 .as_type_operator_node()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             let inner = data
                 .r#type
@@ -1288,7 +1291,7 @@ impl NodeBuilder<'_> {
             if self.checker.node(name)?.kind() == K::ComputedPropertyName
                 && !self.reuse_late_bindable_name(name)?
             {
-                if !ts_ast::has_dynamic_name(self.checker.ast(node)?, Some(node))? {
+                if !tsr_ast::has_dynamic_name(self.checker.ast(node)?, Some(node))? {
                     return self.reuse_visit_children(node).map(Some);
                 }
                 let expression = self
@@ -1298,7 +1301,7 @@ impl NodeBuilder<'_> {
                     .expression()
                     .ok_or(Error::MissingLink("dynamic computed name"))?;
                 let keep = self.internal_flags & inf::ALLOW_UNRESOLVED_NAMES != 0
-                    && ts_ast::is_entity_name_expression(
+                    && tsr_ast::is_entity_name_expression(
                         self.checker.ast(expression)?,
                         expression,
                     )?
@@ -1312,7 +1315,7 @@ impl NodeBuilder<'_> {
             }
         }
         let read = self.checker.node(node)?;
-        if (ts_ast::utilities::is_function_like(Some(&read)) && read.type_node().is_none())
+        if (tsr_ast::utilities::is_function_like(Some(&read)) && read.type_node().is_none())
             || matches!(
                 kind.known(),
                 Some(K::PropertyDeclaration | K::PropertySignature | K::Parameter)
@@ -1321,7 +1324,7 @@ impl NodeBuilder<'_> {
         {
             let mut visited = self.reuse_visit_children(node)?;
             if visited == node {
-                visited = ts_ast::clone_node(&mut self.ast, node);
+                visited = tsr_ast::clone_node(&mut self.ast, node);
                 visited = self.set_reused_text_range(visited, node)?;
             }
             let ty = self.ast.new_keyword_type_node(K::AnyKeyword.into());
@@ -1360,7 +1363,7 @@ impl NodeBuilder<'_> {
                 .node(node)?
                 .expression()
                 .ok_or(Error::MissingLink("computed expression"))?;
-            if ts_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)? {
+            if tsr_ast::is_entity_name_expression(self.checker.ast(expression)?, expression)? {
                 let (error, expression) = self.reuse_track_entity(expression, None)?;
                 if !error {
                     return Ok(Some(
@@ -1379,7 +1382,7 @@ impl NodeBuilder<'_> {
                 .node(node)?
                 .data_source()
                 .as_type_predicate_node()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             let name = data
                 .parameter_name
@@ -1391,7 +1394,7 @@ impl NodeBuilder<'_> {
                 }
                 name
             } else {
-                ts_ast::clone_node(&mut self.ast, name)
+                tsr_ast::clone_node(&mut self.ast, name)
             };
             let asserts = self.reuse_optional_node(data.asserts_modifier)?;
             let ty = self.reuse_optional_node(data.r#type)?;
@@ -1409,7 +1412,7 @@ impl NodeBuilder<'_> {
                 .node(node)?
                 .data_source()
                 .as_conditional_type_node()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             let check = self.reuse_optional_node(data.check_type)?;
             let parameters = self.checker.infer_type_parameters(node)?;
@@ -1431,7 +1434,7 @@ impl NodeBuilder<'_> {
         {
             let mut result = self.reuse_visit_children(node)?;
             if result == node {
-                result = ts_ast::clone_node(&mut self.ast, node);
+                result = tsr_ast::clone_node(&mut self.ast, node);
                 result = self.set_reused_text_range(result, node)?;
             }
             self.emit.add_emit_flags(result, ef::SINGLE_LINE);
@@ -1441,13 +1444,14 @@ impl NodeBuilder<'_> {
             kind.known(),
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
         ) {
-            let result = ts_ast::clone_node(&mut self.ast, node);
+            let result = tsr_ast::clone_node(&mut self.ast, node);
             if kind == K::StringLiteral
                 && self.flags & nf::USE_SINGLE_QUOTES_FOR_STRING_LITERAL_TYPE != 0
             {
-                if let ts_ast::NodeData::StringLiteral(data) = self.ast.node_mut(result)?.data_mut()
+                if let tsr_ast::NodeData::StringLiteral(data) =
+                    self.ast.node_mut(result)?.data_mut()
                 {
-                    data.token_flags |= ts_ast::token_flags::SINGLE_QUOTE;
+                    data.token_flags |= tsr_ast::token_flags::SINGLE_QUOTE;
                 }
             }
             self.emit.add_emit_flags(result, ef::NO_ASCII_ESCAPING);
@@ -1465,7 +1469,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_js_doc_type_literal()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .js_doc_property_tags();
         let tags: Vec<_> = self
             .checker
@@ -1486,7 +1490,7 @@ impl NodeBuilder<'_> {
             let data = read
                 .data_source()
                 .as_js_doc_parameter_or_property_tag()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .to_owned();
             let mut name = data
                 .name
@@ -1498,7 +1502,7 @@ impl NodeBuilder<'_> {
                     .node(name)?
                     .data_source()
                     .as_qualified_name()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .right()
                     .ok_or(Error::MissingLink("documentation qualified name"))?;
             }
@@ -1564,13 +1568,13 @@ impl NodeBuilder<'_> {
             .node(parent)?
             .data_source()
             .as_import_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
-        let mode = ts_ast::utilities_middle::import_attributes_resolution_mode(
+        let mode = tsr_ast::utilities_middle::import_attributes_resolution_mode(
             self.checker.ast(parent)?,
             data.attributes,
         )?
-        .unwrap_or(ts_core::ResolutionMode::NONE);
+        .unwrap_or(tsr_core::ResolutionMode::NONE);
         let original_name = self
             .checker
             .ast(original)?
@@ -1626,7 +1630,7 @@ impl NodeBuilder<'_> {
             .node(node)?
             .data_source()
             .as_import_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .to_owned();
         if let Some(attributes) = data.attributes {
             if self
@@ -1635,7 +1639,7 @@ impl NodeBuilder<'_> {
                 .node(attributes)?
                 .data_source()
                 .as_import_attributes()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .token()
                 == K::AssertKeyword
             {
@@ -1656,7 +1660,7 @@ impl NodeBuilder<'_> {
             .node(argument)?
             .data_source()
             .as_literal_type_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .literal()
             .ok_or(Error::MissingLink("import type literal"))?;
         let specifier = if let Some(name) = self.reuse_module_specifier_override(node, original)? {

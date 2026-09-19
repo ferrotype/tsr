@@ -1,9 +1,9 @@
 //! The print request owns its decoded syntax until emission finishes. Neither
 //! its node ids nor the printer's side tables enter a snapshot or registry.
 
-use ts_arena::Counters;
-use ts_encoder::{decode_nodes, DecodeError, DecodedTree};
-use ts_printer::{EmitContext, Printer, PrinterOptions};
+use tsr_arena::Counters;
+use tsr_encoder::{decode_nodes, DecodeError, DecodedTree};
+use tsr_printer::{EmitContext, Printer, PrinterOptions};
 
 /// The three options accepted by the pinned API's PrintNode request. Transport
 /// base64 decoding is the caller's responsibility; text remains arbitrary bytes.
@@ -17,7 +17,7 @@ pub struct PrintNodeOptions {
 #[derive(Debug, PartialEq, Eq)]
 pub enum PrintError {
     Decode(DecodeError),
-    Print(ts_printer::Error),
+    Print(tsr_printer::Error),
 }
 impl std::fmt::Display for PrintError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

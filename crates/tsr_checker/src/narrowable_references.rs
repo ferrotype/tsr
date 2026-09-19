@@ -1,7 +1,7 @@
 //! Constraint substitution is permitted only at the native reference contexts.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getNarrowableTypeForReference
@@ -77,7 +77,7 @@ impl CheckerState {
                 let argument = read
                     .data_source()
                     .as_element_access_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .argument_expression()
                     .ok_or(Error::MissingLink("index constraint argument"))?;
                 if !self.any_type(ty, &mut |c, t| c.generic_nonnullable_constraint(t))? {

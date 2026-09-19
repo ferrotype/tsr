@@ -1,7 +1,7 @@
 //! Byte-exact observable form of all public and internal CompilerOptions fields.
 use crate::ConfigValue as V;
-use ts_core::CompilerOptions;
-use ts_jsstring::JsString;
+use tsr_core::CompilerOptions;
+use tsr_jsstring::JsString;
 pub fn compiler_options_value(options: &CompilerOptions) -> V {
     let mut values = Vec::new();
     macro_rules! field {

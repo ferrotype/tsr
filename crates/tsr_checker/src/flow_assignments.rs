@@ -1,8 +1,8 @@
 //! One ordered assignment walk per containing function/source. Results publish
 //! only after the scan succeeds; an unsupported edge cannot become a cache hit.
 use crate::{types::Map, CheckerState, Error, LinkStore};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum AssignmentKind {
@@ -70,7 +70,7 @@ impl CheckerState {
     // port: tsc/internal/checker/utilities.go:getAssignmentTargetKind
     pub(crate) fn assignment_target_kind(&self, node: NodeId) -> Result<AssignmentKind, Error> {
         let view = self.ast(node)?;
-        let Some(target) = ts_ast::get_assignment_target(view, node)? else {
+        let Some(target) = tsr_ast::get_assignment_target(view, node)? else {
             return Ok(AssignmentKind::None);
         };
         let target = view.node(target)?;
@@ -79,13 +79,13 @@ impl CheckerState {
                 let binary = target
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let operator = view
                     .node(required(binary.operator_token(), "assignment operator")?)?
                     .kind();
                 Ok(
                     if operator == K::EqualsToken
-                        || ts_ast::is_logical_or_coalescing_assignment_operator(operator)
+                        || tsr_ast::is_logical_or_coalescing_assignment_operator(operator)
                     {
                         AssignmentKind::Definite
                     } else {
@@ -97,7 +97,7 @@ impl CheckerState {
                 Ok(AssignmentKind::Compound)
             }
             Some(K::ForInStatement | K::ForOfStatement) => Ok(AssignmentKind::Definite),
-            _ => Err(ts_arena::Error::InvalidGraph.into()),
+            _ => Err(tsr_arena::Error::InvalidGraph.into()),
         }
     }
 
@@ -118,8 +118,8 @@ impl CheckerState {
             if matches!(
                 read.kind().known(),
                 Some(K::ModuleBlock | K::SourceFile | K::PropertyDeclaration)
-            ) || ts_ast::utilities::is_function_like(Some(&read))
-                && ts_ast::get_immediately_invoked_function_expression(view, id)?.is_none()
+            ) || tsr_ast::utilities::is_function_like(Some(&read))
+                && tsr_ast::get_immediately_invoked_function_expression(view, id)?.is_none()
             {
                 return Ok(Some(id));
             }
@@ -137,7 +137,7 @@ impl CheckerState {
             return Ok(false);
         };
         let view = self.ast(declaration)?;
-        let root = ts_ast::utilities::get_root_declaration(view, declaration)?;
+        let root = tsr_ast::utilities::get_root_declaration(view, declaration)?;
         let read = view.node(root)?;
         if read.kind() == K::Parameter {
             return Ok(true);
@@ -161,7 +161,7 @@ impl CheckerState {
         let parent = required(view.node(declaration)?.parent(), "local declaration list")?;
         let parent = view.node(parent)?;
         if parent.flags() & nf::LET == 0
-            || ts_ast::utilities::get_combined_modifier_flags(view, declaration)? & mf::EXPORT != 0
+            || tsr_ast::utilities::get_combined_modifier_flags(view, declaration)? & mf::EXPORT != 0
         {
             return Ok(false);
         }
@@ -171,7 +171,7 @@ impl CheckerState {
             return Ok(true);
         }
         let container = required(statement.parent(), "variable statement container")?;
-        Ok(!ts_ast::utilities_middle::is_global_source_file(
+        Ok(!tsr_ast::utilities_middle::is_global_source_file(
             view, container,
         )?)
     }
@@ -226,10 +226,10 @@ impl CheckerState {
         let Some(node) = node else {
             return Ok(None);
         };
-        Ok(ts_ast::utilities::find_ancestor(
+        Ok(tsr_ast::utilities::find_ancestor(
             self.ast(node)?,
             Some(node),
-            |read| ts_ast::utilities::is_function_or_source_file(read),
+            |read| tsr_ast::utilities::is_function_or_source_file(read),
         )?)
     }
 
@@ -346,7 +346,7 @@ impl CheckerState {
                     let specifier = read
                         .data_source()
                         .as_export_specifier()
-                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                     let name = required(
                         specifier.property_name().or(read.name()),
                         "export specifier name",
@@ -357,7 +357,7 @@ impl CheckerState {
                     let export = export
                         .data_source()
                         .as_export_declaration()
-                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                     if !specifier.is_type_only()
                         && !export.is_type_only()
                         && export.module_specifier().is_none()
@@ -384,7 +384,7 @@ impl CheckerState {
                 ) => continue,
                 _ => {}
             }
-            if ts_ast::utilities::is_type_node(&read) {
+            if tsr_ast::utilities::is_type_node(&read) {
                 continue;
             }
             stack.extend(self.source_children(node)?.into_iter().rev());

@@ -1,6 +1,6 @@
 //! The parser supplies lazy JSDoc; syntax and encoder crates do not depend on it.
 use crate::{AstView, JSDocRoots, NodeId};
-use ts_arena::Error;
+use tsr_arena::Error;
 
 pub trait JsDocProvider {
     fn jsdoc(

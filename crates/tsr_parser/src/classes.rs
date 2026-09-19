@@ -1,9 +1,9 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{parse_flags, Parser, ParserFactory, ParsingContext};
-use ts_ast::{
+use tsr_ast::{
     node_flags, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_diagnostics as diag;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// Read actual modifiers for source operations that use core.Some, rather

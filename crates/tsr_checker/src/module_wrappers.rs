@@ -1,8 +1,8 @@
 //! Namespace imports retain their original symbol while their anonymous module
 //! type omits call/construct signatures and may expose a synthetic default.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     internal_symbol_names as names, symbol_flags as sf, Diagnostic, JsString, SymbolTable,
 };
 
@@ -130,8 +130,8 @@ impl CheckerState {
     }
     fn clone_module_wrapper_table(
         &mut self,
-        table: Option<ts_ast::SymbolTableId>,
-    ) -> Result<Option<ts_ast::SymbolTableId>, Error> {
+        table: Option<tsr_ast::SymbolTableId>,
+    ) -> Result<Option<tsr_ast::SymbolTableId>, Error> {
         self.clone_symbol_table(table)
     }
     // port: tsc/internal/checker/checker.go:Checker.invocationErrorRecovery
@@ -146,14 +146,14 @@ impl CheckerState {
         let Some(&(target, import)) = self.module_aliases.export_types.get(&symbol) else {
             return Ok(None);
         };
-        if self.node(import)?.kind() == ts_ast::SyntaxKind::CallExpression {
+        if self.node(import)?.kind() == tsr_ast::SyntaxKind::CallExpression {
             return Ok(None);
         }
         let ty = self.get_type_of_symbol(target)?;
         if self.signatures_of_type(ty, construct)?.is_empty() {
             return Ok(None);
         }
-        self.diagnostic_for_node(Some(import), ts_diagnostics::Type_originates_at_this_import_A_namespace_style_import_cannot_be_called_or_constructed_and_will_cause_a_failure_at_runtime_Consider_using_a_default_import_or_import_require_here_instead, vec![]).map(Some)
+        self.diagnostic_for_node(Some(import), tsr_diagnostics::Type_originates_at_this_import_A_namespace_style_import_cannot_be_called_or_constructed_and_will_cause_a_failure_at_runtime_Consider_using_a_default_import_or_import_require_here_instead, vec![]).map(Some)
     }
     pub(crate) fn module_has_signatures(&mut self, ty: TypeId) -> Result<bool, Error> {
         if self.types.flags(ty)? & tf::STRUCTURED_TYPE == 0 {

@@ -1,8 +1,8 @@
 //! Source config value assignment. Enum/type validation belongs to the caller;
 //! this layer preserves the original ParseCompilerOptions conversion boundary.
 use crate::{option_declaration, ConfigValue};
-use ts_core::{CompilerOptions, PathMappings, Tristate};
-use ts_jsstring::JsString;
+use tsr_core::{CompilerOptions, PathMappings, Tristate};
+use tsr_jsstring::JsString;
 
 /// port: tsc/internal/tsoptions/parsinghelpers.go:ParseTristate
 pub fn parse_tristate(value: &ConfigValue) -> Tristate {
@@ -120,7 +120,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"inlineSourceMap" => options.inline_source_map = parse_tristate(value),
         b"inlineSources" => options.inline_sources = parse_tristate(value),
         b"isolatedDeclarations" => options.isolated_declarations = parse_tristate(value),
-        b"jsx" => options.jsx = ts_core::JsxEmit(parse_enum(value)),
+        b"jsx" => options.jsx = tsr_core::JsxEmit(parse_enum(value)),
         b"jsxFactory" => options.jsx_factory = parse_string(value),
         b"jsxFragmentFactory" => options.jsx_fragment_factory = parse_string(value),
         b"jsxImportSource" => options.jsx_import_source = parse_string(value),
@@ -131,13 +131,13 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"listFilesOnly" => options.list_files_only = parse_tristate(value),
         b"locale" => options.locale = parse_string(value),
         b"mapRoot" => options.map_root = parse_string(value),
-        b"module" => options.module = ts_core::ModuleKind(parse_enum(value)),
+        b"module" => options.module = tsr_core::ModuleKind(parse_enum(value)),
         b"moduleResolution" => {
-            options.module_resolution = ts_core::ModuleResolutionKind(parse_enum(value));
+            options.module_resolution = tsr_core::ModuleResolutionKind(parse_enum(value));
         }
         b"moduleSuffixes" => options.module_suffixes = parse_string_array(value),
         b"moduleDetection" | b"moduleDetectionKind" => {
-            options.module_detection = ts_core::ModuleDetectionKind(parse_enum(value));
+            options.module_detection = tsr_core::ModuleDetectionKind(parse_enum(value));
         }
         b"noCheck" => options.no_check = parse_tristate(value),
         b"noFallthroughCasesInSwitch" => {
@@ -199,7 +199,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"sourceRoot" => options.source_root = parse_string(value),
         b"stripInternal" => options.strip_internal = parse_tristate(value),
         b"suppressOutputPathCheck" => options.suppress_output_path_check = parse_tristate(value),
-        b"target" => options.target = ts_core::ScriptTarget(parse_enum(value)),
+        b"target" => options.target = tsr_core::ScriptTarget(parse_enum(value)),
         b"traceResolution" => options.trace_resolution = parse_tristate(value),
         b"tsBuildInfoFile" => options.ts_build_info_file = parse_string(value),
         b"typeRoots" => options.type_roots = parse_string_array(value),
@@ -220,7 +220,7 @@ pub fn parse_compiler_options(key: &[u8], value: &ConfigValue, options: &mut Com
         b"noDtsResolution" => options.no_dts_resolution = parse_tristate(value),
         b"pathsBasePath" => options.paths_base_path = parse_string(value),
         b"outDir" => options.out_dir = parse_string(value),
-        b"newLine" => options.new_line = ts_core::NewLineKind(parse_enum(value)),
+        b"newLine" => options.new_line = tsr_core::NewLineKind(parse_enum(value)),
         b"watch" => options.watch = parse_tristate(value),
         b"pprofDir" => options.pprof_dir = parse_string(value),
         b"singleThreaded" => options.single_threaded = parse_tristate(value),

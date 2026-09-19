@@ -2,8 +2,8 @@ use crate::{
     AstBuilder, AstTransaction, AstView, Node, NodeData, NodeId, NodeKind, NodeMut, NodeRead,
     SourceFileRead, SourceFileState,
 };
-use ts_arena::Error;
-use ts_core::TextRange;
+use tsr_arena::Error;
+use tsr_core::TextRange;
 
 /// Hooks receive identities and an exclusive factory context, with no outstanding
 /// node borrow. An immutable callback can reenter construction or mutate the
@@ -285,8 +285,8 @@ impl<T: Factory + ?Sized> Factory for BorrowedFactory<'_, T> {
 mod tests {
     use super::*;
     use crate::{FactoryMethods, JsString};
-    use ts_arena::Counters;
-    use ts_jsstring::SourceText;
+    use tsr_arena::Counters;
+    use tsr_jsstring::SourceText;
 
     #[test]
     fn header_operations_keep_signed_ranges_flags_and_deferred_parent_validation() {

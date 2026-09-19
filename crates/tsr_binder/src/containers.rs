@@ -3,8 +3,8 @@ use crate::flow_access::BindingFlow;
 use crate::{backend::Backend, target::BindingNode};
 use crate::{need, Binder, ContainerFlags as C};
 use std::ops::ControlFlow;
-use ts_arena::Error;
-use ts_ast::{
+use tsr_arena::Error;
+use tsr_ast::{
     flow_flags as F, modifier_flags, node_flags as N, symbol_flags as S, utilities as u, AstView,
     ChildVisitor, FlowData, JsString, NodeAccess, NodeDataRead, NodeId, NodeListId, NodeSlice,
     SyntaxKind as K,
@@ -170,7 +170,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             .at(index)
     }
     #[cfg(test)]
-    pub(crate) fn syntax_nodes(&self, list: Option<NodeListId>) -> ts_ast::NodeSliceRead<'_> {
+    pub(crate) fn syntax_nodes(&self, list: Option<NodeListId>) -> tsr_ast::NodeSliceRead<'_> {
         let parsed = self.parsed_view();
         let nodes = list.map_or_else(NodeSlice::empty, |list| {
             parsed.list(list).expect("retained syntax list").nodes()
@@ -217,7 +217,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                     }
                 }
                 && !self.is_generator_function_expression(node)
-                && ts_ast::get_immediately_invoked_function_expression(self.view(), node)
+                && tsr_ast::get_immediately_invoked_function_expression(self.view(), node)
                     .expect("retained IIFE")
                     .is_some()
                 || self.node_kind(target) == K::ClassStaticBlockDeclaration;
@@ -252,7 +252,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 && has_body_data(&self.n(node))
             {
                 let body = self.n(node).body();
-                if body.is_some_and(|body| ts_ast::node_is_present(Some(&self.n(body)))) {
+                if body.is_some_and(|body| tsr_ast::node_is_present(Some(&self.n(body)))) {
                     node_flags |= N::HAS_IMPLICIT_RETURN;
                     if self.has_explicit_return {
                         node_flags |= N::HAS_EXPLICIT_RETURN;
@@ -337,7 +337,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             || match target {
                 BindingNode::Local(_) => self.target_is_ambient_module(target),
                 BindingNode::Checked(node) => {
-                    ts_ast::is_ambient_module(self.view(), node).expect("retained module")
+                    tsr_ast::is_ambient_module(self.view(), node).expect("retained module")
                 }
             }
         {
@@ -354,7 +354,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         self.in_assignment_pattern = false;
         if self.same_flow(self.current_flow, self.unreachable_flow) {
             self.set_target_flow(target, None);
-            if ts_ast::is_potentially_executable_node(self.view(), node)
+            if tsr_ast::is_potentially_executable_node(self.view(), node)
                 .expect("retained executable node")
             {
                 self.set_binding_flags(target, self.node_flags(target) | N::UNREACHABLE);
@@ -388,7 +388,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             Some(K::PrefixUnaryExpression) => self.bind_prefix_unary_expression_flow(target),
             Some(K::PostfixUnaryExpression) => self.bind_postfix_unary_expression_flow(target),
             Some(K::BinaryExpression) => {
-                if ts_ast::is_destructuring_assignment(self.view(), node)
+                if tsr_ast::is_destructuring_assignment(self.view(), node)
                     .expect("retained destructuring expression")
                 {
                     self.in_assignment_pattern = saved_pattern;
@@ -550,7 +550,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
     pub(crate) fn add_to_container_chain(&mut self, next: NodeId) {
         if let Some(last) = self.last_container {
             assert!(
-                ts_ast::is_locals_container(&self.n(last)),
+                tsr_ast::is_locals_container(&self.n(last)),
                 "locals-container payload required"
             );
             self.set_node_next_container(last, Some(next));
@@ -593,13 +593,13 @@ impl ChildVisitor for Binder<'_, '_, '_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::Counters;
-    use ts_ast::Node;
-    use ts_ast::{
+    use tsr_arena::Counters;
+    use tsr_ast::Node;
+    use tsr_ast::{
         AstBuilder, FactoryMethods, JSDocParameterOrPropertyTagData, MethodDeclarationData,
     };
-    use ts_core::TextRange;
-    use ts_jsstring::SourceText;
+    use tsr_core::TextRange;
+    use tsr_jsstring::SourceText;
 
     #[test]
     fn immediate_child_storage_covers_the_pinned_schema() {
@@ -738,7 +738,7 @@ mod tests {
         let empty = ast.node_slice(Vec::new()).unwrap();
         let node = Node::from_factory_parts(
             K::JSDocTypeLiteral.into(),
-            ts_ast::JSDocTypeLiteralData {
+            tsr_ast::JSDocTypeLiteralData {
                 js_doc_property_tags: empty,
                 is_array_type: false,
             }

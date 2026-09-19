@@ -3,11 +3,11 @@ use crate::{
     target::{target_payload, BindingNode},
     Binder,
 };
-use ts_ast::{
+use tsr_ast::{
     internal_symbol_names as names, node_flags as nf, symbol_flags as sf, JsString, NodeId,
     SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.bindPropertyWorker

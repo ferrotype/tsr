@@ -4,12 +4,12 @@ use crate::{
     object_flags as of, type_facts as facts, type_flags as tf, CheckerState, Error, RelationKind,
     TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags as cf, modifier_flags as mf, symbol_flags as sf, JsString, SymbolTable,
     SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isValidSpreadType
@@ -120,7 +120,7 @@ impl CheckerState {
         let mut private = false;
         let mut in_class = false;
         for declaration in declarations.iter().flatten() {
-            private |= ts_ast::utilities::is_private_identifier_class_element_declaration(
+            private |= tsr_ast::utilities::is_private_identifier_class_element_declaration(
                 self.ast(declaration)?,
                 declaration,
             )?;
@@ -204,7 +204,7 @@ impl CheckerState {
                     }
                 }
             }
-            let flags = ts_ast::utilities::get_combined_modifier_flags(
+            let flags = tsr_ast::utilities::get_combined_modifier_flags(
                 self.ast(declaration)?,
                 declaration,
             )?;

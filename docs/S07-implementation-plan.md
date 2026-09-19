@@ -27,7 +27,7 @@ checker merely because later checker consumers need binding APIs.
 | Existing sprint requirement | Concrete deliverable | Acceptance |
 | --- | --- | --- |
 | S07-1 | File-owned symbols, tables, flow graphs, bind diagnostics and both binder resolver helpers | Exact binder corpus parity plus separate resolver observations |
-| S07-2 | Object-safe in-memory host, options, paths, resolution and bundled-library closure in `ts_compiler` and its dependency crates | Every frozen subset variant loads the same ordered files, options, references and diagnostics as Go |
+| S07-2 | Object-safe in-memory host, options, paths, resolution and bundled-library closure in `tsr_compiler` and its dependency crates | Every frozen subset variant loads the same ordered files, options, references and diagnostics as Go |
 | S07-3 | Feature rule, primary manifest, effective options, exclusions and future-consumer operation inventory | Independently regenerated frozen subset; no skipped required rows |
 | S07-4 | Identical pinned VS Code parse+bind runs with retained results, one/eight workers, actual allocation and RSS samples | RSS and allocated bytes each <=0.7 of Go; wall time <=1.0 at each worker count |
 | S07-5 | Real bound files shared between program owners and retained through snapshot replacement | Two separate E3 criteria, with release import checks and final-drop evidence |
@@ -63,14 +63,14 @@ ranges. Parser-private partial helpers do not cover the full binder contract.
 
 | Component | Home | Responsibility |
 | --- | --- | --- |
-| Symbols/flow types and immutable bind result | `ts_ast::{symbols,flow,bind_result}` | Shared types usable by AST, binder and later checker without a dependency cycle |
-| File binding lifecycle | `ts_ast` plus generic owner primitives in `ts_arena` only where needed | One initialization, stable identities, exclusive writes, publication, retention |
-| Binder | `ts_binder::{state,declarations,containers,flow,expressions,statements,jsdoc,diagnostics,expando}` | Pinned bind traversal and state transitions |
-| Name/reference lookup | `ts_binder::{name_resolver,reference_resolver}` | Real hook-driven source algorithms; no fabricated checker answers |
-| Source-facing helpers | `ts_ast`, `ts_scanner`, `ts_core` | Correct shared dependency slices rather than binder-local copies |
-| Options/configuration | `ts_core` option values; `ts_tsoptions` interpretation | Pinned defaults, configuration diagnostics and option projection |
-| Paths/filesystem/resolution | `ts_core::path`, `ts_vfs`, `ts_module` | Canonical identity, immutable in-memory files, supported resolver operations and caches |
-| Libraries/programs/snapshots | `ts_bundled`, `ts_compiler` | Embedded source, file inclusion, bound-file sharing, immutable snapshot roots |
+| Symbols/flow types and immutable bind result | `tsr_ast::{symbols,flow,bind_result}` | Shared types usable by AST, binder and later checker without a dependency cycle |
+| File binding lifecycle | `tsr_ast` plus generic owner primitives in `tsr_arena` only where needed | One initialization, stable identities, exclusive writes, publication, retention |
+| Binder | `tsr_binder::{state,declarations,containers,flow,expressions,statements,jsdoc,diagnostics,expando}` | Pinned bind traversal and state transitions |
+| Name/reference lookup | `tsr_binder::{name_resolver,reference_resolver}` | Real hook-driven source algorithms; no fabricated checker answers |
+| Source-facing helpers | `tsr_ast`, `tsr_scanner`, `tsr_core` | Correct shared dependency slices rather than binder-local copies |
+| Options/configuration | `tsr_core` option values; `tsr_tsoptions` interpretation | Pinned defaults, configuration diagnostics and option projection |
+| Paths/filesystem/resolution | `tsr_core::path`, `tsr_vfs`, `tsr_module` | Canonical identity, immutable in-memory files, supported resolver operations and caches |
+| Libraries/programs/snapshots | `tsr_bundled`, `tsr_compiler` | Embedded source, file inclusion, bound-file sharing, immutable snapshot roots |
 | Producers | `scripts/s07_*.py`, `scripts/s07_oracle/`, Rust examples | Frozen observations, strict comparison, measured benchmark runs |
 
 Keep `lib.rs` as the public boundary. Do not add a new crate merely for each Go
@@ -426,7 +426,7 @@ also the dependency contract for E2/E7/E8.
   These bytes bypass filesystem BOM decoding. Source filesystem loading retains
   the S06 physical/virtual parser-text boundary.
 
-`ts_compiler::Program` owns its immutable host/options view and retained bound
+`tsr_compiler::Program` owns its immutable host/options view and retained bound
 files/bundles. It exposes source lookup, ordered files, resolution results, bind
 results and the eventual checker.Program dependency seam without a fake checker.
 Equivalent file requests reuse the same parsed/bound owner through an explicit

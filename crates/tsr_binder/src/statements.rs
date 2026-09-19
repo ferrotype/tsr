@@ -2,7 +2,7 @@
 use crate::flow_access::BindingFlow;
 use crate::target::{target_payload, BindingNode};
 use crate::{need, ActiveLabel, Binder};
-use ts_ast::{flow_flags as F, node_flags, JsString, SyntaxKind as K};
+use tsr_ast::{flow_flags as F, node_flags, JsString, SyntaxKind as K};
 
 impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.setContinueTarget

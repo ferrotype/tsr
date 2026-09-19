@@ -2,14 +2,14 @@ use crate::{
     glob::{SpecMatcher, Usage},
     ConfigFileSpecs,
 };
-use ts_core::CompilerOptions;
-use ts_jsstring::JsString;
-use ts_vfs::{Error, FileSystem};
+use tsr_core::CompilerOptions;
+use tsr_jsstring::JsString;
+use tsr_vfs::{Error, FileSystem};
 fn key(value: &[u8], case_sensitive: bool) -> JsString {
     if case_sensitive {
         JsString::from_bytes(value)
     } else {
-        JsString::from_bytes(ts_tspath::file_name_lower_case(value).into_owned())
+        JsString::from_bytes(tsr_tspath::file_name_lower_case(value).into_owned())
     }
 }
 type FileMap = Vec<(JsString, JsString)>;
@@ -27,7 +27,7 @@ fn extension_is(file: &[u8], extension: &[u8]) -> bool {
     file.len() > extension.len() && file.ends_with(extension)
 }
 fn changed_extension(file: &[u8], extension: &[u8]) -> Vec<u8> {
-    let base = ts_tspath::remove_file_extension(file);
+    let base = tsr_tspath::remove_file_extension(file);
     if base.len() == file.len() {
         return file.to_vec();
     }
@@ -85,7 +85,7 @@ pub fn file_names_from_specs(
     host: &dyn FileSystem,
     extra: &[JsString],
 ) -> Result<(Vec<JsString>, usize), Error> {
-    let base = ts_tspath::normalize(base);
+    let base = tsr_tspath::normalize(base);
     let case_sensitive = host.use_case_sensitive_file_names();
     let (mut literal, mut wildcard, mut json) = (FileMap::new(), FileMap::new(), FileMap::new());
     let supported = crate::supported_extensions(options, extra);
@@ -93,7 +93,7 @@ pub fn file_names_from_specs(
         set(
             &mut literal,
             key(file.as_bytes(), case_sensitive),
-            JsString::from_bytes(ts_tspath::absolute(file.as_bytes(), &base)),
+            JsString::from_bytes(tsr_tspath::absolute(file.as_bytes(), &base)),
         );
     }
     let json_specs: Vec<_> = specs

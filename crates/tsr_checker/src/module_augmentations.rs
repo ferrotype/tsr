@@ -1,11 +1,11 @@
 //! Pattern modules merge in source order, then concrete augmentations apply to
 //! their resolved target. Pattern augmentation copies never change the wildcard.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     internal_symbol_names as names, node_flags as nf, symbol_flags as sf, SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 impl CheckerState {
     pub(crate) fn collect_pattern_ambient_modules(&mut self, source: NodeId) -> Result<(), Error> {
         let patterns = self

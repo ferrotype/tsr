@@ -1,9 +1,9 @@
 use super::*;
 use std::cell::RefCell;
 use std::sync::mpsc;
-use ts_arena::{Counters, Counts};
-use ts_checker::CheckerOptions;
-use ts_project::{CheckerPool, Project};
+use tsr_arena::{Counters, Counts};
+use tsr_checker::CheckerOptions;
+use tsr_project::{CheckerPool, Project};
 
 thread_local! {
     static PUBLICATION_PAUSE: RefCell<Option<(mpsc::Sender<()>, mpsc::Receiver<()>)>> = const { RefCell::new(None) };
@@ -24,7 +24,7 @@ fn pool(counters: &Counters) -> Arc<CheckerPool> {
     CheckerPool::for_types(CheckerOptions::default(), counters, 1)
 }
 fn snapshot(pool: &Arc<CheckerPool>) -> Snapshot {
-    Snapshot::new(ts_project::Snapshot::new(Project::new(pool.clone()))).unwrap()
+    Snapshot::new(tsr_project::Snapshot::new(Project::new(pool.clone()))).unwrap()
 }
 fn prepared(snapshot: &Snapshot, bytes: &[u8]) -> (u32, PreparedResponse) {
     let operation = snapshot.checker().operation().unwrap();
@@ -37,8 +37,8 @@ fn prepared(snapshot: &Snapshot, bytes: &[u8]) -> (u32, PreparedResponse) {
 fn retired<T>(result: Result<T, Error>) {
     assert_eq!(
         result.err(),
-        Some(Error::Checker(ts_checker::Error::Arena(
-            ts_arena::Error::Retired
+        Some(Error::Checker(tsr_checker::Error::Arena(
+            tsr_arena::Error::Retired
         )))
     );
 }
@@ -93,7 +93,7 @@ fn retirement_before_commit_suppresses_registry_shared_result_and_success() {
         retired(second.latest());
         assert!(matches!(
             pool.acquire(CheckerSlot::Diagnostics),
-            Err(ts_checker::Error::Arena(ts_arena::Error::Retired))
+            Err(tsr_checker::Error::Arena(tsr_arena::Error::Retired))
         ));
     }
     assert_eq!(counters.snapshot(), Counts::default());
@@ -126,7 +126,7 @@ fn commit_holds_generation_gate_through_queue_publication() {
             });
             ready_rx.recv().unwrap();
             let retiring = scope.spawn(|| {
-                ts_arena::observe_next_retirement_contention(attempted);
+                tsr_arena::observe_next_retirement_contention(attempted);
                 pool.generation().retire();
                 retired_tx.send(()).unwrap();
             });
@@ -173,7 +173,7 @@ fn commitment_before_retirement_survives_delivery_but_handles_are_invalidated() 
         assert_eq!(shared.type_ids().collect::<Vec<_>>(), [id]);
         first
             .with_type(id, |op, ty| {
-                assert_eq!(op.type_kind(ty).unwrap(), ts_checker::TypeKind::Intrinsic);
+                assert_eq!(op.type_kind(ty).unwrap(), tsr_checker::TypeKind::Intrinsic);
                 Ok(())
             })
             .unwrap();
@@ -205,7 +205,7 @@ fn lookup_releases_registry_and_gate_before_permit_acquisition_and_revalidates()
         let (attempted, attempted_rx) = mpsc::channel();
         std::thread::scope(|scope| {
             let reader = scope.spawn(|| {
-                ts_arena::observe_next_lease_contention(attempted);
+                tsr_arena::observe_next_lease_contention(attempted);
                 retired::<()>(
                     first.with_type(id, |_, _| panic!("retired callback must not execute")),
                 );
@@ -231,7 +231,7 @@ fn callback_reentry_requires_releasing_the_operation_and_rechecks_retirement() {
         let snapshot = snapshot(&pool);
         let slot = pool.acquire(CheckerSlot::Api).unwrap();
         let operation = slot.operation().unwrap();
-        assert!(matches!(slot.resume(), Err(ts_checker::Error::Reentry)));
+        assert!(matches!(slot.resume(), Err(tsr_checker::Error::Reentry)));
         drop(operation);
         snapshot
             .request(|| {
@@ -246,7 +246,7 @@ fn callback_reentry_requires_releasing_the_operation_and_rechecks_retirement() {
         retired(outcome);
         assert!(matches!(
             slot.resume(),
-            Err(ts_checker::Error::Arena(ts_arena::Error::Retired))
+            Err(tsr_checker::Error::Arena(tsr_arena::Error::Retired))
         ));
     }
     assert_eq!(counters.snapshot(), Counts::default());
@@ -287,8 +287,8 @@ fn equal_numeric_ids_cannot_cross_checkers_snapshots_or_replacement_generations(
         assert_eq!(foreign.id(), id);
         assert!(matches!(
             old.prepare(&operation, &[foreign], vec![]),
-            Err(Error::Checker(ts_checker::Error::Arena(
-                ts_arena::Error::WrongOwner
+            Err(Error::Checker(tsr_checker::Error::Arena(
+                tsr_arena::Error::WrongOwner
             )))
         ));
         drop(operation);

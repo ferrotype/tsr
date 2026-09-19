@@ -1,8 +1,8 @@
 //! Public location queries follow contextual syntax classification. Checking an
 //! identifier expression directly is not equivalent to querying a property name.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, AstView, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, AstView, SyntaxKind as K};
 
 // port: tsc/internal/ast/utilities.go:IsDeclarationNameOrImportPropertyName
 pub(super) fn declaration_or_import_name(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
@@ -19,8 +19,8 @@ pub(super) fn declaration_or_import_name(view: AstView<'_>, node: NodeId) -> Res
             matches!(read.kind().known(), Some(K::Identifier | K::StringLiteral))
         } else {
             read.kind() != K::SourceFile
-                && !ts_ast::utilities::is_binding_pattern(&read)
-                && ts_ast::is_declaration(&parent)
+                && !tsr_ast::utilities::is_binding_pattern(&read)
+                && tsr_ast::is_declaration(&parent)
                 && parent.name() == Some(node)
         },
     )
@@ -56,7 +56,7 @@ impl CheckerState {
     pub(crate) fn symbol_at_literal_location(
         &mut self,
         node: NodeId,
-    ) -> Result<Option<ts_arena::SymbolId>, Error> {
+    ) -> Result<Option<tsr_arena::SymbolId>, Error> {
         let view = self.ast(node)?;
         let read = view.node(node)?;
         let Some(parent) = read.parent() else {
@@ -78,7 +78,7 @@ impl CheckerState {
                 Some(K::ImportDeclaration | K::JSImportDeclaration | K::ExportDeclaration)
             ) && parent_read.module_specifier() == Some(node);
             let require = grandparent
-                .map(|g| ts_ast::is_variable_declaration_initialized_to_require(view, g))
+                .map(|g| tsr_ast::is_variable_declaration_initialized_to_require(view, g))
                 .transpose()?
                 .unwrap_or(false);
             let import_type = if let Some(grand) = grandparent {
@@ -101,7 +101,7 @@ impl CheckerState {
                 return self.resolve_external_module_name(node, node, true);
             }
             if parent_read.kind() == K::CallExpression
-                && ts_ast::is_bindable_object_define_property_call(view, parent)?
+                && tsr_ast::is_bindable_object_define_property_call(view, parent)?
             {
                 let args = parent_read.arguments(view)?;
                 if view.node_slice(args)?.get(1) == Some(Some(node)) {
@@ -195,7 +195,7 @@ impl CheckerState {
     fn type_of_location_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let read = self.node(node)?;
         if read.kind() == K::SourceFile
-            && !ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(node)?)
+            && !tsr_ast::utilities::is_external_or_common_js_module(&self.source_file_read(node)?)
             || read.flags() & nf::IN_WITH_STATEMENT != 0
         {
             return Ok(self.builtins.error_type);
@@ -257,7 +257,7 @@ impl CheckerState {
                 .type_for_variable_like_raw(node, true, 0 /* CheckModeNormal */)?
                 .unwrap_or(self.builtins.error_type));
         }
-        if ts_ast::is_declaration(&self.node(node)?) {
+        if tsr_ast::is_declaration(&self.node(node)?) {
             return match self.get_symbol_of_declaration(node)? {
                 Some(symbol) => self.get_type_of_symbol(symbol),
                 None => Ok(self.builtins.error_type),
@@ -269,7 +269,7 @@ impl CheckerState {
                 None => Ok(self.builtins.error_type),
             };
         }
-        if ts_ast::utilities::is_binding_pattern(&self.node(node)?) {
+        if tsr_ast::utilities::is_binding_pattern(&self.node(node)?) {
             let parent = parent.ok_or(Error::MissingLink("binding pattern parent"))?;
             return Ok(self
                 .type_for_variable_like_raw(parent, true, 0 /* CheckModeNormal */)?

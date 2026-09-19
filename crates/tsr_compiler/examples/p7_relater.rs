@@ -15,9 +15,9 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::time::Instant;
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::{CheckerOwner, Operation, RelationKind, TypeRef};
-use ts_compiler::{Program, ProgramCheckerHost};
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::{CheckerOwner, Operation, RelationKind, TypeRef};
+use tsr_compiler::{Program, ProgramCheckerHost};
 
 use s08_relater_prototype as proto;
 
@@ -108,7 +108,7 @@ fn mode_of(value: &Value) -> Result<(RelationKind, proto::Mode)> {
     })
 }
 
-fn diagnostic_payload(program: &Program, d: &ts_ast::Diagnostic) -> Result<Value> {
+fn diagnostic_payload(program: &Program, d: &tsr_ast::Diagnostic) -> Result<Value> {
     let file = if let Some(file) = d.file {
         let file = program
             .files()
@@ -130,7 +130,7 @@ fn diagnostic_payload(program: &Program, d: &ts_ast::Diagnostic) -> Result<Value
 
 /// A/B declaration nodes and declared types of one fixture on one checker.
 struct Lookup {
-    declarations: BTreeMap<Vec<u8>, ts_arena::NodeId>,
+    declarations: BTreeMap<Vec<u8>, tsr_arena::NodeId>,
     types: BTreeMap<String, TypeRef>,
 }
 

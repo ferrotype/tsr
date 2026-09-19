@@ -1,8 +1,8 @@
 //! Non-arithmetic operator diagnostics use source syntax as well as type facts.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -75,7 +75,7 @@ impl CheckerState {
             let data = read
                 .data_source()
                 .as_binary_expression()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             let operand = required(data.left(), "coalescing enclosing left")?;
             let operator = required(data.operator_token(), "coalescing enclosing operator")?;
             if self.node(operand)?.kind() == K::BinaryExpression
@@ -88,7 +88,7 @@ impl CheckerState {
                 self.node(left)?
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .operator_token(),
                 "left coalescing operator",
             )?;
@@ -112,7 +112,7 @@ impl CheckerState {
                 self.node(right)?
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .operator_token(),
                 "right coalescing operator",
             )?;
@@ -184,7 +184,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let left = required(data.left(), "nullish left")?;
                 let right = required(data.right(), "nullish right")?;
                 let token = required(data.operator_token(), "nullish operator")?;
@@ -212,7 +212,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_conditional_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let a = required(data.when_true(), "nullish true")?;
                 let b = required(data.when_false(), "nullish false")?;
                 self.syntactic_nullishness(a)? | self.syntactic_nullishness(b)?
@@ -235,16 +235,16 @@ impl CheckerState {
         right: NodeId,
         result: TypeId,
     ) -> Result<TypeId, Error> {
-        if self.program()?.host.options().allow_unreachable_code != ts_core::Tristate::TRUE
+        if self.program()?.host.options().allow_unreachable_code != tsr_core::Tristate::TRUE
             && self.side_effect_free(left)?
             && !self.indirect_call(left, right)?
         {
             let view = self.ast(left)?;
-            let source = ts_ast::utilities::get_source_file_of_node(view, Some(left))?
+            let source = tsr_ast::utilities::get_source_file_of_node(view, Some(left))?
                 .ok_or(Error::MissingLink("comma source"))?;
             let file = view.source_file(source)?;
             let start =
-                ts_scanner::skip_trivia(file.text().as_bytes(), view.node(left)?.pos().into());
+                tsr_scanner::skip_trivia(file.text().as_bytes(), view.node(left)?.pos().into());
             let in_jsx_diagnostic = file.diagnostics().iter().any(|diagnostic| {
                 diagnostic.code == d::JSX_expressions_must_have_one_parent_element.code
                     && (diagnostic.loc.pos() <= start && start < diagnostic.loc.end())
@@ -293,7 +293,7 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_conditional_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
                 self.side_effect_free(required(data.when_true(), "side effect true")?)?
                     && self.side_effect_free(required(data.when_false(), "side effect false")?)?
             }
@@ -301,8 +301,8 @@ impl CheckerState {
                 let data = read
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
-                !ts_ast::is_assignment_operator(
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
+                !tsr_ast::is_assignment_operator(
                     self.ast(node)?
                         .node(required(data.operator_token(), "side effect operator")?)?
                         .kind(),
@@ -312,7 +312,7 @@ impl CheckerState {
             Some(K::PrefixUnaryExpression) => matches!(
                 read.data_source()
                     .as_prefix_unary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .operator()
                     .known(),
                 Some(K::ExclamationToken | K::PlusToken | K::MinusToken | K::TildeToken)
@@ -353,7 +353,7 @@ impl CheckerState {
     pub(crate) fn check_nan_equality(
         &mut self,
         node: NodeId,
-        operator: ts_ast::NodeKind,
+        operator: tsr_ast::NodeKind,
         left: NodeId,
         right: NodeId,
     ) -> Result<(), Error> {
@@ -383,7 +383,7 @@ impl CheckerState {
         while self.node(expression)?.kind() == K::ParenthesizedExpression {
             expression = required(self.node(expression)?.expression(), "NaN parentheses")?;
         }
-        let name = if ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        let name = if tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             self.entity_name_text(expression)?
         } else {
             JsString::from_bytes(b"...".as_slice())
@@ -414,7 +414,7 @@ impl CheckerState {
             return Ok(false);
         }
         let global =
-            self.lookup_symbol(self.builtins.globals, b"NaN", ts_ast::symbol_flags::VALUE)?;
+            self.lookup_symbol(self.builtins.globals, b"NaN", tsr_ast::symbol_flags::VALUE)?;
         Ok(global.is_some() && global == Some(self.resolved_value_symbol(node)?))
     }
     // port: tsc/internal/checker/utilities.go:isLiteralExpressionOfObject

@@ -8,14 +8,14 @@ from s06_ownership import validate_output
 
 GROUPS = ("shared_bound_file", "retained_snapshot_edit")
 COMMON = {
-    "binding_publication": ("ts_ast", "bind_tests::"),
-    "exclusive_binding": ("ts_binder", "exclusive_tests::"),
-    "core_validation_proof": ("ts_ast", "storage::validation_proof_tests::"),
-    "local_ast": ("ts_ast", "local_bind_tests::"),
-    "local_ast_core": ("ts_ast", "bind_result::local_bind::"),
-    "local_binder": ("ts_binder", "local_tests::"),
-    "local_flow_ids": ("ts_binder", "flow_access::tests::"),
-    "local_symbol_ids": ("ts_binder", "symbol_access::tests::"),
+    "binding_publication": ("tsr_ast", "bind_tests::"),
+    "exclusive_binding": ("tsr_binder", "exclusive_tests::"),
+    "core_validation_proof": ("tsr_ast", "storage::validation_proof_tests::"),
+    "local_ast": ("tsr_ast", "local_bind_tests::"),
+    "local_ast_core": ("tsr_ast", "bind_result::local_bind::"),
+    "local_binder": ("tsr_binder", "local_tests::"),
+    "local_flow_ids": ("tsr_binder", "flow_access::tests::"),
+    "local_symbol_ids": ("tsr_binder", "symbol_access::tests::"),
 }
 # libtest filters are substrings, not module prefixes. Keep the explicitly
 # inventoried local AST suite out of the publication batch; it executes below.
@@ -38,7 +38,7 @@ def validate_manifest(manifest):
     identities = set()
     for suite in suites:
         if (type(suite) is not dict or set(suite) != {"package", "filter", "skip", "exact", "cases"}
-                or type(suite["package"]) is not str or suite["package"] not in {"ts_ast", "ts_binder", "ts_compiler"}
+                or type(suite["package"]) is not str or suite["package"] not in {"tsr_ast", "tsr_binder", "tsr_compiler"}
                 or type(suite["filter"]) is not str or not suite["filter"]
                 or type(suite["skip"]) is not list
                 or any(type(skip) is not str or not re.fullmatch(r"(?:[a-z0-9_]+::)+", skip)
@@ -61,7 +61,7 @@ def validate_manifest(manifest):
         if ((suite["package"], suite["filter"], suite["exact"]) != (package, prefix, False)
                 or suite["skip"] != SKIPS.get(name, [])):
             raise ValueError("S07 common ownership suite changed scope: " + name)
-    if any(suite["package"] != "ts_compiler" or not suite["exact"] or suite["skip"]
+    if any(suite["package"] != "tsr_compiler" or not suite["exact"] or suite["skip"]
            or not suite["filter"].startswith("ownership_tests::") for suite in manifest["groups"].values()):
         raise ValueError("S07 program ownership group changed scope")
     return manifest

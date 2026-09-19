@@ -113,8 +113,8 @@ pub use subtree_facts::{is_left_hand_side_expression_kind, subtree_flags, Subtre
 pub use subtree_generated::SubtreeContext;
 pub use tokens::{token_flags, CommentDirective, CommentDirectiveKind, TokenFlags};
 pub use transform_generated::{VisitContext, VisitorMethods};
-pub use ts_arena::{ArenaId, NodeId};
-pub use ts_jsstring::JsString;
+pub use tsr_arena::{ArenaId, NodeId};
+pub use tsr_jsstring::JsString;
 pub use visitor::{
     modifier_to_flag, ListVisit, NodeVisit, NodeVisitor, NodeVisitorHooks, RuntimeFactory,
 };
@@ -230,12 +230,12 @@ impl Node {
     pub fn set_parent(&mut self, parent: Option<NodeId>) {
         self.parent = parent;
     }
-    pub fn set_range(&mut self, range: ts_core::TextRange) {
+    pub fn set_range(&mut self, range: tsr_core::TextRange) {
         self.pos = range.pos() as i32;
         self.end = range.end() as i32;
     }
-    pub fn range(&self) -> ts_core::TextRange {
-        ts_core::TextRange::new(i64::from(self.pos), i64::from(self.end))
+    pub fn range(&self) -> tsr_core::TextRange {
+        tsr_core::TextRange::new(i64::from(self.pos), i64::from(self.end))
     }
     pub fn data_mut(&mut self) -> &mut NodeData {
         &mut self.data
@@ -307,7 +307,7 @@ mod storage_tests;
 #[cfg(test)]
 mod tests;
 
-impl ts_arena::NodeRecord for Node {
+impl tsr_arena::NodeRecord for Node {
     type Aux = AstStorageData;
     type CoreAux = AstStorageData;
     type Store = compact::CoreStore;
@@ -320,7 +320,7 @@ impl ts_arena::NodeRecord for Node {
     }
 }
 
-impl ts_arena::NodeParentRecord for Node {
+impl tsr_arena::NodeParentRecord for Node {
     fn set_storage_parent(&mut self, parent: Option<NodeId>) {
         self.parent = parent;
     }

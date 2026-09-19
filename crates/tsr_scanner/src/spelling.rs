@@ -1,8 +1,8 @@
 //! The pinned Go suggestion distance and simple-fold comparison.
 
-use ts_jsstring::{helpers::to_lower_go, wtf8::decode_utf8};
+use tsr_jsstring::{helpers::to_lower_go, wtf8::decode_utf8};
 
-pub use ts_jsstring::equal_fold;
+pub use tsr_jsstring::equal_fold;
 
 fn runes(mut bytes: &[u8]) -> Vec<i32> {
     let mut result = Vec::with_capacity(bytes.len());

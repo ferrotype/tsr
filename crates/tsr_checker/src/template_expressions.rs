@@ -1,8 +1,8 @@
 //! Runtime template expressions reuse the pinned constant evaluator and type
 //! template interner; contextual templates retain substitution identities.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTemplateExpression
@@ -31,7 +31,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("template literal tail"))?;
             let ty = self.check_expression(expression)?;
             if self.maybe_type_with_constraint(ty, tf::ES_SYMBOL_LIKE)? {
-                self.error_at(Some(expression),ts_diagnostics::Implicit_conversion_of_a_symbol_to_a_string_will_fail_at_runtime_Consider_wrapping_this_expression_in_String,vec![])?;
+                self.error_at(Some(expression),tsr_diagnostics::Implicit_conversion_of_a_symbol_to_a_string_will_fail_at_runtime_Consider_wrapping_this_expression_in_String,vec![])?;
             }
             texts.push(self.node_text(literal)?.into_js_string());
             types.push(

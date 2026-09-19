@@ -3,11 +3,11 @@
 //! scanner ranges and diagnostic payload, not a second expression evaluator.
 
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId};
-use ts_checker::{CheckerOwner, Error};
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
+use tsr_checker::{CheckerOwner, Error};
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 
 fn options() -> CompilerOptions {
     CompilerOptions {
@@ -35,14 +35,14 @@ fn fixture_files(
 ) -> (Arc<CheckerOwner>, Arc<Program>, Counters) {
     let counters = Counters::new();
     let generation = Generation::new(&counters);
-    let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     for &(path, text) in files {
         fs.insert_loaded(path, text);
     }
     let program = Arc::new(
         Program::load(
             ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(
+                config: tsr_tsoptions::ParsedCommandLine::new(
                     options,
                     std::iter::once(root)
                         .chain(
@@ -80,7 +80,7 @@ fn display_rejects_foreign_and_builder_generated_enclosing_nodes() {
     let mut op = owner.operation().unwrap();
     let typ = op.builtin_type("stringType").unwrap();
     let symbol = op
-        .new_symbol(ts_ast::symbol_flags::VARIABLE, b"local", 0)
+        .new_symbol(tsr_ast::symbol_flags::VARIABLE, b"local", 0)
         .unwrap();
     let symbol = op.symbol_ref(symbol).unwrap();
     let generated = op
@@ -94,18 +94,18 @@ fn display_rejects_foreign_and_builder_generated_enclosing_nodes() {
     ] {
         assert_eq!(
             op.type_to_string_at(typ, Some(enclosing), 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner)),
             "type string: {case}"
         );
         assert_eq!(
             op.symbol_to_string_at(symbol, Some(enclosing), 0, 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner)),
             "symbol string: {case}"
         );
         let mut builder = op.node_builder();
         assert_eq!(
             builder.type_to_type_node(typ, Some(enclosing), 0, 0),
-            Err(Error::Arena(ts_arena::Error::WrongOwner)),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner)),
             "type node: {case}"
         );
         assert!(builder
@@ -557,11 +557,11 @@ fn source_symbol_references_are_bound_to_the_exact_checker_even_when_source_is_s
     );
     assert!(matches!(
         second_op.get_declared_type_of_symbol(first_symbol),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     ));
     assert!(matches!(
         second_op.properties_of_type(ty),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     ));
     assert!(second_op.get_declared_type_of_symbol(second_symbol).is_ok());
     let weak = Arc::downgrade(&program);
@@ -593,7 +593,7 @@ fn declared_type_queries_repeat_without_drift_and_unresolved_names_are_any() {
             .unwrap();
         let generic = op.get_declared_type_of_symbol(generic_symbol).unwrap();
         assert_ne!(
-            op.type_object_flags(generic).unwrap() & ts_checker::object_flags::REFERENCE,
+            op.type_object_flags(generic).unwrap() & tsr_checker::object_flags::REFERENCE,
             0
         );
         // `typeof value` on a name that resolves to nothing is `any`, not a failure.
@@ -664,14 +664,14 @@ fn an_outer_generic_interface_retains_outer_parameters_on_repeated_queries() {
         let symbol = op.get_symbol_at_location(name).unwrap().unwrap();
         let ty = op.get_declared_type_of_symbol(symbol).unwrap();
         assert_ne!(
-            op.type_object_flags(ty).unwrap() & ts_checker::object_flags::REFERENCE,
+            op.type_object_flags(ty).unwrap() & tsr_checker::object_flags::REFERENCE,
             0
         );
         let property = op.properties_of_type(ty).unwrap()[0];
         let value = op.get_type_of_symbol(property).unwrap();
         assert_eq!(
             op.type_flags(value).unwrap(),
-            ts_checker::type_flags::TYPE_PARAMETER
+            tsr_checker::type_flags::TYPE_PARAMETER
         );
         assert_eq!(op.type_to_string(value, 0).unwrap().as_bytes(), b"T");
     }
@@ -679,7 +679,7 @@ fn an_outer_generic_interface_retains_outer_parameters_on_repeated_queries() {
 
 #[test]
 fn lazy_jsdoc_type_names_do_not_resolve_as_ordinary_wrapper_interfaces() {
-    use ts_ast::JsDocProvider;
+    use tsr_ast::JsDocProvider;
     let (owner, program, _) = fixture(
         b"interface String { tag: number }\n/** @type {String} */\nlet value: string = \"ok\";",
         options(),
@@ -687,7 +687,7 @@ fn lazy_jsdoc_type_names_do_not_resolve_as_ordinary_wrapper_interfaces() {
     let file = program.file(b"/main.ts").unwrap();
     let view = file.bound().view().ast();
     let statement = declarations(&program)[1];
-    let roots = ts_parser::ParserJsDocProvider::default()
+    let roots = tsr_parser::ParserJsDocProvider::default()
         .jsdoc(view, file.source(), statement)
         .unwrap();
     let doc = view.node(roots[0]).unwrap();
@@ -708,7 +708,7 @@ fn lazy_jsdoc_type_names_do_not_resolve_as_ordinary_wrapper_interfaces() {
     let reference = view.node(expression).unwrap().type_node().unwrap();
     assert_eq!(
         view.node(reference).unwrap().kind(),
-        ts_ast::SyntaxKind::TypeReference
+        tsr_ast::SyntaxKind::TypeReference
     );
     assert_ne!(
         reference.arena(),
@@ -876,7 +876,7 @@ fn union_property_normalization_is_deferred_and_repeated_identity_is_stable() {
         "discovery must defer the property type union"
     );
     assert_ne!(
-        op.symbol(properties[0]).unwrap().check_flags() & ts_ast::check_flags::DEFERRED_TYPE,
+        op.symbol(properties[0]).unwrap().check_flags() & tsr_ast::check_flags::DEFERRED_TYPE,
         0
     );
     let ty = op.get_type_of_symbol(properties[0]).unwrap();
@@ -1093,7 +1093,7 @@ fn an_incompatible_property_reports_the_index_signature_wrapper_chain() {
 
 #[test]
 fn intersection_discriminant_reduction_is_lazy_and_raw_display_is_available() {
-    use ts_checker::{object_flags as of, type_format_flags as ff};
+    use tsr_checker::{object_flags as of, type_format_flags as ff};
     let (owner, program, _) = fixture(
         b"type A = { tag: 'a' }; type B = { tag: 'b' }; type I = A & B;",
         options(),
@@ -1149,7 +1149,7 @@ fn intersection_reduction_computes_its_never_flag_once_and_repeats_without_drift
     // Discovering the alias must not reduce it.
     assert_eq!(
         op.type_object_flags(ty).unwrap()
-            & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+            & tsr_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
         0
     );
     let mut counts = None;
@@ -1164,11 +1164,11 @@ fn intersection_reduction_computes_its_never_flag_once_and_repeats_without_drift
         assert_eq!(op.type_to_string(ty, 0).unwrap().as_bytes(), b"I");
         assert_ne!(
             op.type_object_flags(ty).unwrap()
-                & ts_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
+                & tsr_checker::object_flags::IS_NEVER_INTERSECTION_COMPUTED,
             0
         );
         assert_eq!(
-            op.type_object_flags(ty).unwrap() & ts_checker::object_flags::IS_NEVER_INTERSECTION,
+            op.type_object_flags(ty).unwrap() & tsr_checker::object_flags::IS_NEVER_INTERSECTION,
             0
         );
         let current = (op.type_count(), op.symbol_count());
@@ -1202,7 +1202,7 @@ fn deferred_intersection_property_builds_an_intersection_and_caches_its_identity
     let properties = op.properties_of_type(ty).unwrap();
     assert_eq!(properties.len(), 1);
     assert_ne!(
-        op.symbol(properties[0]).unwrap().check_flags() & ts_ast::check_flags::DEFERRED_TYPE,
+        op.symbol(properties[0]).unwrap().check_flags() & tsr_ast::check_flags::DEFERRED_TYPE,
         0
     );
     assert_eq!(
@@ -1214,7 +1214,7 @@ fn deferred_intersection_property_builds_an_intersection_and_caches_its_identity
     assert_eq!(op.type_count(), before + 1);
     assert_eq!(
         op.type_flags(value).unwrap(),
-        ts_checker::type_flags::INTERSECTION
+        tsr_checker::type_flags::INTERSECTION
     );
     assert_eq!(
         op.type_to_string(value, 0).unwrap().as_bytes(),
@@ -1264,9 +1264,9 @@ fn delete_operands_must_be_optional_writable_property_references() {
     assert_eq!(
         codes,
         vec![
-            ts_diagnostics::The_operand_of_a_delete_operator_must_be_optional.code,
-            ts_diagnostics::The_operand_of_a_delete_operator_cannot_be_a_read_only_property.code,
-            ts_diagnostics::The_operand_of_a_delete_operator_must_be_a_property_reference.code,
+            tsr_diagnostics::The_operand_of_a_delete_operator_must_be_optional.code,
+            tsr_diagnostics::The_operand_of_a_delete_operator_cannot_be_a_read_only_property.code,
+            tsr_diagnostics::The_operand_of_a_delete_operator_must_be_a_property_reference.code,
         ]
     );
 }
@@ -1285,7 +1285,7 @@ fn meta_properties_need_their_containers_and_module_targets() {
     assert_eq!(diagnostics.len(), 1);
     assert_eq!(
         diagnostics[0].code,
-        ts_diagnostics::Meta_property_0_is_only_allowed_in_the_body_of_a_function_declaration_function_expression_or_constructor.code
+        tsr_diagnostics::Meta_property_0_is_only_allowed_in_the_body_of_a_function_declaration_function_expression_or_constructor.code
     );
     assert_eq!(
         (diagnostics[0].loc.pos(), diagnostics[0].loc.end()),
@@ -1303,7 +1303,7 @@ fn meta_properties_need_their_containers_and_module_targets() {
     let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
     assert_eq!(
         codes,
-        vec![ts_diagnostics::The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_es2022_esnext_system_node16_node18_node20_or_nodenext.code]
+        vec![tsr_diagnostics::The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_es2022_esnext_system_node16_node18_node20_or_nodenext.code]
     );
 }
 
@@ -1319,7 +1319,7 @@ fn regular_expression_literals_report_grammar_errors_once() {
         let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
         assert_eq!(
             codes,
-            vec![ts_diagnostics::Duplicate_regular_expression_flag.code],
+            vec![tsr_diagnostics::Duplicate_regular_expression_flag.code],
             "one flag error for the duplicated `g`, none for `/y/i`"
         );
     }
@@ -1340,13 +1340,13 @@ fn debugger_statements_in_ambient_blocks_report_once_per_block() {
     assert_eq!(
         codes,
         vec![
-            ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
-            ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
+            tsr_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
+            tsr_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code,
         ]
     );
 }
 
-fn codes_and_args(diagnostics: &[ts_ast::Diagnostic]) -> Vec<(i32, Vec<String>)> {
+fn codes_and_args(diagnostics: &[tsr_ast::Diagnostic]) -> Vec<(i32, Vec<String>)> {
     diagnostics
         .iter()
         .map(|d| {
@@ -1388,16 +1388,16 @@ fn no_unused_locals_reports_locals_and_private_members_as_errors() {
     );
     let mut op = owner.operation().unwrap();
     let diagnostics = op.semantic_diagnostics(source).unwrap();
-    let never_read = ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code;
+    let never_read = tsr_diagnostics::X_0_is_declared_but_its_value_is_never_read.code;
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![
             (never_read, vec!["unused".to_string()]),
-            (ts_diagnostics::All_variables_are_unused.code, vec![]),
+            (tsr_diagnostics::All_variables_are_unused.code, vec![]),
             (never_read, vec!["x".to_string()]),
             (never_read, vec!["secret".to_string()]),
             (
-                ts_diagnostics::Property_0_is_declared_but_its_value_is_never_read.code,
+                tsr_diagnostics::Property_0_is_declared_but_its_value_is_never_read.code,
                 vec!["param".to_string()]
             ),
         ]
@@ -1407,13 +1407,13 @@ fn no_unused_locals_reports_locals_and_private_members_as_errors() {
     assert_eq!(
         codes_and_args(&suggestions),
         vec![
-            (ts_diagnostics::All_type_parameters_are_unused.code, vec![]),
+            (tsr_diagnostics::All_type_parameters_are_unused.code, vec![]),
             (never_read, vec!["a".to_string()]),
         ]
     );
     assert!(suggestions
         .iter()
-        .all(|d| d.category == ts_diagnostics::Category::Suggestion as i32));
+        .all(|d| d.category == tsr_diagnostics::Category::Suggestion as i32));
 }
 
 #[test]
@@ -1433,9 +1433,9 @@ fn no_unused_parameters_reports_parameters_and_type_parameter_lists() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![
-            (ts_diagnostics::All_type_parameters_are_unused.code, vec![]),
+            (tsr_diagnostics::All_type_parameters_are_unused.code, vec![]),
             (
-                ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
+                tsr_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
                 vec!["a".to_string()]
             ),
         ]
@@ -1458,13 +1458,13 @@ fn unused_reports_are_suggestions_without_the_options() {
     assert_eq!(
         codes_and_args(&suggestions),
         vec![(
-            ts_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
+            tsr_diagnostics::X_0_is_declared_but_its_value_is_never_read.code,
             vec!["unused".to_string()]
         )]
     );
     assert_eq!(
         suggestions[0].category,
-        ts_diagnostics::Category::Suggestion as i32
+        tsr_diagnostics::Category::Suggestion as i32
     );
 }
 
@@ -1477,7 +1477,7 @@ fn renamed_binding_elements_in_function_types_are_errors_regardless_of_options()
         .unwrap()
         .semantic_diagnostics(source)
         .unwrap();
-    let code = ts_diagnostics::X_0_is_an_unused_renaming_of_1_Did_you_intend_to_use_it_as_a_type_annotation.code;
+    let code = tsr_diagnostics::X_0_is_an_unused_renaming_of_1_Did_you_intend_to_use_it_as_a_type_annotation.code;
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(code, vec!["renamed".to_string(), "a".to_string()])]
@@ -1505,7 +1505,7 @@ fn renamed_binding_elements_in_function_types_are_errors_regardless_of_options()
     assert_eq!(related.len(), 1);
     assert_eq!(
         related[0].code,
-        ts_diagnostics::We_can_only_write_a_type_for_0_by_adding_a_type_for_the_entire_parameter_here
+        tsr_diagnostics::We_can_only_write_a_type_for_0_by_adding_a_type_for_the_entire_parameter_here
             .code
     );
     let end = untyped.iter().position(|&b| b == b')').unwrap() as i64;
@@ -1524,7 +1524,7 @@ fn excess_properties_report_the_offending_property_with_spelling_suggestions() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
+            tsr_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
             vec!["extra".to_string(), "{ field: number; }".to_string()]
         )]
     );
@@ -1546,7 +1546,7 @@ fn excess_properties_report_the_offending_property_with_spelling_suggestions() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Object_literal_may_only_specify_known_properties_but_0_does_not_exist_in_type_1_Did_you_mean_to_write_2.code,
+            tsr_diagnostics::Object_literal_may_only_specify_known_properties_but_0_does_not_exist_in_type_1_Did_you_mean_to_write_2.code,
             vec![
                 "feild".to_string(),
                 "{ field: number; }".to_string(),
@@ -1565,7 +1565,7 @@ fn excess_properties_report_the_offending_property_with_spelling_suggestions() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
+            tsr_diagnostics::Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1.code,
             vec!["y".to_string(), "{ kind: \"a\"; x: number; }".to_string()]
         )],
         "the matching discriminant narrows the reported target"
@@ -1576,7 +1576,7 @@ fn excess_properties_report_the_offending_property_with_spelling_suggestions() {
 fn commonjs_files_cannot_import_ecmascript_modules_synchronously_under_node16() {
     let node16 = CompilerOptions {
         module: ModuleKind::NODE16,
-        module_resolution: ts_core::ModuleResolutionKind::NODE16,
+        module_resolution: tsr_core::ModuleResolutionKind::NODE16,
         ..options()
     };
     let main = b"import { x } from \"./esm.mjs\";\nx;\n";
@@ -1594,7 +1594,7 @@ fn commonjs_files_cannot_import_ecmascript_modules_synchronously_under_node16() 
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::The_current_file_is_a_CommonJS_module_whose_imports_will_produce_require_calls_however_the_referenced_file_is_an_ECMAScript_module_and_cannot_be_imported_with_require_Consider_writing_a_dynamic_import_0_call_instead.code,
+            tsr_diagnostics::The_current_file_is_a_CommonJS_module_whose_imports_will_produce_require_calls_however_the_referenced_file_is_an_ECMAScript_module_and_cannot_be_imported_with_require_Consider_writing_a_dynamic_import_0_call_instead.code,
             vec!["./esm.mjs".to_string()]
         )]
     );
@@ -1608,7 +1608,7 @@ fn commonjs_files_cannot_import_ecmascript_modules_synchronously_under_node16() 
     let details = &diagnostics[0].message_chain[0];
     assert_eq!(
         details.code,
-        ts_diagnostics::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module.code
+        tsr_diagnostics::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module.code
     );
     assert_eq!(
         codes_and_args(std::slice::from_ref(details))[0].1,
@@ -1633,7 +1633,7 @@ fn commonjs_files_cannot_import_ecmascript_modules_synchronously_under_node16() 
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Type_only_import_of_an_ECMAScript_module_from_a_CommonJS_module_must_have_a_resolution_mode_attribute.code,
+            tsr_diagnostics::Type_only_import_of_an_ECMAScript_module_from_a_CommonJS_module_must_have_a_resolution_mode_attribute.code,
             vec!["./esm.mjs".to_string()]
         )]
     );
@@ -1670,11 +1670,11 @@ switch (1) { case 1: using inClause = null; }
         codes_and_args(&diagnostics),
         vec![
             (
-                ts_diagnostics::The_initializer_of_a_using_declaration_must_be_either_an_object_with_a_Symbol_dispose_method_or_be_null_or_undefined.code,
+                tsr_diagnostics::The_initializer_of_a_using_declaration_must_be_either_an_object_with_a_Symbol_dispose_method_or_be_null_or_undefined.code,
                 vec!["number".to_string(), "Disposable".to_string()]
             ),
             (
-                ts_diagnostics::X_using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block.code,
+                tsr_diagnostics::X_using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block.code,
                 vec![]
             ),
         ]
@@ -1703,7 +1703,7 @@ switch (1) { case 1: using inClause = null; }
     assert_eq!(
         codes,
         vec![
-            ts_diagnostics::The_initializer_of_an_await_using_declaration_must_be_either_an_object_with_a_Symbol_asyncDispose_or_Symbol_dispose_method_or_be_null_or_undefined.code
+            tsr_diagnostics::The_initializer_of_an_await_using_declaration_must_be_either_an_object_with_a_Symbol_asyncDispose_or_Symbol_dispose_method_or_be_null_or_undefined.code
         ]
     );
 
@@ -1717,7 +1717,7 @@ switch (1) { case 1: using inClause = null; }
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::X_await_using_statements_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module.code,
+            tsr_diagnostics::X_await_using_statements_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module.code,
             vec![]
         )]
     );
@@ -1748,7 +1748,7 @@ fn import_helpers_report_a_missing_tslib_once_per_file() {
         assert_eq!(
             codes,
             vec![
-                ts_diagnostics::This_syntax_requires_an_imported_helper_but_module_0_cannot_be_found.code;
+                tsr_diagnostics::This_syntax_requires_an_imported_helper_but_module_0_cannot_be_found.code;
                 expected
             ],
             "target {target:?}"
@@ -1781,7 +1781,7 @@ import * as thing6 from \"./mod.mjs\" with { type: \"json\", field: 0..toString(
     let nodenext = CompilerOptions {
         target: ScriptTarget::ES2022,
         module: ModuleKind::NODE_NEXT,
-        module_resolution: ts_core::ModuleResolutionKind::NODE_NEXT,
+        module_resolution: tsr_core::ModuleResolutionKind::NODE_NEXT,
         ..options()
     };
     let (owner, program, _) = fixture_files(
@@ -1796,9 +1796,9 @@ import * as thing6 from \"./mod.mjs\" with { type: \"json\", field: 0..toString(
         .semantic_diagnostics(source)
         .unwrap();
     let codes: Vec<i32> = diagnostics.iter().map(|d| d.code).collect();
-    let not_assignable = ts_diagnostics::Type_0_is_not_assignable_to_type_1.code;
+    let not_assignable = tsr_diagnostics::Type_0_is_not_assignable_to_type_1.code;
     let not_string =
-        ts_diagnostics::Import_attribute_values_must_be_string_literal_expressions.code;
+        tsr_diagnostics::Import_attribute_values_must_be_string_literal_expressions.code;
     // Pinned Go: importAttributes6(module=nodenext).errors.txt, ten errors in source order.
     assert_eq!(
         codes,
@@ -1876,7 +1876,7 @@ fn abstract_properties_destructured_from_this_in_constructors_are_reported() {
         .semantic_diagnostics(source)
         .unwrap();
     let code =
-        ts_diagnostics::Abstract_property_0_in_class_1_cannot_be_accessed_in_the_constructor.code;
+        tsr_diagnostics::Abstract_property_0_in_class_1_cannot_be_accessed_in_the_constructor.code;
     assert_eq!(
         codes_and_args(&diagnostics),
         ["x", "y", "x", "y", "y"]
@@ -1896,7 +1896,7 @@ fn abstract_properties_destructured_from_this_in_constructors_are_reported() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Property_0_is_private_and_only_accessible_within_class_1.code,
+            tsr_diagnostics::Property_0_is_private_and_only_accessible_within_class_1.code,
             vec!["p".to_string(), "A".to_string()]
         )]
     );
@@ -1921,11 +1921,11 @@ fn missing_properties_from_later_libs_suggest_the_lib() {
         codes_and_args(&diagnostics),
         vec![
             (
-                ts_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later.code,
+                tsr_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later.code,
                 vec!["padStart".to_string(), "string".to_string(), "es2017".to_string()]
             ),
             (
-                ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+                tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
                 vec!["nope".to_string(), "string".to_string()]
             ),
         ]
@@ -1970,7 +1970,7 @@ fn untyped_packages_report_the_types_install_chain() {
         ],
         CompilerOptions {
             module: ModuleKind::COMMON_JS,
-            module_resolution: ts_core::ModuleResolutionKind::NODE10,
+            module_resolution: tsr_core::ModuleResolutionKind::NODE10,
             ..options()
         },
     );
@@ -1983,7 +1983,7 @@ fn untyped_packages_report_the_types_install_chain() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type.code,
+            tsr_diagnostics::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type.code,
             vec!["foo".to_string(), "/node_modules/foo/index.js".to_string()]
         )]
     );
@@ -1991,7 +1991,7 @@ fn untyped_packages_report_the_types_install_chain() {
     let chain = &diagnostics[0].message_chain[0];
     assert_eq!(
         chain.code,
-        ts_diagnostics::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0.code
+        tsr_diagnostics::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0.code
     );
     assert_eq!(
         codes_and_args(std::slice::from_ref(chain))[0].1,
@@ -2024,7 +2024,7 @@ fn global_augmentations_merging_into_aliases_resolve_the_alias() {
     assert!(test_diagnostics.unwrap().is_empty());
     let global = program.file(b"/global.d.ts").unwrap().source();
     let diagnostics = op.semantic_diagnostics(global).unwrap();
-    let redeclare = ts_diagnostics::Cannot_redeclare_block_scoped_variable_0.code;
+    let redeclare = tsr_diagnostics::Cannot_redeclare_block_scoped_variable_0.code;
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![
@@ -2046,7 +2046,7 @@ fn unique_symbol_index_errors_name_the_symbol_fully_qualified() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Element_implicitly_has_an_any_type_because_expression_of_type_0_can_t_be_used_to_index_type_1.code,
+            tsr_diagnostics::Element_implicitly_has_an_any_type_because_expression_of_type_0_can_t_be_used_to_index_type_1.code,
             vec!["unique symbol".to_string(), "{ a: number; }".to_string()]
         )]
     );
@@ -2055,7 +2055,7 @@ fn unique_symbol_index_errors_name_the_symbol_fully_qualified() {
     assert_eq!(
         codes_and_args(std::slice::from_ref(&chain[0])),
         vec![(
-            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
             vec!["[s]".to_string(), "{ a: number; }".to_string()]
         )]
     );
@@ -2071,14 +2071,14 @@ fn deprecated_contextual_properties_are_suggested_with_their_tag() {
     assert_eq!(
         codes_and_args(&suggestions),
         vec![(
-            ts_diagnostics::X_0_is_deprecated.code,
+            tsr_diagnostics::X_0_is_deprecated.code,
             vec!["old".to_string()]
         )]
     );
     assert_eq!(suggestions[0].related_information.len(), 1);
     assert_eq!(
         suggestions[0].related_information[0].code,
-        ts_diagnostics::The_declaration_was_marked_as_deprecated_here.code
+        tsr_diagnostics::The_declaration_was_marked_as_deprecated_here.code
     );
 }
 
@@ -2113,7 +2113,7 @@ fn rewritten_relative_imports_that_resolve_to_directories_are_reported() {
         CompilerOptions {
             target: ScriptTarget::ES2022,
             module: ModuleKind::NODE18,
-            module_resolution: ts_core::ModuleResolutionKind::NODE16,
+            module_resolution: tsr_core::ModuleResolutionKind::NODE16,
             rewrite_relative_import_extensions: Tristate::TRUE,
             verbatim_module_syntax: Tristate::TRUE,
             ..options()
@@ -2128,7 +2128,7 @@ fn rewritten_relative_imports_that_resolve_to_directories_are_reported() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::This_relative_import_path_is_unsafe_to_rewrite_because_it_looks_like_a_file_name_but_actually_resolves_to_0.code,
+            tsr_diagnostics::This_relative_import_path_is_unsafe_to_rewrite_because_it_looks_like_a_file_name_but_actually_resolves_to_0.code,
             vec!["./foo.ts/index.ts".to_string()]
         )]
     );
@@ -2148,7 +2148,7 @@ fn never_intersections_explain_the_conflicting_property() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
             vec!["kind".to_string(), "never".to_string()]
         )]
     );
@@ -2157,7 +2157,7 @@ fn never_intersections_explain_the_conflicting_property() {
     assert_eq!(
         codes_and_args(std::slice::from_ref(&chain[0])),
         vec![(
-            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents.code,
+            tsr_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents.code,
             vec!["A".to_string(), "kind".to_string()]
         )]
     );
@@ -2223,7 +2223,7 @@ fn too_many_arguments_through_a_spread_report_the_extra_argument_span() {
         .unwrap()
         .semantic_diagnostics(source)
         .unwrap();
-    let expected = ts_diagnostics::Expected_0_arguments_but_got_1.code;
+    let expected = tsr_diagnostics::Expected_0_arguments_but_got_1.code;
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![
@@ -2247,7 +2247,7 @@ fn readonly_type_operators_are_limited_to_array_and_tuple_literals() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types.code,
+            tsr_diagnostics::X_readonly_type_modifier_is_only_permitted_on_array_and_tuple_literal_types.code,
             vec!["symbol".to_string()]
         )]
     );
@@ -2266,14 +2266,14 @@ fn conflicting_private_members_reduce_intersections_to_never_with_an_explanation
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
             vec!["p".to_string(), "never".to_string()]
         )]
     );
     assert_eq!(
         codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
         vec![(
-            ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some.code,
+            tsr_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some.code,
             vec!["A & B".to_string(), "p".to_string()]
         )]
     );
@@ -2290,7 +2290,7 @@ fn circular_import_aliases_report_the_circularity() {
     assert!(
         diagnostics
             .iter()
-            .any(|d| d.code == ts_diagnostics::Circular_definition_of_import_alias_0.code),
+            .any(|d| d.code == tsr_diagnostics::Circular_definition_of_import_alias_0.code),
         "{:?}",
         codes_and_args(&diagnostics)
     );
@@ -2308,7 +2308,7 @@ fn misspelled_mapped_types_suggest_the_in_keyword() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Did_you_mean_to_use_1_in_0.code,
+            tsr_diagnostics::X_0_only_refers_to_a_type_but_is_being_used_as_a_value_here_Did_you_mean_to_use_1_in_0.code,
             vec!["Keys".to_string(), "K".to_string()]
         )]
     );
@@ -2335,7 +2335,7 @@ fn misspelled_builtin_names_suggest_the_primitive_alias() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Cannot_find_name_0_Did_you_mean_1.code,
+            tsr_diagnostics::Cannot_find_name_0_Did_you_mean_1.code,
             vec!["strng".to_string(), "string".to_string()]
         )]
     );
@@ -2359,7 +2359,7 @@ fn exported_namespaces_in_commonjs_files_are_rejected_under_verbatim_module_synt
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled.code,
+            tsr_diagnostics::A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled.code,
             vec![]
         )]
     );
@@ -2378,12 +2378,12 @@ fn constructor_visibility_mismatches_report_the_visibilities() {
     assert_eq!(diagnostics.len(), 1);
     assert_eq!(
         diagnostics[0].code,
-        ts_diagnostics::Type_0_is_not_assignable_to_type_1.code
+        tsr_diagnostics::Type_0_is_not_assignable_to_type_1.code
     );
     assert_eq!(
         codes_and_args(std::slice::from_ref(&*diagnostics[0].message_chain[0])),
         vec![(
-            ts_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type.code,
+            tsr_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type.code,
             vec!["private".to_string(), "protected".to_string()]
         )]
     );
@@ -2411,7 +2411,7 @@ fn imports_conflicting_with_global_values_need_type_only_imports_under_isolated_
         .unwrap();
     assert!(
         diagnostics.iter().any(|d| d.code
-            == ts_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled.code),
+            == tsr_diagnostics::Import_0_conflicts_with_global_value_used_in_this_file_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled.code),
         "{:?}",
         codes_and_args(&diagnostics)
     );
@@ -2428,7 +2428,7 @@ fn uncalled_function_checks_resolve_this_property_symbols() {
         .unwrap();
     assert_eq!(
         diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
-        vec![ts_diagnostics::This_condition_will_always_return_true_since_this_function_is_always_defined_Did_you_mean_to_call_it_instead.code]
+        vec![tsr_diagnostics::This_condition_will_always_return_true_since_this_function_is_always_defined_Did_you_mean_to_call_it_instead.code]
     );
 }
 
@@ -2477,7 +2477,7 @@ let p: Passport = passport.use();
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::Type_0_is_not_assignable_to_type_1.code,
+            tsr_diagnostics::Type_0_is_not_assignable_to_type_1.code,
             vec!["PassportStatic".to_string(), "Passport".to_string()]
         )]
     );
@@ -2519,8 +2519,8 @@ module.exports.Sub = class {
     assert_eq!(
         semantic.iter().map(|d| d.code).collect::<Vec<_>>(),
         vec![
-            ts_diagnostics::An_export_assignment_cannot_be_used_in_a_module_with_other_exported_elements.code,
-            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            tsr_diagnostics::An_export_assignment_cannot_be_used_in_a_module_with_other_exported_elements.code,
+            tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
         ]
     );
     let declarations = program.declaration_diagnostics_with_checker(&mut op, file);
@@ -2545,13 +2545,13 @@ class B4 implements I {}
     assert_eq!(
         diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
         vec![
-            ts_diagnostics::Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass.code,
-            ts_diagnostics::Class_0_incorrectly_implements_interface_1.code,
+            tsr_diagnostics::Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass.code,
+            tsr_diagnostics::Class_0_incorrectly_implements_interface_1.code,
         ]
     );
     assert_eq!(
         diagnostics[0].message_chain[0].code,
-        ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
+        tsr_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
     );
 }
 
@@ -2587,10 +2587,10 @@ fn reentrant_effects_signature_resolution_terminates_like_upstream() {
     assert_eq!(
         diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
         vec![
-            ts_diagnostics::Block_scoped_variable_0_used_before_its_declaration.code,
-            ts_diagnostics::Variable_0_is_used_before_being_assigned.code,
-            ts_diagnostics::Expected_0_arguments_but_got_1.code,
-            ts_diagnostics::Type_alias_0_circularly_references_itself.code,
+            tsr_diagnostics::Block_scoped_variable_0_used_before_its_declaration.code,
+            tsr_diagnostics::Variable_0_is_used_before_being_assigned.code,
+            tsr_diagnostics::Expected_0_arguments_but_got_1.code,
+            tsr_diagnostics::Type_alias_0_circularly_references_itself.code,
         ]
     );
 }
@@ -2661,8 +2661,8 @@ fn jsdoc_rest_parameter_displays_reuse_the_variadic_operand() {
     // Pinned Go nodecopy.go reuses JSDocVariadicType.Type. Sources and displays
     // are the `f` rows of jsdocRestParameter, jsdocRestParameter_es6 and
     // jsdocParseStarEquals .types, requested with the type baseline walker flags.
-    use ts_checker::type_format_flags as ff;
-    use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    use tsr_checker::type_format_flags as ff;
+    use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
     let cases: [(&[u8], &[u8]); 3] = [
         (
             b"/** @param {...number} a */\nfunction f(a) {\n    a;\n}\n",
@@ -2681,7 +2681,7 @@ fn jsdoc_rest_parameter_displays_reuse_the_variadic_operand() {
         | ff::ALLOW_UNIQUE_ES_SYMBOL_TYPE
         | ff::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS)
         & ff::NODE_BUILDER_FLAGS_MASK)
-        | ts_nodebuilder::flags::IGNORE_ERRORS;
+        | tsr_nodebuilder::flags::IGNORE_ERRORS;
     for (text, expected) in cases {
         let (owner, program, _) = fixture_files(
             b"/a.js",
@@ -2711,7 +2711,7 @@ fn jsdoc_rest_parameter_displays_reuse_the_variadic_operand() {
                 typ,
                 Some(function),
                 flags,
-                ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
+                tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
             )
             .unwrap()
             .unwrap();
@@ -2737,9 +2737,9 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
     // Pinned Go: parseJSDocType wraps a leading `...` in JSDocVariadicType, the
     // typedef reparse keeps that node as the alias type, and
     // transformJSDocVariadicType emits an array of JSDocVariadicType.Type.
-    use ts_ast::{AstBuilder, SyntaxKind as K};
-    use ts_printer::{EmitContext, EmitTextWriter, Printer, PrinterOptions, TextWriter};
-    use ts_transformers::declarations::{transform_declarations, DeclarationOptions};
+    use tsr_ast::{AstBuilder, SyntaxKind as K};
+    use tsr_printer::{EmitContext, EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    use tsr_transformers::declarations::{transform_declarations, DeclarationOptions};
     let (owner, program, _) = fixture_files(
         b"/a.js",
         &[(
@@ -2758,7 +2758,7 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
     let counters = Counters::new();
     let mut emit = EmitContext::new();
     let mut output = AstBuilder::with_hooks(
-        ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+        tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]),
         &counters,
         emit.factory_hooks(),
     );
@@ -2864,7 +2864,7 @@ fn qualified_enum_member_declaration_phase_completes_and_displays_like_native() 
     // Pinned compiler/declarationEmitQualifiedName.ts. b.ts reaches E only through
     // an import type, so appendReferenceToType extends that import's qualifier.
     // Native reports no declaration diagnostics; displays are the `.types` rows.
-    use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+    use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
     let files: [(&[u8], &[u8]); 3] = [
         (b"/e.ts", b"export enum E {\n    A = 'a',\n    B = 'b',\n}\n"),
         (
@@ -2942,7 +2942,7 @@ fn qualified_enum_member_declaration_phase_completes_and_displays_like_native() 
                 typ,
                 Some(declaration),
                 flags,
-                ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
+                tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES,
             )
             .unwrap()
             .unwrap();
@@ -2973,7 +2973,7 @@ fn missing_identifier_value_references_report_no_cannot_find_name_like_native() 
         "../../../data/s08/p6/missing-identifier/observations.json"
     ))
     .unwrap();
-    let observe = |values: &[ts_ast::Diagnostic]| -> Vec<serde_json::Value> {
+    let observe = |values: &[tsr_ast::Diagnostic]| -> Vec<serde_json::Value> {
         values
             .iter()
             .map(|d| {
@@ -3083,7 +3083,7 @@ fn property_write_access_classification_matches_native_program_diagnostics() {
         "../../../data/s08/p6/write-access/observations.json"
     ))
     .unwrap();
-    let observe = |values: &[ts_ast::Diagnostic]| -> Vec<serde_json::Value> {
+    let observe = |values: &[tsr_ast::Diagnostic]| -> Vec<serde_json::Value> {
         values
             .iter()
             .map(|d| {
@@ -3319,7 +3319,7 @@ fn unresolved_jsdoc_property_access_drops_the_receiver_alias() {
         .flatten()
         .filter_map(|node| {
             let read = view.node(node).unwrap();
-            (read.kind() == ts_ast::SyntaxKind::ExpressionStatement)
+            (read.kind() == tsr_ast::SyntaxKind::ExpressionStatement)
                 .then(|| read.expression().unwrap())
         })
         .collect();
@@ -3383,7 +3383,7 @@ fn jsdoc_aliases_and_optional_methods_keep_native_display() {
             .flatten()
             .filter_map(|node| {
                 let read = view.node(node).unwrap();
-                (read.kind() == ts_ast::SyntaxKind::ExpressionStatement)
+                (read.kind() == tsr_ast::SyntaxKind::ExpressionStatement)
                     .then(|| read.expression().unwrap())
             })
             .collect();
@@ -3464,7 +3464,7 @@ fn jsdoc_return_typedef_expands_when_its_alias_is_inaccessible() {
             op.type_to_string_at(
                 typ,
                 Some(declaration),
-                ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE
+                tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE
             )
             .unwrap()
             .as_bytes(),
@@ -3475,7 +3475,7 @@ fn jsdoc_return_typedef_expands_when_its_alias_is_inaccessible() {
 
 #[test]
 fn display_keeps_nontrailing_variadics_in_one_rest_parameter() {
-    use ts_checker::type_format_flags as ff;
+    use tsr_checker::type_format_flags as ff;
     let text = b"type Variadic = <A extends any[], B extends any[]>(...args: [...A, ...B]) => void;\ntype Fixed = (...args: [a: number, b: string]) => void;";
     let (owner, program, _) = fixture(text, options());
     let declarations = declarations(&program);
@@ -3507,7 +3507,7 @@ fn assert_native_semantic_fixture(requests: &str, native: &str) {
             }
         }
     }
-    fn payload(program: &Program, d: &ts_ast::Diagnostic) -> serde_json::Value {
+    fn payload(program: &Program, d: &tsr_ast::Diagnostic) -> serde_json::Value {
         let file = d.file.map(|id| {
             let file = program
                 .files()
@@ -3592,7 +3592,7 @@ fn assert_native_semantic_fixture(requests: &str, native: &str) {
                 .iter()
                 .try_fold(Vec::new(), |mut diagnostics, file| {
                     diagnostics.extend(program.semantic_diagnostics_with_checker(&mut op, file)?);
-                    Ok::<_, ts_compiler::Error>(diagnostics)
+                    Ok::<_, tsr_compiler::Error>(diagnostics)
                 })
                 .and_then(|diagnostics| program.sort_and_deduplicate_diagnostics(&diagnostics));
             match diagnostics {
@@ -3643,7 +3643,7 @@ declare namespace N2 { export const a: number; a; a; }
         codes
             .iter()
             .filter(|(code, _)| *code
-                == ts_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code)
+                == tsr_diagnostics::Statements_are_not_allowed_in_ambient_contexts.code)
             .count(),
         2,
         "{codes:?}"
@@ -3656,7 +3656,8 @@ fn functions_with_missing_bodies_report_implicit_any_return_types() {
     // whose body is missing after the reserved-word parameter.
     let codes = semantic_codes(b"function f1(enum) {}\nfunction f2(class) {}\n", options());
     let code =
-        ts_diagnostics::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type.code;
+        tsr_diagnostics::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type
+            .code;
     assert!(
         codes.contains(&(code, strings(&["f1", "any"]))),
         "{codes:?}"
@@ -3677,7 +3678,7 @@ class C {
 }
 ";
     let codes = semantic_codes(text, options());
-    let code = ts_diagnostics::Property_0_of_type_1_is_not_assignable_to_2_index_type_3.code;
+    let code = tsr_diagnostics::Property_0_of_type_1_is_not_assignable_to_2_index_type_3.code;
     assert_eq!(
         codes
             .iter()
@@ -3696,12 +3697,12 @@ fn parameter_grammar_errors_are_suppressed_by_parse_errors() {
     let clean = semantic_codes(b"((arg?: number = 0) => 47);\n", options());
     assert_eq!(
         clean.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
-        vec![ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code]
+        vec![tsr_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code]
     );
     let broken = semantic_codes(b"((arg?: number = 0) => 47);\nlet x = ;\n", options());
     assert!(
         !broken.iter().any(|(code, _)| *code
-            == ts_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code),
+            == tsr_diagnostics::Parameter_cannot_have_question_mark_and_initializer.code),
         "{broken:?}"
     );
 }
@@ -3718,7 +3719,7 @@ fn type_declarations_outside_blocks_are_grammar_errors() {
 }
 ";
     let codes = semantic_codes(text, options());
-    let code = ts_diagnostics::X_0_declarations_can_only_be_declared_inside_a_block.code;
+    let code = tsr_diagnostics::X_0_declarations_can_only_be_declared_inside_a_block.code;
     assert_eq!(
         codes
             .iter()
@@ -3747,14 +3748,14 @@ abstract class A {
         codes
             .iter()
             .filter(|(c, _)| *c
-                == ts_diagnostics::Private_identifiers_are_not_allowed_outside_class_bodies.code)
+                == tsr_diagnostics::Private_identifiers_are_not_allowed_outside_class_bodies.code)
             .count(),
         2,
         "{codes:?}"
     );
     assert!(
         codes.contains(&(
-            ts_diagnostics::Method_0_cannot_have_an_implementation_because_it_is_marked_abstract
+            tsr_diagnostics::Method_0_cannot_have_an_implementation_because_it_is_marked_abstract
                 .code,
             strings(&["foo"])
         )),
@@ -3775,7 +3776,7 @@ var x: T.I = y;
     assert_eq!(
         semantic_codes(text, options()),
         vec![(
-            ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code,
+            tsr_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code,
             strings(&["p", "I", "T.I"])
         )]
     );
@@ -3797,11 +3798,11 @@ var BB: typeof B = A;
     assert_eq!(diagnostics.len(), 1, "{:?}", codes_and_args(&diagnostics));
     assert_eq!(
         diagnostics[0].code,
-        ts_diagnostics::Type_0_is_not_assignable_to_type_1.code
+        tsr_diagnostics::Type_0_is_not_assignable_to_type_1.code
     );
     assert_eq!(
         diagnostics[0].message_chain[0].code,
-        ts_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type.code
+        tsr_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type.code
     );
 }
 
@@ -3839,7 +3840,7 @@ f({ y: undefined });
     );
     assert_eq!(
         codes.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
-        vec![ts_diagnostics::Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties.code]
+        vec![tsr_diagnostics::Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties.code]
     );
 }
 
@@ -3864,7 +3865,7 @@ fn comparison_errors_name_same_named_types_by_module() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap.code,
+            tsr_diagnostics::This_comparison_appears_to_be_unintentional_because_the_types_0_and_1_have_no_overlap.code,
             strings(&["import(\"/a\").F", "import(\"/b\").F"])
         )]
     );
@@ -3881,10 +3882,10 @@ type A = { [key: string,]: string; };
 ";
     let codes = semantic_codes(text, options());
     let expected = [
-        ts_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest.code,
-        ts_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type.code,
-        ts_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type.code,
-        ts_diagnostics::An_index_signature_cannot_have_a_trailing_comma.code,
+        tsr_diagnostics::A_tuple_member_cannot_be_both_optional_and_rest.code,
+        tsr_diagnostics::A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type.code,
+        tsr_diagnostics::A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type.code,
+        tsr_diagnostics::An_index_signature_cannot_have_a_trailing_comma.code,
     ];
     for code in expected {
         assert!(
@@ -3900,7 +3901,7 @@ fn circular_return_types_name_the_assigned_variable() {
     let codes = semantic_codes(b"const f = () => 42 satisfies typeof f;\n", options());
     assert!(
         codes.contains(&(
-            ts_diagnostics::X_0_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions.code,
+            tsr_diagnostics::X_0_implicitly_has_return_type_any_because_it_does_not_have_a_return_type_annotation_and_is_referenced_directly_or_indirectly_in_one_of_its_return_expressions.code,
             strings(&["f"])
         )),
         "{codes:?}"
@@ -3917,7 +3918,7 @@ fn backslash_relative_ambient_module_names_and_deferred_rest_tuples() {
     );
     assert_eq!(
         codes.iter().map(|(code, _)| *code).collect::<Vec<_>>(),
-        vec![ts_diagnostics::Ambient_module_declaration_cannot_specify_relative_module_name.code]
+        vec![tsr_diagnostics::Ambient_module_declaration_cannot_specify_relative_module_name.code]
     );
     let text = b"export type Expression = BooleanLogicExpression | 'true' | 'false';
 export type BooleanLogicExpression = ['and', ...Expression[]] | ['not', Expression];
@@ -3935,7 +3936,7 @@ fn exported_import_aliases_resolve_their_first_identifier_as_a_value() {
     );
     assert!(
         codes.contains(&(
-            ts_diagnostics::Cannot_use_namespace_0_as_a_value.code,
+            tsr_diagnostics::Cannot_use_namespace_0_as_a_value.code,
             strings(&["x"])
         )),
         "{codes:?}"
@@ -3946,7 +3947,7 @@ fn exported_import_aliases_resolve_their_first_identifier_as_a_value() {
     );
     assert!(
         codes.contains(&(
-            ts_diagnostics::Cannot_find_name_0.code,
+            tsr_diagnostics::Cannot_find_name_0.code,
             strings(&["SomeNonExistingName"])
         )),
         "{codes:?}"
@@ -3978,7 +3979,7 @@ fn export_equals_members_imported_from_js_get_the_require_hint() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import.code,
+            tsr_diagnostics::X_0_can_only_be_imported_by_using_a_require_call_or_by_using_a_default_import.code,
             strings(&["Foo"])
         )]
     );
@@ -4008,7 +4009,7 @@ fn jsdoc_extends_tags_that_disagree_with_the_extends_clause_are_reported() {
     assert_eq!(
         codes_and_args(&diagnostics),
         vec![(
-            ts_diagnostics::JSDoc_0_1_does_not_match_the_extends_2_clause.code,
+            tsr_diagnostics::JSDoc_0_1_does_not_match_the_extends_2_clause.code,
             strings(&["extends", "Component", "PureComponent"])
         )]
     );
@@ -4030,7 +4031,7 @@ class Derived extends Base {}
     assert_eq!(
         codes,
         vec![(
-            ts_diagnostics::Property_0_does_not_exist_on_type_1.code,
+            tsr_diagnostics::Property_0_does_not_exist_on_type_1.code,
             strings(&["#prop", "typeof Derived"])
         )]
     );
@@ -4059,13 +4060,13 @@ fn reported_relation_failures_are_not_elaborated_twice() {
         .unwrap();
     let this_error = diagnostics
         .iter()
-        .find(|d| d.code == ts_diagnostics::Type_0_is_not_assignable_to_type_1.code)
+        .find(|d| d.code == tsr_diagnostics::Type_0_is_not_assignable_to_type_1.code)
         .expect("assignment error for `this`");
     assert_eq!(this_error.message_chain.len(), 1);
     let missing = &this_error.message_chain[0];
     assert_eq!(
         missing.code,
-        ts_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
+        tsr_diagnostics::Property_0_is_missing_in_type_1_but_required_in_type_2.code
     );
     assert!(
         missing.message_chain.is_empty(),

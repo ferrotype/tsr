@@ -1,9 +1,9 @@
 use super::transform::Transformer;
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, symbol_flags as sf, Factory, FactoryMethods, JsString, NodeId,
     NodeListId, RuntimeFactory, SyntaxKind as K,
 };
-use ts_printer::{emit_resolver::DeclarationEmitResolver, AutoGenerateOptions};
+use tsr_printer::{emit_resolver::DeclarationEmitResolver, AutoGenerateOptions};
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     fn expando_host_root(&self, declaration: NodeId) -> Result<NodeId, R::Error> {
@@ -24,7 +24,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             return Ok(());
         }
         let left = Self::required(self.node(node).as_binary_expression().unwrap().left())?;
-        let namespace = ts_ast::get_leftmost_access_expression(self.output.view(), left)?;
+        let namespace = tsr_ast::get_leftmost_access_expression(self.output.view(), left)?;
         if self.node(namespace).kind() != K::Identifier {
             return Ok(());
         }
@@ -40,7 +40,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     .node(declaration)
                     .initializer()
                     .is_some_and(|initializer| {
-                        ts_ast::utilities::is_function_like(Some(&self.node(initializer)))
+                        tsr_ast::utilities::is_function_like(Some(&self.node(initializer)))
                     }))
         {
             return Ok(());
@@ -72,9 +72,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             _ => JsString::default(),
         };
         if property.is_empty()
-            || !ts_scanner::is_identifier_text(
+            || !tsr_scanner::is_identifier_text(
                 property.as_bytes(),
-                ts_core::LanguageVariant::STANDARD,
+                tsr_core::LanguageVariant::STANDARD,
             )
         {
             return Ok(());
@@ -179,7 +179,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 let mut updated = Vec::with_capacity(existing.len());
                 for node in existing {
                     let flags =
-                        ts_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?
+                        tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?
                             | mf::EXPORT;
                     let modifiers = self.modifier_list(flags);
                     updated.push(self.replace_top_level_modifiers(node, modifiers)?);
@@ -318,7 +318,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         let name = self
             .output
             .clone_node_generated(name)
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let modifiers = self.node(named).modifiers();
         let list = self.new_list(members);
         let body = self.output.new_module_block(Some(list));
@@ -339,13 +339,13 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     ) -> Result<NodeId, R::Error> {
         let mut data = self.node(node).data().to_owned();
         match &mut data {
-            ts_ast::NodeData::VariableStatement(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::FunctionDeclaration(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::InterfaceDeclaration(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::TypeAliasDeclaration(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::ClassDeclaration(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::ModuleDeclaration(d) => d.modifiers = modifiers,
-            ts_ast::NodeData::EnumDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::VariableStatement(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::FunctionDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::InterfaceDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::TypeAliasDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::ClassDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::ModuleDeclaration(d) => d.modifiers = modifiers,
+            tsr_ast::NodeData::EnumDeclaration(d) => d.modifiers = modifiers,
             _ => return Self::unsupported("declaration emit: replace declaration modifiers"),
         }
         let result = self.output.new_node(self.node(node).kind(), data);
@@ -353,5 +353,5 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
 }
 fn non_contextual_keyword(text: &[u8]) -> bool {
-    ts_ast::utilities_tail::is_non_contextual_keyword(ts_scanner::string_to_token(text).into())
+    tsr_ast::utilities_tail::is_non_contextual_keyword(tsr_scanner::string_to_token(text).into())
 }

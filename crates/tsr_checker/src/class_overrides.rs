@@ -1,17 +1,17 @@
 //! Inheritance diagnostics distinguish redeclarations, abstract requirements and
 //! the syntactic override contract; assignability is checked by the caller.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags as cf, modifier_flags as mf, node_flags as nf, symbol_flags as sf, JsString,
     SyntaxKind as K,
 };
-use ts_diagnostics as d;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/grammarchecks.go:Checker.isNonBindableDynamicName
     pub(crate) fn non_bindable_dynamic_name(&mut self, name: NodeId) -> Result<bool, Error> {
-        if !ts_ast::is_dynamic_name(self.ast(name)?, name)? {
+        if !tsr_ast::is_dynamic_name(self.ast(name)?, name)? {
             return Ok(false);
         }
         let read = self.node(name)?;
@@ -23,7 +23,7 @@ impl CheckerState {
                 .and_then(|data| data.argument_expression())
         }
         .ok_or(Error::MissingLink("override dynamic name expression"))?;
-        if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+        if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
             return Ok(true);
         }
         let ty = self.late_name_type(name)?;
@@ -58,7 +58,7 @@ impl CheckerState {
                 candidates.push((rank, symbol, name));
             }
         }
-        Ok(ts_scanner::get_spelling_suggestion(
+        Ok(tsr_scanner::get_spelling_suggestion(
             name,
             candidates.iter(),
             |candidate| candidate.2.as_bytes(),
@@ -89,13 +89,13 @@ impl CheckerState {
         }
         let static_base = self.class_base_constructor_type(ty)?;
         for member in self.source_list(node, self.node(node)?.member_list())? {
-            if ts_ast::utilities::has_syntactic_modifier(self.ast(member)?, member, mf::AMBIENT)? {
+            if tsr_ast::utilities::has_syntactic_modifier(self.ast(member)?, member, mf::AMBIENT)? {
                 continue;
             }
             let members = if self.node(member)?.kind() == K::Constructor {
                 let mut parameters = vec![];
                 for parameter in self.source_list(member, self.node(member)?.parameter_list())? {
-                    if ts_ast::utilities::is_parameter_property_declaration(
+                    if tsr_ast::utilities::is_parameter_property_declaration(
                         self.ast(parameter)?,
                         parameter,
                         member,
@@ -148,7 +148,7 @@ impl CheckerState {
         if has_override {
             if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
                 let read = self.node(declaration)?;
-                if ts_ast::utilities::is_class_element(&read) {
+                if tsr_ast::utilities::is_class_element(&read) {
                     if let Some(name) = read.name() {
                         if self.non_bindable_dynamic_name(name)? {
                             self.error_at(Some(member), if javascript {d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_name_is_dynamic} else {d::This_member_cannot_have_an_override_modifier_because_its_name_is_dynamic},vec![])?;
@@ -210,7 +210,7 @@ impl CheckerState {
                 if !declarations.is_empty() {
                     let mut base_abstract = false;
                     for declaration in declarations.into_iter().flatten() {
-                        if ts_ast::utilities::has_syntactic_modifier(
+                        if tsr_ast::utilities::has_syntactic_modifier(
                             self.ast(declaration)?,
                             declaration,
                             mf::ABSTRACT,
@@ -315,7 +315,7 @@ impl CheckerState {
                 if base_flags & mf::ABSTRACT != 0 {
                     let abstract_class = class
                         .map(|class| {
-                            ts_ast::utilities::has_syntactic_modifier(
+                            tsr_ast::utilities::has_syntactic_modifier(
                                 self.ast(class)?,
                                 class,
                                 mf::ABSTRACT,

@@ -6,9 +6,9 @@ use crate::{
     signature_flags as sg, type_flags as tf, types::Map, CheckerState, Error, InferenceId,
     RelationKind, SignatureId, TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 #[derive(Clone, Copy)]
 enum Resolution {
@@ -140,7 +140,8 @@ impl CheckerState {
         node: NodeId,
     ) -> Result<Option<InferenceId>, Error> {
         for &(scope, inference) in self.calls.inference_contexts.iter().rev() {
-            if ts_ast::utilities::is_node_descendant_of(self.ast(node)?, Some(node), Some(scope))? {
+            if tsr_ast::utilities::is_node_descendant_of(self.ast(node)?, Some(node), Some(scope))?
+            {
                 return Ok(inference);
             }
         }
@@ -346,7 +347,7 @@ impl CheckerState {
                 return Ok(self.builtins.any_signature);
             }
             if !self.is_error_type(ty)? {
-                let class = ts_ast::utilities::get_containing_class(self.ast(node)?, node)?
+                let class = tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?
                     .ok_or(Error::MissingLink("super call class"))?;
                 if let Some(base) = self
                     .class_heritage_nodes(class, K::ExtendsKeyword)?
@@ -368,7 +369,7 @@ impl CheckerState {
             let non_optional = self.optional_expression_type(ty, expression)?;
             if non_optional != ty {
                 call_chain_flags =
-                    if ts_ast::utilities::is_outermost_optional_chain(self.ast(node)?, node)? {
+                    if tsr_ast::utilities::is_outermost_optional_chain(self.ast(node)?, node)? {
                         sg::IS_OUTER_CALL_CHAIN
                     } else {
                         sg::IS_INNER_CALL_CHAIN
@@ -473,9 +474,9 @@ impl CheckerState {
             if let Some((modifier, class_type)) = self.constructor_accessibility_error(
                 node,
                 &signatures,
-                ts_ast::modifier_flags::NON_PUBLIC_ACCESSIBILITY_MODIFIER,
+                tsr_ast::modifier_flags::NON_PUBLIC_ACCESSIBILITY_MODIFIER,
             )? {
-                let message = if modifier == ts_ast::modifier_flags::PRIVATE {
+                let message = if modifier == tsr_ast::modifier_flags::PRIVATE {
                     messages::Constructor_of_class_0_is_private_and_only_accessible_within_the_class_declaration
                 } else {
                     messages::Constructor_of_class_0_is_protected_and_only_accessible_within_the_class_declaration
@@ -522,7 +523,7 @@ impl CheckerState {
                         read.kind().known(),
                         Some(K::ClassDeclaration | K::ClassExpression)
                     ) && read.modifier_flags(self.ast(declaration)?)?
-                        & ts_ast::modifier_flags::ABSTRACT
+                        & tsr_ast::modifier_flags::ABSTRACT
                         != 0
                     {
                         abstract_class = true;
@@ -765,7 +766,7 @@ impl CheckerState {
                 *candidate
             } else {
                 let type_arguments = if type_arguments.is_empty() {
-                    let flags = if ts_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
+                    let flags = if tsr_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
                         crate::inference::ANY_DEFAULT
                     } else {
                         0

@@ -4,10 +4,10 @@ use crate::{
     OptionDeclaration, OptionKind, TsConfigSourceFile, COMPILER_OPTIONS,
 };
 use std::borrow::Cow;
-use ts_ast::{Diagnostic, NodeDataRead, NodeId};
-use ts_core::{CompilerOptions, Tristate};
-use ts_diagnostics::{self as d, Message};
-use ts_jsstring::JsString;
+use tsr_ast::{Diagnostic, NodeDataRead, NodeId};
+use tsr_core::{CompilerOptions, Tristate};
+use tsr_diagnostics::{self as d, Message};
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Copy, Default)]
 pub struct OptionSyntax<'a> {
@@ -109,7 +109,7 @@ pub fn convert_json_option<'a>(
             let Some(value) = value.as_string().filter(|v| !v.is_empty()) else {
                 return (Cow::Owned(ConfigValue::Null), vec![]);
             };
-            let lower = ts_jsstring::helpers::to_lower_go(value.as_bytes());
+            let lower = tsr_jsstring::helpers::to_lower_go(value.as_bytes());
             if let Some((_, value)) = option
                 .enum_values
                 .iter()
@@ -160,11 +160,11 @@ pub fn convert_json_option<'a>(
     );
     if option.is_file_path {
         let input = value.as_string().expect("file path is a validated string");
-        let slashes = ts_tspath::normalize_slashes(input.as_bytes());
+        let slashes = tsr_tspath::normalize_slashes(input.as_bytes());
         let normalized = if starts_with_config_dir(&slashes) {
             slashes.into_owned()
         } else {
-            ts_tspath::absolute(&slashes, base_path)
+            tsr_tspath::absolute(&slashes, base_path)
         };
         return (
             Cow::Owned(ConfigValue::String(if normalized.is_empty() {
@@ -259,7 +259,7 @@ pub fn spec_diagnostic(spec: &[u8], disallow_trailing_recursion: bool) -> Option
 
 pub fn default_compiler_options(config_file_name: &[u8]) -> CompilerOptions {
     let mut options = CompilerOptions::default();
-    if ts_tspath::base_name(config_file_name) == b"jsconfig.json" {
+    if tsr_tspath::base_name(config_file_name) == b"jsconfig.json" {
         options.allow_js = Tristate::TRUE;
         options.max_node_module_js_depth = Some(2);
         options.skip_lib_check = Tristate::TRUE;
@@ -297,12 +297,12 @@ pub fn compiler_options_from_json(
     }
     if !config_file_name.is_empty() {
         options.config_file_path =
-            JsString::from_bytes(ts_tspath::normalize_slashes(config_file_name).into_owned());
+            JsString::from_bytes(tsr_tspath::normalize_slashes(config_file_name).into_owned());
     }
     (options, errors)
 }
 pub fn unknown_option(key: &[u8]) -> Diagnostic {
-    let suggestion = ts_scanner::get_spelling_suggestion_for_strings(
+    let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
         key,
         COMPILER_OPTIONS.iter().map(|option| option.name.as_bytes()),
     );

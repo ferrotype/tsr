@@ -6,8 +6,8 @@ use crate::{
 };
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId, SymbolArena, SymbolId};
-use ts_ast::{symbol_flags, JsString};
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId, SymbolArena, SymbolId};
+use tsr_ast::{symbol_flags, JsString};
 
 fn node(arena: &SymbolArena<u32>, slot: u32) -> NodeId {
     NodeId::from_parts(arena.id(), slot).unwrap()
@@ -47,7 +47,7 @@ fn missing_indexed_property_without_a_program_remains_unresolved() {
 
 #[test]
 fn unused_pass_failure_is_sticky_without_poisoning_completed_type_checks() {
-    use ts_ast::FactoryMethods;
+    use tsr_ast::FactoryMethods;
     let (_counters, _generation, _identity, owner) = owner();
     let (source, other) = {
         let mut operation = owner.operation().unwrap();
@@ -55,12 +55,12 @@ fn unused_pass_failure_is_sticky_without_poisoning_completed_type_checks() {
         let mut sources = Vec::new();
         for file in [b"/failed.ts".as_slice(), b"/other.ts"] {
             let source = state.factory.new_source_file(
-                ts_ast::SourceFileParseOptions {
+                tsr_ast::SourceFileParseOptions {
                     file_name: JsString::from_bytes(file),
                     path: JsString::from_bytes(file),
                     ..Default::default()
                 },
-                ts_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
+                tsr_jsstring::SourceText::from_loaded_bytes(b"".as_slice()),
                 None,
                 None,
             );
@@ -251,7 +251,7 @@ fn pattern_literal_property_conflicts_reduce_the_intersection() {
                 .value_symbol_links
                 .get_or_default(property)
                 .resolved_type = Some(ty);
-            let mut table = ts_ast::SymbolTable::default();
+            let mut table = tsr_ast::SymbolTable::default();
             table.insert(name, Some(property));
             let members = state.alloc_symbol_table(table);
             objects.push(
@@ -267,7 +267,7 @@ fn pattern_literal_property_conflicts_reduce_the_intersection() {
         assert_eq!(properties.len(), 1);
         assert_eq!(
             state.symbol(properties[0]).unwrap().check_flags()
-                & ts_ast::check_flags::HAS_LITERAL_TYPE
+                & tsr_ast::check_flags::HAS_LITERAL_TYPE
                 != 0,
             is_discriminant,
         );
@@ -387,7 +387,7 @@ fn owner_adopts_the_identity_once_and_scopes_state_to_an_operation() {
     let (counters, _generation, identity, owner) = owner();
     assert!(matches!(
         CheckerOwner::new(identity.clone(), &counters, CheckerOptions::default()),
-        Err(Error::Arena(ts_arena::Error::IdentityAdopted))
+        Err(Error::Arena(tsr_arena::Error::IdentityAdopted))
     ));
     let mut operation = owner.operation().unwrap();
     assert_eq!(operation.state().symbols().id(), identity.id());
@@ -446,10 +446,10 @@ fn a_panic_inside_an_operation_retires_the_generation() {
         panic!("injected checker failure");
     }));
     assert!(result.is_err());
-    assert_eq!(generation.validate(), Err(ts_arena::Error::Retired));
+    assert_eq!(generation.validate(), Err(tsr_arena::Error::Retired));
     assert!(matches!(
         owner.operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
 }
 
@@ -460,7 +460,7 @@ fn a_direct_identity_lease_cannot_bypass_operation_reentry_detection() {
     assert!(matches!(owner.operation(), Err(Error::Reentry)));
     drop(lease);
     let operation = owner.operation().unwrap();
-    assert!(matches!(identity.lease(), Err(ts_arena::Error::Reentry)));
+    assert!(matches!(identity.lease(), Err(tsr_arena::Error::Reentry)));
     drop(operation);
     assert!(identity.lease().is_ok());
 }
@@ -480,7 +480,7 @@ fn type_store_numbers_from_one_and_alias_helpers_tolerate_absence() {
     let mut store = TypeStore::new();
     let intrinsic = || {
         Payload::Intrinsic(IntrinsicData {
-            name: ts_ast::JsString::from_bytes(&b"any"[..]),
+            name: tsr_ast::JsString::from_bytes(&b"any"[..]),
         })
     };
     let first = store
@@ -514,8 +514,8 @@ fn node_builder_flags_are_a_mask_of_type_format_flags() {
     let converted = to_node_builder_flags(flags);
     assert_eq!(
         converted,
-        ts_nodebuilder::flags::NO_TRUNCATION
-            | ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE
+        tsr_nodebuilder::flags::NO_TRUNCATION
+            | tsr_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE
     );
     assert_eq!(
         converted & type_format_flags::ADD_UNDEFINED,
@@ -570,7 +570,7 @@ fn a_same_numbered_handle_from_another_checker_is_rejected_before_any_read() {
         type_a.id(),
         "the same numeric slot in both checkers"
     );
-    let wrong = Some(Error::Arena(ts_arena::Error::WrongOwner));
+    let wrong = Some(Error::Arena(tsr_arena::Error::WrongOwner));
     assert_eq!(op_b.import_type(&retained_type).err(), wrong);
     assert_eq!(op_b.import_symbol(&retained_symbol).err(), wrong);
     assert_eq!(op_b.import_signature(&retained_signature).err(), wrong);
@@ -627,7 +627,7 @@ fn retained_results_outlive_the_operation_and_the_callers_owner_handle() {
     let declaration = op.signature_declaration(signature).unwrap().unwrap();
     assert_eq!(
         op.node_kind(declaration).unwrap().known(),
-        Some(ts_ast::SyntaxKind::FunctionType)
+        Some(tsr_ast::SyntaxKind::FunctionType)
     );
     assert_eq!(
         union,
@@ -666,7 +666,7 @@ fn retirement_rejects_retained_handles_while_their_storage_stays_live() {
     generation.retire();
     assert!(matches!(
         owner.operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     assert_eq!(retained.id(), retained.id(), "the handle is intact");
     assert!(
@@ -680,7 +680,7 @@ fn checker_local_id_exhaustion_fails_before_writing() {
     let mut store = TypeStore::with_base_for_test(u32::MAX - 1);
     let intrinsic = || {
         Payload::Intrinsic(IntrinsicData {
-            name: ts_ast::JsString::from_bytes(&b"any"[..]),
+            name: tsr_ast::JsString::from_bytes(&b"any"[..]),
         })
     };
     let last = store

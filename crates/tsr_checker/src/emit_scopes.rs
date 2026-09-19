@@ -2,7 +2,7 @@
 //! bindings are separate from immutable program bindings; the factory retains
 //! every source parent before an edge to it is created.
 use crate::{CheckerState, Error};
-use ts_ast::{
+use tsr_ast::{
     node_flags as nf, Factory, FactoryMethods, JsString, NodeBinding, NodeId, RuntimeFactory,
     SymbolId, SymbolTable, SyntaxKind as K,
 };
@@ -58,7 +58,7 @@ impl CheckerState {
             || kind == K::Block && (name.is_some() || symbol.is_some())
             || kind == K::ModuleDeclaration && (name.is_none() || signature_kind.is_some())
         {
-            return Err(ts_arena::Error::InvalidGraph.into());
+            return Err(tsr_arena::Error::InvalidGraph.into());
         }
         if let Some(symbol) = symbol {
             self.symbol(symbol)?;
@@ -72,7 +72,7 @@ impl CheckerState {
         let empty = self.factory.alloc_nodes(Vec::new());
         let list = self
             .factory
-            .alloc_list(ts_core::TextRange::new(-1, -1), empty);
+            .alloc_list(tsr_core::TextRange::new(-1, -1), empty);
         let node = if kind == K::Block {
             self.factory.new_block(Some(list), false)
         } else {
@@ -117,9 +117,9 @@ mod tests {
     #[test]
     fn synthetic_scope_bindings_are_local_and_validate_symbols_before_allocating(
     ) -> Result<(), Error> {
-        let counters = ts_arena::Counters::new();
-        let generation = ts_arena::Generation::new(&counters);
-        let identity = ts_arena::CheckerIdentity::new(generation, &counters);
+        let counters = tsr_arena::Counters::new();
+        let generation = tsr_arena::Generation::new(&counters);
+        let identity = tsr_arena::CheckerIdentity::new(generation, &counters);
         let owner = std::sync::Arc::new(crate::CheckerOwner::new(
             identity,
             &counters,
@@ -129,8 +129,8 @@ mod tests {
         let state = operation.state_mut();
         let parent = state.factory.new_block(None, false);
         let name = JsString::from_bytes(b"T".as_slice());
-        let outer = state.new_symbol(ts_ast::symbol_flags::TYPE_PARAMETER, name.clone())?;
-        let inner = state.new_symbol(ts_ast::symbol_flags::TYPE_PARAMETER, name.clone())?;
+        let outer = state.new_symbol(tsr_ast::symbol_flags::TYPE_PARAMETER, name.clone())?;
+        let inner = state.new_symbol(tsr_ast::symbol_flags::TYPE_PARAMETER, name.clone())?;
         let scope = state.create_emit_scope(
             parent,
             K::Block,
@@ -163,7 +163,7 @@ mod tests {
             Some(Some(inner))
         );
         assert!(state.checker_node_binding(parent)?.is_none());
-        let foreign = ts_arena::SymbolArena::<u8>::new(&counters);
+        let foreign = tsr_arena::SymbolArena::<u8>::new(&counters);
         let foreign_symbol = SymbolId::from_parts(foreign.id(), 1)?;
         let count = state.factory.node_count();
         assert!(state

@@ -69,7 +69,7 @@ fn scan_rows(file: &mut FormatFile<'_, '_>, row: &mut dyn FnMut(&str)) -> Result
 
 /// The settings variants the oracle names, mirrored here by name.
 pub fn variant(name: &str) -> Option<crate::FormatCodeSettings> {
-    use ts_core::Tristate;
+    use tsr_core::Tristate;
     let mut settings = crate::FormatCodeSettings::default();
     match name {
         "default" => {}
@@ -115,13 +115,13 @@ pub fn variant(name: &str) -> Option<crate::FormatCodeSettings> {
 
 struct Item {
     span: TextRangeWithKind,
-    parent: ts_arena::NodeId,
+    parent: tsr_arena::NodeId,
 }
 
-fn is_comment(kind: ts_ast::SyntaxKind) -> bool {
+fn is_comment(kind: tsr_ast::SyntaxKind) -> bool {
     matches!(
         kind,
-        ts_ast::SyntaxKind::SingleLineCommentTrivia | ts_ast::SyntaxKind::MultiLineCommentTrivia
+        tsr_ast::SyntaxKind::SingleLineCommentTrivia | tsr_ast::SyntaxKind::MultiLineCommentTrivia
     )
 }
 
@@ -161,9 +161,9 @@ fn items(file: &mut FormatFile<'_, '_>) -> Result<Vec<Item>, Error> {
 
 fn common_ancestor(
     file: &FormatFile<'_, '_>,
-    a: ts_arena::NodeId,
-    b: ts_arena::NodeId,
-) -> Result<ts_arena::NodeId, Error> {
+    a: tsr_arena::NodeId,
+    b: tsr_arena::NodeId,
+) -> Result<tsr_arena::NodeId, Error> {
     let mut seen = std::collections::HashSet::new();
     let mut current = Some(a);
     while let Some(node) = current {
@@ -223,7 +223,7 @@ pub fn rules(
 /// Every non-empty bucket of the rules map, in order.
 pub fn rules_map(row: &mut dyn FnMut(&str)) {
     let map = crate::rulesmap::get_rules_map();
-    let row_length = ts_ast::SyntaxKind::LastToken as usize + 1;
+    let row_length = tsr_ast::SyntaxKind::LastToken as usize + 1;
     for index in 0..map.buckets() {
         let names: Vec<&str> = map.bucket(index).map(|rule| rule.debug_name).collect();
         if !names.is_empty() {
@@ -282,7 +282,7 @@ fn hex(bytes: &[u8]) -> String {
     })
 }
 
-fn edits(list: Result<Vec<ts_core::TextChange>, Error>) -> String {
+fn edits(list: Result<Vec<tsr_core::TextChange>, Error>) -> String {
     match list {
         Ok(list) => list
             .iter()
@@ -343,7 +343,7 @@ pub fn entry(
         &mut FormatFile<'_, '_>,
         &crate::FormatContext,
         i64,
-    ) -> Result<Vec<ts_core::TextChange>, Error>;
+    ) -> Result<Vec<tsr_core::TextChange>, Error>;
     let triggers: [(u8, &str, Run); 3] = [
         (b';', "M", crate::format_on_semicolon),
         (b'{', "O", crate::format_on_opening_curly),

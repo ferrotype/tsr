@@ -18,7 +18,7 @@ version-1 captures remain historical evidence, not evidence for this contract.
 
 ## Decision
 
-1. Keep the separate `ts_testhost --stdio` prototype and reusable session API.
+1. Keep the separate `tsr_testhost --stdio` prototype and reusable session API.
    The endpoint executes no external code, performs no disk fallback and makes
    no claim to execute fourslash semantic assertions.
 

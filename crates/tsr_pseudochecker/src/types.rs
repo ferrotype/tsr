@@ -1,6 +1,6 @@
 //! Native pseudo-type variants remain unnormalized and retain source nodes.
 use std::sync::{Arc, OnceLock};
-use ts_arena::NodeId;
+use tsr_arena::NodeId;
 
 pub type PseudoType = Arc<PseudoTypeData>;
 

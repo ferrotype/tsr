@@ -1,7 +1,7 @@
 //! Local paths and extension preferences from modulespecifiers/{preferences,specifiers}.go.
 use super::{Error, Generation, Import};
-use ts_core::{CompilerOptions, JsxEmit, ModuleResolutionKind as MR, ResolutionMode as Mode};
-use ts_tspath as path;
+use tsr_core::{CompilerOptions, JsxEmit, ModuleResolutionKind as MR, ResolutionMode as Mode};
+use tsr_tspath as path;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum Ending {
@@ -306,7 +306,7 @@ impl Generation<'_> {
     pub(super) fn module_name_from_paths(
         &self,
         relative: &[u8],
-        mappings: &ts_core::PathMappings,
+        mappings: &tsr_core::PathMappings,
         endings: &[Ending],
         base: &[u8],
     ) -> Result<Vec<u8>, Error> {

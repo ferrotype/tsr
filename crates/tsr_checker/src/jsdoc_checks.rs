@@ -1,7 +1,7 @@
 //! Eager documentation references participate in name usage without forcing lazy comments.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkSourceElementWorker
@@ -16,7 +16,7 @@ impl CheckerState {
                 .node(doc)?
                 .data_source()
                 .as_js_doc()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .tags();
             for tag in self.source_list(doc, tags)? {
                 self.check_jsdoc_comments(tag)?;
@@ -47,18 +47,18 @@ impl CheckerState {
 
     // port: tsc/internal/ast/utilities.go:GetHostSignatureFromJSDoc
     pub(crate) fn jsdoc_host_signature(&self, name: NodeId) -> Result<Option<NodeId>, Error> {
-        let Some(host) = ts_ast::utilities_tail::get_js_doc_host(self.ast(name)?, name)? else {
+        let Some(host) = tsr_ast::utilities_tail::get_js_doc_host(self.ast(name)?, name)? else {
             return Ok(None);
         };
         let read = self.node(host)?;
         if read.kind() == K::PropertySignature {
             if let Some(ty) = read.type_node() {
-                if ts_ast::utilities::is_function_like(Some(&self.node(ty)?)) {
+                if tsr_ast::utilities::is_function_like(Some(&self.node(ty)?)) {
                     return Ok(Some(ty));
                 }
             }
         }
-        Ok(ts_ast::utilities::is_function_like(Some(&read)).then_some(host))
+        Ok(tsr_ast::utilities::is_function_like(Some(&read)).then_some(host))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.resolveJSDocMemberName

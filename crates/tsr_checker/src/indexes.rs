@@ -2,7 +2,7 @@
 //! source aliases and access flags; properties are resolved in source order.
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, IndexInfoId, TypeId};
-use ts_ast::{modifier_flags as mf, JsString, SyntaxKind as K};
+use tsr_ast::{modifier_flags as mf, JsString, SyntaxKind as K};
 
 pub(crate) const STRINGS_ONLY: u32 = 1;
 pub(crate) const NO_INDEX_SIGNATURES: u32 = 2;
@@ -224,7 +224,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getLiteralTypeFromProperty
     pub(crate) fn literal_type_from_property(
         &mut self,
-        symbol: ts_arena::SymbolId,
+        symbol: tsr_arena::SymbolId,
         include: crate::TypeFlags,
     ) -> Result<TypeId, Error> {
         let symbol = self.get_merged_symbol(symbol);
@@ -243,7 +243,7 @@ impl CheckerState {
             .try_get(symbol)
             .and_then(|links| links.name_type);
         if ty.is_none() {
-            if name.as_bytes() == ts_ast::internal_symbol_names::DEFAULT {
+            if name.as_bytes() == tsr_ast::internal_symbol_names::DEFAULT {
                 ty = Some(
                     self.get_string_literal_type(JsString::from_bytes(b"default".as_slice()))?,
                 );
@@ -300,7 +300,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromIndexedAccessTypeNode
     pub(crate) fn source_indexed_access_type(
         &mut self,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
     ) -> Result<TypeId, Error> {
         let read = self.node(node)?;
         let data = read
@@ -326,7 +326,7 @@ impl CheckerState {
         object: TypeId,
         index: TypeId,
         flags: crate::AccessFlags,
-        node: Option<ts_arena::NodeId>,
+        node: Option<tsr_arena::NodeId>,
         alias: Option<crate::AliasId>,
     ) -> Result<TypeId, Error> {
         let result = self.indexed_access_or_undefined(object, index, flags, node, alias)?;
@@ -343,7 +343,7 @@ impl CheckerState {
         object: TypeId,
         mut index: TypeId,
         mut flags: crate::AccessFlags,
-        node: Option<ts_arena::NodeId>,
+        node: Option<tsr_arena::NodeId>,
         alias: Option<crate::AliasId>,
     ) -> Result<Option<TypeId>, Error> {
         use crate::access_flags as af;
@@ -443,7 +443,7 @@ impl CheckerState {
         &mut self,
         object: TypeId,
         index: TypeId,
-        node: Option<ts_arena::NodeId>,
+        node: Option<tsr_arena::NodeId>,
     ) -> Result<bool, Error> {
         if self.is_generic_index_type(index)? {
             return Ok(true);
@@ -629,7 +629,7 @@ impl CheckerState {
         object: TypeId,
         index: TypeId,
         full_index: TypeId,
-        node: Option<ts_arena::NodeId>,
+        node: Option<tsr_arena::NodeId>,
         flags: crate::AccessFlags,
     ) -> Result<Option<TypeId>, Error> {
         use crate::access_flags as af;
@@ -651,9 +651,9 @@ impl CheckerState {
         } else if let Some(name) = self.index_property_name(index)? {
             Some(name)
         } else if let Some(node) = node {
-            if ts_ast::utilities::is_property_name(&self.node(node)?) {
+            if tsr_ast::utilities::is_property_name(&self.node(node)?) {
                 let name = self.index_property_name_node(node)?;
-                (name.as_bytes() != ts_ast::internal_symbol_names::MISSING).then_some(name)
+                (name.as_bytes() != tsr_ast::internal_symbol_names::MISSING).then_some(name)
             } else {
                 None
             }
@@ -681,7 +681,7 @@ impl CheckerState {
                         let name = self.symbol_to_string(symbol)?;
                         self.error_at(
                             self.index_access_node(node)?,
-                            ts_diagnostics::Cannot_assign_to_0_because_it_is_a_read_only_property,
+                            tsr_diagnostics::Cannot_assign_to_0_because_it_is_a_read_only_property,
                             vec![name],
                         )?;
                         return Ok(None);
@@ -774,13 +774,13 @@ impl CheckerState {
                         let display = self
                             .type_to_string(original_object, crate::type_display::DEFAULT_FLAGS)?;
                         if flags & af::WRITING != 0 {
-                            self.error_at(Some(expression),ts_diagnostics::Type_0_is_generic_and_can_only_be_indexed_for_reading,vec![display])?;
+                            self.error_at(Some(expression),tsr_diagnostics::Type_0_is_generic_and_can_only_be_indexed_for_reading,vec![display])?;
                         } else {
                             let index =
                                 self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
                             self.error_at(
                                 Some(expression),
-                                ts_diagnostics::Type_0_cannot_be_used_to_index_type_1,
+                                tsr_diagnostics::Type_0_cannot_be_used_to_index_type_1,
                                 vec![index, display],
                             )?;
                         }
@@ -794,7 +794,7 @@ impl CheckerState {
                     let text = self.type_to_string(index, crate::type_display::DEFAULT_FLAGS)?;
                     self.error_at(
                         self.index_access_node(node)?,
-                        ts_diagnostics::Type_0_cannot_be_used_as_an_index_type,
+                        tsr_diagnostics::Type_0_cannot_be_used_as_an_index_type,
                         vec![text],
                     )?;
                     return if flags & af::INCLUDE_UNDEFINED != 0 {
@@ -809,7 +809,7 @@ impl CheckerState {
                     self.types.get(object)?.symbol,
                     self.types.get(index)?.symbol,
                 ) {
-                    self.symbol(object_symbol)?.flags() & ts_ast::symbol_flags::ENUM != 0
+                    self.symbol(object_symbol)?.flags() & tsr_ast::symbol_flags::ENUM != 0
                         && self.types.flags(index)? & tf::ENUM_LITERAL != 0
                         && self.parent_of_symbol(index_symbol)? == Some(object_symbol)
                 } else {
@@ -836,7 +836,7 @@ impl CheckerState {
                 .symbol
                 .map(|symbol| {
                     self.symbol(symbol)
-                        .map(|read| read.flags() & ts_ast::symbol_flags::CONST_ENUM != 0)
+                        .map(|read| read.flags() & tsr_ast::symbol_flags::CONST_ENUM != 0)
                 })
                 .transpose()?
                 .unwrap_or(false);
@@ -873,7 +873,7 @@ impl CheckerState {
             {
                 self.error_at(
                     Some(node),
-                    ts_diagnostics::Property_0_does_not_exist_on_type_1,
+                    tsr_diagnostics::Property_0_does_not_exist_on_type_1,
                     vec![
                         self.index_property_name(index)?
                             .ok_or(Error::MissingLink("literal index name"))?,
@@ -883,7 +883,7 @@ impl CheckerState {
             } else if self.types.flags(index)? & (tf::STRING | tf::NUMBER) != 0 {
                 self.error_at(
                     Some(node),
-                    ts_diagnostics::Type_0_has_no_matching_index_signature_for_type_1,
+                    tsr_diagnostics::Type_0_has_no_matching_index_signature_for_type_1,
                     vec![object_text, index_text],
                 )?;
             } else {
@@ -894,7 +894,7 @@ impl CheckerState {
                 };
                 self.error_at(
                     Some(node),
-                    ts_diagnostics::Type_0_cannot_be_used_as_an_index_type,
+                    tsr_diagnostics::Type_0_cannot_be_used_as_an_index_type,
                     vec![index_text],
                 )?;
             }
@@ -904,8 +904,8 @@ impl CheckerState {
 
     pub(crate) fn index_access_node(
         &self,
-        node: Option<ts_arena::NodeId>,
-    ) -> Result<Option<ts_arena::NodeId>, Error> {
+        node: Option<tsr_arena::NodeId>,
+    ) -> Result<Option<tsr_arena::NodeId>, Error> {
         node.map(|node| {
             let read = self.node(node)?;
             match read.kind().known() {
@@ -942,7 +942,7 @@ impl CheckerState {
         parts: &[TypeId],
         index: f64,
         name: JsString,
-        node: Option<ts_arena::NodeId>,
+        node: Option<tsr_arena::NodeId>,
         flags: crate::AccessFlags,
     ) -> Result<Option<TypeId>, Error> {
         let mut fixed = true;
@@ -957,7 +957,7 @@ impl CheckerState {
                 if index < 0.0 {
                     self.error_at(
                         error_node,
-                        ts_diagnostics::A_tuple_type_cannot_be_indexed_with_a_negative_value,
+                        tsr_diagnostics::A_tuple_type_cannot_be_indexed_with_a_negative_value,
                         vec![],
                     )?;
                     return Ok(Some(self.builtins.undefined_type));
@@ -970,7 +970,7 @@ impl CheckerState {
                     .len();
                 self.error_at(
                     error_node,
-                    ts_diagnostics::Tuple_type_0_of_length_1_has_no_element_at_index_2,
+                    tsr_diagnostics::Tuple_type_0_of_length_1_has_no_element_at_index_2,
                     vec![
                         display,
                         JsString::from_bytes(count.to_string().into_bytes()),
@@ -981,7 +981,7 @@ impl CheckerState {
                 let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
                 self.error_at(
                     error_node,
-                    ts_diagnostics::Property_0_does_not_exist_on_type_1,
+                    tsr_diagnostics::Property_0_does_not_exist_on_type_1,
                     vec![name, display],
                 )?;
             }
@@ -1051,7 +1051,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkIndexedAccessIndexType
     pub(crate) fn check_indexed_access_type(
         &mut self,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
     ) -> Result<(), Error> {
         for child in self.source_children(node)? {
             self.check_source_element(child)?;
@@ -1064,6 +1064,6 @@ impl CheckerState {
 
 // port: tsc/internal/checker/utilities.go:isNumericLiteralName
 pub(crate) fn numeric_name(name: &[u8]) -> Option<f64> {
-    let value = ts_jsnum::from_string(name);
+    let value = tsr_jsnum::from_string(name);
     (value.to_string().as_bytes() == name).then_some(value.value())
 }

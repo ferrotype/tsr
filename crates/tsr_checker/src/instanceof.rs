@@ -2,8 +2,8 @@
 //! supplies a callable `Symbol.hasInstance` member.
 
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, SignatureId, TypeId};
-use ts_arena::NodeId;
-use ts_diagnostics as messages;
+use tsr_arena::NodeId;
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkInstanceOfExpression

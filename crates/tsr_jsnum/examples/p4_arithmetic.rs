@@ -1,7 +1,7 @@
 //! Native-probe companion; inputs/outputs are IEEE-754 bits so no formatter or
 //! JSON number conversion can hide a last-bit difference.
 use std::io::{self, BufRead};
-use ts_jsnum::Number;
+use tsr_jsnum::Number;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     for line in io::stdin().lock().lines() {

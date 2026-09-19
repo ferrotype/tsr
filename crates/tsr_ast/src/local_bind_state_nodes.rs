@@ -56,7 +56,7 @@ impl<'scope> LocalBind<'scope, '_> {
     pub fn scoped_node_symbol(
         &self,
         node: BindNode<'scope>,
-    ) -> Result<Option<BindSymbol<'scope>>, ts_arena::Error> {
+    ) -> Result<Option<BindSymbol<'scope>>, tsr_arena::Error> {
         if self.result.bindings.is_empty() && !self.core.store().has_binding_overrides() {
             let (_, header) = self
                 .core
@@ -80,7 +80,7 @@ impl<'scope> LocalBind<'scope, '_> {
     pub fn scoped_node_locals(
         &self,
         node: BindNode<'scope>,
-    ) -> Result<Option<BindTable<'scope>>, ts_arena::Error> {
+    ) -> Result<Option<BindTable<'scope>>, tsr_arena::Error> {
         if self.result.bindings.is_empty() && !self.core.store().has_binding_overrides() {
             let (_, header) = self
                 .core
@@ -202,8 +202,8 @@ mod tests {
         AstBuilder, FactoryMethods, FlowNode, JsString, ParsedFile, SourceFileParseOptions,
         SyntaxKind,
     };
-    use ts_arena::Counters;
-    use ts_jsstring::SourceText;
+    use tsr_arena::Counters;
+    use tsr_jsstring::SourceText;
 
     fn parsed() -> (ParsedFile, crate::NodeId, crate::NodeId) {
         let text = SourceText::default();
@@ -258,7 +258,7 @@ mod tests {
                         local.binding_mut(raw)?.symbol = Some(foreign);
                         assert_eq!(
                             local.scoped_node_symbol(source),
-                            Err(ts_arena::Error::WrongOwner)
+                            Err(tsr_arena::Error::WrongOwner)
                         );
                         assert_eq!(local.local_node_symbol(source), Some(foreign));
                         local.set_symbol(source, Some(symbol));

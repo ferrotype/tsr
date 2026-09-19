@@ -145,7 +145,7 @@ func init() {}
         self.generate()
         path = self.output / "PORTS.toml"
         text = path.read_text().replace('status = "planned"', 'status = "ported"')
-        text = text.replace('rust = []', 'rust = ["crates/ts_scanner/src/a.rs", "crates/ts_scanner/src/b.rs"]')
+        text = text.replace('rust = []', 'rust = ["crates/tsr_scanner/src/a.rs", "crates/tsr_scanner/src/b.rs"]')
         path.write_text(text.replace('verify = []', 'verify = ["evidence.scanner.passed == 1"]'))
         self.write_source("scanner.go", "package scanner\nfunc Scan() { println(2) }\n")
         second = self.commit("change one source")
@@ -171,7 +171,7 @@ func init() {}
 [[file]]
 go = "tsc/internal/scanner/scanner.go"
 status = "verified"
-rust = "crates/ts_scanner/src/lib.rs"
+rust = "crates/tsr_scanner/src/lib.rs"
 pin = "{self.pin[:10]}"
 verify = ["evidence.scanner.passed == 1"]
 ''')
@@ -183,7 +183,7 @@ verify = ["evidence.scanner.passed == 1"]
         self.assertEqual(ledger["pin"], second)
         self.assertEqual(entry["pin"], self.pin)
         self.assertEqual(entry["status"], "ported")
-        self.assertEqual(entry["rust"], ["crates/ts_scanner/src/lib.rs"])
+        self.assertEqual(entry["rust"], ["crates/tsr_scanner/src/lib.rs"])
         self.assertEqual(entry["verify"], ["evidence.scanner.passed == 1"])
 
     def test_parse_error_is_fatal_and_does_not_publish_partial_outputs(self):
@@ -208,7 +208,7 @@ class LedgerProjectionTests(unittest.TestCase):
         self.ledger = {
             "pin": "a" * 40,
             "file": [{
-                "go": "tsc/internal/é.go", "package": "internal", "crate": "ts_core",
+                "go": "tsc/internal/é.go", "package": "internal", "crate": "tsr_core",
                 "phase": 0, "kind": "source", "pin": "a" * 40,
                 "source_hash": "b" * 64, "loc": 2,
                 "status": "planned", "rust": [], "verify": [],
@@ -220,7 +220,7 @@ class LedgerProjectionTests(unittest.TestCase):
 
     def test_canonical_json_contract(self):
         # Fixed serialized vector also documents the bytes Rust must hash.
-        canonical = ('{"file":[{"crate":"ts_core","go":"tsc/internal/é.go",'
+        canonical = ('{"file":[{"crate":"tsr_core","go":"tsc/internal/é.go",'
                      '"kind":"source","loc":2,"package":"internal","phase":0,'
                      '"pin":"' + "a" * 40 + '","source_hash":"' + "b" * 64
                      + '"}],"pin":"' + "a" * 40 + '"}')
@@ -230,7 +230,7 @@ class LedgerProjectionTests(unittest.TestCase):
         before = self.digest()
         for field, value in {
             "status": "ported",
-            "rust": ["crates/ts_core/src/a.rs", "crates/ts_core/src/b.rs"],
+            "rust": ["crates/tsr_core/src/a.rs", "crates/tsr_core/src/b.rs"],
             "verify": ["evidence.core.passed == 1"],
         }.items():
             with self.subTest(field=field):

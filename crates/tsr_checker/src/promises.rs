@@ -4,9 +4,9 @@ use crate::{
     object_flags as of, type_facts as f, type_flags as tf, types::Map, CheckerState, Error,
     RelationKind, TypeId, UnionReduction,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 #[derive(Default)]
 pub(crate) struct PromiseState {
@@ -380,7 +380,7 @@ impl CheckerState {
                 };
                 let message = message.ok_or(Error::MissingLink("invalid thenable diagnostic"))?;
                 let diagnostic = if child.is_some() {
-                    ts_ast::Diagnostic::chain(child, message, args.to_vec())
+                    tsr_ast::Diagnostic::chain(child, message, args.to_vec())
                 } else {
                     self.diagnostic_for_node(Some(error), message, args.to_vec())?
                 };

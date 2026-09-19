@@ -1,6 +1,6 @@
-use ts_ast::{token_flags as flags, SyntaxKind};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
+use tsr_ast::{token_flags as flags, SyntaxKind};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
 
 use crate::identifier::{get_identifier_token, is_identifier_part, is_identifier_start};
 use crate::regexp::{self, reg_exp_flags};

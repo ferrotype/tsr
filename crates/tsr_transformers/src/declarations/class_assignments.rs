@@ -1,10 +1,10 @@
 use super::transform::Transformer;
 use std::{collections::HashSet, ops::ControlFlow};
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, AstView, ChildVisitor, FactoryMethods, JsString, NodeId, NodeListId,
     NodeSlice, RuntimeFactory, SyntaxKind as K,
 };
-use ts_printer::emit_resolver::DeclarationEmitResolver;
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 #[derive(Hash, PartialEq, Eq)]
 struct AssignmentKey {
@@ -55,7 +55,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         node: NodeId,
         is_static: bool,
     ) -> Result<AssignmentKey, R::Error> {
-        let text = if ts_ast::is_dynamic_name(self.output.view(), name)? {
+        let text = if tsr_ast::is_dynamic_name(self.output.view(), name)? {
             None
         } else {
             self.property_text(name)?
@@ -91,7 +91,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 Ok(data.as_class_declaration().unwrap().heritage_clauses())
             }
             Some(K::ClassExpression) => Ok(data.as_class_expression().unwrap().heritage_clauses()),
-            _ => Err(ts_arena::Error::InvalidGraph.into()),
+            _ => Err(tsr_arena::Error::InvalidGraph.into()),
         }
     }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.collectThisPropertyAssignments
@@ -104,7 +104,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         for &member in &members {
             if let Some(name) = self.node(member).name() {
                 let is_static =
-                    ts_ast::utilities::get_combined_modifier_flags(self.output.view(), member)?
+                    tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), member)?
                         & mf::STATIC
                         != 0;
                 seen.insert(self.assignment_key(name, member, is_static)?);
@@ -131,21 +131,21 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         seen: &mut HashSet<AssignmentKey>,
         output: &mut Vec<NodeId>,
     ) -> Result<bool, R::Error> {
-        let container = ts_ast::get_this_container(self.output.view(), node, false, false)?;
+        let container = tsr_ast::get_this_container(self.output.view(), node, false, false)?;
         if self.node(container).parent() != Some(class) {
             return Ok(false);
         }
-        if ts_ast::get_assignment_declaration_kind(self.output.view(), node)?
-            != ts_ast::JSDeclarationKind::ThisProperty
+        if tsr_ast::get_assignment_declaration_kind(self.output.view(), node)?
+            != tsr_ast::JSDeclarationKind::ThisProperty
         {
             return Ok(true);
         }
-        let mut name = Self::required(ts_ast::get_name_of_declaration(
+        let mut name = Self::required(tsr_ast::get_name_of_declaration(
             self.output.view(),
             Some(node),
         )?)?;
         let is_static = self.node(container).kind() == K::ClassStaticBlockDeclaration
-            || ts_ast::utilities::get_combined_modifier_flags(self.output.view(), container)?
+            || tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), container)?
                 & mf::STATIC
                 != 0;
         let base = self.resolver.referenced_member_value_declaration(node)?;
@@ -161,13 +161,13 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 return Ok(true);
             }
         }
-        if ts_ast::has_dynamic_name(self.output.view(), Some(node))? {
+        if tsr_ast::has_dynamic_name(self.output.view(), Some(node))? {
             // IsSimpleInlineableExpression excludes identifiers deliberately.
             let kind = self.node(name).kind();
             if !matches!(
                 kind.known(),
                 Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral | K::NumericLiteral)
-            ) && !ts_ast::is_keyword_kind(kind)
+            ) && !tsr_ast::is_keyword_kind(kind)
             {
                 return Ok(true);
             }
@@ -196,8 +196,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         }
         if self.node(name).kind() == K::Identifier {
             let text = self.output.view().node_text(name)?.into_js_string();
-            if !ts_scanner::is_identifier_text(text.as_bytes(), ts_core::LanguageVariant::STANDARD)
-            {
+            if !tsr_scanner::is_identifier_text(
+                text.as_bytes(),
+                tsr_core::LanguageVariant::STANDARD,
+            ) {
                 name = self.output.new_string_literal(text, 0);
             }
         }
@@ -231,7 +233,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
 struct AssignmentChildren<'a> {
     view: AstView<'a>,
     nodes: Vec<NodeId>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 impl ChildVisitor for AssignmentChildren<'_> {
     fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {

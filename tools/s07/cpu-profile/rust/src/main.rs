@@ -11,11 +11,11 @@ use std::{
     thread,
     time::Instant,
 };
-use ts_ast::{
+use tsr_ast::{
     AstFile, BoundFile, ExternalModuleIndicatorOptions, JsString, NodeId, ParsedFile,
     SourceFileParseOptions,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 #[global_allocator]
 static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
@@ -33,7 +33,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 #[derive(Default, Serialize)]
 struct WorkerTimes {
@@ -79,7 +79,7 @@ fn profile_preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect()
@@ -112,7 +112,7 @@ fn loaded_digest(inputs: &[Loaded]) -> String {
 // black_box prevents a tail call from erasing the phase frame in sampled stacks.
 #[inline(never)]
 fn profile_parse(input: &Loaded) -> ParsedFile {
-    black_box(ts_parser::parse_source_file(
+    black_box(tsr_parser::parse_source_file(
         input.source.clone(),
         input.script_kind,
         input.options.clone(),
@@ -127,7 +127,7 @@ fn profile_publish(parsed: ParsedFile) -> (AstFile, NodeId) {
 
 #[inline(never)]
 fn profile_bind(file: AstFile, source: NodeId) -> BoundFile {
-    let bound = ts_binder::bind_source_file(&file, source).expect("workload binding must complete");
+    let bound = tsr_binder::bind_source_file(&file, source).expect("workload binding must complete");
     drop(file);
     black_box(bound)
 }
@@ -157,7 +157,7 @@ fn profile_retirement(files: Vec<Vec<BoundFile>>) {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 3 {
-        return Err("usage: ts_cpu_profile INPUTS.json WORKERS (1 or 8)".into());
+        return Err("usage: tsr_cpu_profile INPUTS.json WORKERS (1 or 8)".into());
     }
     let workers: usize = args[2].to_str().ok_or("invalid workers")?.parse()?;
     if !matches!(workers, 1 | 8) || thread::available_parallelism()?.get() < workers {
@@ -178,7 +178,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             senders.push(send);
             let inputs = &inputs;
             let (ready, finished, release) = (&ready, &finished, &release);
-            handles.push(ts_parser::spawn_parser_worker(scope, move || {
+            handles.push(tsr_parser::spawn_parser_worker(scope, move || {
                 let mut roots = Vec::with_capacity(file_count.div_ceil(workers));
                 let mut times = WorkerTimes::default();
                 let mut failure = None;

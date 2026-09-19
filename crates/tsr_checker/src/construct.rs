@@ -12,12 +12,12 @@ use crate::{
 };
 use std::collections::HashMap;
 use std::sync::Arc;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     check_flags, symbol_flags, Factory, FactoryMethods, JsString, SymbolTableId, SyntaxKind,
     SyntheticExpressionData,
 };
-use ts_jsnum::{Number, PseudoBigInt};
+use tsr_jsnum::{Number, PseudoBigInt};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.newIntrinsicType

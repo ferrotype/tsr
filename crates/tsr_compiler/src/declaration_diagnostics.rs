@@ -2,11 +2,11 @@
 //! resolver; no output file is written and semantic skip/noEmit rules do not
 //! substitute for this phase's own source selection.
 use crate::{Error, Program, ProgramFile};
-use ts_ast::{AstBuilder, Diagnostic};
-use ts_checker::Operation;
-use ts_core::ScriptKind;
-use ts_printer::EmitContext;
-use ts_transformers::declarations::{transform_declarations, DeclarationOptions};
+use tsr_ast::{AstBuilder, Diagnostic};
+use tsr_checker::Operation;
+use tsr_core::ScriptKind;
+use tsr_printer::EmitContext;
+use tsr_transformers::declarations::{transform_declarations, DeclarationOptions};
 
 impl Program {
     // port: tsc/internal/compiler/program.go:Program.getDeclarationDiagnosticsForFile
@@ -19,9 +19,9 @@ impl Program {
         let source = file.bound().view().source_file()?;
         let retained = self
             .file(source.parse_options().path.as_bytes())
-            .ok_or(ts_arena::Error::WrongOwner)?;
+            .ok_or(tsr_arena::Error::WrongOwner)?;
         if retained.source() != file.source() {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         if source.is_declaration_file {
             return Ok(Vec::new());
@@ -42,10 +42,10 @@ impl Program {
         {
             Vec::new()
         } else {
-            let counters = ts_arena::Counters::new();
+            let counters = tsr_arena::Counters::new();
             let mut emit = EmitContext::new();
             let mut output = AstBuilder::with_hooks(
-                ts_jsstring::SourceText::from_loaded_bytes(&b""[..]),
+                tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]),
                 &counters,
                 emit.factory_hooks(),
             );

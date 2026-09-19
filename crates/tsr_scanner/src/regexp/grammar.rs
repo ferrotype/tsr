@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-use ts_core::ScriptTarget;
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
+use tsr_core::ScriptTarget;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
 
 use super::{
     compare_decimal_strings, flag_for_character, reg_exp_flags, RegExpParser, STACK_RED_ZONE,

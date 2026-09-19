@@ -4,8 +4,8 @@ use crate::{
     ParenthesizedExpressionData, SourceFileParseOptions, SyntaxKind as K,
 };
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_jsstring::SourceText;
 
 fn outcome<T>(operation: impl FnOnce() -> T) -> Result<T, String> {
     catch_unwind(AssertUnwindSafe(operation)).map_err(|error| {
@@ -29,7 +29,7 @@ fn semantic_getters_share_kind_shape_and_nil_contracts() {
     let initializer = build.new_token(K::NullKeyword.into());
     let backing = build.node_slice(vec![Some(name), None]).unwrap();
     let list = build
-        .new_list(ts_core::TextRange::new(0, 0), backing)
+        .new_list(tsr_core::TextRange::new(0, 0), backing)
         .unwrap();
     let function = build.new_function_declaration_data(
         K::Unknown.into(),
@@ -604,7 +604,7 @@ fn modifier_helpers_read_stored_flags_and_binding_root_inheritance() {
     let mut lists = Vec::new();
     for flags in [mf::ASYNC, mf::DEFAULT, mf::EXPORT] {
         let list = build
-            .new_list(ts_core::TextRange::new(0, 0), backing)
+            .new_list(tsr_core::TextRange::new(0, 0), backing)
             .unwrap();
         build.set_list_modifier_flags(list, flags).unwrap();
         lists.push(list);

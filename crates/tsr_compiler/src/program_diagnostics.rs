@@ -2,9 +2,9 @@
 //! writes are already retained by Program; a cache hit only borrows this snapshot.
 use crate::{Error, Program};
 use std::{collections::BTreeMap, sync::OnceLock};
-use ts_arena::Error as AstError;
-use ts_ast::{Diagnostic, NodeId, SourceFileRead};
-use ts_jsstring::JsString;
+use tsr_arena::Error as AstError;
+use tsr_ast::{Diagnostic, NodeId, SourceFileRead};
+use tsr_jsstring::JsString;
 type LocationIndex<'a> = BTreeMap<(&'a [u8], i64, i64, i32), Vec<usize>>;
 
 #[derive(Default)]
@@ -66,8 +66,8 @@ impl Snapshot {
             .clone_from(&program.option_verification().diagnostics);
         result.program.extend(result.globals.iter().cloned());
         validate_owners(&result.program, &file_name)?;
-        ts_core::sort_like_go(&mut result.program, &mut |a, b| {
-            ts_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
+        tsr_core::sort_like_go(&mut result.program, &mut |a, b| {
+            tsr_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
         });
         result.program = compact_and_merge_related_infos(result.program, &file_name);
         Ok(result)
@@ -105,7 +105,7 @@ impl Snapshot {
             ))
             .or_default();
         for &index in collisions.iter() {
-            if ts_ast::equal_diagnostics(&bucket[index], &diagnostic, file_name)? {
+            if tsr_ast::equal_diagnostics(&bucket[index], &diagnostic, file_name)? {
                 return Ok(());
             }
         }
@@ -146,7 +146,7 @@ fn sort<'a>(
 ) -> Result<(), AstError> {
     validate_owners(diagnostics, file_name)?;
     diagnostics.sort_by(|a, b| {
-        ts_ast::compare_diagnostics(a, b, file_name).expect("validated diagnostic owners")
+        tsr_ast::compare_diagnostics(a, b, file_name).expect("validated diagnostic owners")
     });
     Ok(())
 }
@@ -185,7 +185,7 @@ fn compact_and_merge_related_infos<'a>(
     while let Some(mut diagnostic) = input.next() {
         let mut merged = false;
         while input.peek().is_some_and(|next| {
-            ts_ast::equal_diagnostics_no_related_info(&diagnostic, next, file_name)
+            tsr_ast::equal_diagnostics_no_related_info(&diagnostic, next, file_name)
                 .expect("validated diagnostic owners")
         }) {
             merged = true;
@@ -194,11 +194,11 @@ fn compact_and_merge_related_infos<'a>(
                 .extend(input.next().expect("peeked diagnostic").related_information);
         }
         if merged && !diagnostic.related_information.is_empty() {
-            ts_core::sort_like_go(&mut diagnostic.related_information, &mut |a, b| {
-                ts_ast::compare_diagnostics(a, b, file_name).expect("validated diagnostic owners")
+            tsr_core::sort_like_go(&mut diagnostic.related_information, &mut |a, b| {
+                tsr_ast::compare_diagnostics(a, b, file_name).expect("validated diagnostic owners")
             });
             diagnostic.related_information.dedup_by(|a, b| {
-                ts_ast::equal_diagnostics(a, b, file_name).expect("validated diagnostic owners")
+                tsr_ast::equal_diagnostics(a, b, file_name).expect("validated diagnostic owners")
             });
         }
         result.push(diagnostic);
@@ -216,8 +216,8 @@ impl Program {
         let file_name = |id| source_names(self, id).map(|(name, _)| name);
         validate_owners(diagnostics, &file_name)?;
         let mut sorted = diagnostics.to_vec();
-        ts_core::sort_like_go(&mut sorted, &mut |a, b| {
-            ts_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
+        tsr_core::sort_like_go(&mut sorted, &mut |a, b| {
+            tsr_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
         });
         Ok(compact_and_merge_related_infos(sorted, &file_name))
     }
@@ -274,15 +274,15 @@ mod tests {
     use super::*;
     use serde_json::{json, Value};
     use std::sync::Arc;
-    use ts_core::TextRange;
+    use tsr_core::TextRange;
     fn program() -> Program {
-        let mut files = ts_vfs::MemoryBuilder::new(b"/", true);
+        let mut files = tsr_vfs::MemoryBuilder::new(b"/", true);
         files.insert_loaded(b"/file.ts", b"let value = 1;".as_slice());
         Program::load(
             crate::ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(
-                    ts_core::CompilerOptions {
-                        no_lib: ts_core::Tristate::TRUE,
+                config: tsr_tsoptions::ParsedCommandLine::new(
+                    tsr_core::CompilerOptions {
+                        no_lib: tsr_core::Tristate::TRUE,
                         ..Default::default()
                     },
                     vec![JsString::from_bytes(b"/file.ts".as_slice())],
@@ -293,7 +293,7 @@ mod tests {
                 skip_module_resolution: true,
             },
             &mut crate::FileCache::new(),
-            &ts_arena::Counters::new(),
+            &tsr_arena::Counters::new(),
         )
         .unwrap()
     }
@@ -327,7 +327,7 @@ mod tests {
         for (request, expected) in requests.iter().zip(expected) {
             assert_eq!(request["id"], expected["id"]);
             let diagnostics: Vec<_> = request["diagnostics"].as_array().unwrap().iter().map(|recipe| {
-                let mut diagnostic = Diagnostic::compiler(ts_diagnostics::File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files,vec![JsString::from_bytes(b"same".as_slice()),JsString::from_bytes(b"root".as_slice())]);
+                let mut diagnostic = Diagnostic::compiler(tsr_diagnostics::File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files,vec![JsString::from_bytes(b"same".as_slice()),JsString::from_bytes(b"root".as_slice())]);
                 let external = |code| Arc::new(Diagnostic::external(None,TextRange::new(-1,-1),JsString::default(),1,code,JsString::from_bytes(b"x".as_slice())));
                 let chain = i32::try_from(recipe["Chain"].as_i64().unwrap()).unwrap();
                 if chain != 0 {diagnostic.message_chain.push(external(9000+chain));}

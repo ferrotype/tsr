@@ -1,12 +1,12 @@
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     deep_clone_node, deep_clone_reparse, modifier_flags, node_flags, AstBuilder, ChildRole,
     Factory, FactoryMethods, JsString, NodeId, NodeSlice, NodeVisitor, NodeVisitorHooks,
     RuntimeFactory, SyntaxKind, VisitContext,
 };
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 fn builder() -> AstBuilder {
     AstBuilder::new(SourceText::from_loaded_bytes(&b""[..]), &Counters::new())
 }
@@ -211,7 +211,7 @@ fn parent_setter_preserves_prior_mutation_before_nil_list_child_panic() {
     let list = b.new_list(TextRange::new(0, 2), nodes).unwrap();
     let root = b.new_array_literal_expression(Some(list), false);
     assert!(
-        catch_unwind(AssertUnwindSafe(|| ts_ast::set_parent_in_children(
+        catch_unwind(AssertUnwindSafe(|| tsr_ast::set_parent_in_children(
             &mut b, root
         )))
         .is_err()
@@ -233,7 +233,7 @@ fn deep_clone_grows_a_small_native_stack() {
             assert_ne!(cloned, root);
             assert!(matches!(
                 b.node(cloned).data(),
-                ts_ast::NodeDataRead::ParenthesizedExpression(_)
+                tsr_ast::NodeDataRead::ParenthesizedExpression(_)
             ));
         })
         .unwrap()

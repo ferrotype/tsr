@@ -1,10 +1,10 @@
 //! Content mapper package metadata lookup never starts external code.
 use std::sync::Arc;
-use ts_ast::Diagnostic;
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
-use ts_tsoptions::config_mappers::{MapperManifest, MapperResolution};
-use ts_vfs::FileSystem;
+use tsr_ast::Diagnostic;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
+use tsr_tsoptions::config_mappers::{MapperManifest, MapperResolution};
+use tsr_vfs::FileSystem;
 
 /// port: tsc/internal/tsoptions/contentmappers.go:resolveContentMapperManifest
 pub fn resolve_content_mapper_manifest(
@@ -23,7 +23,7 @@ pub fn resolve_content_mapper_manifest(
         ));
     };
     let directory = resolved.resolved_file_name;
-    let filename = ts_tspath::combine(directory.as_bytes(), &[b"package.json"]);
+    let filename = tsr_tspath::combine(directory.as_bytes(), &[b"package.json"]);
     let Some(content) = host.read_file(&filename)? else {
         return Ok(failure(
             name,

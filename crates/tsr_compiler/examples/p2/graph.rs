@@ -3,16 +3,16 @@ use super::{file_name, hex, node_json, source, utf8, view, Error, Result};
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::ops::ControlFlow;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SymbolTableId};
-use ts_checker::Operation;
-use ts_compiler::Program;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SymbolTableId};
+use tsr_checker::Operation;
+use tsr_compiler::Program;
 
 pub fn children(program: &Program, node: NodeId) -> Result<Vec<NodeId>> {
     struct Visitor<'a> {
         view: AstView<'a>,
         nodes: Vec<NodeId>,
-        error: Option<ts_arena::Error>,
+        error: Option<tsr_arena::Error>,
     }
     impl ChildVisitor for Visitor<'_> {
         fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
@@ -60,20 +60,20 @@ pub fn walk(program: &Program, node: NodeId) -> Result<Vec<NodeId>> {
     }
     Ok(out)
 }
-fn source_symbol(program: &Program, id: SymbolId) -> Result<ts_ast::SymbolRef<'_>> {
+fn source_symbol(program: &Program, id: SymbolId) -> Result<tsr_ast::SymbolRef<'_>> {
     for file in program.files() {
         let view = file.bound().view();
         if view.result().symbols().id() == id.arena() {
-            return Ok(ts_ast::SymbolRef::Stored(view.symbol(id)?));
+            return Ok(tsr_ast::SymbolRef::Stored(view.symbol(id)?));
         }
     }
-    Err(Error::Ast(ts_arena::Error::WrongOwner))
+    Err(Error::Ast(tsr_arena::Error::WrongOwner))
 }
 fn symbol<'a>(
     program: &'a Program,
     op: Option<&'a Operation<'_>>,
     id: SymbolId,
-) -> Result<ts_ast::SymbolRef<'a>> {
+) -> Result<tsr_ast::SymbolRef<'a>> {
     match op {
         Some(op) => Ok(op.symbol(op.symbol_ref(id)?)?),
         None => source_symbol(program, id),
@@ -103,7 +103,7 @@ fn portable_name(
             let ty = op.symbol_name_type(op.symbol_ref(id)?)?.ok_or_else(|| {
                 Error::Protocol("unique name has no existing nameType identity".into())
             })?;
-            if op.type_flags(ty)? & ts_checker::type_flags::UNIQUE_ES_SYMBOL == 0 {
+            if op.type_flags(ty)? & tsr_checker::type_flags::UNIQUE_ES_SYMBOL == 0 {
                 return Err(Error::Protocol(
                     "unique nameType is not unique symbol".into(),
                 ));
@@ -156,7 +156,7 @@ fn portable_name(
         let read = view(program, node)?.node(node)?;
         if matches!(
             read.kind().known(),
-            Some(ts_ast::SyntaxKind::ClassDeclaration | ts_ast::SyntaxKind::ClassExpression)
+            Some(tsr_ast::SyntaxKind::ClassDeclaration | tsr_ast::SyntaxKind::ClassExpression)
         ) {
             let mut result = vec![0xfe];
             result.extend_from_slice(
@@ -190,7 +190,7 @@ fn table(
             .files()
             .iter()
             .find(|f| f.bound().view().result().tables().id() == id.arena())
-            .ok_or(Error::Ast(ts_arena::Error::WrongOwner))?
+            .ok_or(Error::Ast(tsr_arena::Error::WrongOwner))?
             .bound()
             .view()
             .result()
@@ -216,7 +216,7 @@ fn declarations(
         .files()
         .iter()
         .find(|f| f.bound().view().result().symbols().id() == id.arena())
-        .ok_or(Error::Ast(ts_arena::Error::WrongOwner))?;
+        .ok_or(Error::Ast(tsr_arena::Error::WrongOwner))?;
     let view = file.bound().view();
     Ok(view
         .result()
@@ -374,13 +374,13 @@ pub fn bound_snapshot(program: &Program, root: NodeId) -> Result<Value> {
 pub fn bound_global(program: &Program, file: &str, name: &str) -> Result<SymbolId> {
     let file = program
         .file(file.as_bytes())
-        .ok_or(Error::Ast(ts_arena::Error::WrongOwner))?;
+        .ok_or(Error::Ast(tsr_arena::Error::WrongOwner))?;
     let locals = file
         .bound()
         .view()
         .node_binding(file.source())?
         .and_then(|b| b.locals)
-        .ok_or(Error::Ast(ts_arena::Error::InvalidGraph))?;
+        .ok_or(Error::Ast(tsr_arena::Error::InvalidGraph))?;
     file.bound()
         .view()
         .result()
@@ -388,5 +388,5 @@ pub fn bound_global(program: &Program, file: &str, name: &str) -> Result<SymbolI
         .get(locals)?
         .get(name.as_bytes())
         .flatten()
-        .ok_or(Error::Ast(ts_arena::Error::InvalidGraph))
+        .ok_or(Error::Ast(tsr_arena::Error::InvalidGraph))
 }

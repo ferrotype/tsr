@@ -69,12 +69,12 @@ def build_locked(output, control, control_sha):
     before = {"source_fingerprint": source_fingerprint(), "tool_inputs": tools_fingerprint(),
               "cargo_configuration": configuration(env), "registry_lock": registry_lock()}
     argv = ["cargo", "+" + stable, "build", "--release", "--offline", "--locked",
-            "--manifest-path", str(HERE / "Cargo.toml"), "--bin", "ts_s07_bis_phases",
+            "--manifest-path", str(HERE / "Cargo.toml"), "--bin", "tsr_s07_bis_phases",
             "--target", host, "--message-format=json-render-diagnostics", *release_configuration(env, HERE)]
     messages = command(argv, cwd=HERE, env=env)
     (output / "cargo-messages.ndjson").write_bytes(messages)
-    binary = cargo_executable(messages, HERE / "Cargo.toml", "ts_s07_bis_phases", "bin", [])
-    frozen = output / "artifacts/ts_s07_bis_phases"
+    binary = cargo_executable(messages, HERE / "Cargo.toml", "tsr_s07_bis_phases", "bin", [])
+    frozen = output / "artifacts/tsr_s07_bis_phases"
     shutil.copyfile(binary, frozen)
     runner.runtime_libraries(frozen, output / "runtime-libraries.txt")
     runner.snapshot_sources(output, before["source_fingerprint"])
@@ -86,8 +86,8 @@ def build_locked(output, control, control_sha):
     manifest = {"version": 1, "kind": "s07_bis_same_revision_phases", "diagnostic_only": True,
         **before, "expected_work": reference["expected_work"], "control_manifest_sha256": control_sha,
         "backend_policy": "one binary, one source revision, published and consuming selection at runtime",
-        "profile": "release; panic=unwind; fat LTO; one codegen unit; ts_ast/layout-profile enabled in both modes",
-        "artifact": {"path": "artifacts/ts_s07_bis_phases", "sha256": runner.digest(frozen)},
+        "profile": "release; panic=unwind; fat LTO; one codegen unit; tsr_ast/layout-profile enabled in both modes",
+        "artifact": {"path": "artifacts/tsr_s07_bis_phases", "sha256": runner.digest(frozen)},
         "rustc": command(["rustc", "+" + stable, "-vV"], cwd=ROOT, env=env).decode(),
         "command": argv, "revision": command(["git", "rev-parse", "HEAD"], cwd=ROOT).decode().strip()}
     return runner.seal(output, manifest)

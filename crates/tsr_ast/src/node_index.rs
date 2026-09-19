@@ -6,7 +6,7 @@ use std::{
     panic::{catch_unwind, resume_unwind, AssertUnwindSafe},
     sync::{Mutex, OnceLock},
 };
-use ts_arena::Error;
+use tsr_arena::Error;
 
 #[derive(Debug)]
 pub struct NodeIndexCache {
@@ -76,7 +76,7 @@ impl NodeIndexCache {
                     sorted.push(index as u32);
                 }
             }
-            ts_core::sort_like_go(&mut sorted, &mut |&left, &right| {
+            tsr_core::sort_like_go(&mut sorted, &mut |&left, &right| {
                 let left = self.nodes[left as usize].expect("sorted table excludes nil");
                 let right = self.nodes[right as usize].expect("sorted table excludes nil");
                 let left =

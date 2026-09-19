@@ -4,7 +4,7 @@
 //! in `ast`; it lives here until a second consumer needs it.
 
 use crate::Error;
-use ts_ast::{AstView, NodeId, SyntaxKind as K};
+use tsr_ast::{AstView, NodeId, SyntaxKind as K};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(i32)]

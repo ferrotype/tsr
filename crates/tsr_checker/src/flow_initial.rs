@@ -1,8 +1,8 @@
 //! Initial and assigned types follow the destructuring shape without creating
 //! synthetic syntax. Only initializer types already cached by checking are reused.
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
@@ -66,7 +66,7 @@ impl CheckerState {
                     };
                     self.flow_type_with_default(ty, initializer)
                 }
-                _ => Err(ts_arena::Error::InvalidGraph.into()),
+                _ => Err(tsr_arena::Error::InvalidGraph.into()),
             }
         })
     }
@@ -82,7 +82,7 @@ impl CheckerState {
                     let right = required(
                         read.data_source()
                             .as_binary_expression()
-                            .ok_or(ts_arena::Error::InvalidGraph)?
+                            .ok_or(tsr_arena::Error::InvalidGraph)?
                             .right(),
                         "assigned binary right",
                     )?;

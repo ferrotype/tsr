@@ -3,7 +3,7 @@ use super::FieldKey;
 use crate::JsString;
 use hashbrown::HashMap;
 use std::ops::Range;
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 const EXTENDED: u32 = u32::MAX;
 const POOL_LIMIT: usize = (u32::MAX >> 1) as usize;
@@ -65,7 +65,7 @@ pub(super) struct TextPool {
     entries: Vec<TextEntry>,
     free: Vec<u32>,
     // Cooked/foreign values and exhausted pool words retain their original Arc.
-    owned: HashMap<FieldKey, JsString, ts_arena::hash::FastState>,
+    owned: HashMap<FieldKey, JsString, tsr_arena::hash::FastState>,
 }
 
 fn raw_range(word: u32, end: i32, source: &SourceText) -> Range<usize> {
@@ -249,9 +249,9 @@ impl TextPool {
     /// strings' backings (source-backed entries alias the file text).
     #[cfg(test)]
     pub(super) fn structural_bytes(&self) -> usize {
-        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+        self.structural_bytes_with(&mut tsr_arena::StorageCensus::default())
     }
-    pub(super) fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> usize {
+    pub(super) fn structural_bytes_with(&self, census: &mut tsr_arena::StorageCensus) -> usize {
         self.entries.capacity() * size_of::<TextEntry>()
             + self.free.capacity() * size_of::<u32>()
             + self.owned.allocation_size()
@@ -275,16 +275,16 @@ mod tests {
         let mut two = TextPool::default();
         one.insert(FieldKey::new(3, 0, 0), text.clone(), -1, &source);
         two.insert(FieldKey::new(3, 0, 0), text.clone(), -1, &source);
-        let mut census = ts_arena::StorageCensus::default();
+        let mut census = tsr_arena::StorageCensus::default();
         let first = one.structural_bytes_with(&mut census);
         let second = two.structural_bytes_with(&mut census);
         assert_eq!(
             first - second,
-            ts_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
+            tsr_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
         );
         let mut prior = std::collections::HashSet::new();
         prior.insert(text.backing_bytes().as_ptr() as usize);
-        let mut census = ts_arena::StorageCensus::new(prior);
+        let mut census = tsr_arena::StorageCensus::new(prior);
         assert_eq!(one.structural_bytes_with(&mut census), second);
     }
 
@@ -300,7 +300,7 @@ mod tests {
             + pool.owned.allocation_size();
         assert_eq!(
             pool.structural_bytes() - containers,
-            ts_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
+            tsr_arena::StorageCensus::arc_slice_bytes::<u8>(text.backing_bytes().len())
         );
     }
 
@@ -401,7 +401,7 @@ mod tests {
             owned.as_bytes().as_ptr(),
             pool.bytes(second, second_word, -1, &source).as_ptr()
         );
-        assert_eq!(owned.validity(), ts_jsstring::Validity::Raw);
+        assert_eq!(owned.validity(), tsr_jsstring::Validity::Raw);
         let third = FieldKey::new(2, 1, 0);
         let third_word = pool.insert_pool(third, source.slice(7..9).unwrap(), &source, 0);
         assert_eq!(third_word, EXTENDED);

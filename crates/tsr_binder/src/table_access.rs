@@ -5,7 +5,7 @@ use crate::{
     target::BindingNode,
     Binder,
 };
-use ts_ast::{
+use tsr_ast::{
     local_bind::BindTable, JsString, SymbolId, SymbolTable, SymbolTableId, SymbolTableRead,
 };
 
@@ -119,7 +119,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 };
                 local.node(node).is_locals_container()
             }
-            BindingNode::Checked(id) => ts_ast::is_locals_container(&self.n(id)),
+            BindingNode::Checked(id) => tsr_ast::is_locals_container(&self.n(id)),
         }
     }
     pub(crate) fn ensure_binding_locals(

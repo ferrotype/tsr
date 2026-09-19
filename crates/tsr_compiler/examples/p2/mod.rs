@@ -7,33 +7,33 @@ mod queries;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation, NodeId};
-use ts_ast::{AstView, CompletedFile};
-use ts_checker::CheckerOwner;
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
+use tsr_ast::{AstView, CompletedFile};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 
 #[derive(Debug)]
 pub enum Error {
-    Checker(ts_checker::Error),
-    Compiler(ts_compiler::Error),
-    Ast(ts_arena::Error),
+    Checker(tsr_checker::Error),
+    Compiler(tsr_compiler::Error),
+    Ast(tsr_arena::Error),
     Protocol(String),
     Unsupported(&'static str),
 }
-impl From<ts_checker::Error> for Error {
-    fn from(v: ts_checker::Error) -> Self {
+impl From<tsr_checker::Error> for Error {
+    fn from(v: tsr_checker::Error) -> Self {
         Self::Checker(v)
     }
 }
-impl From<ts_compiler::Error> for Error {
-    fn from(v: ts_compiler::Error) -> Self {
+impl From<tsr_compiler::Error> for Error {
+    fn from(v: tsr_compiler::Error) -> Self {
         Self::Compiler(v)
     }
 }
-impl From<ts_arena::Error> for Error {
-    fn from(v: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(v: tsr_arena::Error) -> Self {
         Self::Ast(v)
     }
 }
@@ -85,10 +85,10 @@ pub fn panic_error(payload: &(dyn std::any::Any + Send)) -> Error {
 }
 pub fn failure(error: &Error, operation: &str) -> Value {
     let unsupported = match error {
-        Error::Checker(ts_checker::Error::Unsupported(name))
+        Error::Checker(tsr_checker::Error::Unsupported(name))
         | Error::Compiler(
-            ts_compiler::Error::Checker(ts_checker::Error::Unsupported(name))
-            | ts_compiler::Error::Unsupported(name),
+            tsr_compiler::Error::Checker(tsr_checker::Error::Unsupported(name))
+            | tsr_compiler::Error::Unsupported(name),
         )
         | Error::Unsupported(name) => Some(*name),
         _ => None,
@@ -104,7 +104,7 @@ pub fn source(program: &Program, node: NodeId) -> Result<&CompletedFile> {
         .iter()
         .find(|f| f.source().arena() == node.arena())
         .map(|f| f.bound())
-        .ok_or(Error::Ast(ts_arena::Error::WrongOwner))
+        .ok_or(Error::Ast(tsr_arena::Error::WrongOwner))
 }
 pub fn view(program: &Program, node: NodeId) -> Result<AstView<'_>> {
     Ok(source(program, node)?.view().ast())
@@ -180,7 +180,7 @@ pub fn load_with_libraries(
     libraries: bool,
     overrides: FixtureOptions,
 ) -> Result<Arc<Program>> {
-    let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     for (name, source) in files
         .as_object()
         .ok_or_else(|| Error::Protocol("expected files".into()))?
@@ -259,15 +259,15 @@ pub fn load_with_libraries(
         },
         ..Default::default()
     };
-    let config = ts_tsoptions::ParsedCommandLine::new(
+    let config = tsr_tsoptions::ParsedCommandLine::new(
         options,
         array(roots)?
             .iter()
             .map(|name| Ok(JsString::from_bytes(text(name)?.as_bytes())))
             .collect::<Result<Vec<_>>>()?,
     );
-    let host: Arc<dyn ts_vfs::FileSystem> = if libraries {
-        Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish())))
+    let host: Arc<dyn tsr_vfs::FileSystem> = if libraries {
+        Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish())))
     } else {
         Arc::new(fs.finish())
     };
@@ -277,7 +277,7 @@ pub fn load_with_libraries(
             host,
             current_directory: JsString::from_bytes(b"/".as_slice()),
             default_library_path: JsString::from_bytes(if libraries {
-                ts_bundled::LIB_PATH
+                tsr_bundled::LIB_PATH
             } else {
                 b"/no-default-lib"
             }),

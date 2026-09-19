@@ -49,7 +49,7 @@ impl Construction {
         let name: &[u8] = if readonly { b"ReadonlyArray" } else { b"Array" };
         let group = self
             .input
-            .resolve_global(name, ts_ast::symbol_flags::TYPE)?
+            .resolve_global(name, tsr_ast::symbol_flags::TYPE)?
             .ok_or_else(|| Error::Unsupported("global array declaration missing".into()))?;
         let target = self.declared(&group)?;
         let array = self.instantiate_interface(&group, &target, std::slice::from_ref(&element))?;
@@ -1025,7 +1025,7 @@ impl Construction {
             };
             let group = self
                 .input
-                .resolve_global(name, ts_ast::symbol_flags::TYPE)?
+                .resolve_global(name, tsr_ast::symbol_flags::TYPE)?
                 .ok_or(Error::ResolutionFailed)?;
             let this = self
                 .checker
@@ -1101,13 +1101,13 @@ mod tests {
     use crate::bound::BoundChecker;
     use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
-    use ts_ast::SourceFileParseOptions;
-    use ts_core::ScriptKind;
-    use ts_jsstring::{JsString, SourceText};
+    use tsr_ast::SourceFileParseOptions;
+    use tsr_core::ScriptKind;
+    use tsr_jsstring::{JsString, SourceText};
 
     #[test]
     fn aliased_tuple_creates_target_but_defers_element_resolution() {
-        let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(
+        let file = tsr_binder::bind_parsed_file(tsr_parser::parse_source_file(
             SourceText::from_loaded_bytes(b"interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type A = [string, number?, ...boolean[]]; type B = [string, number?, ...boolean[]];".as_slice()),
             ScriptKind::TS,
             SourceFileParseOptions { file_name: JsString::from_bytes(b"/tuple.ts".as_slice()), ..Default::default() },

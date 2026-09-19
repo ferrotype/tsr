@@ -110,11 +110,11 @@ observations, and generic machinery is required through the loaded libraries.
 2. **The denominator's composition was not stated.** §1 now lists the nine
    families with zero eligible variants and the counts of what remains, so P3 and
    P4 scope is legible without opening the rule file.
-3. **Homes missing from §3:** `ts_nodebuilder` (the cycle-breaking package
-   upstream keeps for the declarations transformer), `ts_evaluator`, the
+3. **Homes missing from §3:** `tsr_nodebuilder` (the cycle-breaking package
+   upstream keeps for the declarations transformer), `tsr_evaluator`, the
    collections the checker uses (24 `collections.Set` sites plus ordered and
    copy-on-write structures), and the fact that `resolveName` already exists as
-   `ts_binder::name_resolver` with hooks the checker implements.
+   `tsr_binder::name_resolver` with hooks the checker implements.
 4. **Go accounting baseline measured, not modeled.** `unsafe.Sizeof` at the pin:
    `Type` header 56 bytes embedded in every payload, `UnionType` 272,
    `InterfaceType` 376, `TupleType` 424, `ast.Symbol` 96 (§6.1 table, fixture in
@@ -124,7 +124,7 @@ observations, and generic machinery is required through the loaded libraries.
    lines of `checker.go`, `relater.go`, `flow.go`, `inference.go` and
    `grammarchecks.go`) and that S08 is the entry to the Phase 2 critical path,
    reported by pass count per checkpoint rather than time-boxed.
-6. **Program host mapped member by member.** `ts_checker::CheckerHost` carries
+6. **Program host mapped member by member.** `tsr_checker::CheckerHost` carries
    the members whose types exist below the compiler and documents the rest as P2
    obligations, including that `SourceFileMetaData` must move below the checker
    and that project-reference members are explicitly unsupported.
@@ -133,14 +133,14 @@ observations, and generic machinery is required through the loaded libraries.
 
 ### Scaffold delivered with this review
 
-`crates/ts_checker`: `CheckerOwner`/`Operation` (identity adoption exactly once,
+`crates/tsr_checker`: `CheckerOwner`/`Operation` (identity adoption exactly once,
 same-thread reentry refused before waiting, panic retires the generation),
 `ResolutionStack` (exact port of the four resolution-guard functions),
 `LinkStore` (paged per arena on first use), `TypeStore`/`TypeRecord`/`TypeAlias`,
 all `types.go` flag families and enums, `CheckerHost`, and the type-display
-constants and flag mask. `crates/ts_printer`: `EmitTextWriter`, `TextWriter`,
+constants and flag mask. `crates/tsr_printer`: `EmitTextWriter`, `TextWriter`,
 `SingleLineStringWriter`, with Go's strict last-rune decoding.
-`crates/ts_nodebuilder`: flags and `SymbolTracker`. `ts_arena`:
+`crates/tsr_nodebuilder`: flags and `SymbolTracker`. `tsr_arena`:
 `CheckerIdentity::adopt_symbol_arena` and the `IdentityAdopted` error.
 `data/s08/checker-flag-observations.json`: 238 constants and 23 record sizes read
 out of the pinned Go packages through `go test -overlay`, asserted by the Rust
@@ -150,9 +150,9 @@ No algorithm, no producer, no evidence claim is included.
 ### Open for the owner
 
 - Declaration diagnostics: port in S08, or defer with named pending failures.
-- Collections home (`ts_core` or `ts_collections`): decide at P1 with the first
+- Collections home (`tsr_core` or `tsr_collections`): decide at P1 with the first
   ordered-structure use.
-- Whether to fold checker state into the `ts_arena` permit: decide from P1's
+- Whether to fold checker state into the `tsr_arena` permit: decide from P1's
   per-operation measurement, not now.
 
 ## Codex takeover review

@@ -15,9 +15,9 @@ use crate::{
     TypePredicateId, TypePredicateKind,
 };
 use std::collections::HashMap;
-use ts_arena::SymbolId;
-use ts_ast::{check_flags, internal_symbol_names, symbol_flags, JsString, SymbolTableId};
-use ts_jsnum::{Number, PseudoBigInt};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags, internal_symbol_names, symbol_flags, JsString, SymbolTableId};
+use tsr_jsnum::{Number, PseudoBigInt};
 
 /// The named types, symbols, signatures and index infos `NewChecker` creates.
 ///
@@ -118,7 +118,7 @@ pub(crate) const TYPEOF_NAMES: [&[u8]; 8] = [
 impl Builtins {
     /// `checker_arena` is the checker's own symbol arena, so the symbol sentinel
     /// names an unpublished slot of the right owner.
-    pub(crate) fn uninitialized(checker_arena: ts_arena::ArenaId) -> Self {
+    pub(crate) fn uninitialized(checker_arena: tsr_arena::ArenaId) -> Self {
         let t = TypeId::new(u32::MAX).expect("sentinel");
         let s = SignatureId::new(u32::MAX).expect("sentinel");
         let i = IndexInfoId::new(u32::MAX).expect("sentinel");

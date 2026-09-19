@@ -2,8 +2,8 @@
 //! to one query; only completed reachability results enter the checker cache.
 
 use crate::{type_facts as facts, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{flow_flags as ff, FlowData, FlowId, FlowListId, FlowNode, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{flow_flags as ff, FlowData, FlowId, FlowListId, FlowNode, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct FlowAnalysis {
@@ -62,7 +62,7 @@ struct FlowQuery {
     container: Option<NodeId>,
     depth: usize,
     shared: Vec<(FlowId, FlowType)>,
-    reduce_labels: Vec<ts_ast::FlowReduceLabelData>,
+    reduce_labels: Vec<tsr_ast::FlowReduceLabelData>,
 }
 
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
@@ -140,7 +140,7 @@ impl CheckerState {
         &mut self,
         owner: NodeId,
         mut flow: FlowId,
-        reduced: &mut Vec<ts_ast::FlowReduceLabelData>,
+        reduced: &mut Vec<tsr_ast::FlowReduceLabelData>,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             // Every node passed on the way to the answer has the answer's
@@ -187,7 +187,7 @@ impl CheckerState {
                     flow = first;
                 } else if node.flags & ff::REDUCE_LABEL != 0 {
                     let Some(FlowData::ReduceLabel(data)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     // Temporary antecedents invalidate the last-flow shortcut,
                     // just as they do in isReachableFlowNodeWorker upstream.
@@ -202,7 +202,7 @@ impl CheckerState {
                     break result?;
                 } else if node.flags & ff::CALL != 0 {
                     let Some(FlowData::Ast(call)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if self.flow_call_is_never(call)? {
                         break false;
@@ -210,7 +210,7 @@ impl CheckerState {
                     flow = required(node.antecedent, "reachable call antecedent")?;
                 } else if node.flags & ff::SWITCH_CLAUSE != 0 {
                     let Some(FlowData::SwitchClause(data)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if data.is_empty()
                         && self.flow_switch_exhaustive(required(
@@ -247,7 +247,7 @@ impl CheckerState {
         owner: NodeId,
         mut flow: FlowId,
         mut no_cache_check: bool,
-        reduced: &mut Vec<ts_ast::FlowReduceLabelData>,
+        reduced: &mut Vec<tsr_ast::FlowReduceLabelData>,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || loop {
             let node = self.flow_node(owner, flow)?;
@@ -268,7 +268,7 @@ impl CheckerState {
                 flow = required(node.antecedent, "post-super antecedent")?;
             } else if node.flags & ff::CALL != 0 {
                 let Some(FlowData::Ast(call)) = node.node else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 };
                 let expression =
                     required(self.node(call)?.expression(), "post-super call expression")?;
@@ -292,10 +292,10 @@ impl CheckerState {
                 flow = *self
                     .flow_antecedents(owner, node.antecedents)?
                     .first()
-                    .ok_or(ts_arena::Error::InvalidGraph)?;
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
             } else if node.flags & ff::REDUCE_LABEL != 0 {
                 let Some(FlowData::ReduceLabel(data)) = node.node else {
-                    return Err(ts_arena::Error::InvalidGraph.into());
+                    return Err(tsr_arena::Error::InvalidGraph.into());
                 };
                 reduced.push(data);
                 let result = self.post_super_flow_worker(
@@ -467,7 +467,7 @@ impl CheckerState {
                 }
                 let result = if node.flags & ff::ASSIGNMENT != 0 {
                     let Some(FlowData::Ast(target)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if self.matching_reference(query.reference, target)? {
                         if !self.reachable_flow(query.flow_owner, flow)? {
@@ -519,8 +519,11 @@ impl CheckerState {
                         }
                         let read = self.node(target)?;
                         if read.kind() == K::VariableDeclaration
-                            && (ts_ast::utilities::is_in_js_file(Some(&read))
-                                || ts_ast::utilities::is_var_const_like(self.ast(target)?, target)?)
+                            && (tsr_ast::utilities::is_in_js_file(Some(&read))
+                                || tsr_ast::utilities::is_var_const_like(
+                                    self.ast(target)?,
+                                    target,
+                                )?)
                         {
                             if let Some(initializer) = read.initializer() {
                                 if matches!(
@@ -580,7 +583,7 @@ impl CheckerState {
                         previous
                     } else {
                         let Some(FlowData::Ast(condition)) = node.node else {
-                            return Err(ts_arena::Error::InvalidGraph.into());
+                            return Err(tsr_arena::Error::InvalidGraph.into());
                         };
                         let non_evolving = self.finalize_evolving_array(previous.ty)?;
                         let ty = self.narrow_reference_type(
@@ -616,7 +619,7 @@ impl CheckerState {
                         let branch_node = self.flow_node(query.flow_owner, branch)?;
                         if bypass.is_none() && branch_node.flags & ff::SWITCH_CLAUSE != 0 {
                             let Some(FlowData::SwitchClause(data)) = branch_node.node else {
-                                return Err(ts_arena::Error::InvalidGraph.into());
+                                return Err(tsr_arena::Error::InvalidGraph.into());
                             };
                             if data.is_empty() {
                                 bypass = Some((branch, data));
@@ -661,7 +664,7 @@ impl CheckerState {
                     self.type_at_flow_loop(query, flow, &branches)?
                 } else if node.flags & ff::REDUCE_LABEL != 0 {
                     let Some(FlowData::ReduceLabel(data)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     query.reduce_labels.push(data);
                     let result =
@@ -686,7 +689,7 @@ impl CheckerState {
                     FlowType::complete(query.initial)
                 } else if node.flags & ff::ARRAY_MUTATION != 0 {
                     let Some(FlowData::Ast(mutation)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if self.is_auto_flow_type(query.declared)
                         && self.evolving_mutation_target(query.reference, mutation)?
@@ -703,7 +706,7 @@ impl CheckerState {
                     }
                 } else if node.flags & ff::CALL != 0 {
                     let Some(FlowData::Ast(call)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if let Some(signature) = self.effects_signature(call)? {
                         if let Some(predicate) = self.type_predicate_of_signature(signature)? {
@@ -767,7 +770,7 @@ impl CheckerState {
                     continue;
                 } else if node.flags & ff::SWITCH_CLAUSE != 0 {
                     let Some(FlowData::SwitchClause(data)) = node.node else {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     let previous =
                         self.type_at_flow(query, required(node.antecedent, "switch antecedent")?)?;
@@ -925,7 +928,7 @@ impl CheckerState {
                 break;
             }
         }
-        let first = first.ok_or(ts_arena::Error::InvalidGraph)?;
+        let first = first.ok_or(tsr_arena::Error::InvalidGraph)?;
         let ty = self.flow_union_type(query, &types, subtype)?;
         if first.incomplete {
             self.new_flow_type(ty, true)
@@ -985,7 +988,7 @@ impl CheckerState {
                     let data = read
                         .data_source()
                         .as_qualified_name()
-                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                     let left = required(data.left(), "flow key qualified left")?;
                     let right = required(data.right(), "flow key qualified right")?;
                     if !self.write_flow_reference_key(builder, left, query)? {
@@ -1048,23 +1051,23 @@ impl CheckerState {
     // port: tsc/internal/checker/utilities.go:isInCompoundLikeAssignment
     pub(crate) fn compound_like_assignment(&self, node: NodeId) -> Result<bool, Error> {
         let view = self.ast(node)?;
-        let Some(target) = ts_ast::get_assignment_target(view, node)? else {
+        let Some(target) = tsr_ast::get_assignment_target(view, node)? else {
             return Ok(false);
         };
-        if !ts_ast::is_assignment_expression(view, target, true)? {
+        if !tsr_ast::is_assignment_expression(view, target, true)? {
             return Ok(false);
         }
         let read = view.node(target)?;
         let binary = read
             .data_source()
             .as_binary_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
-        let right = ts_ast::skip_parentheses(view, required(binary.right(), "compound right")?)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        let right = tsr_ast::skip_parentheses(view, required(binary.right(), "compound right")?)?;
         let read = view.node(right)?;
         let Some(binary) = read.data_source().as_binary_expression() else {
             return Ok(false);
         };
-        Ok(ts_ast::is_shift_operator_or_higher(
+        Ok(tsr_ast::is_shift_operator_or_higher(
             view.node(required(binary.operator_token(), "compound operator")?)?
                 .kind(),
         ))
@@ -1187,7 +1190,10 @@ impl FlowAnalysis {
                 .flatten()
                 .map(|values| {
                     size_of_val(values.as_ref())
-                        + values.iter().map(ts_jsstring::JsString::len).sum::<usize>()
+                        + values
+                            .iter()
+                            .map(tsr_jsstring::JsString::len)
+                            .sum::<usize>()
                 })
                 .sum(),
         );
@@ -1318,22 +1324,22 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.reportFlowControlError
     fn report_flow_control_error(&mut self, node: NodeId) -> Result<(), Error> {
         let view = self.ast(node)?;
-        let block = ts_ast::utilities::find_ancestor(view, Some(node), |candidate| {
-            ts_ast::utilities::is_function_or_module_block(view, candidate.id()).unwrap_or(false)
+        let block = tsr_ast::utilities::find_ancestor(view, Some(node), |candidate| {
+            tsr_ast::utilities::is_function_or_module_block(view, candidate.id()).unwrap_or(false)
         })?
         .ok_or(Error::MissingLink("flow control block"))?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::MissingLink("flow control source"))?;
         let statements = view
             .node(block)?
             .statement_list()
             .ok_or(Error::MissingLink("flow control statements"))?;
         let position = view.list(statements)?.loc().pos();
-        let range = ts_scanner::get_range_of_token_at_position(view, source, position)?;
-        self.add_diagnostic(ts_ast::Diagnostic::new(
+        let range = tsr_scanner::get_range_of_token_at_position(view, source, position)?;
+        self.add_diagnostic(tsr_ast::Diagnostic::new(
             Some(source),
             range,
-            ts_diagnostics::The_containing_function_or_module_body_is_too_large_for_control_flow_analysis,
+            tsr_diagnostics::The_containing_function_or_module_body_is_too_large_for_control_flow_analysis,
             vec![],
         ))?;
         Ok(())

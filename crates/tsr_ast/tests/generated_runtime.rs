@@ -3,10 +3,10 @@
 use std::ops::ControlFlow;
 use std::sync::{Arc, Mutex};
 
-use ts_arena::Counters;
-use ts_ast::*;
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::*;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 #[derive(Default)]
 struct Hooks(Mutex<Vec<[i64; 7]>>);
@@ -273,7 +273,7 @@ fn owner_validation_includes_references_omitted_from_child_enumeration() {
         |nodes| destination.view().node_slice(nodes).map(|_| ()),
         |text| destination.view().text_slice(text).map(|_| ()),
     );
-    assert_eq!(result, Err(ts_arena::Error::WrongOwner));
+    assert_eq!(result, Err(tsr_arena::Error::WrongOwner));
     assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         destination.new_node(SyntaxKind::CallSignature.into(), data)
     }))

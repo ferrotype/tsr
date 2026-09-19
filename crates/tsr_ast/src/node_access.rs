@@ -3,8 +3,8 @@ use crate::{
     AstView, Node, NodeDataRead, NodeDataSource, NodeId, NodeKind, NodeListId, NodeSlice,
     SyntaxKind as K,
 };
-use ts_arena::Error;
-use ts_core::TextRange;
+use tsr_arena::Error;
+use tsr_core::TextRange;
 
 macro_rules! field {
     ($node:expr, $variant:ident, $accessor:ident, $field:ident) => {

@@ -3,26 +3,26 @@
 //! `cargo test`, where no Go toolchain is needed.
 
 use crate::{probe, FormatCodeSettings, FormatFile};
-use ts_ast::SourceFileParseOptions;
-use ts_jsstring::SourceText;
+use tsr_ast::SourceFileParseOptions;
+use tsr_jsstring::SourceText;
 
 fn rows(
     name: &[u8],
     text: &[u8],
-    kind: ts_core::ScriptKind,
+    kind: tsr_core::ScriptKind,
     run: impl FnOnce(&mut FormatFile<'_, '_>, &mut dyn FnMut(&str)),
 ) -> Vec<String> {
-    let file = ts_parser::parse_source_file(
+    let file = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(text.to_vec()),
         kind,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(name),
-            path: ts_ast::JsString::from_bytes(name),
+            file_name: tsr_ast::JsString::from_bytes(name),
+            path: tsr_ast::JsString::from_bytes(name),
             ..Default::default()
         },
     )
     .publish_unbound();
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut format_file = FormatFile {
         view: file.view(),
         source: file.root().unwrap(),
@@ -39,7 +39,7 @@ fn the_formatting_scanner_rescans_where_the_container_says_so() {
     // text and `</` are each more than the smallest token the scanner would
     // return on its own.
     let text = b"const a = x >= 1 ? /re/g : `t${b}u`; // c\nlet v = <div id='q'>text</div>;\n";
-    let rows = rows(b"/s.tsx", text, ts_core::ScriptKind::TSX, |file, row| {
+    let rows = rows(b"/s.tsx", text, tsr_core::ScriptKind::TSX, |file, row| {
         probe::scan(file, row);
     });
     let tokens: Vec<&str> = rows
@@ -60,7 +60,7 @@ fn the_formatting_scanner_rescans_where_the_container_says_so() {
 #[test]
 fn rules_are_selected_in_the_pinned_order_for_adjacent_tokens() {
     let text = b"namespace Default{var x= ( { } ) ;}\n";
-    let rows = rows(b"/s.ts", text, ts_core::ScriptKind::TS, |file, row| {
+    let rows = rows(b"/s.ts", text, tsr_core::ScriptKind::TS, |file, row| {
         probe::rules(file, FormatCodeSettings::default(), row);
     });
     assert_eq!(
@@ -80,7 +80,7 @@ fn rules_are_selected_in_the_pinned_order_for_adjacent_tokens() {
 fn an_option_changes_which_rule_answers() {
     let text = b"f(a,b);\n";
     let pick = |settings: FormatCodeSettings| {
-        rows(b"/s.ts", text, ts_core::ScriptKind::TS, |file, row| {
+        rows(b"/s.ts", text, tsr_core::ScriptKind::TS, |file, row| {
             probe::rules(file, settings, row);
         })
         .into_iter()
@@ -113,7 +113,7 @@ fn the_smart_indenter_answers_as_the_pin_does_at_every_line_start() {
     let text = b"function f(a: number,\n    b: string) {\n\tif (a) {\n        return {\n            x: 1,\n        };\n    }\n    else\n        g(a,\n            b);\n    /* note\n       more\n     */\n    const s = `t\n  u`;\n}\nconst c = a\n    ? b\n    : d;\n";
     let lines = |name: &str| -> Vec<(i64, i64)> {
         let settings = probe::variant(name).unwrap();
-        rows(b"/u.ts", text, ts_core::ScriptKind::TS, |file, row| {
+        rows(b"/u.ts", text, tsr_core::ScriptKind::TS, |file, row| {
             probe::indent(file, &settings, &[], row);
         })
         .iter()
@@ -148,17 +148,17 @@ fn the_smart_indenter_answers_as_the_pin_does_at_every_line_start() {
 const UNFORMATTED: &[u8] = b"function f( a:number,b :string ){\nif(a){return {x:1 ,y : 2}}\n  else\n g( a,\nb ) ;   \n    /* note\n  more */\n}\nclass C<T>{ @dec()\nm( ) :void{ } }\n";
 
 fn with_file<T>(text: &[u8], run: impl FnOnce(&mut FormatFile<'_, '_>) -> T) -> T {
-    let file = ts_parser::parse_source_file(
+    let file = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(text.to_vec()),
-        ts_core::ScriptKind::TS,
+        tsr_core::ScriptKind::TS,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(&b"/u.ts"[..]),
-            path: ts_ast::JsString::from_bytes(&b"/u.ts"[..]),
+            file_name: tsr_ast::JsString::from_bytes(&b"/u.ts"[..]),
+            path: tsr_ast::JsString::from_bytes(&b"/u.ts"[..]),
             ..Default::default()
         },
     )
     .publish_unbound();
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut format_file = FormatFile {
         view: file.view(),
         source: file.root().unwrap(),
@@ -172,7 +172,7 @@ fn a_document_is_formatted_into_the_text_the_pin_produces() {
     let context = crate::FormatContext::new(FormatCodeSettings::default(), b"\n");
     let edits = with_file(UNFORMATTED, |file| crate::format_document(file, &context)).unwrap();
     assert_eq!(edits.len(), 35);
-    let text = ts_core::apply_bulk_edits(UNFORMATTED, &edits).unwrap();
+    let text = tsr_core::apply_bulk_edits(UNFORMATTED, &edits).unwrap();
     // The member after the decorator keeps its column: upstream does not indent
     // the first token that follows a list of decorators.
     assert_eq!(

@@ -9,7 +9,7 @@ use crate::{
     Error,
 };
 use std::sync::OnceLock;
-use ts_ast::SyntaxKind as K;
+use tsr_ast::SyntaxKind as K;
 
 const MASK_BIT_SIZE: u32 = 5;
 const MASK: u32 = 0b11111;

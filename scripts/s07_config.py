@@ -136,7 +136,7 @@ def rust_binary():
     for key in list(env):
         if key.startswith('CARGO_PROFILE_') or key == 'CARGO_BUILD_TARGET':
             env.pop(key, None)
-    output = command(['cargo', 'build', '--locked', '--offline', '-p', 'ts_compiler',
+    output = command(['cargo', 'build', '--locked', '--offline', '-p', 'tsr_compiler',
                       '--example', 's07_config', '--message-format=json'], cwd=ROOT, env=env)
     records = [strict_json_loads(line) for line in output.splitlines() if line.strip()]
     binaries = [row['executable'] for row in records

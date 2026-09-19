@@ -1,8 +1,8 @@
 //! Assertion/predicate calls use explicit dotted names to avoid feeding a
 //! transient flow type back into the signature being resolved.
 use crate::{types::Map, CheckerState, Error, SignatureId, TypeId, TypePredicateKind};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{check_flags as cf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{check_flags as cf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct FlowEffects {
@@ -22,19 +22,19 @@ impl CheckerState {
         _signature: SignatureId,
     ) -> Result<(), Error> {
         let expression = required(self.node(call)?.expression(), "assertion callee")?;
-        if !ts_ast::is_dotted_name(self.ast(expression)?, expression)? {
-            self.error_at(Some(expression), ts_diagnostics::Assertions_require_the_call_target_to_be_an_identifier_or_qualified_name, vec![])?;
+        if !tsr_ast::is_dotted_name(self.ast(expression)?, expression)? {
+            self.error_at(Some(expression), tsr_diagnostics::Assertions_require_the_call_target_to_be_an_identifier_or_qualified_name, vec![])?;
         } else if self.effects_signature(call)?.is_none() {
-            let diagnostic = self.error_at(Some(expression), ts_diagnostics::Assertions_require_every_name_in_the_call_target_to_be_declared_with_an_explicit_type_annotation, vec![])?;
+            let diagnostic = self.error_at(Some(expression), tsr_diagnostics::Assertions_require_every_name_in_the_call_target_to_be_declared_with_an_explicit_type_annotation, vec![])?;
             self.type_of_dotted_name_with_diagnostic(expression, diagnostic)?;
         }
         Ok(())
     }
     // port: tsc/internal/checker/flow.go:Checker.getExplicitThisType
     fn explicit_flow_this_type(&mut self, node: NodeId) -> Result<Option<TypeId>, Error> {
-        let container = ts_ast::get_this_container(self.ast(node)?, node, false, false)?;
+        let container = tsr_ast::get_this_container(self.ast(node)?, node, false, false)?;
         let read = self.node(container)?;
-        if ts_ast::utilities::is_function_like(Some(&read)) {
+        if tsr_ast::utilities::is_function_like(Some(&read)) {
             let signature = self.signature_from_declaration(container)?;
             if let Some(parameter) = self.signatures.get(signature)?.this_parameter {
                 return self.explicit_type_of_symbol(parameter);
@@ -49,7 +49,7 @@ impl CheckerState {
                     self.get_symbol_of_declaration(class)?,
                     "explicit this class symbol",
                 )?;
-                if ts_ast::utilities::is_static(self.ast(container)?, container)? {
+                if tsr_ast::utilities::is_static(self.ast(container)?, container)? {
                     return self.get_type_of_symbol(symbol).map(Some);
                 }
                 let ty = self.get_declared_type_of_symbol(symbol)?;
@@ -194,7 +194,7 @@ impl CheckerState {
                     let Some(symbol) = self.types.get(ty)?.symbol else {
                         return Ok(None);
                     };
-                    ts_binder::get_symbol_name_for_private_identifier(
+                    tsr_binder::get_symbol_name_for_private_identifier(
                         &self.symbol(symbol)?,
                         text.as_bytes(),
                     )
@@ -225,7 +225,7 @@ impl CheckerState {
         symbol: SymbolId,
         diagnostic: Option<usize>,
     ) -> Result<Option<TypeId>, Error> {
-        let symbol = if ts_ast::is_non_local_alias(
+        let symbol = if tsr_ast::is_non_local_alias(
             Some(&self.symbol(symbol)?),
             sf::VALUE | sf::TYPE | sf::NAMESPACE,
         ) {
@@ -272,7 +272,7 @@ impl CheckerState {
                     } else if let Some(binary) = read.data_source().as_binary_expression() {
                         let right = required(binary.right(), "expando function")?;
                         let right = self.node(right)?;
-                        ts_ast::utilities::is_function_like(Some(&right))
+                        tsr_ast::utilities::is_function_like(Some(&right))
                             && right.type_node().is_some()
                     } else {
                         false
@@ -289,7 +289,7 @@ impl CheckerState {
                             let data = read
                                 .data_source()
                                 .as_for_in_or_of_statement()
-                                .ok_or(ts_arena::Error::InvalidGraph)?;
+                                .ok_or(tsr_arena::Error::InvalidGraph)?;
                             let expression =
                                 required(data.expression(), "explicit for-of expression")?;
                             let use_ = crate::iteration::FOR_OF
@@ -314,7 +314,7 @@ impl CheckerState {
                         let name = self.symbol_to_string(symbol)?;
                         let related = self.diagnostic_for_node(
                             Some(declaration),
-                            ts_diagnostics::X_0_needs_an_explicit_type_annotation,
+                            tsr_diagnostics::X_0_needs_an_explicit_type_annotation,
                             vec![name],
                         )?;
                         self.add_related_diagnostic(index, related)?;
@@ -329,7 +329,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.isFalseExpression
     pub(crate) fn false_flow_expression(&self, expression: NodeId) -> Result<bool, Error> {
-        let node = ts_ast::skip_parentheses(self.ast(expression)?, expression)?;
+        let node = tsr_ast::skip_parentheses(self.ast(expression)?, expression)?;
         let read = self.node(node)?;
         if read.kind() == K::FalseKeyword {
             return Ok(true);

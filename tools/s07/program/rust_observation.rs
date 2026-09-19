@@ -3,9 +3,9 @@ use super::{FileCache, Program, ProgramOptions};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_jsstring::JsString;
-use ts_vfs::MemoryBuilder;
+use tsr_arena::Counters;
+use tsr_jsstring::JsString;
+use tsr_vfs::MemoryBuilder;
 pub(super) fn bytes(value: &str) -> Vec<u8> {
     assert_eq!(value.len() % 2, 0);
     value
@@ -22,7 +22,7 @@ pub(super) fn try_load(
     request: &Value,
     cache: &mut FileCache,
     counters: &Counters,
-    parsed_config: Option<ts_tsoptions::ParsedCommandLine>,
+    parsed_config: Option<tsr_tsoptions::ParsedCommandLine>,
 ) -> Result<Program, ts_compiler_error::Error> {
     Program::load(program_options(request, parsed_config), cache, counters)
 }
@@ -31,7 +31,7 @@ pub(super) fn try_load(
 /// Construction of the actual Program remains an explicit caller policy.
 pub(super) fn program_options(
     request: &Value,
-    parsed_config: Option<ts_tsoptions::ParsedCommandLine>,
+    parsed_config: Option<tsr_tsoptions::ParsedCommandLine>,
 ) -> ProgramOptions {
     let mut fs = MemoryBuilder::new(
         request["cwd"].as_str().unwrap().as_bytes(),
@@ -45,15 +45,15 @@ pub(super) fn program_options(
             fs.insert_symlink(name.as_bytes(), target.as_str().unwrap().as_bytes());
         }
     }
-    let options = ts_tsoptions::raw::compiler_options(&request["options"]).unwrap();
+    let options = tsr_tsoptions::raw::compiler_options(&request["options"]).unwrap();
     let roots = request["roots"]
         .as_array()
         .unwrap()
         .iter()
         .map(|v| JsString::from_bytes(v.as_str().unwrap().as_bytes()))
         .collect();
-    let host = Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish())));
-    let mut config = ts_tsoptions::ParsedCommandLine::new(options, roots);
+    let host = Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish())));
+    let mut config = tsr_tsoptions::ParsedCommandLine::new(options, roots);
     if let Some(parsed) = parsed_config {
         // CompileFilesEx carries config diagnostics and their syntax owners
         // beside the already finalized fixture options and source-file list.
@@ -70,21 +70,21 @@ pub(super) fn program_options(
         config.config_case_sensitive = false;
     } else if let Some(name) = request["config_name"].as_str() {
         let text = bytes(request["config_text"].as_str().expect("config text hex"));
-        config.config_file = Some(Arc::new(ts_tsoptions::TsConfigSourceFile::parse(
+        config.config_file = Some(Arc::new(tsr_tsoptions::TsConfigSourceFile::parse(
             JsString::from_bytes(name.as_bytes()),
-            ts_tspath::to_path(
+            tsr_tspath::to_path(
                 name.as_bytes(),
                 request["cwd"].as_str().unwrap().as_bytes(),
                 request["case_sensitive"].as_bool().unwrap(),
             ),
-            ts_jsstring::SourceText::from_loaded_bytes(text),
+            tsr_jsstring::SourceText::from_loaded_bytes(text),
         )));
     }
     ProgramOptions {
         config,
         host,
         current_directory: JsString::from_bytes(request["cwd"].as_str().unwrap().as_bytes()),
-        default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
+        default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
         skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
     }
 }
@@ -95,7 +95,7 @@ fn nullable<T>(values: Vec<T>) -> Option<Vec<T>> {
         Some(values)
     }
 }
-pub(super) fn diagnostic(d: &ts_ast::Diagnostic, program: &Program) -> Value {
+pub(super) fn diagnostic(d: &tsr_ast::Diagnostic, program: &Program) -> Value {
     let name = d
         .file
         .map(|id| {
@@ -135,7 +135,7 @@ pub(super) fn observe(id: &str, program: &Program) -> Value {
     let files:Vec<_>=program.files().iter().map(|file|{let view=file.bound().view();let source=view.source_file().unwrap();let options=source.parse_options();let name=options.file_name.as_bytes();let path=options.path.as_bytes();let meta=program.metadata(path).unwrap();json!({"Name":text(name),"Path":text(path),"SHA256":format!("{:x}",Sha256::digest(source.text().as_bytes())),"Bytes":source.text().as_bytes().len(),"Meta":{"PackageJsonType":text(meta.package_json_type.as_bytes()),"PackageJsonDirectory":text(meta.package_json_directory.as_bytes()),"ImpliedNodeFormat":meta.implied_node_format.0},"Lib":program.is_lib(path),"Imports":source.imports().unwrap().iter().map(|id|text(view.ast().node_text(id.unwrap()).unwrap().as_bytes()).to_owned()).collect::<Vec<_>>(),"External":source.external_module_indicator.is_some()})}).collect();
     let resolutions:Vec<_>=program.resolutions().iter().map(|r|{let result=&r.result;let p=&result.package_id;json!({"File":text(r.file.as_bytes()),"Name":text(r.name.as_bytes()),"Mode":r.mode.0,"Result":{"ResolutionDiagnostics":nullable(result.resolution_diagnostics.iter().map(|d|diagnostic(d, program)).collect()),"ResolvedFileName":text(result.resolved_file_name.as_bytes()),"OriginalPath":text(result.original_path.as_bytes()),"Extension":text(result.extension.as_bytes()),"ResolvedUsingTsExtension":result.resolved_using_ts_extension,"ResolvedUsingExtraExtensions":result.resolved_using_extra_extensions,"PackageId":{"Name":text(p.name.as_bytes()),"SubModuleName":text(p.sub_module_name.as_bytes()),"Version":text(p.version.as_bytes()),"PeerDependencies":text(p.peer_dependencies.as_bytes())},"IsExternalLibraryImport":result.is_external_library_import,"AlternateResult":text(result.alternate_result.as_bytes())}})}).collect();
     let types:Vec<_> = program.type_resolutions().iter().map(|r| { let result=&r.result; let p=&result.package_id; json!({"File":text(r.file.as_bytes()),"Name":text(r.name.as_bytes()),"Mode":r.mode.0,"Result":{"ResolutionDiagnostics":nullable(result.resolution_diagnostics.iter().map(|d|diagnostic(d, program)).collect()),"Primary":result.primary,"ResolvedFileName":text(result.resolved_file_name.as_bytes()),"OriginalPath":text(result.original_path.as_bytes()),"PackageId":{"Name":text(p.name.as_bytes()),"SubModuleName":text(p.sub_module_name.as_bytes()),"Version":text(p.version.as_bytes()),"PeerDependencies":text(p.peer_dependencies.as_bytes())},"IsExternalLibraryImport":result.is_external_library_import}}) }).collect();
-    json!({"ID":id,"Files":files,"Missing":nullable(program.missing_files().iter().map(|p|text(p.as_bytes())).collect()),"Resolutions":resolutions,"TypeResolutions":types,"Diagnostics":nullable(program.include_diagnostics().iter().map(|d| diagnostic(d, program)).collect()),"Trace":nullable(program.trace().iter().map(|entry| {let args:Vec<_>=entry.args.iter().map(|arg| match arg {ts_module::TraceArg::Text(value)=>text(value.as_bytes()).to_owned(),ts_module::TraceArg::Bool(value)=>value.to_string()}).collect();format!("{}:[{}]",entry.message.code,args.join(" "))}).collect())})
+    json!({"ID":id,"Files":files,"Missing":nullable(program.missing_files().iter().map(|p|text(p.as_bytes())).collect()),"Resolutions":resolutions,"TypeResolutions":types,"Diagnostics":nullable(program.include_diagnostics().iter().map(|d| diagnostic(d, program)).collect()),"Trace":nullable(program.trace().iter().map(|entry| {let args:Vec<_>=entry.args.iter().map(|arg| match arg {tsr_module::TraceArg::Text(value)=>text(value.as_bytes()).to_owned(),tsr_module::TraceArg::Bool(value)=>value.to_string()}).collect();format!("{}:[{}]",entry.message.code,args.join(" "))}).collect())})
 }
 
 /// Observe option verification separately from loader graph construction.

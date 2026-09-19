@@ -1,5 +1,5 @@
 use num_traits::ToPrimitive;
-use ts_jsstring::wtf8::decode_utf8;
+use tsr_jsstring::wtf8::decode_utf8;
 
 use crate::{bigint::parse_go_big_int, Number};
 

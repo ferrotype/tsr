@@ -6,9 +6,9 @@ use crate::{
     scanner::TextRangeWithKind, settings::FormatCodeSettings, util::range_is_on_one_line, Error,
     FormatFile,
 };
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
-use ts_core::{TextRange, Tristate};
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
+use tsr_core::{TextRange, Tristate};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FormatRequestKind {

@@ -2,12 +2,12 @@
 //! selection. Both consume the same cached anonymous type and retained loader
 //! resolution; grammar errors never silently drop the attribute clause.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     internal_symbol_names as names, symbol_flags as sf, JsString, SymbolTable, SyntaxKind as K,
 };
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
 
 impl CheckerState {
     pub(crate) fn import_attributes(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
@@ -28,7 +28,7 @@ impl CheckerState {
             .ast(node)?
             .node(node)?
             .as_import_attributes()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .attributes();
         self.source_list(node, attributes)
     }
@@ -43,9 +43,9 @@ impl CheckerState {
                 .ast(attribute)?
                 .node(attribute)?
                 .as_import_attribute()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .value()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             if self.node(value)?.kind() != K::StringLiteral {
                 has_error = true;
                 self.error_at(
@@ -74,9 +74,9 @@ impl CheckerState {
             let read = self.node(attribute)?;
             let data = read
                 .as_import_attribute()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
-            let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
-            let value = data.value().ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
+            let name = read.name().ok_or(tsr_arena::Error::InvalidGraph)?;
+            let value = data.value().ok_or(tsr_arena::Error::InvalidGraph)?;
             let name = self.node_text(name)?.into_js_string();
             let member = self.new_symbol(sf::PROPERTY, name.clone())?;
             let ty = self.check_expression_cached(value)?;
@@ -217,7 +217,7 @@ impl CheckerState {
         report: bool,
     ) -> Result<ModuleKind, Error> {
         let (mode, invalid) =
-            ts_ast::utilities_middle::import_attributes_resolution_mode_with_invalid_value(
+            tsr_ast::utilities_middle::import_attributes_resolution_mode_with_invalid_value(
                 self.ast(node)?,
                 Some(node),
             )?;
@@ -242,12 +242,12 @@ impl CheckerState {
         };
         for attribute in self.import_attribute_nodes(attributes)? {
             let read = self.node(attribute)?;
-            let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
+            let name = read.name().ok_or(tsr_arena::Error::InvalidGraph)?;
             let value = read
                 .as_import_attribute()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .value()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             if self.node_text(name)?.as_bytes() == b"type"
                 && matches!(
                     self.node(value)?.kind().known(),
@@ -326,7 +326,7 @@ impl CheckerState {
                     vec![],
                 );
             }
-            let name = read.name().ok_or(ts_arena::Error::InvalidGraph)?;
+            let name = read.name().ok_or(tsr_arena::Error::InvalidGraph)?;
             if !matches!(
                 self.node(name)?.kind().known(),
                 Some(K::Identifier | K::StringLiteral | K::NoSubstitutionTemplateLiteral)
@@ -374,7 +374,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.mergePatternAmbientModules
     pub(crate) fn merge_attributed_pattern_modules(&mut self) -> Result<(), Error> {
         let source = std::mem::take(&mut self.module_aliases.patterns);
-        let mut grouped: Vec<ts_ast::PatternAmbientModule> = Vec::new();
+        let mut grouped: Vec<tsr_ast::PatternAmbientModule> = Vec::new();
         let mut groups: crate::types::Map<JsString, Vec<usize>> = crate::types::Map::default();
         for module in &source {
             let symbol = module
@@ -479,7 +479,7 @@ impl CheckerState {
             if best.len() == 1 {
                 best[0].symbol
             } else {
-                ts_core::pattern::find_best_pattern_match(
+                tsr_core::pattern::find_best_pattern_match(
                     &best,
                     |module| module.pattern.clone(),
                     name,

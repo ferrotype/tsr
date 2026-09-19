@@ -180,7 +180,7 @@ def build(directory, modes=None):
     bin_dir = directory / "bin"
     bin_dir.mkdir(exist_ok=True)
     env = native_environment()
-    manifest = ROOT / "crates/ts_compiler/Cargo.toml"
+    manifest = ROOT / "crates/tsr_compiler/Cargo.toml"
     binaries = {}
     for mode in selected_modes:
         features = MODES[mode]

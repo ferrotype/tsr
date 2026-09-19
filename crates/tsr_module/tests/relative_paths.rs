@@ -1,8 +1,8 @@
 use std::sync::Arc;
-use ts_core::{CompilerOptions, ModuleKind, Tristate};
-use ts_jsstring::JsString;
-use ts_module::Resolver;
-use ts_vfs::MemoryBuilder;
+use tsr_core::{CompilerOptions, ModuleKind, Tristate};
+use tsr_jsstring::JsString;
+use tsr_module::Resolver;
+use tsr_vfs::MemoryBuilder;
 
 #[test]
 fn paths_mappings_do_not_intercept_relative_backslash_imports() {
@@ -28,7 +28,7 @@ fn paths_mappings_do_not_intercept_relative_backslash_imports() {
     ] {
         let result = resolver.resolve(name, file, ModuleKind::NONE).unwrap();
         assert_eq!(result.resolved_file_name.as_bytes(), b"/shim.ts");
-        assert!(!resolver.take_trace().iter().any(|entry| entry.message.code == ts_diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0.code));
+        assert!(!resolver.take_trace().iter().any(|entry| entry.message.code == tsr_diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0.code));
     }
     assert_eq!(
         resolver
@@ -38,5 +38,5 @@ fn paths_mappings_do_not_intercept_relative_backslash_imports() {
             .as_bytes(),
         b"/mapped.ts"
     );
-    assert!(resolver.take_trace().iter().any(|entry| entry.message.code == ts_diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0.code));
+    assert!(resolver.take_trace().iter().any(|entry| entry.message.code == tsr_diagnostics::X_paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0.code));
 }

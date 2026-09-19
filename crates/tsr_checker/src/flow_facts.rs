@@ -73,7 +73,7 @@ impl CheckerState {
                 f::BIG_INT_FACTS
             }
         } else if flags & tf::BIG_INT_LITERAL != 0 {
-            let zero = matches!(&self.types.literal(ty)?.value, LiteralValue::BigInt(value) if *value == ts_jsnum::PseudoBigInt::default());
+            let zero = matches!(&self.types.literal(ty)?.value, LiteralValue::BigInt(value) if *value == tsr_jsnum::PseudoBigInt::default());
             match (strict, zero) {
                 (true, true) => f::ZERO_BIG_INT_STRICT_FACTS,
                 (true, false) => f::NON_ZERO_BIG_INT_STRICT_FACTS,
@@ -293,7 +293,7 @@ impl CheckerState {
         if let Some(symbol) = self.lookup_symbol(
             self.builtins.globals,
             b"NonNullable",
-            ts_ast::symbol_flags::TYPE_ALIAS,
+            tsr_ast::symbol_flags::TYPE_ALIAS,
         )? {
             // getGlobalTypeAliasResolver only accepts aliases with the expected arity.
             let declared = self.get_declared_type_of_symbol(symbol)?;

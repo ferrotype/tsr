@@ -1,10 +1,10 @@
 use crate::Parser;
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     node_flags, AstBuilder, Factory, FactoryMethods, JsString, SourceFileParseOptions, SyntaxKind,
 };
-use ts_core::{ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 
 #[test]
 fn scanner_errors_are_drained_before_node_finish_and_duplicate_errors_still_mark_nodes() {
@@ -30,7 +30,7 @@ fn scanner_errors_are_drained_before_node_finish_and_duplicate_errors_still_mark
         parser.parse_error_at(
             diagnostic_pos,
             diagnostic_pos + 1,
-            ts_diagnostics::Identifier_expected,
+            tsr_diagnostics::Identifier_expected,
             vec![]
         ),
         None
@@ -60,7 +60,7 @@ fn speculation_restores_source_checkpoint_fields_but_keeps_counts_allocations_an
     parser.context_flags |= node_flags::AWAIT_CONTEXT;
     parser.source_flags |= node_flags::POSSIBLY_CONTAINS_DYNAMIC_IMPORT;
     parser.statement_has_await_identifier = true;
-    parser.parse_error_at(2, 3, ts_diagnostics::Identifier_expected, vec![]);
+    parser.parse_error_at(2, 3, tsr_diagnostics::Identifier_expected, vec![]);
     let inner = parser.mark();
     parser.parse_identifier();
     parser.commit(inner);
@@ -113,7 +113,7 @@ fn finish_failure_and_parent_failure_keep_the_parse_error_reset_boundary() {
     );
     let malformed = parser.factory.new_node(
         SyntaxKind::ParenthesizedExpression.into(),
-        ts_ast::TokenData {}.into(),
+        tsr_ast::TokenData {}.into(),
     );
     parser.has_parse_error = true;
     let pos = i64::from(i32::MAX) + 1;
@@ -125,7 +125,7 @@ fn finish_failure_and_parent_failure_keep_the_parse_error_reset_boundary() {
     let read = parser.factory.node(malformed);
     assert_eq!(read.range(), TextRange::new(i64::from(i32::MIN), -2));
     assert_ne!(read.flags() & node_flags::THIS_NODE_HAS_ERROR, 0);
-    let invalid = ts_arena::NodeId::from_parts(malformed.arena(), u32::MAX).unwrap();
+    let invalid = tsr_arena::NodeId::from_parts(malformed.arena(), u32::MAX).unwrap();
     parser.has_parse_error = true;
     assert!(catch_unwind(AssertUnwindSafe(
         || parser.finish_node_with_end(invalid, 1, 2)

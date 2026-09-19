@@ -1,14 +1,14 @@
 use crate::{Parser, ParserFactory};
 use std::sync::Arc;
-use ts_ast::{Diagnostic, FactoryMethods, JsString, NodeId, SyntaxKind};
-use ts_core::TextRange;
-use ts_diagnostics::{self as diagnostics, Message};
-use ts_scanner::token_to_string;
+use tsr_ast::{Diagnostic, FactoryMethods, JsString, NodeId, SyntaxKind};
+use tsr_core::TextRange;
+use tsr_diagnostics::{self as diagnostics, Message};
+use tsr_scanner::token_to_string;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.nextToken
     pub(crate) fn next_token(&mut self) -> SyntaxKind {
-        if ts_ast::is_keyword_kind(self.token.into())
+        if tsr_ast::is_keyword_kind(self.token.into())
             && (self.scanner.has_unicode_escape() || self.scanner.has_extended_unicode_escape())
         {
             self.parse_error_at_current_token(
@@ -20,12 +20,12 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.nextTokenWithoutCheck
     pub(crate) fn next_token_without_check(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::scan);
+        self.token = self.scan_operation(tsr_scanner::Scanner::scan);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.nextTokenJSDoc
     pub(crate) fn next_token_jsdoc(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::scan_jsdoc_token);
+        self.token = self.scan_operation(tsr_scanner::Scanner::scan_jsdoc_token);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.nextJSDocCommentTextToken
@@ -36,12 +36,12 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.reScanLessThanToken
     pub(crate) fn re_scan_less_than_token(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::rescan_less_than_token);
+        self.token = self.scan_operation(tsr_scanner::Scanner::rescan_less_than_token);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.reScanGreaterThanToken
     pub(crate) fn re_scan_greater_than_token(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::rescan_greater_than_token);
+        self.token = self.scan_operation(tsr_scanner::Scanner::rescan_greater_than_token);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.reScanSlashToken
@@ -195,7 +195,7 @@ pub(crate) fn token_text(kind: SyntaxKind) -> JsString {
 }
 /// port: tsc/internal/parser/utilities.go:isKeywordOrPunctuation
 pub(crate) fn is_keyword_or_punctuation(kind: SyntaxKind) -> bool {
-    ts_ast::is_keyword_kind(kind.into()) || ts_ast::is_punctuation_kind(kind.into())
+    tsr_ast::is_keyword_kind(kind.into()) || tsr_ast::is_punctuation_kind(kind.into())
 }
 /// port: tsc/internal/parser/utilities.go:tokenIsIdentifierOrKeyword
 pub(crate) fn token_is_identifier_or_keyword(kind: SyntaxKind) -> bool {

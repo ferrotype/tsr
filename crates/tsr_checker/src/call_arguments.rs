@@ -4,9 +4,9 @@ use crate::{
     inference::priority, type_flags as tf, CheckerState, Error, InferenceId, RelationKind,
     SignatureId, TypeId,
 };
-use ts_arena::NodeId;
-use ts_ast::{Diagnostic, Factory, JsString, SyntaxKind as K};
-use ts_diagnostics as messages;
+use tsr_arena::NodeId;
+use tsr_ast::{Diagnostic, Factory, JsString, SyntaxKind as K};
+use tsr_diagnostics as messages;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeArgumentArityError
@@ -24,17 +24,18 @@ impl CheckerState {
             minimum.to_string()
         };
         let view = self.ast(node)?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::MissingLink("type argument arity source"))?;
         let list = view
             .node(node)?
             .type_argument_list()
             .ok_or(Error::MissingLink("type argument arity list"))?;
         let loc = view.list(list)?.loc();
-        let start = ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos());
+        let start =
+            tsr_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), loc.pos());
         let diagnostic = Diagnostic::new(
             Some(source),
-            ts_core::TextRange::new(start, loc.end()),
+            tsr_core::TextRange::new(start, loc.end()),
             messages::Expected_0_type_arguments_but_got_1,
             vec![
                 JsString::from_bytes(expected.as_bytes()),
@@ -117,7 +118,7 @@ impl CheckerState {
             .map(|node| {
                 self.ast(node)?
                     .node(node)
-                    .map(|read| read.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0)
+                    .map(|read| read.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0)
                     .map_err(Error::from)
             })
             .transpose()?
@@ -279,7 +280,7 @@ impl CheckerState {
             .type_parameters
             .clone()
             .unwrap_or_else(|| [].into());
-        let flags = if ts_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
+        let flags = if tsr_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
             crate::inference::ANY_DEFAULT
         } else {
             0
@@ -485,7 +486,7 @@ impl CheckerState {
         let skip_this = read.kind() == K::NewExpression
             || read.kind() == K::CallExpression
                 && match read.expression() {
-                    Some(expression) => ts_ast::utilities_tail::is_super_property(
+                    Some(expression) => tsr_ast::utilities_tail::is_super_property(
                         self.ast(expression)?,
                         &self.node(expression)?,
                     )?,
@@ -564,7 +565,7 @@ impl CheckerState {
                             .end();
                         self.factory.set_node_range(
                             synthetic,
-                            ts_core::TextRange::new(i64::from(start), i64::from(end)),
+                            tsr_core::TextRange::new(i64::from(start), i64::from(end)),
                         );
                         synthetic
                     }
@@ -600,9 +601,9 @@ impl CheckerState {
                     return Ok(ty);
                 };
                 let read = self.node(parent)?;
-                if ts_ast::utilities::is_optional_chain_root(&read) {
+                if tsr_ast::utilities::is_optional_chain_root(&read) {
                     self.non_nullable_type(ty)
-                } else if read.flags() & ts_ast::node_flags::OPTIONAL_CHAIN != 0 {
+                } else if read.flags() & tsr_ast::node_flags::OPTIONAL_CHAIN != 0 {
                     self.remove_optional_type_marker(ty)
                 } else {
                     Ok(ty)
@@ -631,7 +632,7 @@ impl CheckerState {
             return Ok(None);
         }
         let mut expression =
-            ts_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
+            tsr_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
                 .ok_or(Error::MissingLink("this invoked expression"))?;
         loop {
             let read = self.node(expression)?;
@@ -769,7 +770,7 @@ impl CheckerState {
             node
         };
         if void_promise_error
-            && self.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
+            && self.node(node)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0
         {
             self.error_at(Some(error_node), messages::Expected_1_argument_but_got_0_new_Promise_needs_a_JSDoc_hint_to_produce_a_resolve_that_can_be_called_without_arguments, vec![])?;
             return Ok(());
@@ -778,7 +779,7 @@ impl CheckerState {
             self.diagnostic_for_node(Some(error_node), message, diagnostic_args)?
         } else {
             let view = self.ast(node)?;
-            let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
                 .ok_or(Error::MissingLink("arity source"))?;
             // Spread arguments expand to synthetic expressions owned by the
             // checker factory; they carry the spread element's range.
@@ -791,11 +792,11 @@ impl CheckerState {
             if end == start {
                 end += 1;
             }
-            start = ts_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), start);
+            start = tsr_scanner::skip_trivia(view.source_file(source)?.text().as_bytes(), start);
             end = end.max(start);
             Diagnostic::new(
                 Some(source),
-                ts_core::TextRange::new(start, end),
+                tsr_core::TextRange::new(start, end),
                 message,
                 diagnostic_args,
             )
@@ -866,7 +867,7 @@ impl CheckerState {
         let Some(symbol) = self.resolve_name(
             Some(callee),
             text.as_bytes(),
-            ts_ast::symbol_flags::VALUE,
+            tsr_ast::symbol_flags::VALUE,
             None,
             false,
         )?

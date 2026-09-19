@@ -1,8 +1,8 @@
 //! Correlated destructuring and contextual-rest parameters use their shared
 //! declaration as a pseudo-reference at the occurrence's flow position.
 use crate::{signature_flags as sg, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
@@ -36,9 +36,9 @@ impl CheckerState {
                 >= 2
         {
             let root =
-                ts_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
+                tsr_ast::utilities::get_root_declaration(self.ast(declaration)?, declaration)?;
             if let Some(initializer) = self.node(root)?.initializer() {
-                if ts_ast::utilities::is_node_descendant_of(
+                if tsr_ast::utilities::is_node_descendant_of(
                     self.ast(location)?,
                     Some(location),
                     Some(initializer),
@@ -51,7 +51,7 @@ impl CheckerState {
             let read = self.node(root)?;
             let parameter = read.kind() == K::Parameter;
             let constant = read.kind() == K::VariableDeclaration
-                && ts_ast::utilities::get_combined_node_flags(self.ast(root)?, root)?
+                && tsr_ast::utilities::get_combined_node_flags(self.ast(root)?, root)?
                     & nf::CONSTANT
                     != 0;
             if constant || parameter {
@@ -154,7 +154,7 @@ impl CheckerState {
                                     let position = parameters
                                         .iter()
                                         .position(|&parameter| parameter == declaration)
-                                        .ok_or(ts_arena::Error::InvalidGraph)?;
+                                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                                     let this_parameter = match parameters.first().copied() {
                                         Some(parameter) => match self.node(parameter)?.name() {
                                             Some(name) => {
@@ -165,10 +165,10 @@ impl CheckerState {
                                         None => false,
                                     };
                                     let index = isize::try_from(position)
-                                        .map_err(|_| ts_arena::Error::InvalidGraph)?
+                                        .map_err(|_| tsr_arena::Error::InvalidGraph)?
                                         - isize::from(this_parameter);
                                     let index = self.get_number_literal_type(
-                                        ts_jsnum::Number::new(index as f64),
+                                        tsr_jsnum::Number::new(index as f64),
                                     )?;
                                     ty = self
                                         .get_indexed_access_type(narrowed, index, 0, None, None)?;

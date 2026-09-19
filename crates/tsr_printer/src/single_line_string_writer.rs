@@ -7,8 +7,8 @@
 //! text is the buffer's tail, so only its length is kept.
 
 use crate::emit_text_writer::{decode_last_rune, EmitTextWriter};
-use ts_ast::SymbolId;
-use ts_scanner::is_white_space_like;
+use tsr_ast::SymbolId;
+use tsr_scanner::is_white_space_like;
 
 #[derive(Debug, Default)]
 pub struct SingleLineStringWriter {

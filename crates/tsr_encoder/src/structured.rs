@@ -1,6 +1,6 @@
 //! The pinned encoder's minimal MessagePack writer, including narrowing at the wire.
-use ts_ast::{FileReference, MappedDiagnosticDirective, SpanSegment};
-use ts_jsstring::PositionMap;
+use tsr_ast::{FileReference, MappedDiagnosticDirective, SpanSegment};
+use tsr_jsstring::PositionMap;
 pub(crate) const NONE: u32 = u32::MAX;
 // port: tsc/internal/api/encoder/encoder.go:msgpackWriteArrayHeader
 pub(crate) fn array(out: &mut Vec<u8>, len: usize) {

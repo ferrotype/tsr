@@ -4,9 +4,9 @@ use crate::signatures::IndexInfo;
 use crate::{
     access_flags as af, object_flags as of, type_flags as tf, CheckerState, Error, TypeId,
 };
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.errorIfWritingToReadonlyIndex
@@ -101,7 +101,7 @@ impl CheckerState {
         if let Some(name) = name {
             if self.index_type_has_static_property(name.as_bytes(), object)? {
                 let display = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;
-                let text = ts_scanner::get_text_of_node(self.ast(index_node)?, index_node)?;
+                let text = tsr_scanner::get_text_of_node(self.ast(index_node)?, index_node)?;
                 let mut suggested = display.as_bytes().to_vec();
                 suggested.push(b'[');
                 suggested.extend(text.as_bytes());
@@ -124,9 +124,9 @@ impl CheckerState {
                     names.push(self.symbol(property)?.name_to_owned());
                 }
             }
-            if let Some(suggestion) = ts_scanner::get_spelling_suggestion_for_strings(
+            if let Some(suggestion) = tsr_scanner::get_spelling_suggestion_for_strings(
                 name.as_bytes(),
-                names.iter().map(ts_jsstring::JsString::as_bytes),
+                names.iter().map(tsr_jsstring::JsString::as_bytes),
             ) {
                 let suggestion = JsString::from_bytes(suggestion);
                 let display = self.type_to_string(object, crate::type_display::DEFAULT_FLAGS)?;
@@ -191,7 +191,7 @@ impl CheckerState {
         let full = self.type_to_string(full_index, crate::type_display::DEFAULT_FLAGS)?;
         let message=d::Element_implicitly_has_an_any_type_because_expression_of_type_0_can_t_be_used_to_index_type_1;
         let diagnostic = match child {
-            Some(child) => ts_ast::Diagnostic::chain(
+            Some(child) => tsr_ast::Diagnostic::chain(
                 Some(std::sync::Arc::new(child)),
                 message,
                 vec![full, object_text],
@@ -222,7 +222,7 @@ impl CheckerState {
             let ty = self.get_type_of_symbol(symbol)?;
             if let Some(property) = self.constituent_property(ty, name, false)? {
                 if let Some(declaration) = self.symbol(property)?.value_declaration() {
-                    return Ok(ts_ast::utilities::is_static(
+                    return Ok(tsr_ast::utilities::is_static(
                         self.ast(declaration)?,
                         declaration,
                     )?);
@@ -299,7 +299,7 @@ impl CheckerState {
                     .as_element_access_expression()
                     .and_then(|data| data.argument_expression())
                     .ok_or(Error::MissingLink("suggestion index"))?;
-                if !ts_ast::utilities::is_property_name(&self.node(name)?) {
+                if !tsr_ast::utilities::is_property_name(&self.node(name)?) {
                     return Ok(None);
                 }
                 name
@@ -372,7 +372,7 @@ impl CheckerState {
             }
         }
         Ok(JsString::from_bytes(
-            ts_ast::internal_symbol_names::MISSING.to_vec(),
+            tsr_ast::internal_symbol_names::MISSING.to_vec(),
         ))
     }
 }

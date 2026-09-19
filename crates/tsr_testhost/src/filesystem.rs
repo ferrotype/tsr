@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::Deserialize;
 use serde_json::{json, Value};
-use ts_vfs::{FileSystem, MemoryBuilder, MemorySnapshot};
+use tsr_vfs::{FileSystem, MemoryBuilder, MemorySnapshot};
 
 pub(crate) const OPERATIONS: [&str; 5] = [
     "readFile",
@@ -38,7 +38,7 @@ impl Host {
         let mut canonical = BTreeSet::new();
         for path in base.keys().chain(symlinks.keys()) {
             valid_base_path(path)?;
-            let key = ts_tspath::to_path(path.as_bytes(), b"/", case_sensitive)
+            let key = tsr_tspath::to_path(path.as_bytes(), b"/", case_sensitive)
                 .as_bytes()
                 .to_vec();
             if !canonical.insert(key) {
@@ -46,7 +46,7 @@ impl Host {
             }
         }
         for key in &canonical {
-            for ancestor in ts_tspath::ancestors(&ts_tspath::directory(key.as_slice())) {
+            for ancestor in tsr_tspath::ancestors(&tsr_tspath::directory(key.as_slice())) {
                 if canonical.contains(ancestor.as_slice()) {
                     return Err("injected file or symlink is an ancestor of another entry".into());
                 }
@@ -110,7 +110,7 @@ impl Host {
 
     fn base(&self, operation: &str, path: &str) -> Result<Value, String> {
         let bytes = path.as_bytes();
-        let io = |error: ts_vfs::Error| error.to_string();
+        let io = |error: tsr_vfs::Error| error.to_string();
         match operation {
             "readFile" => {
                 let content = self.snapshot.read_file(bytes).map_err(io)?;

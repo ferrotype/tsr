@@ -13,7 +13,7 @@ use crate::{
     NumericLiteralData, PrivateIdentifierData, RegularExpressionLiteralData, StringLiteralData,
     SyntaxKind, TemplateHeadData, TemplateMiddleData, TemplateTailData, TokenData, TokenFlags,
 };
-use ts_arena::{Error, TokenKey};
+use tsr_arena::{Error, TokenKey};
 
 impl<'a> AstView<'a> {
     /// Gets a token from the file's token cache, or creates it if it does not
@@ -123,8 +123,8 @@ fn create_token(
 mod tests {
     use super::*;
     use crate::{AstBuilder, FactoryMethods};
-    use ts_arena::Counters;
-    use ts_jsstring::SourceText;
+    use tsr_arena::Counters;
+    use tsr_jsstring::SourceText;
 
     fn published(text: &'static [u8]) -> (crate::AstFile, NodeId) {
         let mut build = AstBuilder::new(SourceText::from_loaded_bytes(text), &Counters::new());

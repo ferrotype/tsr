@@ -3,9 +3,9 @@
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, sync::Arc};
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::{CheckerOwner, RelationKind};
-use ts_compiler::{Program, ProgramCheckerHost};
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::{CheckerOwner, RelationKind};
+use tsr_compiler::{Program, ProgramCheckerHost};
 
 mod p3;
 use p3::{array, load, text, Result};
@@ -17,7 +17,7 @@ fn hex(bytes: &[u8]) -> String {
     }
     text
 }
-fn diagnostic_payload(program: &Program, d: &ts_ast::Diagnostic) -> Result<Value> {
+fn diagnostic_payload(program: &Program, d: &tsr_ast::Diagnostic) -> Result<Value> {
     let file = if let Some(file) = d.file {
         let file = program
             .files()
@@ -120,7 +120,7 @@ fn group(
         let mut alias_display = BTreeMap::new();
         let mut flags = BTreeMap::new();
         for (name, typ) in &types {
-            use ts_checker::type_format_flags as ff;
+            use tsr_checker::type_format_flags as ff;
             display.insert(
                 name,
                 hex(op
@@ -144,7 +144,7 @@ fn group(
             );
             // The frozen deep fixtures have no unions. Refuse a future changed
             // fixture instead of silently omitting its ordering observation.
-            if op.type_flags(*typ)? & ts_checker::type_flags::UNION != 0 {
+            if op.type_flags(*typ)? & tsr_checker::type_flags::UNION != 0 {
                 return Err("deep fixture acquired a union ordering obligation".into());
             }
         }

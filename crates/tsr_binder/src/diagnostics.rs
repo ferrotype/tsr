@@ -3,8 +3,8 @@ use crate::{
     target::{target_payload, BindingNode},
     Binder,
 };
-use ts_ast::{node_flags as nf, AstView, Diagnostic, JsString, NodeId, SyntaxKind as K};
-use ts_diagnostics::{self as d, Message};
+use tsr_ast::{node_flags as nf, AstView, Diagnostic, JsString, NodeId, SyntaxKind as K};
+use tsr_diagnostics::{self as d, Message};
 
 impl<'scope> Binder<'_, 'scope, '_> {
     // port: tsc/internal/binder/binder.go:Binder.errorOnNode
@@ -19,7 +19,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         message: &'static Message,
         args: Vec<JsString>,
     ) {
-        let range = checked(ts_scanner::get_range_of_token_at_position(
+        let range = checked(tsr_scanner::get_range_of_token_at_position(
             self.view(),
             self.file,
             i64::from(self.n(node).pos()),
@@ -35,7 +35,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
     ) -> Diagnostic {
         Diagnostic::new(
             Some(self.file),
-            checked(ts_scanner::get_error_range_for_node(
+            checked(tsr_scanner::get_error_range_for_node(
                 self.view(),
                 self.file,
                 node,
@@ -68,13 +68,13 @@ impl<'scope> Binder<'_, 'scope, '_> {
             && !checked(a::is_identifier_name(self.view(), node))
         {
             let text = self.view().node_text(node).expect("text payload required");
-            let keyword = ts_scanner::get_identifier_token(text.as_bytes());
+            let keyword = tsr_scanner::get_identifier_token(text.as_bytes());
             self.check_contextual_keyword(node, keyword, flags);
         }
     }
     pub(crate) fn check_local_contextual_identifier(
         &mut self,
-        node: ts_ast::local_bind::BindNode<'scope>,
+        node: tsr_ast::local_bind::BindNode<'scope>,
     ) {
         if self.source_has_parse_errors {
             return;
@@ -88,7 +88,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             return;
         }
         // Preserve parent/name classification before reading identifier text.
-        let keyword = ts_scanner::get_identifier_token(
+        let keyword = tsr_scanner::get_identifier_token(
             read.as_identifier().expect("Identifier payload").text(),
         );
         if keyword == K::Identifier {
@@ -123,7 +123,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             self.error_on_node(
                 node,
                 message,
-                vec![checked(ts_scanner::declaration_name_to_string(
+                vec![checked(tsr_scanner::declaration_name_to_string(
                     self.view(),
                     Some(node),
                 ))],
@@ -136,7 +136,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
             self.error_on_node(
                 node,
                 d::X_constructor_is_a_reserved_word,
-                vec![checked(ts_scanner::declaration_name_to_string(
+                vec![checked(tsr_scanner::declaration_name_to_string(
                     self.view(),
                     Some(node),
                 ))],
@@ -280,7 +280,7 @@ fn is_eval_or_arguments_text(bytes: &[u8]) -> bool {
 // port: tsc/internal/binder/binder.go:isUseStrictPrologueDirective
 pub fn is_use_strict_prologue_directive(view: AstView<'_>, source: NodeId, node: NodeId) -> bool {
     matches!(
-        checked(ts_scanner::get_source_text_of_node_from_source_file(
+        checked(tsr_scanner::get_source_text_of_node_from_source_file(
             view,
             source,
             checked(view.node(node)).expression(),

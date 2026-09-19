@@ -2,8 +2,8 @@
 //! not replace diagnostic production or insert frozen expected output bytes.
 use super::{file_name, hex, source, utf8, Error, Result};
 use serde_json::{json, Value};
-use ts_ast::Diagnostic;
-use ts_compiler::Program;
+use tsr_ast::Diagnostic;
+use tsr_compiler::Program;
 const NL: &str = "\r\n";
 fn category(d: &Diagnostic) -> Result<&'static str> {
     match d.category {
@@ -25,7 +25,7 @@ fn message(d: &Diagnostic) -> Result<String> {
         .or_else(|| {
             std::str::from_utf8(d.message_key.as_bytes())
                 .ok()
-                .and_then(ts_diagnostics::by_key)
+                .and_then(tsr_diagnostics::by_key)
         })
         .ok_or(Error::Unsupported("baseline unknown diagnostic key"))?;
     if d.message_args.is_empty() {

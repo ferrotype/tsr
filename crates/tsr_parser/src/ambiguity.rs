@@ -1,6 +1,6 @@
 use crate::{parse_flags, Parser, ParserFactory};
-use ts_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind};
-use ts_core::{LanguageVariant, Tristate};
+use tsr_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind};
+use tsr_core::{LanguageVariant, Tristate};
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.isParenthesizedArrowFunctionExpression
@@ -50,7 +50,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             if second == K::DotDotDotToken {
                 return Tristate::TRUE;
             }
-            if ts_ast::is_modifier_kind(second.into())
+            if tsr_ast::is_modifier_kind(second.into())
                 && second != K::AsyncKeyword
                 && self.look_ahead(|p| {
                     p.next_token();
@@ -323,7 +323,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             let jsdoc = self.jsdoc_scanner_info();
             let asynchronous = self.parse_modifiers_for_arrow_function();
             let expression =
-                self.parse_binary_expression_or_higher(ts_ast::operator_precedence::LOWEST);
+                self.parse_binary_expression_or_higher(tsr_ast::operator_precedence::LOWEST);
             return Some(self.parse_simple_arrow_function_expression(
                 pos,
                 expression,

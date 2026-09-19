@@ -4,8 +4,8 @@ use crate::{
     relater::{Relater, RelationKind, BOTH},
     ternary as tr, type_flags as tf, CheckerState, Error, Ternary, TypeId, UnionReduction,
 };
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, JsString};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, JsString};
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:Checker.findDiscriminantProperties
@@ -33,7 +33,7 @@ impl CheckerState {
         // check applies (getUnionOrIntersectionProperty, not getPropertyOfType).
         let Some(property) = self.compound_property_including_partial(
             ty,
-            ts_ast::JsString::from_bytes(name),
+            tsr_ast::JsString::from_bytes(name),
             false,
         )?
         else {

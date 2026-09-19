@@ -1,7 +1,7 @@
 //! JSDoc annotations use the reparsed AST type edges and the ordinary type stores.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getIntendedTypeFromJSDocTypeReference
@@ -13,7 +13,7 @@ impl CheckerState {
         let name = read
             .data_source()
             .as_type_reference_node()
-            .ok_or(ts_arena::Error::InvalidGraph)?
+            .ok_or(tsr_arena::Error::InvalidGraph)?
             .type_name()
             .ok_or(Error::MissingLink("documentation type name"))?;
         if self.node(name)?.kind() != K::Identifier {
@@ -46,10 +46,10 @@ impl CheckerState {
         if builtin.is_some() || text.as_bytes() == b"Object" && arguments.len() != 2 && !no_implicit
         {
             if !arguments.is_empty() {
-                let name = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+                let name = tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
                 self.error_at(
                     Some(node),
-                    ts_diagnostics::Type_0_is_not_generic,
+                    tsr_diagnostics::Type_0_is_not_generic,
                     vec![name],
                 )?;
             }
@@ -98,7 +98,7 @@ impl CheckerState {
         name: &'static str,
         arity: usize,
         report: bool,
-    ) -> Result<Option<ts_arena::SymbolId>, Error> {
+    ) -> Result<Option<tsr_arena::SymbolId>, Error> {
         let key = (name, arity, report);
         if let Some(&symbol) = self.query.global_type_aliases.get(&key) {
             return Ok(symbol);
@@ -107,7 +107,7 @@ impl CheckerState {
             None,
             name.as_bytes(),
             sf::TYPE_ALIAS,
-            report.then_some(ts_diagnostics::Cannot_find_global_type_0),
+            report.then_some(tsr_diagnostics::Cannot_find_global_type_0),
             false,
         )?;
         let symbol = if let Some(symbol) = symbol {
@@ -125,10 +125,10 @@ impl CheckerState {
                     let name = self.symbol(symbol)?.name_to_owned();
                     self.error_at(
                         declaration,
-                        ts_diagnostics::Global_type_0_must_have_1_type_parameter_s,
+                        tsr_diagnostics::Global_type_0_must_have_1_type_parameter_s,
                         vec![
                             name,
-                            ts_ast::JsString::from_bytes(arity.to_string().into_bytes()),
+                            tsr_ast::JsString::from_bytes(arity.to_string().into_bytes()),
                         ],
                     )?;
                 }
@@ -170,21 +170,21 @@ impl CheckerState {
                         self.nullable_type(ty, if postfix { tf::UNDEFINED } else { tf::NULLABLE })?;
                 }
                 let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
-                let token = ts_ast::JsString::from_bytes(if nullable {
+                let token = tsr_ast::JsString::from_bytes(if nullable {
                     b"?".as_slice()
                 } else {
                     b"!".as_slice()
                 });
                 let message = if postfix {
-                    ts_diagnostics::X_0_at_the_end_of_a_type_is_not_valid_TypeScript_syntax_Did_you_mean_to_write_1
+                    tsr_diagnostics::X_0_at_the_end_of_a_type_is_not_valid_TypeScript_syntax_Did_you_mean_to_write_1
                 } else {
-                    ts_diagnostics::X_0_at_the_start_of_a_type_is_not_valid_TypeScript_syntax_Did_you_mean_to_write_1
+                    tsr_diagnostics::X_0_at_the_start_of_a_type_is_not_valid_TypeScript_syntax_Did_you_mean_to_write_1
                 };
                 self.grammar_error_node(node, message, vec![token, display])?;
             } else {
                 self.grammar_error_node(
                     node,
-                    ts_diagnostics::JSDoc_types_can_only_be_used_inside_documentation_comments,
+                    tsr_diagnostics::JSDoc_types_can_only_be_used_inside_documentation_comments,
                     vec![],
                 )?;
             }

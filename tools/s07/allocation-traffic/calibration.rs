@@ -1,5 +1,5 @@
 //! Run with one thread, before the workload, against the actual cap allocator.
-use ts_arena::allocation_traffic as traffic;
+use tsr_arena::allocation_traffic as traffic;
 
 pub(crate) fn assert_accounting(snapshot: &impl Fn() -> [usize; 2], before: [usize; 2]) {
     let after = snapshot();
@@ -28,7 +28,7 @@ pub fn calibrate_allocation_traffic(snapshot: impl Fn() -> [usize; 2]) {
         drop(rows);
         checkpoint();
     });
-    let owner = crate::AstBuilder::new(ts_jsstring::SourceText::default(), &ts_arena::Counters::new()).id().arena();
+    let owner = crate::AstBuilder::new(tsr_jsstring::SourceText::default(), &tsr_arena::Counters::new()).id().arena();
     let node = crate::NodeId::from_parts(owner, 1).unwrap();
     check(&snapshot, |checkpoint| {
         let mut edges = crate::compact::lists::EdgePages::default();
@@ -37,9 +37,9 @@ pub fn calibrate_allocation_traffic(snapshot: impl Fn() -> [usize; 2]) {
         drop(edges);
         checkpoint();
     });
-    let counters = ts_arena::Counters::new();
+    let counters = tsr_arena::Counters::new();
     check(&snapshot, |checkpoint| {
-        let mut values = ts_arena::OwnedArena::new(&counters);
+        let mut values = tsr_arena::OwnedArena::new(&counters);
         for n in 0_u64..4097 { values.push(n); }
         checkpoint();
         drop(values);

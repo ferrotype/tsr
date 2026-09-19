@@ -1,10 +1,10 @@
 use super::{array, diagnostics, failure, graph, hex, node_json, owner, text, view, Error, Result};
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_arena::{Counters, Generation, NodeId};
-use ts_ast::SyntaxKind;
-use ts_checker::{type_format_flags, Operation, RetainedType, TypeRef};
-use ts_compiler::{FileCache, Program};
+use tsr_arena::{Counters, Generation, NodeId};
+use tsr_ast::SyntaxKind;
+use tsr_checker::{type_format_flags, Operation, RetainedType, TypeRef};
+use tsr_compiler::{FileCache, Program};
 
 pub fn declaration(program: &Program, path: &str, name: &str) -> Result<NodeId> {
     let file = program
@@ -34,7 +34,7 @@ pub fn declaration(program: &Program, path: &str, name: &str) -> Result<NodeId> 
     }
     found.ok_or_else(|| Error::Protocol("declaration selector absent".into()))
 }
-const DEFAULT_DISPLAY_FLAGS: ts_checker::TypeFormatFlags =
+const DEFAULT_DISPLAY_FLAGS: tsr_checker::TypeFormatFlags =
     type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
         | type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE;
 
@@ -97,7 +97,7 @@ fn query(program: &Program, op: &mut Operation<'_>, request: &Value) -> Result<(
         _ => return Err(Error::Protocol("unknown query operation".into())),
     };
     let mut graph = graph::Graph::new(program, "query", None)?;
-    let symbol = graph.snapshot(program, Some(op), symbol.map(ts_checker::SymbolRef::id))?;
+    let symbol = graph.snapshot(program, Some(op), symbol.map(tsr_checker::SymbolRef::id))?;
     let value = if request["operation"] == "declared_type_summary" {
         basic_type(op, typ)?
     } else {

@@ -1,9 +1,9 @@
 use super::{transform::Transformer, util};
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, Factory, FactoryMethods, JsString, NodeId, NodeListId,
     RuntimeFactory, SyntaxKind as K,
 };
-use ts_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver};
+use tsr_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver};
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformSourceFile
@@ -34,12 +34,12 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             if let Some(symbol) = self.resolver.bound_symbol_of_declaration(node)? {
                 if let Some(export) = self
                     .resolver
-                    .symbol_export(symbol, ts_ast::internal_symbol_names::EXPORT_EQUALS)?
+                    .symbol_export(symbol, tsr_ast::internal_symbol_names::EXPORT_EQUALS)?
                 {
                     let declarations = self.resolver.symbol_declarations(export)?;
                     if declarations.len() > 1 {
                         for declaration in declarations {
-                            self.diagnostic(declaration, ts_diagnostics::Multiple_module_exports_assignments_cannot_be_serialized_for_declaration_emit, vec![])?;
+                            self.diagnostic(declaration, tsr_diagnostics::Multiple_module_exports_assignments_cannot_be_serialized_for_declaration_emit, vec![])?;
                         }
                     }
                 }
@@ -165,7 +165,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if self.declaration_not_visible(node)? {
             return Ok(None);
         }
-        if ts_ast::utilities::is_function_like(Some(&self.node(node)))
+        if tsr_ast::utilities::is_function_like(Some(&self.node(node)))
             && self.resolver.implementation_of_overload(node)?
         {
             return Ok(None);
@@ -253,12 +253,12 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         let source = self.output.read_source_file(self.source)?;
         let text = source.text().as_bytes();
         let pos = i64::from(self.node(node).pos());
-        let has_internal = |range: ts_scanner::CommentRange| -> Result<bool, R::Error> {
+        let has_internal = |range: tsr_scanner::CommentRange| -> Result<bool, R::Error> {
             let start =
-                usize::try_from(range.loc.pos()).map_err(|_| ts_arena::Error::InvalidGraph)?;
+                usize::try_from(range.loc.pos()).map_err(|_| tsr_arena::Error::InvalidGraph)?;
             let end =
-                usize::try_from(range.loc.end()).map_err(|_| ts_arena::Error::InvalidGraph)?;
-            let bytes = text.get(start..end).ok_or(ts_arena::Error::InvalidGraph)?;
+                usize::try_from(range.loc.end()).map_err(|_| tsr_arena::Error::InvalidGraph)?;
+            let bytes = text.get(start..end).ok_or(tsr_arena::Error::InvalidGraph)?;
             Ok(bytes
                 .windows(b"@internal".len())
                 .any(|window| window == b"@internal"))
@@ -271,20 +271,21 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 .and_then(|index| index.checked_sub(1))
                 .and_then(|index| parameters.get(index))
                 .copied();
-            let stop = ts_scanner::SkipTriviaOptions {
+            let stop = tsr_scanner::SkipTriviaOptions {
                 stop_at_comments: true,
                 ..Default::default()
             };
             let start = previous.map_or(pos, |previous| i64::from(self.node(previous).end()) + 1);
-            let start = ts_scanner::skip_trivia_ex(text, start, Some(&stop));
-            let mut ranges: Vec<_> = ts_scanner::get_trailing_comment_ranges(text, start).collect();
+            let start = tsr_scanner::skip_trivia_ex(text, start, Some(&stop));
+            let mut ranges: Vec<_> =
+                tsr_scanner::get_trailing_comment_ranges(text, start).collect();
             if previous.is_some() {
-                ranges.extend(ts_scanner::get_leading_comment_ranges(text, pos));
+                ranges.extend(tsr_scanner::get_leading_comment_ranges(text, pos));
             }
             return ranges.pop().map(has_internal).unwrap_or(Ok(false));
         }
         if self.node(node).kind() != K::JsxText {
-            for range in ts_scanner::get_leading_comment_ranges(text, pos) {
+            for range in tsr_scanner::get_leading_comment_ranges(text, pos) {
                 if has_internal(range)? {
                     return Ok(true);
                 }
@@ -332,7 +333,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.ensureModifierFlags
     pub fn modifiers(&mut self, node: NodeId) -> Result<Option<NodeListId>, R::Error> {
         let old =
-            ts_ast::utilities::get_combined_modifier_flags(self.output.view(), node)? & mf::ALL;
+            tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), node)? & mf::ALL;
         let mut mask = mf::ALL ^ (mf::PUBLIC | mf::ASYNC | mf::OVERRIDE);
         let always_type = matches!(
             self.node(node).kind().known(),
@@ -376,7 +377,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
     fn modifiers_from_flags(&mut self, flags: u32) -> Option<NodeListId> {
         let nodes =
-            ts_ast::utilities_middle::create_modifiers_from_modifier_flags(flags, |kind| {
+            tsr_ast::utilities_middle::create_modifiers_from_modifier_flags(flags, |kind| {
                 Some(self.output.new_modifier(kind))
             })?;
         let nodes = self.output.alloc_nodes(nodes);
@@ -414,7 +415,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             .is_some();
         for declaration in self.list_nodes(declarations) {
             if common_js
-                && ts_ast::is_variable_declaration_initialized_to_require(
+                && tsr_ast::is_variable_declaration_initialized_to_require(
                     self.output.view(),
                     declaration,
                 )?
@@ -513,7 +514,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     None,
                 )))
             }
-            _ => Err(ts_arena::Error::InvalidGraph.into()),
+            _ => Err(tsr_arena::Error::InvalidGraph.into()),
         }
     }
     fn enum_declaration(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
@@ -536,7 +537,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 && value.has_external_references
                 && name.is_none_or(|n| self.node(n).kind() != K::ComputedPropertyName)
             {
-                self.diagnostic(member, ts_diagnostics::Enum_member_initializers_must_be_computable_without_references_to_external_symbols_with_isolatedDeclarations, vec![])?;
+                self.diagnostic(member, tsr_diagnostics::Enum_member_initializers_must_be_computable_without_references_to_external_symbols_with_isolatedDeclarations, vec![])?;
             }
             let initializer = match value.value {
                 None => None,
@@ -554,7 +555,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     } else {
                         self.output.new_numeric_literal(
                             JsString::from_bytes(
-                                ts_jsnum::Number::new(number.abs()).to_string().as_bytes(),
+                                tsr_jsnum::Number::new(number.abs()).to_string().as_bytes(),
                             ),
                             0,
                         )
@@ -665,7 +666,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             && self.resolver.import_required_by_augmentation(node)?
         {
             if self.options.isolated_declarations {
-                self.diagnostic(node, ts_diagnostics::Declaration_emit_for_this_file_requires_preserving_this_import_for_augmentations_This_is_not_supported_with_isolatedDeclarations, vec![])?;
+                self.diagnostic(node, tsr_diagnostics::Declaration_emit_for_this_file_requires_preserving_this_import_for_augmentations_This_is_not_supported_with_isolatedDeclarations, vec![])?;
             }
             self.external_indicator = true;
             return Ok(Some(self.output.update_import_declaration(
@@ -709,7 +710,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 if self.node(node).flags() & nf::AMBIENT != 0 {
                     self.needs_scope_marker = false;
                 }
-                if !ts_ast::utilities::is_global_scope_augmentation(&self.node(node))
+                if !tsr_ast::utilities::is_global_scope_augmentation(&self.node(node))
                     && !self.has_scope_marker
                 {
                     if self.needs_scope_marker {
@@ -745,7 +746,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if self.node(node).kind() == K::ImportEqualsDeclaration {
             return Ok(node);
         }
-        let flags = ts_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?;
+        let flags = tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?;
         if flags & mf::DEFAULT != 0 || flags & mf::EXPORT == 0 {
             return Ok(node);
         }
@@ -774,7 +775,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             return Ok(false);
         }
         Ok(
-            ts_ast::utilities::get_combined_modifier_flags(self.output.view(), node)? & mf::EXPORT
+            tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), node)? & mf::EXPORT
                 == 0,
         )
     }
@@ -794,7 +795,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 .unwrap()
                 .module_reference()
                 .is_some_and(|r| self.node(r).kind() == K::ExternalModuleReference))
-            || ts_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?
+            || tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), node)?
                 & mf::EXPORT
                 != 0)
     }

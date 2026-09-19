@@ -26,7 +26,7 @@ run_overlay(
     'TestS08P6SemanticDiagnostics',
 )
 PYTHON
-cargo test --locked -p ts_compiler --test checker_semantics
+cargo test --locked -p tsr_compiler --test checker_semantics
 ```
 
 Focused Rust display regressions also preserve unresolved aliases on receivers

@@ -2,8 +2,8 @@
 //! Casing uses S04's pinned JavaScript byte semantics, including surrogates.
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::JsString;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::JsString;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromTemplateTypeNode
@@ -141,7 +141,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:applyStringMapping
     fn apply_string_mapping(&self, symbol: SymbolId, text: &JsString) -> Result<JsString, Error> {
-        use ts_jsstring::helpers::{to_lower_js, to_upper_js};
+        use tsr_jsstring::helpers::{to_lower_js, to_upper_js};
         let bytes = text.as_bytes();
         let (uppercase, first_only) = match self.symbol(symbol)?.name_bytes() {
             b"Uppercase" => (true, false),
@@ -151,7 +151,7 @@ impl CheckerState {
             _ => return Ok(text.clone()),
         };
         let split = if first_only {
-            ts_jsstring::wtf8::decode_rune(bytes).1
+            tsr_jsstring::wtf8::decode_rune(bytes).1
         } else {
             bytes.len()
         };

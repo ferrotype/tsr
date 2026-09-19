@@ -11,7 +11,7 @@ fn repeat(out: &mut Vec<u8>, byte: u8, count: usize) {
 fn trim_line(bytes: &[u8]) -> Vec<u8> {
     let (mut offset, mut end) = (0, 0);
     while offset < bytes.len() {
-        let (rune, width) = ts_jsstring::wtf8::decode_utf8(&bytes[offset..]);
+        let (rune, width) = tsr_jsstring::wtf8::decode_utf8(&bytes[offset..]);
         offset += width;
         if !char::from_u32(rune as u32).is_some_and(char::is_whitespace) {
             end = offset;
@@ -38,7 +38,7 @@ impl DiagnosticWriter<'_> {
         out.extend_from_slice(RESET);
         out.extend_from_slice(&flattened(d, &self.options.new_line)?);
         if let Some(file) =
-            file.filter(|_| d.code != ts_diagnostics::File_appears_to_be_binary.code)
+            file.filter(|_| d.code != tsr_diagnostics::File_appears_to_be_binary.code)
         {
             out.extend_from_slice(&self.options.new_line);
             self.snippet(
@@ -128,7 +128,7 @@ impl DiagnosticWriter<'_> {
                 let last_for_line = if line == last {
                     last_char
                 } else {
-                    ts_jsstring::line_map::utf16_len(&content) as usize
+                    tsr_jsstring::line_map::utf16_len(&content) as usize
                 };
                 last_for_line
                     .checked_sub(first_char)
@@ -138,7 +138,7 @@ impl DiagnosticWriter<'_> {
             } else if line == last {
                 last_char
             } else {
-                ts_jsstring::line_map::utf16_len(&content) as usize
+                tsr_jsstring::line_map::utf16_len(&content) as usize
             };
             repeat(out, b'~', length);
             out.extend_from_slice(RESET);
@@ -148,8 +148,8 @@ impl DiagnosticWriter<'_> {
     }
     fn pretty_path(&self, file: &File, first: &Diagnostic) -> Result<Vec<u8>> {
         let (line, _) = file.line_and_character(first.loc.pos())?;
-        let mut path = if ts_tspath::root_length(file.name.as_bytes()) > 0
-            && ts_tspath::root_length(&self.options.current_directory) > 0
+        let mut path = if tsr_tspath::root_length(file.name.as_bytes()) > 0
+            && tsr_tspath::root_length(&self.options.current_directory) > 0
         {
             self.relative_name(file.name.as_bytes())
         } else {

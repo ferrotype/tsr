@@ -97,7 +97,7 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("inference alias parameters"))?;
                     let in_js = match self.symbol(a.symbol)?.value_declaration() {
                         Some(node) => {
-                            self.node(node)?.flags() & ts_ast::node_flags::JAVA_SCRIPT_FILE != 0
+                            self.node(node)?.flags() & tsr_ast::node_flags::JAVA_SCRIPT_FILE != 0
                         }
                         None => false,
                     };

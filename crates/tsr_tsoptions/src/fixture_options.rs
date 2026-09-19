@@ -4,10 +4,10 @@ use crate::{
     find_declaration, ConfigValue as V, EnumValue, OptionDeclaration, OptionKind, OptionSyntax,
     BUILD_OPTIONS, COMPILER_OPTIONS,
 };
-use ts_ast::Diagnostic;
-use ts_core::{CompilerOptions, NewLineKind, Tristate};
-use ts_diagnostics as d;
-use ts_jsstring::{helpers::to_lower_go, wtf8::decode_utf8, JsString};
+use tsr_ast::Diagnostic;
+use tsr_core::{CompilerOptions, NewLineKind, Tristate};
+use tsr_diagnostics as d;
+use tsr_jsstring::{helpers::to_lower_go, wtf8::decode_utf8, JsString};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum FixtureOptionError {
@@ -101,7 +101,7 @@ pub fn parse_list_type_option(
                 panic!("List of {} is not yet supported.", element.kind.as_str())
             }
             _ => {
-                let item = trim(item, ts_scanner::is_white_space_like);
+                let item = trim(item, tsr_scanner::is_white_space_like);
                 if item.is_empty() {
                     continue;
                 }
@@ -130,7 +130,7 @@ fn fixture_value(
     let invalid = || FixtureOptionError::InvalidValue(text(option.name.as_bytes()));
     match option.kind {
         OptionKind::String => Ok(V::String(if option.is_file_path {
-            JsString::from_bytes(ts_tspath::absolute(value, cwd))
+            JsString::from_bytes(tsr_tspath::absolute(value, cwd))
         } else {
             text(value)
         })),
@@ -151,7 +151,7 @@ fn fixture_value(
                 if let V::Array(Some(values)) = &mut values {
                     for value in values {
                         let name = value.as_string().expect("filepath list string");
-                        *value = V::String(JsString::from_bytes(ts_tspath::absolute(
+                        *value = V::String(JsString::from_bytes(tsr_tspath::absolute(
                             name.as_bytes(),
                             cwd,
                         )));
@@ -214,7 +214,7 @@ pub fn apply_fixture_settings(
             if option.kind == OptionKind::Enum && enum_value(option, value.as_bytes()).is_none() {
                 let value = V::String(text(trim(
                     value.as_bytes(),
-                    ts_scanner::is_white_space_like,
+                    tsr_scanner::is_white_space_like,
                 )));
                 errors.extend(
                     crate::convert_json_option(option, &value, cwd, OptionSyntax::default()).1,
@@ -223,9 +223,9 @@ pub fn apply_fixture_settings(
             }
             let adjusted = if name == b"baseurl"
                 && !has_config
-                && ts_tspath::encoded_root_length(value.as_bytes()) <= 0
+                && tsr_tspath::encoded_root_length(value.as_bytes()) <= 0
             {
-                Some(ts_tspath::absolute(value.as_bytes(), cwd))
+                Some(tsr_tspath::absolute(value.as_bytes(), cwd))
             } else {
                 None
             };
@@ -283,7 +283,7 @@ pub fn apply_fixture_settings(
                 vec![key.clone()],
             ));
         } else {
-            let suggestion = ts_scanner::get_spelling_suggestion_for_strings(
+            let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
                 name,
                 COMPILER_OPTIONS.iter().map(|option| option.name.as_bytes()),
             );
@@ -311,7 +311,7 @@ pub fn apply_fixture_settings(
         &mut options.declaration_dir,
     ] {
         if !value.is_empty() {
-            *value = JsString::from_bytes(ts_tspath::absolute(value.as_bytes(), cwd));
+            *value = JsString::from_bytes(tsr_tspath::absolute(value.as_bytes(), cwd));
         }
     }
     for values in [&mut options.root_dirs, &mut options.type_roots]
@@ -319,7 +319,7 @@ pub fn apply_fixture_settings(
         .flatten()
     {
         for value in values {
-            *value = JsString::from_bytes(ts_tspath::absolute(value.as_bytes(), cwd));
+            *value = JsString::from_bytes(tsr_tspath::absolute(value.as_bytes(), cwd));
         }
     }
     Ok((case_sensitive, errors))

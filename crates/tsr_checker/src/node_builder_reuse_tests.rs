@@ -1,7 +1,7 @@
 use super::*;
 use crate::{CheckerOptions, CheckerState};
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_jsstring::SourceText;
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_jsstring::SourceText;
 
 #[test]
 fn reused_nonlocal_lists_drop_positions_without_mutating_the_input() {
@@ -19,7 +19,7 @@ fn reused_nonlocal_lists_drop_positions_without_mutating_the_input() {
             let tuple = builder.ast.new_tuple_type_node(Some(elements));
             let statements = builder.list(vec![tuple]).unwrap();
             let source = builder.ast.new_source_file(
-                ts_ast::SourceFileParseOptions {
+                tsr_ast::SourceFileParseOptions {
                     file_name: JsString::from_bytes(b"/input.ts".as_slice()),
                     ..Default::default()
                 },
@@ -30,7 +30,7 @@ fn reused_nonlocal_lists_drop_positions_without_mutating_the_input() {
             builder.ast.set_node_parent(tuple, Some(source));
             builder.ast.set_node_parent(element, Some(tuple));
             let other = builder.ast.new_source_file(
-                ts_ast::SourceFileParseOptions {
+                tsr_ast::SourceFileParseOptions {
                     file_name: JsString::from_bytes(b"/other.ts".as_slice()),
                     ..Default::default()
                 },

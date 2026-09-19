@@ -1,7 +1,7 @@
 //! Explicit continuations for ordinary binary-expression evaluation. Logical and
 //! destructuring forms retain their own branch semantics under the bind guard.
 use crate::{backend::Backend, need, target::BindingNode, Binder};
-use ts_ast::{flow_flags as F, node_flags as N, SyntaxKind as K};
+use tsr_ast::{flow_flags as F, node_flags as N, SyntaxKind as K};
 
 struct Exit<'scope> {
     node: BindingNode<'scope>,
@@ -89,14 +89,14 @@ impl<'scope> Binder<'_, 'scope, '_> {
         {
             return false;
         }
-        if ts_ast::is_destructuring_assignment(self.view(), self.node_id(node))
+        if tsr_ast::is_destructuring_assignment(self.view(), self.node_id(node))
             .expect("retained destructuring expression")
         {
             return false;
         }
         let operator = self.node_kind(need(self.binary_operands(node).operator_token));
-        !ts_ast::utilities::is_logical_or_coalescing_binary_operator(operator)
-            && !ts_ast::is_logical_or_coalescing_assignment_operator(operator)
+        !tsr_ast::utilities::is_logical_or_coalescing_binary_operator(operator)
+            && !tsr_ast::is_logical_or_coalescing_assignment_operator(operator)
     }
     fn bind_binary_middle(&mut self, node: BindingNode<'scope>) {
         let expression = self.binary_operands(node);
@@ -112,8 +112,8 @@ impl<'scope> Binder<'_, 'scope, '_> {
         if operator == K::CommaToken {
             self.maybe_bind_expression_flow_if_call(need(expression.right));
         }
-        if ts_ast::is_assignment_operator(operator)
-            && !ts_ast::is_assignment_target(self.view(), self.node_id(node))
+        if tsr_ast::is_assignment_operator(operator)
+            && !tsr_ast::is_assignment_target(self.view(), self.node_id(node))
                 .expect("retained assignment")
         {
             self.bind_assignment_target_flow(need(expression.left));

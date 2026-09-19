@@ -2,9 +2,9 @@
 //! type. Equal spelling alone never identifies a private property.
 use crate::flow_assignments::AssignmentKind;
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 pub(crate) enum PrivateAccessResult {
     Type(TypeId),
@@ -126,19 +126,19 @@ impl CheckerState {
                     self.node(parent)?.kind().known(),
                     Some(K::ClassDeclaration | K::ClassExpression)
                 ) {
-                    return Ok(ts_ast::utilities::get_containing_class(
+                    return Ok(tsr_ast::utilities::get_containing_class(
                         self.ast(parent)?,
                         parent,
                     )?);
                 }
-                return Ok(ts_ast::utilities::get_containing_class(
+                return Ok(tsr_ast::utilities::get_containing_class(
                     self.ast(ancestor)?,
                     ancestor,
                 )?);
             }
             current = read.parent();
         }
-        Ok(ts_ast::utilities::get_containing_class(
+        Ok(tsr_ast::utilities::get_containing_class(
             self.ast(node)?,
             node,
         )?)
@@ -156,14 +156,14 @@ impl CheckerState {
                 .raw_declaration_symbol(node)?
                 .ok_or(Error::MissingLink("private class symbol"))?;
             let read = self.symbol(symbol)?;
-            let name = ts_binder::get_symbol_name_for_private_identifier(&read, name);
+            let name = tsr_binder::get_symbol_name_for_private_identifier(&read, name);
             if let Some(property) = self.member_symbol(read.members(), name.as_bytes())? {
                 return Ok(Some(property));
             }
             if let Some(property) = self.member_symbol(read.exports(), name.as_bytes())? {
                 return Ok(Some(property));
             }
-            class = ts_ast::utilities::get_containing_class(self.ast(node)?, node)?;
+            class = tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?;
         }
         Ok(None)
     }
@@ -196,12 +196,12 @@ impl CheckerState {
             .symbol(property)?
             .value_declaration()
             .ok_or(Error::MissingLink("private property declaration"))?;
-        let class = ts_ast::utilities::get_containing_class(self.ast(declaration)?, declaration)?
+        let class = tsr_ast::utilities::get_containing_class(self.ast(declaration)?, declaration)?
             .ok_or(Error::MissingLink("private property class"))?;
-        let name = ts_scanner::declaration_name_to_string(self.ast(right)?, Some(right))?;
+        let name = tsr_scanner::declaration_name_to_string(self.ast(right)?, Some(right))?;
         if let Some(lexical) = lexical {
             if let Some(lexical_declaration) = self.symbol(lexical)?.value_declaration() {
-                let lexical_class = ts_ast::utilities::get_containing_class(
+                let lexical_class = tsr_ast::utilities::get_containing_class(
                     self.ast(lexical_declaration)?,
                     lexical_declaration,
                 )?
@@ -272,7 +272,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarPrivateIdentifierExpression
     fn check_private_identifier_grammar(&mut self, node: NodeId) -> Result<bool, Error> {
-        if ts_ast::utilities::get_containing_class(self.ast(node)?, node)?.is_none() {
+        if tsr_ast::utilities::get_containing_class(self.ast(node)?, node)?.is_none() {
             return self.grammar_error_node(
                 node,
                 d::Private_identifiers_are_not_allowed_outside_class_bodies,
@@ -324,7 +324,7 @@ impl CheckerState {
             .copied()
             .flatten()
             .is_none()
-            && ts_ast::utilities::get_containing_class(self.ast(left)?, left)?.is_some()
+            && tsr_ast::utilities::get_containing_class(self.ast(left)?, left)?.is_some()
         {
             let right_symbol = self.types.get(right)?.symbol;
             let unchecked_js = self.is_unchecked_js_suggestion(Some(left), right_symbol, true)?;
@@ -337,14 +337,14 @@ impl CheckerState {
     // port: tsc/internal/ast/utilities.go:IsPlainJSFile
     pub(crate) fn is_plain_js_node(&self, node: NodeId) -> Result<bool, Error> {
         let view = self.ast(node)?;
-        let Some(source) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+        let Some(source) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {
             return Ok(false);
         };
         let file = view.source_file(source)?;
         Ok(matches!(
             file.script_kind,
-            ts_core::ScriptKind::JS | ts_core::ScriptKind::JSX
+            tsr_core::ScriptKind::JS | tsr_core::ScriptKind::JSX
         ) && file.check_js_directive.is_none()
-            && self.program()?.host.options().check_js == ts_core::Tristate::UNKNOWN)
+            && self.program()?.host.options().check_js == tsr_core::Tristate::UNKNOWN)
     }
 }

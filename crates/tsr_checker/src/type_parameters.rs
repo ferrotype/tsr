@@ -3,8 +3,8 @@
 //! recursive generic identities and the pinned checker's resolution order.
 
 use crate::{CheckerState, Error, TypeId, TypeList};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct TypeAliasLinks {
@@ -16,16 +16,16 @@ impl CheckerState {
     pub(crate) fn source_children(&self, node: NodeId) -> Result<Vec<NodeId>, Error> {
         use std::ops::ControlFlow;
         struct Collector<'a> {
-            view: ts_ast::AstView<'a>,
+            view: tsr_ast::AstView<'a>,
             nodes: Vec<NodeId>,
-            error: Option<ts_arena::Error>,
+            error: Option<tsr_arena::Error>,
         }
-        impl ts_ast::ChildVisitor for Collector<'_> {
+        impl tsr_ast::ChildVisitor for Collector<'_> {
             fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
                 self.nodes.push(node);
                 ControlFlow::Continue(())
             }
-            fn visit_list(&mut self, list: ts_ast::NodeListId) -> ControlFlow<()> {
+            fn visit_list(&mut self, list: tsr_ast::NodeListId) -> ControlFlow<()> {
                 match self.view.list(list) {
                     Ok(list) => self.visit_node_slice(list.nodes()),
                     Err(error) => {
@@ -34,7 +34,7 @@ impl CheckerState {
                     }
                 }
             }
-            fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> ControlFlow<()> {
+            fn visit_node_slice(&mut self, nodes: tsr_ast::NodeSlice) -> ControlFlow<()> {
                 match self.view.node_slice(nodes) {
                     Ok(nodes) => {
                         self.nodes.extend(nodes.iter().flatten());
@@ -63,7 +63,7 @@ impl CheckerState {
     pub(crate) fn source_list(
         &self,
         owner: NodeId,
-        list: Option<ts_ast::NodeListId>,
+        list: Option<tsr_ast::NodeListId>,
     ) -> Result<Vec<NodeId>, Error> {
         let Some(list) = list else {
             return Ok(Vec::new());

@@ -86,7 +86,7 @@ class S10Evidence(unittest.TestCase):
         patterns = corpus.source_patterns()
         runs = tomllib.loads((corpus.ROOT / 'status/runs.toml').read_text())
         for name in ['scripts/s09_format.py', 'tools/s08/p7/child.rs',
-                     'crates/ts_api/src/lib.rs', 'data/s10/initial-acceptance.json']:
+                     'crates/tsr_api/src/lib.rs', 'data/s10/initial-acceptance.json']:
             self.assertFalse(any(fnmatch.fnmatchcase(name, p) for p in patterns), name)
             for producer in ['e7', 'e8']:
                 self.assertFalse(any(fnmatch.fnmatchcase(name, p) for p in runs[producer]['sources']), name)

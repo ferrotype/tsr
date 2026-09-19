@@ -3,14 +3,14 @@
 //! Upstream keeps these in `tsc/internal/nodebuilder/types.go`, a package with
 //! no implementation, so that the declarations transformer and the printer's
 //! emit resolver can name them without importing the checker. This crate keeps
-//! that boundary: the concrete node builder lives in `ts_checker`, the Phase 3
+//! that boundary: the concrete node builder lives in `tsr_checker`, the Phase 3
 //! declarations transformer depends on this crate only.
 //!
 //! Flag values are the pinned source's bit positions. `Flags` must stay aligned
 //! with the checker's `TypeFormatFlags`; the checker converts one into the other
 //! by masking, not by translation.
 
-use ts_ast::{NodeId, SymbolFlags, SymbolId};
+use tsr_ast::{NodeId, SymbolFlags, SymbolId};
 
 /// Open 32-bit node-builder flags (`nodebuilder.Flags`).
 pub type Flags = u32;

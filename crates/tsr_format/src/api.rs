@@ -13,10 +13,10 @@ use crate::util::{
     get_line_start_position_for_position,
 };
 use crate::{Error, FormatFile};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
-use ts_core::{TextChange, TextRange};
-use ts_jsstring::wtf8::decode_utf8;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
+use tsr_core::{TextChange, TextRange};
+use tsr_jsstring::wtf8::decode_utf8;
 
 /// What upstream carries in its `context.Context`: the settings and the host's
 /// new line.
@@ -92,7 +92,7 @@ pub fn format_node_given_indentation(
     file: &mut FormatFile<'_, '_>,
     context: &FormatContext,
     node: NodeId,
-    language_variant: ts_core::LanguageVariant,
+    language_variant: tsr_core::LanguageVariant,
     initial_indentation: i64,
     delta: i64,
 ) -> Result<Vec<TextChange>, Error> {
@@ -260,11 +260,11 @@ pub fn format_on_enter(
                     ))
                 })
         };
-        let mut end = ts_scanner::get_ecma_end_line_position(&state, line as isize);
+        let mut end = tsr_scanner::get_ecma_end_line_position(&state, line as isize);
         while end > start_pos {
             let (ch, size) = decode_utf8(rest(end)?);
             // On a multi-byte character, keep backing up.
-            if size == 0 || ts_scanner::is_white_space_single_line(ch) {
+            if size == 0 || tsr_scanner::is_white_space_single_line(ch) {
                 end -= 1;
                 continue;
             }
@@ -274,7 +274,7 @@ pub fn format_on_enter(
         // be touched, so it is left out. Where the line break is two characters
         // the one before it was handled above.
         let (ch, _) = decode_utf8(rest(end)?);
-        if ts_scanner::is_line_break(ch) {
+        if tsr_scanner::is_line_break(ch) {
             end -= 1;
         }
         end

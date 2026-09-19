@@ -21,15 +21,15 @@ use crate::{
     TrailingSemicolonDeferringWriter, TypePrecedence,
 };
 use std::collections::HashMap;
-use ts_arena::SymbolId;
-use ts_ast::operator_precedence as op;
-use ts_ast::{
+use tsr_arena::SymbolId;
+use tsr_ast::operator_precedence as op;
+use tsr_ast::{
     node_flags, token_flags, AstView, NodeId, NodeKind, NodeListId, NodeRead, SourceFileRead,
     SyntaxKind as K,
 };
-use ts_core::{NewLineKind, ScriptTarget};
-use ts_jsstring::LiteralEscapeFlags;
-use ts_scanner::token_to_string;
+use tsr_core::{NewLineKind, ScriptTarget};
+use tsr_jsstring::LiteralEscapeFlags;
+use tsr_scanner::token_to_string;
 
 /// `PrinterOptions`. Members upstream keeps for source maps and helpers that
 /// this port does not consume are omitted; the supported ones keep their names.
@@ -426,7 +426,7 @@ impl<'a> Session<'a, '_> {
         let text = self.source_text()?;
         Some(
             self.line_starts
-                .get_or_init(|| ts_jsstring::line_map::compute_ecma_line_starts(text)),
+                .get_or_init(|| tsr_jsstring::line_map::compute_ecma_line_starts(text)),
         )
     }
 
@@ -438,7 +438,7 @@ impl<'a> Session<'a, '_> {
         let text = self
             .source_text()
             .expect("line comparisons need a source file");
-        ts_scanner::skip_trivia(text, pos)
+        tsr_scanner::skip_trivia(text, pos)
     }
 
     // port: tsc/internal/printer/utilities.go:GetLinesBetweenPositions
@@ -455,9 +455,9 @@ impl<'a> Session<'a, '_> {
             (pos2, pos1, true)
         };
         let lower_line =
-            ts_jsstring::scanner_positions::compute_line_of_position(line_starts, lower as isize);
+            tsr_jsstring::scanner_positions::compute_line_of_position(line_starts, lower as isize);
         let upper_line = lower_line
-            + ts_jsstring::scanner_positions::compute_line_of_position(
+            + tsr_jsstring::scanner_positions::compute_line_of_position(
                 &line_starts[lower_line as usize..],
                 upper as isize,
             );
@@ -523,7 +523,7 @@ impl<'a> Session<'a, '_> {
         while let Some(id) = span.node {
             let read = self.node(id)?;
             if read.kind() != K::ParenthesizedExpression
-                || !ts_ast::utilities::node_is_synthesized(&read)
+                || !tsr_ast::utilities::node_is_synthesized(&read)
             {
                 break;
             }
@@ -603,7 +603,7 @@ impl<'a> Session<'a, '_> {
                 let parent_read = self.node(parent)?;
                 if self.current_source.is_some()
                     && !position_is_synthesized(i64::from(parent_read.pos()))
-                    && !ts_ast::utilities::node_is_synthesized(&first)
+                    && !tsr_ast::utilities::node_is_synthesized(&first)
                     && first.parent().is_none()
                 {
                     return Ok(i64::from(!self.range_start_positions_are_on_same_line(
@@ -635,8 +635,8 @@ impl<'a> Session<'a, '_> {
             if next_read.kind() == K::JsxText {
                 return Ok(0);
             } else if self.current_source.is_some()
-                && !ts_ast::utilities::node_is_synthesized(&previous_read)
-                && !ts_ast::utilities::node_is_synthesized(&next_read)
+                && !tsr_ast::utilities::node_is_synthesized(&previous_read)
+                && !tsr_ast::utilities::node_is_synthesized(&next_read)
             {
                 if self.original_nodes_have_same_parent(previous, next)? {
                     return Ok(i64::from(!self.range_end_is_on_same_line_as_range_start(
@@ -684,7 +684,7 @@ impl<'a> Session<'a, '_> {
                 let parent_read = self.node(parent)?;
                 if self.current_source.is_some()
                     && !position_is_synthesized(i64::from(parent_read.pos()))
-                    && !ts_ast::utilities::node_is_synthesized(&last)
+                    && !tsr_ast::utilities::node_is_synthesized(&last)
                     && (last.parent().is_none() || last.parent() == Some(parent))
                 {
                     return Ok(i64::from(!self.range_end_positions_are_on_same_line(
@@ -871,7 +871,7 @@ impl<'a> Session<'a, '_> {
         let read = self.node(node)?;
         let can_use_source_file = self.current_source.is_some()
             && read.parent().is_some()
-            && !ts_ast::utilities::node_is_synthesized(&read);
+            && !tsr_ast::utilities::node_is_synthesized(&read);
         match read.kind().known() {
             Some(K::Identifier | K::PrivateIdentifier) => {
                 if !can_use_source_file || !self.node_belongs_to_current_source(node)? {
@@ -891,7 +891,7 @@ impl<'a> Session<'a, '_> {
                     });
                 }
                 let text = self.source_text().expect("checked above");
-                Ok(ts_scanner::get_text_of_node_from_source_text(
+                Ok(tsr_scanner::get_text_of_node_from_source_text(
                     self.view,
                     text,
                     Some(node),
@@ -923,7 +923,7 @@ impl<'a> Session<'a, '_> {
         let Some((file, _)) = &self.current_source else {
             return Ok(false);
         };
-        Ok(ts_ast::utilities::get_source_file_of_node(self.view, Some(node))? == Some(*file))
+        Ok(tsr_ast::utilities::get_source_file_of_node(self.view, Some(node))? == Some(*file))
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitIdentifierText
@@ -2643,8 +2643,8 @@ impl<'a> Session<'a, '_> {
     /// `ast.GetExpressionPrecedence` of the expression under any partially
     /// emitted wrappers.
     fn expression_precedence(&self, node: NodeId) -> Result<i32, Error> {
-        let skipped = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
-        Ok(ts_ast::get_expression_precedence(
+        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
+        Ok(tsr_ast::get_expression_precedence(
             self.view,
             &self.node(skipped)?,
         )?)
@@ -2806,7 +2806,7 @@ impl<'a> Session<'a, '_> {
                 .name()
                 .ok_or(Error::MissingNode("property access name"))?,
         );
-        let precedence = if ts_ast::utilities::is_optional_chain(&read) {
+        let precedence = if tsr_ast::utilities::is_optional_chain(&read) {
             op::OPTIONAL_CHAIN
         } else {
             op::MEMBER
@@ -2873,7 +2873,7 @@ impl<'a> Session<'a, '_> {
             .argument_expression()
             .ok_or(Error::MissingNode("element access argument"))?;
         let question_dot = access.question_dot_token();
-        let precedence = if ts_ast::utilities::is_optional_chain(&read) {
+        let precedence = if tsr_ast::utilities::is_optional_chain(&read) {
             op::OPTIONAL_CHAIN
         } else {
             op::MEMBER
@@ -3273,14 +3273,14 @@ impl<'a> Session<'a, '_> {
             // triple-slash directives with it.
             K::SourceFile => Err(Error::Unsupported("SourceFile")),
             _ if is_type_node_kind(kind) => self.emit_type_node_outside_extends(node),
-            _ if ts_ast::utilities::is_statement(self.view, node)? => self.emit_statement(node),
-            _ if ts_ast::utilities::is_expression_kind(kind.into()) => {
+            _ if tsr_ast::utilities::is_statement(self.view, node)? => self.emit_statement(node),
+            _ if tsr_ast::utilities::is_expression_kind(kind.into()) => {
                 self.emit_expression(node, op::LOWEST)
             }
             _ if is_keyword_kind(kind) => self.emit_keyword_node(Some(node)),
             _ if is_punctuation_kind(kind) => self.emit_punctuation_node(Some(node)),
             // Upstream's `emitJSDocNode` is itself unimplemented and panics.
-            _ if ts_ast::utilities::is_js_doc_kind(kind.into()) => {
+            _ if tsr_ast::utilities::is_js_doc_kind(kind.into()) => {
                 Err(Error::Unsupported("JSDoc nodes"))
             }
             _ => Err(Error::UnexpectedKind {

@@ -3,8 +3,8 @@
 use super::{NameTable, NameTableId};
 use crate::node_builder::NodeBuilder;
 use crate::Error;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SymbolTableId, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SymbolTableId, SyntaxKind as K};
 
 impl NodeBuilder<'_> {
     fn name_table(id: NameTableId, table: Option<SymbolTableId>) -> NameTable {
@@ -27,7 +27,7 @@ impl NodeBuilder<'_> {
             let kind = read.kind();
             let parent = read.parent();
             let global_source = kind == K::SourceFile
-                && !ts_ast::utilities::is_external_or_common_js_module(
+                && !tsr_ast::utilities::is_external_or_common_js_module(
                     &self.checker.source_file_read(node)?,
                 );
             let locals = self
@@ -42,7 +42,7 @@ impl NodeBuilder<'_> {
             }
             match kind.known() {
                 Some(K::SourceFile | K::ModuleDeclaration) if !global_source => {
-                    if self.checker.node(node)?.flags() & ts_ast::node_flags::REPARSED != 0 {
+                    if self.checker.node(node)?.flags() & tsr_ast::node_flags::REPARSED != 0 {
                         return Err(Error::Unsupported(
                             "someSymbolTableInScope: reparsed module",
                         ));

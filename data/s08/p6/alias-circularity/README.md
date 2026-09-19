@@ -28,7 +28,7 @@ run_overlay(
     'TestS08P6SemanticDiagnostics',
 )
 PY
-cargo test --locked -p ts_compiler --test checker_semantics alias_circularity
+cargo test --locked -p tsr_compiler --test checker_semantics alias_circularity
 python3 scripts/s08_p5_recheck.py --control target/s08/e2/corpus \
   --selection tools/s08/p6/alias-circularity/selection.json \
   --output target/s08/p6-alias-circularity-recheck-new

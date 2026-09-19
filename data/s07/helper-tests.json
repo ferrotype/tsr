@@ -3,7 +3,7 @@
     {
       "checker": "scripts/s07_ast_helpers.py",
       "name": "ast",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "prefix": "binder_helpers::tests::",
       "tests": [
         "binder_helpers::tests::binding_syntax_branches_match_frozen_source_observations",
@@ -13,7 +13,7 @@
     {
       "checker": "scripts/s07_scanner_helpers.py",
       "name": "scanner",
-      "package": "ts_scanner",
+      "package": "tsr_scanner",
       "prefix": "binder_helpers::tests::",
       "tests": [
         "binder_helpers::tests::source_text_and_diagnostic_spans_match_pinned_go"
@@ -22,7 +22,7 @@
     {
       "checker": "scripts/s07_resolver.py",
       "name": "resolver",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "prefix": "name_resolver::tests::",
       "tests": [
         "name_resolver::tests::pinned_default_export_class_type_and_parameter_cache",
@@ -38,7 +38,7 @@
     {
       "checker": "scripts/s07_diagnostic_order.py",
       "name": "diagnostic_order",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "prefix": "diagnostic_order::tests::",
       "tests": [
         "diagnostic_order::tests::identity_shortcut_and_fallible_borrowed_lookup",
@@ -48,7 +48,7 @@
     {
       "checker": null,
       "name": "pattern",
-      "package": "ts_core",
+      "package": "tsr_core",
       "prefix": "pattern::tests::",
       "tests": [
         "pattern::tests::best_match_preserves_source_order_even_after_an_exact_match",
@@ -59,7 +59,7 @@
     {
       "checker": "tools/s06/node-index-sort/generate.py",
       "name": "sort",
-      "package": "ts_core",
+      "package": "tsr_core",
       "prefix": "go_sort::tests::",
       "tests": [
         "go_sort::tests::comparator_order_and_permutations_match_the_pinned_go_standard_library"
@@ -68,7 +68,7 @@
     {
       "checker": "scripts/s07_bound_clone.py",
       "name": "bound_factory",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "prefix": "bound_factory_tests::",
       "tests": [
         "bound_factory_tests::clone_and_update_bound_js_match_go_without_rebinding"

@@ -1,5 +1,5 @@
 [package]
-name = "ts_bundled"
+name = "tsr_bundled"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,8 +7,8 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true

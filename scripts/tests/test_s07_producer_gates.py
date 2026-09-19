@@ -22,12 +22,12 @@ class ProgramPreflightTests(unittest.TestCase):
         (self.root / 'data/s07').mkdir(parents=True)
         (self.root / 'data/upstream.json').write_text(json.dumps({'pin': 'test-pin'}))
         self.manifest = {'schema': 1, 'upstream_pin': 'test-pin', 'checks': helpers.CHECKS,
-                         'groups': [{'package': 'ts_compiler', 'target': 'helpers',
+                         'groups': [{'package': 'tsr_compiler', 'target': 'helpers',
                                      'prefix': 'named::', 'tests': ['named::first', 'named::second']}]}
         self.binary = str(self.root / 'helper-tests')
         self.build = json.dumps({'reason': 'compiler-artifact', 'profile': {'test': True},
                                  'executable': self.binary,
-                                 'manifest_path': str(self.root / 'crates/ts_compiler/Cargo.toml'),
+                                 'manifest_path': str(self.root / 'crates/tsr_compiler/Cargo.toml'),
                                  'target': {'kind': ['test'], 'name': 'helpers'}}).encode()
         self.valid_inventory = b'named::first: test\nnamed::second: test\n'
 
@@ -41,15 +41,15 @@ class ProgramPreflightTests(unittest.TestCase):
         with patch.object(helpers, 'ROOT', self.root), \
                 patch.object(helpers, 'setup', side_effect=[self.build, self.valid_inventory]) as setup:
             prepared = helpers.preflight(self.root / 'capture')
-        self.assertEqual(prepared, (raw, self.manifest, {('ts_compiler', 'helpers'): self.binary}))
+        self.assertEqual(prepared, (raw, self.manifest, {('tsr_compiler', 'helpers'): self.binary}))
         self.assertEqual(setup.call_count, 2)
         self.assertEqual(setup.call_args_list[1].args[0], [self.binary, '--list', '--format=terse'])
 
     def test_builds_only_manifest_targets_with_separate_build_budget(self):
         self.manifest['groups'] += [
-            {'package': 'ts_compiler', 'target': 'lib', 'prefix': 'compiler::', 'tests': ['compiler::check']},
-            {'package': 'ts_module', 'target': 'lib', 'prefix': 'module::', 'tests': ['module::check']},
-            {'package': 'ts_module', 'target': 'lib', 'prefix': 'trace::', 'tests': ['trace::check']},
+            {'package': 'tsr_compiler', 'target': 'lib', 'prefix': 'compiler::', 'tests': ['compiler::check']},
+            {'package': 'tsr_module', 'target': 'lib', 'prefix': 'module::', 'tests': ['module::check']},
+            {'package': 'tsr_module', 'target': 'lib', 'prefix': 'trace::', 'tests': ['trace::check']},
         ]
         self.write_manifest()
         def run(args, **kwargs):
@@ -74,12 +74,12 @@ class ProgramPreflightTests(unittest.TestCase):
             _, _, binaries = helpers.preflight(self.root / 'capture')
         base = ['cargo', 'test', '--locked', '--release', '--no-run', '--message-format=json', '--package']
         self.assertEqual([call.args[0] for call in invoked.call_args_list[:2]], [
-            base + ['ts_compiler', '--test', 'helpers', '--lib'],
-            base + ['ts_module', '--lib'],
+            base + ['tsr_compiler', '--test', 'helpers', '--lib'],
+            base + ['tsr_module', '--lib'],
         ])
         self.assertEqual([call.kwargs['timeout'] for call in invoked.call_args_list],
                          [1800, 1800, 300, 300, 300])
-        self.assertEqual(set(binaries), {('ts_compiler', 'helpers'), ('ts_compiler', 'lib'), ('ts_module', 'lib')})
+        self.assertEqual(set(binaries), {('tsr_compiler', 'helpers'), ('tsr_compiler', 'lib'), ('tsr_module', 'lib')})
 
     def test_build_timeout_stops_before_subset_capture(self):
         self.write_manifest()

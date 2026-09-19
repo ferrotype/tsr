@@ -87,7 +87,7 @@ def capture(directory, source_fn):
         ('p3_relations', [directory / 'requests.json', directory / 'recursion.json', '--deep-runtime']),
     ):
         build = p4.build(directory / example, example=example, source_fn=source_fn, optimize=True,
-                         features=('relation-probe', 'ts_checker/storage-pilot'))
+                         features=('relation-probe', 'tsr_checker/storage-pilot'))
         binary = directory / (example + '-executable')
         shutil.copy2(build['binary'], binary)
         invoke(directory, example + '-run', [binary, *arguments])

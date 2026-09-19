@@ -1,12 +1,12 @@
 use crate::{backend::Backend, symbol_access::BindingSymbol, table_access::BindingTable, Binder};
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::{Counters, SymbolArena};
-use ts_ast::{internal_symbol_names as names, JsString, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, SymbolArena};
+use tsr_ast::{internal_symbol_names as names, JsString, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
-fn parsed() -> ts_ast::ParsedFile {
-    ts_parser::parse_source_file(
+fn parsed() -> tsr_ast::ParsedFile {
+    tsr_parser::parse_source_file(
         SourceText::default(),
         ScriptKind::TS,
         SourceFileParseOptions {
@@ -108,7 +108,7 @@ fn tombstones_and_foreign_symbol_links_keep_their_deferred_failure_boundary() {
                         .result()
                         .node_binding(b.parsed_view(), b.file)
                         .is_none());
-                    let local = b.new_binding_symbol(0, ts_ast::JsString::default());
+                    let local = b.new_binding_symbol(0, tsr_ast::JsString::default());
                     let raw = b.symbol_id(local);
                     b.set_symbol_parent(raw, Some(foreign));
                     let parent = b.binding_symbol_parent(local).unwrap();
@@ -124,7 +124,7 @@ fn tombstones_and_foreign_symbol_links_keep_their_deferred_failure_boundary() {
 
 #[test]
 fn declaration_and_infer_payload_failures_keep_their_named_messages() {
-    use ts_ast::{AstBuilder, FactoryMethods, SyntaxKind};
+    use tsr_ast::{AstBuilder, FactoryMethods, SyntaxKind};
 
     let text = SourceText::default();
     let mut build = AstBuilder::new(text.clone(), &Counters::new());

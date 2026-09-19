@@ -31513,7 +31513,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 135
         }
       ],
@@ -31671,11 +31671,11 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_checker/src/diagnostics.rs",
+          "file": "crates/tsr_checker/src/diagnostics.rs",
           "line": 26
         },
         {
-          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 76
         }
       ],
@@ -31707,7 +31707,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 39
         }
       ],
@@ -31721,7 +31721,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 16
         }
       ],
@@ -31735,7 +31735,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic.rs",
+          "file": "crates/tsr_ast/src/diagnostic.rs",
           "line": 83
         }
       ],
@@ -31749,7 +31749,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic.rs",
+          "file": "crates/tsr_ast/src/diagnostic.rs",
           "line": 31
         }
       ],
@@ -31763,7 +31763,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 99
         }
       ],
@@ -31777,7 +31777,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 82
         }
       ],
@@ -31791,7 +31791,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 114
         }
       ],
@@ -31805,7 +31805,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 73
         }
       ],
@@ -31837,7 +31837,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_ast/src/diagnostic_order.rs",
+          "file": "crates/tsr_ast/src/diagnostic_order.rs",
           "line": 7
         }
       ],
@@ -32166,7 +32166,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/output_paths.rs",
+          "file": "crates/tsr_compiler/src/output_paths.rs",
           "line": 82
         }
       ],
@@ -32216,7 +32216,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 219
         }
       ],
@@ -32230,7 +32230,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 304
         }
       ],
@@ -32253,7 +32253,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 100
         }
       ],
@@ -32276,7 +32276,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 206
         }
       ],
@@ -32290,7 +32290,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 352
         }
       ],
@@ -32304,7 +32304,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 453
         }
       ],
@@ -32363,7 +32363,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 165
         }
       ],
@@ -32386,7 +32386,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/loader.rs",
+          "file": "crates/tsr_compiler/src/loader.rs",
           "line": 579
         }
       ],
@@ -32436,7 +32436,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/loader.rs",
+          "file": "crates/tsr_compiler/src/loader.rs",
           "line": 668
         }
       ],
@@ -32450,7 +32450,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/loader.rs",
+          "file": "crates/tsr_compiler/src/loader.rs",
           "line": 503
         }
       ],
@@ -32518,7 +32518,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 180
         }
       ],
@@ -32532,7 +32532,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/metadata.rs",
+          "file": "crates/tsr_compiler/src/metadata.rs",
           "line": 89
         }
       ],
@@ -32564,7 +32564,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/metadata.rs",
+          "file": "crates/tsr_compiler/src/metadata.rs",
           "line": 356
         }
       ],
@@ -32578,7 +32578,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 166
         }
       ],
@@ -32727,7 +32727,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 487
         }
       ],
@@ -32741,7 +32741,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 467
         }
       ],
@@ -32755,7 +32755,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 24
         }
       ],
@@ -32769,7 +32769,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 92
         }
       ],
@@ -32783,7 +32783,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 343
         }
       ],
@@ -32815,7 +32815,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 569
         }
       ],
@@ -32838,7 +32838,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 386
         }
       ],
@@ -32852,7 +32852,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 399
         }
       ],
@@ -32866,7 +32866,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 129
         }
       ],
@@ -32880,7 +32880,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 140
         }
       ],
@@ -32894,7 +32894,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 248
         }
       ],
@@ -32908,7 +32908,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 204
         }
       ],
@@ -32940,7 +32940,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 228
         }
       ],
@@ -32972,7 +32972,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 68
         }
       ],
@@ -32995,7 +32995,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/checker_host.rs",
+          "file": "crates/tsr_compiler/src/checker_host.rs",
           "line": 404
         }
       ],
@@ -33045,7 +33045,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/verify_options.rs",
+          "file": "crates/tsr_compiler/src/verify_options.rs",
           "line": 619
         }
       ],
@@ -33077,11 +33077,11 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/examples/p2/diagnostics.rs",
+          "file": "crates/tsr_compiler/examples/p2/diagnostics.rs",
           "line": 24
         },
         {
-          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 211
         }
       ],
@@ -33095,7 +33095,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/program_diagnostics.rs",
+          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 175
         }
       ],
@@ -33109,7 +33109,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/verify_options.rs",
+          "file": "crates/tsr_compiler/src/verify_options.rs",
           "line": 171
         }
       ],
@@ -33123,7 +33123,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/verify_options.rs",
+          "file": "crates/tsr_compiler/src/verify_options.rs",
           "line": 162
         }
       ],
@@ -33137,7 +33137,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/verify_options.rs",
+          "file": "crates/tsr_compiler/src/verify_options.rs",
           "line": 166
         }
       ],
@@ -33196,7 +33196,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 287
         }
       ],
@@ -33210,7 +33210,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/type_references.rs",
+          "file": "crates/tsr_module/src/type_references.rs",
           "line": 31
         }
       ],
@@ -33224,7 +33224,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 337
         }
       ],
@@ -33238,7 +33238,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 207
         }
       ],
@@ -33252,7 +33252,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 199
         }
       ],
@@ -33266,7 +33266,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 316
         }
       ],
@@ -33280,7 +33280,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 225
         }
       ],
@@ -33294,7 +33294,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 352
         }
       ],
@@ -33308,7 +33308,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 273
         }
       ],
@@ -33322,7 +33322,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 256
         }
       ],
@@ -33336,7 +33336,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 260
         }
       ],
@@ -33350,7 +33350,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 302
         }
       ],
@@ -33364,7 +33364,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 310
         }
       ],
@@ -33387,7 +33387,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/compiler_options.rs",
+          "file": "crates/tsr_core/src/compiler_options.rs",
           "line": 364
         }
       ],
@@ -33482,7 +33482,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_scanner/src/spelling.rs",
+          "file": "crates/tsr_scanner/src/spelling.rs",
           "line": 17
         }
       ],
@@ -33595,7 +33595,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_json.rs",
+          "file": "crates/tsr_tsoptions/src/config_json.rs",
           "line": 22
         }
       ],
@@ -33618,7 +33618,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_scanner/src/spelling.rs",
+          "file": "crates/tsr_scanner/src/spelling.rs",
           "line": 85
         }
       ],
@@ -33641,7 +33641,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/pattern.rs",
+          "file": "crates/tsr_core/src/pattern.rs",
           "line": 59
         }
       ],
@@ -33655,7 +33655,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/pattern.rs",
+          "file": "crates/tsr_core/src/pattern.rs",
           "line": 25
         }
       ],
@@ -33669,7 +33669,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/pattern.rs",
+          "file": "crates/tsr_core/src/pattern.rs",
           "line": 42
         }
       ],
@@ -33683,7 +33683,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/pattern.rs",
+          "file": "crates/tsr_core/src/pattern.rs",
           "line": 30
         }
       ],
@@ -33697,7 +33697,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/pattern.rs",
+          "file": "crates/tsr_core/src/pattern.rs",
           "line": 12
         }
       ],
@@ -33720,7 +33720,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/lib.rs",
+          "file": "crates/tsr_core/src/lib.rs",
           "line": 154
         }
       ],
@@ -33734,7 +33734,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/lib.rs",
+          "file": "crates/tsr_core/src/lib.rs",
           "line": 167
         }
       ],
@@ -33748,7 +33748,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/lib.rs",
+          "file": "crates/tsr_core/src/lib.rs",
           "line": 162
         }
       ],
@@ -33951,7 +33951,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/type_references.rs",
+          "file": "crates/tsr_module/src/type_references.rs",
           "line": 386
         }
       ],
@@ -33974,7 +33974,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 874
         }
       ],
@@ -34006,7 +34006,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 739
         }
       ],
@@ -34038,11 +34038,11 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 760
         },
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 777
         }
       ],
@@ -34083,7 +34083,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 740
         }
       ],
@@ -34304,7 +34304,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 406
         }
       ],
@@ -34318,7 +34318,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 124
         }
       ],
@@ -34332,7 +34332,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 162
         }
       ],
@@ -34346,7 +34346,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 563
         }
       ],
@@ -34378,7 +34378,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 86
         }
       ],
@@ -34410,7 +34410,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 50
         }
       ],
@@ -34424,7 +34424,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 562
         }
       ],
@@ -34438,7 +34438,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 223
         }
       ],
@@ -34542,7 +34542,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 599
         }
       ],
@@ -34556,7 +34556,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 662
         }
       ],
@@ -34570,7 +34570,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 678
         }
       ],
@@ -34584,7 +34584,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 718
         }
       ],
@@ -34598,7 +34598,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 439
         }
       ],
@@ -34675,7 +34675,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/trace.rs",
+          "file": "crates/tsr_module/src/trace.rs",
           "line": 77
         }
       ],
@@ -34707,7 +34707,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/trace.rs",
+          "file": "crates/tsr_module/src/trace.rs",
           "line": 68
         }
       ],
@@ -34739,7 +34739,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 671
         }
       ],
@@ -34780,7 +34780,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 690
         }
       ],
@@ -34794,7 +34794,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/diagnostic.rs",
+          "file": "crates/tsr_module/src/diagnostic.rs",
           "line": 6
         }
       ],
@@ -34808,7 +34808,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 706
         }
       ],
@@ -34822,7 +34822,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/resolver.rs",
+          "file": "crates/tsr_module/src/resolver.rs",
           "line": 859
         }
       ],
@@ -34899,7 +34899,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/package_maps.rs",
+          "file": "crates/tsr_module/src/package_maps.rs",
           "line": 725
         }
       ],
@@ -35237,7 +35237,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_module/src/config_mapper.rs",
+          "file": "crates/tsr_module/src/config_mapper.rs",
           "line": 9
         }
       ],
@@ -35251,7 +35251,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/lib.rs",
+          "file": "crates/tsr_tsoptions/src/lib.rs",
           "line": 132
         }
       ],
@@ -35265,7 +35265,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/lib.rs",
+          "file": "crates/tsr_tsoptions/src/lib.rs",
           "line": 125
         }
       ],
@@ -35279,7 +35279,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_syntax.rs",
+          "file": "crates/tsr_tsoptions/src/config_syntax.rs",
           "line": 147
         }
       ],
@@ -35374,7 +35374,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_specs.rs",
+          "file": "crates/tsr_tsoptions/src/config_specs.rs",
           "line": 71
         }
       ],
@@ -35424,7 +35424,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_specs.rs",
+          "file": "crates/tsr_tsoptions/src/config_specs.rs",
           "line": 86
         }
       ],
@@ -35438,7 +35438,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_specs.rs",
+          "file": "crates/tsr_tsoptions/src/config_specs.rs",
           "line": 97
         }
       ],
@@ -35461,7 +35461,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 56
         }
       ],
@@ -35475,7 +35475,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 27
         }
       ],
@@ -35489,7 +35489,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 15
         }
       ],
@@ -35503,7 +35503,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 7
         }
       ],
@@ -35517,7 +35517,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 24
         }
       ],
@@ -35540,7 +35540,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/merge_options.rs",
+          "file": "crates/tsr_tsoptions/src/merge_options.rs",
           "line": 5
         }
       ],
@@ -35563,7 +35563,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 44
         }
       ],
@@ -35586,7 +35586,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 40
         }
       ],
@@ -35609,7 +35609,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 36
         }
       ],
@@ -35623,7 +35623,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/parse_options.rs",
+          "file": "crates/tsr_tsoptions/src/parse_options.rs",
           "line": 31
         }
       ],
@@ -35664,7 +35664,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_syntax.rs",
+          "file": "crates/tsr_tsoptions/src/config_syntax.rs",
           "line": 72
         }
       ],
@@ -35687,7 +35687,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_compiler/src/include_reason.rs",
+          "file": "crates/tsr_compiler/src/include_reason.rs",
           "line": 705
         }
       ],
@@ -35710,7 +35710,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/lib.rs",
+          "file": "crates/tsr_tsoptions/src/lib.rs",
           "line": 150
         }
       ],
@@ -35724,7 +35724,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/lib.rs",
+          "file": "crates/tsr_tsoptions/src/lib.rs",
           "line": 185
         }
       ],
@@ -35756,7 +35756,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 690
         }
       ],
@@ -35779,7 +35779,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_specs.rs",
+          "file": "crates/tsr_tsoptions/src/config_specs.rs",
           "line": 43
         }
       ],
@@ -35793,7 +35793,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_specs.rs",
+          "file": "crates/tsr_tsoptions/src/config_specs.rs",
           "line": 53
         }
       ],
@@ -35816,7 +35816,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/convert_options.rs",
+          "file": "crates/tsr_tsoptions/src/convert_options.rs",
           "line": 271
         }
       ],
@@ -35830,7 +35830,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_text.rs",
+          "file": "crates/tsr_tsoptions/src/config_text.rs",
           "line": 96
         }
       ],
@@ -35934,7 +35934,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 241
         }
       ],
@@ -35948,7 +35948,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 192
         }
       ],
@@ -35962,7 +35962,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 231
         }
       ],
@@ -36003,7 +36003,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 177
         }
       ],
@@ -36017,7 +36017,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 228
         }
       ],
@@ -36031,7 +36031,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_files.rs",
+          "file": "crates/tsr_tsoptions/src/config_files.rs",
           "line": 80
         }
       ],
@@ -36045,7 +36045,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_substitution.rs",
+          "file": "crates/tsr_tsoptions/src/config_substitution.rs",
           "line": 9
         }
       ],
@@ -36077,7 +36077,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_substitution.rs",
+          "file": "crates/tsr_tsoptions/src/config_substitution.rs",
           "line": 28
         }
       ],
@@ -36091,7 +36091,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_files.rs",
+          "file": "crates/tsr_tsoptions/src/config_files.rs",
           "line": 38
         }
       ],
@@ -36123,7 +36123,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/convert_options.rs",
+          "file": "crates/tsr_tsoptions/src/convert_options.rs",
           "line": 34
         }
       ],
@@ -36164,7 +36164,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 408
         }
       ],
@@ -36196,7 +36196,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_parse.rs",
+          "file": "crates/tsr_tsoptions/src/config_parse.rs",
           "line": 283
         }
       ],
@@ -36219,7 +36219,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_files.rs",
+          "file": "crates/tsr_tsoptions/src/config_files.rs",
           "line": 59
         }
       ],
@@ -36233,7 +36233,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_mappers.rs",
+          "file": "crates/tsr_tsoptions/src/config_mappers.rs",
           "line": 268
         }
       ],
@@ -36265,7 +36265,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/config_substitution.rs",
+          "file": "crates/tsr_tsoptions/src/config_substitution.rs",
           "line": 5
         }
       ],
@@ -36378,7 +36378,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/path.rs",
+          "file": "crates/tsr_core/src/path.rs",
           "line": 158
         }
       ],
@@ -36401,7 +36401,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/path.rs",
+          "file": "crates/tsr_core/src/path.rs",
           "line": 186
         }
       ],
@@ -36424,7 +36424,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_checker/src/external_resolution.rs",
+          "file": "crates/tsr_checker/src/external_resolution.rs",
           "line": 962
         }
       ],
@@ -36438,7 +36438,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 26
         }
       ],
@@ -36452,7 +36452,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 141
         }
       ],
@@ -36484,7 +36484,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 193
         }
       ],
@@ -36552,7 +36552,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_checker/src/external_resolution.rs",
+          "file": "crates/tsr_checker/src/external_resolution.rs",
           "line": 1086
         }
       ],
@@ -36566,7 +36566,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 115
         }
       ],
@@ -36580,7 +36580,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 103
         }
       ],
@@ -36594,7 +36594,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 45
         }
       ],
@@ -36608,7 +36608,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/path.rs",
+          "file": "crates/tsr_core/src/path.rs",
           "line": 11
         }
       ],
@@ -36631,7 +36631,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 63
         }
       ],
@@ -36654,7 +36654,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 44
         }
       ],
@@ -36686,7 +36686,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 66
         }
       ],
@@ -36700,7 +36700,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 78
         }
       ],
@@ -36714,7 +36714,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 131
         }
       ],
@@ -36728,7 +36728,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 93
         }
       ],
@@ -36769,7 +36769,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_parser/src/references.rs",
+          "file": "crates/tsr_parser/src/references.rs",
           "line": 562
         }
       ],
@@ -36801,7 +36801,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_core/src/path.rs",
+          "file": "crates/tsr_core/src/path.rs",
           "line": 88
         }
       ],
@@ -36815,7 +36815,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 14
         }
       ],
@@ -36838,15 +36838,15 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_checker/src/external_resolution.rs",
+          "file": "crates/tsr_checker/src/external_resolution.rs",
           "line": 1071
         },
         {
-          "file": "crates/ts_checker/src/node_builder_names.rs",
+          "file": "crates/tsr_checker/src/node_builder_names.rs",
           "line": 1452
         },
         {
-          "file": "crates/ts_tspath/src/comparison.rs",
+          "file": "crates/tsr_tspath/src/comparison.rs",
           "line": 6
         }
       ],
@@ -36878,7 +36878,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 78
         }
       ],
@@ -36892,7 +36892,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tspath/src/lib.rs",
+          "file": "crates/tsr_tspath/src/lib.rs",
           "line": 111
         }
       ],
@@ -36987,7 +36987,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 16
         }
       ],
@@ -37001,7 +37001,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 299
         }
       ],
@@ -37015,7 +37015,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 495
         }
       ],
@@ -37029,7 +37029,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 316
         }
       ],
@@ -37043,7 +37043,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 312
         }
       ],
@@ -37057,7 +37057,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 40
         }
       ],
@@ -37080,7 +37080,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 390
         }
       ],
@@ -37094,7 +37094,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 372
         }
       ],
@@ -37135,7 +37135,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 65
         }
       ],
@@ -37149,7 +37149,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 131
         }
       ],
@@ -37163,7 +37163,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 115
         }
       ],
@@ -37222,7 +37222,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 177
         }
       ],
@@ -37245,7 +37245,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 424
         }
       ],
@@ -37268,7 +37268,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 283
         }
       ],
@@ -37300,7 +37300,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 248
         }
       ],
@@ -37314,7 +37314,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 228
         }
       ],
@@ -37328,7 +37328,7 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/ts_tsoptions/src/glob.rs",
+          "file": "crates/tsr_tsoptions/src/glob.rs",
           "line": 200
         }
       ],

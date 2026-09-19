@@ -6,10 +6,10 @@ pub use comparison::{
     path_from_components, relative_from_directory, relative_from_file,
     relative_to_directory_or_url, trim_file_path_prefix,
 };
-pub use ts_core::path::{
+pub use tsr_core::path::{
     encoded_root_length, is_declaration_file_name, normalize, remove_file_extension, root_length,
 };
-use ts_jsstring::JsString;
+use tsr_jsstring::JsString;
 
 /// port: tsc/internal/tspath/path.go:NormalizeSlashes
 pub fn normalize_slashes(path: &[u8]) -> Cow<'_, [u8]> {
@@ -95,7 +95,7 @@ pub fn file_name_lower_case(path: &[u8]) -> Cow<'_, [u8]> {
             .windows(2)
             .position(|pair| pair == [0xc4, 0xb0])
             .map_or(path.len(), |n| offset + n);
-        result.extend(ts_jsstring::helpers::to_lower_go(&path[offset..end]));
+        result.extend(tsr_jsstring::helpers::to_lower_go(&path[offset..end]));
         offset = end;
     }
     Cow::Owned(result)

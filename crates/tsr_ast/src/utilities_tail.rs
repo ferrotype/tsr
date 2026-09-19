@@ -4,7 +4,7 @@
 
 use crate::NodeAccess;
 use crate::{node_flags, AstView, NodeId, NodeKind, NodeListId, SyntaxKind as K};
-use ts_arena::Error;
+use tsr_arena::Error;
 
 fn required(id: Option<NodeId>) -> NodeId {
     id.expect("nil node in AST utility")

@@ -30,4 +30,4 @@ def render(data):
 
 if __name__ == '__main__':
     data = json.loads((ROOT / 'data/s06/node-index-sort-traces.json').read_text())
-    (ROOT / 'crates/ts_core/src/go_sort/fixtures.rs').write_text(render(data))
+    (ROOT / 'crates/tsr_core/src/go_sort/fixtures.rs').write_text(render(data))

@@ -1,5 +1,5 @@
 [package]
-name = "ts_api"
+name = "tsr_api"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,20 +7,20 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-ts_arena = { version = "0.1.0", path = "../ts_arena" }
-ts_ast = { version = "0.1.0", path = "../ts_ast" }
-ts_checker = { version = "0.1.0", path = "../ts_checker" }
-ts_core = { version = "0.1.0", path = "../ts_core" }
-ts_encoder = { version = "0.1.0", path = "../ts_encoder" }
-ts_format = { version = "0.1.0", path = "../ts_format" }
-ts_printer = { version = "0.1.0", path = "../ts_printer" }
-ts_project = { version = "0.1.0", path = "../ts_project" }
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_encoder = { version = "0.1.0", path = "../tsr_encoder" }
+tsr_format = { version = "0.1.0", path = "../tsr_format" }
+tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
+tsr_project = { version = "0.1.0", path = "../tsr_project" }
 
 [dev-dependencies]
-ts_arena = { version = "0.1.0", path = "../ts_arena", features = ["harness"] }
+tsr_arena = { version = "0.1.0", path = "../tsr_arena", features = ["harness"] }
 serde_json = "1"
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
-ts_parser = { version = "0.1.0", path = "../ts_parser" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
 
 [lints]
 workspace = true

@@ -1,9 +1,9 @@
 //! Source config validation and manifest metadata; mapper execution is separate.
 use crate::{ConfigValue, TsConfigSourceFile};
 use std::collections::BTreeSet;
-use ts_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
+use tsr_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
 
 #[derive(Clone, Debug, Default)]
 pub struct MapperManifest {
@@ -118,11 +118,11 @@ pub fn validate_content_mappers<E>(
                 Some(diagnostics::Content_mapper_file_extension_0_must_begin_with_a)
             } else if NATIVE
                 .iter()
-                .any(|native| ts_jsstring::equal_fold(native, extension.as_bytes()))
+                .any(|native| tsr_jsstring::equal_fold(native, extension.as_bytes()))
             {
                 Some(diagnostics::Content_mapper_file_extension_0_is_a_built_in_extension_and_cannot_be_registered_by_a_content_mapper)
             } else if !seen
-                .insert(ts_tspath::canonical(extension.as_bytes(), case_sensitive).into_owned())
+                .insert(tsr_tspath::canonical(extension.as_bytes(), case_sensitive).into_owned())
             {
                 Some(diagnostics::Content_mapper_file_extension_0_is_registered_by_more_than_one_content_mapper)
             } else {
@@ -276,8 +276,8 @@ pub fn set_diagnostic_location(
         let node = view.node(node).expect("diagnostic node");
         let source = view.source_file(config.root).expect("diagnostic source");
         diagnostic.file = Some(config.root);
-        diagnostic.loc = ts_core::TextRange::new(
-            ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(node.pos())),
+        diagnostic.loc = tsr_core::TextRange::new(
+            tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(node.pos())),
             i64::from(node.end()),
         );
     }

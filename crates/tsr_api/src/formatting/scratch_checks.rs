@@ -1,10 +1,10 @@
 use super::*;
 use crate::{Error, ResponseQueue, Snapshot};
 use serde_json::Value;
-use ts_arena::Counts;
-use ts_ast::{AstFile, NodeId, SourceFileParseOptions};
-use ts_checker::CheckerOptions;
-use ts_project::{CheckerPool, Project};
+use tsr_arena::Counts;
+use tsr_ast::{AstFile, NodeId, SourceFileParseOptions};
+use tsr_checker::CheckerOptions;
+use tsr_project::{CheckerPool, Project};
 
 fn insertion_rows() -> Value {
     serde_json::from_str(include_str!(
@@ -38,12 +38,12 @@ fn unhex(hex: &str) -> Vec<u8> {
 
 fn parse(name: &str, source: &[u8]) -> AstFile {
     let path = format!("/{name}.ts");
-    ts_parser::parse_source_file(
-        ts_jsstring::SourceText::from_loaded_bytes(source.to_vec()),
-        ts_core::ScriptKind::TS,
+    tsr_parser::parse_source_file(
+        tsr_jsstring::SourceText::from_loaded_bytes(source.to_vec()),
+        tsr_core::ScriptKind::TS,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(path.as_bytes()),
-            path: ts_ast::JsString::from_bytes(path.as_bytes()),
+            file_name: tsr_ast::JsString::from_bytes(path.as_bytes()),
+            path: tsr_ast::JsString::from_bytes(path.as_bytes()),
             ..Default::default()
         },
     )
@@ -67,8 +67,8 @@ fn statement(file: &AstFile, index: usize) -> NodeId {
 
 /// What an API request carries for one statement of a parsed file.
 fn wire(file: &AstFile, index: usize) -> Vec<u8> {
-    let mut provider = ts_parser::ParserJsDocProvider::default();
-    ts_encoder::encode_node(
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    tsr_encoder::encode_node(
         file.view(),
         statement(file, index),
         file.root(),
@@ -85,7 +85,7 @@ fn insert(
     settings: &FormatCodeSettings,
     counters: &Counters,
 ) -> Result<Vec<u8>, FormatError> {
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut target = FormatFile {
         view: file.view(),
         source: file.root().unwrap(),
@@ -97,7 +97,7 @@ fn insert(
 
 fn snapshot(counters: &Counters) -> Snapshot {
     let pool = CheckerPool::for_types(CheckerOptions::default(), counters, 1);
-    Snapshot::new(ts_project::Snapshot::new(Project::new(pool))).unwrap()
+    Snapshot::new(tsr_project::Snapshot::new(Project::new(pool))).unwrap()
 }
 
 #[test]
@@ -111,7 +111,7 @@ fn native_insertion_outputs_and_failures_match() {
         let name = row["name"].as_str().unwrap();
         let file = parse(name, &unhex(row["source_hex"].as_str().unwrap()));
         for variant in ["default", "tabs"] {
-            let settings = ts_format::probe::variant(variant).unwrap();
+            let settings = tsr_format::probe::variant(variant).unwrap();
             let detail = row["insert"][variant].as_str().unwrap();
             for line in detail.lines().filter(|line| line.starts_with("R|")) {
                 let fields: Vec<&str> = line.splitn(4, '|').collect();
@@ -155,7 +155,7 @@ fn insertion_scratch_is_live_only_until_the_text_returns() {
         live.allocations > before.allocations,
         "no live decoded storage"
     );
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut target = FormatFile {
         view: file.view(),
         source: file.root().unwrap(),
@@ -253,10 +253,12 @@ fn printer_and_decoder_errors_drop_scratch_without_retiring_snapshot() {
     let result = snapshot.request(|| Ok(insert(&file, &unhandled, 0, &settings, &counters)));
     assert_eq!(
         result,
-        Ok(Err(FormatError::Print(ts_printer::Error::UnexpectedKind {
-            context: "unhandled statement",
-            kind: ts_ast::SyntaxKind::JSImportDeclaration.into(),
-        })))
+        Ok(Err(FormatError::Print(
+            tsr_printer::Error::UnexpectedKind {
+                context: "unhandled statement",
+                kind: tsr_ast::SyntaxKind::JSImportDeclaration.into(),
+            }
+        )))
     );
     assert_eq!(counters.snapshot(), before);
     // Bytes that are not protocol-8 syntax.

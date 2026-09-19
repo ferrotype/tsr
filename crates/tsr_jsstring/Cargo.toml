@@ -1,5 +1,5 @@
 [package]
-name = "ts_jsstring"
+name = "tsr_jsstring"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true

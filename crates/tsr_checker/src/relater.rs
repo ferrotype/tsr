@@ -247,9 +247,9 @@ impl CheckerState {
         source: TypeId,
         target: TypeId,
         kind: RelationKind,
-        error_node: Option<ts_arena::NodeId>,
-        head: Option<&'static ts_diagnostics::Message>,
-    ) -> Result<(bool, Option<ts_ast::Diagnostic>), Error> {
+        error_node: Option<tsr_arena::NodeId>,
+        head: Option<&'static tsr_diagnostics::Message>,
+    ) -> Result<(bool, Option<tsr_ast::Diagnostic>), Error> {
         let frame = self.new_relation_frame(kind)?;
         let mut relater = Relater {
             checker: self,
@@ -295,7 +295,7 @@ impl CheckerState {
                 .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
             Some(relater.checker.diagnostic_for_node(
                 error_node.or(relater.checker.current_node),
-                ts_diagnostics::Excessive_complexity_comparing_types_0_and_1,
+                tsr_diagnostics::Excessive_complexity_comparing_types_0_and_1,
                 vec![source, target],
             )?)
         } else {
@@ -307,11 +307,11 @@ impl CheckerState {
                         relater.checker.module_aliases.export_types.get(&symbol)
                     {
                         if relater.checker.node(import)?.kind()
-                            != ts_ast::SyntaxKind::CallExpression
+                            != tsr_ast::SyntaxKind::CallExpression
                         {
                             let ty = relater.checker.get_type_of_symbol(alias_target)?;
                             if relater.checker.is_type_related_to(ty, target, kind)? {
-                                let related = relater.checker.diagnostic_for_node(Some(import), ts_diagnostics::Type_originates_at_this_import_A_namespace_style_import_cannot_be_called_or_constructed_and_will_cause_a_failure_at_runtime_Consider_using_a_default_import_or_import_require_here_instead, vec![])?;
+                                let related = relater.checker.diagnostic_for_node(Some(import), tsr_diagnostics::Type_originates_at_this_import_A_namespace_style_import_cannot_be_called_or_constructed_and_will_cause_a_failure_at_runtime_Consider_using_a_default_import_or_import_require_here_instead, vec![])?;
                                 relater.errors.related.push(std::sync::Arc::new(related));
                             }
                         }
@@ -415,7 +415,7 @@ impl CheckerState {
         &self,
         source: TypeId,
         target: TypeId,
-    ) -> Result<Option<(ts_arena::SymbolId, ts_arena::SymbolId)>, Error> {
+    ) -> Result<Option<(tsr_arena::SymbolId, tsr_arena::SymbolId)>, Error> {
         let s = self.types.get(source)?;
         let t = self.types.get(target)?;
         let eligible = s.flags & tf::ENUM != 0 && t.flags & tf::ENUM != 0
@@ -654,7 +654,7 @@ impl Relater<'_> {
         target: TypeId,
         recursion: u32,
         intersection: u32,
-        head: Option<&'static ts_diagnostics::Message>,
+        head: Option<&'static tsr_diagnostics::Message>,
     ) -> Result<Ternary, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             self.related_worker(source, target, recursion, intersection, head)
@@ -667,7 +667,7 @@ impl Relater<'_> {
         mut target: TypeId,
         recursion: u32,
         intersection: u32,
-        head: Option<&'static ts_diagnostics::Message>,
+        head: Option<&'static tsr_diagnostics::Message>,
     ) -> Result<Ternary, Error> {
         let original_source = source;
         let original_target = target;
@@ -783,9 +783,9 @@ impl Relater<'_> {
                 let target = self.checker.enum_owner_symbol(target)?;
                 if self.checker.symbol(source)?.name_bytes()
                     == self.checker.symbol(target)?.name_bytes()
-                    && self.checker.symbol(source)?.flags() & ts_ast::symbol_flags::REGULAR_ENUM
+                    && self.checker.symbol(source)?.flags() & tsr_ast::symbol_flags::REGULAR_ENUM
                         != 0
-                    && self.checker.symbol(target)?.flags() & ts_ast::symbol_flags::REGULAR_ENUM
+                    && self.checker.symbol(target)?.flags() & tsr_ast::symbol_flags::REGULAR_ENUM
                         != 0
                 {
                     if let Some(mismatch) = self.checker.enum_relation_mismatch(source, target)? {
@@ -802,7 +802,7 @@ impl Relater<'_> {
         mismatch: crate::enums::EnumRelationMismatch,
     ) -> Result<(), Error> {
         use crate::enums::EnumRelationMismatch as M;
-        use ts_diagnostics as d;
+        use tsr_diagnostics as d;
         let (message, args) = match mismatch {
             M::Missing { property, target } => {
                 let name = self.checker.symbol_to_string(property)?;
@@ -850,7 +850,7 @@ impl Relater<'_> {
                         .checker
                         .type_to_string(target, crate::type_display::DEFAULT_FLAGS)?;
                     self.report_error(
-                        ts_diagnostics::Excessive_complexity_comparing_types_0_and_1,
+                        tsr_diagnostics::Excessive_complexity_comparing_types_0_and_1,
                         vec![source, target],
                     );
                 }

@@ -30,7 +30,7 @@ run_overlay(
     'TestS08P6SemanticDiagnostics',
 )
 PY
-cargo test --locked -p ts_compiler --test checker_semantics interface_inheritance
+cargo test --locked -p tsr_compiler --test checker_semantics interface_inheritance
 ```
 
 The separate 130-variant selection includes all 33 acceptance cases with missing

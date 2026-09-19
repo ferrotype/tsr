@@ -7215,7 +7215,7 @@
       "phase": "bind",
       "requested_bytes": 673700864,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_arena/src/arena.rs",
+      "source_file": "crates/tsr_arena/src/arena.rs",
       "source_line": 41
     },
     {
@@ -7225,7 +7225,7 @@
       "phase": "bind",
       "requested_bytes": 172035032,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_arena/src/node_slots.rs",
+      "source_file": "crates/tsr_arena/src/node_slots.rs",
       "source_line": 37
     },
     {
@@ -7235,7 +7235,7 @@
       "phase": "bind",
       "requested_bytes": 633396600,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/bind_result.rs",
+      "source_file": "crates/tsr_ast/src/bind_result.rs",
       "source_line": 312
     },
     {
@@ -7245,7 +7245,7 @@
       "phase": "bind",
       "requested_bytes": 85930408,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/bind_result.rs",
+      "source_file": "crates/tsr_ast/src/bind_result.rs",
       "source_line": 264
     },
     {
@@ -7255,7 +7255,7 @@
       "phase": "bind",
       "requested_bytes": 55349384,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_jsstring/src/jsstring.rs",
+      "source_file": "crates/tsr_jsstring/src/jsstring.rs",
       "source_line": 32
     },
     {
@@ -7265,7 +7265,7 @@
       "phase": "bind",
       "requested_bytes": 399076016,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_binder/src/declarations.rs",
+      "source_file": "crates/tsr_binder/src/declarations.rs",
       "source_line": 11
     },
     {
@@ -7275,7 +7275,7 @@
       "phase": "bind",
       "requested_bytes": 451648,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/symbols.rs",
+      "source_file": "crates/tsr_ast/src/symbols.rs",
       "source_line": 418
     },
     {
@@ -7285,7 +7285,7 @@
       "phase": "bind",
       "requested_bytes": 56240352,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/symbols.rs",
+      "source_file": "crates/tsr_ast/src/symbols.rs",
       "source_line": 379
     },
     {
@@ -7295,7 +7295,7 @@
       "phase": "bind",
       "requested_bytes": 219409080,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_binder/src/declarations.rs",
+      "source_file": "crates/tsr_binder/src/declarations.rs",
       "source_line": 89
     },
     {
@@ -7305,7 +7305,7 @@
       "phase": "parse",
       "requested_bytes": 2012845600,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_arena/src/arena.rs",
+      "source_file": "crates/tsr_arena/src/arena.rs",
       "source_line": 41
     },
     {
@@ -7315,7 +7315,7 @@
       "phase": "parse",
       "requested_bytes": 847,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_scanner/src/identifier.rs",
+      "source_file": "crates/tsr_scanner/src/identifier.rs",
       "source_line": 105
     },
     {
@@ -7325,7 +7325,7 @@
       "phase": "parse",
       "requested_bytes": 6634970,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_scanner/src/number.rs",
+      "source_file": "crates/tsr_scanner/src/number.rs",
       "source_line": 35
     },
     {
@@ -7335,7 +7335,7 @@
       "phase": "parse",
       "requested_bytes": 7467587,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_scanner/src/literal.rs",
+      "source_file": "crates/tsr_scanner/src/literal.rs",
       "source_line": 7
     },
     {
@@ -7345,7 +7345,7 @@
       "phase": "parse",
       "requested_bytes": 1572746,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_scanner/src/literal.rs",
+      "source_file": "crates/tsr_scanner/src/literal.rs",
       "source_line": 61
     },
     {
@@ -7355,7 +7355,7 @@
       "phase": "parse",
       "requested_bytes": 3439192,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_jsstring/src/jsstring.rs",
+      "source_file": "crates/tsr_jsstring/src/jsstring.rs",
       "source_line": 32
     },
     {
@@ -7365,7 +7365,7 @@
       "phase": "parse",
       "requested_bytes": 178788096,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/storage.rs",
+      "source_file": "crates/tsr_ast/src/storage.rs",
       "source_line": 79
     },
     {
@@ -7375,7 +7375,7 @@
       "phase": "parse",
       "requested_bytes": 1044000,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_ast/src/storage.rs",
+      "source_file": "crates/tsr_ast/src/storage.rs",
       "source_line": 93
     },
     {
@@ -7385,7 +7385,7 @@
       "phase": "preload",
       "requested_bytes": 2490688,
       "scope_kind": "inclusive_site",
-      "source_file": "crates/ts_jsstring/src/jsstring.rs",
+      "source_file": "crates/tsr_jsstring/src/jsstring.rs",
       "source_line": 32
     }
   ],

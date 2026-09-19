@@ -1,21 +1,21 @@
 //! Implicit-any and widening diagnostics run when native variable inference
 //! reports them, rather than being inferred from the eventual displayed type.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.reportCircularityError
     pub(crate) fn report_symbol_circularity(
         &mut self,
-        symbol: ts_arena::SymbolId,
+        symbol: tsr_arena::SymbolId,
     ) -> Result<TypeId, Error> {
         if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
             let read = self.node(declaration)?;
             if read.type_node().is_some() {
                 let name = self.symbol_to_string(symbol)?;
-                self.error_at(Some(declaration), ts_diagnostics::X_0_is_referenced_directly_or_indirectly_in_its_own_type_annotation, vec![name])?;
+                self.error_at(Some(declaration), tsr_diagnostics::X_0_is_referenced_directly_or_indirectly_in_its_own_type_annotation, vec![name])?;
                 return Ok(self.builtins.error_type);
             }
             if self
@@ -23,17 +23,17 @@ impl CheckerState {
                 .host
                 .options()
                 .strict_option_value(self.program()?.host.options().no_implicit_any)
-                && (read.kind() != ts_ast::SyntaxKind::Parameter || read.initializer().is_some())
+                && (read.kind() != tsr_ast::SyntaxKind::Parameter || read.initializer().is_some())
             {
                 let name = self.symbol_to_string(symbol)?;
-                self.error_at(Some(declaration), ts_diagnostics::X_0_implicitly_has_type_any_because_it_does_not_have_a_type_annotation_and_is_referenced_directly_or_indirectly_in_its_own_initializer, vec![name])?;
+                self.error_at(Some(declaration), tsr_diagnostics::X_0_implicitly_has_type_any_because_it_does_not_have_a_type_annotation_and_is_referenced_directly_or_indirectly_in_its_own_initializer, vec![name])?;
             }
-        } else if self.symbol(symbol)?.flags() & ts_ast::symbol_flags::ALIAS != 0 {
+        } else if self.symbol(symbol)?.flags() & tsr_ast::symbol_flags::ALIAS != 0 {
             if let Some(declaration) = self.alias_declaration_or_none(symbol)? {
                 let name = self.symbol_to_string(symbol)?;
                 self.error_at(
                     Some(declaration),
-                    ts_diagnostics::Circular_definition_of_import_alias_0,
+                    tsr_diagnostics::Circular_definition_of_import_alias_0,
                     vec![name],
                 )?;
             }
@@ -56,8 +56,8 @@ impl CheckerState {
         let display = self.type_to_string(widened, crate::type_display::DEFAULT_FLAGS)?;
         let read = self.node(declaration)?;
         let kind = read.kind();
-        let name = ts_ast::get_name_of_declaration(self.ast(declaration)?, Some(declaration))?;
-        let spelling = ts_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
+        let name = tsr_ast::get_name_of_declaration(self.ast(declaration)?, Some(declaration))?;
+        let spelling = tsr_scanner::declaration_name_to_string(self.ast(declaration)?, name)?;
         let message = match kind.known() {
             Some(K::BinaryExpression | K::PropertyDeclaration | K::PropertySignature) => {
                 if no_implicit {
@@ -90,10 +90,10 @@ impl CheckerState {
                         {
                             let text = self.node_text(name)?.into_js_string();
                             let keyword =
-                                ts_scanner::identifier_to_keyword_kind(&ts_ast::IdentifierData {
+                                tsr_scanner::identifier_to_keyword_kind(&tsr_ast::IdentifierData {
                                     text: text.clone(),
                                 });
-                            if ts_ast::utilities::is_type_node_kind(keyword.into())
+                            if tsr_ast::utilities::is_type_node_kind(keyword.into())
                                 || self
                                     .resolve_name(
                                         Some(declaration),
@@ -160,7 +160,7 @@ impl CheckerState {
     pub(crate) fn variable_error_or_suggestion(
         &mut self,
         error: bool,
-        mut diagnostic: ts_ast::Diagnostic,
+        mut diagnostic: tsr_ast::Diagnostic,
     ) -> Result<(), Error> {
         if error {
             self.add_diagnostic(diagnostic)?;
@@ -200,7 +200,7 @@ impl CheckerState {
                 .symbol
                 .map(|symbol| {
                     self.symbol(symbol)
-                        .map(ts_ast::SymbolRef::value_declaration)
+                        .map(tsr_ast::SymbolRef::value_declaration)
                 })
                 .transpose()?
                 .flatten();

@@ -1,7 +1,7 @@
 //! Expression forms retained in generated parameter and computed-property names.
 use super::{greatest_end, Session, Span, WriteKind};
 use crate::{emit_flags as ef, list_format as lf, Error};
-use ts_ast::{operator_precedence as op, NodeId, NodeKind, SyntaxKind as K};
+use tsr_ast::{operator_precedence as op, NodeId, NodeKind, SyntaxKind as K};
 
 impl Session<'_, '_> {
     pub(super) fn binary_parts(&self, node: NodeId) -> Result<(NodeId, NodeId, NodeId), Error> {
@@ -22,10 +22,10 @@ impl Session<'_, '_> {
         let kind = self.node(operator)?.kind();
         Ok(if kind == K::CommaToken {
             op::COMMA
-        } else if ts_ast::is_assignment_operator(kind) {
+        } else if tsr_ast::is_assignment_operator(kind) {
             op::ASSIGNMENT
         } else {
-            ts_ast::get_binary_operator_precedence(kind)
+            tsr_ast::get_binary_operator_precedence(kind)
         })
     }
 
@@ -45,7 +45,7 @@ impl Session<'_, '_> {
             self.write_punctuation(b")");
             return Ok(());
         }
-        let skipped = ts_ast::skip_partially_emitted_expressions(self.view, callee)?;
+        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, callee)?;
         let read = self.node(skipped)?;
         let needs_parens = read.kind() == K::NewExpression
             && read
@@ -54,7 +54,7 @@ impl Session<'_, '_> {
                 .is_some_and(|n| n.arguments().is_none());
         let precedence = if needs_parens {
             op::PARENTHESES
-        } else if ts_ast::utilities::is_optional_chain(&self.node(parent)?) {
+        } else if tsr_ast::utilities::is_optional_chain(&self.node(parent)?) {
             op::OPTIONAL_CHAIN
         } else {
             op::MEMBER
@@ -138,7 +138,7 @@ impl Session<'_, '_> {
     }
 
     fn binary_operator(&self, node: NodeId) -> Result<Option<NodeKind>, Error> {
-        let node = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let node = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
         if self.node(node)?.kind() != K::BinaryExpression {
             return Ok(None);
         }
@@ -151,9 +151,9 @@ impl Session<'_, '_> {
         let mut pending = vec![node];
         let mut literal = None;
         while let Some(node) = pending.pop() {
-            let node = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
+            let node = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
             let kind = self.node(node)?.kind();
-            if ts_ast::is_literal_kind(kind) {
+            if tsr_ast::is_literal_kind(kind) {
                 if literal.is_some_and(|previous| previous != kind) {
                     return Ok(None);
                 }
@@ -230,8 +230,8 @@ impl Session<'_, '_> {
             self.binary_operand_precedences(left, operator, right)?;
         let outer = self.node(operator)?.kind();
         for (operand, precedence) in [(left, &mut left_prec), (right, &mut right_prec)] {
-            let skipped = ts_ast::skip_partially_emitted_expressions(self.view, operand)?;
-            if ts_ast::utilities::node_is_synthesized(&self.node(skipped)?) {
+            let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, operand)?;
+            if tsr_ast::utilities::node_is_synthesized(&self.node(skipped)?) {
                 if let Some(inner) = self.binary_operator(skipped)? {
                     // port: tsc/internal/printer/utilities.go:mixingBinaryOperatorsRequiresParentheses
                     let logical = |kind: NodeKind| {

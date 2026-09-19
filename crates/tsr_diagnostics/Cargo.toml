@@ -1,5 +1,5 @@
 [package]
-name = "ts_diagnostics"
+name = "tsr_diagnostics"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true

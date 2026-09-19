@@ -4,8 +4,8 @@
 use crate::{
     inference::priority, type_flags as tf, CheckerState, Error, InferenceId, SignatureId, TypeId,
 };
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, JsString};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, JsString};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSingleSignature

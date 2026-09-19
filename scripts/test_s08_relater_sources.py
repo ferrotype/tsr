@@ -18,7 +18,7 @@ class RelaterSourceFingerprint(unittest.TestCase):
             'tools/s08/relater-prototype/src/bound_input.rs',
             'tools/s08/relater-prototype/src/diagnostics.rs',
             'tools/s08/relater-prototype/src/template.rs',
-            'crates/ts_compiler/examples/p7_relater/reference.rs',
+            'crates/tsr_compiler/examples/p7_relater/reference.rs',
         )
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -8,8 +8,8 @@ use crate::{
     NodeRead, NodeSlice, Pragma, SourceFileState, SyntaxKind as K,
 };
 use std::borrow::Cow;
-use ts_arena::Error;
-use ts_core::{ScriptKind, Tristate};
+use tsr_arena::Error;
+use tsr_core::{ScriptKind, Tristate};
 
 fn required(view: AstView<'_>, id: Option<NodeId>) -> Result<NodeRead<'_>, Error> {
     view.node(id.expect("nil node in AST utility"))
@@ -865,7 +865,7 @@ impl FileNameInfo {
 pub fn import_attributes_resolution_mode(
     view: AstView<'_>,
     attributes: Option<NodeId>,
-) -> Result<Option<ts_core::ResolutionMode>, Error> {
+) -> Result<Option<tsr_core::ResolutionMode>, Error> {
     import_attributes_resolution_mode_with_invalid_value(view, attributes).map(|(mode, _)| mode)
 }
 
@@ -874,7 +874,7 @@ pub fn import_attributes_resolution_mode(
 pub fn import_attributes_resolution_mode_with_invalid_value(
     view: AstView<'_>,
     attributes: Option<NodeId>,
-) -> Result<(Option<ts_core::ResolutionMode>, Option<NodeId>), Error> {
+) -> Result<(Option<tsr_core::ResolutionMode>, Option<NodeId>), Error> {
     let Some(attributes) = attributes else {
         return Ok((None, None));
     };
@@ -902,8 +902,8 @@ pub fn import_attributes_resolution_mode_with_invalid_value(
             return Ok((None, None));
         }
         return Ok(match view.node_text(value)?.as_bytes() {
-            b"import" => (Some(ts_core::ResolutionMode::ESNEXT), None),
-            b"require" => (Some(ts_core::ResolutionMode::COMMON_JS), None),
+            b"import" => (Some(tsr_core::ResolutionMode::ESNEXT), None),
+            b"require" => (Some(tsr_core::ResolutionMode::COMMON_JS), None),
             _ => (None, Some(value)),
         });
     }

@@ -1,6 +1,6 @@
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use ts_ast::{
+use tsr_ast::{
     AstView, BindResult, DeclarationRead, DeclarationSlice, FlowData, FlowId, FlowListId,
     NodeDataRead, NodeId, NodeListId, NodeSlice, SymbolId, SymbolRead, SymbolTableId, TextSlice,
 };
@@ -150,12 +150,12 @@ impl<'a> Graph<'a> {
             .iter()
             .flatten()
         {
-            let Some(name) =
-                ts_ast::get_name_of_declaration(view, Some(declaration)).expect("declaration name")
+            let Some(name) = tsr_ast::get_name_of_declaration(view, Some(declaration))
+                .expect("declaration name")
             else {
                 continue;
             };
-            if ts_ast::is_ambient_module(view, declaration).expect("ambient module") {
+            if tsr_ast::is_ambient_module(view, declaration).expect("ambient module") {
                 let node = view.node(declaration).expect("module declaration");
                 let attributes = node
                     .data_source()
@@ -163,14 +163,14 @@ impl<'a> Graph<'a> {
                     .expect("module payload")
                     .attributes();
                 let name = view.node_text(name).expect("module name");
-                let pattern = ts_core::pattern::Pattern::parse(name.as_bytes());
+                let pattern = tsr_core::pattern::Pattern::parse(name.as_bytes());
                 if let Some(attributes) =
                     attributes.filter(|_| pattern.is_valid() && pattern.star_index >= 0)
                 {
                     let mut prefix = b"\xfe\"".to_vec();
                     prefix.extend_from_slice(name.as_bytes());
                     prefix.extend_from_slice(b"\"pattern@");
-                    let runtime = ts_ast::existing_runtime_node_id(
+                    let runtime = tsr_ast::existing_runtime_node_id(
                         &view.node(attributes).expect("module attributes"),
                     );
                     let mut expected = prefix.clone();
@@ -182,9 +182,9 @@ impl<'a> Graph<'a> {
                 }
             }
             if view.node(name).expect("declaration name").kind()
-                == ts_ast::SyntaxKind::PrivateIdentifier
+                == tsr_ast::SyntaxKind::PrivateIdentifier
             {
-                let Some(class) = ts_ast::utilities::get_containing_class(view, declaration)
+                let Some(class) = tsr_ast::utilities::get_containing_class(view, declaration)
                     .expect("private class")
                 else {
                     continue;
@@ -197,7 +197,7 @@ impl<'a> Graph<'a> {
                     continue;
                 };
                 let owner_symbol = self.result().symbols().get(owner).expect("class symbol");
-                let runtime = ts_ast::existing_runtime_symbol_id(&owner_symbol);
+                let runtime = tsr_ast::existing_runtime_symbol_id(&owner_symbol);
                 let prefix = b"\xfe#";
                 let mut suffix = b"@".to_vec();
                 suffix.extend_from_slice(view.node_text(name).expect("private name").as_bytes());
@@ -212,7 +212,7 @@ impl<'a> Graph<'a> {
         }
         result
     }
-    fn diagnostic(&mut self, d: &ts_ast::Diagnostic) -> Value {
+    fn diagnostic(&mut self, d: &tsr_ast::Diagnostic) -> Value {
         json!({"file":self.node_ref(d.file),"pos":d.loc.pos(),"end":d.loc.end(),"code":d.code,"category":d.category,"source_hex":hex(d.source.as_bytes()),"key_hex":hex(d.message_key.as_bytes()),"text_hex":hex(d.message_text.as_bytes()),"args_hex":d.message_args.iter().map(|s|hex(s.as_bytes())).collect::<Vec<_>>(),"chain":d.message_chain.iter().map(|item|self.diagnostic(item)).collect::<Vec<_>>(),"related":d.related_information.iter().map(|item|self.diagnostic(item)).collect::<Vec<_>>(),"unnecessary":d.reports_unnecessary,"deprecated":d.reports_deprecated,"skipped":d.skipped_on_no_emit})
     }
     fn source_record(&mut self) -> Value {
@@ -240,7 +240,7 @@ impl<'a> Graph<'a> {
                 let node = view.node(node_id).expect("graph node");
                 let parent = self.node_ref(node.parent());
                 let (payload, fields) = self.syntax_fields(&node);
-                let docs = if node.flags() & ts_ast::node_flags::HAS_JS_DOC != 0 {
+                let docs = if node.flags() & tsr_ast::node_flags::HAS_JS_DOC != 0 {
                     view.source_eager_jsdoc(self.source, node_id)
                         .expect("eager JSDoc")
                         .map_or_else(Vec::new, |nodes| {
@@ -333,19 +333,19 @@ fn aliases(queue: &[(usize, Work)], records: &mut [Value]) {
         let (domain, backing, start, length) = match work {
             Work::Nodes(v) => (
                 0,
-                v.backing_id().map(ts_arena::AuxId::bits),
+                v.backing_id().map(tsr_arena::AuxId::bits),
                 v.start(),
                 v.len(),
             ),
             Work::Texts(v) => (
                 1,
-                v.backing_id().map(ts_arena::AuxId::bits),
+                v.backing_id().map(tsr_arena::AuxId::bits),
                 v.start(),
                 v.len(),
             ),
             Work::Declarations(v) => (
                 0,
-                v.backing_id().map(ts_arena::AuxId::bits),
+                v.backing_id().map(tsr_arena::AuxId::bits),
                 v.start(),
                 v.capacity(),
             ),

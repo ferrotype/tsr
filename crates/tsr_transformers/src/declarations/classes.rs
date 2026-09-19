@@ -1,8 +1,8 @@
 use super::transform::{Transformer, BUILDER_FLAGS, INTERNAL_FLAGS};
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, Factory, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_printer::emit_resolver::DeclarationEmitResolver;
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformClassDeclaration
@@ -48,7 +48,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 continue;
             }
             let expression = Self::required(self.node(base).expression())?;
-            if ts_ast::is_entity_name_expression(self.output.view(), expression)?
+            if tsr_ast::is_entity_name_expression(self.output.view(), expression)?
                 || self.node(expression).kind() == K::NullKeyword
             {
                 continue;
@@ -65,7 +65,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             name.extend_from_slice(b"_base");
             let new_id = self.unique_name(JsString::from_bytes(name));
             self.tracker.selector = super::tracker::Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
-                diagnostic_message: ts_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
+                diagnostic_message: tsr_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
                 error_node: Some(base), type_name: data.name,
             });
             let ty = self.resolver.create_type_of_expression(
@@ -116,7 +116,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         &mut self,
         node: NodeId,
         name: NodeId,
-        modifiers: Option<ts_ast::NodeListId>,
+        modifiers: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, R::Error> {
         let enclosing = self.enclosing;
         self.enclosing = node;
@@ -160,7 +160,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if let Some(constructor) = constructor {
             let old = self.tracker.selector.clone();
             for parameter in self.list_nodes(self.node(constructor).parameter_list()) {
-                if ts_ast::utilities::get_combined_modifier_flags(self.output.view(), parameter)?
+                if tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), parameter)?
                     & mf::PARAMETER_PROPERTY_MODIFIER
                     == 0
                     || self.strip_internal(parameter)?

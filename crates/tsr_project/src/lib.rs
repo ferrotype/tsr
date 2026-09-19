@@ -4,8 +4,8 @@
 
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, OnceLock};
-use ts_arena::{ArenaId, CheckerIdentity, Counters, Generation};
-use ts_checker::{CheckerHost, CheckerOptions, CheckerOwner, Error, Operation};
+use tsr_arena::{ArenaId, CheckerIdentity, Counters, Generation};
+use tsr_checker::{CheckerHost, CheckerOptions, CheckerOwner, Error, Operation};
 
 /// The API checker is persistent; diagnostics and query slots can be evicted
 /// only after their last checkout returns (project/checkerpool.go at the pin).
@@ -90,7 +90,7 @@ impl CheckerPool {
             CheckerSlot::Diagnostics => Ok(0),
             CheckerSlot::Query(index) if index < self.query_slots => Ok(index + 1),
             CheckerSlot::Api => Ok(self.query_slots + 1),
-            CheckerSlot::Query(_) => Err(ts_arena::Error::InvalidSlot.into()),
+            CheckerSlot::Query(_) => Err(tsr_arena::Error::InvalidSlot.into()),
         }
     }
 
@@ -101,7 +101,7 @@ impl CheckerPool {
         let index = self.index(slot)?;
         let cell = {
             let _gate = self.generation.enter()?;
-            let mut slots = self.slots.lock().map_err(|_| ts_arena::Error::Retired)?;
+            let mut slots = self.slots.lock().map_err(|_| tsr_arena::Error::Retired)?;
             slots[index].checkouts = slots[index]
                 .checkouts
                 .checked_add(1)
@@ -150,7 +150,7 @@ impl CheckerPool {
         let index = self.index(slot)?;
         let displaced = {
             let _gate = self.generation.enter()?;
-            let mut slots = self.slots.lock().map_err(|_| ts_arena::Error::Retired)?;
+            let mut slots = self.slots.lock().map_err(|_| tsr_arena::Error::Retired)?;
             if slot == CheckerSlot::Api || slots[index].checkouts != 0 {
                 return Ok(false);
             }

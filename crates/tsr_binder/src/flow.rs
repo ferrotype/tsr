@@ -3,7 +3,7 @@
 use crate::flow_access::{BindingFlow, BindingFlowList};
 use crate::target::BindingNode;
 use crate::{need, Binder};
-use ts_ast::{
+use tsr_ast::{
     flow_flags as F, FlowData, FlowReduceLabelData, FlowSwitchClauseData, SyntaxKind as K,
 };
 
@@ -196,16 +196,16 @@ impl<'scope> Binder<'_, 'scope, '_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_ast::{AstFile, FlowNode, NodeId, SourceFileParseOptions};
-    use ts_core::ScriptKind;
-    use ts_jsstring::SourceText;
+    use tsr_ast::{AstFile, FlowNode, NodeId, SourceFileParseOptions};
+    use tsr_core::ScriptKind;
+    use tsr_jsstring::SourceText;
 
     fn parse(text: &[u8]) -> (AstFile, NodeId) {
-        let parsed = ts_parser::parse_source_file(
+        let parsed = tsr_parser::parse_source_file(
             SourceText::from_loaded_bytes(text),
             ScriptKind::TS,
             SourceFileParseOptions {
-                file_name: ts_ast::JsString::from_bytes(b"/flow.ts".as_slice()),
+                file_name: tsr_ast::JsString::from_bytes(b"/flow.ts".as_slice()),
                 ..SourceFileParseOptions::default()
             },
         );

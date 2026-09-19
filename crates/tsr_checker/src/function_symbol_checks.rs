@@ -1,9 +1,9 @@
 //! Function/constructor declaration groups, overload agreement and implementation
 //! compatibility. Signature comparisons use the production relater.
 use crate::{CheckerState, Error, RelationKind, SignatureId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 const DECLARATION_FLAGS: u32 =
     mf::EXPORT | mf::AMBIENT | mf::PRIVATE | mf::PROTECTED | mf::ABSTRACT;
@@ -30,7 +30,7 @@ impl CheckerState {
             .map(|body| {
                 self.ast(body)?
                     .node(body)
-                    .map(|read| ts_ast::node_is_present(Some(&read)))
+                    .map(|read| tsr_ast::node_is_present(Some(&read)))
                     .map_err(Error::from)
             })
             .transpose()
@@ -45,7 +45,7 @@ impl CheckerState {
     ) -> Result<u32, Error> {
         let view = self.ast(node)?;
         let read = view.node(node)?;
-        let mut flags = ts_ast::utilities::get_combined_modifier_flags(view, node)?;
+        let mut flags = tsr_ast::utilities::get_combined_modifier_flags(view, node)?;
         let parent = read
             .parent()
             .ok_or(Error::MissingLink("overload declaration parent"))?;
@@ -57,8 +57,8 @@ impl CheckerState {
         {
             let mut container = Some(parent);
             while let Some(current) = container {
-                if ts_binder::get_container_flags(self.ast(current)?, current)?.0
-                    & ts_binder::ContainerFlags::IS_CONTAINER
+                if tsr_binder::get_container_flags(self.ast(current)?, current)?.0
+                    & tsr_binder::ContainerFlags::IS_CONTAINER
                     != 0
                 {
                     break;
@@ -72,7 +72,7 @@ impl CheckerState {
                         .map(|parent| {
                             self.ast(parent)?
                                 .node(parent)
-                                .map(|read| ts_ast::utilities::is_global_scope_augmentation(&read))
+                                .map(|read| tsr_ast::utilities::is_global_scope_augmentation(&read))
                                 .map_err(Error::from)
                         })
                         .transpose()?
@@ -317,7 +317,7 @@ impl CheckerState {
         let mut groups: Vec<(NodeId, Vec<NodeId>)> = Vec::new();
         for &overload in overloads {
             let source =
-                ts_ast::utilities::get_source_file_of_node(self.ast(overload)?, Some(overload))?
+                tsr_ast::utilities::get_source_file_of_node(self.ast(overload)?, Some(overload))?
                     .ok_or(Error::MissingLink("overload source"))?;
             if let Some((_, group)) = groups.iter_mut().find(|(file, _)| *file == source) {
                 group.push(overload);
@@ -370,7 +370,7 @@ impl CheckerState {
         let read = self.node(node)?;
         let name = read.name();
         if let Some(name) = name {
-            if !ts_ast::node_is_present(Some(&self.node(name)?)) {
+            if !tsr_ast::node_is_present(Some(&self.node(name)?)) {
                 return Ok(());
             }
         }
@@ -398,8 +398,8 @@ impl CheckerState {
                         let b = self.check_computed_property_name(next_name)?;
                         self.is_type_related_to(a, b, RelationKind::Identity)?
                     } else if a.kind() == K::PrivateIdentifier && b.kind() == K::PrivateIdentifier
-                        || ts_ast::utilities::is_property_name_literal(&a)
-                            && ts_ast::utilities::is_property_name_literal(&b)
+                        || tsr_ast::utilities::is_property_name_literal(&a)
+                            && tsr_ast::utilities::is_property_name_literal(&b)
                     {
                         self.node_text(name)?.as_bytes() == self.node_text(next_name)?.as_bytes()
                     } else {
@@ -440,7 +440,7 @@ impl CheckerState {
                     return Ok(());
                 }
                 if self.declaration_body_present(next)? {
-                    let text = ts_scanner::declaration_name_to_string(self.ast(node)?, name)?;
+                    let text = tsr_scanner::declaration_name_to_string(self.ast(node)?, name)?;
                     self.error_at(
                         location,
                         d::Function_implementation_name_must_be_0,

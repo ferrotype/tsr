@@ -3,9 +3,9 @@ use crate::number::saturated_radix;
 use crate::utilities::{is_digit, is_hex_digit, is_octal_digit};
 use crate::{escape_flags as ef, Scanner};
 use std::borrow::Cow;
-use ts_ast::token_flags as flags;
-use ts_diagnostics as diagnostics;
-use ts_jsstring::wtf8::{
+use tsr_ast::token_flags as flags;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::wtf8::{
     decode_utf8, encode_rune, is_high_surrogate, is_low_surrogate, surrogate_pair_to_code_point,
 };
 

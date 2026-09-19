@@ -5,8 +5,8 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, TypeId, TypeSystemEntity,
     TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum RecursionIdentity {
@@ -280,7 +280,7 @@ impl CheckerState {
                     let name = self.type_to_string(ty, crate::type_format_flags::NONE)?;
                     self.error_at(
                         Some(node),
-                        ts_diagnostics::Type_parameter_0_has_a_circular_constraint,
+                        tsr_diagnostics::Type_parameter_0_has_a_circular_constraint,
                         vec![name],
                     )?;
                 }

@@ -3,11 +3,11 @@ use crate::baseline::{self, InputFile};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::CheckerOwner;
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Deserialize)]
@@ -46,13 +46,13 @@ fn run(case: &Case, trace: &mut baseline::Trace) -> Result<Value> {
         );
     }
     let counters = Counters::new();
-    let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     for file in &case.files {
         fs.insert_loaded(file.name.as_bytes(), file.content.as_bytes());
     }
     let program = Arc::new(Program::load(
         ProgramOptions {
-            config: ts_tsoptions::ParsedCommandLine::new(
+            config: tsr_tsoptions::ParsedCommandLine::new(
                 CompilerOptions {
                     target: ScriptTarget::ESNEXT,
                     module: ModuleKind::ESNEXT,

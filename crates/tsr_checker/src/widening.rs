@@ -3,8 +3,8 @@
 use crate::{
     object_flags as of, type_flags as tf, types::Map, CheckerState, Error, TypeId, UnionReduction,
 };
-use ts_arena::SymbolId;
-use ts_ast::{symbol_flags as sf, JsString};
+use tsr_arena::SymbolId;
+use tsr_ast::{symbol_flags as sf, JsString};
 
 #[derive(Default)]
 struct Context {
@@ -197,7 +197,7 @@ impl CheckerState {
                 return Ok(cached);
             }
         }
-        let mut members = ts_ast::SymbolTable::default();
+        let mut members = tsr_ast::SymbolTable::default();
         for property in self.get_properties_of_type(ty)? {
             let name = self.symbol(property)?.name_to_owned();
             let widened = if self.symbol(property)?.flags() & sf::PROPERTY != 0 {

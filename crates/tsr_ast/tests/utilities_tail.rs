@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
-use ts_ast::{
+use tsr_ast::{
     utilities_tail as u, AstBuilder, FactoryMethods, JsString, NodeId, NodeKind, NodeListId,
     SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn string(bytes: &[u8]) -> JsString {
     JsString::from_bytes(bytes)
@@ -20,7 +20,7 @@ fn list(f: &mut AstBuilder, nodes: &[NodeId]) -> NodeListId {
 #[test]
 fn matches_pinned_go_tail_utility_observations() {
     let mut actual = BTreeMap::new();
-    let mut f = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+    let mut f = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
     for raw in i16::MIN..=i16::MAX {
         let kind = NodeKind::from_raw(raw);
         let id = f.new_token(kind);
@@ -97,7 +97,7 @@ fn matches_pinned_go_tail_utility_observations() {
     );
     f.node_mut(other)
         .unwrap()
-        .set_flags(ts_ast::node_flags::JS_DOC);
+        .set_flags(tsr_ast::node_flags::JS_DOC);
     emit(
         "jsdoc/context/flagged".into(),
         u::is_js_doc_name_reference_context(f.view(), other).unwrap(),
@@ -302,7 +302,7 @@ fn matches_pinned_go_tail_utility_observations() {
     );
     emit(
         "expando/nil".into(),
-        u::is_expando_property_declaration(None::<&ts_ast::NodeRead<'_>>),
+        u::is_expando_property_declaration(None::<&tsr_ast::NodeRead<'_>>),
     );
     let super_node = f.new_token(K::SuperKeyword.into());
     let nodes = [

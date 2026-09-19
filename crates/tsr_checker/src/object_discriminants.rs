@@ -1,8 +1,8 @@
 //! Contextual discrimination tests only expressions whose type can be read
 //! without their context, preventing a contextual-type recursion cycle.
 use crate::{type_flags as tf, CheckerState, Error, TypeId, UnionReduction};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.discriminateContextualTypeByObjectMembers

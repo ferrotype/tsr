@@ -2,10 +2,10 @@
 //! loader and the actual bundled library declarations.
 use serde_json::Value;
 use std::sync::Arc;
-use ts_arena::Counters;
-use ts_compiler::{FileCache, Program, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_arena::Counters;
+use tsr_compiler::{FileCache, Program, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub fn text(value: &Value) -> Result<&str> {
     value.as_str().ok_or_else(|| "expected string".into())
@@ -27,7 +27,7 @@ fn unhex(value: &Value) -> Result<Vec<u8>> {
         .collect()
 }
 pub fn load(request: &Value, counters: &Counters) -> Result<Arc<Program>> {
-    let mut fs = ts_vfs::MemoryBuilder::new(b"/", false);
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", false);
     fs.insert_loaded(b"/fixture.ts", unhex(&request["source_hex"])?);
     for (name, bytes) in request["files"].as_object().ok_or("expected files")? {
         fs.insert_loaded(name.as_bytes(), unhex(bytes)?);
@@ -44,16 +44,16 @@ pub fn load(request: &Value, counters: &Counters) -> Result<Arc<Program>> {
         },
         ..Default::default()
     };
-    let config = ts_tsoptions::ParsedCommandLine::new(
+    let config = tsr_tsoptions::ParsedCommandLine::new(
         options,
         vec![JsString::from_bytes(b"/fixture.ts".as_slice())],
     );
     Ok(Arc::new(Program::load(
         ProgramOptions {
             config,
-            host: Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish()))),
+            host: Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish()))),
             current_directory: JsString::from_bytes(b"/".as_slice()),
-            default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
+            default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
             skip_module_resolution: false,
         },
         &mut FileCache::new(),

@@ -9,7 +9,7 @@ use crate::{
 };
 use std::collections::HashSet;
 use std::sync::Arc;
-use ts_ast::symbol_flags as sf;
+use tsr_ast::symbol_flags as sf;
 
 pub(crate) const NO_SUPERTYPE_REDUCTION: u32 = 1;
 pub(crate) const NO_CONSTRAINT_REDUCTION: u32 = 2;

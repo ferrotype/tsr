@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # ts_bundled embeds libraries from the pinned upstream gitlink.
+          # tsr_bundled embeds libraries from the pinned upstream gitlink.
           submodules: true
       - name: Read and validate toolchain pins
         id: pins
@@ -150,44 +150,44 @@ jobs:
         run: cargo xtask run workspace
       - name: Generated crate contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
-        run: cargo test -p ts_diagnostics --all-targets --all-features --locked
+        run: cargo test -p tsr_diagnostics --all-targets --all-features --locked
       - name: Scanner, numeric and shared-range contracts in debug and release
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_scanner -p ts_jsnum -p ts_core --all-targets --all-features --locked
-          cargo test -p ts_scanner -p ts_jsnum -p ts_core --all-targets --all-features --locked --release
+          cargo test -p tsr_scanner -p tsr_jsnum -p tsr_core --all-targets --all-features --locked
+          cargo test -p tsr_scanner -p tsr_jsnum -p tsr_core --all-targets --all-features --locked --release
       - name: Parser, AST runtime and codec contracts in debug and release
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_parser -p ts_ast -p ts_encoder --all-targets --all-features --locked
-          cargo test -p ts_parser -p ts_ast -p ts_encoder --all-targets --all-features --locked --release
+          cargo test -p tsr_parser -p tsr_ast -p tsr_encoder --all-targets --all-features --locked
+          cargo test -p tsr_parser -p tsr_ast -p tsr_encoder --all-targets --all-features --locked --release
       - name: Binder, program and configuration contracts on this native target
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_binder -p ts_compiler -p ts_tsoptions -p ts_module -p ts_semver -p ts_tspath -p ts_vfs -p ts_bundled --all-targets --all-features --locked
-          cargo test -p ts_binder -p ts_compiler -p ts_tsoptions -p ts_module -p ts_semver -p ts_tspath -p ts_vfs -p ts_bundled --all-targets --all-features --locked --release
+          cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked
+          cargo test -p tsr_binder -p tsr_compiler -p tsr_tsoptions -p tsr_module -p tsr_semver -p tsr_tspath -p tsr_vfs -p tsr_bundled --all-targets --all-features --locked --release
       - name: Checker ownership, constructor and type-display contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked
-          cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked --release
+          cargo test -p tsr_arena -p tsr_checker -p tsr_nodebuilder -p tsr_printer -p s08_relater_prototype --all-features --locked
+          cargo test -p tsr_arena -p tsr_checker -p tsr_nodebuilder -p tsr_printer -p s08_relater_prototype --all-features --locked --release
       - name: Test-host framing and native subprocess contracts
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_testhost --locked
-          cargo test -p ts_testhost --locked --release
+          cargo test -p tsr_testhost --locked
+          cargo test -p tsr_testhost --locked --release
           python3 -m unittest discover -s scripts/tests -p test_s11.py
           cargo xtask run testhost
       - name: Navigation and formatter contracts in debug and release
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked
-          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked --release
+          cargo test -p tsr_astnav -p tsr_format --all-targets --all-features --locked
+          cargo test -p tsr_astnav -p tsr_format --all-targets --all-features --locked --release
       - name: Native allocator build and original-request accounting
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
-          cargo run -p ts_bench --example allocation_probe --features allocation --locked
-          cargo run -p ts_bench --example allocation_probe --features allocation --locked --release
+          cargo run -p tsr_bench --example allocation_probe --features allocation --locked
+          cargo run -p tsr_bench --example allocation_probe --features allocation --locked --release
       - name: Oracle build and version smoke
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run oracle
@@ -369,13 +369,13 @@ jobs:
         run: |
           optimizer=$(python3 scripts/s10_toolchain.py)
           python3 scripts/s10_build.py --wasm-bindgen "$(command -v wasm-bindgen)" --wasm-opt "$optimizer"
-          cargo build --locked --release -p ts_wasm --example parser
+          cargo build --locked --release -p tsr_wasm --example parser
           mapfile -t node_flags < <(python3 -c 'import json; print("\n".join(json.load(open("tools/s10/toolchains.json"))["node_flags"]))')
           node "${node_flags[@]}" tools/s10/wasm/test.mjs target/s10/parser
       - name: Build and exercise the shipped portable checker
         run: |
           python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
-          cargo build --locked --release -p ts_wasm --example parser
+          cargo build --locked --release -p tsr_wasm --example parser
           # rust-cache restores target/, including old or emptied capture dirs.
           # Keep fresh evidence outside that cache and never overwrite a capture.
           python3 scripts/s10_measure.py capture --kind portable --output "$RUNNER_TEMP/s10-portable-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"

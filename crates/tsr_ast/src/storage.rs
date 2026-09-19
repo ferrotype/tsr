@@ -6,12 +6,12 @@ use crate::{
     NodeListId, NodeListRead, NodeRead, NodeSlice, NodeSliceRead, TextSlice, TextSliceRead,
 };
 use std::sync::Arc;
-use ts_arena::{
+use tsr_arena::{
     AuxId, Counters, Error, StorageBuilder, StorageHandle, StorageRead, StorageTransaction,
     StorageView,
 };
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 #[cfg(test)]
 mod parent_tests;
@@ -76,7 +76,7 @@ impl AstBuilder {
     pub fn view(&self) -> AstView<'_> {
         AstView(self.storage.view(), None)
     }
-    pub fn id(&self) -> ts_arena::FileId {
+    pub fn id(&self) -> tsr_arena::FileId {
         self.storage.id()
     }
     /// Retain a published dependency before storing any of its identities.
@@ -337,8 +337,8 @@ impl AstBuilder {
 }
 
 struct CoreParents<'a> {
-    nodes: ts_arena::CoreNodesMut<'a, StoredNode>,
-    data: ts_arena::CoreDataRead<'a, StoredNode>,
+    nodes: tsr_arena::CoreNodesMut<'a, StoredNode>,
+    data: tsr_arena::CoreDataRead<'a, StoredNode>,
     // Resolved against nodes before traversal; its slot fits the local codec.
     parent: NodeId,
 }
@@ -382,17 +382,17 @@ impl crate::ChildVisitor for CoreParents<'_> {
 /// The whole value can move to a worker; none of its views can escape that move.
 ///
 /// ```compile_fail
-/// use ts_ast::{AstBuilder, FactoryMethods, NodeRead, SyntaxKind};
+/// use tsr_ast::{AstBuilder, FactoryMethods, NodeRead, SyntaxKind};
 /// fn escaped() -> NodeRead<'static> {
-///     let mut builder = AstBuilder::new(ts_jsstring::SourceText::from_loaded_bytes(&b""[..]), &ts_arena::Counters::new());
+///     let mut builder = AstBuilder::new(tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]), &tsr_arena::Counters::new());
 ///     let root = builder.new_token(SyntaxKind::Unknown.into());
 ///     builder.view().node(root).unwrap()
 /// }
 /// ```
 ///
 /// ```compile_fail
-/// use ts_ast::{AstBuilder, FactoryMethods, SyntaxKind};
-/// let mut builder = AstBuilder::new(ts_jsstring::SourceText::from_loaded_bytes(&b""[..]), &ts_arena::Counters::new());
+/// use tsr_ast::{AstBuilder, FactoryMethods, SyntaxKind};
+/// let mut builder = AstBuilder::new(tsr_jsstring::SourceText::from_loaded_bytes(&b""[..]), &tsr_arena::Counters::new());
 /// let root = builder.new_token(SyntaxKind::Unknown.into());
 /// let published = builder.complete(root).unwrap().publish_unbound();
 /// published.node_mut(root).unwrap().set_flags(1);
@@ -411,7 +411,7 @@ impl ParsedFile {
 
     pub(crate) fn with_local_core<R>(
         &mut self,
-        operation: impl for<'scope> FnOnce(ts_arena::CoreScopeMut<'scope, '_, StoredNode>) -> R,
+        operation: impl for<'scope> FnOnce(tsr_arena::CoreScopeMut<'scope, '_, StoredNode>) -> R,
     ) -> R {
         // The caller checked eligibility. Only the AST's narrow local writer
         // receives this scope, preserving the completed syntax validation.
@@ -494,7 +494,7 @@ impl ParsedFile {
             }
             Ok(())
         })?;
-        Ok(AstBundle(ts_arena::StorageBundle::new(
+        Ok(AstBundle(tsr_arena::StorageBundle::new(
             self.builder.storage,
             supplemental
                 .into_iter()
@@ -505,7 +505,7 @@ impl ParsedFile {
 }
 
 #[derive(Clone, Debug)]
-pub struct AstBundle(Arc<ts_arena::StorageBundle<StoredNode>>);
+pub struct AstBundle(Arc<tsr_arena::StorageBundle<StoredNode>>);
 impl AstBundle {
     pub fn len(&self) -> usize {
         self.0.len()
@@ -523,8 +523,8 @@ impl AstBundle {
 /// Raw arena writers cannot bypass AST validation after publication.
 ///
 /// ```compile_fail
-/// fn raw_storage(file: &ts_ast::AstFile) {
-///     let _: &ts_arena::StorageHandle<ts_ast::Node> = file.storage();
+/// fn raw_storage(file: &tsr_ast::AstFile) {
+///     let _: &tsr_arena::StorageHandle<tsr_ast::Node> = file.storage();
 /// }
 /// ```
 ///
@@ -532,8 +532,8 @@ impl AstBundle {
 /// adopted as a published AST file.
 ///
 /// ```compile_fail
-/// fn unchecked_adoption(storage: ts_arena::StorageHandle<ts_ast::Node>) {
-///     let _ = ts_ast::AstFile::from_storage(storage);
+/// fn unchecked_adoption(storage: tsr_arena::StorageHandle<tsr_ast::Node>) {
+///     let _ = tsr_ast::AstFile::from_storage(storage);
 /// }
 /// ```
 #[derive(Clone, Debug)]
@@ -560,7 +560,7 @@ impl AstFile {
         Ok(RetainedNode { record, fallback })
     }
     /// Follow a mapped-file or imported-file identity within this retention root.
-    pub fn file(&self, id: ts_arena::FileId) -> Option<Self> {
+    pub fn file(&self, id: tsr_arena::FileId) -> Option<Self> {
         self.0.file(id).map(Self)
     }
 }
@@ -569,13 +569,13 @@ impl AstFile {
 /// The private arena handle cannot expose unchecked lazy publication.
 ///
 /// ```compile_fail
-/// fn raw_owner(node: &ts_ast::RetainedNode) {
+/// fn raw_owner(node: &tsr_ast::RetainedNode) {
 ///     let _ = node.owner();
 /// }
 /// ```
 #[derive(Clone, Debug)]
 pub struct RetainedNode {
-    record: ts_arena::RetainedRecord<StoredNode>,
+    record: tsr_arena::RetainedRecord<StoredNode>,
     fallback: Option<Arc<Node>>,
 }
 impl RetainedNode {
@@ -635,7 +635,7 @@ impl<'a> AstView<'a> {
     pub fn source(self) -> &'a SourceText {
         self.0.source()
     }
-    pub fn position_map(self) -> &'a ts_jsstring::PositionMap {
+    pub fn position_map(self) -> &'a tsr_jsstring::PositionMap {
         self.0.position_map()
     }
     #[inline]
@@ -1133,7 +1133,7 @@ fn list_read(record: AuxRead<'_>) -> Result<NodeListRead<'_>, Error> {
 fn node_slice_read<'a>(
     nodes: NodeSlice,
     record: Option<AuxRead<'a>>,
-    compact: Option<(&'a crate::compact::lists::EdgePages, ts_arena::ArenaId)>,
+    compact: Option<(&'a crate::compact::lists::EdgePages, tsr_arena::ArenaId)>,
 ) -> Result<NodeSliceRead<'a>, Error> {
     let mut start = nodes.start as usize;
     let len = nodes.len();
@@ -1211,7 +1211,7 @@ fn validate_data(
 }
 
 impl AstBuilder {
-    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+    pub fn structural_bytes_with(&self, census: &mut tsr_arena::StorageCensus) -> (usize, usize) {
         self.storage
             .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
     }
@@ -1224,7 +1224,7 @@ impl AstBuilder {
 }
 
 impl AstFile {
-    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+    pub fn structural_bytes_with(&self, census: &mut tsr_arena::StorageCensus) -> (usize, usize) {
         self.0
             .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
     }

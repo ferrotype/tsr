@@ -2,13 +2,13 @@
 //! these checks are independent of the later checker and emitter execution.
 use crate::{Error, Program};
 use std::sync::Arc;
-use ts_ast::{Diagnostic, NodeId};
-use ts_core::{
+use tsr_ast::{Diagnostic, NodeId};
+use tsr_core::{
     CompilerOptions, JsxEmit, LanguageVariant, ModuleKind, ModuleResolutionKind, ScriptTarget,
 };
-use ts_diagnostics::{self as d, Message};
-use ts_jsstring::{JsString, SourceText};
-use ts_tsoptions::TsConfigSourceFile;
+use tsr_diagnostics::{self as d, Message};
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tsoptions::TsConfigSourceFile;
 
 struct Verifier<'a> {
     config: Option<&'a TsConfigSourceFile>,
@@ -19,7 +19,7 @@ impl<'a> Verifier<'a> {
     fn new(config: Option<&'a TsConfigSourceFile>) -> Self {
         Self {
             compiler_options: config
-                .and_then(|config| ts_tsoptions::find_property(config, &[b"compilerOptions"])),
+                .and_then(|config| tsr_tsoptions::find_property(config, &[b"compilerOptions"])),
             config,
             diagnostics: Vec::new(),
         }
@@ -32,7 +32,7 @@ impl<'a> Verifier<'a> {
     ) -> Diagnostic {
         match (self.config, node) {
             (Some(config), Some(node)) => {
-                ts_tsoptions::diagnostic_for_node(config, node, message, args)
+                tsr_tsoptions::diagnostic_for_node(config, node, message, args)
             }
             _ => Diagnostic::compiler(message, args),
         }
@@ -56,7 +56,7 @@ impl<'a> Verifier<'a> {
             .name()
     }
     fn property(&self, object: Option<NodeId>, key1: &[u8], key2: &[u8]) -> Option<NodeId> {
-        ts_tsoptions::find_property_in_object(self.config?, object?, &[key1, key2])
+        tsr_tsoptions::find_property_in_object(self.config?, object?, &[key1, key2])
     }
     fn compiler(&mut self, message: &'static Message, args: Vec<JsString>) -> &mut Diagnostic {
         let diagnostic = self.at(self.name(self.compiler_options), message, args);
@@ -135,7 +135,7 @@ impl<'a> Verifier<'a> {
                 let config = self.config?;
                 let view = config.file.view();
                 let read = view.node(node).expect("retained path substitution");
-                let ts_ast::NodeDataRead::ArrayLiteralExpression(data) = read.data() else {
+                let tsr_ast::NodeDataRead::ArrayLiteralExpression(data) = read.data() else {
                     return None;
                 };
                 let list = view
@@ -335,7 +335,7 @@ fn path_and_emit_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
                     &[value, key],
                 );
             }
-            if !ts_tspath::is_relative(value) && ts_tspath::root_length(value) == 0 {
+            if !tsr_tspath::is_relative(value) && tsr_tspath::root_length(value) == 0 {
                 v.path(
                     false,
                     key,
@@ -452,7 +452,7 @@ fn final_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
                 &[],
             );
         }
-        if ts_parser::parse_isolated_entity_name(SourceText::from_loaded_bytes(
+        if tsr_parser::parse_isolated_entity_name(SourceText::from_loaded_bytes(
             options.jsx_factory.as_bytes(),
         ))
         .is_none()
@@ -464,7 +464,7 @@ fn final_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
             );
         }
     } else if !options.react_namespace.is_empty()
-        && !ts_scanner::is_identifier_text(
+        && !tsr_scanner::is_identifier_text(
             options.react_namespace.as_bytes(),
             LanguageVariant::STANDARD,
         )
@@ -492,7 +492,7 @@ fn final_options(v: &mut Verifier<'_>, options: &CompilerOptions) {
                 &[],
             );
         }
-        if ts_parser::parse_isolated_entity_name(SourceText::from_loaded_bytes(
+        if tsr_parser::parse_isolated_entity_name(SourceText::from_loaded_bytes(
             options.jsx_fragment_factory.as_bytes(),
         ))
         .is_none()
@@ -619,7 +619,7 @@ pub struct OptionVerification {
 /// port: tsc/internal/compiler/program.go:Program.verifyCompilerOptions
 pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, Error> {
     use crate::output_paths as output;
-    use ts_tspath as path;
+    use tsr_tspath as path;
     let options = program.options();
     let config = program.config().config_file.as_deref();
     let config_path = config
@@ -842,7 +842,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
 // Go encoding/json string output (the baseUrl migration suggestion) replaces
 // each malformed UTF-8 byte and escapes HTML and the two JavaScript separators.
 fn json_string(mut input: &[u8]) -> Vec<u8> {
-    use ts_jsstring::wtf8::decode_utf8;
+    use tsr_jsstring::wtf8::decode_utf8;
     let mut output = vec![b'"'];
     while !input.is_empty() {
         let (rune, width) = decode_utf8(input);

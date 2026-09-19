@@ -2,7 +2,7 @@
 //!
 //! A local identity cannot escape the scope that selected its owner.
 //! ```compile_fail
-//! use ts_ast::{BindBuilder, local_bind::BindNode};
+//! use tsr_ast::{BindBuilder, local_bind::BindNode};
 //! fn escape(builder: &mut BindBuilder<'_>) -> BindNode<'static> {
 //!     builder.with_local_scope(|local| local.source()).unwrap()
 //! }
@@ -10,7 +10,7 @@
 //!
 //! Two simultaneously live files still receive distinct scopes.
 //! ```compile_fail
-//! use ts_ast::BindBuilder;
+//! use tsr_ast::BindBuilder;
 //! fn cross_owner(first: &mut BindBuilder<'_>, second: &mut BindBuilder<'_>) {
 //!     first.with_local_scope(|left| {
 //!         let node = left.source();
@@ -21,7 +21,7 @@
 //!
 //! Syntax and flow namespaces remain distinct even in the same scope.
 //! ```compile_fail
-//! use ts_ast::local_bind::{BindNode, LocalBind};
+//! use tsr_ast::local_bind::{BindNode, LocalBind};
 //! fn wrong_namespace<'scope>(local: &mut LocalBind<'scope, '_>, node: BindNode<'scope>) {
 //!     local.set_flow(node, Some(node));
 //! }
@@ -29,7 +29,7 @@
 //!
 //! A typed row borrow excludes writes until its last read.
 //! ```compile_fail
-//! use ts_ast::local_bind::{BindNode, LocalBind};
+//! use tsr_ast::local_bind::{BindNode, LocalBind};
 //! fn overlapping<'scope>(local: &mut LocalBind<'scope, '_>, node: BindNode<'scope>) {
 //!     let read = local.node(node).as_identifier().unwrap();
 //!     local.set_flags(node, 1);
@@ -39,7 +39,7 @@
 //!
 //! The same operations compile when the borrowed observation finishes first.
 //! ```
-//! use ts_ast::local_bind::{BindNode, LocalBind};
+//! use tsr_ast::local_bind::{BindNode, LocalBind};
 //! fn separate<'scope>(local: &mut LocalBind<'scope, '_>, node: BindNode<'scope>) {
 //!     let is_x = local.node(node).as_identifier().unwrap().text() == b"x";
 //!     local.set_flags(node, u32::from(is_x));
@@ -52,9 +52,9 @@ use std::{
     ops::ControlFlow,
     panic::{catch_unwind, AssertUnwindSafe},
 };
-use ts_arena::{Counters, Error};
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, Error};
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn text(bytes: &[u8]) -> JsString {
     JsString::from_bytes(bytes)
@@ -585,13 +585,13 @@ fn list_imports_validate_owner_kind_and_empty_ranges_before_minting_handles() {
                     }
                     assert_eq!(local.import_list(foreign_list), Err(Error::WrongOwner));
                     let wrong_owner =
-                        ts_arena::AuxId::from_parts(foreign_list.0.arena(), u32::MAX).unwrap();
+                        tsr_arena::AuxId::from_parts(foreign_list.0.arena(), u32::MAX).unwrap();
                     assert_eq!(
                         local.import_list(NodeListId(wrong_owner)),
                         Err(Error::WrongOwner)
                     );
                     let invalid_slot =
-                        ts_arena::AuxId::from_parts(list.0.arena(), u32::MAX).unwrap();
+                        tsr_arena::AuxId::from_parts(list.0.arena(), u32::MAX).unwrap();
                     assert_eq!(
                         local.import_list(NodeListId(invalid_slot)),
                         Err(Error::InvalidSlot)

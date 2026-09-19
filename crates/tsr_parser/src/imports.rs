@@ -1,9 +1,9 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{
+use tsr_ast::{
     node_flags, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_diagnostics as diag;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     fn import_identifier_has_text(&self, node: NodeId, text: &[u8]) -> bool {
@@ -287,7 +287,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             return (self.parse_literal_expression(), true);
         }
         let ok = !(disallow_keywords
-            && ts_ast::is_keyword_kind(self.token.into())
+            && tsr_ast::is_keyword_kind(self.token.into())
             && !self.is_identifier());
         (self.parse_identifier_name(), ok)
     }

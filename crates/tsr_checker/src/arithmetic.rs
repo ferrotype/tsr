@@ -1,8 +1,8 @@
 //! Arithmetic binary operators, including evaluator-backed shift suggestions.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{JsString, NodeKind, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, NodeKind, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkBinaryLikeExpression
@@ -75,7 +75,7 @@ impl CheckerState {
                     d::The_0_operator_is_not_allowed_for_boolean_types_Consider_using_1_instead,
                     vec![
                         operator_text(operator),
-                        JsString::from_bytes(ts_scanner::token_to_string(suggestion).as_bytes()),
+                        JsString::from_bytes(tsr_scanner::token_to_string(suggestion).as_bytes()),
                     ],
                 )?;
                 return Ok(self.builtins.number_type);
@@ -99,7 +99,7 @@ impl CheckerState {
                 ) => self.report_binary_operator_error(node, operator, a, b)?,
                 Some(K::AsteriskAsteriskToken | K::AsteriskAsteriskEqualsToken)
                     if self.program()?.host.options().emit_script_target()
-                        < ts_core::ScriptTarget::ES2016 =>
+                        < tsr_core::ScriptTarget::ES2016 =>
                 {
                     self.error_at(Some(node),d::Exponentiation_cannot_be_performed_on_bigint_values_unless_the_target_option_is_set_to_es2016_or_later,vec![])?;
                 }
@@ -131,10 +131,10 @@ impl CheckerState {
                             Some(node),
                             d::This_operation_can_be_simplified_This_shift_is_identical_to_0_1_2,
                             vec![
-                                ts_scanner::get_text_of_node(self.ast(left)?, left)?,
+                                tsr_scanner::get_text_of_node(self.ast(left)?, left)?,
                                 operator_text(operator),
                                 JsString::from_bytes(
-                                    ts_jsnum::Number::new(value.value() % 32.0)
+                                    tsr_jsnum::Number::new(value.value() % 32.0)
                                         .to_string()
                                         .into_bytes(),
                                 ),
@@ -160,7 +160,7 @@ impl CheckerState {
                             self.add_diagnostic(diagnostic)?;
                         } else {
                             let mut diagnostic = diagnostic;
-                            diagnostic.category = ts_diagnostics::Category::Suggestion as i32;
+                            diagnostic.category = tsr_diagnostics::Category::Suggestion as i32;
                             self.add_suggestion_diagnostic(diagnostic)?;
                         }
                     }
@@ -217,13 +217,13 @@ impl CheckerState {
         mut a: TypeId,
         b: TypeId,
     ) -> Result<(), Error> {
-        if !ts_ast::is_assignment_operator(operator) {
+        if !tsr_ast::is_assignment_operator(operator) {
             return Ok(());
         }
         if let Some(parent) = self.node(left)?.parent() {
-            if ts_ast::is_declaration_node(&self.node(parent)?)
-                && ts_ast::get_assignment_declaration_kind(self.ast(parent)?, parent)?
-                    == ts_ast::JSDeclarationKind::ExportsProperty
+            if tsr_ast::is_declaration_node(&self.node(parent)?)
+                && tsr_ast::get_assignment_declaration_kind(self.ast(parent)?, parent)?
+                    == tsr_ast::JSDeclarationKind::ExportsProperty
             {
                 if let Some(symbol) = self.query.resolved_symbols.try_get(left).copied().flatten() {
                     if self.symbol_declarations(symbol)?.len() > 1
@@ -256,6 +256,7 @@ impl CheckerState {
 }
 fn operator_text(kind: NodeKind) -> JsString {
     JsString::from_bytes(
-        ts_scanner::token_to_string(kind.known().expect("arithmetic operator dispatch")).as_bytes(),
+        tsr_scanner::token_to_string(kind.known().expect("arithmetic operator dispatch"))
+            .as_bytes(),
     )
 }

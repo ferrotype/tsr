@@ -1,7 +1,7 @@
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{node_flags, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind};
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_ast::{node_flags, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind};
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseJsxElementOrSelfClosingElementOrFragment
@@ -130,7 +130,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 self.factory
                     .set_node_range(operator, TextRange::new(loc.pos(), loc.pos()));
                 self.parse_error_at(
-                    ts_scanner::skip_trivia(self.source_text, bad_pos),
+                    tsr_scanner::skip_trivia(self.source_text, bad_pos),
                     loc.end(),
                     diagnostics::JSX_expressions_must_have_one_parent_element,
                     vec![],
@@ -228,7 +228,8 @@ impl<F: ParserFactory> Parser<'_, F> {
                 } else {
                     let tag = self.jsx_tag_name(opening);
                     let loc = self.factory.node(tag).range();
-                    let start = ts_scanner::skip_trivia(self.source_text, loc.pos()).min(loc.end());
+                    let start =
+                        tsr_scanner::skip_trivia(self.source_text, loc.pos()).min(loc.end());
                     let text = self.get_text_of_node_from_source_text(tag, false);
                     self.parse_error_at(
                         start,
@@ -287,17 +288,17 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.scanJsxText
     pub(crate) fn scan_jsx_text(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::scan_jsx_token);
+        self.token = self.scan_operation(tsr_scanner::Scanner::scan_jsx_token);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.scanJsxIdentifier
     pub(crate) fn scan_jsx_identifier(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::scan_jsx_identifier);
+        self.token = self.scan_operation(tsr_scanner::Scanner::scan_jsx_identifier);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.scanJsxAttributeValue
     pub(crate) fn scan_jsx_attribute_value(&mut self) -> SyntaxKind {
-        self.token = self.scan_operation(ts_scanner::Scanner::scan_jsx_attribute_value);
+        self.token = self.scan_operation(tsr_scanner::Scanner::scan_jsx_attribute_value);
         self.token
     }
     /// port: tsc/internal/parser/parser.go:Parser.parseJsxClosingElement

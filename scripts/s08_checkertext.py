@@ -83,7 +83,7 @@ def measure():
     directory.mkdir(parents=True, exist_ok=False)
     expected = run_overlay(directory / 'native', 'checker', DRIVER.read_text(), request, 'TestS08P5Display')
     output = directory / 'rust.json'
-    command(['cargo', 'run', '--locked', '--package', 'ts_compiler', '--example', 'p5_display', '--',
+    command(['cargo', 'run', '--locked', '--package', 'tsr_compiler', '--example', 'p5_display', '--',
              str(directory / 'native/requests.json'), str(output)], cwd=ROOT)
     actual = strict_json_loads(output.read_bytes())
     report, failures = compare(request, coverage, cases, expected, actual)

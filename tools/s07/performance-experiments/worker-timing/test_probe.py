@@ -133,9 +133,9 @@ class DiagnosticContracts(unittest.TestCase):
         frozen = probe.ROOT / "target/s07-bis/current-candidate-acceptance-2026-09-10/frozen/source"
         if not frozen.is_dir():
             self.skipTest("local frozen source is unavailable")
-        rust = patches.rust((frozen / "crates/ts_bench/src/main.rs").read_text())
+        rust = patches.rust((frozen / "crates/tsr_bench/src/main.rs").read_text())
         go = patches.go((frozen / "tools/s07/benchmark/main.go").read_text())
-        for marker in ("mpsc::sync_channel::<usize>(workers)", "senders[index % workers].send(index)?;", "ts_binder::bind_parsed_file(parsed)", "release.wait();"):
+        for marker in ("mpsc::sync_channel::<usize>(workers)", "senders[index % workers].send(index)?;", "tsr_binder::bind_parsed_file(parsed)", "release.wait();"):
             self.assertIn(marker, rust)
         for marker in ("make(chan int, workers)", "channels[index%workers] <- index", "binder.BindSourceFile(file)", "runtime.KeepAlive(results)"):
             self.assertIn(marker, go)

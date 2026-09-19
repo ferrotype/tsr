@@ -3,11 +3,11 @@
 //! `checkGrammarMetaProperty` in `grammarchecks.go`).
 
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{NodeKind, SyntaxKind as K};
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
-use ts_jsstring::JsString;
+use tsr_arena::NodeId;
+use tsr_ast::{NodeKind, SyntaxKind as K};
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
+use tsr_jsstring::JsString;
 
 impl CheckerState {
     /// The keyword and the name of a meta property.
@@ -69,7 +69,7 @@ impl CheckerState {
     // port: tsc/internal/ast/utilities.go:GetNewTargetContainer
     fn new_target_container(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let view = self.ast(node)?;
-        let container = ts_ast::get_this_container(view, node, false, false)?;
+        let container = tsr_ast::get_this_container(view, node, false, false)?;
         Ok(matches!(
             view.node(container)?.kind().known(),
             Some(K::Constructor | K::FunctionDeclaration | K::FunctionExpression)
@@ -81,7 +81,7 @@ impl CheckerState {
     fn check_import_meta_property(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let module_kind = self.program()?.host.options().emit_module_kind();
         if (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module_kind) {
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("import.meta source file"))?;
             let path = self
                 .ast(source)?
@@ -125,13 +125,13 @@ impl CheckerState {
         let symbol = self.new_symbol(0, JsString::from_bytes(&b"ImportMetaExpression"[..]))?;
         let import_meta = self.global_import_meta_type()?;
         let meta = self.new_symbol_ex(
-            ts_ast::symbol_flags::PROPERTY,
+            tsr_ast::symbol_flags::PROPERTY,
             JsString::from_bytes(&b"meta"[..]),
-            ts_ast::check_flags::READONLY,
+            tsr_ast::check_flags::READONLY,
         )?;
         self.symbol_mut(meta)?.parent = Some(symbol);
         self.value_symbol_links.get_or_default(meta).resolved_type = Some(import_meta);
-        let mut table = ts_ast::SymbolTable::default();
+        let mut table = tsr_ast::SymbolTable::default();
         table.insert(JsString::from_bytes(&b"meta"[..]), Some(meta));
         let members = self.alloc_symbol_table(table);
         self.symbol_mut(symbol)?.members = Some(members);
@@ -158,7 +158,7 @@ impl CheckerState {
         let text = self.node_text(name)?.into_js_string();
         let keyword_text = |keyword: NodeKind| {
             JsString::from_bytes(
-                ts_scanner::token_to_string(keyword.known().expect("keyword token")).as_bytes(),
+                tsr_scanner::token_to_string(keyword.known().expect("keyword token")).as_bytes(),
             )
         };
         match keyword.known() {

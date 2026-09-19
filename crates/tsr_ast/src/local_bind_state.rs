@@ -4,7 +4,7 @@
 //!
 //! Binding identities cannot escape their fresh scope.
 //! ```compile_fail
-//! use ts_ast::{BindBuilder, local_bind::BindSymbol};
+//! use tsr_ast::{BindBuilder, local_bind::BindSymbol};
 //! fn escape(builder: &mut BindBuilder<'_>) -> BindSymbol<'static> {
 //!     builder.with_local_scope(|mut local| local.new_symbol(0, Default::default())).unwrap()
 //! }
@@ -12,7 +12,7 @@
 //!
 //! Binding identities from two scopes cannot be exchanged.
 //! ```compile_fail
-//! use ts_ast::BindBuilder;
+//! use tsr_ast::BindBuilder;
 //! fn cross(first: &mut BindBuilder<'_>, second: &mut BindBuilder<'_>) {
 //!     first.with_local_scope(|mut left| {
 //!         let table = left.new_table();
@@ -23,7 +23,7 @@
 //!
 //! Flow and flow-list namespaces remain distinct.
 //! ```compile_fail
-//! use ts_ast::local_bind::{BindFlow, LocalBind};
+//! use tsr_ast::local_bind::{BindFlow, LocalBind};
 //! fn namespace<'s>(local: &LocalBind<'s, '_>, flow: BindFlow<'s>) {
 //!     local.flow_list(flow);
 //! }
@@ -31,7 +31,7 @@
 //!
 //! A borrowed state row excludes writes until its final observation.
 //! ```compile_fail
-//! use ts_ast::local_bind::{BindFlow, LocalBind};
+//! use tsr_ast::local_bind::{BindFlow, LocalBind};
 //! fn overlapping<'s>(local: &mut LocalBind<'s, '_>, flow: BindFlow<'s>) {
 //!     let read = local.flow(flow);
 //!     *local.local_flow_flags_mut(flow) = 1;
@@ -41,15 +41,15 @@
 //!
 //! An existing handle cannot be invalidated by replacing its owning table arena.
 //! ```compile_fail
-//! use ts_ast::local_bind::LocalBind;
+//! use tsr_ast::local_bind::LocalBind;
 //! fn replace(local: &mut LocalBind<'_, '_>) {
-//!     let _ = std::mem::replace(local.tables_mut(), ts_ast::SymbolTables::new(&Default::default()));
+//!     let _ = std::mem::replace(local.tables_mut(), tsr_ast::SymbolTables::new(&Default::default()));
 //! }
 //! ```
 //!
 //! Identities can cross narrow mutations after a read borrow ends.
 //! ```
-//! use ts_ast::local_bind::{BindFlow, LocalBind};
+//! use tsr_ast::local_bind::{BindFlow, LocalBind};
 //! fn separate<'s>(local: &mut LocalBind<'s, '_>, flow: BindFlow<'s>) {
 //!     let flags = local.flow(flow).flags();
 //!     *local.local_flow_flags_mut(flow) = flags | 1;
@@ -62,7 +62,7 @@ use crate::{
     SymbolTableRead,
 };
 use std::{marker::PhantomData, num::NonZeroU32};
-use ts_arena::Error;
+use tsr_arena::Error;
 
 macro_rules! state_identity {
     ($name:ident) => {

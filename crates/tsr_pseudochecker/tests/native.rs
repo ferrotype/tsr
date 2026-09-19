@@ -1,21 +1,21 @@
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     AstView, ChildVisitor, CompletedFile, JsString, NodeListId, NodeSlice, SourceFileParseOptions,
     SyntaxKind as K,
 };
-use ts_pseudochecker::*;
+use tsr_pseudochecker::*;
 
 #[derive(Debug)]
 struct TestError(String);
-impl From<ts_pseudochecker::Error> for TestError {
-    fn from(e: ts_pseudochecker::Error) -> Self {
+impl From<tsr_pseudochecker::Error> for TestError {
+    fn from(e: tsr_pseudochecker::Error) -> Self {
         Self(e.to_string())
     }
 }
-impl From<ts_arena::Error> for TestError {
-    fn from(e: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for TestError {
+    fn from(e: tsr_arena::Error) -> Self {
         Self(e.to_string())
     }
 }
@@ -185,19 +185,19 @@ fn operations(k: K) -> Vec<&'static str> {
     reason = "The pinned test filenames and upstream extension matching are case sensitive"
 )]
 fn parse(file: &str, source: &str) -> TestHost {
-    let parsed = ts_parser::parse_source_file(
-        ts_jsstring::SourceText::from_loaded_bytes(source.as_bytes()),
+    let parsed = tsr_parser::parse_source_file(
+        tsr_jsstring::SourceText::from_loaded_bytes(source.as_bytes()),
         if file.ends_with(".js") {
-            ts_core::ScriptKind::JS
+            tsr_core::ScriptKind::JS
         } else {
-            ts_core::ScriptKind::TS
+            tsr_core::ScriptKind::TS
         },
         SourceFileParseOptions {
             file_name: JsString::from_bytes(file.as_bytes()),
             ..Default::default()
         },
     );
-    TestHost(ts_binder::bind_parsed_file(parsed).unwrap())
+    TestHost(tsr_binder::bind_parsed_file(parsed).unwrap())
 }
 #[test]
 fn complete_trees_and_error_nodes_match_pinned_native_pseudochecker() {

@@ -1,11 +1,11 @@
 //! External names consume the program's already-published, mode-specific
 //! resolution. Checker diagnostics and ambient declarations remain checker-owned.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_core::{ModuleKind, ModuleResolutionKind};
-use ts_diagnostics::{self as d, Message};
-use ts_tspath as path;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_core::{ModuleKind, ModuleResolutionKind};
+use tsr_diagnostics::{self as d, Message};
+use tsr_tspath as path;
 
 #[path = "external_resolution_context.rs"]
 mod context;
@@ -22,7 +22,7 @@ struct ExternalModuleReference {
 
 impl CheckerState {
     pub(crate) fn module_source(&self, node: NodeId) -> Result<(NodeId, JsString), Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("external module source file"))?;
         Ok((
             source,
@@ -69,7 +69,7 @@ impl CheckerState {
                     };
                     let view = self.ast(initializer)?;
                     let call = view.node(initializer)?;
-                    if !ts_ast::utilities_middle::is_require_call(view, &call, true)? {
+                    if !tsr_ast::utilities_middle::is_require_call(view, &call, true)? {
                         return Ok(None);
                     }
                     let arguments = call.argument_list();
@@ -88,7 +88,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.tryFindAmbientModule
     fn try_find_ambient_module(&mut self, name: &[u8]) -> Result<Option<SymbolId>, Error> {
-        if ts_module::is_relative(name) {
+        if tsr_module::is_relative(name) {
             return Ok(None);
         }
         let mut key = Vec::with_capacity(name.len() + 2);
@@ -237,7 +237,7 @@ impl CheckerState {
             resolved
                 .filter(|resolved| resolved.is_resolved())
                 .and_then(|resolved| {
-                    ts_module::resolution_diagnostic(options, resolved, is_declaration_file)
+                    tsr_module::resolution_diagnostic(options, resolved, is_declaration_file)
                 })
         } else {
             None
@@ -418,21 +418,21 @@ impl CheckerState {
         &mut self,
         is_error: bool,
         node: NodeId,
-        resolved: &ts_module::ResolvedModule,
+        resolved: &tsr_module::ResolvedModule,
         name: &JsString,
     ) -> Result<(), Error> {
         if self.side_effect_import(node)? {
             return Ok(());
         }
         let chain =
-            if !ts_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
+            if !tsr_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
                 Some(self.module_not_found_chain(node, resolved, name)?)
             } else {
                 None
             };
         let args = vec![name.clone(), resolved.resolved_file_name.clone()];
         let diagnostic = if let Some(chain) = chain {
-            ts_ast::Diagnostic::chain(
+            tsr_ast::Diagnostic::chain(
                 Some(std::sync::Arc::new(chain)),
                 d::Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type,
                 args,
@@ -462,7 +462,7 @@ impl CheckerState {
             (b".cjs", b".cjs"),
             (
                 b".tsx",
-                if self.program()?.host.options().jsx == ts_core::JsxEmit::PRESERVE {
+                if self.program()?.host.options().jsx == tsr_core::JsxEmit::PRESERVE {
                     b".jsx"
                 } else {
                     b".js"
@@ -486,9 +486,9 @@ impl CheckerState {
         location: NodeId,
         error: NodeId,
         name: &JsString,
-        resolved: &ts_module::ResolvedModule,
+        resolved: &tsr_module::ResolvedModule,
         mode: ModuleKind,
-        target: &ts_ast::CompletedFile,
+        target: &tsr_ast::CompletedFile,
     ) -> Result<(), Error> {
         let (_, source_name) = self.module_source(location)?;
         let emittable = self.module_import_emittable(location)?;
@@ -551,7 +551,7 @@ impl CheckerState {
             .options()
             .rewrite_relative_import_extensions
             .is_true()
-            && self.node(location)?.flags() & ts_ast::node_flags::AMBIENT == 0
+            && self.node(location)?.flags() & tsr_ast::node_flags::AMBIENT == 0
             && !path::is_declaration_file_name(name.as_bytes())
             && !self.is_literal_import_type_node(location)?
             && !self.is_part_of_type_only_import_or_export_declaration(location)?
@@ -633,7 +633,7 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         let view = self.ast(node)?;
         Ok(
-            ts_ast::utilities::find_ancestor(view, Some(node), |candidate| {
+            tsr_ast::utilities::find_ancestor(view, Some(node), |candidate| {
                 type_only_import_or_export_declaration(view, candidate).unwrap_or(false)
             })?
             .is_some(),
@@ -769,19 +769,19 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let host = self.program()?.host.clone();
         let view = self.ast(location)?;
-        let in_import_call = ts_ast::utilities::find_ancestor(view, Some(location), |node| {
+        let in_import_call = tsr_ast::utilities::find_ancestor(view, Some(location), |node| {
             is_import_call(view, node).unwrap_or(false)
         })?
         .is_some();
-        let import_equals = ts_ast::utilities::find_ancestor(view, Some(location), |node| {
+        let import_equals = tsr_ast::utilities::find_ancestor(view, Some(location), |node| {
             node.kind() == K::ImportEqualsDeclaration
         })?;
         let sync = host.get_default_resolution_mode_for_file(importing_file_name.as_bytes())?
             == ModuleKind::COMMON_JS
             && !in_import_call
             || import_equals.is_some();
-        let override_host = ts_ast::utilities::find_ancestor(view, Some(location), |node| {
-            ts_ast::utilities_middle::is_resolution_mode_override_host(Some(node))
+        let override_host = tsr_ast::utilities::find_ancestor(view, Some(location), |node| {
+            tsr_ast::utilities_middle::is_resolution_mode_override_host(Some(node))
         })?;
         let has_override = override_host
             .map(|host| self.has_resolution_mode_override(host))
@@ -834,7 +834,7 @@ impl CheckerState {
         }
         let args = vec![module_reference.clone()];
         let diagnostic = if let Some(details) = details {
-            ts_ast::Diagnostic::chain(Some(std::sync::Arc::new(details)), message, args)
+            tsr_ast::Diagnostic::chain(Some(std::sync::Arc::new(details)), message, args)
         } else {
             self.diagnostic_for_node(Some(error_node), message, args)?
         };
@@ -855,7 +855,7 @@ impl CheckerState {
             _ => None,
         };
         let (mode, _) =
-            ts_ast::utilities_middle::import_attributes_resolution_mode_with_invalid_value(
+            tsr_ast::utilities_middle::import_attributes_resolution_mode_with_invalid_value(
                 self.ast(node)?,
                 attributes,
             )?;
@@ -870,7 +870,7 @@ impl CheckerState {
         &mut self,
         source: NodeId,
         error_node: NodeId,
-    ) -> Result<ts_ast::Diagnostic, Error> {
+    ) -> Result<tsr_ast::Diagnostic, Error> {
         let file_name = self
             .ast(source)?
             .source_file(source)?
@@ -935,8 +935,8 @@ impl CheckerState {
 
 // port: tsc/internal/ast/utilities.go:IsImportCall
 pub(crate) fn is_import_call(
-    view: ts_ast::AstView<'_>,
-    node: &ts_ast::NodeRead<'_>,
+    view: tsr_ast::AstView<'_>,
+    node: &tsr_ast::NodeRead<'_>,
 ) -> Result<bool, Error> {
     if node.kind() != K::CallExpression {
         return Ok(false);
@@ -978,18 +978,18 @@ impl CheckerState {
     fn module_not_found_chain(
         &mut self,
         error_node: NodeId,
-        resolved: &ts_module::ResolvedModule,
+        resolved: &tsr_module::ResolvedModule,
         module_reference: &JsString,
-    ) -> Result<ts_ast::Diagnostic, Error> {
+    ) -> Result<tsr_ast::Diagnostic, Error> {
         let mut package_name = resolved.package_id.name.as_bytes().to_vec();
         let (message, args): (&'static Message, Vec<JsString>) = if resolved
             .alternate_result
             .is_empty()
         {
             let host = self.program()?.host.clone();
-            let types_name = ts_module::get_types_package_name(&package_name);
+            let types_name = tsr_module::get_types_package_name(&package_name);
             let mangled = JsString::from_bytes(
-                ts_module::mangle_scoped_package_name(&package_name).as_slice(),
+                tsr_module::mangle_scoped_package_name(&package_name).as_slice(),
             );
             if host.package_bundles_types(&types_name)?.is_some() {
                 (
@@ -1017,7 +1017,7 @@ impl CheckerState {
                 .windows(b"/node_modules/@types/".len())
                 .any(|window| window == b"/node_modules/@types/")
             {
-                package_name = ts_module::get_types_package_name(&package_name);
+                package_name = tsr_module::get_types_package_name(&package_name);
             }
             (
                 d::There_are_types_at_0_but_this_result_could_not_be_resolved_when_respecting_package_json_exports_The_1_library_may_need_to_update_its_package_json_or_typings,
@@ -1033,8 +1033,8 @@ impl CheckerState {
 
 // port: tsc/internal/ast/utilities.go:IsTypeOnlyImportOrExportDeclaration
 pub(crate) fn type_only_import_or_export_declaration(
-    view: ts_ast::AstView<'_>,
-    node: &ts_ast::NodeRead<'_>,
+    view: tsr_ast::AstView<'_>,
+    node: &tsr_ast::NodeRead<'_>,
 ) -> Result<bool, Error> {
     let parent_type_only = |depth: usize| -> Result<bool, Error> {
         let mut current = node.parent();
@@ -1059,7 +1059,7 @@ pub(crate) fn type_only_import_or_export_declaration(
             let data = node
                 .data_source()
                 .as_export_declaration()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             data.is_type_only()
                 && data.module_specifier().is_some()
                 && data.export_clause().is_none()

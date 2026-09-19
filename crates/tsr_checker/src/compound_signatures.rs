@@ -5,8 +5,8 @@ use crate::{
     type_flags as tf, CheckerState, Error, MapperId, RelationKind, SignatureId, TypeId,
     TypePredicateId,
 };
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, symbol_flags as sf, JsString};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, symbol_flags as sf, JsString};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.resolveUnionTypeMembers

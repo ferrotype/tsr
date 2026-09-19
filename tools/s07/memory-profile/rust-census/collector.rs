@@ -1,4 +1,4 @@
-//! Diagnostic only. Appended to a staged ts_jsstring; never a production API.
+//! Diagnostic only. Appended to a staged tsr_jsstring; never a production API.
 //! Walk counts owned heap children, not the enclosing inline value.
 use std::{collections::{BTreeMap, HashMap, HashSet}, hash::BuildHasher,
     mem::{size_of, size_of_val}, sync::{Arc, OnceLock}};

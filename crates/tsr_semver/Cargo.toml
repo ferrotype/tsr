@@ -1,5 +1,5 @@
 [package]
-name = "ts_semver"
+name = "tsr_semver"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -7,7 +7,7 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 
 [dev-dependencies]
 serde_json = "1.0"

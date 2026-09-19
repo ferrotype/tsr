@@ -1,9 +1,9 @@
 //! Variable-like source checks for parameter and binding declarations. Child
 //! binding elements are checked before the enclosing initializer is related.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     pub(crate) fn check_binding_element(&mut self, node: NodeId) -> Result<(), Error> {
@@ -114,7 +114,7 @@ impl CheckerState {
             if self.node(parent)?.kind() == K::ObjectBindingPattern
                 && self.binding_is_rest(node)?
                 && self.program()?.host.options().emit_script_target()
-                    < ts_core::ScriptTarget::ES2018
+                    < tsr_core::ScriptTarget::ES2018
             {
                 self.check_external_emit_helpers(node, crate::external_emit_helpers::REST)?;
             }
@@ -307,7 +307,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         let ty = self.check_non_null_type_with_reporter(ty, node, false)?;
         if self.types.flags(ty)? & tf::VOID != 0 {
-            if ts_ast::is_entity_name_expression(self.ast(node)?, node)? {
+            if tsr_ast::is_entity_name_expression(self.ast(node)?, node)? {
                 let text = self.entity_name_text(node)?;
                 if self.node(node)?.kind() == K::Identifier && text.as_bytes() == b"undefined" {
                     self.error_at(Some(node), d::The_value_0_cannot_be_used_here, vec![text])?;

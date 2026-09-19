@@ -2,12 +2,12 @@
 use super::local_container_flags;
 use crate::get_container_flags;
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     AstBuilder, FactoryMethods, JsString, NodeId, NodeKind, ParsedFile, SourceFileParseOptions,
     SyntaxKind as K,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 fn finish(mut build: AstBuilder) -> ParsedFile {
     let source = build.new_source_file(

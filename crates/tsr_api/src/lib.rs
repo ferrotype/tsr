@@ -12,26 +12,26 @@ pub use printing::{print_node, PrintError, PrintNodeOptions};
 use std::collections::{HashMap, VecDeque};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Arc, Mutex};
-use ts_arena::Generation;
-use ts_checker::{CheckerOwner, Operation, RetainedType, TypeRef};
-use ts_project::CheckerSlot;
+use tsr_arena::Generation;
+use tsr_checker::{CheckerOwner, Operation, RetainedType, TypeRef};
+use tsr_project::CheckerSlot;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Error {
-    Checker(ts_checker::Error),
+    Checker(tsr_checker::Error),
     UnknownType,
     WrongSnapshot,
     QueueFull,
     Capacity,
     Panicked(String),
 }
-impl From<ts_checker::Error> for Error {
-    fn from(value: ts_checker::Error) -> Self {
+impl From<tsr_checker::Error> for Error {
+    fn from(value: tsr_checker::Error) -> Self {
         Self::Checker(value)
     }
 }
-impl From<ts_arena::Error> for Error {
-    fn from(value: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(value: tsr_arena::Error) -> Self {
         Self::Checker(value.into())
     }
 }
@@ -59,7 +59,7 @@ struct Registry {
 }
 
 struct SnapshotData {
-    project: ts_project::Snapshot,
+    project: tsr_project::Snapshot,
     checker: Arc<CheckerOwner>,
     registry: Mutex<Registry>,
 }
@@ -69,7 +69,7 @@ struct SnapshotData {
 #[derive(Clone)]
 pub struct Snapshot(Arc<SnapshotData>);
 impl Snapshot {
-    pub fn new(project: ts_project::Snapshot) -> Result<Self, Error> {
+    pub fn new(project: tsr_project::Snapshot) -> Result<Self, Error> {
         let checker = project.project().pool().acquire(CheckerSlot::Api)?;
         let owner = checker.owner().clone();
         let snapshot = Self(Arc::new(SnapshotData {
@@ -130,7 +130,7 @@ impl Snapshot {
         bytes: Vec<u8>,
     ) -> Result<PreparedResponse, Error> {
         if !Arc::ptr_eq(operation.owner(), &self.0.checker) {
-            return Err(ts_arena::Error::WrongOwner.into());
+            return Err(tsr_arena::Error::WrongOwner.into());
         }
         let types = types
             .iter()
@@ -162,8 +162,8 @@ impl Snapshot {
                 .0
                 .registry
                 .lock()
-                .map_err(|_| ts_arena::Error::Retired)?;
-            let mut output = queue.state.lock().map_err(|_| ts_arena::Error::Retired)?;
+                .map_err(|_| tsr_arena::Error::Retired)?;
+            let mut output = queue.state.lock().map_err(|_| tsr_arena::Error::Retired)?;
             if output.len() == queue.capacity {
                 return Err(Error::QueueFull);
             }
@@ -197,7 +197,7 @@ impl Snapshot {
         self.0
             .registry
             .lock()
-            .map_err(|_| ts_arena::Error::Retired)?
+            .map_err(|_| tsr_arena::Error::Retired)?
             .types
             .get(&id)
             .cloned()
@@ -230,7 +230,7 @@ impl Snapshot {
             .0
             .registry
             .lock()
-            .map_err(|_| ts_arena::Error::Retired)?
+            .map_err(|_| tsr_arena::Error::Retired)?
             .latest
             .clone())
     }

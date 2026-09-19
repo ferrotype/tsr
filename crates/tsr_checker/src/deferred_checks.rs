@@ -2,7 +2,7 @@
 //! the mutable checker. Failed callbacks remain pending and fail again on retry.
 
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
+use tsr_arena::NodeId;
 
 #[derive(Clone, Copy)]
 pub(crate) enum DeferredCheck {
@@ -85,9 +85,9 @@ impl CheckerState {
             return Ok(());
         }
         let text = self.node_text(name)?.into_js_string();
-        let spelling = ts_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
+        let spelling = tsr_scanner::declaration_name_to_string(self.ast(name)?, Some(name))?;
         let mut child = None;
-        if self.node(name)?.kind() != ts_ast::SyntaxKind::PrivateIdentifier
+        if self.node(name)?.kind() != tsr_ast::SyntaxKind::PrivateIdentifier
             && self.types.flags(containing)? & (tf::UNION | tf::PRIMITIVE) == tf::UNION
         {
             for &part in self.types.compound_types(containing)?.clone().iter() {
@@ -101,7 +101,7 @@ impl CheckerState {
                             self.type_to_string(part, crate::type_display::DEFAULT_FLAGS)?;
                         child = Some(std::sync::Arc::new(self.diagnostic_for_node(
                             Some(name),
-                            ts_diagnostics::Property_0_does_not_exist_on_type_1,
+                            tsr_diagnostics::Property_0_does_not_exist_on_type_1,
                             vec![spelling.clone(), display],
                         )?));
                         break;
@@ -114,10 +114,10 @@ impl CheckerState {
             let mut qualified = display.as_bytes().to_vec();
             qualified.push(b'.');
             qualified.extend_from_slice(spelling.as_bytes());
-            let message = ts_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_to_access_the_static_member_2_instead;
-            let args = vec![spelling, display, ts_ast::JsString::from_bytes(qualified)];
+            let message = tsr_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_to_access_the_static_member_2_instead;
+            let args = vec![spelling, display, tsr_ast::JsString::from_bytes(qualified)];
             let diagnostic = if child.is_some() {
-                ts_ast::Diagnostic::chain(child, message, args)
+                tsr_ast::Diagnostic::chain(child, message, args)
             } else {
                 self.diagnostic_for_node(Some(name), message, args)?
             };
@@ -132,17 +132,17 @@ impl CheckerState {
             {
                 let display =
                     self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
-                let message = ts_diagnostics::Property_0_does_not_exist_on_type_1;
+                let message = tsr_diagnostics::Property_0_does_not_exist_on_type_1;
                 let args = vec![spelling, display];
                 let mut diagnostic = if child.is_some() {
-                    ts_ast::Diagnostic::chain(child, message, args)
+                    tsr_ast::Diagnostic::chain(child, message, args)
                 } else {
                     self.diagnostic_for_node(Some(name), message, args)?
                 };
                 diagnostic.related_information.push(std::sync::Arc::new(
                     self.diagnostic_for_node(
                         Some(name),
-                        ts_diagnostics::Did_you_forget_to_use_await,
+                        tsr_diagnostics::Did_you_forget_to_use_await,
                         vec![],
                     )?,
                 ));
@@ -161,14 +161,14 @@ impl CheckerState {
             ) {
                 let display =
                     self.type_to_string(containing, crate::type_display::DEFAULT_FLAGS)?;
-                let message = ts_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later;
+                let message = tsr_diagnostics::Property_0_does_not_exist_on_type_1_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_2_or_later;
                 let args = vec![
                     spelling,
                     display,
-                    ts_ast::JsString::from_bytes(lib.as_bytes()),
+                    tsr_ast::JsString::from_bytes(lib.as_bytes()),
                 ];
                 let diagnostic = if child.is_some() {
-                    ts_ast::Diagnostic::chain(child, message, args)
+                    tsr_ast::Diagnostic::chain(child, message, args)
                 } else {
                     self.diagnostic_for_node(Some(name), message, args)?
                 };
@@ -181,13 +181,13 @@ impl CheckerState {
         let mut names = Vec::new();
         for property in properties {
             if let Some(parent) = self.node(name)?.parent() {
-                if self.node(parent)?.kind() == ts_ast::SyntaxKind::PropertyAccessExpression {
+                if self.node(parent)?.kind() == tsr_ast::SyntaxKind::PropertyAccessExpression {
                     let receiver = self
                         .ast(parent)?
                         .node(parent)?
                         .expression()
                         .ok_or(Error::MissingLink("property completion receiver"))?;
-                    let is_super = self.node(receiver)?.kind() == ts_ast::SyntaxKind::SuperKeyword;
+                    let is_super = self.node(receiver)?.kind() == tsr_ast::SyntaxKind::SuperKeyword;
                     if !self.is_access_property_accessible(
                         parent, is_super, false, containing, property,
                     )? {
@@ -197,7 +197,7 @@ impl CheckerState {
             }
             names.push((self.symbol(property)?.name_to_owned(), property));
         }
-        let suggestion = ts_scanner::get_spelling_suggestion_for_strings(
+        let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
             text.as_bytes(),
             names.iter().map(|(name, _)| name.as_bytes()),
         );
@@ -209,9 +209,9 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("property suggestion"))?;
             (
                 if unchecked_js {
-                    ts_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2
+                    tsr_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2
                 } else {
-                    ts_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_2
+                    tsr_diagnostics::Property_0_does_not_exist_on_type_1_Did_you_mean_2
                 },
                 vec![spelling, display, self.symbol(*symbol)?.name_to_owned()],
                 Some(*symbol),
@@ -219,14 +219,14 @@ impl CheckerState {
         } else {
             child = self.elaborate_never_intersection(child, name, containing)?;
             let message = if self.container_seems_to_be_empty_dom_element(containing)? {
-                ts_diagnostics::Property_0_does_not_exist_on_type_1_Try_changing_the_lib_compiler_option_to_include_dom
+                tsr_diagnostics::Property_0_does_not_exist_on_type_1_Try_changing_the_lib_compiler_option_to_include_dom
             } else {
-                ts_diagnostics::Property_0_does_not_exist_on_type_1
+                tsr_diagnostics::Property_0_does_not_exist_on_type_1
             };
             (message, vec![spelling, display], None)
         };
         let mut diagnostic = if child.is_some() {
-            ts_ast::Diagnostic::chain(child, message, args)
+            tsr_ast::Diagnostic::chain(child, message, args)
         } else {
             self.diagnostic_for_node(Some(name), message, args)?
         };
@@ -235,7 +235,7 @@ impl CheckerState {
                 diagnostic.related_information.push(std::sync::Arc::new(
                     self.diagnostic_for_node(
                         Some(declaration),
-                        ts_diagnostics::X_0_is_declared_here,
+                        tsr_diagnostics::X_0_is_declared_here,
                         vec![self.symbol(symbol)?.name_to_owned()],
                     )?,
                 ));
@@ -244,11 +244,11 @@ impl CheckerState {
         // port: tsc/internal/checker/checker.go:Checker.addErrorOrSuggestion
         if !unchecked_js
             || diagnostic.code
-                != ts_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2.code
+                != tsr_diagnostics::Property_0_may_not_exist_on_type_1_Did_you_mean_2.code
         {
             self.add_diagnostic(diagnostic)?;
         } else {
-            diagnostic.category = ts_diagnostics::Category::Suggestion as i32;
+            diagnostic.category = tsr_diagnostics::Category::Suggestion as i32;
             self.add_suggestion_diagnostic(diagnostic)?;
         }
         self.deferred_checks.reported_properties.insert(name);
@@ -260,10 +260,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.elaborateNeverIntersection
     pub(crate) fn elaborate_never_intersection(
         &mut self,
-        chain: Option<std::sync::Arc<ts_ast::Diagnostic>>,
+        chain: Option<std::sync::Arc<tsr_ast::Diagnostic>>,
         node: NodeId,
         ty: TypeId,
-    ) -> Result<Option<std::sync::Arc<ts_ast::Diagnostic>>, Error> {
+    ) -> Result<Option<std::sync::Arc<tsr_ast::Diagnostic>>, Error> {
         let record = *self.types.get(ty)?;
         if record.flags & tf::INTERSECTION == 0
             || record.object_flags & crate::object_flags::IS_NEVER_INTERSECTION == 0
@@ -276,7 +276,7 @@ impl CheckerState {
         let display = self.type_to_string(ty, crate::type_format_flags::NO_TYPE_REDUCTION)?;
         let name = self.symbol_to_string(property)?;
         let diagnostic = if chain.is_some() {
-            ts_ast::Diagnostic::chain(chain, message, vec![display, name])
+            tsr_ast::Diagnostic::chain(chain, message, vec![display, name])
         } else {
             self.diagnostic_for_node(Some(node), message, vec![display, name])?
         };
@@ -287,16 +287,16 @@ impl CheckerState {
     pub(crate) fn never_intersection_cause(
         &mut self,
         ty: TypeId,
-    ) -> Result<Option<(&'static ts_diagnostics::Message, ts_arena::SymbolId)>, Error> {
+    ) -> Result<Option<(&'static tsr_diagnostics::Message, tsr_arena::SymbolId)>, Error> {
         let properties = self.get_properties_of_union_or_intersection_type(ty)?;
         for &property in &properties {
             if self.is_discriminant_with_never_type(property)? {
-                return Ok(Some((ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents, property)));
+                return Ok(Some((tsr_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_has_conflicting_types_in_some_constituents, property)));
             }
         }
         for property in properties {
             if self.is_conflicting_private_property(property)? {
-                return Ok(Some((ts_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some, property)));
+                return Ok(Some((tsr_diagnostics::The_intersection_0_was_reduced_to_never_because_property_1_exists_in_multiple_constituents_and_is_private_in_some, property)));
             }
         }
         Ok(None)

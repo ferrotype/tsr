@@ -2,8 +2,8 @@ use crate::{
     element_flags as ef, object_flags as of, type_flags as tf, types::Map, CheckerState, Error,
     LinkStore, MapperId, RelationKind, TypeId,
 };
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, symbol_flags as sf, SymbolTable};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, symbol_flags as sf, SymbolTable};
 
 type ReverseKey = (TypeId, TypeId, TypeId);
 
@@ -258,7 +258,7 @@ impl CheckerState {
                     & tf::TYPE_PARAMETER
                     != 0
                 {
-                    let zero = self.get_number_literal_type(ts_jsnum::Number::new(0.0))?;
+                    let zero = self.get_number_literal_type(tsr_jsnum::Number::new(0.0))?;
                     let tuple = self.create_tuple_type(&[data.object_type])?;
                     let mapper =
                         self.new_type_mapper(&[data.index_type, data.object_type], &[zero, tuple])?;

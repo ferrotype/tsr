@@ -5,15 +5,15 @@ use std::{
     collections::BTreeMap,
     sync::{Arc, OnceLock, RwLock},
 };
-use ts_arena::Error as AstError;
-use ts_ast::{Diagnostic, NodeId};
-use ts_ast::{NodeDataRead, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_core::{ModuleKind, ScriptTarget};
-use ts_diagnostics::{self as d, Message};
-use ts_jsstring::JsString;
-use ts_module::PackageId;
-use ts_tspath as path;
+use tsr_arena::Error as AstError;
+use tsr_ast::{Diagnostic, NodeId};
+use tsr_ast::{NodeDataRead, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_core::{ModuleKind, ScriptTarget};
+use tsr_diagnostics::{self as d, Message};
+use tsr_jsstring::JsString;
+use tsr_module::PackageId;
+use tsr_tspath as path;
 
 #[derive(Clone, Debug)]
 pub(crate) struct SyntheticImport {
@@ -58,7 +58,7 @@ pub(crate) enum IncludeReasonData {
     },
 }
 
-type Cached<T> = OnceLock<Result<T, ts_arena::Error>>;
+type Cached<T> = OnceLock<Result<T, tsr_arena::Error>>;
 
 #[derive(Debug)]
 pub(crate) struct IncludeReason {
@@ -155,9 +155,9 @@ impl IncludeReason {
                         };
                     let read = view.node(node)?;
                     let start =
-                        ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(read.pos()));
+                        tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(read.pos()));
                     let loc = TextRange::new(start, i64::from(read.end()));
-                    let text = if ts_ast::utilities::node_is_synthesized(&read) {
+                    let text = if tsr_ast::utilities::node_is_synthesized(&read) {
                         let mut text = vec![b'"'];
                         text.extend_from_slice(view.node_text(node)?.as_bytes());
                         text.push(b'"');
@@ -423,7 +423,7 @@ impl IncludeReason {
                     target.as_bytes(),
                 )?
                 .map(|node| {
-                    ts_tsoptions::diagnostic_for_node(
+                    tsr_tsoptions::diagnostic_for_node(
                         syntax,
                         node,
                         d::File_is_default_library_for_target_specified_here,
@@ -437,7 +437,7 @@ impl IncludeReason {
             return Ok(None);
         };
         Ok(find_array_value(syntax, object, key, value)?
-            .map(|node| ts_tsoptions::diagnostic_for_node(syntax, node, message, Vec::new())))
+            .map(|node| tsr_tsoptions::diagnostic_for_node(syntax, node, message, Vec::new())))
     }
 }
 
@@ -468,7 +468,7 @@ impl IncludeExplanations {
     fn compiler_options(&self, program: &Program) -> Option<NodeId> {
         *self.compiler_options.get_or_init(|| {
             let syntax = program.config().config_file.as_ref()?;
-            let property = ts_tsoptions::find_property(syntax, &[b"compilerOptions"])?;
+            let property = tsr_tsoptions::find_property(syntax, &[b"compilerOptions"])?;
             let view = syntax.file.view();
             let node = view.node(property).expect("config property owner");
             let NodeDataRead::PropertyAssignment(data) = node.data() else {
@@ -518,7 +518,7 @@ impl IncludeExplanations {
                 return Ok(Arc::from([]));
             };
             let source = file.bound().view().source_file()?;
-            if ts_ast::utilities::is_external_or_common_js_module(&source) {
+            if tsr_ast::utilities::is_external_or_common_js_module(&source) {
                 let metadata = program.metadata(file_path).expect("loaded source metadata");
                 let emit = crate::metadata::implied_for_emit(
                     source.parse_options().file_name.as_bytes(),
@@ -648,7 +648,7 @@ impl Program {
     }
 }
 
-fn source_slice(source: &ts_jsstring::SourceText, loc: TextRange) -> JsString {
+fn source_slice(source: &tsr_jsstring::SourceText, loc: TextRange) -> JsString {
     source
         .slice(
             usize::try_from(loc.pos()).expect("negative reference position")
@@ -704,7 +704,7 @@ fn script_target_text(target: ScriptTarget) -> JsString {
 }
 /// port: tsc/internal/tsoptions/tsconfigparsing.go:GetCallbackForFindingPropertyAssignmentByValue
 fn find_array_value(
-    config: &ts_tsoptions::TsConfigSourceFile,
+    config: &tsr_tsoptions::TsConfigSourceFile,
     object: Option<NodeId>,
     key: &[u8],
     value: &[u8],
@@ -712,7 +712,7 @@ fn find_array_value(
     let Some(object) = object else {
         return Ok(None);
     };
-    let Some(property) = ts_tsoptions::find_property_in_object(config, object, &[key]) else {
+    let Some(property) = tsr_tsoptions::find_property_in_object(config, object, &[key]) else {
         return Ok(None);
     };
     let view = config.file.view();

@@ -1,10 +1,10 @@
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     AstBuilder, CheckJsDirective, CommentRange, ContentMapperSourceFileInfo, Diagnostic, Factory,
     FactoryMethods, JsString, SourceFileParseOptions, SourceHash, SyntaxKind,
 };
-use ts_core::{ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 
 fn options(name: &[u8]) -> SourceFileParseOptions {
     SourceFileParseOptions {
@@ -40,7 +40,7 @@ fn source_file_clone_copies_only_the_pinned_copy_from_fields() {
         });
         file.external_module_indicator = Some(original);
         file.diagnostics.push(Diagnostic::compiler(
-            ts_diagnostics::by_code(1005).unwrap(),
+            tsr_diagnostics::by_code(1005).unwrap(),
             Vec::new(),
         ));
         file.set_content_mapper_info(ContentMapperSourceFileInfo {
@@ -150,10 +150,10 @@ fn node_index_cache_keeps_go_once_panic_and_rust_ownership_error_distinct() {
     let view = factory.view();
     let file = view.source_file(source).unwrap();
     assert!(file
-        .try_node_index_cache(|| Err(ts_arena::Error::WrongOwner))
+        .try_node_index_cache(|| Err(tsr_arena::Error::WrongOwner))
         .is_err());
     let table = file
-        .node_index_cache(|| ts_ast::NodeIndexCache::new(vec![None]))
+        .node_index_cache(|| tsr_ast::NodeIndexCache::new(vec![None]))
         .unwrap();
     assert_eq!(table.nodes(), &[None]);
     assert!(std::ptr::eq(
@@ -174,7 +174,7 @@ fn node_index_cache_keeps_go_once_panic_and_rust_ownership_error_distinct() {
     let reentrant = view.source_file(reentrant_source).unwrap();
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         reentrant.node_index_cache(|| {
-            reentrant.node_index_cache(|| ts_ast::NodeIndexCache::new(vec![]));
+            reentrant.node_index_cache(|| tsr_ast::NodeIndexCache::new(vec![]));
             unreachable!("same-thread reentry must be diagnosed");
         });
     }));

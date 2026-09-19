@@ -7,11 +7,11 @@ use crate::{
     TYPE_ACQUISITION_OPTIONS,
 };
 use std::sync::Arc;
-use ts_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
-use ts_core::{CompilerOptions, Tristate};
-use ts_diagnostics::{self as d, Message};
-use ts_jsstring::JsString;
-use ts_vfs::Error;
+use tsr_ast::{Diagnostic, NodeDataRead, NodeId, SyntaxKind as K};
+use tsr_core::{CompilerOptions, Tristate};
+use tsr_diagnostics::{self as d, Message};
+use tsr_jsstring::JsString;
+use tsr_vfs::Error;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TypeAcquisition {
@@ -38,7 +38,7 @@ impl TypeAcquisition {
     }
     fn for_config(name: &[u8]) -> Self {
         Self {
-            enable: if ts_tspath::base_name(name) == b"jsconfig.json" {
+            enable: if tsr_tspath::base_name(name) == b"jsconfig.json" {
                 Tristate::TRUE
             } else {
                 Tristate::UNKNOWN
@@ -158,7 +158,7 @@ fn unknown(config: &TsConfigSourceFile, node: NodeId, key: &[u8], parent: &str) 
     let suggestion = find_declaration(options, key, false)
         .map(|option| option.name.as_bytes())
         .or_else(|| {
-            ts_scanner::get_spelling_suggestion_for_strings(
+            tsr_scanner::get_spelling_suggestion_for_strings(
                 key,
                 options.iter().map(|option| option.name.as_bytes()),
             )
@@ -182,12 +182,12 @@ fn extends_path(
     config: &TsConfigSourceFile,
     node: Option<NodeId>,
 ) -> Result<(Option<JsString>, Vec<Diagnostic>), Error> {
-    let value = ts_tspath::normalize_slashes(value);
-    if ts_tspath::encoded_root_length(&value) > 0
+    let value = tsr_tspath::normalize_slashes(value);
+    if tsr_tspath::encoded_root_length(&value) > 0
         || value.starts_with(b"./")
         || value.starts_with(b"../")
     {
-        let mut path = ts_tspath::absolute(&value, base);
+        let mut path = tsr_tspath::absolute(&value, base);
         if !host.fs().file_exists(&path)? && !path.ends_with(b".json") {
             path.extend_from_slice(b".json");
             if !host.fs().file_exists(&path)? {
@@ -205,7 +205,7 @@ fn extends_path(
         return Ok((Some(JsString::from_bytes(path)), vec![]));
     }
     if let Some(path) =
-        host.resolve_config(&value, &ts_tspath::combine(base, &[b"tsconfig.json"]))?
+        host.resolve_config(&value, &tsr_tspath::combine(base, &[b"tsconfig.json"]))?
     {
         return Ok((Some(path), vec![]));
     }
@@ -237,7 +237,7 @@ fn extends_paths(
     let new_base = if name.is_empty() {
         base.to_vec()
     } else {
-        ts_tspath::directory(&ts_tspath::combine(base, &[name]))
+        tsr_tspath::directory(&tsr_tspath::combine(base, &[name]))
     };
     let expression = initializer(config, property);
     let option = find_declaration(ROOT_OPTIONS, b"extends", false).expect("extends declaration");
@@ -413,8 +413,8 @@ fn parse_config(
     name: &[u8],
     stack: &[JsString],
 ) -> Result<Parsed, Error> {
-    let base = ts_tspath::normalize_slashes(base);
-    let resolved = ts_tspath::to_path(name, &base, host.fs().use_case_sensitive_file_names());
+    let base = tsr_tspath::normalize_slashes(base);
+    let resolved = tsr_tspath::to_path(name, &base, host.fs().use_case_sensitive_file_names());
     if stack.contains(&resolved) {
         return Ok(Parsed {
             raw: ConfigValue::Null,
@@ -441,7 +441,7 @@ fn parse_config(
         // ParseExtendedConfig returns a source-file record even when ReadFile
         // fails; getExtendedConfig records its name before returning errors.
         own.source.extended_source_files.push(path.clone());
-        let resolved = ts_tspath::to_path(
+        let resolved = tsr_tspath::to_path(
             path.as_bytes(),
             host.current_directory(),
             host.fs().use_case_sensitive_file_names(),
@@ -469,8 +469,8 @@ fn parse_config(
         let mut parsed = parse_config(
             source,
             host,
-            &ts_tspath::directory(path.as_bytes()),
-            ts_tspath::base_name(path.as_bytes()),
+            &tsr_tspath::directory(path.as_bytes()),
+            tsr_tspath::base_name(path.as_bytes()),
             &stack,
         )?;
         own.errors.append(&mut parsed.errors);
@@ -678,7 +678,7 @@ fn references(parsed: &mut Parsed, base: &[u8]) -> Option<Vec<ProjectReference>>
             None => false,
         };
         result.push(ProjectReference {
-            path: JsString::from_bytes(ts_tspath::absolute(path.as_bytes(), base)),
+            path: JsString::from_bytes(tsr_tspath::absolute(path.as_bytes(), base)),
             original_path: path.clone(),
             circular,
         });
@@ -696,11 +696,11 @@ pub fn parse_json_source_file_config_file_content(
     existing_raw: &ConfigValue,
     name: &[u8],
 ) -> Result<ParsedCommandLine, Error> {
-    ts_parser::on_parser_worker(|| {
+    tsr_parser::on_parser_worker(|| {
         let base_files = if name.is_empty() {
-            ts_tspath::normalize(base).into_owned()
+            tsr_tspath::normalize(base).into_owned()
         } else {
-            ts_tspath::normalize(&ts_tspath::directory(&ts_tspath::combine(base, &[name])))
+            tsr_tspath::normalize(&tsr_tspath::directory(&tsr_tspath::combine(base, &[name])))
                 .into_owned()
         };
         let mut parsed = parse_config(source, host, base, name, &[])?;
@@ -709,12 +709,12 @@ pub fn parse_json_source_file_config_file_content(
         substitute_options(options, &base_files);
         if !name.is_empty() {
             options.config_file_path =
-                JsString::from_bytes(ts_tspath::normalize_slashes(name).into_owned());
+                JsString::from_bytes(tsr_tspath::normalize_slashes(name).into_owned());
         }
         let config_specs = specs(&mut parsed, &base_files, name);
         let options = parsed.options.as_ref().expect("root config options");
         let containing = if name.is_empty() {
-            ts_tspath::combine(&base_files, &[b"tsconfig.json"])
+            tsr_tspath::combine(&base_files, &[b"tsconfig.json"])
         } else {
             name.to_vec()
         };

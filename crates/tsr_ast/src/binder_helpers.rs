@@ -3,7 +3,7 @@
 use crate::NodeAccess;
 use crate::{modifier_flags, node_flags, AstView, NodeDataRead, NodeId, NodeRead, SyntaxKind as K};
 use std::collections::HashMap;
-use ts_arena::Error;
+use tsr_arena::Error;
 
 fn required(view: AstView<'_>, id: Option<NodeId>) -> Result<NodeRead<'_>, Error> {
     view.node(id.expect("nil node in source AST utility"))

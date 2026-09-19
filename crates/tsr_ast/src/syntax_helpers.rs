@@ -6,7 +6,7 @@ use crate::{
     AstView, NodeAccess, NodeId, NodeKind, NodeRead, SyntaxKind as K,
 };
 use std::convert::Infallible;
-use ts_arena::Error;
+use tsr_arena::Error;
 
 pub(crate) trait Read {
     type Id: Copy + Eq;

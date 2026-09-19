@@ -7,7 +7,7 @@ no checker algorithm is copied into the harness.
 
 ```sh
 python3 scripts/s08_p2.py capture --spec tools/s08/p3/requests.json --output target/s08/p3a-native
-cargo run -p ts_compiler --example p2_checker -- target/s08/p3a-native/requests.json target/s08/p3a-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p3a-native/requests.json target/s08/p3a-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p3a-native --actual target/s08/p3a-rust.json --output target/s08/p3a-comparison.json
 ```
 

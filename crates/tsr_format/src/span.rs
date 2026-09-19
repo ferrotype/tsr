@@ -20,11 +20,11 @@ use crate::util::{
 };
 use crate::{debug_assert, Error, FormatFile};
 use std::ops::ControlFlow;
-use ts_arena::NodeId;
-use ts_ast::{node_flags, utilities, utilities_middle, ChildVisitor, NodeListId, SyntaxKind as K};
-use ts_astnav::Visit;
-use ts_core::{TextChange, TextRange};
-use ts_jsstring::wtf8::decode_utf8;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags, utilities, utilities_middle, ChildVisitor, NodeListId, SyntaxKind as K};
+use tsr_astnav::Visit;
+use tsr_core::{TextChange, TextRange};
+use tsr_jsstring::wtf8::decode_utf8;
 
 /// Upstream's zero `TextRangeWithKind`, which stands for "no range yet".
 fn no_range() -> TextRangeWithKind {
@@ -62,9 +62,9 @@ pub(crate) fn with_token_start(
 
 /// Every child `ForEachChild` reaches, with lists flattened.
 struct Children<'v> {
-    view: ts_ast::AstView<'v>,
+    view: tsr_ast::AstView<'v>,
     out: Vec<NodeId>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 
 impl ChildVisitor for Children<'_> {
@@ -81,7 +81,7 @@ impl ChildVisitor for Children<'_> {
             }
         }
     }
-    fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> ControlFlow<()> {
+    fn visit_node_slice(&mut self, nodes: tsr_ast::NodeSlice) -> ControlFlow<()> {
         match self.view.node_slice(nodes) {
             Ok(read) => {
                 self.out.extend(read.iter().flatten());
@@ -344,7 +344,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
         self.context.file
     }
 
-    fn kind_of(&self, node: NodeId) -> Result<ts_ast::NodeKind, Error> {
+    fn kind_of(&self, node: NodeId) -> Result<tsr_ast::NodeKind, Error> {
         Ok(self.context.file.node(node)?.kind())
     }
 
@@ -490,7 +490,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
         let (child_flags, child_range, child_kind) = {
             let read = self.context.file.node(child)?;
             debug_assert(!utilities::node_is_synthesized(&read))?;
-            if ts_ast::node_is_missing(Some(&read)) || read.flags() & node_flags::REPARSED != 0 {
+            if tsr_ast::node_is_missing(Some(&read)) || read.flags() & node_flags::REPARSED != 0 {
                 return Ok(inherited_indentation);
             }
             (read.flags(), read.range(), read.kind())
@@ -564,7 +564,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
             return Ok(inherited_indentation);
         }
 
-        if ts_ast::is_token_kind(child_kind) {
+        if tsr_ast::is_token_kind(child_kind) {
             // A token child does not affect indentation: it is processed under
             // the parent's indentation scope.
             let token_info = self.read_token_info(child)?;
@@ -780,7 +780,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
     ) -> Result<(), Error> {
         let view = self.context.file.view;
         let modifiers = view.node(node)?.modifiers();
-        for visit in ts_astnav::visit_each_child(view, node)? {
+        for visit in tsr_astnav::visit_each_child(view, node)? {
             let children = match visit {
                 Visit::Node(child) => vec![child],
                 Visit::List(list) if Some(list) == modifiers => view
@@ -1286,7 +1286,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
                     .file
                     .view
                     .source_file(self.context.file.source)?;
-                ts_scanner::get_ecma_end_line_position(&state, line as isize)
+                tsr_scanner::get_ecma_end_line_position(&state, line as isize)
             };
 
             // Whitespace inside comments and template literals is not trimmed.
@@ -1310,7 +1310,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
                         .source_file(self.context.file.source)?;
                     let text = state.text().as_bytes();
                     let (ch, _) = decode_utf8(&text[(whitespace_start - 1) as usize..]);
-                    debug_assert(!ts_scanner::is_white_space_single_line(ch))?;
+                    debug_assert(!tsr_scanner::is_white_space_single_line(ch))?;
                 }
                 self.record_delete(whitespace_start, line_end_position + 1 - whitespace_start);
             }
@@ -1337,7 +1337,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
             };
             let (ch, size) = decode_utf8(rest);
             // At the end of the text there is nothing to decode: rewind.
-            if size != 0 && !ts_scanner::is_white_space_single_line(ch) {
+            if size != 0 && !tsr_scanner::is_white_space_single_line(ch) {
                 break;
             }
             pos -= 1;
@@ -1490,7 +1490,7 @@ impl<'a, 'p, 'f, 's> FormatSpanWorker<'a, 'p, 'f, 's> {
                     .file
                     .view
                     .source_file(self.context.file.source)?;
-                ts_scanner::get_ecma_end_line_position(&state, line as isize)
+                tsr_scanner::get_ecma_end_line_position(&state, line as isize)
             };
             parts.push(TextRange::new(start_pos, end_of_line));
             start_pos = self.file().line_start(line + 1)?;
@@ -1882,7 +1882,7 @@ fn get_non_decorator_token_pos_of_node(
     };
     let end = i64::from(view.node(last_decorator)?.end());
     let state = view.source_file(file.source)?;
-    Ok(ts_scanner::skip_trivia(state.text().as_bytes(), end))
+    Ok(tsr_scanner::skip_trivia(state.text().as_bytes(), end))
 }
 
 /// `node.ModifierNodes()`: empty when the node has no modifier list.
@@ -1930,7 +1930,7 @@ fn get_first_non_decorator_token_of_node(
 
     let name_kind = |file: &FormatFile<'_, '_>| -> Result<K, Error> {
         Ok(
-            match ts_ast::get_name_of_declaration(file.view, Some(node))? {
+            match tsr_ast::get_name_of_declaration(file.view, Some(node))? {
                 Some(name) => file.view.node(name)?.kind().known().unwrap_or(K::Unknown),
                 None => K::Unknown,
             },

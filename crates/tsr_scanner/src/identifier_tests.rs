@@ -1,7 +1,7 @@
 use super::{get_identifier_token, get_viable_keyword_suggestions, keyword, KEYWORDS};
 use crate::identifier_to_keyword_kind;
-use ts_ast::{IdentifierData, SyntaxKind};
-use ts_jsstring::JsString;
+use tsr_ast::{IdentifierData, SyntaxKind};
+use tsr_jsstring::JsString;
 
 fn table_kind(bytes: &[u8]) -> SyntaxKind {
     KEYWORDS

@@ -2,7 +2,7 @@ use super::*;
 use crate::Resolver;
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_vfs::MemoryBuilder;
+use tsr_vfs::MemoryBuilder;
 fn hex(bytes: &[u8]) -> String {
     use std::fmt::Write;
     let mut text = String::with_capacity(bytes.len() * 2);
@@ -29,14 +29,14 @@ fn independent_go_trace_callbacks_and_typed_arguments() {
                 content.as_str().unwrap().as_bytes().to_vec(),
             );
         }
-        let options = ts_tsoptions::raw::compiler_options(&request["options"]).unwrap();
+        let options = tsr_tsoptions::raw::compiler_options(&request["options"]).unwrap();
         let mut resolver = Resolver::new(Arc::new(files.finish()), Arc::new(options), cwd).unwrap();
         let mut previous: Option<Arc<crate::PackageJson>> = None;
         for (index, operation) in request["operations"].as_array().unwrap().iter().enumerate() {
             let name = operation["name"].as_str().unwrap().as_bytes();
             let file = operation["file"].as_str().unwrap().as_bytes();
             let mode =
-                ts_core::ModuleKind(i32::try_from(operation["mode"].as_i64().unwrap()).unwrap());
+                tsr_core::ModuleKind(i32::try_from(operation["mode"].as_i64().unwrap()).unwrap());
             let mut observed_package = Value::Null;
             match operation["kind"].as_str().unwrap() {
                 "automatic" => {
@@ -84,12 +84,12 @@ fn disabled_trace_does_not_build_arguments_and_metadata_does_not_start_trace() {
     let files = MemoryBuilder::new(b"/repo", true).finish();
     let mut resolver = Resolver::new(
         Arc::new(files),
-        Arc::new(ts_core::CompilerOptions::default()),
+        Arc::new(tsr_core::CompilerOptions::default()),
         b"/repo",
     )
     .unwrap();
     let called = std::cell::Cell::new(false);
-    trace!(resolver, ts_diagnostics::File_0_does_not_exist, {
+    trace!(resolver, tsr_diagnostics::File_0_does_not_exist, {
         called.set(true);
         b"/unused"
     });
@@ -101,7 +101,7 @@ fn disabled_trace_does_not_build_arguments_and_metadata_does_not_start_trace() {
         .resolve(
             b"./absent",
             b"/repo/main.ts",
-            ts_core::ModuleKind::COMMON_JS
+            tsr_core::ModuleKind::COMMON_JS
         )
         .is_ok());
     assert!(resolver.take_trace().is_empty());
@@ -111,14 +111,18 @@ fn disabled_trace_does_not_build_arguments_and_metadata_does_not_start_trace() {
 #[test]
 fn trace_scope_retires_after_error_and_native_unwind() {
     let files = MemoryBuilder::new(b"/repo", true).finish();
-    let options = ts_core::CompilerOptions {
-        trace_resolution: ts_core::Tristate::TRUE,
-        module_resolution: ts_core::ModuleResolutionKind(999),
+    let options = tsr_core::CompilerOptions {
+        trace_resolution: tsr_core::Tristate::TRUE,
+        module_resolution: tsr_core::ModuleResolutionKind(999),
         ..Default::default()
     };
     let mut resolver = Resolver::new(Arc::new(files), Arc::new(options), b"/repo").unwrap();
     assert!(resolver
-        .resolve(b"missing", b"/repo/main.ts", ts_core::ModuleKind::COMMON_JS)
+        .resolve(
+            b"missing",
+            b"/repo/main.ts",
+            tsr_core::ModuleKind::COMMON_JS
+        )
         .is_err());
     assert!(!resolver.tracer.active);
     resolver.take_trace();
@@ -145,7 +149,7 @@ fn directory_alias_preserves_uncomputed_and_initialized_version_cache_identity()
     );
     let mut resolver = Resolver::new(
         Arc::new(files.finish()),
-        Arc::new(ts_core::CompilerOptions::default()),
+        Arc::new(tsr_core::CompilerOptions::default()),
         b"/repo",
     )
     .unwrap();

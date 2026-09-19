@@ -2,12 +2,12 @@
 //! fallback reports when the syntactic structure cannot describe the result.
 use super::NodeBuilder;
 use crate::Error;
-use ts_arena::NodeId;
-use ts_ast::NodeListId;
-use ts_ast::{Factory, FactoryMethods, SyntaxKind as K};
-use ts_nodebuilder::flags as nf;
-use ts_printer::{emit_flags, emit_resolver::DeclarationTrackerEvent as Event};
-use ts_pseudochecker::{
+use tsr_arena::NodeId;
+use tsr_ast::NodeListId;
+use tsr_ast::{Factory, FactoryMethods, SyntaxKind as K};
+use tsr_nodebuilder::flags as nf;
+use tsr_printer::{emit_flags, emit_resolver::DeclarationTrackerEvent as Event};
+use tsr_pseudochecker::{
     PseudoObjectElementData as E, PseudoParameter, PseudoSignature, PseudoType, PseudoTypeData as P,
 };
 
@@ -32,13 +32,13 @@ impl NodeBuilder<'_> {
                     for &node in error_nodes {
                         self.report(Event::InferenceFallback(node));
                     }
-                } else if ts_ast::is_entity_name_expression(self.checker.ast(node)?, node)?
+                } else if tsr_ast::is_entity_name_expression(self.checker.ast(node)?, node)?
                     && parent
                         .map(|p| {
                             self.checker
                                 .ast(p)?
                                 .node(p)
-                                .map(|n| ts_ast::is_declaration(&n))
+                                .map(|n| tsr_ast::is_declaration(&n))
                                 .map_err(Error::from)
                         })
                         .transpose()?
@@ -76,7 +76,7 @@ impl NodeBuilder<'_> {
                     if read.kind() == K::ArrowFunction && read.body() == Some(node) {
                         return self.pseudo_return_node(parent);
                     }
-                    if ts_ast::is_declaration(&read) {
+                    if tsr_ast::is_declaration(&read) {
                         return self.serialize_declaration_type(Some(parent), None, None, false);
                     }
                 }
@@ -86,7 +86,7 @@ impl NodeBuilder<'_> {
             P::NoResult { declaration } => {
                 self.report(Event::InferenceFallback(*declaration));
                 let read = self.checker.ast(*declaration)?.node(*declaration)?;
-                if ts_ast::utilities::is_function_like(Some(&read))
+                if tsr_ast::utilities::is_function_like(Some(&read))
                     && !matches!(read.kind().known(), Some(K::GetAccessor | K::SetAccessor))
                 {
                     self.pseudo_return_node(*declaration)
@@ -100,7 +100,7 @@ impl NodeBuilder<'_> {
                 regular_type,
             } => {
                 let mut is_const = self.checker.is_const_context(*node)?;
-                if !is_const && ts_pseudochecker::is_in_const_context(self.checker, *node)? {
+                if !is_const && tsr_pseudochecker::is_in_const_context(self.checker, *node)? {
                     let context = self.checker.contextual_expression_type(*node)?;
                     if let Some(ty) = self.pseudo_type_to_type(const_type)? {
                         let inference = self.checker.call_inference_at_node(*node)?;
@@ -135,7 +135,7 @@ impl NodeBuilder<'_> {
                             let list = read
                                 .data_source()
                                 .as_union_type_node()
-                                .ok_or(ts_arena::Error::InvalidGraph)?
+                                .ok_or(tsr_arena::Error::InvalidGraph)?
                                 .types()
                                 .ok_or(Error::MissingLink("pseudo union list"))?;
                             let elements: Vec<_> = view
@@ -415,12 +415,12 @@ impl NodeBuilder<'_> {
         let (Some(original), Some(enclosing)) = (original, self.enclosing) else {
             return Ok(());
         };
-        let source = ts_ast::utilities::get_source_file_of_node(
+        let source = tsr_ast::utilities::get_source_file_of_node(
             self.checker.ast(original)?,
             Some(original),
         )?;
         if source
-            == ts_ast::utilities::get_source_file_of_node(
+            == tsr_ast::utilities::get_source_file_of_node(
                 self.checker.ast(enclosing)?,
                 Some(enclosing),
             )?

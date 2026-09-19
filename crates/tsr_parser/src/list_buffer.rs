@@ -1,5 +1,5 @@
 //! Short eager parser lists avoid a temporary heap backing before AST storage.
-use ts_ast::NodeId;
+use tsr_ast::NodeId;
 
 pub(crate) enum ListBuffer {
     Inline {
@@ -99,9 +99,9 @@ impl ListBuffer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::Counters;
-    use ts_ast::AstBuilder;
-    use ts_jsstring::SourceText;
+    use tsr_arena::Counters;
+    use tsr_ast::AstBuilder;
+    use tsr_jsstring::SourceText;
 
     fn ids(count: u32) -> Vec<NodeId> {
         let owner = AstBuilder::new(SourceText::default(), &Counters::new())

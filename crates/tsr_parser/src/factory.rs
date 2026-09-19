@@ -1,5 +1,5 @@
 use crate::list_buffer::ListBuffer;
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, AstTransaction, BorrowedFactory, JsString, NodeListId, NodeSlice, RuntimeFactory,
     TextSlice,
 };

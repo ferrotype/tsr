@@ -1,6 +1,6 @@
 //! Scanner metadata from ast/tokenflags.go and ast/ast.go at the source pin.
 
-use ts_core::TextRange;
+use tsr_core::TextRange;
 
 pub type TokenFlags = i32;
 

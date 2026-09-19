@@ -4,9 +4,9 @@
 //! Returned vectors are copied into owned JS typed arrays by wasm-bindgen.
 //! A wasm trap is terminal for the instance; use the supplied JS wrapper.
 
-use ts_ast::SourceFileParseOptions;
-use ts_core::ScriptKind;
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::SourceFileParseOptions;
+use tsr_core::ScriptKind;
+use tsr_jsstring::{JsString, SourceText};
 use wasm_bindgen::prelude::*;
 
 // Private ABI tag: only an explicit Rust Result::Err uses this prefix. Unknown
@@ -25,14 +25,14 @@ pub use checker::{MemoryHost, WasmSession};
 #[wasm_bindgen]
 pub fn observe_corpus(request: &str) -> Result<Vec<u8>, JsValue> {
     let request = serde_json::from_str(request).map_err(api_error)?;
-    serde_json::to_vec(&s10_corpus::observe(&request, ts_embed::Session::load)).map_err(api_error)
+    serde_json::to_vec(&s10_corpus::observe(&request, tsr_embed::Session::load)).map_err(api_error)
 }
 
 fn options(file_name: &[u8], jsx: bool, force: bool) -> SourceFileParseOptions {
     SourceFileParseOptions {
         file_name: JsString::from_bytes(file_name),
         path: JsString::from_bytes(file_name),
-        external_module_indicator_options: ts_ast::ExternalModuleIndicatorOptions { jsx, force },
+        external_module_indicator_options: tsr_ast::ExternalModuleIndicatorOptions { jsx, force },
     }
 }
 
@@ -47,7 +47,7 @@ pub fn parse(
     jsx: bool,
     force: bool,
 ) -> Vec<u32> {
-    let file = ts_embed::parse(
+    let file = tsr_embed::parse(
         SourceText::from_loaded_bytes(source),
         ScriptKind(script_kind),
         options(file_name, jsx, force),
@@ -72,7 +72,7 @@ pub fn parse_and_encode(
     jsx: bool,
     force: bool,
 ) -> Result<Vec<u8>, JsValue> {
-    ts_embed::parse_and_encode(
+    tsr_embed::parse_and_encode(
         SourceText::from_loaded_bytes(source),
         ScriptKind(script_kind),
         options(file_name, jsx, force),

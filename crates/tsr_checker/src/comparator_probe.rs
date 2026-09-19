@@ -1,7 +1,7 @@
 //! Supplemental P0 comparator domain bridge. No expected outcomes live here.
 use crate::{mapper::Mapper, object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
 use serde_json::{json, Value};
-use ts_arena::NodeId;
+use tsr_arena::NodeId;
 
 impl CheckerState {
     pub(crate) fn residual_comparators(
@@ -16,8 +16,8 @@ impl CheckerState {
             "nil-and-intrinsic-creation".into(),
             self.comparator_matrix(&[None, Some(a), Some(b)])?,
         );
-        let s1 = self.new_symbol(0, ts_ast::JsString::from_bytes(b"duplicate".as_slice()))?;
-        let s2 = self.new_symbol(0, ts_ast::JsString::from_bytes(b"duplicate".as_slice()))?;
+        let s1 = self.new_symbol(0, tsr_ast::JsString::from_bytes(b"duplicate".as_slice()))?;
+        let s2 = self.new_symbol(0, tsr_ast::JsString::from_bytes(b"duplicate".as_slice()))?;
         out.insert(
             "duplicate-name-no-declarations".into(),
             json!([

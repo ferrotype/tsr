@@ -3,8 +3,8 @@
 //! the same marker operations.
 
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::node_flags as nf;
+use tsr_arena::NodeId;
+use tsr_ast::node_flags as nf;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getOptionalExpressionType
@@ -13,7 +13,7 @@ impl CheckerState {
         ty: TypeId,
         expression: NodeId,
     ) -> Result<TypeId, Error> {
-        if ts_ast::utilities::is_expression_of_optional_chain_root(
+        if tsr_ast::utilities::is_expression_of_optional_chain_root(
             self.ast(expression)?,
             expression,
         )? {
@@ -54,7 +54,7 @@ impl CheckerState {
         if !was_optional {
             return Ok(ty);
         }
-        if ts_ast::utilities::is_outermost_optional_chain(self.ast(node)?, node)? {
+        if tsr_ast::utilities::is_outermost_optional_chain(self.ast(node)?, node)? {
             self.add_type_optionality(ty, false, true)
         } else {
             self.add_optional_type_marker(ty)

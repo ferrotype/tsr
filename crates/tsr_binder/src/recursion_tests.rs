@@ -1,14 +1,14 @@
 use crate::{recursion::take_observations, Binder};
-use ts_ast::{AstFile, NodeId, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_ast::{AstFile, NodeId, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 fn parse(bytes: Vec<u8>, kind: ScriptKind) -> (AstFile, NodeId) {
-    let parsed = ts_parser::parse_source_file(
+    let parsed = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(bytes),
         kind,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(b"/depth.ts".as_slice()),
+            file_name: tsr_ast::JsString::from_bytes(b"/depth.ts".as_slice()),
             ..Default::default()
         },
     );
@@ -51,7 +51,7 @@ fn binder_depth_small_stack_growth_and_binary_continuations() {
                 let bound = file.retain_bound(source).unwrap();
                 assert_eq!(
                     bound.view().node(source).unwrap().kind(),
-                    ts_ast::SyntaxKind::SourceFile
+                    tsr_ast::SyntaxKind::SourceFile
                 );
                 take_observations()
             })
@@ -90,7 +90,7 @@ fn binder_depth_combines_shared_flow_tail_with_real_stack_growth() {
             let mut observed = None;
             file.bind_with(source, |builder| {
                 let mut binder = Binder::new(builder);
-                let flow = binder.new_flow_node(ts_ast::flow_flags::START);
+                let flow = binder.new_flow_node(tsr_ast::flow_flags::START);
                 let tail = binder.new_flow_list(Some(flow), None);
                 let mut head = None;
                 for index in 0..20_000 {
@@ -154,11 +154,11 @@ fn binder_depth_growth_unwind_publishes_terminal_failure() {
             assert!(observed.growths > 0);
             assert!(matches!(
                 file.retain_bound(source),
-                Err(ts_ast::BindError::Failed)
+                Err(tsr_ast::BindError::Failed)
             ));
             assert!(matches!(
                 file.bind_with(source, |_| panic!("terminal failure must not retry")),
-                Err(ts_ast::BindError::Failed)
+                Err(tsr_ast::BindError::Failed)
             ));
             observed
         })

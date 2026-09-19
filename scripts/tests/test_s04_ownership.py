@@ -52,7 +52,7 @@ def program_manifest():
             for name, (package, prefix) in ownership.s07_ownership.COMMON.items()
         },
         "groups": {
-            name: {"package": "ts_compiler", "filter": f"ownership_tests::{name}",
+            name: {"package": "tsr_compiler", "filter": f"ownership_tests::{name}",
                    "exact": True, "skip": [], "cases": [f"ownership_tests::{name}"]}
             for name in ownership.s07_ownership.GROUPS
         },
@@ -94,7 +94,7 @@ def successful_invoke(root, args, env=None):
     for suite in [*manifest["common"].values(), *manifest["groups"].values()]:
         if suite["package"] in args and suite["filter"] in args:
             return named_suite_output(suite["cases"])
-    if "ts_ast" in args and "storage_tests::" in args:
+    if "tsr_ast" in args and "storage_tests::" in args:
         return ast_suite_output(root)
     for suite in ownership.s09_ownership.load_cases(root)["suites"].values():
         if suite["package"] in args and suite["filter"] in args:
@@ -141,7 +141,7 @@ class OwnershipProducerTests(unittest.TestCase):
             def invoke(root, args, env=None):
                 actual_mode = ("miri" if "miri" in args else "address_sanitizer" if "-Zbuild-std" in args
                                else "release" if "--release" in args else "debug")
-                if "ts_api" in args and "tests::" in args and actual_mode == mode:
+                if "tsr_api" in args and "tests::" in args and actual_mode == mode:
                     return named_suite_output([])
                 return successful_invoke(root, args, env)
 
@@ -186,7 +186,7 @@ class OwnershipProducerTests(unittest.TestCase):
 
     def test_arena_boundary_failure_cannot_be_hidden_by_passing_pool_tests(self):
         def invoke(root, args, env=None):
-            if "miri" in args and "ts_arena" in args and "lease::" not in args:
+            if "miri" in args and "tsr_arena" in args and "lease::" not in args:
                 raise RuntimeError("arena owner boundary failed")
             return successful_invoke(root, args, env)
 
@@ -306,7 +306,7 @@ class OwnershipProducerTests(unittest.TestCase):
             with patch.object(ownership, "invoke", invoke), patch.dict(ownership.os.environ, {"CARGO_ENCODED_RUSTFLAGS": ""}):
                 report = ownership.run(root)
         asan = [(args, env) for args, env in calls
-                if "-Zbuild-std" in args and "ts_arena" in args and "lease::" not in args]
+                if "-Zbuild-std" in args and "tsr_arena" in args and "lease::" not in args]
         self.assertEqual(len(asan), 1)
         args, env = asan[0]
         self.assertNotIn("CARGO_ENCODED_RUSTFLAGS", env)
@@ -440,9 +440,9 @@ class OwnershipProducerTests(unittest.TestCase):
             with patch.object(ownership, "invoke", invoke):
                 ownership.run(root)
         runs = [(args, env) for args, env in calls
-                if "miri" in args and "test" in args and "ts_arena" in args and "lease::" not in args]
+                if "miri" in args and "test" in args and "tsr_arena" in args and "lease::" not in args]
         docs = [args for args, _ in calls if "--doc" in args]
-        self.assertEqual(docs, [["cargo", "test", "--package", "ts_arena", "--doc", "--locked"]])
+        self.assertEqual(docs, [["cargo", "test", "--package", "tsr_arena", "--doc", "--locked"]])
         self.assertEqual(len(runs), 1)
         args, env = runs[0]
         self.assertEqual(env["MIRIFLAGS"], "-Zmiri-strict-provenance")

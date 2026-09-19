@@ -1,7 +1,7 @@
 //! Program-dependent initialization after NewChecker's intrinsic prefix.
 
 use crate::{object_flags, CheckerState, Error, TypeId};
-use ts_ast::{symbol_flags as sf, utilities as ast, JsString, SymbolId, SyntaxKind as K};
+use tsr_ast::{symbol_flags as sf, utilities as ast, JsString, SymbolId, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.initializeChecker
@@ -52,7 +52,7 @@ impl CheckerState {
                 for symbol in symbols {
                     let read = self.symbol(symbol)?;
                     if read.flags() & sf::MODULE != 0
-                        && ts_ast::is_ambient_module_symbol_name(read.name_bytes())
+                        && tsr_ast::is_ambient_module_symbol_name(read.name_bytes())
                     {
                         ambient_modules.push(symbol);
                         continue;
@@ -64,7 +64,7 @@ impl CheckerState {
                             .into_iter()
                             .flatten()
                         {
-                            self.error_at(Some(declaration), ts_diagnostics::Declaration_name_conflicts_with_built_in_global_identifier_0, vec![JsString::from_bytes(&b"globalThis"[..])])?;
+                            self.error_at(Some(declaration), tsr_diagnostics::Declaration_name_conflicts_with_built_in_global_identifier_0, vec![JsString::from_bytes(&b"globalThis"[..])])?;
                         }
                     }
                     self.merge_global_symbol(symbol)?;
@@ -173,7 +173,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.mergeModuleAugmentation
-    fn merge_global_augmentation(&mut self, declaration: ts_arena::NodeId) -> Result<(), Error> {
+    fn merge_global_augmentation(&mut self, declaration: tsr_arena::NodeId) -> Result<(), Error> {
         // The raw bound symbol accumulates all augmentations in this file.
         // Process only its first declaration, before resolving global types.
         let symbol = self
@@ -207,7 +207,7 @@ impl CheckerState {
                 .flatten()
             {
                 if !self.is_type_declaration(declaration)? {
-                    self.error_at(Some(declaration), ts_diagnostics::Declaration_name_conflicts_with_built_in_global_identifier_0, vec![JsString::from_bytes(&b"undefined"[..])])?;
+                    self.error_at(Some(declaration), tsr_diagnostics::Declaration_name_conflicts_with_built_in_global_identifier_0, vec![JsString::from_bytes(&b"undefined"[..])])?;
                 }
             }
         } else {
@@ -230,7 +230,7 @@ impl CheckerState {
             None,
             name.as_bytes(),
             sf::TYPE,
-            report.then_some(ts_diagnostics::Cannot_find_global_type_0),
+            report.then_some(tsr_diagnostics::Cannot_find_global_type_0),
             false,
         )?;
         if let Some(symbol) = symbol {
@@ -244,7 +244,7 @@ impl CheckerState {
                     let name = self.symbol_to_string(symbol)?;
                     self.error_at(
                         declaration,
-                        ts_diagnostics::Global_type_0_must_have_1_type_parameter_s,
+                        tsr_diagnostics::Global_type_0_must_have_1_type_parameter_s,
                         vec![name, JsString::from_bytes(arity.to_string().as_bytes())],
                     )?;
                 }
@@ -253,7 +253,7 @@ impl CheckerState {
                 let name = self.symbol_to_string(symbol)?;
                 self.error_at(
                     declaration,
-                    ts_diagnostics::Global_type_0_must_be_a_class_or_interface_type,
+                    tsr_diagnostics::Global_type_0_must_be_a_class_or_interface_type,
                     vec![name],
                 )?;
             }
@@ -266,7 +266,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:getGlobalTypeDeclaration
-    fn global_type_declaration(&self, symbol: SymbolId) -> Result<Option<ts_arena::NodeId>, Error> {
+    fn global_type_declaration(
+        &self,
+        symbol: SymbolId,
+    ) -> Result<Option<tsr_arena::NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             if matches!(
                 self.node(declaration)?.kind().known(),

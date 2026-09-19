@@ -1,6 +1,6 @@
-use ts_ast::{JsString, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_ast::{JsString, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 // These allocation/identifier counts were observed through the pinned Go
 // ParseSourceFile before Rust comparison. They include discarded speculation
@@ -138,7 +138,7 @@ fn jsdoc_eager_and_deferred_counts_match_pinned_go() {
 #[test]
 fn type_tag_sets_the_full_signature_edge_and_its_immediate_parent() {
     use std::ops::ControlFlow;
-    use ts_ast::{ChildVisitor, NodeId, NodeListId, NodeSlice};
+    use tsr_ast::{ChildVisitor, NodeId, NodeListId, NodeSlice};
     let file = crate::parse_source_file(
         SourceText::from_loaded_bytes(
             b"/**\n * @type {...Object}  ``` @see ignore ```\n */\nfunction f(x,y) {}".as_slice(),
@@ -172,7 +172,7 @@ fn type_tag_sets_the_full_signature_edge_and_its_immediate_parent() {
     assert_eq!(view.node(signature).unwrap().parent(), Some(fun));
     assert_eq!(
         view.node(signature).unwrap().kind(),
-        ts_ast::SyntaxKind::JSDocVariadicType
+        tsr_ast::SyntaxKind::JSDocVariadicType
     );
     struct Edges(Vec<NodeId>);
     impl ChildVisitor for Edges {
@@ -204,7 +204,7 @@ fn nested_jsdoc_namespaces_grow_the_stack_during_parse_and_reparse() {
                 let text = format!("/** @typedef {{string}} {}Z */", "A.".repeat(depth));
                 let source = SourceText::from_loaded_bytes(text.into_bytes());
                 let factory =
-                    ts_ast::AstBuilder::new(source.clone(), &ts_arena::Counters::default());
+                    tsr_ast::AstBuilder::new(source.clone(), &tsr_arena::Counters::default());
                 let mut parser = crate::Parser::new(
                     SourceFileParseOptions {
                         file_name: JsString::from_bytes(b"/depth.js".as_slice()),

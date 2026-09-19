@@ -2,8 +2,8 @@
 //! the native inference mapper; assignment functions derive it from the target.
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:getContainingObjectLiteral
@@ -126,7 +126,7 @@ impl CheckerState {
                 .parent()
                 .ok_or(Error::MissingLink("parenthesized function parent"))?;
         }
-        if ts_ast::is_assignment_expression(self.ast(parent)?, parent, false)? {
+        if tsr_ast::is_assignment_expression(self.ast(parent)?, parent, false)? {
             let parent_read = self.node(parent)?;
             let target = parent_read
                 .data_source()
@@ -143,7 +143,7 @@ impl CheckerState {
                     .expression()
                     .ok_or(Error::MissingLink("function assignment receiver"))?;
                 if javascript && self.node(expression)?.kind() == K::Identifier {
-                    let source = ts_ast::utilities::get_source_file_of_node(
+                    let source = tsr_ast::utilities::get_source_file_of_node(
                         self.ast(parent)?,
                         Some(parent),
                     )?

@@ -2,11 +2,11 @@ use super::{
     transform::{Transformer, BUILDER_FLAGS, INTERNAL_FLAGS},
     util,
 };
-use ts_ast::{
+use tsr_ast::{
     modifier_flags as mf, Factory, FactoryMethods, JsString, NodeId, NodeListId, RuntimeFactory,
     SyntaxKind as K,
 };
-use ts_printer::emit_resolver::{
+use tsr_printer::emit_resolver::{
     DeclarationEmitResolver, DeclarationSymbolTracker, DeclarationTrackerEvent,
 };
 
@@ -20,16 +20,16 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if kind == Some(K::SemicolonClassElement) {
             return Ok(None);
         }
-        if ts_ast::utilities::is_function_like(Some(&self.node(node)))
+        if tsr_ast::utilities::is_function_like(Some(&self.node(node)))
             && self.resolver.implementation_of_overload(node)?
         {
             return Ok(None);
         }
-        let dynamic = ts_ast::has_dynamic_name(self.output.view(), Some(node))?;
+        let dynamic = tsr_ast::has_dynamic_name(self.output.view(), Some(node))?;
         if dynamic {
             let name = Self::required(self.node(node).name())?;
             let expression = Self::required(self.node(name).expression())?;
-            let entity = ts_ast::is_entity_name_expression(self.output.view(), expression)?;
+            let entity = tsr_ast::is_entity_name_expression(self.output.view(), expression)?;
             if self.options.isolated_declarations {
                 if !self
                     .resolver
@@ -40,7 +40,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         self.node(parent).kind().known(),
                         Some(K::ClassDeclaration | K::ObjectLiteralExpression)
                     ) {
-                        self.diagnostic(node, ts_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations, vec![])?;
+                        self.diagnostic(node, tsr_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations, vec![])?;
                         return Ok(None);
                     }
                     if matches!(
@@ -48,7 +48,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         Some(K::InterfaceDeclaration | K::TypeLiteral)
                     ) && !entity
                     {
-                        self.diagnostic(node, ts_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations, vec![])?;
+                        self.diagnostic(node, tsr_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations, vec![])?;
                         return Ok(None);
                     }
                 }
@@ -111,7 +111,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                     .read_source_file(self.source)?
                     .common_js_module_indicator()
                     .is_some()
-                    && ts_ast::is_variable_declaration_initialized_to_require(
+                    && tsr_ast::is_variable_declaration_initialized_to_require(
                         self.output.view(),
                         node,
                     )?
@@ -191,7 +191,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             }
             Some(K::ExpressionWithTypeArguments) => {
                 let expression = Self::required(self.node(node).expression())?;
-                if ts_ast::is_entity_name_expression(self.output.view(), expression)? {
+                if tsr_ast::is_entity_name_expression(self.output.view(), expression)? {
                     self.entity_visible(expression)?;
                 }
                 self.children(node).map(Some)
@@ -257,7 +257,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                                 .type_name(),
                         )?
                     };
-                    if ts_ast::is_entity_name_expression(self.output.view(), name)?
+                    if tsr_ast::is_entity_name_expression(self.output.view(), name)?
                         || matches!(self.node(name).kind().known(), Some(K::QualifiedName))
                         || (data.token == K::ExtendsKeyword
                             && self.node(name).kind() == K::NullKeyword)
@@ -305,7 +305,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             Some(K::QualifiedName) => {
                 let right = Self::required(self.node(node).as_qualified_name().unwrap().right())?;
                 if self.node(right).kind() == K::PrivateIdentifier {
-                    self.diagnostic(node, ts_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here, vec![self.output.view().node_text(right)?.into_js_string()])?;
+                    self.diagnostic(node, tsr_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here, vec![self.output.view().node_text(right)?.into_js_string()])?;
                 }
                 self.children(node).map(Some)
             }
@@ -403,10 +403,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 let nodes = self.output.alloc_nodes(vec![ty, Some(extra)]);
                 let list = self
                     .output
-                    .alloc_list(ts_core::TextRange::new(-1, -1), nodes);
+                    .alloc_list(tsr_core::TextRange::new(-1, -1), nodes);
                 self.output.new_union_type_node(Some(list))
             }
-            _ => return Err(ts_arena::Error::InvalidGraph.into()),
+            _ => return Err(tsr_arena::Error::InvalidGraph.into()),
         };
         self.emit.set_original(result, node);
         Ok(result)
@@ -467,7 +467,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if !self.suppress_context && util::can_produce_diagnostics(&self.node(node)) {
             self.select_context(node, false)?;
         }
-        let result = if ts_ast::utilities_tail::has_inferred_type(&self.node(node)) {
+        let result = if tsr_ast::utilities_tail::has_inferred_type(&self.node(node)) {
             self.resolver.create_type_of_declaration(
                 self.output,
                 self.emit,
@@ -477,7 +477,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 INTERNAL_FLAGS,
                 &mut self.tracker,
             )
-        } else if ts_ast::utilities::is_function_like(Some(&self.node(node))) {
+        } else if tsr_ast::utilities::is_function_like(Some(&self.node(node))) {
             self.resolver.create_return_type_of_signature(
                 self.output,
                 self.emit,
@@ -514,7 +514,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         }
         let initializer = Self::required(self.node(node).initializer())?;
         let unwrapped = util::unwrap_parenthesized_expression(self.output.view(), initializer)?;
-        if !ts_ast::utilities_tail::is_primitive_literal_value(
+        if !tsr_ast::utilities_tail::is_primitive_literal_value(
             self.output.view(),
             &self.node(unwrapped),
             true,
@@ -755,7 +755,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 parameters,
                 ty,
             ),
-            _ => return Err(ts_arena::Error::InvalidGraph.into()),
+            _ => return Err(tsr_arena::Error::InvalidGraph.into()),
         };
         Ok(Some(result))
     }
@@ -825,7 +825,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 if let Some(property) = data.property_name {
                     if self.node(property).kind() == K::ComputedPropertyName {
                         let expression = Self::required(self.node(property).expression())?;
-                        if ts_ast::is_entity_name_expression(self.output.view(), expression)? {
+                        if tsr_ast::is_entity_name_expression(self.output.view(), expression)? {
                             self.entity_visible(expression)?;
                         }
                     }

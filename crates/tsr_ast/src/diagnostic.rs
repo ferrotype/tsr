@@ -3,8 +3,8 @@
 
 use crate::{JsString, NodeId};
 use std::sync::Arc;
-use ts_core::TextRange;
-use ts_diagnostics::Message;
+use tsr_core::TextRange;
+use tsr_diagnostics::Message;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Diagnostic {

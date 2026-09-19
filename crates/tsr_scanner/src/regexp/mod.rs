@@ -7,8 +7,8 @@
 use std::borrow::Cow;
 use std::collections::HashSet;
 
-use ts_core::ScriptTarget;
-use ts_diagnostics::{self as diagnostics, Message};
+use tsr_core::ScriptTarget;
+use tsr_diagnostics::{self as diagnostics, Message};
 
 use crate::spelling::get_spelling_suggestion_for_strings;
 use crate::{DiagnosticArgument, Scanner, TokenValue};

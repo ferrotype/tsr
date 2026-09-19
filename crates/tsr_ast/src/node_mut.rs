@@ -3,8 +3,8 @@
 use crate::compact::{CoreStore, FieldKey, StoredNode};
 use crate::{Node, NodeData, NodeId};
 use std::ops::{Deref, DerefMut};
-use ts_arena::ArenaId;
-use ts_jsstring::SourceText;
+use tsr_arena::ArenaId;
+use tsr_jsstring::SourceText;
 
 pub struct NodeMut<'a> {
     inner: Mutation<'a>,

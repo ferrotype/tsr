@@ -1,8 +1,8 @@
 use crate::tokens::{token_is_identifier_or_keyword, token_text};
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{JsString, NodeId, NodeListId, SyntaxKind};
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_ast::{JsString, NodeId, NodeListId, SyntaxKind};
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 #[cfg(test)]
 #[path = "lists_tests.rs"]
@@ -24,8 +24,8 @@ impl<F: ParserFactory> Parser<'_, F> {
                 let element = parse_element(self, list.len());
                 for reparsed in self.reparse_list.drain(..) {
                     let node = self.factory.node(reparsed);
-                    if (ts_ast::is_js_type_alias_declaration(&node)
-                        || ts_ast::is_js_import_declaration(&node))
+                    if (tsr_ast::is_js_type_alias_declaration(&node)
+                        || tsr_ast::is_js_import_declaration(&node))
                         && !matches!(
                             kind,
                             ParsingContext::SourceElements | ParsingContext::BlockStatements
@@ -183,7 +183,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             }
             P::EnumMembers => diagnostics::Enum_member_expected,
             P::HeritageClauseElement => diagnostics::Expression_expected,
-            P::VariableDeclarations if ts_ast::is_keyword_kind(self.token.into()) => {
+            P::VariableDeclarations if tsr_ast::is_keyword_kind(self.token.into()) => {
                 args.push(token_text(self.token));
                 diagnostics::X_0_is_not_allowed_as_a_variable_declaration_name
             }
@@ -193,7 +193,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             P::ArgumentExpressions => diagnostics::Argument_expression_expected,
             P::ObjectLiteralMembers => diagnostics::Property_assignment_expected,
             P::ArrayLiteralMembers => diagnostics::Expression_or_comma_expected,
-            P::Parameters if ts_ast::is_keyword_kind(self.token.into()) => {
+            P::Parameters if tsr_ast::is_keyword_kind(self.token.into()) => {
                 args.push(token_text(self.token));
                 diagnostics::X_0_is_not_allowed_as_a_parameter_name
             }

@@ -4,51 +4,51 @@
 
 use crate::{CheckerState, Error, RelationKind};
 use std::cell::Cell;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     symbol_flags as sf, AstView, DeclarationRead, Factory, FactoryMethods, JsString, NodeBinding,
     SymbolFlags, SymbolRef, SymbolTableId, SymbolTableRead, SyntaxKind as K,
 };
-use ts_binder::name_resolver::{Hook, ResolverHost, ResolverOptions};
-use ts_binder::reference_resolver::{ReferenceResolver, ReferenceResolverHooks};
-use ts_diagnostics::Message;
+use tsr_binder::name_resolver::{Hook, ResolverHost, ResolverOptions};
+use tsr_binder::reference_resolver::{ReferenceResolver, ReferenceResolverHooks};
+use tsr_diagnostics::Message;
 
 struct ReferenceHost<'a> {
     state: &'a CheckerState,
     failure: &'a Cell<Option<Error>>,
 }
 impl ReferenceHost<'_> {
-    fn capture<T>(&self, result: Result<T, Error>) -> Result<T, ts_arena::Error> {
+    fn capture<T>(&self, result: Result<T, Error>) -> Result<T, tsr_arena::Error> {
         result.map_err(|error| {
             self.failure.set(Some(error));
             match error {
                 Error::Arena(error) => error,
-                _ => ts_arena::Error::InvalidGraph,
+                _ => tsr_arena::Error::InvalidGraph,
             }
         })
     }
 }
 impl ResolverHost for ReferenceHost<'_> {
-    fn ast(&self, node: NodeId) -> Result<AstView<'_>, ts_arena::Error> {
+    fn ast(&self, node: NodeId) -> Result<AstView<'_>, tsr_arena::Error> {
         self.capture(self.state.ast(node))
     }
-    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, ts_arena::Error> {
+    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error> {
         self.capture(self.state.checker_node_binding(node))
     }
-    fn symbol(&self, symbol: SymbolId) -> Result<SymbolRef<'_>, ts_arena::Error> {
+    fn symbol(&self, symbol: SymbolId) -> Result<SymbolRef<'_>, tsr_arena::Error> {
         self.capture(self.state.symbol(symbol))
     }
-    fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, ts_arena::Error> {
+    fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error> {
         self.capture(self.state.table(table))
     }
-    fn declarations(&self, symbol: SymbolId) -> Result<DeclarationRead<'_>, ts_arena::Error> {
+    fn declarations(&self, symbol: SymbolId) -> Result<DeclarationRead<'_>, tsr_arena::Error> {
         self.capture(self.state.symbol_declarations(symbol))
     }
     fn new_transient_symbol(
         &mut self,
         _flags: SymbolFlags,
         _name: JsString,
-    ) -> Result<SymbolId, ts_arena::Error> {
+    ) -> Result<SymbolId, tsr_arena::Error> {
         // Both entry points supply ResolveName. Taking its fallback would be a
         // change to the binder callback contract, not an alternate resolution.
         self.capture(Err(Error::MissingLink(
@@ -77,7 +77,7 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
         message: Option<&'static Message>,
         is_use: bool,
         exclude_globals: bool,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         self.host.capture((|| {
             let answer = self
                 .name
@@ -100,7 +100,7 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
     fn get_resolved_symbol(
         &mut self,
         node: NodeId,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         self.host.capture(if node == self.node {
             Ok(Hook::Value(self.cached))
         } else {
@@ -110,13 +110,13 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
     fn get_merged_symbol(
         &mut self,
         symbol: SymbolId,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         Ok(Hook::Value(Some(self.host.state.get_merged_symbol(symbol))))
     }
     fn get_export_symbol_of_value_symbol_if_exported(
         &mut self,
         symbol: SymbolId,
-    ) -> Result<Hook<Option<SymbolId>>, ts_arena::Error> {
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         self.host.capture(
             self.host
                 .state
@@ -227,7 +227,7 @@ impl CheckerState {
             self.retain_flow_source(parent)?;
         }
         let node = self.factory.new_identifier(name);
-        let flags = self.factory.view().node(node)?.flags() & !ts_ast::node_flags::SYNTHESIZED;
+        let flags = self.factory.view().node(node)?.flags() & !tsr_ast::node_flags::SYNTHESIZED;
         self.factory.set_node_flags(node, flags);
         self.factory.set_node_parent(node, Some(parent));
         self.emit_referenced_value_declaration(node)

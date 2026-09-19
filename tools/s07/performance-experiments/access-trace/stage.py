@@ -24,7 +24,7 @@ def apply(directory):
               if p.is_file() and p.suffix in {'.rs', '.toml', '.lock'}}
     state.apply(directory)
     hooks.apply(directory)
-    ast = directory / 'crates/ts_ast'
+    ast = directory / 'crates/tsr_ast'
     lib = ast / 'src/lib.rs'
     if 'pub mod access_trace;' in lib.read_text():
         raise ValueError('recorder module already present')

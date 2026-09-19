@@ -3,8 +3,8 @@ use crate::{
     element_flags as ef, object_flags as of, type_flags as tf, CheckerState, Error,
     TupleElementInfo, TypeId, UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.createArrayLiteralType
@@ -72,7 +72,7 @@ impl CheckerState {
 
     fn check_array_literal_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let elements = self.source_list(node, self.node(node)?.element_list())?;
-        let destructuring = ts_ast::is_assignment_target(self.ast(node)?, node)?;
+        let destructuring = tsr_ast::is_assignment_target(self.ast(node)?, node)?;
         let constant = self.is_const_context(node)?;
         let contextual = self.apparent_contextual_expression_type(node)?;
         let mut parent = self.node(node)?.parent();

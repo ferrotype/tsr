@@ -11,11 +11,11 @@ use std::{
     thread,
     time::Instant,
 };
-use ts_ast::{
+use tsr_ast::{
     BoundFile, BoundView, CompletedFile, ExternalModuleIndicatorOptions, JsString, ParsedFile,
     SourceFileParseOptions,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 #[global_allocator]
 static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
@@ -59,7 +59,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 #[derive(Default, Serialize)]
 struct PhaseTimes {
@@ -106,7 +106,7 @@ fn preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error>> {
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect()
@@ -137,7 +137,7 @@ fn loaded_digest(inputs: &[Loaded]) -> String {
 
 #[inline(never)]
 fn profile_parse(input: &Loaded) -> ParsedFile {
-    black_box(ts_parser::parse_source_file(
+    black_box(tsr_parser::parse_source_file(
         input.source.clone(),
         input.script_kind,
         input.options.clone(),
@@ -150,13 +150,13 @@ fn profile_binding_and_publication(parsed: ParsedFile, backend: Backend) -> Reta
         Backend::Published => {
             let source = parsed.root();
             let file = parsed.publish_unbound();
-            let bound = ts_binder::bind_source_file(&file, source)
+            let bound = tsr_binder::bind_source_file(&file, source)
                 .expect("diagnostic workload binding must complete");
             drop(file);
             RetainedFile::Published(bound)
         }
         Backend::Consuming => RetainedFile::Consuming(
-            ts_binder::bind_parsed_file(parsed).expect("diagnostic workload binding must complete"),
+            tsr_binder::bind_parsed_file(parsed).expect("diagnostic workload binding must complete"),
         ),
     };
     black_box(file)
@@ -165,7 +165,7 @@ fn profile_binding_and_publication(parsed: ParsedFile, backend: Backend) -> Reta
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 3 && !(args.len() == 5 && args[3] == "--shapes") {
-        return Err("usage: ts_s07_bis_phases INPUTS.json published|consuming [--shapes OUTPUT.ndjson] (one worker)".into());
+        return Err("usage: tsr_s07_bis_phases INPUTS.json published|consuming [--shapes OUTPUT.ndjson] (one worker)".into());
     }
     let backend = match args[2].to_str() {
         Some("published") => Backend::Published,
@@ -184,7 +184,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let (send, receive) = mpsc::sync_channel::<usize>(1);
         let inputs = &inputs;
         let (ready, finished, release) = (&ready, &finished, &release);
-        let worker = ts_parser::spawn_parser_worker(scope, move || {
+        let worker = tsr_parser::spawn_parser_worker(scope, move || {
             let mut roots = Vec::with_capacity(file_count);
             let mut times = PhaseTimes::default();
             let mut failure = None;

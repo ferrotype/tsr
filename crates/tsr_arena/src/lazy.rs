@@ -157,7 +157,7 @@ pub struct StorageTransaction<'a, N: NodeRecord> {
     auxiliary: Staging<'a, N::Aux>,
     core: &'a Arena<N>,
     core_auxiliary: &'a Arena<N::CoreAux>,
-    source: &'a ts_jsstring::SourceText,
+    source: &'a tsr_jsstring::SourceText,
     store: &'a N::Store,
 }
 impl<N: NodeRecord> StorageTransaction<'_, N> {
@@ -167,7 +167,7 @@ impl<N: NodeRecord> StorageTransaction<'_, N> {
     }
     /// The source is borrowed before initialization acquires its publication
     /// lock. Reading it here cannot reenter the lazy directory.
-    pub fn source(&self) -> &ts_jsstring::SourceText {
+    pub fn source(&self) -> &tsr_jsstring::SourceText {
         self.source
     }
     /// Immutable core payload storage is borrowed before the lazy publication
@@ -206,7 +206,7 @@ impl<N: NodeRecord> StorageTransaction<'_, N> {
     /// borrow this transaction's already locked pages without locking again.
     ///
     /// ```compile_fail
-    /// use ts_arena::{AuxId, AuxiliaryRead, Node, StorageTransaction};
+    /// use tsr_arena::{AuxId, AuxiliaryRead, Node, StorageTransaction};
     /// fn escape<'a>(transaction: &StorageTransaction<'_, Node<()>>, id: AuxId) -> AuxiliaryRead<'a, Node<()>> {
     ///     transaction.aux(id).unwrap()
     /// }

@@ -1,6 +1,6 @@
-use ts_ast::SyntaxKind;
-use ts_core::LanguageVariant;
-use ts_jsstring::wtf8::{encode_rune, is_high_surrogate};
+use tsr_ast::SyntaxKind;
+use tsr_core::LanguageVariant;
+use tsr_jsstring::wtf8::{encode_rune, is_high_surrogate};
 
 use crate::tables_generated::{keyword_kind, IDENTIFIER_PART, IDENTIFIER_START, KEYWORDS, TOKENS};
 use crate::utilities::{is_ascii_letter, is_digit};
@@ -40,7 +40,7 @@ pub fn is_valid_identifier(text: &[u8]) -> bool {
     }
     let mut pos = 0;
     while pos < text.len() {
-        let (ch, size) = ts_jsstring::wtf8::decode_utf8(&text[pos..]);
+        let (ch, size) = tsr_jsstring::wtf8::decode_utf8(&text[pos..]);
         if if pos == 0 {
             !is_identifier_start(ch)
         } else {

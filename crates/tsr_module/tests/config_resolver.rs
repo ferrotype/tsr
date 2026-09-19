@@ -1,7 +1,7 @@
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_module::resolve_config;
-use ts_vfs::MemoryBuilder;
+use tsr_module::resolve_config;
+use tsr_vfs::MemoryBuilder;
 
 #[test]
 fn original_go_config_resolution() {

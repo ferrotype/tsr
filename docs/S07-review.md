@@ -48,7 +48,7 @@ all are included in the program helper inventory.
 ## Evidence interpretation
 
 The first CI run exposed a missing build input in all four MSRV jobs:
-`ts_bundled` embeds the pinned upstream copyright notice and 108 library files,
+`tsr_bundled` embeds the pinned upstream copyright notice and 108 library files,
 but the MSRV checkout did not initialize submodules. The shared MSRV job now
 checks out `upstream`, as the other build jobs already did. The local MSRV result
 had used an initialized checkout and therefore did not exercise this failure.

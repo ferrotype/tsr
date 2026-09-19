@@ -6,8 +6,8 @@ use crate::{
     Error,
 };
 use std::cmp::Ordering;
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, JsString, SymbolTableId, SyntaxKind as K};
 
 #[path = "node_builder_imports.rs"]
 mod imports;
@@ -61,12 +61,12 @@ impl NodeBuilder<'_> {
         meaning: u32,
         allow_any_node: bool,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         if !allow_any_node {
             let chain = self.display_name_chain(symbol, self.enclosing, meaning)?;
             return self.entity_name_from_symbol_chain(&chain);
         }
-        if self.internal_flags & ts_nodebuilder::internal_flags::WRITE_COMPUTED_PROPS != 0 {
+        if self.internal_flags & tsr_nodebuilder::internal_flags::WRITE_COMPUTED_PROPS != 0 {
             if let Some(declaration) = self.checker.symbol(symbol)?.value_declaration() {
                 let view = self.checker.ast(declaration)?;
                 if let Some(name) = view.node(declaration)?.name() {
@@ -115,20 +115,20 @@ impl NodeBuilder<'_> {
         &mut self,
         chain: &[SymbolId],
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         let (&symbol, prefix) = chain
             .split_last()
             .ok_or(Error::MissingLink("entity name chain"))?;
         if prefix.is_empty() {
-            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags |= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let name = self.symbol_name(symbol);
         if prefix.is_empty() {
-            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags ^= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let identifier = self.ast.new_identifier(name?);
         self.emit
-            .add_emit_flags(identifier, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+            .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
         if prefix.is_empty() {
             return Ok(identifier);
         }
@@ -200,7 +200,7 @@ impl NodeBuilder<'_> {
             let view = self.checker.ast(node)?;
             let read = view.node(node)?;
             if read.kind() == K::SourceFile
-                && ts_ast::utilities::is_external_or_common_js_module(&view.source_file(node)?)
+                && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(node)?)
             {
                 return Ok(true);
             }
@@ -237,7 +237,7 @@ impl NodeBuilder<'_> {
                         if let Some(export) = self
                             .checker
                             .table(exports)?
-                            .get(ts_ast::internal_symbol_names::EXPORT_EQUALS)
+                            .get(tsr_ast::internal_symbol_names::EXPORT_EQUALS)
                             .flatten()
                         {
                             if self.checker.module_symbols_same_reference(export, symbol)? {
@@ -289,7 +289,7 @@ impl NodeBuilder<'_> {
                 }
             }
         }
-        if let Some(specifier) = ts_ast::try_get_ambient_module_name_from_symbol_name(
+        if let Some(specifier) = tsr_ast::try_get_ambient_module_name_from_symbol_name(
             self.checker.symbol(symbol)?.name_bytes(),
         ) {
             return Ok(JsString::from_bytes(specifier));
@@ -310,9 +310,10 @@ impl NodeBuilder<'_> {
                 let view = self.checker.ast(candidate)?;
                 let read = view.node(candidate)?;
                 let external_augmentation = read.kind() == K::ModuleDeclaration
-                    && ts_ast::is_ambient_module(view, candidate)?
-                    && ts_ast::is_module_augmentation_external(view, candidate)?;
-                if !external_augmentation && !ts_ast::utilities::is_global_scope_augmentation(&read)
+                    && tsr_ast::is_ambient_module(view, candidate)?
+                    && tsr_ast::is_module_augmentation_external(view, candidate)?;
+                if !external_augmentation
+                    && !tsr_ast::utilities::is_global_scope_augmentation(&read)
                 {
                     declaration = Some(candidate);
                     break;
@@ -320,7 +321,7 @@ impl NodeBuilder<'_> {
             }
         }
         match declaration {
-            Some(node) => Ok(ts_ast::utilities::get_source_file_of_node(
+            Some(node) => Ok(tsr_ast::utilities::get_source_file_of_node(
                 self.checker.ast(node)?,
                 Some(node),
             )?),
@@ -339,7 +340,7 @@ impl NodeBuilder<'_> {
         self.module_specifier_with_context_and_mode(
             symbol,
             enclosing,
-            ts_core::ResolutionMode::NONE,
+            tsr_core::ResolutionMode::NONE,
         )
     }
 
@@ -347,7 +348,7 @@ impl NodeBuilder<'_> {
         &mut self,
         symbol: SymbolId,
         enclosing: Option<NodeId>,
-        mode: ts_core::ResolutionMode,
+        mode: tsr_core::ResolutionMode,
     ) -> Result<JsString, Error> {
         let Some(enclosing) = enclosing else {
             return self.context_free_module_specifier(symbol);
@@ -372,7 +373,7 @@ impl NodeBuilder<'_> {
                     }
                 }
             }
-            if let Some(name) = ts_ast::try_get_ambient_module_name_from_symbol_name(
+            if let Some(name) = tsr_ast::try_get_ambient_module_name_from_symbol_name(
                 self.checker.symbol(symbol)?.name_bytes(),
             ) {
                 return Ok(JsString::from_bytes(name));
@@ -387,7 +388,7 @@ impl NodeBuilder<'_> {
             .to_vec();
         let (importer, importer_name) = self.checker.module_source(enclosing)?;
         let host = self.checker.program()?.host.clone();
-        let preferred_mode = if mode == ts_core::ResolutionMode::NONE {
+        let preferred_mode = if mode == tsr_core::ResolutionMode::NONE {
             match self.original_module_specifier(enclosing)? {
                 Some(original) => {
                     host.get_mode_for_usage_location(importer_name.as_bytes(), original)?
@@ -411,7 +412,7 @@ impl NodeBuilder<'_> {
             importer_name.as_bytes(),
             &target,
             mode,
-            preferred_mode == ts_core::ResolutionMode::ESNEXT,
+            preferred_mode == tsr_core::ResolutionMode::ESNEXT,
         )?;
         self.cache_module_specifier(key, specifier.clone());
         Ok(specifier)
@@ -580,14 +581,14 @@ impl NodeBuilder<'_> {
             let name = self.checker.symbol(alias)?.name_to_owned();
             if matches!(
                 name.as_bytes(),
-                ts_ast::internal_symbol_names::EXPORT_EQUALS
-                    | ts_ast::internal_symbol_names::DEFAULT
+                tsr_ast::internal_symbol_names::EXPORT_EQUALS
+                    | tsr_ast::internal_symbol_names::DEFAULT
             ) {
                 continue;
             }
             if self.name_has_declaration_kind(alias, K::NamespaceExportDeclaration)? {
                 if let Some(enclosing) = query.enclosing {
-                    let file = ts_ast::utilities::get_source_file_of_node(
+                    let file = tsr_ast::utilities::get_source_file_of_node(
                         self.checker.ast(enclosing)?,
                         Some(enclosing),
                     )?
@@ -778,10 +779,10 @@ impl NodeBuilder<'_> {
         yield_module: bool,
     ) -> Result<Vec<SymbolId>, Error> {
         if self.checker.symbol(symbol)?.flags() & sf::TYPE_PARAMETER != 0
-            || self.internal_flags & ts_nodebuilder::internal_flags::DO_NOT_INCLUDE_SYMBOL_CHAIN
+            || self.internal_flags & tsr_nodebuilder::internal_flags::DO_NOT_INCLUDE_SYMBOL_CHAIN
                 != 0
             || enclosing.is_none()
-                && self.flags & ts_nodebuilder::flags::USE_FULLY_QUALIFIED_TYPE == 0
+                && self.flags & tsr_nodebuilder::flags::USE_FULLY_QUALIFIED_TYPE == 0
         {
             return Ok(vec![symbol]);
         }
@@ -790,7 +791,7 @@ impl NodeBuilder<'_> {
                 symbol,
                 enclosing,
                 meaning,
-                external_only: self.flags & ts_nodebuilder::flags::USE_ONLY_EXTERNAL_ALIASING != 0,
+                external_only: self.flags & tsr_nodebuilder::flags::USE_ONLY_EXTERNAL_ALIASING != 0,
             },
             true,
             yield_module,
@@ -887,7 +888,7 @@ impl NodeBuilder<'_> {
                     if let Some(export) = self
                         .checker
                         .table(exports)?
-                        .get(ts_ast::internal_symbol_names::EXPORT_EQUALS)
+                        .get(tsr_ast::internal_symbol_names::EXPORT_EQUALS)
                         .flatten()
                     {
                         if self
@@ -961,9 +962,9 @@ impl NodeBuilder<'_> {
         chain: &[SymbolId],
         index: usize,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         let symbol = chain[index];
-        if self.flags & ts_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
+        if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
             && index + 1 < chain.len()
         {
             for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
@@ -981,11 +982,11 @@ impl NodeBuilder<'_> {
             }
         }
         if index == 0 {
-            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags |= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let name = self.symbol_name(symbol);
         if index == 0 {
-            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags ^= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let mut name = name?;
         if name
@@ -1000,17 +1001,17 @@ impl NodeBuilder<'_> {
         }
         let can_access = if name.as_bytes().starts_with(b"#") {
             name.len() > 1
-                && ts_scanner::is_identifier_text(
+                && tsr_scanner::is_identifier_text(
                     &name.as_bytes()[1..],
-                    ts_core::LanguageVariant::STANDARD,
+                    tsr_core::LanguageVariant::STANDARD,
                 )
         } else {
-            ts_scanner::is_identifier_text(name.as_bytes(), ts_core::LanguageVariant::STANDARD)
+            tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
         };
         if index == 0 || can_access {
             let identifier = self.ast.new_identifier(name.clone());
             self.emit
-                .add_emit_flags(identifier, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+                .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
             self.approximate_length += name.len() + 1;
             if index > 0 {
                 let left = self.expression_from_name_chain(chain, index - 1)?;
@@ -1018,7 +1019,7 @@ impl NodeBuilder<'_> {
                     self.ast
                         .new_property_access_expression(Some(left), None, Some(identifier), 0);
                 self.emit
-                    .add_emit_flags(node, ts_printer::emit_flags::NO_INDENTATION);
+                    .add_emit_flags(node, tsr_printer::emit_flags::NO_INDENTATION);
                 return Ok(node);
             }
             return Ok(identifier);
@@ -1038,12 +1039,12 @@ impl NodeBuilder<'_> {
             self.ast.new_string_literal(
                 text,
                 if single {
-                    ts_ast::token_flags::SINGLE_QUOTE
+                    tsr_ast::token_flags::SINGLE_QUOTE
                 } else {
                     0
                 },
             )
-        } else if ts_jsnum::from_string(name.as_bytes())
+        } else if tsr_jsnum::from_string(name.as_bytes())
             .to_string()
             .as_bytes()
             == name.as_bytes()
@@ -1054,7 +1055,7 @@ impl NodeBuilder<'_> {
             self.approximate_length += name.len();
             let node = self.ast.new_identifier(name);
             self.emit
-                .add_emit_flags(node, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+                .add_emit_flags(node, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
             node
         };
         self.approximate_length += 2;
@@ -1099,7 +1100,7 @@ impl NodeBuilder<'_> {
             symbol,
             self.enclosing,
             meaning,
-            self.flags & ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0,
+            self.flags & tsr_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0,
         )?;
         if chain.is_empty() {
             return Err(Error::MissingLink("symbol type node chain"));
@@ -1113,7 +1114,7 @@ impl NodeBuilder<'_> {
         &mut self,
         symbol: SymbolId,
         meaning: u32,
-        type_arguments: Option<ts_ast::NodeListId>,
+        type_arguments: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
         let chain = self.type_symbol_chain(symbol, meaning)?;
         self.symbol_type_node_from_resolved_chain(&chain, meaning, type_arguments)
@@ -1123,9 +1124,9 @@ impl NodeBuilder<'_> {
         &mut self,
         chain: &[SymbolId],
         meaning: u32,
-        type_arguments: Option<ts_ast::NodeListId>,
+        type_arguments: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         let is_type_of = meaning == sf::VALUE;
         if self.name_external_module(chain[0])? {
             return self.import_type_from_symbol_chain(chain, is_type_of, type_arguments);
@@ -1155,9 +1156,9 @@ impl NodeBuilder<'_> {
         &mut self,
         chain: &[SymbolId],
         is_type_of: bool,
-        type_arguments: Option<ts_ast::NodeListId>,
+        type_arguments: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         let qualifier = if chain.len() > 1 {
             Some(self.access_from_symbol_chain(chain, chain.len() - 1, 1, type_arguments)?)
         } else {
@@ -1232,8 +1233,8 @@ impl NodeBuilder<'_> {
         &mut self,
         chain: &[SymbolId],
         index: usize,
-    ) -> Result<Option<ts_ast::NodeListId>, Error> {
-        if self.flags & ts_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME == 0
+    ) -> Result<Option<tsr_ast::NodeListId>, Error> {
+        if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME == 0
             || index + 1 >= chain.len()
         {
             return Ok(None);
@@ -1265,7 +1266,7 @@ impl NodeBuilder<'_> {
         chain: &[SymbolId],
         index: usize,
         stopper: usize,
-        override_type_arguments: Option<ts_ast::NodeListId>,
+        override_type_arguments: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             self.access_from_symbol_chain_worker(chain, index, stopper, override_type_arguments)
@@ -1277,9 +1278,9 @@ impl NodeBuilder<'_> {
         chain: &[SymbolId],
         index: usize,
         stopper: usize,
-        override_type_arguments: Option<ts_ast::NodeListId>,
+        override_type_arguments: Option<tsr_ast::NodeListId>,
     ) -> Result<NodeId, Error> {
-        use ts_ast::FactoryMethods;
+        use tsr_ast::FactoryMethods;
         let type_parameter_nodes = if index + 1 == chain.len() {
             override_type_arguments
         } else {
@@ -1290,9 +1291,9 @@ impl NodeBuilder<'_> {
         let raw_name = self.checker.symbol(symbol)?.name_to_owned();
         let mut symbol_name: Option<JsString> = None;
         if index == 0 {
-            self.flags |= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags |= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
             let name = self.symbol_name(symbol);
-            self.flags ^= ts_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
+            self.flags ^= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
             let name = name?;
             self.approximate_length += name.len() + 1;
             symbol_name = Some(name);
@@ -1305,7 +1306,7 @@ impl NodeBuilder<'_> {
                     .get(raw_name.as_bytes())
                     .flatten();
                 let export_equals =
-                    raw_name.as_bytes() == ts_ast::internal_symbol_names::EXPORT_EQUALS;
+                    raw_name.as_bytes() == tsr_ast::internal_symbol_names::EXPORT_EQUALS;
                 let same_direct = match direct {
                     Some(direct) if !export_equals && !is_late_bound_name(raw_name.as_bytes()) => {
                         self.checker.module_symbols_same_reference(direct, symbol)?
@@ -1327,7 +1328,7 @@ impl NodeBuilder<'_> {
                     let mut results: Vec<(SymbolId, JsString)> = Vec::new();
                     for (name, export) in entries {
                         if !is_late_bound_name(name.as_bytes())
-                            && name.as_bytes() != ts_ast::internal_symbol_names::EXPORT_EQUALS
+                            && name.as_bytes() != tsr_ast::internal_symbol_names::EXPORT_EQUALS
                             && self.checker.module_symbols_same_reference(export, symbol)?
                         {
                             results.push((export, name));
@@ -1350,7 +1351,7 @@ impl NodeBuilder<'_> {
             let mut declared_name = None;
             for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
                 let view = self.checker.ast(declaration)?;
-                if let Some(name) = ts_ast::get_name_of_declaration(view, Some(declaration))? {
+                if let Some(name) = tsr_ast::get_name_of_declaration(view, Some(declaration))? {
                     declared_name = Some((view, name));
                     break;
                 }
@@ -1361,7 +1362,7 @@ impl NodeBuilder<'_> {
                     && read
                         .expression()
                         .map(|expression| {
-                            Ok::<_, Error>(ts_ast::utilities::is_entity_name(
+                            Ok::<_, Error>(tsr_ast::utilities::is_entity_name(
                                 &view.node(expression)?,
                             ))
                         })
@@ -1377,7 +1378,7 @@ impl NodeBuilder<'_> {
         };
         self.approximate_length += symbol_name.len() + 1;
 
-        if self.flags & ts_nodebuilder::flags::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES == 0 {
+        if self.flags & tsr_nodebuilder::flags::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES == 0 {
             if let Some(parent) = parent {
                 if let Some(members) = self.checker.members_of_symbol(parent)? {
                     let member = self
@@ -1419,7 +1420,7 @@ impl NodeBuilder<'_> {
 
         let identifier = self.ast.new_identifier(symbol_name);
         self.emit
-            .add_emit_flags(identifier, ts_printer::emit_flags::NO_ASCII_ESCAPING);
+            .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
         if index > stopper {
             let lhs =
                 self.access_from_symbol_chain(chain, index - 1, stopper, override_type_arguments)?;
@@ -1436,7 +1437,7 @@ impl NodeBuilder<'_> {
                 })
                 .transpose()?
                 .unwrap_or(true);
-            if self.flags & ts_nodebuilder::flags::USE_INSTANTIATION_EXPRESSIONS == 0
+            if self.flags & tsr_nodebuilder::flags::USE_INSTANTIATION_EXPRESSIONS == 0
                 || entity && bare
             {
                 return Ok(self.ast.new_qualified_name(Some(lhs), Some(identifier)));

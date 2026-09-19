@@ -23,7 +23,7 @@ JavaScript casing and its Final_Sigma properties are generated from the pinned
 `stringutil/js_case_generated.go` (Unicode 15.1). `LowerFirstChar` instead uses
 the exact simple lowercase table of the oracle Go 1.27.1 toolchain (Unicode 17),
 as the upstream function does. Rust's toolchain Unicode casing is not used.
-Regenerate with `python3 crates/ts_jsstring/tools/generate_case_tables.py`;
+Regenerate with `python3 crates/tsr_jsstring/tools/generate_case_tables.py`;
 `--check` verifies deterministic output. The generator checks the clean upstream
 pin and Go version, and the output records the input hash and both Unicode
 versions. No network access or build-time generation is required.
@@ -31,7 +31,7 @@ versions. No network access or build-time generation is required.
 `go_quote` preserves the pinned Go `strconv.Quote` spelling required by source
 panic payloads. It escapes malformed UTF-8 one byte at a time and uses generated
 Go `strconv.IsPrint` data, including that toolchain's Unicode version. Regenerate
-with `python3 crates/ts_jsstring/tools/generate_go_quote.py`; `--check` verifies
+with `python3 crates/tsr_jsstring/tools/generate_go_quote.py`; `--check` verifies
 the checked-in table. This operation is separate from JavaScript literal escaping.
 
 The public byte helper functions return owned transformed buffers. Casing and

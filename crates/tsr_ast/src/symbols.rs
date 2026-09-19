@@ -9,9 +9,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 #[cfg(test)]
-use ts_arena::Counters;
-use ts_arena::Error;
-pub use ts_arena::SymbolId;
+use tsr_arena::Counters;
+use tsr_arena::Error;
+pub use tsr_arena::SymbolId;
 
 pub type SymbolFlags = u32;
 pub type CheckFlags = u32;
@@ -295,8 +295,8 @@ pub fn is_locals_container(node: &(impl NodeAccess + ?Sized)) -> bool {
 mod tests {
     use super::*;
     use crate::{AstBuilder, Factory, FactoryMethods, Node, RuntimeFactory, SyntaxKind};
-    use ts_arena::SymbolArena;
-    use ts_jsstring::SourceText;
+    use tsr_arena::SymbolArena;
+    use tsr_jsstring::SourceText;
 
     #[test]
     fn alias_queries_keep_nil_symbols_local_merges_and_declaration_expression_rules() {

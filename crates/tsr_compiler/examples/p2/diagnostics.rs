@@ -1,8 +1,8 @@
 use super::{baseline, failure, file_name, hex, utf8, Error, Result};
 use serde_json::{json, Value};
-use ts_ast::Diagnostic;
-use ts_checker::Operation;
-use ts_compiler::Program;
+use tsr_ast::Diagnostic;
+use tsr_checker::Operation;
+use tsr_compiler::Program;
 
 pub fn payload(program: &Program, d: &Diagnostic) -> Result<Value> {
     let args = if d.message_args.is_empty() {
@@ -28,15 +28,15 @@ pub fn sorted(program: &Program, mut values: Vec<Diagnostic>) -> Result<Vec<Diag
         let _ = payload(program, d)?;
     }
     let names = |id| file_name(program, id);
-    ts_core::sort_like_go(&mut values, &mut |a, b| {
-        ts_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
+    tsr_core::sort_like_go(&mut values, &mut |a, b| {
+        tsr_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
     });
     let mut out: Vec<Diagnostic> = Vec::new();
     let mut input = values.into_iter().peekable();
     while let Some(mut value) = input.next() {
         let mut merged = false;
         while input.peek().is_some_and(|next| {
-            ts_ast::equal_diagnostics_no_related_info(&value, next, &names)
+            tsr_ast::equal_diagnostics_no_related_info(&value, next, &names)
                 .expect("validated diagnostic owners")
         }) {
             merged = true;
@@ -45,11 +45,11 @@ pub fn sorted(program: &Program, mut values: Vec<Diagnostic>) -> Result<Vec<Diag
                 .extend(input.next().expect("peeked diagnostic").related_information);
         }
         if merged && !value.related_information.is_empty() {
-            ts_core::sort_like_go(&mut value.related_information, &mut |a, b| {
-                ts_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
+            tsr_core::sort_like_go(&mut value.related_information, &mut |a, b| {
+                tsr_ast::compare_diagnostics(a, b, &names).expect("validated diagnostic owners")
             });
             value.related_information.dedup_by(|a, b| {
-                ts_ast::equal_diagnostics(a, b, &names).expect("validated diagnostic owners")
+                tsr_ast::equal_diagnostics(a, b, &names).expect("validated diagnostic owners")
             });
         }
         out.push(value);

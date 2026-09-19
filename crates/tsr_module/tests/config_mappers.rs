@@ -1,9 +1,9 @@
 use serde_json::{json, Value};
 use std::fmt::Write;
 use std::sync::Arc;
-use ts_jsstring::{JsString, SourceText};
-use ts_tsoptions::{config_mappers::validate_content_mappers, ConfigValue};
-use ts_vfs::MemoryBuilder;
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tsoptions::{config_mappers::validate_content_mappers, ConfigValue};
+use tsr_vfs::MemoryBuilder;
 fn hex(bytes: &[u8]) -> String {
     bytes
         .iter()
@@ -67,7 +67,7 @@ fn original_go_compact_json() {
     assert_eq!(requests.len(), expected.len());
     for (request, expected) in requests.iter().zip(expected) {
         let observed =
-            match ts_tsoptions::config_json::stringify_json(&config_value(&request["value"])) {
+            match tsr_tsoptions::config_json::stringify_json(&config_value(&request["value"])) {
                 Ok(text) => json!({"id":request["id"],"error":false,"text_hex":hex(&text)}),
                 Err(_) => json!({"id":request["id"],"error":true}),
             };
@@ -95,29 +95,30 @@ fn original_go_mapper_validation_and_manifests() {
         for (path, text) in request["files"].as_object().unwrap() {
             host.insert_physical(path.as_bytes(), text.as_str().unwrap().as_bytes());
         }
-        let host: Arc<dyn ts_vfs::FileSystem> = Arc::new(host.finish());
+        let host: Arc<dyn tsr_vfs::FileSystem> = Arc::new(host.finish());
         let text = SourceText::from_loaded_bytes(request["text"].as_str().unwrap().as_bytes());
         let name = JsString::from_bytes(b"/home/project/tsconfig.json".as_slice());
-        let parsed = ts_tsoptions::parse_config_file_text_to_json(name.clone(), name.clone(), text);
+        let parsed =
+            tsr_tsoptions::parse_config_file_text_to_json(name.clone(), name.clone(), text);
         let values = parsed
             .value
             .get(b"contentMappers")
             .and_then(ConfigValue::as_array)
             .unwrap_or_default();
-        let property = ts_tsoptions::find_property(&parsed.source, &[b"contentMappers"]).unwrap();
+        let property = tsr_tsoptions::find_property(&parsed.source, &[b"contentMappers"]).unwrap();
         let node = parsed.source.file.view().node(property).unwrap();
-        let ts_ast::NodeDataRead::PropertyAssignment(data) = node.data() else {
+        let tsr_ast::NodeDataRead::PropertyAssignment(data) = node.data() else {
             panic!("config property")
         };
-        let option = ts_tsoptions::ROOT_OPTIONS
+        let option = tsr_tsoptions::ROOT_OPTIONS
             .iter()
             .find(|option| option.name == "contentMappers")
             .unwrap();
-        let (_, mut prelude) = ts_tsoptions::convert_json_option(
+        let (_, mut prelude) = tsr_tsoptions::convert_json_option(
             option,
             parsed.value.get(b"contentMappers").unwrap(),
             b"/home/project",
-            ts_tsoptions::OptionSyntax {
+            tsr_tsoptions::OptionSyntax {
                 config: Some(&parsed.source),
                 property: Some(property),
                 value: data.initializer(),
@@ -130,7 +131,7 @@ fn original_go_mapper_validation_and_manifests() {
             request["RunExternalCode"].as_bool().unwrap(),
             name.as_bytes(),
             &mut |containing, package| {
-                ts_module::resolve_content_mapper_manifest(
+                tsr_module::resolve_content_mapper_manifest(
                     &host,
                     b"/home/project",
                     containing,

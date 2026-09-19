@@ -3,8 +3,8 @@
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
 use std::collections::HashSet;
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, JsString, SymbolTable};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, modifier_flags as mf, symbol_flags as sf, JsString, SymbolTable};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getPropertiesOfType
@@ -215,7 +215,7 @@ impl CheckerState {
         &mut self,
         ty: TypeId,
         skip_augment: bool,
-    ) -> Result<ts_ast::SymbolTableId, Error> {
+    ) -> Result<tsr_ast::SymbolTableId, Error> {
         let common = self.types.compound_members(ty)?;
         let cache = if skip_augment {
             common.property_cache_without_function_property_augment
@@ -464,7 +464,7 @@ impl CheckerState {
         }
         prop_types.extend(index_types);
         let declaration_list = if declarations.is_empty() {
-            ts_ast::DeclarationSlice::empty()
+            tsr_ast::DeclarationSlice::empty()
         } else {
             self.declarations.alloc(declarations)?
         };

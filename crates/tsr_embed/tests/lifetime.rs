@@ -1,16 +1,16 @@
 use std::sync::Arc;
-use ts_arena::{Counters, Counts};
-use ts_checker::Error;
-use ts_core::{CompilerOptions, Tristate};
-use ts_embed::{FileCache, ProgramOptions, Session};
-use ts_jsstring::JsString;
+use tsr_arena::{Counters, Counts};
+use tsr_checker::Error;
+use tsr_core::{CompilerOptions, Tristate};
+use tsr_embed::{FileCache, ProgramOptions, Session};
+use tsr_jsstring::JsString;
 
 fn session(counters: &Counters) -> Session {
-    let mut host = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut host = tsr_vfs::MemoryBuilder::new(b"/", true);
     host.insert_loaded(b"/main.ts", b"const value: string = 1;".as_slice());
     Session::load(
         ProgramOptions {
-            config: ts_tsoptions::ParsedCommandLine::new(
+            config: tsr_tsoptions::ParsedCommandLine::new(
                 CompilerOptions {
                     no_lib: Tristate::TRUE,
                     strict: Tristate::TRUE,
@@ -69,7 +69,7 @@ fn retained_type_keeps_its_program_alive_and_rejects_other_sessions() {
     let second = Session::from_program(first.program().clone(), &counters);
     assert_eq!(
         second.operation().unwrap().import_type(&retained),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     );
     drop(second);
     drop(first);
@@ -101,11 +101,11 @@ fn reentry_is_an_error_and_retirement_invalidates_retained_results() {
     session.retire();
     assert!(matches!(
         session.operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     assert!(matches!(
         retained.owner().operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     drop(session);
     drop(retained);
@@ -119,7 +119,7 @@ fn retire_before_initialization_cannot_create_a_checker() {
     session.retire();
     assert!(matches!(
         session.checker(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     drop(session);
     assert_eq!(counters.snapshot(), Counts::default());
@@ -136,7 +136,7 @@ fn native_unwind_retires_the_session_and_preserves_the_payload() {
     assert_eq!(*result.unwrap_err().downcast::<u32>().unwrap(), 42);
     assert!(matches!(
         session.operation(),
-        Err(Error::Arena(ts_arena::Error::Retired))
+        Err(Error::Arena(tsr_arena::Error::Retired))
     ));
     drop(session);
     assert_eq!(counters.snapshot(), Counts::default());

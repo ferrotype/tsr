@@ -1,11 +1,11 @@
 use crate::{FileCache, Program, ProgramOptions};
 use std::sync::{Arc, Barrier};
-use ts_arena::{Counters, Counts, Error, SymbolId};
-use ts_ast::CompletedFile;
-use ts_core::{CompilerOptions, Tristate};
-use ts_jsstring::JsString;
-use ts_tsoptions::ParsedCommandLine;
-use ts_vfs::MemoryBuilder;
+use tsr_arena::{Counters, Counts, Error, SymbolId};
+use tsr_ast::CompletedFile;
+use tsr_core::{CompilerOptions, Tristate};
+use tsr_jsstring::JsString;
+use tsr_tsoptions::ParsedCommandLine;
+use tsr_vfs::MemoryBuilder;
 
 fn snapshot(text: &[u8], cache: &mut FileCache, counters: &Counters) -> Program {
     let mut host = MemoryBuilder::new(b"/src", true);

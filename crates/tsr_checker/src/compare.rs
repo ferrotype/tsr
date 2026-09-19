@@ -9,7 +9,7 @@
 use crate::{object_flags, type_flags, CheckerState, Error, LiteralValue, TypeId, TypeKind};
 use std::cell::Cell;
 use std::cmp::Ordering;
-use ts_arena::{NodeId, SymbolId};
+use tsr_arena::{NodeId, SymbolId};
 
 fn ordering(value: i64) -> Ordering {
     value.cmp(&0)
@@ -301,8 +301,8 @@ impl CheckerState {
             };
             let c = texts1
                 .iter()
-                .map(ts_ast::JsString::as_bytes)
-                .cmp(texts2.iter().map(ts_ast::JsString::as_bytes));
+                .map(tsr_ast::JsString::as_bytes)
+                .cmp(texts2.iter().map(tsr_ast::JsString::as_bytes));
             if c != Ordering::Equal {
                 return Ok(c);
             }
@@ -524,7 +524,7 @@ impl CheckerState {
         }
         // Fall back to symbol IDs. This is a last resort that should happen only when symbols have
         // no declaration and duplicate names.
-        Ok(ts_ast::runtime_symbol_id(&sym1).cmp(&ts_ast::runtime_symbol_id(&sym2)))
+        Ok(tsr_ast::runtime_symbol_id(&sym1).cmp(&tsr_ast::runtime_symbol_id(&sym2)))
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.compareNodes
@@ -556,7 +556,7 @@ impl CheckerState {
             return Ok(index);
         }
         let view = self.ast(node)?;
-        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?;
+        let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?;
         Ok(program.file_index(source))
     }
 

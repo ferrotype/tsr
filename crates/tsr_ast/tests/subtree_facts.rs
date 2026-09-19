@@ -1,8 +1,8 @@
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     subtree_flags as f, AstBuilder, Factory, FactoryMethods, JsString, NodeData, SyntaxKind,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 fn builder() -> AstBuilder {
     AstBuilder::new(SourceText::from_loaded_bytes(&b""[..]), &Counters::new())
@@ -33,9 +33,9 @@ fn computed_cache_survives_a_temporary_noncomposite_payload() {
     let identifier = b.new_identifier(JsString::from_bytes(b"x".as_slice()));
     let outer = b.new_computed_property_name(Some(this));
     assert_eq!(b.view().subtree_facts(outer), f::LEXICAL_THIS);
-    *b.node_mut(outer).unwrap().data_mut() = ts_ast::TokenData {}.into();
+    *b.node_mut(outer).unwrap().data_mut() = tsr_ast::TokenData {}.into();
     assert!(b.node(outer).as_token().is_some());
-    *b.node_mut(outer).unwrap().data_mut() = ts_ast::ComputedPropertyNameData {
+    *b.node_mut(outer).unwrap().data_mut() = tsr_ast::ComputedPropertyNameData {
         expression: Some(identifier),
     }
     .into();
@@ -52,7 +52,7 @@ fn scope_masks_preserve_transform_facts_and_exclude_lexical_markers() {
     let awaited = b.new_await_expression(Some(this));
     let function = b.new_node(
         SyntaxKind::FunctionExpression.into(),
-        ts_ast::FunctionExpressionData {
+        tsr_ast::FunctionExpressionData {
             modifiers: None,
             type_parameters: None,
             parameters: None,
@@ -74,7 +74,7 @@ fn scope_masks_preserve_transform_facts_and_exclude_lexical_markers() {
     );
     let arrow = b.new_node(
         SyntaxKind::ArrowFunction.into(),
-        ts_ast::ArrowFunctionData {
+        tsr_ast::ArrowFunctionData {
             modifiers: None,
             type_parameters: None,
             parameters: None,
@@ -97,7 +97,7 @@ fn erased_types_do_not_visit_their_stored_children() {
     let mut b = builder();
     let malformed = b.new_node(
         SyntaxKind::CallExpression.into(),
-        ts_ast::CallExpressionData {
+        tsr_ast::CallExpressionData {
             expression: None,
             question_dot_token: None,
             type_arguments: None,
@@ -107,7 +107,7 @@ fn erased_types_do_not_visit_their_stored_children() {
     );
     let declaration = b.new_node(
         SyntaxKind::VariableDeclaration.into(),
-        ts_ast::VariableDeclarationData {
+        tsr_ast::VariableDeclarationData {
             name: None,
             exclamation_token: None,
             r#type: Some(malformed),

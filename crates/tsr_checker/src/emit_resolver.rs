@@ -1,20 +1,20 @@
 //! The declaration resolver borrows the current exclusive checker operation.
 //! No callback takes another owner lock, and output syntax belongs to its caller.
 use crate::{type_flags as tf, CheckerState, Error, Operation};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, symbol_flags as sf, AstBuilder, AstView,
     FactoryMethods, SyntaxKind as K,
 };
-use ts_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver, EnumMemberValue};
+use tsr_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver, EnumMemberValue};
 
 impl DeclarationEmitResolver for Operation<'_> {
     fn create_expando_namespace_scope(
         &mut self,
         parent: NodeId,
-        name: ts_ast::JsString,
+        name: tsr_ast::JsString,
         host: SymbolId,
-        local_name: ts_ast::JsString,
+        local_name: tsr_ast::JsString,
         symbol: SymbolId,
     ) -> Result<NodeId, Error> {
         self.state_mut().create_emit_scope(
@@ -26,7 +26,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             None,
         )
     }
-    fn symbol_flags(&mut self, symbol: SymbolId) -> Result<ts_ast::SymbolFlags, Error> {
+    fn symbol_flags(&mut self, symbol: SymbolId) -> Result<tsr_ast::SymbolFlags, Error> {
         Ok(self.state().symbol(symbol)?.flags())
     }
     fn symbol_export(&mut self, symbol: SymbolId, name: &[u8]) -> Result<Option<SymbolId>, Error> {
@@ -43,12 +43,12 @@ impl DeclarationEmitResolver for Operation<'_> {
         }
         self.state_mut().emit_referenced_value_declaration(node)
     }
-    fn element_access_expression_name(&mut self, node: NodeId) -> Result<ts_ast::JsString, Error> {
+    fn element_access_expression_name(&mut self, node: NodeId) -> Result<tsr_ast::JsString, Error> {
         self.state_mut().emit_element_access_expression_name(node)
     }
     fn referenced_name_declaration(
         &mut self,
-        name: ts_ast::JsString,
+        name: tsr_ast::JsString,
         parent: NodeId,
     ) -> Result<Option<NodeId>, Error> {
         self.state_mut()
@@ -93,7 +93,7 @@ impl DeclarationEmitResolver for Operation<'_> {
                 return Ok(());
             }
         }
-        Err(ts_arena::Error::WrongOwner.into())
+        Err(tsr_arena::Error::WrongOwner.into())
     }
     fn bound_symbol_of_declaration(&self, node: NodeId) -> Result<Option<SymbolId>, Error> {
         self.state().raw_declaration_symbol(node)
@@ -136,7 +136,7 @@ impl DeclarationEmitResolver for Operation<'_> {
         enclosing: Option<NodeId>,
         meaning: u32,
         compute_aliases: bool,
-    ) -> Result<ts_printer::emit_resolver::SymbolAccessibilityResult, Error> {
+    ) -> Result<tsr_printer::emit_resolver::SymbolAccessibilityResult, Error> {
         self.state_mut()
             .emit_symbol_accessible(symbol, enclosing, meaning, compute_aliases, true)
     }
@@ -144,7 +144,7 @@ impl DeclarationEmitResolver for Operation<'_> {
         &mut self,
         node: NodeId,
         enclosing: NodeId,
-    ) -> Result<ts_printer::emit_resolver::SymbolAccessibilityResult, Error> {
+    ) -> Result<tsr_printer::emit_resolver::SymbolAccessibilityResult, Error> {
         self.state_mut().emit_entity_visible(node, enclosing)
     }
     fn late_bound(&mut self, node: NodeId) -> Result<bool, Error> {
@@ -153,7 +153,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             return Ok(false);
         }
         Ok(match state.get_symbol_of_declaration(node)? {
-            Some(s) => state.symbol(s)?.check_flags() & ts_ast::check_flags::LATE != 0,
+            Some(s) => state.symbol(s)?.check_flags() & tsr_ast::check_flags::LATE != 0,
             None => false,
         })
     }
@@ -209,12 +209,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_late_bound_index_signatures(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Vec<NodeId>, Error> {
         crate::node_builder::NodeBuilder::with_output(
             self.state_mut(),
@@ -242,12 +242,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_type_of_declaration(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Error> {
         let original = emit.most_original(node);
         if output.view().node(original)?.flags() & nf::SYNTHESIZED != 0 {
@@ -258,7 +258,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             output,
             emit,
             enclosing,
-            flags | ts_nodebuilder::flags::MULTILINE_OBJECT_LITERALS,
+            flags | tsr_nodebuilder::flags::MULTILINE_OBJECT_LITERALS,
             internal_flags,
             tracker,
             |builder| {
@@ -271,12 +271,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_return_type_of_signature(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Error> {
         let original = emit.most_original(node);
         if output.view().node(original)?.flags() & nf::SYNTHESIZED != 0 {
@@ -306,12 +306,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_type_of_expression(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Error> {
         let original = emit.most_original(node);
         if output.view().node(original)?.flags() & nf::SYNTHESIZED != 0 {
@@ -322,7 +322,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             output,
             emit,
             enclosing,
-            flags | ts_nodebuilder::flags::MULTILINE_OBJECT_LITERALS,
+            flags | tsr_nodebuilder::flags::MULTILINE_OBJECT_LITERALS,
             internal_flags,
             tracker,
             |builder| {
@@ -334,12 +334,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_type_parameters_of_signature(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Vec<NodeId>, Error> {
         let node = emit.most_original(node);
         if output.view().node(node)?.flags() & nf::SYNTHESIZED != 0 {
@@ -366,9 +366,9 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn create_literal_const_value(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Error> {
         let node = emit.most_original(node);
         crate::node_builder::NodeBuilder::with_output(
@@ -385,12 +385,12 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn try_js_type_node_to_type_node(
         &mut self,
         output: &mut AstBuilder,
-        emit: &mut ts_printer::EmitContext,
+        emit: &mut tsr_printer::EmitContext,
         node: NodeId,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
     ) -> Result<Option<NodeId>, Error> {
         let node = emit.most_original(node);
         if output.view().node(node)?.flags() & nf::SYNTHESIZED != 0 {
@@ -438,7 +438,7 @@ impl CheckerState {
         let Some(body) = read.body() else {
             return Ok(false);
         };
-        if !ts_ast::node_is_present(Some(&self.node(body)?)) {
+        if !tsr_ast::node_is_present(Some(&self.node(body)?)) {
             return Ok(false);
         }
         let symbol = self.get_symbol_of_declaration(node)?;
@@ -466,15 +466,16 @@ impl CheckerState {
         let read = view.node(node)?;
         let parameter_property = match read.parent() {
             Some(parent) => {
-                ts_ast::utilities::is_parameter_property_declaration(view, node, parent)?
+                tsr_ast::utilities::is_parameter_property_declaration(view, node, parent)?
             }
             None => false,
         };
-        let readonly = ts_ast::utilities::get_combined_modifier_flags(view, node)? & mf::READONLY
+        let readonly = tsr_ast::utilities::get_combined_modifier_flags(view, node)? & mf::READONLY
             != 0
             && !parameter_property;
         if readonly
-            || read.kind() == K::VariableDeclaration && ts_ast::utilities::is_var_const(view, node)?
+            || read.kind() == K::VariableDeclaration
+                && tsr_ast::utilities::is_var_const(view, node)?
         {
             if let Some(symbol) = self.get_symbol_of_declaration(node)? {
                 let ty = self.get_type_of_symbol(symbol)?;
@@ -534,14 +535,14 @@ impl CheckerState {
                     return Ok(false);
                 }
                 let optional = self.is_optional_parameter(node)?;
-                let property = ts_ast::utilities::has_syntactic_modifier(
+                let property = tsr_ast::utilities::has_syntactic_modifier(
                     self.ast(node)?,
                     node,
                     mf::PARAMETER_PROPERTY_MODIFIER,
                 )?;
                 let enclosing_function = match enclosing {
                     Some(n) => {
-                        ts_ast::utilities::is_function_like_declaration(Some(&self.node(n)?))
+                        tsr_ast::utilities::is_function_like_declaration(Some(&self.node(n)?))
                     }
                     None => false,
                 };
@@ -583,8 +584,9 @@ impl CheckerState {
         }
         for property in self.emit_container_function_properties(node)? {
             if let Some(value) = self.symbol(property)?.value_declaration() {
-                if ts_ast::utilities_tail::is_expando_property_declaration(Some(&self.node(value)?))
-                {
+                if tsr_ast::utilities_tail::is_expando_property_declaration(Some(
+                    &self.node(value)?,
+                )) {
                     return Ok(true);
                 }
             }
@@ -633,7 +635,7 @@ impl CheckerState {
         if !self.emit_parse_node(node)? {
             return Ok(false);
         }
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("augmentation import source"))?;
         let Some(file_symbol) = self.raw_declaration_symbol(source)? else {
             return Ok(false);
@@ -656,7 +658,7 @@ impl CheckerState {
             let merged = self.get_merged_symbol(symbol);
             if merged != symbol {
                 for declaration in self.symbol_declarations(merged)?.iter().flatten() {
-                    if ts_ast::utilities::get_source_file_of_node(
+                    if tsr_ast::utilities::get_source_file_of_node(
                         self.ast(declaration)?,
                         Some(declaration),
                     )? == Some(target)

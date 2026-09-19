@@ -1,5 +1,5 @@
-use ts_ast::{token_flags as flags, SyntaxKind};
-use ts_diagnostics as diagnostics;
+use tsr_ast::{token_flags as flags, SyntaxKind};
+use tsr_diagnostics as diagnostics;
 
 use crate::identifier::is_identifier_start;
 use crate::utilities::{is_digit, is_hex_digit, is_octal_digit};
@@ -23,7 +23,7 @@ pub(crate) fn saturated_radix(bytes: &[u8], base: i64, maximum: i64) -> i64 {
 
 impl<'src> Scanner<'src> {
     fn normalize_number_value(&mut self) {
-        let value = ts_jsnum::from_string(self.token_value())
+        let value = tsr_jsnum::from_string(self.token_value())
             .to_string()
             .into_bytes();
         if value != self.token_value() {
@@ -345,7 +345,7 @@ impl<'src> Scanner<'src> {
         if self.char() == i32::from(b'n') {
             self.append_token_value(b"n");
             if self.state.token_flags & flags::BINARY_OR_OCTAL_SPECIFIER != 0 {
-                let mut value = ts_jsnum::parse_pseudo_big_int(self.token_value());
+                let mut value = tsr_jsnum::parse_pseudo_big_int(self.token_value());
                 value.push(b'n');
                 self.state.token_value = value.into();
             }

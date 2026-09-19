@@ -1,6 +1,6 @@
 //! One container rule inventory; each access path supplies only the selected fact.
 use crate::ContainerFlags as C;
-use ts_ast::{
+use tsr_ast::{
     local_bind::{BindNode, LocalBind},
     utilities as u, NodeKind, SyntaxKind as K,
 };

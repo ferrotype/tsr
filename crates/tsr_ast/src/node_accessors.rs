@@ -2,7 +2,7 @@
 use crate::{
     AstView, Node, NodeAccess, NodeData, NodeId, NodeListId, NodeRead, NodeSlice, SyntaxKind as K,
 };
-use ts_arena::Error;
+use tsr_arena::Error;
 
 macro_rules! read_methods {
     () => {

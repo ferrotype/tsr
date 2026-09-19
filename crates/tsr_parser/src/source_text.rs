@@ -1,6 +1,6 @@
 use crate::{Parser, ParserFactory};
 use std::borrow::Cow;
-use ts_ast::{node_flags, token_flags, JsString, NodeId, SyntaxKind};
+use tsr_ast::{node_flags, token_flags, JsString, NodeId, SyntaxKind};
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/scanner/utilities.go:GetTextOfNodeFromSourceText
@@ -17,13 +17,13 @@ impl<F: ParserFactory> Parser<'_, F> {
         let pos = if include_trivia {
             loc.pos()
         } else {
-            ts_scanner::skip_trivia(self.source_text, loc.pos())
+            tsr_scanner::skip_trivia(self.source_text, loc.pos())
         };
         let range = usize::try_from(pos).expect("source node start is nonnegative")
             ..usize::try_from(loc.end()).expect("source node end is nonnegative");
         let text = &self.source_text[range.clone()];
         let text = if self.is_jsdoc_type_expression_or_child(id) {
-            ts_scanner::normalize_jsdoc_type_source_text(text)
+            tsr_scanner::normalize_jsdoc_type_source_text(text)
         } else {
             Cow::Borrowed(text)
         };
@@ -89,7 +89,7 @@ impl<F: ParserFactory> Parser<'_, F> {
 }
 
 /// port: tsc/internal/ast/utilities.go:IsTypeNodeKind
-pub(crate) fn is_type_node_kind(kind: ts_ast::NodeKind) -> bool {
+pub(crate) fn is_type_node_kind(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(

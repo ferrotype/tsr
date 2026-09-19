@@ -1,9 +1,9 @@
 use super::*;
 use crate::{FileCache, ProgramOptions};
-use ts_arena::Counters;
-use ts_core::{ModuleResolutionKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
-use ts_vfs::MemoryBuilder;
+use tsr_arena::Counters;
+use tsr_core::{ModuleResolutionKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
+use tsr_vfs::MemoryBuilder;
 
 fn load(
     options: CompilerOptions,
@@ -331,17 +331,17 @@ fn checker_host_retains_program_and_preserves_foreign_source_and_vfs_errors() {
     let file = foreign.files()[0].bound();
     assert_eq!(
         host.source_file_may_be_emitted(file, false),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     );
     assert_eq!(
         host.get_emit_syntax_for_usage_location(b"main.ts", usage(file, b"./x")),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     );
     assert_eq!(
         host.get_emit_module_format_of_file(b"foreign.ts"),
-        Err(Error::Arena(ts_arena::Error::WrongOwner))
+        Err(Error::Arena(tsr_arena::Error::WrongOwner))
     );
-    assert_eq!(host.file_exists(b"loop"), Err(ts_vfs::Error::SymlinkCycle));
+    assert_eq!(host.file_exists(b"loop"), Err(tsr_vfs::Error::SymlinkCycle));
     // Project references are rejected before files load, so the native lookup
     // is an empty one rather than an unported boundary.
     assert!(host

@@ -4,7 +4,7 @@ use crate::{
     modifier_flags, symbol_flags, AstView, DeclarationSlice, JsString, NodeId, Symbol, SymbolId,
     SymbolRead, SymbolTableId,
 };
-use ts_arena::Error;
+use tsr_arena::Error;
 
 pub(crate) mod sealed {
     pub trait Sealed {
@@ -16,7 +16,7 @@ pub(crate) mod sealed {
 /// Symbol queries expose controlled runtime identity operations, not its atomic.
 ///
 /// ```compile_fail
-/// fn overwrite(symbol: &dyn ts_ast::SymbolAccess) {
+/// fn overwrite(symbol: &dyn tsr_ast::SymbolAccess) {
 ///     symbol.runtime_cell().store(7, std::sync::atomic::Ordering::SeqCst);
 /// }
 /// ```

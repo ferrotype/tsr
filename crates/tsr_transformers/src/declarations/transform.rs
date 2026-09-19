@@ -1,10 +1,10 @@
 use super::tracker::{Pending, Selector, Tracker};
 use std::collections::HashMap;
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, Diagnostic, Factory, JsString, NodeId, NodeListId, RuntimeFactory, SyntaxKind as K,
     VisitorMethods,
 };
-use ts_printer::{
+use tsr_printer::{
     emit_resolver::{DeclarationEmitResolver, DeclarationTrackerEvent as Event},
     EmitContext,
 };
@@ -88,21 +88,21 @@ pub(super) struct Transformer<'a, R: DeclarationEmitResolver> {
     pub cjs: super::common_js::CommonJsState,
 }
 
-pub(super) const BUILDER_FLAGS: ts_nodebuilder::Flags =
-    ts_nodebuilder::flags::MULTILINE_OBJECT_LITERALS
-        | ts_nodebuilder::flags::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL
-        | ts_nodebuilder::flags::USE_TYPE_OF_FUNCTION
-        | ts_nodebuilder::flags::USE_STRUCTURAL_FALLBACK
-        | ts_nodebuilder::flags::ALLOW_EMPTY_TUPLE
-        | ts_nodebuilder::flags::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS
-        | ts_nodebuilder::flags::NO_TRUNCATION;
-pub(super) const INTERNAL_FLAGS: ts_nodebuilder::InternalFlags =
-    ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
+pub(super) const BUILDER_FLAGS: tsr_nodebuilder::Flags =
+    tsr_nodebuilder::flags::MULTILINE_OBJECT_LITERALS
+        | tsr_nodebuilder::flags::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL
+        | tsr_nodebuilder::flags::USE_TYPE_OF_FUNCTION
+        | tsr_nodebuilder::flags::USE_STRUCTURAL_FALLBACK
+        | tsr_nodebuilder::flags::ALLOW_EMPTY_TUPLE
+        | tsr_nodebuilder::flags::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS
+        | tsr_nodebuilder::flags::NO_TRUNCATION;
+pub(super) const INTERNAL_FLAGS: tsr_nodebuilder::InternalFlags =
+    tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
-    pub fn builder_flags(&self) -> ts_nodebuilder::Flags {
+    pub fn builder_flags(&self) -> tsr_nodebuilder::Flags {
         if self.in_class_expression_declaration {
-            BUILDER_FLAGS & !ts_nodebuilder::flags::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL
+            BUILDER_FLAGS & !tsr_nodebuilder::flags::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL
         } else {
             BUILDER_FLAGS
         }
@@ -110,11 +110,11 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     pub fn unsupported<T>(name: &'static str) -> Result<T, R::Error> {
         Err(R::unsupported(name))
     }
-    pub fn node(&self, node: NodeId) -> ts_ast::NodeRead<'_> {
+    pub fn node(&self, node: NodeId) -> tsr_ast::NodeRead<'_> {
         Factory::node(&*self.output, node)
     }
     pub fn required(node: Option<NodeId>) -> Result<NodeId, R::Error> {
-        node.ok_or_else(|| ts_arena::Error::InvalidGraph.into())
+        node.ok_or_else(|| tsr_arena::Error::InvalidGraph.into())
     }
     pub fn list_nodes(&self, list: Option<NodeListId>) -> Vec<NodeId> {
         list.map(|list| {
@@ -131,7 +131,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             .output
             .alloc_nodes(nodes.into_iter().map(Some).collect());
         self.output
-            .alloc_list(ts_core::TextRange::new(-1, -1), nodes)
+            .alloc_list(tsr_core::TextRange::new(-1, -1), nodes)
     }
 
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visit
@@ -226,7 +226,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     pub fn diagnostic(
         &mut self,
         node: NodeId,
-        message: &'static ts_diagnostics::Message,
+        message: &'static tsr_diagnostics::Message,
         args: Vec<JsString>,
     ) -> Result<(), R::Error> {
         let diagnostic = super::diagnostics::diagnostic_for_node(
@@ -240,11 +240,11 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
     pub fn name_text(&self, name: NodeId) -> Result<JsString, R::Error> {
         let view = self.resolver.ast(name)?;
-        Ok(ts_scanner::get_text_of_node(view, name)?)
+        Ok(tsr_scanner::get_text_of_node(view, name)?)
     }
     pub fn fallback_name(&self) -> Result<JsString, R::Error> {
         if let Some(name) = self.tracker.error_name {
-            return Ok(ts_scanner::declaration_name_to_string(
+            return Ok(tsr_scanner::declaration_name_to_string(
                 self.resolver.ast(name)?,
                 Some(name),
             )?);
@@ -252,9 +252,9 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         if let Some(Some(node)) = self.tracker.fallback.last() {
             let read = self.node(*node);
             if let Some(name) =
-                ts_ast::get_name_of_declaration(self.resolver.ast(*node)?, Some(*node))?
+                tsr_ast::get_name_of_declaration(self.resolver.ast(*node)?, Some(*node))?
             {
-                return Ok(ts_scanner::declaration_name_to_string(
+                return Ok(tsr_scanner::declaration_name_to_string(
                     self.resolver.ast(name)?,
                     Some(name),
                 )?);
@@ -271,7 +271,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     }
     // Source: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl
     pub fn flush_reports(&mut self) -> Result<(), R::Error> {
-        use ts_diagnostics as d;
+        use tsr_diagnostics as d;
         for pending in std::mem::take(&mut self.tracker.pending) {
             match pending {
                 Pending::SelectorError(error) => return Err(error.into()),
@@ -289,7 +289,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                 }
                 Pending::Report(Event::PopErrorFallbackNode) => {
                     if self.tracker.fallback.pop().is_none() {
-                        return Err(ts_arena::Error::InvalidGraph.into());
+                        return Err(tsr_arena::Error::InvalidGraph.into());
                     }
                 }
                 Pending::Report(Event::InferenceFallback(node)) => self.inference_fallback(node)?,
@@ -315,7 +315,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
                         Event::Truncation => (&d::The_inferred_type_of_this_node_exceeds_the_maximum_length_the_compiler_will_serialize_An_explicit_type_annotation_is_needed, vec![]),
                         Event::NonSerializableProperty(property) => (&d::The_type_of_this_node_cannot_be_serialized_because_its_property_0_cannot_be_serialized, vec![property]),
                         Event::PrivateInBaseOfClassExpression(property) => { self.diagnostic(location, d::Property_0_of_exported_anonymous_class_type_may_not_be_private_or_protected, vec![property])?; if self.node(location).parent().is_some_and(|p| self.node(p).kind() == K::VariableDeclaration) { let related = super::diagnostics::diagnostic_for_node(self.resolver.ast(location)?, Some(location), d::Add_a_type_annotation_to_the_variable_0, vec![name])?; self.diagnostics.last_mut().expect("just added diagnostic").related_information.push(std::sync::Arc::new(related)); } continue; }
-                        _ => return Err(ts_arena::Error::InvalidGraph.into()),
+                        _ => return Err(tsr_arena::Error::InvalidGraph.into()),
                     };
                     self.diagnostic(location, message, args)?;
                 }

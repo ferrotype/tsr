@@ -8,15 +8,15 @@ mod class_emit;
 #[path = "node_builder_enum.rs"]
 mod enums;
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, LiteralValue, TypeId};
-use ts_arena::SymbolId;
-use ts_ast::{
+use tsr_arena::SymbolId;
+use tsr_ast::{
     check_flags, symbol_flags as sf, token_flags, AstBuilder, Factory, FactoryMethods, JsString,
     NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_core::{LanguageVariant, TextRange};
-use ts_jsstring::SourceText;
-use ts_nodebuilder::flags as nf;
-use ts_printer::{emit_flags, EmitContext};
+use tsr_core::{LanguageVariant, TextRange};
+use tsr_jsstring::SourceText;
+use tsr_nodebuilder::flags as nf;
+use tsr_printer::{emit_flags, EmitContext};
 
 #[path = "accessibility.rs"]
 mod accessibility;
@@ -41,7 +41,7 @@ pub(crate) struct NodeBuilder<'a> {
     pub(crate) checker: &'a mut CheckerState,
     pub(crate) ast: AstBuilder,
     pub(crate) emit: EmitContext,
-    pub(crate) flags: ts_nodebuilder::Flags,
+    pub(crate) flags: tsr_nodebuilder::Flags,
     pub(crate) enclosing: Option<NodeId>,
     pub(crate) mapper: Option<crate::MapperId>,
     pub(crate) suppress_inference_fallback: bool,
@@ -50,8 +50,8 @@ pub(crate) struct NodeBuilder<'a> {
     pub(crate) id_to_symbol: crate::types::Map<NodeId, Option<SymbolId>>,
     type_parameter_names: scopes::TypeParameterNames,
     reuse_boundaries: Vec<reuse::RecoveryBoundary>,
-    internal_flags: ts_nodebuilder::InternalFlags,
-    tracker: Option<&'a mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker>,
+    internal_flags: tsr_nodebuilder::InternalFlags,
+    tracker: Option<&'a mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker>,
     pub(crate) approximate_length: usize,
     truncating: bool,
     visited: Vec<TypeId>,
@@ -73,8 +73,8 @@ impl<'a> NodeBuilder<'a> {
     pub(crate) fn prepare_context(
         &mut self,
         enclosing: Option<NodeId>,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
     ) -> Result<(), Error> {
         if let Some(node) = enclosing {
             self.retain_source_node(node)?;
@@ -100,13 +100,13 @@ impl<'a> NodeBuilder<'a> {
         Ok(())
     }
 
-    pub(crate) fn new(checker: &'a mut CheckerState, flags: ts_nodebuilder::Flags) -> Self {
+    pub(crate) fn new(checker: &'a mut CheckerState, flags: tsr_nodebuilder::Flags) -> Self {
         Self::with_emit(checker, flags, EmitContext::new())
     }
 
     fn with_emit(
         checker: &'a mut CheckerState,
-        flags: ts_nodebuilder::Flags,
+        flags: tsr_nodebuilder::Flags,
         emit: EmitContext,
     ) -> Self {
         let ast = AstBuilder::with_hooks(
@@ -156,9 +156,9 @@ impl<'a> NodeBuilder<'a> {
         output: &mut AstBuilder,
         emit: &mut EmitContext,
         enclosing: NodeId,
-        flags: ts_nodebuilder::Flags,
-        internal_flags: ts_nodebuilder::InternalFlags,
-        tracker: &'a mut dyn ts_printer::emit_resolver::DeclarationSymbolTracker,
+        flags: tsr_nodebuilder::Flags,
+        internal_flags: tsr_nodebuilder::InternalFlags,
+        tracker: &'a mut dyn tsr_printer::emit_resolver::DeclarationSymbolTracker,
         action: impl FnOnce(&mut Self) -> Result<T, Error>,
     ) -> Result<T, Error> {
         let mut builder = Self::new(checker, flags);
@@ -169,18 +169,18 @@ impl<'a> NodeBuilder<'a> {
         builder.tracker = Some(tracker);
         let result = action(&mut builder);
         if builder.truncating && builder.flags & nf::NO_TRUNCATION != 0 {
-            builder.report(ts_printer::emit_resolver::DeclarationTrackerEvent::Truncation);
+            builder.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::Truncation);
         }
         std::mem::swap(&mut builder.ast, output);
         std::mem::swap(&mut builder.emit, emit);
         result
     }
 
-    fn report(&mut self, event: ts_printer::emit_resolver::DeclarationTrackerEvent) {
+    fn report(&mut self, event: tsr_printer::emit_resolver::DeclarationTrackerEvent) {
         if self.defer_reuse_report(&event) {
             return;
         }
-        use ts_printer::emit_resolver::DeclarationTrackerEvent as Event;
+        use tsr_printer::emit_resolver::DeclarationTrackerEvent as Event;
         if !matches!(
             event,
             Event::InferenceFallback(_)
@@ -232,7 +232,7 @@ impl<'a> NodeBuilder<'a> {
     fn symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
         let read = self.checker.symbol(symbol)?;
         let declarations = self.checker.symbol_declarations(symbol)?;
-        if read.name_bytes() == ts_ast::internal_symbol_names::DEFAULT
+        if read.name_bytes() == tsr_ast::internal_symbol_names::DEFAULT
             && self.flags & nf::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE == 0
         {
             let external =
@@ -250,7 +250,7 @@ impl<'a> NodeBuilder<'a> {
         }
         for declaration in declarations.iter().flatten() {
             let view = self.checker.ast(declaration)?;
-            if let Some(name) = ts_ast::get_name_of_declaration(view, Some(declaration))? {
+            if let Some(name) = tsr_ast::get_name_of_declaration(view, Some(declaration))? {
                 if view.node(name)?.kind() == K::ComputedPropertyName
                     && read.check_flags() & check_flags::LATE == 0
                 {
@@ -270,7 +270,7 @@ impl<'a> NodeBuilder<'a> {
                         }
                     }
                 }
-                return Ok(ts_scanner::declaration_name_to_string(view, Some(name))?);
+                return Ok(tsr_scanner::declaration_name_to_string(view, Some(name))?);
             }
         }
         if let Some(declaration) = declarations.first().flatten() {
@@ -278,7 +278,7 @@ impl<'a> NodeBuilder<'a> {
             let node = view.node(declaration)?;
             if let Some(parent) = node.parent() {
                 if view.node(parent)?.kind() == K::VariableDeclaration {
-                    return Ok(ts_scanner::declaration_name_to_string(
+                    return Ok(tsr_scanner::declaration_name_to_string(
                         view,
                         view.node(parent)?.name(),
                     )?);
@@ -298,7 +298,7 @@ impl<'a> NodeBuilder<'a> {
             return Ok(name);
         }
         Ok(JsString::from_bytes(
-            ts_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
+            tsr_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
         ))
     }
 
@@ -307,7 +307,7 @@ impl<'a> NodeBuilder<'a> {
         while let Some(id) = node {
             let view = self.checker.ast(id)?;
             let read = view.node(id)?;
-            if read.kind() == K::SourceFile || ts_ast::is_ambient_module(view, id)? {
+            if read.kind() == K::SourceFile || tsr_ast::is_ambient_module(view, id)? {
                 return Ok(node);
             }
             node = read.parent();
@@ -333,12 +333,12 @@ impl<'a> NodeBuilder<'a> {
                 _ => return Err(Error::MissingLink("symbol literal name value")),
             };
             let name = value.text();
-            let numeric = ts_jsnum::from_string(name.as_bytes())
+            let numeric = tsr_jsnum::from_string(name.as_bytes())
                 .to_string()
                 .as_bytes()
                 == name.as_bytes();
             if !numeric
-                && !ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD)
+                && !tsr_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD)
             {
                 return Ok(Some(value.diagnostic_text()));
             }
@@ -665,7 +665,7 @@ impl<'a> NodeBuilder<'a> {
                     return self.symbol_type_node_with_meaning(symbol, sf::VALUE);
                 }
                 self.report(
-                    ts_printer::emit_resolver::DeclarationTrackerEvent::InaccessibleUniqueSymbol,
+                    tsr_printer::emit_resolver::DeclarationTrackerEvent::InaccessibleUniqueSymbol,
                 );
             }
             self.approximate_length += 13;
@@ -697,7 +697,7 @@ impl<'a> NodeBuilder<'a> {
                 if self.flags & nf::ALLOW_THIS_IN_OBJECT_LITERAL == 0 {
                     self.encountered_error = true;
                 }
-                self.report(ts_printer::emit_resolver::DeclarationTrackerEvent::InaccessibleThis);
+                self.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::InaccessibleThis);
             }
             self.approximate_length += 4;
             return Ok(self.ast.new_this_type_node());
@@ -1149,7 +1149,7 @@ impl<'a> NodeBuilder<'a> {
                         false,
                     )?;
                     if accessible.accessibility
-                        == ts_printer::emit_resolver::SymbolAccessibility::Accessible
+                        == tsr_printer::emit_resolver::SymbolAccessibility::Accessible
                     {
                         let expression = self.symbol_expression(member, Some(context))?;
                         return Ok(self.ast.new_computed_property_name(Some(expression)));
@@ -1177,15 +1177,15 @@ impl<'a> NodeBuilder<'a> {
         let (string_named, single_quote) = self.property_name_style(symbol)?;
         if name
             .as_bytes()
-            .starts_with(ts_ast::INTERNAL_SYMBOL_NAME_PREFIX)
+            .starts_with(tsr_ast::INTERNAL_SYMBOL_NAME_PREFIX)
         {
             return Err(Error::Unsupported(
                 "getPropertyNameNodeForSymbol: late/private name",
             ));
         }
         let is_identifier =
-            ts_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
-        let is_numeric_name = ts_jsnum::from_string(name.as_bytes())
+            tsr_scanner::is_identifier_text(name.as_bytes(), LanguageVariant::STANDARD);
+        let is_numeric_name = tsr_jsnum::from_string(name.as_bytes())
             .to_string()
             .as_bytes()
             == name.as_bytes();
@@ -1211,11 +1211,11 @@ impl<'a> NodeBuilder<'a> {
                     .new_prefix_unary_expression(K::MinusToken.into(), Some(number));
                 self.ast.new_computed_property_name(Some(negative))
             } else if !string_named
-                && ts_jsnum::from_string(name.as_bytes())
+                && tsr_jsnum::from_string(name.as_bytes())
                     .to_string()
                     .as_bytes()
                     == name.as_bytes()
-                && ts_jsnum::from_string(name.as_bytes()).value() >= 0.0
+                && tsr_jsnum::from_string(name.as_bytes()).value() >= 0.0
             {
                 self.ast.new_numeric_literal(name.clone(), 0)
             } else {
@@ -1278,7 +1278,7 @@ impl<'a> NodeBuilder<'a> {
         let mut string_named = !declarations.is_empty();
         for &declaration in &declarations {
             let view = self.checker.ast(declaration)?;
-            let Some(name) = ts_ast::get_name_of_declaration(view, Some(declaration))? else {
+            let Some(name) = tsr_ast::get_name_of_declaration(view, Some(declaration))? else {
                 string_named = false;
                 break;
             };
@@ -1306,7 +1306,7 @@ impl<'a> NodeBuilder<'a> {
         let mut single_quote = !declarations.is_empty();
         for declaration in declarations {
             let view = self.checker.ast(declaration)?;
-            let Some(name) = ts_ast::get_name_of_declaration(view, Some(declaration))? else {
+            let Some(name) = tsr_ast::get_name_of_declaration(view, Some(declaration))? else {
                 single_quote = false;
                 break;
             };
@@ -1315,7 +1315,7 @@ impl<'a> NodeBuilder<'a> {
                 && node
                     .data_source()
                     .as_string_literal()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .token_flags()
                     & token_flags::SINGLE_QUOTE
                     != 0;

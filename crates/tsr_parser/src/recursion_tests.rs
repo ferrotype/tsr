@@ -1,8 +1,8 @@
 use crate::{recursion::take_observations, Parser};
-use ts_arena::Counters;
-use ts_ast::{AstBuilder, JsString, SourceFileParseOptions, SyntaxKind};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::{AstBuilder, JsString, SourceFileParseOptions, SyntaxKind};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 fn nested(prefix: &str, inner: &str, suffix: &str, depth: usize) -> Vec<u8> {
     format!("{}{}{}", prefix.repeat(depth), inner, suffix.repeat(depth)).into_bytes()

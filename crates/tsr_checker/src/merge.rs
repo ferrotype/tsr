@@ -3,12 +3,12 @@
 //! backing until an append actually needs private storage.
 
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     symbol_flags as flags, DeclarationSlice, SymbolFlags, SymbolRef, SymbolTable, SymbolTableId,
     SyntaxKind,
 };
-use ts_diagnostics as messages;
+use tsr_diagnostics as messages;
 
 // port: tsc/internal/checker/checker.go:getExcludedSymbolFlags
 pub(crate) fn excluded_symbol_flags(value: SymbolFlags) -> SymbolFlags {
@@ -143,7 +143,7 @@ impl CheckerState {
         let (hash, target) = {
             let name = self.symbol(symbol)?;
             let name = name.name_bytes();
-            let hash = ts_ast::name_hash(name);
+            let hash = tsr_ast::name_hash(name);
             (hash, self.table(globals)?.get_hashed(name, hash).flatten())
         };
         let merged = if let Some(target) = target {
@@ -218,7 +218,7 @@ impl CheckerState {
                 if target != self.builtins.global_this_symbol {
                     let declaration = self.first_symbol_declaration(source)?;
                     let node = if let Some(declaration) = declaration {
-                        ts_ast::get_name_of_declaration(self.ast(declaration)?, Some(declaration))?
+                        tsr_ast::get_name_of_declaration(self.ast(declaration)?, Some(declaration))?
                     } else {
                         None
                     };
@@ -235,7 +235,7 @@ impl CheckerState {
         }
         if target_flags & flags::TRANSIENT == 0 {
             let symbol = self.symbol(target)?;
-            let resolved_target = if ts_ast::is_non_local_alias(
+            let resolved_target = if tsr_ast::is_non_local_alias(
                 Some(&symbol),
                 flags::VALUE | flags::TYPE | flags::NAMESPACE,
             ) {
@@ -334,7 +334,7 @@ impl CheckerState {
         let replace = if let Some(previous) = previous {
             let old_kind = self.node(previous)?.kind();
             let new_kind = self.node(node)?.kind();
-            let assignment = |kind: ts_ast::NodeKind| {
+            let assignment = |kind: tsr_ast::NodeKind| {
                 matches!(
                     kind.known(),
                     Some(
@@ -392,10 +392,10 @@ impl CheckerState {
             return Ok(false);
         };
         let view = self.ast(node)?;
-        let Some(file) = ts_ast::utilities::get_source_file_of_node(view, Some(node))? else {
+        let Some(file) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {
             return Ok(false);
         };
-        Ok(ts_ast::utilities_middle::is_plain_js_file(
+        Ok(tsr_ast::utilities_middle::is_plain_js_file(
             Some(&*view.source_file(file)?),
             self.program()?.host.options().check_js,
         ))

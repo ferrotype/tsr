@@ -94,7 +94,7 @@ pub(super) fn emit(input: &Value, pin: &str) -> Result<BTreeMap<PathBuf, String>
     }
     output.push_str("];\n");
     Ok(BTreeMap::from([(
-        PathBuf::from("crates/ts_diagnostics/src/generated.rs"),
+        PathBuf::from("crates/tsr_diagnostics/src/generated.rs"),
         output,
     )]))
 }

@@ -54,26 +54,26 @@ pub use type_precedence::{get_type_node_precedence, TypePrecedence};
 /// printer refused to guess about.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
-    Arena(ts_arena::Error),
+    Arena(tsr_arena::Error),
     /// A configuration or node the port does not print yet, by upstream name.
     Unsupported(&'static str),
     /// A node kind upstream would panic on in this position.
     UnexpectedKind {
         context: &'static str,
-        kind: ts_ast::NodeKind,
+        kind: tsr_ast::NodeKind,
     },
     /// A required child or payload was absent.
     MissingNode(&'static str),
     /// A child holds another kind of node than the field is typed for, where
     /// upstream's unchecked conversion panics.
     InterfaceConversion {
-        found: ts_ast::NodeKind,
+        found: tsr_ast::NodeKind,
         expected: &'static str,
     },
 }
 
-impl From<ts_arena::Error> for Error {
-    fn from(error: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(error: tsr_arena::Error) -> Self {
         Self::Arena(error)
     }
 }
@@ -101,8 +101,8 @@ impl std::error::Error for Error {}
 /// The name of upstream's payload struct for a kind, as its panic prints it:
 /// the kind's name, with `Node` appended for type nodes, and one shared struct
 /// for the keyword types.
-fn node_data_name(kind: ts_ast::NodeKind) -> String {
-    use ts_ast::SyntaxKind as K;
+fn node_data_name(kind: tsr_ast::NodeKind) -> String {
+    use tsr_ast::SyntaxKind as K;
     let name = format!("{kind:?}");
     let name = name.strip_prefix("Kind").unwrap_or(&name).to_owned();
     match kind.known() {

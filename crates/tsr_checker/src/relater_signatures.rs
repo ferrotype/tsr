@@ -54,7 +54,7 @@ impl Relater<'_> {
                 // abstract class.
                 if self.report_errors {
                     self.report_error(
-                        ts_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type,
+                        tsr_diagnostics::Cannot_assign_an_abstract_constructor_type_to_a_non_abstract_constructor_type,
                         vec![],
                     );
                 }
@@ -110,7 +110,7 @@ impl Relater<'_> {
                     .type_to_string(source, crate::type_display::DEFAULT_FLAGS)?;
                 let target = self.checker.signature_to_string(target)?;
                 self.report_error(
-                    ts_diagnostics::Type_0_provides_no_match_for_the_signature_1,
+                    tsr_diagnostics::Type_0_provides_no_match_for_the_signature_1,
                     vec![source, target],
                 );
             }
@@ -176,7 +176,7 @@ impl Relater<'_> {
             if more {
                 if self.report_errors && mode & STRICT_ARITY == 0 {
                     let count = self.checker.min_argument_count(source)?;
-                    self.report_error(ts_diagnostics::Target_signature_provides_too_few_arguments_Expected_0_or_more_but_got_1, vec![ts_ast::JsString::from_bytes(count.to_string().into_bytes()), ts_ast::JsString::from_bytes(target_count.to_string().into_bytes())]);
+                    self.report_error(tsr_diagnostics::Target_signature_provides_too_few_arguments_Expected_0_or_more_but_got_1, vec![tsr_ast::JsString::from_bytes(count.to_string().into_bytes()), tsr_ast::JsString::from_bytes(target_count.to_string().into_bytes())]);
                 }
                 return Ok(tr::FALSE);
             }
@@ -218,9 +218,9 @@ impl Relater<'_> {
             matches!(
                 kind.known(),
                 Some(
-                    ts_ast::SyntaxKind::MethodDeclaration
-                        | ts_ast::SyntaxKind::MethodSignature
-                        | ts_ast::SyntaxKind::Constructor
+                    tsr_ast::SyntaxKind::MethodDeclaration
+                        | tsr_ast::SyntaxKind::MethodSignature
+                        | tsr_ast::SyntaxKind::Constructor
                 )
             )
         });
@@ -253,7 +253,7 @@ impl Relater<'_> {
                 if related == tr::FALSE {
                     if self.report_errors {
                         self.report_error(
-                            ts_diagnostics::The_this_types_of_each_signature_are_incompatible,
+                            tsr_diagnostics::The_this_types_of_each_signature_are_incompatible,
                             vec![],
                         );
                     }
@@ -353,7 +353,7 @@ impl Relater<'_> {
                     let source = self.checker.parameter_name_at(source, i)?;
                     let target = self.checker.parameter_name_at(target, i)?;
                     self.report_error(
-                        ts_diagnostics::Types_of_parameters_0_and_1_are_incompatible,
+                        tsr_diagnostics::Types_of_parameters_0_and_1_are_incompatible,
                         vec![source, target],
                     );
                 }
@@ -381,7 +381,7 @@ impl Relater<'_> {
                 if self.report_errors {
                     let signature = self.checker.signature_to_string(source)?;
                     self.report_error(
-                        ts_diagnostics::Signature_0_must_be_a_type_predicate,
+                        tsr_diagnostics::Signature_0_must_be_a_type_predicate,
                         vec![signature],
                     );
                 }
@@ -415,10 +415,10 @@ impl Relater<'_> {
                         .as_ref()
                         .is_none_or(|p| p.is_empty());
                 let message = match (construct, no_arguments) {
-                    (false, true) => ts_diagnostics::Call_signatures_with_no_arguments_have_incompatible_return_types_0_and_1,
-                    (true, true) => ts_diagnostics::Construct_signatures_with_no_arguments_have_incompatible_return_types_0_and_1,
-                    (false, false) => ts_diagnostics::Call_signature_return_types_0_and_1_are_incompatible,
-                    (true, false) => ts_diagnostics::Construct_signature_return_types_0_and_1_are_incompatible,
+                    (false, true) => tsr_diagnostics::Call_signatures_with_no_arguments_have_incompatible_return_types_0_and_1,
+                    (true, true) => tsr_diagnostics::Construct_signatures_with_no_arguments_have_incompatible_return_types_0_and_1,
+                    (false, false) => tsr_diagnostics::Call_signature_return_types_0_and_1_are_incompatible,
+                    (true, false) => tsr_diagnostics::Construct_signature_return_types_0_and_1_are_incompatible,
                 };
                 let source = self
                     .checker
@@ -443,7 +443,7 @@ impl Relater<'_> {
         let t = self.checker.signatures.predicate(target)?.clone();
         let related = if s.kind != t.kind {
             if self.report_errors {
-                self.report_error(ts_diagnostics::A_this_based_type_guard_is_not_compatible_with_a_parameter_based_type_guard, vec![]);
+                self.report_error(tsr_diagnostics::A_this_based_type_guard_is_not_compatible_with_a_parameter_based_type_guard, vec![]);
             }
             tr::FALSE
         } else if matches!(
@@ -453,7 +453,7 @@ impl Relater<'_> {
         {
             if self.report_errors {
                 self.report_error(
-                    ts_diagnostics::Parameter_0_is_not_in_the_same_position_as_parameter_1,
+                    tsr_diagnostics::Parameter_0_is_not_in_the_same_position_as_parameter_1,
                     vec![s.parameter_name, t.parameter_name],
                 );
             }
@@ -470,7 +470,7 @@ impl Relater<'_> {
             let source = self.checker.type_predicate_to_string(source)?;
             let target = self.checker.type_predicate_to_string(target)?;
             self.report_error(
-                ts_diagnostics::Type_predicate_0_is_not_assignable_to_1,
+                tsr_diagnostics::Type_predicate_0_is_not_assignable_to_1,
                 vec![source, target],
             );
         }
@@ -499,14 +499,14 @@ impl Relater<'_> {
         source: crate::SignatureId,
         target: crate::SignatureId,
     ) -> Result<bool, Error> {
-        use ts_ast::modifier_flags as mf;
+        use tsr_ast::modifier_flags as mf;
         let (Some(source_declaration), Some(target_declaration)) = (
             self.checker.signatures.get(source)?.declaration,
             self.checker.signatures.get(target)?.declaration,
         ) else {
             return Ok(true);
         };
-        let accessibility = |checker: &crate::CheckerState, node: ts_arena::NodeId| {
+        let accessibility = |checker: &crate::CheckerState, node: tsr_arena::NodeId| {
             Ok::<_, Error>(
                 checker
                     .ast(node)?
@@ -530,8 +530,8 @@ impl Relater<'_> {
             return Ok(true);
         }
         if self.report_errors {
-            let visibility = |flags: u32| -> ts_ast::JsString {
-                ts_ast::JsString::from_bytes(if flags == mf::PRIVATE {
+            let visibility = |flags: u32| -> tsr_ast::JsString {
+                tsr_ast::JsString::from_bytes(if flags == mf::PRIVATE {
                     b"private".as_slice()
                 } else if flags == mf::PROTECTED {
                     b"protected".as_slice()
@@ -540,7 +540,7 @@ impl Relater<'_> {
                 })
             };
             self.report_error(
-                ts_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type,
+                tsr_diagnostics::Cannot_assign_a_0_constructor_type_to_a_1_constructor_type,
                 vec![
                     visibility(source_accessibility),
                     visibility(target_accessibility),

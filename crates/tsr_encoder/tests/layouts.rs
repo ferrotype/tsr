@@ -1,19 +1,19 @@
-use ts_ast::SyntaxKind;
-use ts_encoder::{layout, ChildType, DataType, NODE_LAYOUTS};
+use tsr_ast::SyntaxKind;
+use tsr_encoder::{layout, ChildType, DataType, NODE_LAYOUTS};
 
 #[test]
 fn preserves_protocol_eight_offsets_and_masks() {
-    assert_eq!(ts_encoder::PROTOCOL_VERSION, 8);
-    assert_eq!(ts_encoder::HEADER_SIZE, 44);
-    assert_eq!(ts_encoder::HEADER_OFFSET_PARSE_OPTIONS, 20);
-    assert_eq!(ts_encoder::HEADER_OFFSET_STRUCTURED_DATA, 36);
-    assert_eq!(ts_encoder::HEADER_OFFSET_NODES, 40);
-    assert_eq!(ts_encoder::NODE_SIZE, 28);
-    assert_eq!(ts_encoder::NODE_OFFSET_FLAGS, 24);
-    assert_eq!(ts_encoder::NODE_DATA_TYPE_MASK, 0xc000_0000);
-    assert_eq!(ts_encoder::NODE_DATA_CHILD_MASK, 0xff);
-    assert_eq!(ts_encoder::NODE_DATA_STRING_INDEX_MASK, 0x00ff_ffff);
-    assert_eq!(ts_encoder::SYNTAX_KIND_NODE_LIST, u32::MAX);
+    assert_eq!(tsr_encoder::PROTOCOL_VERSION, 8);
+    assert_eq!(tsr_encoder::HEADER_SIZE, 44);
+    assert_eq!(tsr_encoder::HEADER_OFFSET_PARSE_OPTIONS, 20);
+    assert_eq!(tsr_encoder::HEADER_OFFSET_STRUCTURED_DATA, 36);
+    assert_eq!(tsr_encoder::HEADER_OFFSET_NODES, 40);
+    assert_eq!(tsr_encoder::NODE_SIZE, 28);
+    assert_eq!(tsr_encoder::NODE_OFFSET_FLAGS, 24);
+    assert_eq!(tsr_encoder::NODE_DATA_TYPE_MASK, 0xc000_0000);
+    assert_eq!(tsr_encoder::NODE_DATA_CHILD_MASK, 0xff);
+    assert_eq!(tsr_encoder::NODE_DATA_STRING_INDEX_MASK, 0x00ff_ffff);
+    assert_eq!(tsr_encoder::SYNTAX_KIND_NODE_LIST, u32::MAX);
     assert_eq!(DataType::String as u32, 1 << 30);
     assert_eq!(DataType::Extended as u32, 2 << 30);
 }

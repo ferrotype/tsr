@@ -1,9 +1,9 @@
 //! Parameter checks keep the variable-like semantic checks before the
 //! parameter-specific property, `this`, and rest diagnostics.
 use crate::{CheckerState, Error, RelationKind, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:Checker.isOptionalParameter
@@ -36,7 +36,7 @@ impl CheckerState {
             return Ok(index >= self.min_argument_count_ex(signature, 1 | 2)?);
         }
         if let Some(call) =
-            ts_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
+            tsr_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
         {
             let parameters = self.source_list(function, self.node(function)?.parameter_list())?;
             let index = parameters
@@ -227,7 +227,7 @@ impl CheckerState {
             .dot_dot_dot_token()
             .is_some();
         if let Some(call) =
-            ts_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
+            tsr_ast::get_immediately_invoked_function_expression(self.ast(function)?, function)?
         {
             if rest {
                 let args = self.effective_call_arguments(call)?;

@@ -10,12 +10,12 @@
 use serde_json::{json, Map, Value};
 use sha2::{Digest, Sha256};
 use std::io::{BufRead, Write};
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     AstView, ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions, SyntaxKind as K,
 };
-use ts_astnav::Navigator;
-use ts_jsstring::SourceText;
+use tsr_astnav::Navigator;
+use tsr_jsstring::SourceText;
 
 const PROTOCOL_VERSION: i64 = 1;
 /// At most this many evenly spaced probe positions per file, plus the end.
@@ -90,7 +90,7 @@ fn positions(length: usize) -> Vec<i64> {
     out
 }
 
-fn node_text(view: AstView<'_>, id: NodeId) -> Result<String, ts_astnav::Error> {
+fn node_text(view: AstView<'_>, id: NodeId) -> Result<String, tsr_astnav::Error> {
     let node = view.node(id)?;
     Ok(format!(
         "{},{},{}",
@@ -100,13 +100,13 @@ fn node_text(view: AstView<'_>, id: NodeId) -> Result<String, ts_astnav::Error> 
     ))
 }
 
-fn optional(view: AstView<'_>, id: Option<NodeId>) -> Result<String, ts_astnav::Error> {
+fn optional(view: AstView<'_>, id: Option<NodeId>) -> Result<String, tsr_astnav::Error> {
     id.map_or_else(|| Ok("-".into()), |id| node_text(view, id))
 }
 
 /// One entry-point call. A failure where upstream panics becomes the row's
 /// value, so one failing position does not hide the rest of the file.
-fn call(action: impl FnOnce() -> Result<String, ts_astnav::Error>) -> String {
+fn call(action: impl FnOnce() -> Result<String, tsr_astnav::Error>) -> String {
     match action() {
         Ok(text) => text,
         Err(error) => format!("!{error}"),
@@ -124,7 +124,7 @@ const CHILD_KINDS: [K; 6] = [
 
 fn navigation(view: AstView<'_>, source: NodeId, length: usize, detail: bool) -> Value {
     let mut stream = Stream::new(detail);
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut navigator = Navigator::new(view, source, &mut provider);
     for p in positions(length) {
         let mut token = None;
@@ -180,18 +180,18 @@ struct Flat<'v> {
     out: Vec<NodeId>,
 }
 
-impl ts_ast::ChildVisitor for Flat<'_> {
+impl tsr_ast::ChildVisitor for Flat<'_> {
     fn visit_node(&mut self, node: NodeId) -> std::ops::ControlFlow<()> {
         self.out.push(node);
         std::ops::ControlFlow::Continue(())
     }
-    fn visit_list(&mut self, nodes: ts_ast::NodeListId) -> std::ops::ControlFlow<()> {
+    fn visit_list(&mut self, nodes: tsr_ast::NodeListId) -> std::ops::ControlFlow<()> {
         match self.view.list(nodes) {
             Ok(list) => self.visit_node_slice(list.nodes()),
             Err(_) => std::ops::ControlFlow::Break(()),
         }
     }
-    fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> std::ops::ControlFlow<()> {
+    fn visit_node_slice(&mut self, nodes: tsr_ast::NodeSlice) -> std::ops::ControlFlow<()> {
         match self.view.node_slice(nodes) {
             Ok(read) => {
                 self.out.extend(read.iter().flatten());
@@ -232,16 +232,16 @@ fn decoded(
     statement: NodeId,
     index: usize,
     stream: &mut Stream,
-) -> Option<ts_encoder::DecodedTree> {
+) -> Option<tsr_encoder::DecodedTree> {
     // The codec keeps upstream's panics, so they are caught as the oracle
     // catches them and reported in upstream's words.
     let answer = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let mut provider = ts_parser::ParserJsDocProvider::default();
-        ts_encoder::encode_node(view, statement, Some(root), &mut provider)
+        let mut provider = tsr_parser::ParserJsDocProvider::default();
+        tsr_encoder::encode_node(view, statement, Some(root), &mut provider)
             .map_err(|error| error.to_string())
             .and_then(|wire| {
                 let digest = hex(&Sha256::digest(&wire.bytes));
-                ts_encoder::decode_nodes(&wire.bytes, &ts_arena::Counters::default())
+                tsr_encoder::decode_nodes(&wire.bytes, &tsr_arena::Counters::default())
                     .map(|tree| (digest, tree))
                     .map_err(|error| error.to_string())
             })
@@ -337,7 +337,7 @@ fn insertion(
     variant: &str,
     detail: bool,
 ) -> Result<Value, String> {
-    let settings = ts_format::probe::variant(variant).expect("a known variant");
+    let settings = tsr_format::probe::variant(variant).expect("a known variant");
     let mut stream = Stream::new(detail);
     let places = targets(view, root, length)?;
     for (index, statement) in leading_statements(view, root, MAX_STATEMENTS)?
@@ -352,13 +352,13 @@ fn insertion(
                 let mut quiet = Stream::new(false);
                 let tree = decoded(view, root, statement, index, &mut quiet)
                     .expect("the statement decoded a moment ago");
-                let mut provider = ts_parser::ParserJsDocProvider::default();
-                let mut target = ts_format::FormatFile {
+                let mut provider = tsr_parser::ParserJsDocProvider::default();
+                let mut target = tsr_format::FormatFile {
                     view,
                     source: root,
                     jsdoc: &mut provider,
                 };
-                ts_api::format_decoded_for_insertion(tree, &mut target, position, &settings)
+                tsr_api::format_decoded_for_insertion(tree, &mut target, position, &settings)
             }));
             let text = match answer {
                 Ok(Ok(text)) => hex(&text),
@@ -388,9 +388,9 @@ fn positioned(view: AstView<'_>, root: NodeId, detail: bool) -> Result<Value, St
             ));
             continue;
         };
-        let settings = ts_format::FormatCodeSettings::default();
-        let context = ts_printer::EmitContext::new();
-        match ts_printer::print_and_position_node(
+        let settings = tsr_format::FormatCodeSettings::default();
+        let context = tsr_printer::EmitContext::new();
+        match tsr_printer::print_and_position_node(
             &mut tree.builder,
             node,
             &settings.editor.new_line_character,
@@ -417,7 +417,7 @@ fn positioned(view: AstView<'_>, root: NodeId, detail: bool) -> Result<Value, St
 fn document(
     view: AstView<'_>,
     root: NodeId,
-    edits: &[ts_core::TextChange],
+    edits: &[tsr_core::TextChange],
     detail: bool,
 ) -> Result<Value, String> {
     let mut stream = Stream::new(detail);
@@ -433,7 +433,7 @@ fn document(
         unreachable!("a stream result is an object");
     };
     let state = view.source_file(root).map_err(|e| format!("{e:?}"))?;
-    match ts_core::apply_bulk_edits(state.text().as_bytes(), edits) {
+    match tsr_core::apply_bulk_edits(state.text().as_bytes(), edits) {
         Ok(text) => out.insert("text_sha256".into(), json!(hex(&Sha256::digest(&text)))),
         Err(error) => out.insert("text_panic".into(), json!(error.to_string())),
     };
@@ -479,9 +479,9 @@ fn observe(request: &Value) -> Result<Value, String> {
             force: flag("force")?,
         },
     };
-    let parsed = ts_parser::parse_source_file(
+    let parsed = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(source),
-        ts_core::ScriptKind(script_kind as i32),
+        tsr_core::ScriptKind(script_kind as i32),
         options,
     );
     let file = parsed.publish_unbound();
@@ -518,16 +518,16 @@ fn observe(request: &Value) -> Result<Value, String> {
                 let positions = positions(length);
                 for name in ["default", "dense", "terse"] {
                     let mut stream = Stream::new(detail);
-                    let mut provider = ts_parser::ParserJsDocProvider::default();
-                    let mut format_file = ts_format::FormatFile {
+                    let mut provider = tsr_parser::ParserJsDocProvider::default();
+                    let mut format_file = tsr_format::FormatFile {
                         view,
                         source: root,
                         jsdoc: &mut provider,
                     };
-                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    let settings = tsr_format::probe::variant(name).expect("a known variant");
                     let new_line = settings.editor.new_line_character.clone();
-                    let context = ts_format::FormatContext::new(settings, &new_line);
-                    ts_format::probe::entry(&mut format_file, &context, &positions, &mut |row| {
+                    let context = tsr_format::FormatContext::new(settings, &new_line);
+                    tsr_format::probe::entry(&mut format_file, &context, &positions, &mut |row| {
                         stream.row(row);
                     });
                     result.insert(name.into(), stream.result());
@@ -537,16 +537,16 @@ fn observe(request: &Value) -> Result<Value, String> {
             "format" => {
                 let mut result = Map::new();
                 for name in ["default", "tabs", "two", "dense", "terse"] {
-                    let mut provider = ts_parser::ParserJsDocProvider::default();
-                    let mut format_file = ts_format::FormatFile {
+                    let mut provider = tsr_parser::ParserJsDocProvider::default();
+                    let mut format_file = tsr_format::FormatFile {
                         view,
                         source: root,
                         jsdoc: &mut provider,
                     };
-                    let settings = ts_format::probe::variant(name).expect("a known variant");
+                    let settings = tsr_format::probe::variant(name).expect("a known variant");
                     let new_line = settings.editor.new_line_character.clone();
-                    let context = ts_format::FormatContext::new(settings, &new_line);
-                    let answer = match ts_format::format_document(&mut format_file, &context) {
+                    let context = tsr_format::FormatContext::new(settings, &new_line);
+                    let answer = match tsr_format::format_document(&mut format_file, &context) {
                         Ok(edits) => document(view, root, &edits, detail)?,
                         Err(error) => json!({"panic": error.to_string()}),
                     };
@@ -559,16 +559,21 @@ fn observe(request: &Value) -> Result<Value, String> {
                 let positions = positions(length);
                 for name in ["default", "tabs", "two"] {
                     let mut stream = Stream::new(detail);
-                    let mut provider = ts_parser::ParserJsDocProvider::default();
-                    let mut format_file = ts_format::FormatFile {
+                    let mut provider = tsr_parser::ParserJsDocProvider::default();
+                    let mut format_file = tsr_format::FormatFile {
                         view,
                         source: root,
                         jsdoc: &mut provider,
                     };
-                    let settings = ts_format::probe::variant(name).expect("a known variant");
-                    ts_format::probe::indent(&mut format_file, &settings, &positions, &mut |row| {
-                        stream.row(row);
-                    });
+                    let settings = tsr_format::probe::variant(name).expect("a known variant");
+                    tsr_format::probe::indent(
+                        &mut format_file,
+                        &settings,
+                        &positions,
+                        &mut |row| {
+                            stream.row(row);
+                        },
+                    );
                     result.insert(name.into(), stream.result());
                 }
                 out.insert("indent".into(), Value::Object(result));
@@ -577,32 +582,34 @@ fn observe(request: &Value) -> Result<Value, String> {
                 let mut result = Map::new();
                 for name in ["default", "tabs", "two", "dense", "terse"] {
                     let mut stream = Stream::new(detail);
-                    let mut provider = ts_parser::ParserJsDocProvider::default();
-                    let mut format_file = ts_format::FormatFile {
+                    let mut provider = tsr_parser::ParserJsDocProvider::default();
+                    let mut format_file = tsr_format::FormatFile {
                         view,
                         source: root,
                         jsdoc: &mut provider,
                     };
-                    let settings = ts_format::probe::variant(name).expect("a known variant");
-                    ts_format::probe::rules(&mut format_file, settings, &mut |row| stream.row(row));
+                    let settings = tsr_format::probe::variant(name).expect("a known variant");
+                    tsr_format::probe::rules(&mut format_file, settings, &mut |row| {
+                        stream.row(row);
+                    });
                     result.insert(name.into(), stream.result());
                 }
                 out.insert("rules".into(), Value::Object(result));
             }
             "rulesmap" => {
                 let mut stream = Stream::new(detail);
-                ts_format::probe::rules_map(&mut |row| stream.row(row));
+                tsr_format::probe::rules_map(&mut |row| stream.row(row));
                 out.insert("rulesmap".into(), stream.result());
             }
             "scan" => {
                 let mut stream = Stream::new(detail);
-                let mut provider = ts_parser::ParserJsDocProvider::default();
-                let mut format_file = ts_format::FormatFile {
+                let mut provider = tsr_parser::ParserJsDocProvider::default();
+                let mut format_file = tsr_format::FormatFile {
                     view,
                     source: root,
                     jsdoc: &mut provider,
                 };
-                ts_format::probe::scan(&mut format_file, &mut |row| stream.row(row));
+                tsr_format::probe::scan(&mut format_file, &mut |row| stream.row(row));
                 out.insert("scan".into(), stream.result());
             }
             other => return Err(format!("operation {other:?} is not ported yet")),

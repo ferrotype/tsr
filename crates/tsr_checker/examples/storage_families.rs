@@ -7,7 +7,7 @@ fn main() {
     let mut raw = Vec::new();
     std::io::stdin().read_to_end(&mut raw).unwrap();
     let request = serde_json::from_slice(&raw).unwrap();
-    let prepared = ts_checker::storage_families::Prepared::new(&request).unwrap();
+    let prepared = tsr_checker::storage_families::Prepared::new(&request).unwrap();
     let live_before = ALLOCATOR.allocated();
     let requested_before = ALLOCATOR.total_allocated();
     // NewChecker's prefix and the trace are sampled separately, like the Go driver.

@@ -5,8 +5,8 @@ use crate::{
     access_flags as af, element_flags as ef, object_flags as of, type_facts as facts,
     type_flags as tf, types::Map, CheckerState, Error, TypeId, UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, symbol_flags as sf, SymbolTable, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SymbolTable, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct BindingState {
@@ -16,8 +16,8 @@ pub(crate) struct BindingState {
         clippy::option_option,
         reason = "Distinguish an unqueried symbol from a cached absent symbol"
     )]
-    pub omit_symbol: Option<Option<ts_arena::SymbolId>>,
-    pub spread_links: Map<ts_arena::SymbolId, (ts_arena::SymbolId, ts_arena::SymbolId)>,
+    pub omit_symbol: Option<Option<tsr_arena::SymbolId>>,
+    pub spread_links: Map<tsr_arena::SymbolId, (tsr_arena::SymbolId, tsr_arena::SymbolId)>,
     pub discriminated_contexts: Map<(NodeId, TypeId), TypeId>,
 }
 
@@ -233,7 +233,7 @@ impl CheckerState {
                 self.get_string_literal_type(text)
             }
             _ => {
-                if ts_ast::utilities::is_expression_kind(self.node(node)?.kind()) {
+                if tsr_ast::utilities::is_expression_kind(self.node(node)?.kind()) {
                     let ty = self.check_expression(node)?;
                     self.get_regular_type_of_literal_type(ty)
                 } else {
@@ -346,7 +346,7 @@ impl CheckerState {
                     {
                         self.error_at(
                             Some(declaration),
-                            ts_diagnostics::Rest_types_may_only_be_created_from_object_types,
+                            tsr_diagnostics::Rest_types_may_only_be_created_from_object_types,
                             vec![],
                         )?;
                         return Ok(self.builtins.error_type);
@@ -425,7 +425,7 @@ impl CheckerState {
                     }
                 } else if self.is_array_like_type(parent_type)? {
                     let index =
-                        self.get_number_literal_type(ts_jsnum::Number::new(index as f64))?;
+                        self.get_number_literal_type(tsr_jsnum::Number::new(index as f64))?;
                     let name = self.node(declaration)?.name();
                     let declared = self
                         .indexed_access_or_undefined(parent_type, index, access, name, None)?
@@ -602,7 +602,7 @@ impl CheckerState {
             _ => None,
         };
         if elements.is_empty() || elements.len() == 1 && rest.is_some() {
-            if self.program()?.host.options().emit_script_target() >= ts_core::ScriptTarget::ES2015
+            if self.program()?.host.options().emit_script_target() >= tsr_core::ScriptTarget::ES2015
             {
                 return self.create_iterable_type(self.builtins.any_type);
             }
@@ -709,8 +709,8 @@ impl CheckerState {
         }
         let read = self.node(root)?;
         Ok(read.flags() & nf::AMBIENT != 0
-            && (read.modifier_flags(self.ast(root)?)? & ts_ast::modifier_flags::PRIVATE != 0
-                || ts_ast::utilities::is_private_identifier_class_element_declaration(
+            && (read.modifier_flags(self.ast(root)?)? & tsr_ast::modifier_flags::PRIVATE != 0
+                || tsr_ast::utilities::is_private_identifier_class_element_declaration(
                     self.ast(root)?,
                     root,
                 )?))

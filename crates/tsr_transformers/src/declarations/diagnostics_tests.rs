@@ -1,7 +1,7 @@
 use super::*;
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
-use ts_ast::{ChildVisitor, NodeListId, NodeSlice};
+use tsr_ast::{ChildVisitor, NodeListId, NodeSlice};
 
 struct Children<'a> {
     view: AstView<'a>,
@@ -59,12 +59,12 @@ fn selector_codes_and_locations_match_native_declaration_contexts(
         report["pin"], upstream["pin"],
         "selector oracle must be recaptured at the pin"
     );
-    let parsed = ts_parser::parse_source_file(
-        ts_jsstring::SourceText::from_loaded_bytes(source.as_slice()),
-        ts_core::ScriptKind::TS,
-        ts_ast::SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(b"/selectors.ts".as_slice()),
-            path: ts_ast::JsString::from_bytes(b"/selectors.ts".as_slice()),
+    let parsed = tsr_parser::parse_source_file(
+        tsr_jsstring::SourceText::from_loaded_bytes(source.as_slice()),
+        tsr_core::ScriptKind::TS,
+        tsr_ast::SourceFileParseOptions {
+            file_name: tsr_ast::JsString::from_bytes(b"/selectors.ts".as_slice()),
+            path: tsr_ast::JsString::from_bytes(b"/selectors.ts".as_slice()),
             ..Default::default()
         },
     );
@@ -83,10 +83,10 @@ fn selector_codes_and_locations_match_native_declaration_contexts(
                     } else {
                         SymbolAccessibility::NotAccessible
                     };
-                    result.error_symbol_name = ts_ast::JsString::from_bytes(b"Hidden".as_slice());
+                    result.error_symbol_name = tsr_ast::JsString::from_bytes(b"Hidden".as_slice());
                     if variant & 1 != 0 {
                         result.error_module_name =
-                            ts_ast::JsString::from_bytes(b"module".as_slice());
+                            tsr_ast::JsString::from_bytes(b"module".as_slice());
                     }
                     let diagnostic = accessibility_diagnostic(view, node, name_context, &result)?;
                     actual.push(json!({

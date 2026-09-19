@@ -27,7 +27,7 @@ run_overlay(
     'TestS08P6SemanticDiagnostics',
 )
 PY
-cargo test --locked -p ts_compiler --test checker_semantics catch_destructuring
+cargo test --locked -p tsr_compiler --test checker_semantics catch_destructuring
 python3 scripts/s08_p5_recheck.py --control target/s08/e2/corpus \
   --selection tools/s08/p6/catch-destructuring/selection.json \
   --output target/s08/p6-catch-destructuring-recheck-new

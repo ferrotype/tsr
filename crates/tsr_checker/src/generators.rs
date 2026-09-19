@@ -5,9 +5,9 @@ use crate::{
     object_flags as of, type_flags as tf, CheckerState, Error, RelationKind, TypeId,
     UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getReturnTypeFromBody
@@ -170,7 +170,7 @@ impl CheckerState {
                     | K::TypeAliasDeclaration,
                 ) => {}
                 _ => {
-                    if ts_ast::utilities::is_function_like(Some(&read)) {
+                    if tsr_ast::utilities::is_function_like(Some(&read)) {
                         if let Some(name) = read.name() {
                             if self.node(name)?.kind() == K::ComputedPropertyName {
                                 stack.push(
@@ -340,7 +340,7 @@ impl CheckerState {
             self.error_at(Some(function),if yield_kind {d::Generator_implicitly_has_yield_type_0_Consider_supplying_a_return_type_annotation} else {d::Function_expression_which_lacks_return_type_annotation_implicitly_has_an_0_return_type},vec![text])?;
             return Ok(());
         }
-        let name = ts_scanner::declaration_name_to_string(self.ast(function)?, name)?;
+        let name = tsr_scanner::declaration_name_to_string(self.ast(function)?, name)?;
         let reparsed = read.flags() & nf::REPARSED != 0;
         if reparsed && name.as_bytes().is_empty() {
             self.error_at(Some(function),d::This_overload_implicitly_returns_the_type_0_because_it_lacks_a_return_type_annotation,vec![text])?;
@@ -485,7 +485,7 @@ impl CheckerState {
         let star = self.yield_is_star(node)?;
         if star
             && asynchronous
-            && self.program()?.host.options().emit_script_target() < ts_core::ScriptTarget::ES2018
+            && self.program()?.host.options().emit_script_target() < tsr_core::ScriptTarget::ES2018
         {
             // Async generator functions prior to ES2018 require the __await, __asyncDelegator,
             // and __asyncValues helpers

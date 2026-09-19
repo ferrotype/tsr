@@ -5,8 +5,8 @@ use crate::{
     object_flags as of, type_flags as tf, AliasId, CacheKey, CheckerState, Error, MapperId, TypeId,
     TypeList,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{check_flags as cf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{check_flags as cf, symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Default)]
 pub(crate) struct InstantiationState {
@@ -145,7 +145,7 @@ impl CheckerState {
         if self.instantiation.depth == 100 || self.instantiation.count >= 5_000_000 {
             self.error_at(
                 self.current_node,
-                ts_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
+                tsr_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
                 vec![],
             )?;
             return Ok(self.builtins.error_type);
@@ -691,7 +691,7 @@ impl CheckerState {
     pub(crate) fn type_parameter_possibly_referenced(
         &mut self,
         parameter: TypeId,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
     ) -> Result<bool, Error> {
         let Some(symbol) = self.types.get(parameter)?.symbol else {
             return Ok(true);
@@ -729,7 +729,7 @@ impl CheckerState {
     fn contains_type_parameter_reference(
         &mut self,
         parameter: TypeId,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
     ) -> Result<bool, Error> {
         let is_this = self.types.type_parameter(parameter)?.is_this_type;
         let read = self.node(node)?;
@@ -748,7 +748,7 @@ impl CheckerState {
                     .as_type_query_node()
                     .and_then(|data| data.expr_name())
                     .ok_or(Error::MissingLink("type query name"))?;
-                let first = ts_ast::utilities_middle::get_first_identifier(view, entity_name)?;
+                let first = tsr_ast::utilities_middle::get_first_identifier(view, entity_name)?;
                 let type_arguments = read.type_argument_list();
                 let is_this = view.node(first)?.kind() == K::Identifier
                     && view.node_text(first)?.as_bytes() == b"this";
@@ -784,7 +784,7 @@ impl CheckerState {
                             .into_iter()
                             .flatten()
                         {
-                            if ts_ast::utilities::is_node_descendant_of(
+                            if tsr_ast::utilities::is_node_descendant_of(
                                 self.ast(candidate)?,
                                 Some(candidate),
                                 Some(scope),

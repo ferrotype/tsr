@@ -13,8 +13,8 @@ use crate::{
     scanner::TextRangeWithKind,
     Error,
 };
-use ts_arena::NodeId;
-use ts_ast::{utilities, utilities_middle, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{utilities, utilities_middle, SyntaxKind as K};
 
 type Context<'c, 'a, 'p, 'f> = &'c mut FormattingContext<'a, 'p, 'f>;
 type Predicate = Result<bool, Error>;
@@ -64,7 +64,7 @@ pub(crate) fn is_binary_op_context(context: Context<'_, '_, '_, '_>) -> Predicat
                 .data_source()
                 .as_binary_expression()
                 .and_then(|data| data.operator_token())
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             context.file.node(operator)?.kind() != K::CommaToken
         }
         Some(
@@ -453,7 +453,7 @@ fn node_is_in_decorator_context(
     mut node: Option<NodeId>,
 ) -> Predicate {
     while let Some(id) = node {
-        let skipped = ts_ast::skip_partially_emitted_expressions(context.file.view, id)?;
+        let skipped = tsr_ast::skip_partially_emitted_expressions(context.file.view, id)?;
         if !utilities::is_expression_kind(context.file.node(skipped)?.kind()) {
             break;
         }
@@ -611,7 +611,7 @@ pub(crate) fn is_semicolon_deletion_context(context: Context<'_, '_, '_, '_>) ->
             .node(next_real)?
             .kind()
             .known()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         next_start = context.file.token_pos(next_real)?;
     }
 

@@ -1,6 +1,6 @@
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{node_flags, FactoryMethods, NodeId, SyntaxKind as K};
-use ts_diagnostics as diag;
+use tsr_ast::{node_flags, FactoryMethods, NodeId, SyntaxKind as K};
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     fn finish_statement(&mut self, node: NodeId, pos: i64, jsdoc: u8) -> NodeId {

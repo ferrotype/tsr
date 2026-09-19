@@ -33,7 +33,7 @@ observed = run_overlay(
 )
 print(validate(request, observed))
 PYTHON
-cargo test --locked -p ts_compiler --test checker_display --test checker_semantics
+cargo test --locked -p tsr_compiler --test checker_display --test checker_semantics
 ```
 
 The corpus selection contains 503 acceptance variants: all JSDoc cases, all

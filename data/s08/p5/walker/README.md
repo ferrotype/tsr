@@ -31,7 +31,7 @@ contract separately compares its approved action columns, excluding raw IDs.
 
 ```sh
 python3 scripts/s08_p5_walker.py capture --output target/s08/p5-walker-new
-cargo run -p ts_compiler --example p5_baseline -- target/s08/p5-walker-new/requests.json target/s08/p5-walker-new/rust.json
+cargo run -p tsr_compiler --example p5_baseline -- target/s08/p5-walker-new/requests.json target/s08/p5-walker-new/rust.json
 python3 scripts/s08_p5_walker.py compare --native target/s08/p5-walker-new --actual target/s08/p5-walker-new/rust.json
 ```
 

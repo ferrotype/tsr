@@ -1,7 +1,7 @@
 //! The parser service used by AST consumers for first-use JSDoc parsing.
 use crate::{jsdoc::get_jsdoc_comment_ranges, on_parser_worker, Parser};
-use ts_arena::Error;
-use ts_ast::{node_flags, AstView, BorrowedFactory, Factory, JSDocRoots, JsDocProvider, NodeId};
+use tsr_arena::Error;
+use tsr_ast::{node_flags, AstView, BorrowedFactory, Factory, JSDocRoots, JsDocProvider, NodeId};
 
 /// Reuse one provider for an encoding/indexing operation. Ordinary nodes return
 /// the shared empty result; cache hits do not enter a worker or create a parser.

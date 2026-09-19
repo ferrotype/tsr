@@ -1,10 +1,10 @@
 //! Option path patterns and virtual root-directory resolution.
 use crate::resolver::{extension, is_relative, Error, ResolvedModule, Resolver};
 use crate::trace::trace;
-use ts_core::pattern::Pattern;
-use ts_diagnostics as diagnostics;
-use ts_jsstring::JsString;
-use ts_tspath as path;
+use tsr_core::pattern::Pattern;
+use tsr_diagnostics as diagnostics;
+use tsr_jsstring::JsString;
+use tsr_tspath as path;
 impl Resolver {
     // resolver.go:tryLoadModuleUsingOptionalResolutionSettings. This pin has no
     // standalone baseUrl lookup; GetPathsBasePath only uses pathsBasePath/cwd.
@@ -48,7 +48,7 @@ impl Resolver {
         &mut self,
         name: &[u8],
         base: &[u8],
-        paths: &ts_core::PathMappings,
+        paths: &tsr_core::PathMappings,
         extensions: u8,
         esm: bool,
     ) -> Result<Option<ResolvedModule>, Error> {
@@ -66,7 +66,7 @@ impl Resolver {
         &mut self,
         name: &[u8],
         base: &[u8],
-        paths: &ts_core::PathMappings,
+        paths: &tsr_core::PathMappings,
         extensions: u8,
         mut loader: impl FnMut(&mut Self, u8, &[u8], bool) -> Result<Option<ResolvedModule>, Error>,
     ) -> Result<Option<ResolvedModule>, Error> {

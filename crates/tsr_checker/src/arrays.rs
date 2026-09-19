@@ -5,8 +5,8 @@ use crate::{
     element_flags as ef, object_flags as of, type_flags as tf, CheckerState, Error, ObjectFlags,
     TupleElementInfo, TypeId, TypeList,
 };
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 #[derive(Default)]
 struct TupleNormalizer {
@@ -50,7 +50,7 @@ impl CheckerState {
         let readonly = tuple.readonly;
         let mut keys = Vec::with_capacity(length as usize + 1);
         for i in 0..length {
-            keys.push(self.get_string_literal_type(ts_ast::JsString::from_bytes(
+            keys.push(self.get_string_literal_type(tsr_ast::JsString::from_bytes(
                 i.to_string().into_bytes(),
             ))?);
         }
@@ -377,9 +377,9 @@ impl CheckerState {
                         .transpose()?
                         .unwrap_or(false);
                     let message = if type_node {
-                        ts_diagnostics::Type_produces_a_tuple_type_that_is_too_large_to_represent
+                        tsr_diagnostics::Type_produces_a_tuple_type_that_is_too_large_to_represent
                     } else {
-                        ts_diagnostics::Expression_produces_a_tuple_type_that_is_too_large_to_represent
+                        tsr_diagnostics::Expression_produces_a_tuple_type_that_is_too_large_to_represent
                     };
                     self.error_at(self.current_node, message, vec![])?;
                     return Ok(self.builtins.error_type);

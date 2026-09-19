@@ -1,16 +1,16 @@
 use crate::Parser;
 use std::collections::BTreeMap;
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, CheckJsDirective, CommentRange, FileReference, JsString, NodeId, Pragma,
     PragmaArgument, SyntaxKind as K,
 };
-use ts_core::TextRange;
-use ts_diagnostics as diagnostics;
+use tsr_core::TextRange;
+use tsr_diagnostics as diagnostics;
 
 /// port: tsc/internal/parser/parser.go:getCommentPragmas
 pub(crate) fn get_comment_pragmas(text: &[u8]) -> Vec<Pragma> {
     let mut pragmas = vec![];
-    for comment in ts_scanner::get_leading_comment_ranges(text, 0) {
+    for comment in tsr_scanner::get_leading_comment_ranges(text, 0) {
         let range = CommentRange {
             loc: comment.loc,
             kind: comment.kind.into(),
@@ -101,7 +101,7 @@ fn extract_pragmas(range: CommentRange, mut text: &[u8]) -> Vec<Pragma> {
                 continue;
             }
             let line_end = line_end_pos(text, pos);
-            let name = ts_jsstring::helpers::to_lower_go(&text[name_pos..name_end]);
+            let name = tsr_jsstring::helpers::to_lower_go(&text[name_pos..name_end]);
             if matches!(
                 name.as_slice(),
                 b"jsx" | b"jsxfrag" | b"jsximportsource" | b"jsxruntime"
@@ -170,7 +170,7 @@ fn skip_to(text: &[u8], pos: usize, needle: &[u8]) -> Option<usize> {
 /// port: tsc/internal/parser/parser.go:lineEndPos
 fn line_end_pos(text: &[u8], mut pos: usize) -> usize {
     while pos < text.len() {
-        let (rune, size) = ts_jsstring::wtf8::decode_utf8(&text[pos..]);
+        let (rune, size) = tsr_jsstring::wtf8::decode_utf8(&text[pos..]);
         if matches!(rune, 10 | 13 | 0x2028 | 0x2029) {
             return pos;
         }
@@ -281,21 +281,21 @@ impl Parser<'_, AstBuilder> {
             }
         }
         let referenced = if referenced.is_empty() {
-            ts_ast::ReferenceSlice::empty()
+            tsr_ast::ReferenceSlice::empty()
         } else {
             self.factory
                 .source_references(referenced)
                 .expect("owned references")
         };
         let types = if types.is_empty() {
-            ts_ast::ReferenceSlice::empty()
+            tsr_ast::ReferenceSlice::empty()
         } else {
             self.factory
                 .source_references(types)
                 .expect("owned type references")
         };
         let libs = if libs.is_empty() {
-            ts_ast::ReferenceSlice::empty()
+            tsr_ast::ReferenceSlice::empty()
         } else {
             self.factory
                 .source_references(libs)

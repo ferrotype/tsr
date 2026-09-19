@@ -17,14 +17,14 @@ import s09_printing
 
 
 SUITES = {
-    "generation": ("ts_arena", "lease::"),
-    "pool": ("ts_project", "tests::"),
-    "registry": ("ts_api", "tests::"),
-    "scratch": ("ts_api", "printing::scratch_checks::"),
-    "insertion": ("ts_api", "formatting::scratch_checks::"),
-    "results": ("ts_project", "retention::results::"),
-    "ast": ("ts_project", "retention::ast::"),
-    "builder": ("ts_checker", "node_builder::cache::retention::"),
+    "generation": ("tsr_arena", "lease::"),
+    "pool": ("tsr_project", "tests::"),
+    "registry": ("tsr_api", "tests::"),
+    "scratch": ("tsr_api", "printing::scratch_checks::"),
+    "insertion": ("tsr_api", "formatting::scratch_checks::"),
+    "results": ("tsr_project", "retention::results::"),
+    "ast": ("tsr_project", "retention::ast::"),
+    "builder": ("tsr_checker", "node_builder::cache::retention::"),
 }
 OWNERSHIP_SUITES = ("generation", "pool", "registry")
 # S09-1 and S09-2: each criterion is one suite. The first two run over a

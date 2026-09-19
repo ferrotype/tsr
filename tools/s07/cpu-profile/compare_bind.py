@@ -26,8 +26,8 @@ def rank(counter, denominator):
 
 
 def phase_for_rust(names, worker):
-    parse = any(n.startswith('ts_parser::orchestration::parse_source_file_with_counters') for n in names)
-    bind = any(n.startswith('ts_binder::bind_parsed_file') for n in names)
+    parse = any(n.startswith('tsr_parser::orchestration::parse_source_file_with_counters') for n in names)
+    bind = any(n.startswith('tsr_binder::bind_parsed_file') for n in names)
     if parse and bind:
         raise ValueError('ambiguous parse/bind ancestry')
     if not worker:
@@ -56,17 +56,17 @@ def summarize(samples):
 # Selectors are operation envelopes, not promises of removable CPU. Physical
 # names supplement display names only for inclusive group membership, never self.
 SUSPECTS = {
-    'stack_guard': lambda n: n.startswith(('stacker::', '<stacker::', 'psm::')) or n.startswith('ts_binder::recursion::guarded'),
-    'contextual_identifier': lambda n: n == '<ts_binder::state::Binder>::check_contextual_identifier',
-    'source_metadata': lambda n: n in {'<ts_ast::storage::AstView>::source_file', '<ts_ast::storage::AstView>::file_info'},
-    'binding_writes': lambda n: n.startswith(('<ts_ast::bind_result::BindBuilder>::set_binding_field', '<ts_ast::compact::binding::BindingWrite>')),
+    'stack_guard': lambda n: n.startswith(('stacker::', '<stacker::', 'psm::')) or n.startswith('tsr_binder::recursion::guarded'),
+    'contextual_identifier': lambda n: n == '<tsr_binder::state::Binder>::check_contextual_identifier',
+    'source_metadata': lambda n: n in {'<tsr_ast::storage::AstView>::source_file', '<tsr_ast::storage::AstView>::file_info'},
+    'binding_writes': lambda n: n.startswith(('<tsr_ast::bind_result::BindBuilder>::set_binding_field', '<tsr_ast::compact::binding::BindingWrite>')),
     'hashing': lambda n: 'Hasher' in n or ('RandomState' in n and 'hash_one' in n),
-    'name_pool': lambda n: n.startswith('<ts_ast::symbol_tables::NamePool>'),
-    'payload_materialization': lambda n: n == '<ts_ast::node_read::NodeRead>::data' or (n.startswith('<ts_ast::') and n.endswith('>::to_owned')),
-    'ast_reads': lambda n: n in {'<ts_ast::storage::AstView>::node', '<ts_ast::bind_result::BindBuilder>::node', '<ts_ast::compact::CompactContext>::decode_node'},
-    'node_text': lambda n: n.startswith(('<ts_ast::storage::AstView>::node_text', '<ts_ast::compact::text::TextPool>')),
-    'is_identifier_name': lambda n: n == 'ts_ast::binder_helpers::is_identifier_name',
-    'bind_validation': lambda n: n == '<ts_ast::bind_result::BindBuilder>::validate',
+    'name_pool': lambda n: n.startswith('<tsr_ast::symbol_tables::NamePool>'),
+    'payload_materialization': lambda n: n == '<tsr_ast::node_read::NodeRead>::data' or (n.startswith('<tsr_ast::') and n.endswith('>::to_owned')),
+    'ast_reads': lambda n: n in {'<tsr_ast::storage::AstView>::node', '<tsr_ast::bind_result::BindBuilder>::node', '<tsr_ast::compact::CompactContext>::decode_node'},
+    'node_text': lambda n: n.startswith(('<tsr_ast::storage::AstView>::node_text', '<tsr_ast::compact::text::TextPool>')),
+    'is_identifier_name': lambda n: n == 'tsr_ast::binder_helpers::is_identifier_name',
+    'bind_validation': lambda n: n == '<tsr_ast::bind_result::BindBuilder>::validate',
 }
 
 

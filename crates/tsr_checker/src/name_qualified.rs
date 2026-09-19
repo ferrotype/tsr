@@ -1,8 +1,8 @@
 //! Qualified-name errors distinguish missing exports from value/type misuse.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentModule
@@ -30,7 +30,7 @@ impl CheckerState {
             }
         }
         let failure = std::cell::Cell::new(None);
-        let result = ts_scanner::get_spelling_suggestion(
+        let result = tsr_scanner::get_spelling_suggestion(
             name.as_bytes(),
             candidates.iter(),
             |entry| entry.0.as_bytes(),
@@ -59,7 +59,7 @@ impl CheckerState {
     ) -> Result<(), Error> {
         let namespace_name = self.fully_qualified_name(namespace, None)?;
         let declaration_name =
-            ts_scanner::declaration_name_to_string(self.ast(right)?, Some(right))?;
+            tsr_scanner::declaration_name_to_string(self.ast(right)?, Some(right))?;
         if let Some(suggestion) = self.suggested_module_member(right, namespace)? {
             let suggestion = self.symbol_to_string(suggestion)?;
             self.error_at(

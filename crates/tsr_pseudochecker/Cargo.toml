@@ -1,5 +1,5 @@
 [package]
-name = "ts_pseudochecker"
+name = "tsr_pseudochecker"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -8,15 +8,15 @@ publish.workspace = true
 
 [dependencies]
 stacker = "=0.1.25"
-ts_ast = { version = "0.1.0", path = "../ts_ast" }
-ts_arena = { version = "0.1.0", path = "../ts_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
 
 [dev-dependencies]
 serde_json = "1"
-ts_parser = { version = "0.1.0", path = "../ts_parser" }
-ts_binder = { version = "0.1.0", path = "../ts_binder" }
-ts_core = { version = "0.1.0", path = "../ts_core" }
-ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_binder = { version = "0.1.0", path = "../tsr_binder" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true

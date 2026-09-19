@@ -1,7 +1,7 @@
 use crate::{Parser, ParserFactory};
-use ts_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_diagnostics as diag;
+use tsr_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseModifiers
@@ -111,7 +111,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseAnyContextualModifier
     pub(crate) fn parse_any_contextual_modifier(&mut self) -> bool {
         let state = self.mark();
-        if ts_ast::is_modifier_kind(self.token.into()) && self.next_token_can_follow_modifier() {
+        if tsr_ast::is_modifier_kind(self.token.into()) && self.next_token_can_follow_modifier() {
             self.commit(state);
             return true;
         }

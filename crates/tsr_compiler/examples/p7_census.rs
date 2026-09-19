@@ -4,9 +4,9 @@
 //! `p7_census requests.json output.json` with the P3 request layout.
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::CheckerOwner;
-use ts_compiler::ProgramCheckerHost;
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::ProgramCheckerHost;
 
 mod p3;
 use p3::{array, load, text, Result};

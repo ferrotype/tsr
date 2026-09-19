@@ -36,12 +36,12 @@ fn deep_message_flattening_uses_an_explicit_stack() {
         .stack_size(512 * 1024)
         .spawn(|| {
             use std::sync::Arc;
-            use ts_ast::Diagnostic;
-            use ts_jsstring::JsString;
+            use tsr_ast::Diagnostic;
+            use tsr_jsstring::JsString;
             fn message() -> Diagnostic {
                 Diagnostic::external(
                     None,
-                    ts_core::TextRange::new(-1, -1),
+                    tsr_core::TextRange::new(-1, -1),
                     JsString::default(),
                     1,
                     9999,
@@ -55,7 +55,7 @@ fn deep_message_flattening_uses_an_explicit_stack() {
                 parent.message_chain.push(node);
                 node = Arc::new(parent);
             }
-            let output = ts_compiler::diagnostic_writer::flattened(&node, b"\n").unwrap();
+            let output = tsr_compiler::diagnostic_writer::flattened(&node, b"\n").unwrap();
             assert_eq!(output.len(), depth * (depth + 1) + 2 * depth + 1);
             assert!(output.ends_with(b" x"));
             // Avoid testing Arc's recursively derived drop instead of the writer.

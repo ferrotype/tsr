@@ -1,10 +1,10 @@
 //! Declaration accessibility diagnostics preserve native diagnostic locations
 //! and module-name distinctions. Selectors are stored as source identities by
 //! the walker, rather than closures retaining a checker borrow.
-use ts_arena::{Error, NodeId};
-use ts_ast::{modifier_flags as mf, AstView, SyntaxKind as K};
-use ts_diagnostics::{self as d, Message};
-use ts_printer::emit_resolver::{SymbolAccessibility, SymbolAccessibilityResult};
+use tsr_arena::{Error, NodeId};
+use tsr_ast::{modifier_flags as mf, AstView, SyntaxKind as K};
+use tsr_diagnostics::{self as d, Message};
+use tsr_printer::emit_resolver::{SymbolAccessibility, SymbolAccessibilityResult};
 
 #[derive(Clone, Copy, Debug)]
 pub struct SymbolAccessibilityDiagnostic {
@@ -17,7 +17,7 @@ fn parent(view: AstView<'_>, node: NodeId) -> Result<NodeId, Error> {
     view.node(node)?.parent().ok_or(Error::InvalidGraph)
 }
 fn static_node(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
-    ts_ast::utilities::is_static(view, node)
+    tsr_ast::utilities::is_static(view, node)
 }
 fn class_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     Ok(view.node(parent(view, node)?)?.kind() == K::ClassDeclaration)
@@ -108,7 +108,7 @@ fn variable_message(
                 | K::PropertySignature
         )
     ) || kind == Some(K::Parameter)
-        && ts_ast::utilities::has_syntactic_modifier(view, parent(view, node)?, mf::PRIVATE)?
+        && tsr_ast::utilities::has_syntactic_modifier(view, parent(view, node)?, mf::PRIVATE)?
     {
         return Ok(Some(if static_node(view, node)? {
             module_message(result, d::Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2, d::Public_static_property_0_of_exported_class_has_or_is_using_private_name_1)
@@ -263,7 +263,7 @@ pub fn accessibility_diagnostic(
     result: &SymbolAccessibilityResult,
 ) -> Result<Option<SymbolAccessibilityDiagnostic>, Error> {
     let kind = view.node(node)?.kind().known().ok_or(Error::InvalidGraph)?;
-    let name = ts_ast::get_name_of_declaration(view, Some(node))?;
+    let name = tsr_ast::get_name_of_declaration(view, Some(node))?;
     let simple = |diagnostic_message| SymbolAccessibilityDiagnostic {
         error_node: Some(node),
         diagnostic_message,
@@ -305,8 +305,8 @@ pub fn accessibility_diagnostic(
         },
         K::Parameter => {
             let owner = parent(view, node)?;
-            if ts_ast::utilities::is_parameter_property_declaration(view, node, owner)?
-                && ts_ast::utilities::has_syntactic_modifier(view, owner, mf::PRIVATE)?
+            if tsr_ast::utilities::is_parameter_property_declaration(view, node, owner)?
+                && tsr_ast::utilities::has_syntactic_modifier(view, owner, mf::PRIVATE)?
             {
                 return Ok(variable_message(view, node, result)?.map(simple));
             }
@@ -338,7 +338,7 @@ pub fn accessibility_diagnostic(
             SymbolAccessibilityDiagnostic {
                 error_node: Some(node),
                 diagnostic_message,
-                type_name: ts_ast::get_name_of_declaration(view, Some(owner))?,
+                type_name: tsr_ast::get_name_of_declaration(view, Some(owner))?,
             }
         }
         K::ImportEqualsDeclaration => simple(d::Import_declaration_0_is_using_private_name_1),
@@ -373,19 +373,19 @@ pub(super) fn diagnostic_for_node(
     view: AstView<'_>,
     node: Option<NodeId>,
     message: &'static Message,
-    args: Vec<ts_ast::JsString>,
-) -> Result<ts_ast::Diagnostic, Error> {
+    args: Vec<tsr_ast::JsString>,
+) -> Result<tsr_ast::Diagnostic, Error> {
     let (file, range) = if let Some(node) = node {
-        let file = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+        let file = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
             .ok_or(Error::InvalidGraph)?;
         (
             Some(file),
-            ts_scanner::get_error_range_for_node(view, file, node)?,
+            tsr_scanner::get_error_range_for_node(view, file, node)?,
         )
     } else {
-        (None, ts_core::TextRange::default())
+        (None, tsr_core::TextRange::default())
     };
-    Ok(ts_ast::Diagnostic::new(file, range, message, args))
+    Ok(tsr_ast::Diagnostic::new(file, range, message, args))
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:findNearestDeclaration
@@ -402,14 +402,14 @@ fn nearest_declaration(view: AstView<'_>, mut node: NodeId) -> Result<Option<Nod
         ) {
             return Ok(Some(node));
         }
-        if ts_ast::utilities::is_statement(view, node)? {
+        if tsr_ast::utilities::is_statement(view, node)? {
             if kind != Some(K::ReturnStatement) {
                 return Ok(None);
             }
             let mut current = Some(node);
             while let Some(node) = current {
                 let read = view.node(node)?;
-                if ts_ast::utilities::is_function_like_declaration(Some(&read))
+                if tsr_ast::utilities::is_function_like_declaration(Some(&read))
                     && read.kind() != K::Constructor
                 {
                     return Ok(Some(node));
@@ -425,13 +425,13 @@ fn nearest_declaration(view: AstView<'_>, mut node: NodeId) -> Result<Option<Nod
     }
 }
 
-fn declaration_target_text(view: AstView<'_>, node: NodeId) -> Result<ts_ast::JsString, Error> {
+fn declaration_target_text(view: AstView<'_>, node: NodeId) -> Result<tsr_ast::JsString, Error> {
     if view.node(node)?.kind() != K::ExportAssignment {
         if let Some(name) = view.node(node)?.name() {
-            return ts_scanner::get_text_of_node(view, name);
+            return tsr_scanner::get_text_of_node(view, name);
         }
     }
-    Ok(ts_ast::JsString::default())
+    Ok(tsr_ast::JsString::default())
 }
 fn kind(view: AstView<'_>, node: NodeId) -> Result<K, Error> {
     view.node(node)?.kind().known().ok_or(Error::InvalidGraph)
@@ -443,7 +443,7 @@ fn required_message(message: Option<&'static Message>) -> Result<&'static Messag
 fn add_parent_related_info(
     view: AstView<'_>,
     node: NodeId,
-    diagnostic: &mut ts_ast::Diagnostic,
+    diagnostic: &mut tsr_ast::Diagnostic,
 ) -> Result<(), Error> {
     if let Some(declaration) = nearest_declaration(view, node)? {
         let text = declaration_target_text(view, declaration)?;
@@ -465,7 +465,7 @@ fn expression_error(
     view: AstView<'_>,
     node: NodeId,
     mut message: Option<&'static Message>,
-) -> Result<ts_ast::Diagnostic, Error> {
+) -> Result<tsr_ast::Diagnostic, Error> {
     let Some(declaration) = nearest_declaration(view, node)? else {
         return diagnostic_for_node(
             view,
@@ -481,12 +481,12 @@ fn expression_error(
         if read.kind() == K::ExportAssignment {
             break;
         }
-        if ts_ast::utilities::is_statement(view, parent)? {
+        if tsr_ast::utilities::is_statement(view, parent)? {
             target = None;
             break;
         }
         if read.kind() != K::ParenthesizedExpression
-            && !ts_ast::utilities::is_assertion_expression(&read)
+            && !tsr_ast::utilities::is_assertion_expression(&read)
         {
             break;
         }
@@ -516,10 +516,10 @@ fn expression_error(
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:createAccessorTypeError
-fn accessor_error<R: ts_printer::emit_resolver::DeclarationEmitResolver>(
+fn accessor_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
     resolver: &mut R,
     node: NodeId,
-) -> Result<ts_ast::Diagnostic, R::Error> {
+) -> Result<tsr_ast::Diagnostic, R::Error> {
     let current_kind = kind(resolver.ast(node)?, node)?;
     let other_kind = if current_kind == K::SetAccessor {
         K::GetAccessor
@@ -692,10 +692,10 @@ pub(super) fn part_of_type_node(view: AstView<'_>, node: NodeId) -> Result<bool,
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:createGetIsolatedDeclarationErrors
-pub(super) fn isolated_declaration_error<R: ts_printer::emit_resolver::DeclarationEmitResolver>(
+pub(super) fn isolated_declaration_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
     resolver: &mut R,
     node: NodeId,
-) -> Result<ts_ast::Diagnostic, R::Error> {
+) -> Result<tsr_ast::Diagnostic, R::Error> {
     let view = resolver.ast(node)?;
     let mut ancestor = Some(node);
     while let Some(current) = ancestor {
@@ -713,14 +713,14 @@ pub(super) fn isolated_declaration_error<R: ts_printer::emit_resolver::Declarati
     let node_kind = kind(view, node)?;
     if part_of_type_node(view, node)?
         || node_kind == K::TypeQuery
-        || ts_ast::utilities::is_entity_name(&view.node(node)?)
-        || ts_ast::is_entity_name_expression(view, node)?
+        || tsr_ast::utilities::is_entity_name(&view.node(node)?)
+        || tsr_ast::is_entity_name_expression(view, node)?
     {
         let mut diagnostic = diagnostic_for_node(
             view,
             Some(node),
             d::Type_containing_private_name_0_can_t_be_used_with_isolatedDeclarations,
-            vec![ts_scanner::get_text_of_node(view, node)?],
+            vec![tsr_scanner::get_text_of_node(view, node)?],
         )?;
         add_parent_related_info(view, node, &mut diagnostic)?;
         return Ok(diagnostic);
@@ -742,7 +742,7 @@ pub(super) fn isolated_declaration_error<R: ts_printer::emit_resolver::Declarati
         K::PropertyDeclaration|K::VariableDeclaration=>{
             let mut diagnostic=diagnostic_for_node(view,Some(node),required_message(isolated_error_message(node_kind))?,vec![])?;
             let name=view.node(node)?.name().ok_or(Error::InvalidGraph)?;
-            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![ts_scanner::get_text_of_node(view,name)?])?));
+            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![tsr_scanner::get_text_of_node(view,name)?])?));
             diagnostic
         }
         K::Parameter=>{
@@ -756,7 +756,7 @@ pub(super) fn isolated_declaration_error<R: ts_printer::emit_resolver::Declarati
             let message=if add_undefined{d::Declaration_emit_for_this_parameter_requires_implicitly_adding_undefined_to_its_type_This_is_not_supported_with_isolatedDeclarations}else{required_message(isolated_error_message(node_kind))?};
             let mut diagnostic=diagnostic_for_node(view,Some(node),message,vec![])?;
             let name=view.node(node)?.name().ok_or(Error::InvalidGraph)?;
-            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![ts_scanner::get_text_of_node(view,name)?])?));
+            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![tsr_scanner::get_text_of_node(view,name)?])?));
             diagnostic
         }
         K::PropertyAssignment=>expression_error(view,view.node(node)?.initializer().ok_or(Error::InvalidGraph)?,None)?,

@@ -9,13 +9,13 @@ from s06_utilities import setup, invoke, test_inventory, test_result
 
 ROOT = Path(__file__).resolve().parents[1]
 GROUPS = {
-    "ast": ("ts_ast", "binder_helpers::tests::", "scripts/s07_ast_helpers.py"),
-    "scanner": ("ts_scanner", "binder_helpers::tests::", "scripts/s07_scanner_helpers.py"),
-    "resolver": ("ts_binder", "name_resolver::tests::", "scripts/s07_resolver.py"),
-    "diagnostic_order": ("ts_ast", "diagnostic_order::tests::", "scripts/s07_diagnostic_order.py"),
-    "pattern": ("ts_core", "pattern::tests::", None),
-    "sort": ("ts_core", "go_sort::tests::", "tools/s06/node-index-sort/generate.py"),
-    "bound_factory": ("ts_binder", "bound_factory_tests::", "scripts/s07_bound_clone.py"),
+    "ast": ("tsr_ast", "binder_helpers::tests::", "scripts/s07_ast_helpers.py"),
+    "scanner": ("tsr_scanner", "binder_helpers::tests::", "scripts/s07_scanner_helpers.py"),
+    "resolver": ("tsr_binder", "name_resolver::tests::", "scripts/s07_resolver.py"),
+    "diagnostic_order": ("tsr_ast", "diagnostic_order::tests::", "scripts/s07_diagnostic_order.py"),
+    "pattern": ("tsr_core", "pattern::tests::", None),
+    "sort": ("tsr_core", "go_sort::tests::", "tools/s06/node-index-sort/generate.py"),
+    "bound_factory": ("tsr_binder", "bound_factory_tests::", "scripts/s07_bound_clone.py"),
 }
 
 

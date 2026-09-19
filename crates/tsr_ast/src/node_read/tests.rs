@@ -1,6 +1,6 @@
 use crate::{AstBuilder, AstFile, FactoryMethods, JsString, NodeId};
-use ts_arena::{Counters, Error};
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, Error};
+use tsr_jsstring::SourceText;
 
 fn fragment(counters: &Counters, bytes: &[u8]) -> (AstFile, NodeId, NodeId) {
     let mut builder = AstBuilder::new(SourceText::from_loaded_bytes(bytes), counters);
@@ -280,7 +280,7 @@ fn payload_views_preserve_shape_dispatch_lists_and_owned_text() {
     );
     let elements = builder.node_slice(vec![Some(name), None]).unwrap();
     let parameters = builder
-        .new_list(ts_core::TextRange::new(0, 2), elements)
+        .new_list(tsr_core::TextRange::new(0, 2), elements)
         .unwrap();
     let function = builder.new_function_declaration(
         None,

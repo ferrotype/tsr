@@ -39,5 +39,5 @@ capture `p4-pseudochecker-native-02`. The first capture failed while compiling t
 observer; it produced no result. Rust replays the fixture with:
 
 ```sh
-cargo test -p ts_pseudochecker --test native
+cargo test -p tsr_pseudochecker --test native
 ```

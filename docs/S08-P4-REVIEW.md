@@ -150,7 +150,7 @@ push merely to trigger validation.
   without a diagnostic as Go does. Callers that require a declaration retain
   their existing failure contract.
 - Five duplicated non-local-alias predicates now use
-  `ts_ast::is_non_local_alias`. This preserves Go's assignment-backed JavaScript
+  `tsr_ast::is_non_local_alias`. This preserves Go's assignment-backed JavaScript
   alias case even when another symbol meaning is present. Tests distinguish that
   case from a local merged alias and exercise CommonJS export/re-export paths.
 

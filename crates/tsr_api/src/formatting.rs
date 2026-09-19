@@ -3,20 +3,20 @@
 //! printed text, the formatting scanner and the edit list. The target file is
 //! borrowed and only read. What is returned is independently owned text.
 
-use ts_arena::Counters;
-use ts_ast::EagerJsDocProvider;
-use ts_encoder::{decode_nodes, DecodeError, DecodedTree};
-use ts_format::{FormatCodeSettings, FormatContext, FormatFile};
-use ts_printer::EmitContext;
+use tsr_arena::Counters;
+use tsr_ast::EagerJsDocProvider;
+use tsr_encoder::{decode_nodes, DecodeError, DecodedTree};
+use tsr_format::{FormatCodeSettings, FormatContext, FormatFile};
+use tsr_printer::EmitContext;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum FormatError {
     Decode(DecodeError),
-    Print(ts_printer::Error),
-    Format(ts_format::Error),
+    Print(tsr_printer::Error),
+    Format(tsr_format::Error),
     /// The formatter's edits overlap or reach outside the printed text.
-    Edits(ts_core::UnappliableEdits),
-    Arena(ts_arena::Error),
+    Edits(tsr_core::UnappliableEdits),
+    Arena(tsr_arena::Error),
 }
 
 impl std::fmt::Display for FormatError {
@@ -33,14 +33,14 @@ impl std::fmt::Display for FormatError {
 
 impl std::error::Error for FormatError {}
 
-impl From<ts_arena::Error> for FormatError {
-    fn from(error: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for FormatError {
+    fn from(error: tsr_arena::Error) -> Self {
         Self::Arena(error)
     }
 }
 
-impl From<ts_format::Error> for FormatError {
-    fn from(error: ts_format::Error) -> Self {
+impl From<tsr_format::Error> for FormatError {
+    fn from(error: tsr_format::Error) -> Self {
         Self::Format(error)
     }
 }
@@ -85,7 +85,7 @@ pub fn format_decoded_for_insertion(
     let new_line = settings.editor.new_line_character.clone();
     let indent_size = settings.editor.indent_size;
     let emit_context = EmitContext::new();
-    let text = ts_printer::print_and_position_node(
+    let text = tsr_printer::print_and_position_node(
         &mut builder,
         root,
         &new_line,
@@ -99,13 +99,13 @@ pub fn format_decoded_for_insertion(
         (state.parse_options().clone(), state.language_variant)
     };
     let synthetic =
-        ts_printer::create_synthetic_source_file(&mut builder, root, &text, parse_options)
+        tsr_printer::create_synthetic_source_file(&mut builder, root, &text, parse_options)
             .map_err(FormatError::Print)?;
 
     let is_at_line_start =
-        ts_format::get_line_start_position_for_position(position, target)? == position;
+        tsr_format::get_line_start_position_for_position(position, target)? == position;
     let initial_indentation =
-        ts_format::get_indentation(target, position, settings, is_at_line_start)?;
+        tsr_format::get_indentation(target, position, settings, is_at_line_start)?;
 
     let file = builder.complete(synthetic)?.try_publish_unbound()?;
     let mut jsdoc = EagerJsDocProvider::default();
@@ -115,14 +115,20 @@ pub fn format_decoded_for_insertion(
         jsdoc: &mut jsdoc,
     };
     let delta = if indent_size != 0
-        && ts_format::should_indent_child_node(&synthetic_file, settings, root, None, false, false)?
-    {
+        && tsr_format::should_indent_child_node(
+            &synthetic_file,
+            settings,
+            root,
+            None,
+            false,
+            false,
+        )? {
         indent_size
     } else {
         0
     };
     let context = FormatContext::new(settings.clone(), &new_line);
-    let changes = ts_format::format_node_given_indentation(
+    let changes = tsr_format::format_node_given_indentation(
         &mut synthetic_file,
         &context,
         root,
@@ -130,7 +136,7 @@ pub fn format_decoded_for_insertion(
         initial_indentation,
         delta,
     )?;
-    ts_core::apply_bulk_edits(&text, &changes).map_err(FormatError::Edits)
+    tsr_core::apply_bulk_edits(&text, &changes).map_err(FormatError::Edits)
 }
 
 #[cfg(test)]

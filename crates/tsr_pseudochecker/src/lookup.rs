@@ -8,8 +8,8 @@ use crate::{
     },
     Error, Host, PseudoChecker,
 };
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, AstView, NodeListId, NodeRead, SyntaxKind as K,
 };
 
@@ -168,7 +168,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         self.is_const_type_reference(annotation)
     }
     fn is_const_type_reference(&self, node: NodeId) -> R<bool, H> {
-        Ok(ts_ast::utilities_middle::is_const_type_reference(
+        Ok(tsr_ast::utilities_middle::is_const_type_reference(
             self.ast(node)?,
             &self.node(node)?,
         )?)
@@ -268,7 +268,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                     }
                 }
                 if (declarations.len() == 1 || count == 1) && !self.contextually_typed(node)? {
-                    if ts_ast::utilities::is_var_const(self.ast(node)?, node)?
+                    if tsr_ast::utilities::is_var_const(self.ast(node)?, node)?
                         && self.node(init)?.kind() == K::TemplateExpression
                     {
                         return Ok(no_result(node));
@@ -378,7 +378,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.createReturnFromSignature
     fn create_return_from_signature(&self, node: NodeId) -> R<PseudoType, H> {
         let read = self.node(node)?;
-        if ts_ast::utilities::is_function_like(Some(&read)) {
+        if tsr_ast::utilities::is_function_like(Some(&read)) {
             if let Some(annotation) = read.type_node() {
                 return Ok(direct(annotation));
             }
@@ -403,7 +403,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     fn type_from_single_return(&self, function: NodeId) -> R<PseudoType, H> {
         let mut candidate = None;
         if let Some(body) = self.node(function)?.body() {
-            if !ts_ast::node_is_missing(Some(&self.node(body)?)) {
+            if !tsr_ast::node_is_missing(Some(&self.node(body)?)) {
                 if self.async_or_generator(function)? {
                     return Ok(inferred(function, true));
                 }
@@ -519,8 +519,11 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 };
             }
             Some(K::PrefixUnaryExpression) => {
-                if ts_ast::utilities_tail::is_primitive_literal_value(self.ast(node)?, &read, true)?
-                {
+                if tsr_ast::utilities_tail::is_primitive_literal_value(
+                    self.ast(node)?,
+                    &read,
+                    true,
+                )? {
                     return self.type_from_primitive_prefix(node);
                 }
             }
@@ -713,7 +716,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             }
             if read.kind() == K::ComputedPropertyName {
                 let expression = self.expression(name)?;
-                if !ts_ast::utilities_tail::is_primitive_literal_value(
+                if !tsr_ast::utilities_tail::is_primitive_literal_value(
                     self.ast(expression)?,
                     &self.node(expression)?,
                     false,
@@ -803,12 +806,12 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 let list = if read.kind() == K::UnionType {
                     read.data_source()
                         .as_union_type_node()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .types()
                 } else {
                     read.data_source()
                         .as_intersection_type_node()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .types()
                 };
                 for child in self.list(node, list)? {
@@ -990,9 +993,9 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         struct Collector<'a> {
             view: AstView<'a>,
             nodes: Vec<NodeId>,
-            error: Option<ts_arena::Error>,
+            error: Option<tsr_arena::Error>,
         }
-        impl ts_ast::ChildVisitor for Collector<'_> {
+        impl tsr_ast::ChildVisitor for Collector<'_> {
             fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
                 self.nodes.push(node);
                 ControlFlow::Continue(())
@@ -1006,7 +1009,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                     }
                 }
             }
-            fn visit_node_slice(&mut self, nodes: ts_ast::NodeSlice) -> ControlFlow<()> {
+            fn visit_node_slice(&mut self, nodes: tsr_ast::NodeSlice) -> ControlFlow<()> {
                 match self.view.node_slice(nodes) {
                     Ok(nodes) => {
                         self.nodes.extend(nodes.iter().flatten());

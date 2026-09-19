@@ -47,7 +47,7 @@ def run():
     }
     outputs = {
         ROOT / 'data/s06/node-index-sort-traces.json': json.dumps(data, separators=(',', ':')) + '\n',
-        ROOT / 'crates/ts_core/src/go_sort/fixtures.rs': render(data),
+        ROOT / 'crates/tsr_core/src/go_sort/fixtures.rs': render(data),
     }
     for path, content in outputs.items():
         if args.check:

@@ -5,8 +5,8 @@ use crate::{
     type_flags as tf, AliasId, CacheKey, CheckerState, ConditionalRootId, Error, MapperId,
     RelationKind, TypeId, TypeList,
 };
-use ts_arena::NodeId;
-use ts_ast::{symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{symbol_flags as sf, SyntaxKind as K};
 
 #[derive(Clone)]
 pub(crate) struct ConditionalRoot {
@@ -35,7 +35,7 @@ impl CheckerState {
     ) -> Result<&ConditionalRoot, Error> {
         id.index(0)
             .and_then(|i| self.conditional.roots.get(i))
-            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+            .ok_or(Error::Arena(tsr_arena::Error::InvalidSlot))
     }
     // port: tsc/internal/checker/checker.go:Checker.getInferTypeParameters
     pub(crate) fn infer_type_parameters(&mut self, node: NodeId) -> Result<TypeList, Error> {
@@ -146,7 +146,7 @@ impl CheckerState {
             if tails == 1000 {
                 self.error_at(
                     self.current_node,
-                    ts_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
+                    tsr_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
                     vec![],
                 )?;
                 return Ok(self.builtins.error_type);

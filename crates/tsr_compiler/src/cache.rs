@@ -3,10 +3,10 @@ use std::{
     collections::BTreeMap,
     sync::{Arc, Weak},
 };
-use ts_arena::Counters;
-use ts_ast::{CompletedFile, SourceFileParseOptions};
-use ts_core::ScriptKind;
-use ts_jsstring::{JsString, SourceText};
+use tsr_arena::Counters;
+use tsr_ast::{CompletedFile, SourceFileParseOptions};
+use tsr_core::ScriptKind;
+use tsr_jsstring::{JsString, SourceText};
 /// An escaped file retains its complete parsed and bound owner. Graph edges in
 /// a Program are IDs; they never retain another Program or create Arc cycles.
 #[derive(Debug)]
@@ -17,7 +17,7 @@ impl ProgramFile {
     pub fn bound(&self) -> &CompletedFile {
         &self.bound
     }
-    pub fn source(&self) -> ts_ast::NodeId {
+    pub fn source(&self) -> tsr_ast::NodeId {
         self.bound.source()
     }
 }
@@ -58,8 +58,8 @@ impl FileCache {
                 }
             }
         }
-        let parsed = ts_parser::parse_source_file_with_counters(source, kind, options, counters);
-        let bound = ts_binder::bind_parsed_file(parsed)?;
+        let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
+        let bound = tsr_binder::bind_parsed_file(parsed)?;
         let file = Arc::new(ProgramFile { bound });
         entries.push(Arc::downgrade(&file));
         Ok(file)

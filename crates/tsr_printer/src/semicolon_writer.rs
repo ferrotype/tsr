@@ -3,7 +3,7 @@
 //! is set, as it is for `SymbolToString`.
 
 use crate::EmitTextWriter;
-use ts_ast::{NodeId, NodeListId, SymbolId};
+use tsr_ast::{NodeId, NodeListId, SymbolId};
 
 pub struct TrailingSemicolonDeferringWriter<'a> {
     inner: &'a mut dyn EmitTextWriter,

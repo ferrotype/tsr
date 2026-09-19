@@ -6,8 +6,8 @@ use crate::{
     object_flags as of, AliasId, CheckerState, Error, MapperId, TypeId, TypeList, TypeSystemEntity,
     TypeSystemPropertyName,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfClassOrInterface
@@ -196,7 +196,7 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("type reference payload"))?
                 .type_name(),
             Some(K::ExpressionWithTypeArguments) => match read.expression() {
-                Some(name) if ts_ast::is_entity_name_expression(self.ast(name)?, name)? => {
+                Some(name) if tsr_ast::is_entity_name_expression(self.ast(name)?, name)? => {
                     Some(name)
                 }
                 _ => None,
@@ -233,7 +233,7 @@ impl CheckerState {
         // intrinsic "error" type. The symbol's declared "unresolved" type is
         // a distinct value, observable when the baseline bypasses the builder.
         if self.symbol(symbol)?.flags() & sf::TYPE_ALIAS != 0
-            && self.symbol(symbol)?.check_flags() & ts_ast::check_flags::UNRESOLVED != 0
+            && self.symbol(symbol)?.check_flags() & tsr_ast::check_flags::UNRESOLVED != 0
         {
             let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
             let arguments = nodes
@@ -312,7 +312,7 @@ impl CheckerState {
             let name = self.symbol_to_string(symbol)?;
             self.error_at(
                 Some(node),
-                ts_diagnostics::Type_0_is_not_generic,
+                tsr_diagnostics::Type_0_is_not_generic,
                 vec![name],
             )?;
             return Ok(self.builtins.error_type);
@@ -346,14 +346,14 @@ impl CheckerState {
             };
         let message = if missing_augments {
             if minimum < parameters.len() {
-                ts_diagnostics::Expected_0_1_type_arguments_provide_these_with_an_extends_tag
+                tsr_diagnostics::Expected_0_1_type_arguments_provide_these_with_an_extends_tag
             } else {
-                ts_diagnostics::Expected_0_type_arguments_provide_these_with_an_extends_tag
+                tsr_diagnostics::Expected_0_type_arguments_provide_these_with_an_extends_tag
             }
         } else if minimum < parameters.len() {
-            ts_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments
+            tsr_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments
         } else {
-            ts_diagnostics::Generic_type_0_requires_1_type_argument_s
+            tsr_diagnostics::Generic_type_0_requires_1_type_argument_s
         };
         let text =
             self.type_to_string(ty, crate::type_format_flags::WRITE_ARRAY_AS_GENERIC_TYPE)?;
@@ -384,12 +384,12 @@ impl CheckerState {
         let minimum_text = JsString::from_bytes(minimum.to_string().into_bytes());
         let (message, arguments) = if minimum == parameters.len() {
             (
-                ts_diagnostics::Generic_type_0_requires_1_type_argument_s,
+                tsr_diagnostics::Generic_type_0_requires_1_type_argument_s,
                 vec![name, minimum_text],
             )
         } else {
             (
-                ts_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments,
+                tsr_diagnostics::Generic_type_0_requires_between_1_and_2_type_arguments,
                 vec![
                     name,
                     minimum_text,
@@ -610,12 +610,12 @@ impl CheckerState {
                 .get_or_insert_with(|| vec![self.builtins.error_type; parameters.len()].into());
             let (message, args) = if let Some(symbol) = self.types.get(target)?.symbol {
                 (
-                    ts_diagnostics::Type_arguments_for_0_circularly_reference_themselves,
+                    tsr_diagnostics::Type_arguments_for_0_circularly_reference_themselves,
                     vec![self.symbol_to_string(symbol)?],
                 )
             } else {
                 (
-                    ts_diagnostics::Tuple_type_arguments_circularly_reference_themselves,
+                    tsr_diagnostics::Tuple_type_arguments_circularly_reference_themselves,
                     vec![],
                 )
             };

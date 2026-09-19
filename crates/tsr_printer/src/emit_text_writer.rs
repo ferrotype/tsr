@@ -1,7 +1,7 @@
 //! The externally opaque writer contract (`printer.EmitTextWriter`,
 //! `tsc/internal/printer/emittextwriter.go`).
 
-use ts_ast::{NodeId, NodeListId, SymbolId};
+use tsr_ast::{NodeId, NodeListId, SymbolId};
 
 /// One method per upstream interface member. Text is bytes; positions are byte
 /// offsets except `get_column`, which counts UTF-16 units (`core.UTF16Offset`, a
@@ -57,7 +57,7 @@ pub trait EmitTextWriter {
 /// Upstream's `utf8.DecodeLastRuneInString`, reduced to the question the writers
 /// ask: the last complete, standard-UTF-8 scalar, or `None` where Go would
 /// return `RuneError`. This is Go's strict decoder, not the JavaScript sentinel
-/// decoder in `ts_jsstring::wtf8`; the two differ on lone surrogates, and the
+/// decoder in `tsr_jsstring::wtf8`; the two differ on lone surrogates, and the
 /// writers follow upstream's `unicode/utf8` here. A literally encoded U+FFFD is
 /// also `None`, as upstream compares the decoded rune against `RuneError`.
 pub(crate) fn decode_last_rune(bytes: &[u8]) -> Option<char> {

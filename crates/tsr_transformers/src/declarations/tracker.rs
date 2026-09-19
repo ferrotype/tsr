@@ -1,6 +1,6 @@
 use super::diagnostics::{accessibility_diagnostic, SymbolAccessibilityDiagnostic};
-use ts_ast::{AstView, JsString, NodeId, SymbolFlags, SymbolId};
-use ts_printer::emit_resolver::{
+use tsr_ast::{AstView, JsString, NodeId, SymbolFlags, SymbolId};
+use tsr_printer::emit_resolver::{
     DeclarationSymbolTracker, DeclarationTrackerEvent, SymbolAccessibility as A,
     SymbolAccessibilityResult,
 };
@@ -12,7 +12,7 @@ use ts_printer::emit_resolver::{
 /// for a diagnostic that is never requested. Preserve failures until selected.
 #[derive(Clone)]
 pub(super) struct Selector {
-    variants: [Result<Option<SymbolAccessibilityDiagnostic>, ts_arena::Error>; 4],
+    variants: [Result<Option<SymbolAccessibilityDiagnostic>, tsr_arena::Error>; 4],
 }
 impl Default for Selector {
     fn default() -> Self {
@@ -46,7 +46,7 @@ impl Selector {
     fn select(
         &self,
         result: &SymbolAccessibilityResult,
-    ) -> Result<Option<SymbolAccessibilityDiagnostic>, ts_arena::Error> {
+    ) -> Result<Option<SymbolAccessibilityDiagnostic>, tsr_arena::Error> {
         let index = usize::from(result.accessibility == A::CannotBeNamed) * 2
             + usize::from(!result.error_module_name.is_empty());
         self.variants[index]
@@ -54,7 +54,7 @@ impl Selector {
 }
 
 pub(super) enum Pending {
-    SelectorError(ts_arena::Error),
+    SelectorError(tsr_arena::Error),
     Accessibility(SymbolAccessibilityDiagnostic, SymbolAccessibilityResult),
     Report(DeclarationTrackerEvent),
 }
@@ -130,10 +130,10 @@ mod tests {
     #[test]
     fn ordinary_call_context_defers_an_unused_accessibility_selector(
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let parsed = ts_parser::parse_source_file(
-            ts_jsstring::SourceText::from_loaded_bytes(b"Symbol();".as_slice()),
-            ts_core::ScriptKind::TS,
-            ts_ast::SourceFileParseOptions {
+        let parsed = tsr_parser::parse_source_file(
+            tsr_jsstring::SourceText::from_loaded_bytes(b"Symbol();".as_slice()),
+            tsr_core::ScriptKind::TS,
+            tsr_ast::SourceFileParseOptions {
                 file_name: JsString::from_bytes(b"/case.ts".as_slice()),
                 path: JsString::from_bytes(b"/case.ts".as_slice()),
                 ..Default::default()
@@ -161,7 +161,7 @@ mod tests {
         assert!(tracker.accessibility(inaccessible));
         assert!(matches!(
             tracker.pending.as_slice(),
-            [Pending::SelectorError(ts_arena::Error::InvalidGraph)]
+            [Pending::SelectorError(tsr_arena::Error::InvalidGraph)]
         ));
         Ok(())
     }

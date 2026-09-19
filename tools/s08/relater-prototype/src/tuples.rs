@@ -187,7 +187,7 @@ impl Relater<'_> {
         if !source_rest && source_arity < target_min {
             self.report(
                 report_errors,
-                ts_diagnostics::Source_has_0_element_s_but_target_requires_1,
+                tsr_diagnostics::Source_has_0_element_s_but_target_requires_1,
                 vec![source_arity.to_string(), target_min.to_string()],
             );
             return Ok(Some(FALSE));
@@ -195,7 +195,7 @@ impl Relater<'_> {
         if !target_variable && target_arity < source_min {
             self.report(
                 report_errors,
-                ts_diagnostics::Source_has_0_element_s_but_target_allows_only_1,
+                tsr_diagnostics::Source_has_0_element_s_but_target_allows_only_1,
                 vec![source_min.to_string(), target_arity.to_string()],
             );
             return Ok(Some(FALSE));
@@ -203,12 +203,12 @@ impl Relater<'_> {
         if !target_variable && (source_rest || target_arity < source_arity) {
             let (message, arg) = if source_min < target_min {
                 (
-                    &ts_diagnostics::Target_requires_0_element_s_but_source_may_have_fewer,
+                    &tsr_diagnostics::Target_requires_0_element_s_but_source_may_have_fewer,
                     target_min,
                 )
             } else {
                 (
-                    &ts_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
+                    &tsr_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
                     target_arity,
                 )
             };
@@ -236,7 +236,7 @@ impl Relater<'_> {
                 if source_position >= target_arity {
                     self.report(
                         report_errors,
-                        ts_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
+                        tsr_diagnostics::Target_allows_only_0_element_s_but_source_may_have_more,
                         vec![target_arity.to_string()],
                     );
                     return Ok(Some(FALSE));
@@ -245,15 +245,15 @@ impl Relater<'_> {
             };
             let target_flags = target_shape.element_flags[target_position];
             if target_flags & ef::VARIADIC != 0 && source_flags & ef::VARIADIC == 0 {
-                self.report(report_errors, ts_diagnostics::Source_provides_no_match_for_variadic_element_at_position_0_in_target, vec![target_position.to_string()]);
+                self.report(report_errors, tsr_diagnostics::Source_provides_no_match_for_variadic_element_at_position_0_in_target, vec![target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             if source_flags & ef::VARIADIC != 0 && target_flags & ef::VARIABLE == 0 {
-                self.report(report_errors, ts_diagnostics::Variadic_element_at_position_0_in_source_does_not_match_element_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
+                self.report(report_errors, tsr_diagnostics::Variadic_element_at_position_0_in_source_does_not_match_element_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             if target_flags & ef::REQUIRED != 0 && source_flags & ef::REQUIRED == 0 {
-                self.report(report_errors, ts_diagnostics::Source_provides_no_match_for_required_element_at_position_0_in_target, vec![target_position.to_string()]);
+                self.report(report_errors, tsr_diagnostics::Source_provides_no_match_for_required_element_at_position_0_in_target, vec![target_position.to_string()]);
                 return Ok(Some(FALSE));
             }
             // With strictNullChecks and exactOptionalPropertyTypes disabled,
@@ -280,9 +280,9 @@ impl Relater<'_> {
                         && from_end >= target_end
                         && target_start as isize != source_arity as isize - target_end as isize - 1
                     {
-                        self.report(report_errors, ts_diagnostics::Type_at_positions_0_through_1_in_source_is_not_compatible_with_type_at_position_2_in_target, vec![target_start.to_string(), (source_arity as isize - target_end as isize - 1).to_string(), target_position.to_string()]);
+                        self.report(report_errors, tsr_diagnostics::Type_at_positions_0_through_1_in_source_is_not_compatible_with_type_at_position_2_in_target, vec![target_start.to_string(), (source_arity as isize - target_end as isize - 1).to_string(), target_position.to_string()]);
                     } else {
-                        self.report(report_errors, ts_diagnostics::Type_at_position_0_in_source_is_not_compatible_with_type_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
+                        self.report(report_errors, tsr_diagnostics::Type_at_position_0_in_source_is_not_compatible_with_type_at_position_1_in_target, vec![source_position.to_string(), target_position.to_string()]);
                     }
                 }
                 return Ok(Some(FALSE));

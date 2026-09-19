@@ -2,17 +2,17 @@
 //! `scripts/s09_format.py compare --ops nav`.
 
 use crate::{Error, Navigator};
-use ts_arena::NodeId;
-use ts_ast::{AstFile, SourceFileParseOptions, SyntaxKind as K};
-use ts_jsstring::SourceText;
+use tsr_arena::NodeId;
+use tsr_ast::{AstFile, SourceFileParseOptions, SyntaxKind as K};
+use tsr_jsstring::SourceText;
 
-fn parse(name: &[u8], text: &[u8], kind: ts_core::ScriptKind) -> (AstFile, NodeId) {
-    let file = ts_parser::parse_source_file(
+fn parse(name: &[u8], text: &[u8], kind: tsr_core::ScriptKind) -> (AstFile, NodeId) {
+    let file = tsr_parser::parse_source_file(
         SourceText::from_loaded_bytes(text.to_vec()),
         kind,
         SourceFileParseOptions {
-            file_name: ts_ast::JsString::from_bytes(name),
-            path: ts_ast::JsString::from_bytes(name),
+            file_name: tsr_ast::JsString::from_bytes(name),
+            path: tsr_ast::JsString::from_bytes(name),
             ..Default::default()
         },
     )
@@ -30,8 +30,8 @@ fn describe(file: &AstFile, id: Option<NodeId>) -> Option<(K, i32, i32)> {
 
 #[test]
 fn tokens_the_tree_does_not_store_come_from_the_cache_and_are_the_same_node_twice() {
-    let (file, root) = parse(b"/a.ts", b"f ( a , b ) ;", ts_core::ScriptKind::TS);
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let (file, root) = parse(b"/a.ts", b"f ( a , b ) ;", tsr_core::ScriptKind::TS);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut navigator = Navigator::new(file.view(), root, &mut provider);
     let comma = navigator.get_token_at_position(6).unwrap();
     assert_eq!(describe(&file, Some(comma)), Some((K::CommaToken, 5, 7)));
@@ -49,8 +49,8 @@ fn tokens_the_tree_does_not_store_come_from_the_cache_and_are_the_same_node_twic
 
 #[test]
 fn preceding_and_next_tokens_cross_the_gaps_between_nodes() {
-    let (file, root) = parse(b"/a.ts", b"f ( a , b ) ;", ts_core::ScriptKind::TS);
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let (file, root) = parse(b"/a.ts", b"f ( a , b ) ;", tsr_core::ScriptKind::TS);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut navigator = Navigator::new(file.view(), root, &mut provider);
     assert_eq!(
         describe(&file, navigator.find_preceding_token(0).unwrap()),
@@ -85,8 +85,8 @@ fn a_jsdoc_parameter_tag_is_searched_name_first_as_the_pinned_visitor_does() {
     // The rightmost valid child is therefore the type, and the token before a
     // position after the comment is the type's closing brace, not the name.
     let text = b"/** @param {<} x */\nfunction f(x) {}\n";
-    let (file, root) = parse(b"/a.js", text, ts_core::ScriptKind::JS);
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let (file, root) = parse(b"/a.js", text, tsr_core::ScriptKind::JS);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut navigator = Navigator::new(file.view(), root, &mut provider);
     for position in 16..=20 {
         assert_eq!(
@@ -108,8 +108,8 @@ fn an_identifier_in_a_nodes_trivia_is_the_pinned_assertion() {
     // The port reports the same message instead of inventing an answer.
     let text =
         b"class C<T> extends B {\n    constructor() {\n        super<number, string, T> `hello world`;\n    }\n}\n";
-    let (file, root) = parse(b"/a.ts", text, ts_core::ScriptKind::TS);
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let (file, root) = parse(b"/a.ts", text, tsr_core::ScriptKind::TS);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut navigator = Navigator::new(file.view(), root, &mut provider);
     let failures: Vec<String> = (0..text.len() as i64)
         .filter_map(|position| match navigator.get_token_at_position(position) {
@@ -127,12 +127,12 @@ fn deep_preceding_and_rightmost_searches_fit_a_small_caller_stack() {
     const DEPTH: usize = 12_000;
     let parenthesized = format!("{}x{};", "(".repeat(DEPTH), ")".repeat(DEPTH));
     let unary = format!("{}x", "!".repeat(DEPTH));
-    let (file, root) = parse(b"/a.ts", parenthesized.as_bytes(), ts_core::ScriptKind::TS);
-    let (unary_file, unary_root) = parse(b"/b.ts", unary.as_bytes(), ts_core::ScriptKind::TS);
+    let (file, root) = parse(b"/a.ts", parenthesized.as_bytes(), tsr_core::ScriptKind::TS);
+    let (unary_file, unary_root) = parse(b"/b.ts", unary.as_bytes(), tsr_core::ScriptKind::TS);
     std::thread::Builder::new()
         .stack_size(512 * 1024)
         .spawn(move || {
-            let mut provider = ts_parser::ParserJsDocProvider::default();
+            let mut provider = tsr_parser::ParserJsDocProvider::default();
             let mut nav = Navigator::new(file.view(), root, &mut provider);
             let expected = Some((K::Identifier, DEPTH as i32, DEPTH as i32 + 1));
             assert_eq!(

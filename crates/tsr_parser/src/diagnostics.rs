@@ -1,9 +1,9 @@
 use crate::{Parser, ParserFactory};
 use std::sync::OnceLock;
-use ts_ast::{Diagnostic, JsString, NodeId, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_diagnostics::Message;
-use ts_scanner::{DiagnosticArgument, Scanner};
+use tsr_ast::{Diagnostic, JsString, NodeId, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_diagnostics::Message;
+use tsr_scanner::{DiagnosticArgument, Scanner};
 
 /// The scanner calls its error callback while scanning. Its parser callback
 /// reads no scanner state and only appends a diagnostic; draining before this
@@ -86,7 +86,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
             drop(node_ref);
             self.parse_error_at_range(
                 loc,
-                ts_diagnostics::Module_declaration_names_may_only_use_or_quoted_strings,
+                tsr_diagnostics::Module_declaration_names_may_only_use_or_quoted_strings,
                 vec![],
             );
             return;
@@ -104,18 +104,18 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
         drop(node_ref);
         if text.is_empty() {
             self.parse_error_at_current_token(
-                ts_diagnostics::X_0_expected,
+                tsr_diagnostics::X_0_expected,
                 vec![JsString::from_bytes(b";".as_slice())],
             );
             return;
         }
-        let pos = ts_scanner::skip_trivia(self.source_text, loc.pos());
+        let pos = tsr_scanner::skip_trivia(self.source_text, loc.pos());
         match text.as_bytes() {
             b"const" | b"let" | b"var" => {
                 self.parse_error_at(
                     pos,
                     loc.end(),
-                    ts_diagnostics::Variable_declaration_not_allowed_at_this_location,
+                    tsr_diagnostics::Variable_declaration_not_allowed_at_this_location,
                     vec![],
                 );
                 return;
@@ -123,35 +123,35 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
             b"declare" => return,
             b"interface" => {
                 self.parse_error_for_invalid_name(
-                    ts_diagnostics::Interface_name_cannot_be_0,
-                    ts_diagnostics::Interface_must_be_given_a_name,
+                    tsr_diagnostics::Interface_name_cannot_be_0,
+                    tsr_diagnostics::Interface_must_be_given_a_name,
                     K::OpenBraceToken,
                 );
                 return;
             }
             b"is" => {
-                self.parse_error_at(pos, self.scanner.token_start(), ts_diagnostics::A_type_predicate_is_only_allowed_in_return_type_position_for_functions_and_methods, vec![]);
+                self.parse_error_at(pos, self.scanner.token_start(), tsr_diagnostics::A_type_predicate_is_only_allowed_in_return_type_position_for_functions_and_methods, vec![]);
                 return;
             }
             b"module" | b"namespace" => {
                 self.parse_error_for_invalid_name(
-                    ts_diagnostics::Namespace_name_cannot_be_0,
-                    ts_diagnostics::Namespace_must_be_given_a_name,
+                    tsr_diagnostics::Namespace_name_cannot_be_0,
+                    tsr_diagnostics::Namespace_must_be_given_a_name,
                     K::OpenBraceToken,
                 );
                 return;
             }
             b"type" => {
                 self.parse_error_for_invalid_name(
-                    ts_diagnostics::Type_alias_name_cannot_be_0,
-                    ts_diagnostics::Type_alias_must_be_given_a_name,
+                    tsr_diagnostics::Type_alias_name_cannot_be_0,
+                    tsr_diagnostics::Type_alias_must_be_given_a_name,
                     K::EqualsToken,
                 );
                 return;
             }
             _ => {}
         }
-        let suggestion = ts_scanner::get_spelling_suggestion_for_strings(
+        let suggestion = tsr_scanner::get_spelling_suggestion_for_strings(
             text.as_bytes(),
             viable_keyword_suggestions()
                 .iter()
@@ -163,7 +163,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
             self.parse_error_at(
                 pos,
                 loc.end(),
-                ts_diagnostics::Unknown_keyword_or_identifier_Did_you_mean_0,
+                tsr_diagnostics::Unknown_keyword_or_identifier_Did_you_mean_0,
                 vec![suggestion],
             );
             return;
@@ -172,7 +172,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
             self.parse_error_at(
                 pos,
                 loc.end(),
-                ts_diagnostics::Unexpected_keyword_or_identifier,
+                tsr_diagnostics::Unexpected_keyword_or_identifier,
                 vec![],
             );
         }
@@ -196,7 +196,7 @@ impl<'src, F: ParserFactory> Parser<'src, F> {
 
 fn viable_keyword_suggestions() -> &'static [&'static str] {
     static CANDIDATES: OnceLock<Vec<&'static str>> = OnceLock::new();
-    CANDIDATES.get_or_init(ts_scanner::get_viable_keyword_suggestions)
+    CANDIDATES.get_or_init(tsr_scanner::get_viable_keyword_suggestions)
 }
 
 /// port: tsc/internal/parser/parser.go:getSpaceSuggestion

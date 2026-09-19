@@ -7,9 +7,9 @@
 //! subsequent operations, including operations through retained results.
 
 use std::sync::{Arc, OnceLock};
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::{CheckerOwner, Error, Operation};
-pub use ts_compiler::{FileCache, Program, ProgramOptions};
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::{CheckerOwner, Error, Operation};
+pub use tsr_compiler::{FileCache, Program, ProgramOptions};
 
 /// Cheap, explicitly retained root for a loaded program and its checker.
 /// Initialization occurs on the first query, under the checker's identity
@@ -29,7 +29,7 @@ impl Session {
         options: ProgramOptions,
         cache: &mut FileCache,
         counters: &Counters,
-    ) -> Result<Self, ts_compiler::Error> {
+    ) -> Result<Self, tsr_compiler::Error> {
         Ok(Self::from_program(
             Arc::new(Program::load(options, cache, counters)?),
             counters,
@@ -63,7 +63,7 @@ impl Session {
                 CheckerOwner::for_program(
                     self.identity.clone(),
                     &self.counters,
-                    Arc::new(ts_compiler::ProgramCheckerHost::new(self.program.clone())),
+                    Arc::new(tsr_compiler::ProgramCheckerHost::new(self.program.clone())),
                 )
                 .map(Arc::new)
             })

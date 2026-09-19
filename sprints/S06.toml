@@ -7,7 +7,7 @@
 # The oracle side encodes each case and lib file with the pinned Go encoder at protocol 8.
 id = "S06"
 title = "Parser, JSDoc, AST runtime and encoder"
-goal = "ts_parser, the ts_ast runtime and ts_encoder at protocol 8 parse and encode the frozen corpus and the lib files identically to the Go oracle; E1 and E4's encoder criteria pass. E4's production literal-type and printer integration completes in S08."
+goal = "tsr_parser, the tsr_ast runtime and tsr_encoder at protocol 8 parse and encode the frozen corpus and the lib files identically to the Go oracle; E1 and E4's encoder criteria pass. E4's production literal-type and printer integration completes in S08."
 exit = [
   "sprint.S03.done == 1",
   "sprint.S05.done == 1",
@@ -43,7 +43,7 @@ done_when = ["exp.E1.encoder_parity.pass == 1", "run.e1.depth == true", "run.e1.
 
 [[item]]
 id = "S06-3"
-title = "ts_ast runtime: node data and flags, the utilities the parser needs, visitor, deep clone, precedence and subtree facts"
+title = "tsr_ast runtime: node data and flags, the utilities the parser needs, visitor, deep clone, precedence and subtree facts"
 kind = "task"
 required = true
 done_when = ["exp.E1.encoder_parity.pass == 1", "functions.package[internal/ast].ratio >= 0.5", "run.e1.ast_runtime == true", "run.e1.ast_utilities == true", "run.e3.ast_runtime == true"]

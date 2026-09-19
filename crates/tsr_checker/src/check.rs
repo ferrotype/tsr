@@ -2,10 +2,10 @@
 //! fails explicitly; a failed file check never becomes a successful cache hit.
 
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, SyntaxKind as K};
-use ts_core::Tristate;
-use ts_diagnostics as messages;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, SyntaxKind as K};
+use tsr_core::Tristate;
+use tsr_diagnostics as messages;
 
 #[derive(Clone, Copy)]
 pub(crate) enum SourceCheckStatus {
@@ -84,10 +84,10 @@ impl CheckerState {
         let file = view.source_file(source)?;
         if !matches!(
             file.script_kind,
-            ts_core::ScriptKind::TS
-                | ts_core::ScriptKind::JS
-                | ts_core::ScriptKind::TSX
-                | ts_core::ScriptKind::JSX
+            tsr_core::ScriptKind::TS
+                | tsr_core::ScriptKind::JS
+                | tsr_core::ScriptKind::TSX
+                | tsr_core::ScriptKind::JSX
         ) {
             return Err(Error::Unsupported("checkSourceFile: non-script input"));
         }
@@ -104,7 +104,7 @@ impl CheckerState {
             self.check_source_element(statement)?;
         }
         self.finish_deferred_function_bodies(source)?;
-        if ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(source)?) {
+        if tsr_ast::utilities::is_external_or_common_js_module(&self.source_file_read(source)?) {
             self.check_external_module_exports(source)?;
             self.register_for_unused_identifiers_check(source)?;
         }
@@ -195,7 +195,7 @@ impl CheckerState {
                 let list = required(
                     read.data_source()
                         .as_variable_statement()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .declaration_list(),
                     "variable declaration list",
                 )?;
@@ -207,10 +207,10 @@ impl CheckerState {
             Some(K::VariableDeclarationList) => {
                 // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclarationList
                 let block_scope =
-                    ts_ast::utilities::get_combined_node_flags(view, node)? & nf::BLOCK_SCOPED;
+                    tsr_ast::utilities::get_combined_node_flags(view, node)? & nf::BLOCK_SCOPED;
                 if (block_scope == nf::USING || block_scope == nf::AWAIT_USING)
                     && self.program()?.host.options().emit_script_target()
-                        < ts_core::ScriptTarget::ESNEXT
+                        < tsr_core::ScriptTarget::ESNEXT
                 {
                     self.check_external_emit_helpers(
                         node,
@@ -222,7 +222,7 @@ impl CheckerState {
                     view.node(node)?
                         .data_source()
                         .as_variable_declaration_list()
-                        .ok_or(ts_arena::Error::InvalidGraph)?
+                        .ok_or(tsr_arena::Error::InvalidGraph)?
                         .declarations(),
                     "variable declarations",
                 )?;
@@ -323,7 +323,7 @@ impl CheckerState {
             Some(K::NamespaceExportDeclaration | K::SemicolonClassElement) => Ok(()),
             // Upstream visits modifier keywords through forEachChild and its
             // switch has no case for them.
-            _ if ts_ast::is_modifier_kind(read.kind()) && read.kind() != K::Decorator => Ok(()),
+            _ if tsr_ast::is_modifier_kind(read.kind()) && read.kind() != K::Decorator => Ok(()),
             _ => Err(Error::Unsupported(
                 "checkSourceElementWorker: statement/type family",
             )),
@@ -343,12 +343,12 @@ impl CheckerState {
             if read.kind() == K::UnionType {
                 read.data_source()
                     .as_union_type_node()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .types()
             } else {
                 read.data_source()
                     .as_intersection_type_node()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .types()
             },
             "compound types",
@@ -380,7 +380,7 @@ impl CheckerState {
             self.grammar_error_node(
                 node,
                 messages::X_0_declarations_can_only_be_declared_inside_a_block,
-                vec![ts_ast::JsString::from_bytes(if interface {
+                vec![tsr_ast::JsString::from_bytes(if interface {
                     b"interface".as_slice()
                 } else {
                     b"type".as_slice()
@@ -462,7 +462,7 @@ impl CheckerState {
             Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
         );
         if !property && name_kind != K::Identifier && !binding
-            || property && !ts_ast::utilities::is_property_name_literal(&self.node(name)?)
+            || property && !tsr_ast::utilities::is_property_name_literal(&self.node(name)?)
         {
             return Err(Error::Unsupported(
                 "checkVariableLikeDeclaration: binding/computed/private name",
@@ -665,7 +665,7 @@ impl CheckerState {
         initializer_type: TypeId,
     ) -> Result<(), Error> {
         let block_scope =
-            ts_ast::utilities::get_combined_node_flags(self.ast(node)?, node)? & nf::BLOCK_SCOPED;
+            tsr_ast::utilities::get_combined_node_flags(self.ast(node)?, node)? & nf::BLOCK_SCOPED;
         let empty = self.builtins.empty_object_type;
         let (mut parts, message) = if block_scope == nf::AWAIT_USING {
             let async_disposable = self.cached_global_type("AsyncDisposable")?;

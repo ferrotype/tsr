@@ -104,7 +104,7 @@ def main():
     messages=command(argv,cwd=STAGE,env=env)
     (OUTPUT/'rust-cargo-messages.ndjson').write_bytes(messages)
     rows=[json.loads(line) for line in messages.splitlines() if line]
-    artifacts=[r for r in rows if r.get('reason')=='compiler-artifact' and r.get('target',{}).get('name')=='ts_memory_profile' and r.get('executable')]
+    artifacts=[r for r in rows if r.get('reason')=='compiler-artifact' and r.get('target',{}).get('name')=='tsr_memory_profile' and r.get('executable')]
     if len(artifacts)!=1 or rows[-1]!={'reason':'build-finished','success':True}:
         raise ValueError('Cargo did not identify a unique successful adapter build')
     artifact=artifacts[0]

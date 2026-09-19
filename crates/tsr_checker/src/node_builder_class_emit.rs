@@ -2,10 +2,10 @@
 //! structural expansion and the diagnostics attached to private base members.
 use super::NodeBuilder;
 use crate::{object_flags as of, signature_flags as sigf, type_flags as tf, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_nodebuilder::flags as nf;
-use ts_printer::emit_resolver::{DeclarationTrackerEvent as Event, SymbolAccessibility as Access};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_nodebuilder::flags as nf;
+use tsr_printer::emit_resolver::{DeclarationTrackerEvent as Event, SymbolAccessibility as Access};
 
 /// Native CompositeSymbolIdentity distinguishes class constructor objects from
 /// instance types, and source-node identities from a symbol's instantiations.
@@ -45,16 +45,16 @@ impl NodeBuilder<'_> {
         let declarations = self.checker.symbol_declarations(symbol)?.to_vec();
         let mut static_method = false;
         if flags & sf::METHOD != 0
-            && ts_scanner::is_identifier_text(
+            && tsr_scanner::is_identifier_text(
                 self.checker.symbol(symbol)?.name_bytes(),
-                ts_core::LanguageVariant::STANDARD,
+                tsr_core::LanguageVariant::STANDARD,
             )
         {
             for declaration in declarations.iter().flatten().copied() {
                 let view = self.checker.ast(declaration)?;
                 let read = view.node(declaration)?;
                 if read.modifier_flags(view)? & mf::STATIC != 0 {
-                    let name = ts_ast::get_name_of_declaration(view, Some(declaration))?;
+                    let name = tsr_ast::get_name_of_declaration(view, Some(declaration))?;
                     if !match name {
                         Some(name) => self.reuse_late_bindable_name(name)?,
                         None => false,
@@ -177,7 +177,9 @@ impl NodeBuilder<'_> {
         if flags & sf::CLASS != 0 && self.checker.class_base_type_variable(symbol)?.is_none() {
             let expand = if self.flags & nf::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL != 0 {
                 match value {
-                    Some(value) if ts_ast::utilities::is_class_like(&self.checker.node(value)?) => {
+                    Some(value)
+                        if tsr_ast::utilities::is_class_like(&self.checker.node(value)?) =>
+                    {
                         self.checker.node(value)?.kind() != K::ClassDeclaration
                             || self
                                 .checker
@@ -313,7 +315,7 @@ impl NodeBuilder<'_> {
             return Ok(false);
         };
         Ok(
-            ts_ast::utilities::is_class_like(&self.checker.node(declaration)?)
+            tsr_ast::utilities::is_class_like(&self.checker.node(declaration)?)
                 && !self.value_symbol_accessible(symbol)?,
         )
     }
@@ -336,7 +338,7 @@ impl NodeBuilder<'_> {
             let read = self.checker.symbol(symbol)?;
             let name = if let Some(declaration) = read.value_declaration() {
                 JsString::from_bytes(
-                    ts_ast::symbol_name(&read, self.checker.ast(declaration)?)?.as_bytes(),
+                    tsr_ast::symbol_name(&read, self.checker.ast(declaration)?)?.as_bytes(),
                 )
             } else {
                 read.name_to_owned()

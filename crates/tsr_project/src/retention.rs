@@ -5,16 +5,16 @@
 
 use super::*;
 use std::sync::Weak;
-use ts_arena::NodeId;
-use ts_checker::{
+use tsr_arena::NodeId;
+use tsr_checker::{
     RetainedNode, RetainedSignature, RetainedSymbol, RetainedType, RetainedTypeList, TypeRef,
 };
-use ts_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
-use ts_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use ts_jsstring::JsString;
+use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
+use tsr_jsstring::JsString;
 
 const SOURCE: &[u8] = b"interface Shared { field: string }\n";
-const WRONG_OWNER: Error = Error::Arena(ts_arena::Error::WrongOwner);
+const WRONG_OWNER: Error = Error::Arena(tsr_arena::Error::WrongOwner);
 
 struct Fixture {
     pool: Arc<CheckerPool>,
@@ -29,12 +29,12 @@ struct Fixture {
 /// The pool's host is the only strong program reference once this returns: the
 /// parse cache and the loader's handle are dropped here.
 fn fixture(counters: &Counters) -> Fixture {
-    let mut files = ts_vfs::MemoryBuilder::new(b"/", true);
+    let mut files = tsr_vfs::MemoryBuilder::new(b"/", true);
     files.insert_loaded(b"/main.ts", SOURCE);
     let program = Arc::new(
         Program::load(
             ProgramOptions {
-                config: ts_tsoptions::ParsedCommandLine::new(
+                config: tsr_tsoptions::ParsedCommandLine::new(
                     CompilerOptions {
                         target: ScriptTarget::ESNEXT,
                         module: ModuleKind::ESNEXT,
@@ -255,7 +255,7 @@ mod results {
         let retained = results.ty.clone();
         let expected = results.expected_type;
         let reader = std::thread::spawn(move || {
-            ts_arena::observe_next_lease_contention(attempted);
+            tsr_arena::observe_next_lease_contention(attempted);
             // Blocks on the production permit until the holder releases it.
             let operation = retained.owner().operation().unwrap();
             assert_eq!(operation.import_type(&retained).unwrap(), expected);
@@ -285,7 +285,7 @@ mod results {
         fixture.pool.generation().retire();
         assert!(matches!(
             results.ty.owner().operation(),
-            Err(Error::Arena(ts_arena::Error::Retired))
+            Err(Error::Arena(tsr_arena::Error::Retired))
         ));
         let program = fixture.program.clone();
         drop(fixture);
@@ -372,7 +372,7 @@ mod ast {
         let node = operation.import_node(&synthetic.node).unwrap();
         assert_eq!(
             operation.node_kind(node).unwrap().known(),
-            Some(ts_ast::SyntaxKind::SyntheticExpression)
+            Some(tsr_ast::SyntaxKind::SyntheticExpression)
         );
         assert_eq!(
             operation.synthetic_expression_type(node).unwrap(),
@@ -380,12 +380,15 @@ mod ast {
         );
         let (parent, kind) = operation.node_parent(node).unwrap().unwrap();
         assert_eq!(parent, fixture_declaration, "the parent is the file's node");
-        assert_eq!(kind.known(), Some(ts_ast::SyntaxKind::InterfaceDeclaration));
+        assert_eq!(
+            kind.known(),
+            Some(tsr_ast::SyntaxKind::InterfaceDeclaration)
+        );
         let signature = operation.import_signature(&synthetic.signature).unwrap();
         let declaration = operation.signature_declaration(signature).unwrap().unwrap();
         assert_eq!(
             operation.node_kind(declaration).unwrap().known(),
-            Some(ts_ast::SyntaxKind::FunctionType)
+            Some(tsr_ast::SyntaxKind::FunctionType)
         );
         assert_eq!(
             operation.signature_return_type(signature).unwrap(),
@@ -437,7 +440,7 @@ mod ast {
             let declaration = operation.signature_declaration(signature).unwrap().unwrap();
             assert_eq!(
                 operation.node_kind(declaration).unwrap().known(),
-                Some(ts_ast::SyntaxKind::FunctionType)
+                Some(tsr_ast::SyntaxKind::FunctionType)
             );
         }
         drop(checkout);

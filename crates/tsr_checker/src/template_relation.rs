@@ -4,7 +4,7 @@ use crate::{
     relater::{Relater, RelationKind},
     ternary as tr, type_flags as tf, CheckerState, Error, LiteralValue, TypeId,
 };
-use ts_ast::JsString;
+use tsr_ast::JsString;
 
 impl CheckerState {
     // port: tsc/internal/checker/relater.go:Checker.inferTypesFromTemplateLiteralType
@@ -103,7 +103,7 @@ impl CheckerState {
             } else if position < source_text(segment).len() {
                 (
                     segment,
-                    position + ts_jsstring::wtf8::decode_rune(&source_text(segment)[position..]).1,
+                    position + tsr_jsstring::wtf8::decode_rune(&source_text(segment)[position..]).1,
                 )
             } else if segment < last {
                 (segment + 1, 0)
@@ -150,7 +150,7 @@ impl CheckerState {
     ) -> Result<TypeId, Error> {
         if segment == end_segment {
             return self.get_string_literal_type(JsString::from_bytes(
-                ts_jsstring::wtf8::combine_surrogate_pairs(&end_text[position..end_position])
+                tsr_jsstring::wtf8::combine_surrogate_pairs(&end_text[position..end_position])
                     .as_ref(),
             ));
         }
@@ -307,7 +307,7 @@ impl CheckerState {
             let bytes = value.as_bytes();
             if t & tf::NUMBER != 0
                 && !bytes.is_empty()
-                && ts_jsnum::from_string(bytes).value().is_finite()
+                && tsr_jsnum::from_string(bytes).value().is_finite()
             {
                 return Ok(true);
             }
@@ -354,17 +354,17 @@ pub(crate) fn valid_bigint_string(bytes: &[u8]) -> bool {
     }
     let mut text = bytes.to_vec();
     text.push(b'n');
-    let mut scanner = ts_scanner::Scanner::new();
+    let mut scanner = tsr_scanner::Scanner::new();
     scanner.set_skip_trivia(false);
     scanner.buffer_diagnostics();
     scanner.set_text(&text);
     let mut kind = scanner.scan();
-    if kind == ts_ast::SyntaxKind::MinusToken {
+    if kind == tsr_ast::SyntaxKind::MinusToken {
         kind = scanner.scan();
     }
     let success = scanner.drain_diagnostics().next().is_none();
     success
-        && kind == ts_ast::SyntaxKind::BigIntLiteral
+        && kind == tsr_ast::SyntaxKind::BigIntLiteral
         && scanner.token_end() == text.len() as i64
-        && scanner.token_flags() & ts_ast::token_flags::CONTAINS_SEPARATOR == 0
+        && scanner.token_flags() & tsr_ast::token_flags::CONTAINS_SEPARATOR == 0
 }

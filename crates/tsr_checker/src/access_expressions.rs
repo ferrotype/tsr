@@ -4,9 +4,9 @@ use crate::flow_assignments::AssignmentKind;
 use crate::{
     access_flags as af, object_flags as of, type_flags as tf, CheckerState, Error, TypeId,
 };
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
@@ -398,7 +398,7 @@ impl CheckerState {
             self.check_access_property_accessibility(
                 node,
                 self.node(left)?.kind() == K::SuperKeyword,
-                ts_ast::utilities::is_write_access(self.ast(node)?, node)?,
+                tsr_ast::utilities::is_write_access(self.ast(node)?, node)?,
                 apparent,
                 property,
                 Some(right),
@@ -413,7 +413,7 @@ impl CheckerState {
             }
             if self.this_property_access_in_constructor(node, property)? {
                 self.builtins.auto_type
-            } else if write_only || ts_ast::utilities::is_write_only_access(self.ast(node)?, node)?
+            } else if write_only || tsr_ast::utilities::is_write_only_access(self.ast(node)?, node)?
             {
                 self.write_type_of_symbol(property)?
             } else {
@@ -699,7 +699,7 @@ impl CheckerState {
                 }
             };
         Ok(constructor
-            == Some(ts_ast::get_this_container(
+            == Some(tsr_ast::get_this_container(
                 self.ast(node)?,
                 node,
                 true,

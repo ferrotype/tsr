@@ -2,8 +2,8 @@
 //! A failed discovery must not leave a completed-reduction flag behind.
 
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::SymbolId;
-use ts_ast::{check_flags as cf, symbol_flags as sf};
+use tsr_arena::SymbolId;
+use tsr_ast::{check_flags as cf, symbol_flags as sf};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getReducedType

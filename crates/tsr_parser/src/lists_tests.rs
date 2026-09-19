@@ -1,8 +1,8 @@
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_arena::Counters;
-use ts_ast::{AstBuilder, Factory, FactoryMethods, JsString, SourceFileParseOptions, SyntaxKind};
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::{AstBuilder, Factory, FactoryMethods, JsString, SourceFileParseOptions, SyntaxKind};
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 #[test]
 fn reparsed_elements_precede_their_element_and_count_in_later_callback_indices() {

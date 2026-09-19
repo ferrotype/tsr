@@ -190,907 +190,907 @@
       "bytes": 2581,
       "sha256": "05339fa0b036284b7a5d7969e3c37aab1164515450e1982edaec6ff1f4829daa"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/Cargo.toml": {
       "bytes": 373,
       "sha256": "d6e45a256f941cfd17c47d0a0b0de979d2bf5e3ccce1cb4457ce5cb6958fd395"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/examples/e3.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/examples/e3.rs": {
       "bytes": 3694,
       "sha256": "d399f7fdaa594018d2888d1f2ffbc2f1c7bd2b742f74bae07d7bf147987c4a5a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/arena.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/arena.rs": {
       "bytes": 4609,
       "sha256": "3a2f84d06455880a42c62865292660d3bd4496dc1c9f5640e0a235b560f11a09"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/bundle.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/bundle.rs": {
       "bytes": 6281,
       "sha256": "d4f237b48705f8dc42a63eb048dfc4690f1b0e1c50316781819ec55a0086b591"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/counters.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/counters.rs": {
       "bytes": 1735,
       "sha256": "614bfdf7cc1417e76ae0d4a1b67d800c3c38fd29495da5066149a2232938cc48"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/error.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/error.rs": {
       "bytes": 1366,
       "sha256": "cd5d7dcd1a92a735df4988ab38718585d0e1bb43eae63f0606eed33e7a2d803a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/file.rs": {
       "bytes": 30729,
       "sha256": "39c01c45d878fa0d4065f3b265b4d4e9ed37dbbc7afc3d96db5776ae46540625"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/ids.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/ids.rs": {
       "bytes": 3444,
       "sha256": "e9c3cdd888b90de7a4da71b8e90048304286989b3598200cb30366c81a5fa33d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/initialization.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/initialization.rs": {
       "bytes": 1977,
       "sha256": "f09dbcfb2c0bd9d9ea21cbd5658a59d209e72877432a724a8468305150b65bc7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/lazy.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/lazy.rs": {
       "bytes": 34368,
       "sha256": "d5d517621e3ac0abac87cce5c4e02f44aaed55ba495a8f94d1c475d773b58e61"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/lease.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/lease.rs": {
       "bytes": 3639,
       "sha256": "ce3dec420206efa6e6f87926bccdf7628717f9fbcec2de2a583efe6b36e75697"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/lib.rs": {
       "bytes": 2150,
       "sha256": "71db2009cd0a01b088d06267934183c76db73773835dd0e1b1f1c134a8f7261c"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/node.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/node.rs": {
       "bytes": 1618,
       "sha256": "19e91f4a7ec38521e761e8f55cf3543a9954ebb0acc6f39c3d456aebe8a31260"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/node_slots.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/node_slots.rs": {
       "bytes": 4706,
       "sha256": "31f586e4fdc20d115acb5dbcd0a909e83ae48f734ca1883a3f639a41ac4599e0"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/owned.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/owned.rs": {
       "bytes": 3351,
       "sha256": "5133b7fd30def6a918f9d3e598b2398275f7499a5227aa03ad3038a042ff4b1d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/refs.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/refs.rs": {
       "bytes": 12432,
       "sha256": "856a61aef256dd14686e041553a3718035ddb429d409fc4cc91cf9caac75deb9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/scenarios.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/scenarios.rs": {
       "bytes": 21096,
       "sha256": "6ff2c8c4d1883978ddc5d2381d911c70be8a0dfe939e606cf1507201262d5469"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/scope.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/scope.rs": {
       "bytes": 4754,
       "sha256": "d1207e16acdb6a85ae40ebffbf938812c7c9f961bf17af8c99df2c9cd42ccb43"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/scratch.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/scratch.rs": {
       "bytes": 734,
       "sha256": "01f5fc260686fd72b5fe23de43c4571494f5fd69ab45814059a7a417b392b1f4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_arena/src/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_arena/src/tests.rs": {
       "bytes": 11832,
       "sha256": "6e29ecf5c5cf4cfadba7f1c339b05c41409e24ea2452d096338b8e873be3cc8e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/Cargo.toml": {
       "bytes": 541,
       "sha256": "ac845bcf63ab0f8b5aaf5932e107e34c168f5c69a4989cde8507c36e5042b812"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/examples/support/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/examples/support/factory.rs": {
       "bytes": 29853,
       "sha256": "7c4bbe9284ad0de93a31a597723912efb6ad0395e39832057eda30414524eb86"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/accessors_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/accessors_generated.rs": {
       "bytes": 82349,
       "sha256": "741d265e01ef93cfc1d92d54f4e6c1079f6ec7cacca6752567b9831b58980f77"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/auxiliary.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/auxiliary.rs": {
       "bytes": 13624,
       "sha256": "ffc546b85653a48a65f3c48ac41de7e8a1a505ee14e6ccb74e043285edcdbf4e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/auxiliary_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/auxiliary_tests.rs": {
       "bytes": 6440,
       "sha256": "38cd727f8329635645a5da7df31e7cb3a7ec37e2ab49c8f188c8d92a96c1c3f5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/bind_result.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/bind_result.rs": {
       "bytes": 36758,
       "sha256": "5514c9f15fa8b8a7519b105f52694323fa5f624998e4ab64ec71e3311a16f45d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/bind_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/bind_tests.rs": {
       "bytes": 35985,
       "sha256": "2f6526fd56527989a9b9817fc7f2526277afaa9855e26a1675b4211a281f255a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/binder_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/binder_helpers.rs": {
       "bytes": 48607,
       "sha256": "6a21e501957147ba9d52f7789b53461cf379bb68c6bd005fb0532e23450a5a44"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/binder_helpers_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/binder_helpers_tests.rs": {
       "bytes": 17706,
       "sha256": "c629390a0d0013936746ebb746f7937cdf34e36b2f0c0a2a7ca8f78a16b43b65"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/clone.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/clone.rs": {
       "bytes": 5653,
       "sha256": "af9b7c5a22086ed4bcfcac66adf7c86768c4f1abf86c4147e09b904dcccc5a83"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/binding.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/binding.rs": {
       "bytes": 10582,
       "sha256": "9a4cbaf71f9f203ec01ab3e5c267b604949697c003827ed09fee1a4dbd9ebda9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/lists.rs": {
       "bytes": 6947,
       "sha256": "821f48aa4d7a18847bf9d6a5887d9e30123b13aba2223f60179de164ec8e88ee"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/mod.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/mod.rs": {
       "bytes": 10358,
       "sha256": "18e1390ea7f75cee7e03b1ae84234eec57a6309c329829b3f344cc1683ad0fd7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/pages.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/pages.rs": {
       "bytes": 2151,
       "sha256": "865963a98a1bbf8be02d6c3df2a5958ddf4121bcaa6da36c1c98659c4278c77b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/tests.rs": {
       "bytes": 12463,
       "sha256": "049e1028f60f27a6734ea59c92e3878a56b652e68e34080191193c29d44da929"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact/text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact/text.rs": {
       "bytes": 6928,
       "sha256": "4d859ef942374758265b3b803a2d60dd7a9e2b93f5d56f3c3645364851e6ed2b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/compact_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/compact_generated.rs": {
       "bytes": 814702,
       "sha256": "94a9757e78f318843bcbeaf52a102da4ff848786890c26b5c358d10823348190"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/data_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/data_generated.rs": {
       "bytes": 108706,
       "sha256": "8563c53e83fe66ea8d7a353102858dabdb5d570556150be53f96ec57f5879428"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/declaration_lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/declaration_lists.rs": {
       "bytes": 19119,
       "sha256": "916293efa97ec37e16c4d203f9fcc208b96ed4b1d5c92b93f980be9694318e3b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/diagnostic.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/diagnostic.rs": {
       "bytes": 3699,
       "sha256": "978fa40584f7d1e19394f921bd7eae4b79ff97feff9780568f21d88d4b01b259"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/diagnostic_order.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/diagnostic_order.rs": {
       "bytes": 6377,
       "sha256": "e4a1aa9068d55c180534b8689dffd047825ee4a0345e16b9abe3737fe96991a7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/diagnostic_order_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/diagnostic_order_tests.rs": {
       "bytes": 8247,
       "sha256": "b8f6f7dbfd8642ab9770d4fa3258609b3408c69669d1ea06fc4235311f5b5f5b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/factory.rs": {
       "bytes": 13077,
       "sha256": "a4111b3b9bd66605be0e1e64fa3188b76eab075379919e4c67cbe2ec71afc26a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/factory_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/factory_generated.rs": {
       "bytes": 606604,
       "sha256": "617dd18666619dd28d7c6fe6ac89fe460a100b99ffb8c808bcdb922f0d4c2680"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/flow.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/flow.rs": {
       "bytes": 6560,
       "sha256": "2b6bb4013e599f07f0b500cae24bc1f5261020212d0ed0ece58a7051e06ca184"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/flow/storage.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/flow/storage.rs": {
       "bytes": 21980,
       "sha256": "669f27a9df9ad7ec7cd6ad04558a41a9efef207e325775b3d65c86b0b224a9cf"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/jsdoc.rs": {
       "bytes": 1143,
       "sha256": "f9acc8ea75f81982be823e0a8e86ed329b147935133e062b8c0c8be5bb9132ce"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/kinds_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/kinds_generated.rs": {
       "bytes": 75195,
       "sha256": "4b28d852a3d6934fd5fe3b2c625aba4b997afdccb790c13c1b406c51f9ad2a07"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/lib.rs": {
       "bytes": 10594,
       "sha256": "390f66e126a2318ca747cfd992400c533d40e7f613edc5e48e89c29ff6dac762"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/lists.rs": {
       "bytes": 11747,
       "sha256": "903aaad37e40fff0c33fa3c60f2fe8d93d7d456d40a772ab0d7860fa97486d4b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/metadata.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/metadata.rs": {
       "bytes": 6402,
       "sha256": "c753475bfdcab0c904d35d1c3e4ba3dd12cd038159f29abc098cb58ddd205b5b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/modifier_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/modifier_flags.rs": {
       "bytes": 2653,
       "sha256": "b24d0213f60508ada317579759b1ce4061c4ae74557003ba8436ab8c98b50aa9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_access.rs": {
       "bytes": 49950,
       "sha256": "2f64a62b369566871ca3660f754a37cc51fcf8f45fab65f1fcb6316a9f755ee1"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_accessors.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_accessors.rs": {
       "bytes": 18028,
       "sha256": "cf29d8520115c34ee865a01e5e3005390d84f71332d077c112a1fcb6a95ba53d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_flags.rs": {
       "bytes": 2576,
       "sha256": "9596f9573bd94c6a804f1d98df40e850547ffb7523fabaaefeb9f95303f9ecf2"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_index.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_index.rs": {
       "bytes": 4082,
       "sha256": "0ca7d220b434c6322981623961de0294ddb3522d66114b9530e8815996f4aa0e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_kind.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_kind.rs": {
       "bytes": 2318,
       "sha256": "fc59513b515a452eb6f7ba793f1a3592ce628cca2c79585ddc152dcde6909dd6"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_map.rs": {
       "bytes": 778,
       "sha256": "e96e761f1a25a7c609060b8fcb526eafad4821f3ace6d79790b1f94c35bdd554"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_mut.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_mut.rs": {
       "bytes": 4769,
       "sha256": "d9ce16583cc87f7697f5e5307c15b95564af661dfee831364e80a3af1e12e1db"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_read.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_read.rs": {
       "bytes": 13623,
       "sha256": "0fc50fb8fc9da8951427de3f96d6fd4e81d13b99ca97a3e9f2ae90329e9ab71b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_read/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_read/tests.rs": {
       "bytes": 13896,
       "sha256": "680feb5f14c8939678423cea2f5567e3b019608aeadf92f41a4e67f8ec4aefee"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_read_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_read_generated.rs": {
       "bytes": 1077876,
       "sha256": "b4ad0a8a5fb16af87f3b662a818860b0d26672f0769cace955b4a3456d79afc4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/node_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/node_text.rs": {
       "bytes": 8168,
       "sha256": "36c772c75efaf6ca385ba4325136a312b5d090fce2026798d5f2e6331c78be79"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/precedence.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/precedence.rs": {
       "bytes": 2588,
       "sha256": "91a839ceb4560c8c1c76bc673911a2f6fb74dc7992b42c0f2268ec13c2e866e7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/runtime_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/runtime_generated.rs": {
       "bytes": 314422,
       "sha256": "eab8712978374e0ffc18c70631577d48ab16eb95cf41b612e93fcd5a295a8223"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/runtime_id.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/runtime_id.rs": {
       "bytes": 1549,
       "sha256": "7b7b627fa71a91af08dc7dcbffa818e7ed96a0a978566633d261913c6219029b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/source_cache.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/source_cache.rs": {
       "bytes": 2814,
       "sha256": "e928122c419eccd948aaa093127d4cf97f128623fb9dbeddb5f53f43c14153f1"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/source_file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/source_file.rs": {
       "bytes": 29677,
       "sha256": "ec8631d098ec22eb56b8be431d8c819e2fcf2611eace806093473cde7e5c51fa"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/storage.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/storage.rs": {
       "bytes": 57898,
       "sha256": "223e913beaabac3741ff0ebe5981c53be51fe06b742de67b0a150d1b3dc4c6eb"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/storage/parent_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/storage/parent_tests.rs": {
       "bytes": 15430,
       "sha256": "71a6ef5d0dfc5a61600c89dbb5a571ce5c9c171f7fabff646a2ba02c9449cd3b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/storage_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/storage_tests.rs": {
       "bytes": 50157,
       "sha256": "86c379ef17910d95d9cd3cb15109b65dc07caf36098b60437355fed125ad3068"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/subtree_facts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/subtree_facts.rs": {
       "bytes": 46726,
       "sha256": "e9a1840cbaeb8dffd850e0e5a2a46ed39e20b1d695a455c2d2a88957b6978355"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/subtree_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/subtree_generated.rs": {
       "bytes": 20542,
       "sha256": "b87170d4277becfe8d6fef324747d630c1cc27f725b0560022ede7aed0ebb63d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/symbol_access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/symbol_access.rs": {
       "bytes": 8004,
       "sha256": "ee1c8f72f96aeb602ad21f81938f1d786a83b783d8afb7a7dee19ed1ab716749"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/symbol_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/symbol_flags.rs": {
       "bytes": 4440,
       "sha256": "b858d284062ae5820fe9f11c062e0a9cef5ae5cf58097a7a8ba8405d62c76004"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/symbol_store.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/symbol_store.rs": {
       "bytes": 30913,
       "sha256": "e3d2121a1bd4f5ce4b8c081e0848306c859a59d889d6771df0fd6d3bcd36488b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/symbol_tables.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/symbol_tables.rs": {
       "bytes": 27776,
       "sha256": "e237dc99b0a35c756b5a72932602bf9615220b457c40a7f4a39fe4ca3ce793ff"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/symbols.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/symbols.rs": {
       "bytes": 23428,
       "sha256": "2917c5d27d364976617c773e310de31ce6bef44799331f800a3105b3bd2b18b9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/tests.rs": {
       "bytes": 10026,
       "sha256": "ca45da0f4956b1e343a9a6838bff94cd0db0dbf3be16a7cf05febdc5e298f5dc"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/tokens.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/tokens.rs": {
       "bytes": 2575,
       "sha256": "736373a7cf837554476cdfe7c0a1b52327ca9d6f2273d5409e66974869f25bca"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/transform_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/transform_generated.rs": {
       "bytes": 147909,
       "sha256": "e2de7f1a1cba21758cad6aca834d3c53c8cb6ddd170c89894b4c03e4532d2013"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/utilities.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/utilities.rs": {
       "bytes": 41180,
       "sha256": "788fdc0306d97d04ff4948ba59d6cc19c4803babb438fb5a70e208db9a7e704e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/utilities_middle.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/utilities_middle.rs": {
       "bytes": 31303,
       "sha256": "7d248d05f4f66ac678063d7c86218147dbe09be42221b1e9d9a9106c8c54b7cb"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/utilities_middle_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/utilities_middle_tests.rs": {
       "bytes": 14992,
       "sha256": "0c157ec06dbf72ec71a8072851935c93268a90425d2395af217e05a04c8eb0da"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/utilities_tail.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/utilities_tail.rs": {
       "bytes": 16319,
       "sha256": "bacae41e80d643e6990b103d470a946a0d15a028161d863b8356a60ec95faa97"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/visitor.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/visitor.rs": {
       "bytes": 25886,
       "sha256": "1fafbf24caf63ec127635c7ed43b32300ac10bd97c21171f5bcd4c238f963366"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/src/visitors_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/src/visitors_generated.rs": {
       "bytes": 135286,
       "sha256": "4f70f5ece61d42eb092a0a336c217f5141c90799e9905487046f1bed752718b6"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/generated_runtime.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/generated_runtime.rs": {
       "bytes": 15823,
       "sha256": "32ab86af8ae5a9eac40e4ffd553145db9bb1f392322b46a646d06aa5b3a221ff"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/node_accessors.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/node_accessors.rs": {
       "bytes": 43017,
       "sha256": "f7db8652ef6b12706d73118631486f609593aa8765b104057f71f2b412aa18e5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/source_file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/source_file.rs": {
       "bytes": 6605,
       "sha256": "976aab181129b1138d4c1e0fcd48b651f988c9f3833aab143838ea3d787a1056"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/source_file_quote.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/source_file_quote.rs": {
       "bytes": 1393,
       "sha256": "cd1a87da77361ad555ea17c7076c288d40d14eaacefe323b71f838e3cc9b0896"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/subtree_facts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/subtree_facts.rs": {
       "bytes": 4871,
       "sha256": "24739cf67262ba4e8f4d38bfc430b01389b69df6e7d12c9fe8028126935a01e3"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/utilities_front.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/utilities_front.rs": {
       "bytes": 22221,
       "sha256": "87b43fb2450baaec4081c3267b9e53d6cab5925c4036dca3fa796b5d31c5a6dc"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/utilities_tail.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/utilities_tail.rs": {
       "bytes": 13960,
       "sha256": "b0cb0b90bdc18d32f11dc02f292c5666cb43ff1109ea02aa0fdf656df6c61ccf"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_ast/tests/visitor.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_ast/tests/visitor.rs": {
       "bytes": 8768,
       "sha256": "69502e18de6e520410e4a2dbf1ea8710b5406b539a1ed1a07e5a30e141c138d5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_bench/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_bench/Cargo.toml": {
       "bytes": 891,
       "sha256": "adebda3951ce4cf52fb875a26f9853902cec3f24c5cf4383e09c5be70e49b472"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_bench/examples/allocation_probe.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_bench/examples/allocation_probe.rs": {
       "bytes": 2444,
       "sha256": "45243d90db254cc125c4c6594df7ec997b7259929598706e4f53254a0cf92bc5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_bench/src/main.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_bench/src/main.rs": {
       "bytes": 16249,
       "sha256": "1c5e996f6661e8df961262b708673df25c7521784ca0a1fa9b35af2f827c1f53"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_bench/src/workload_graph.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_bench/src/workload_graph.rs": {
       "bytes": 3849,
       "sha256": "006b1f4d21f5fa1c05851c9da41de94d0094c46e5dd2d082beb562d8efc182e3"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/Cargo.toml": {
       "bytes": 703,
       "sha256": "10f0af4951de460699133b6e09fd3c6c520c6faeafd39311f13047dba1b4768f"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/examples/binder.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/examples/binder.rs": {
       "bytes": 3712,
       "sha256": "a9e3c06aa1733c348622d9cba92636c1766d3a985110a4acbe97df6352090627"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/examples/support/graph.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/examples/support/graph.rs": {
       "bytes": 20373,
       "sha256": "04ddf8c491f6e6cb13e9e91613f3da235b1badee460c1ee12aa71625ff7e6153"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/examples/support/graph_stream.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/examples/support/graph_stream.rs": {
       "bytes": 1026,
       "sha256": "1aa5a6f258c71ec07d69e9c329fb25de2a6c028c060bb855eaf6e1d74131dfcc"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/examples/support/syntax_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/examples/support/syntax_generated.rs": {
       "bytes": 85388,
       "sha256": "8db07241835078b22fd1b312c2216dedf5ba330ba070ec80ddfdcd37f63004d7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/binary_trampoline.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/binary_trampoline.rs": {
       "bytes": 5381,
       "sha256": "be1795ccad7f466e9e3a93318199b48fcc62621bc4a96651dbe09f7247fb2857"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/bindings.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/bindings.rs": {
       "bytes": 12664,
       "sha256": "ffe1b044581caefc0cc15bf5c65e7d7b8f761be3ad1a1d7eb4170b138e053da4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/bound_factory_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/bound_factory_tests.rs": {
       "bytes": 4702,
       "sha256": "69360329f881d5d610c4049e292da9f912a00dd7deda6833e2ceb6b706342d02"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/containers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/containers.rs": {
       "bytes": 31602,
       "sha256": "6b7ffd2517b2f8e2a9c5e4c8961f95f5365f1147d4ec7af03ff2c77ebe3eb441"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/declarations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/declarations.rs": {
       "bytes": 24336,
       "sha256": "5797bed22943069d02fcd53baf4942b9f9abfbf15cab66a7708ad8990ba836ab"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/diagnostics.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/diagnostics.rs": {
       "bytes": 11429,
       "sha256": "5326cbb8c585ed5a7fc9bf2409440c2525a6d0ef3b9f9a2b1e9f193cce230c22"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/dispatch.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/dispatch.rs": {
       "bytes": 9784,
       "sha256": "bdf74dc270a8097f6faf0eda83c27f9ad313899f8db7ce901105016f6bf95efe"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/exclusive_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/exclusive_tests.rs": {
       "bytes": 18004,
       "sha256": "81be0401a479199b75d6ed179c353e0b4f58b7af6543b0cd79034f3684f28acd"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/expando.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/expando.rs": {
       "bytes": 13745,
       "sha256": "ef34814302be9775cbc9f84939b01d1317b44a83a81ceda686ba22b21685ecaf"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/expressions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/expressions.rs": {
       "bytes": 29203,
       "sha256": "90d292b73fda85eeb125307ad04fb6eba2de960f461bf0ed1edaad9feb20e163"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/flow.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/flow.rs": {
       "bytes": 15437,
       "sha256": "af3d4b3714f85134376e7fdc17e1e693a320850a18d2fb47db04dbb6d6f7bc52"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/lib.rs": {
       "bytes": 2845,
       "sha256": "275e1bcc443614d1b5991f9426c668616454d6054eb22941bb6cb97e63836c5e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/modules.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/modules.rs": {
       "bytes": 12717,
       "sha256": "0fb3e6e0fbe08a1d5d44018b67fff25cd29d7e1db8eefdc9b87eaebf4298e521"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/name_resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/name_resolver.rs": {
       "bytes": 40969,
       "sha256": "d3bd02c3a3c11d5d9483fb1d607da745c82a8156d9977a4dc0f98396daaaf68d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/recursion.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/recursion.rs": {
       "bytes": 1882,
       "sha256": "8cd18c8ab38f278fba26d774b63fbc0e479c65f491a2e59e953e610ede8997b8"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/recursion_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/recursion_tests.rs": {
       "bytes": 6561,
       "sha256": "65287004d63ee75e1d1aeb17f90b3191bdfc55c30f5016bc10545e2470b1dd79"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/reference_resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/reference_resolver.rs": {
       "bytes": 16739,
       "sha256": "37fef0f9f612d0e4a6684c369212560740a8d7d0a7fbd741b79f7ec586299435"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/resolver_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/resolver_tests.rs": {
       "bytes": 31638,
       "sha256": "366f10a9fcb27e1d269b35c7d80fbcddccce3390f8ff107f937f9455234ff49c"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/state.rs": {
       "bytes": 6799,
       "sha256": "e2e2c79fdae2c875f80b5b5e61a1c3625912152892c1b7050dd70a399be3d581"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_binder/src/statements.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_binder/src/statements.rs": {
       "bytes": 19924,
       "sha256": "80ffe20c438b6be945f6de0d78b559e3fab5018a10257d90b2f38aa13c5fd9b8"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/Cargo.toml": {
       "bytes": 253,
       "sha256": "c770d0652338c9df47832ef78b73ab70c9c8b61d7d8e938d17b119fe7d17981e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/compiler_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/compiler_options.rs": {
       "bytes": 15006,
       "sha256": "852f73c80a72987458aed2f278bc2ffe2aaf7d959c78bf3952e3aa43d2bb6517"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/go_sort.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/go_sort.rs": {
       "bytes": 8095,
       "sha256": "6ce269db5e2e18f820381b3834fa8ebfa3302fcbdca19c55325de53c9397aa28"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/go_sort/fixtures.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/go_sort/fixtures.rs": {
       "bytes": 544324,
       "sha256": "1fc5503d0f16200e1ae51ed9c71bc81c8e15193a4b92270997495f31f9fd8d7d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/go_sort/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/go_sort/tests.rs": {
       "bytes": 3461,
       "sha256": "94fa2c7d2b7b9e7841860cf4924eefe068e7ca3744bd427e286da495e52f59d4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/lib.rs": {
       "bytes": 5496,
       "sha256": "25057a7cc0782cd07dfe50dd35eee50c1e39318267f2b8ea6090ca8537026ea3"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/path.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/path.rs": {
       "bytes": 6612,
       "sha256": "c03edb5bd8e003794d06a1d55a0a43cd275be47e25192c2c93514a4fe452796b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/src/pattern.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/src/pattern.rs": {
       "bytes": 4579,
       "sha256": "b1ef99c4a2ae50204318684a809a524bdad475807ffe414a85e0f2bee416a296"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_core/tests/ranges.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_core/tests/ranges.rs": {
       "bytes": 418,
       "sha256": "420a7b25da675a45b7c4aaee06cdd095b290932e16ba4c848c84d9e417a41485"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_diagnostics/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_diagnostics/Cargo.toml": {
       "bytes": 183,
       "sha256": "26a877f6ead43f7d51ef3f8e916815cbd324a81b130f88481568fc7b5c937713"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_diagnostics/src/generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_diagnostics/src/generated.rs": {
       "bytes": 1080829,
       "sha256": "f3370a8cf9b3626c7a6d91e6c581b7f26e5f6ed3f1d93b82043436032e524d9d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_diagnostics/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_diagnostics/src/lib.rs": {
       "bytes": 1327,
       "sha256": "4bcd28bb76616d4bda3a9798bfd0892587ddadbcf2d3851fc38831a157cf4326"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_diagnostics/tests/messages.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_diagnostics/tests/messages.rs": {
       "bytes": 2125,
       "sha256": "bc572ea21ae17b0e08a8c6312ebf366191dea703a4ba45ac667fbeea8517a1b5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsnum/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsnum/Cargo.toml": {
       "bytes": 314,
       "sha256": "37403cdb8a1c117564da9fb73485c21b806933ecbaacad5f600f85d945f3e4e4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsnum/src/bigint.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsnum/src/bigint.rs": {
       "bytes": 3304,
       "sha256": "7b09ebb7f0b61509b9730252841e7f0c28c10259b43755fedb9821a59b09c92d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsnum/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsnum/src/lib.rs": {
       "bytes": 1562,
       "sha256": "d8c72a19c7bad5437f30a435f30942c2b4b2c447bf88eda792c0230019a94462"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsnum/src/string.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsnum/src/string.rs": {
       "bytes": 8016,
       "sha256": "9768de8ee11510db578e0bb6c65d1ec1940e66c4fe0093bd8f13f67f61f5c45b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsnum/tests/contracts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsnum/tests/contracts.rs": {
       "bytes": 2367,
       "sha256": "28dae470a81702e1422e30d199ff786d473b58a7d47875f1f6f27032779295c6"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/Cargo.toml": {
       "bytes": 266,
       "sha256": "8a01237168087dca6418ee34fc75a3bb2b22a7ec9dfa173060b92a6f322a254f"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/examples/e4.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/examples/e4.rs": {
       "bytes": 14804,
       "sha256": "09e8c30c22460005ab594148cdbf64d8c8a93d06f85bcc7cdfb38b2a54a828eb"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/case_tables.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/case_tables.rs": {
       "bytes": 174266,
       "sha256": "8f15bdc816ce897d49d4339f16e8cfd9c8e800da8f95ae6bbab631bc872fb14c"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/escape.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/escape.rs": {
       "bytes": 6368,
       "sha256": "70af910d3e0013a956f813483abf79f17b62a3074e598887ec839b25cb9fcfde"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/go_fold_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/go_fold_generated.rs": {
       "bytes": 60386,
       "sha256": "08677ddcc7a94fb1cad65720dd8c6fefc34359180223e233c5f34e15583aa87a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/go_print_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/go_print_generated.rs": {
       "bytes": 17026,
       "sha256": "08b0d3211960d705991ee2ab4021dba91139e268c81afceb6855743a2a2ba202"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/go_quote.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/go_quote.rs": {
       "bytes": 2992,
       "sha256": "0157beb12f4ba6663c4267e882d06069bd71afd9a5b5949ec1aab4ab47723af1"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/helpers.rs": {
       "bytes": 5804,
       "sha256": "1cadc3f0d89dea0d377aadf629108ee4041b66f4e48d134dcaad48969ab2ae2b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/jsstring.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/jsstring.rs": {
       "bytes": 4586,
       "sha256": "49a0699d71b2e2f72988d154b9b651cab9414be9337179d4c246b6a33ba533a2"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/lib.rs": {
       "bytes": 717,
       "sha256": "fe7678f38c17a48ccd19608a38997b85c20f115363a38e998ff6720e3e0f2493"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/line_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/line_map.rs": {
       "bytes": 6958,
       "sha256": "8736565b640c276f90fbc00c181aaa9bc48bb407eda6096d153313b44b940bb2"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/lsp.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/lsp.rs": {
       "bytes": 2726,
       "sha256": "cf8c9eb289d64a42f2da3bfa6ab8d10b53cef397f0f6e2e76c91ef44fe2f2f22"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/position_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/position_map.rs": {
       "bytes": 2233,
       "sha256": "b82362aeaeff4d28a3a432a2880d1b4c955f7a6fc282986324ee9e24c30f9008"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/scanner_positions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/scanner_positions.rs": {
       "bytes": 5562,
       "sha256": "8cdb3de20df076f605973402b34a0ebcf015ccc1b619e942676941af061aee9f"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/simple_fold.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/simple_fold.rs": {
       "bytes": 1170,
       "sha256": "282205fa4b890b9483c44a9b5989518eedfb4db8670a043cb98a105bfdb7c28b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/source_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/source_text.rs": {
       "bytes": 3294,
       "sha256": "d0bd8314992bc1c2a986db758b9d407082fa0a5baa700e5e54198a813d98a4ca"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/src/wtf8.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/src/wtf8.rs": {
       "bytes": 5289,
       "sha256": "e94eafa75fdf557f16d3c378362b9199280cb3890e4ad27be60377d183f1f034"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/tests/core_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/tests/core_helpers.rs": {
       "bytes": 11457,
       "sha256": "ca7083023fdfba68fef755fa16b7f4cb0cccfabc4cab79911b820f4d38f37fcd"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_jsstring/tests/positions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_jsstring/tests/positions.rs": {
       "bytes": 11059,
       "sha256": "8092d3f21635dd607c3431a918342279097c9417c4e091aa180a1762dbcbec1f"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/Cargo.toml": {
       "bytes": 701,
       "sha256": "e8fd36a52933fc2b8a3985dd78b597dfe5258e07935d78e12ed7b03d6ce33454"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/examples/s06.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/examples/s06.rs": {
       "bytes": 7245,
       "sha256": "3868e1b47d0aa3f9151b2c946b032eb999e5bee86c42a189234e01ee323eea6c"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/access.rs": {
       "bytes": 22563,
       "sha256": "32fb42cd7d334e10e05b4e0378706cfa023aff600c584abbc6a757c868bd7179"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/ambiguity.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/ambiguity.rs": {
       "bytes": 15457,
       "sha256": "31fd2fa681f317b1f6973121b4aaff52bcf57c10b1cc2f3f3d0589c04d52ed40"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/bindings.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/bindings.rs": {
       "bytes": 9538,
       "sha256": "ae1e13573d3eb95bcdb1ff0d7b05bd92e835a6dbe3ce80cd6cb366472742f004"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/classes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/classes.rs": {
       "bytes": 21215,
       "sha256": "9036a310936df319df9d1953766aa1709c1ce2a3bd38013d08eda76fb3f1c016"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/declarations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/declarations.rs": {
       "bytes": 13290,
       "sha256": "4011c8062f50d60af8438f6b997ba37628559dbf955f9cc1b29a309a3f3a1c34"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/diagnostics.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/diagnostics.rs": {
       "bytes": 8528,
       "sha256": "56d1046ec6b505b04f5141770a84cfc4a7724c239f1acc0789a134ebd6aa94c3"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/expressions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/expressions.rs": {
       "bytes": 24217,
       "sha256": "6827de05d2e2cf56eb5797384bdd5c5ba3cff01e29ad3436b0d783314a221c3d"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/factory.rs": {
       "bytes": 3071,
       "sha256": "a77e228cf131b89231df5da0f81f9ab8cbd3f27269bb07b81d1ebd5257579ecc"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/factory_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/factory_tests.rs": {
       "bytes": 6273,
       "sha256": "ec67e1ae69a5cf453827290e0c5265f4d0084f19d5f88db812e3364e701cc777"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/identifiers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/identifiers.rs": {
       "bytes": 9013,
       "sha256": "cf2b5f13e05b46d81c089a2a838222fe25ec2659a2056597d48a868b9611f762"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/imports.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/imports.rs": {
       "bytes": 18554,
       "sha256": "d43ace673479bd8547bf8376468b7d1cc01d8c264b83b4f51782f554ec12ca68"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/js_syntax.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/js_syntax.rs": {
       "bytes": 21980,
       "sha256": "ee9efb045275b6e7b428aa398ead01da180f65d9ac2743be984c12568c699410"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/jsdoc.rs": {
       "bytes": 68109,
       "sha256": "1a4c7e3aaf5438a8e138e3843fdab3b595ab0df9ce600a1a0e034b4e6e1fc170"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/jsdoc_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/jsdoc_tests.rs": {
       "bytes": 7315,
       "sha256": "f8516a863d4166dba708c6a1b8988bbf9f0f9a18b80a61334629d081b385f19e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/json.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/json.rs": {
       "bytes": 9246,
       "sha256": "f8d1a9c36294a7f44a6e86f693cf3192ad0ddf709e254d3805a7b1405ea2a43e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/jsx.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/jsx.rs": {
       "bytes": 25089,
       "sha256": "a83e41dfbeabf303172f899ad53f3adb93ebd11ceb05cebc308229d3a5778e82"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/lazy_jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/lazy_jsdoc.rs": {
       "bytes": 3124,
       "sha256": "977aa7920371a65ea5d36fc942fb5f1b13e576f52ac48f9dafc860eda5012514"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/lazy_jsdoc_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/lazy_jsdoc_tests.rs": {
       "bytes": 6588,
       "sha256": "2a3226eedec26e7e09e1399b518e344c5dab06ec5944e6247a2a06479844b7a6"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/lib.rs": {
       "bytes": 1489,
       "sha256": "4c818a055e81b73b9dba92448c200df6b1606f8347a87ba2ebcc7c082a556a8e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/list_buffer.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/list_buffer.rs": {
       "bytes": 5530,
       "sha256": "98c11206f94669871328bd29328a2598120b4e814e181a0a3d02e13b204f2866"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/lists.rs": {
       "bytes": 16421,
       "sha256": "ffa71d62a516dbea998827db346213bdce8dd6db6539443b37e5d354b7a41a6c"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/lists_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/lists_tests.rs": {
       "bytes": 5478,
       "sha256": "639693e612b9578e7c646ce0d90498262047d2596cb51d231c5e50404ade1d1b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/modifiers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/modifiers.rs": {
       "bytes": 9158,
       "sha256": "6d65bc46b8896c7bf49d5d5235771b5099d541e4e6805086b184387cb23b62e7"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/orchestration.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/orchestration.rs": {
       "bytes": 14460,
       "sha256": "591d1fd921ebb1d3cca02509cd45742105e741903ec00f1cbf5d54076faf16c5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/pipeline_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/pipeline_tests.rs": {
       "bytes": 14332,
       "sha256": "0fb47e4ec0543df24178788c5dfed42926c630947fedd4ee370843a70c345861"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/pragmas.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/pragmas.rs": {
       "bytes": 11796,
       "sha256": "bd0c765e9aeae53e2096691aa4d2db813e97ba2bc01831e6a7fc2341f6aa6fb0"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/predicates.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/predicates.rs": {
       "bytes": 16398,
       "sha256": "396abf37b37978718e3044c357f7c8683efbb15286d66da9c621d0f98e45d266"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/primary.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/primary.rs": {
       "bytes": 12361,
       "sha256": "629abbac9cfd104016587504ea325219c1aca8f7dd5d2bc4a5aa2cd063dd6780"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/recursion.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/recursion.rs": {
       "bytes": 1386,
       "sha256": "4161092b0ed0b1adc07b8eb94b3fcebd4e06e7f9e254f2e83e47178a3e011ce9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/recursion_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/recursion_tests.rs": {
       "bytes": 3557,
       "sha256": "7d19b2025b1cb48ffcc823d97d560f4e28849968025510fad854fcf7fe619358"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/references.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/references.rs": {
       "bytes": 24167,
       "sha256": "c348dabf16f37548e5b8226b11aa34444e7aefc314fcb9d0ae039ab21b9847a0"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/reparser.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/reparser.rs": {
       "bytes": 72182,
       "sha256": "6aa182f0dc9cdd59467a510c90a8411ceb3a0f606d53734b2674115d3cc09ba4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/signatures.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/signatures.rs": {
       "bytes": 27685,
       "sha256": "5f6fb8635fc3b9def4ab23385ac8d34faba6c842f88ed337412606818609927f"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/source_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/source_text.rs": {
       "bytes": 4356,
       "sha256": "2e65b4e718be527e255423f27c48bcb89a102149381c0baef95961e770c42074"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/state.rs": {
       "bytes": 15889,
       "sha256": "685073128bdf99e88fca29a07048e1db25a13275b80f030472659a9790e23204"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/state_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/state_tests.rs": {
       "bytes": 7400,
       "sha256": "2f5932404a3aac08277a90ba04bb68831c79edd422efe937a83303861fd48f36"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/statements.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/statements.rs": {
       "bytes": 20867,
       "sha256": "9aeac21056aeaf4ed0358e769e6bcf054eaede519b20ba386513aa2b434fd9ae"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/tokens.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/tokens.rs": {
       "bytes": 8890,
       "sha256": "26037efa44ca41049f85aa82f45ecd00ac58ddf61a513d2b819efcf4a859f186"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/types.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/types.rs": {
       "bytes": 33487,
       "sha256": "12a742961183ab7f3e0b92aa643a7464a4ba38d7c30d76027c3181bf1cc71b10"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_parser/src/worker.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_parser/src/worker.rs": {
       "bytes": 2672,
       "sha256": "95b57aa28ae30d5d574145172986df6f40295fa27836d21a23963e1da789ad1e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/Cargo.toml": {
       "bytes": 643,
       "sha256": "574e9929dbb07b159799c649dc11514490ca0b2675a3fd120c9b739adc34c684"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/examples/s05.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/examples/s05.rs": {
       "bytes": 32906,
       "sha256": "da8fb58286c6abafb6513aaa462cfa96c24f95a8875a44c47fdf726f92ab9ed8"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/binder_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/binder_helpers.rs": {
       "bytes": 13137,
       "sha256": "fc3c74140a71cc90ca7661156220fa0b820e4c7a8ef503acb331a445e68b1546"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/binder_helpers_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/binder_helpers_tests.rs": {
       "bytes": 11852,
       "sha256": "e1018f6cc24970f8d118b95089d9edd8540b7c6e0020767144a31078bb4739c9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/escape.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/escape.rs": {
       "bytes": 11614,
       "sha256": "3332e32b61b4009102b609c17a88b5814e6365d5466dc9f1fc400c57dd433059"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/identifier.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/identifier.rs": {
       "bytes": 8787,
       "sha256": "17bf1b82603603c0fb8778e0e76f7a3f69ddd2e3abbec2c50b8a5bf3abdbdde4"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/lib.rs": {
       "bytes": 1295,
       "sha256": "1c509f81ec0bc3faed0342ee700e7e14bcdf4e91c0b517be456c06276a5ffdd2"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/literal.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/literal.rs": {
       "bytes": 5094,
       "sha256": "a425034d16a0a16a14d3357e158ce1e68f1b0e626d3886801d795cca4ee40ae1"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/number.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/number.rs": {
       "bytes": 14089,
       "sha256": "09d0348b68c2b88d9b4a9b6fa5ffe3f18b0570cd1b866bc95639119070807dd5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/classes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/classes.rs": {
       "bytes": 17239,
       "sha256": "b7adec234e62ee8ad629f34ebe2acdefa9fd40e50c5468f6212d7cddbbaa4771"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/escapes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/escapes.rs": {
       "bytes": 8073,
       "sha256": "9948939c835ab125c76090f1d2e3f1c511ee9973409a2b5c26f29a53d8152e57"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/grammar.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/grammar.rs": {
       "bytes": 12321,
       "sha256": "2bb6deef5844e7b1c40093892ac452043acf37385b8bdd4365310b0fa28e6229"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/mod.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/mod.rs": {
       "bytes": 9725,
       "sha256": "12b7a2edf770d6390c92481ad5fde1ae423dedc5c7cff2f1cf22660f0e70427a"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/properties.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/properties.rs": {
       "bytes": 8301,
       "sha256": "9b43fd5c47282d2fbae74b355e82b43cbb114f9c8f5b2b64931e704bc0421875"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/regexp/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/regexp/tests.rs": {
       "bytes": 6762,
       "sha256": "2e2c66cc771e2c1f82a20226488b4a919750fb943d6bd46f442ea3d676a49cd9"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/rescan.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/rescan.rs": {
       "bytes": 18634,
       "sha256": "e9fb6ac8c64b8208e4588a5f18515ed9feca2647ba8534f01e3bf48dbabcc41b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/scan.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/scan.rs": {
       "bytes": 23470,
       "sha256": "e12d1af95a7eff49db94686e6d5f6f584d8af258d56c6378e345758ab6ba0256"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/spelling.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/spelling.rs": {
       "bytes": 5271,
       "sha256": "28e2836af7ecc857a17308182ec2ea438eb88f81c6b4aa1a2858a962d22beec5"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/state.rs": {
       "bytes": 19441,
       "sha256": "28136383b2ae201c991b6d8717b34f83f92a1f10dadd15faf43c30caee666158"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/tables_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/tables_generated.rs": {
       "bytes": 46465,
       "sha256": "cb2b9f244c059703aef34ac66e5a17504c3eb70841f105b128e933e8cb9b966b"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/trivia.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/trivia.rs": {
       "bytes": 15211,
       "sha256": "59233c84abf6d38051d97d946a949c216107c48898cbbd555aec51a30bdbf35e"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/src/utilities.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/src/utilities.rs": {
       "bytes": 4359,
       "sha256": "6f8bf7ac9be2d39488b2b9c52935929f1b3f1d8ad03595cad37daa3dd52522f1"
     },
-    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/ts_scanner/tests/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build-failed-metadata/source/crates/tsr_scanner/tests/state.rs": {
       "bytes": 8762,
       "sha256": "65c990ffe13c595516622a899a254939f56ed43d8ff9ab6931d0f90da4127c0b"
     },
@@ -1390,1231 +1390,1231 @@
       "bytes": 2754,
       "sha256": "864f466bf9ee93e39b428cb7ad2eec0c623d304378410118e1bc213d4674708d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/Cargo.toml": {
       "bytes": 373,
       "sha256": "d6e45a256f941cfd17c47d0a0b0de979d2bf5e3ccce1cb4457ce5cb6958fd395"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/examples/e3.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/examples/e3.rs": {
       "bytes": 3694,
       "sha256": "d399f7fdaa594018d2888d1f2ffbc2f1c7bd2b742f74bae07d7bf147987c4a5a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/arena.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/arena.rs": {
       "bytes": 4609,
       "sha256": "3a2f84d06455880a42c62865292660d3bd4496dc1c9f5640e0a235b560f11a09"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/bundle.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/bundle.rs": {
       "bytes": 6281,
       "sha256": "d4f237b48705f8dc42a63eb048dfc4690f1b0e1c50316781819ec55a0086b591"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/counters.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/counters.rs": {
       "bytes": 1735,
       "sha256": "614bfdf7cc1417e76ae0d4a1b67d800c3c38fd29495da5066149a2232938cc48"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/error.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/error.rs": {
       "bytes": 1366,
       "sha256": "cd5d7dcd1a92a735df4988ab38718585d0e1bb43eae63f0606eed33e7a2d803a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/file.rs": {
       "bytes": 30729,
       "sha256": "39c01c45d878fa0d4065f3b265b4d4e9ed37dbbc7afc3d96db5776ae46540625"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/ids.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/ids.rs": {
       "bytes": 3444,
       "sha256": "e9c3cdd888b90de7a4da71b8e90048304286989b3598200cb30366c81a5fa33d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/initialization.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/initialization.rs": {
       "bytes": 1977,
       "sha256": "f09dbcfb2c0bd9d9ea21cbd5658a59d209e72877432a724a8468305150b65bc7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/lazy.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/lazy.rs": {
       "bytes": 34368,
       "sha256": "d5d517621e3ac0abac87cce5c4e02f44aaed55ba495a8f94d1c475d773b58e61"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/lease.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/lease.rs": {
       "bytes": 3639,
       "sha256": "ce3dec420206efa6e6f87926bccdf7628717f9fbcec2de2a583efe6b36e75697"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/lib.rs": {
       "bytes": 2150,
       "sha256": "71db2009cd0a01b088d06267934183c76db73773835dd0e1b1f1c134a8f7261c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/node.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/node.rs": {
       "bytes": 1618,
       "sha256": "19e91f4a7ec38521e761e8f55cf3543a9954ebb0acc6f39c3d456aebe8a31260"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/node_slots.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/node_slots.rs": {
       "bytes": 4706,
       "sha256": "31f586e4fdc20d115acb5dbcd0a909e83ae48f734ca1883a3f639a41ac4599e0"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/owned.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/owned.rs": {
       "bytes": 3351,
       "sha256": "5133b7fd30def6a918f9d3e598b2398275f7499a5227aa03ad3038a042ff4b1d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/refs.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/refs.rs": {
       "bytes": 12432,
       "sha256": "856a61aef256dd14686e041553a3718035ddb429d409fc4cc91cf9caac75deb9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/scenarios.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/scenarios.rs": {
       "bytes": 21096,
       "sha256": "6ff2c8c4d1883978ddc5d2381d911c70be8a0dfe939e606cf1507201262d5469"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/scope.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/scope.rs": {
       "bytes": 4754,
       "sha256": "d1207e16acdb6a85ae40ebffbf938812c7c9f961bf17af8c99df2c9cd42ccb43"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/scratch.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/scratch.rs": {
       "bytes": 734,
       "sha256": "01f5fc260686fd72b5fe23de43c4571494f5fd69ab45814059a7a417b392b1f4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_arena/src/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_arena/src/tests.rs": {
       "bytes": 11832,
       "sha256": "6e29ecf5c5cf4cfadba7f1c339b05c41409e24ea2452d096338b8e873be3cc8e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/Cargo.toml": {
       "bytes": 541,
       "sha256": "ac845bcf63ab0f8b5aaf5932e107e34c168f5c69a4989cde8507c36e5042b812"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/examples/support/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/examples/support/factory.rs": {
       "bytes": 29853,
       "sha256": "7c4bbe9284ad0de93a31a597723912efb6ad0395e39832057eda30414524eb86"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/accessors_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/accessors_generated.rs": {
       "bytes": 82349,
       "sha256": "741d265e01ef93cfc1d92d54f4e6c1079f6ec7cacca6752567b9831b58980f77"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/auxiliary.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/auxiliary.rs": {
       "bytes": 13624,
       "sha256": "ffc546b85653a48a65f3c48ac41de7e8a1a505ee14e6ccb74e043285edcdbf4e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/auxiliary_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/auxiliary_tests.rs": {
       "bytes": 6440,
       "sha256": "38cd727f8329635645a5da7df31e7cb3a7ec37e2ab49c8f188c8d92a96c1c3f5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/bind_result.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/bind_result.rs": {
       "bytes": 36758,
       "sha256": "5514c9f15fa8b8a7519b105f52694323fa5f624998e4ab64ec71e3311a16f45d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/bind_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/bind_tests.rs": {
       "bytes": 35985,
       "sha256": "2f6526fd56527989a9b9817fc7f2526277afaa9855e26a1675b4211a281f255a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/binder_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/binder_helpers.rs": {
       "bytes": 48607,
       "sha256": "6a21e501957147ba9d52f7789b53461cf379bb68c6bd005fb0532e23450a5a44"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/binder_helpers_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/binder_helpers_tests.rs": {
       "bytes": 17706,
       "sha256": "c629390a0d0013936746ebb746f7937cdf34e36b2f0c0a2a7ca8f78a16b43b65"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/clone.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/clone.rs": {
       "bytes": 5653,
       "sha256": "af9b7c5a22086ed4bcfcac66adf7c86768c4f1abf86c4147e09b904dcccc5a83"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/binding.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/binding.rs": {
       "bytes": 10582,
       "sha256": "9a4cbaf71f9f203ec01ab3e5c267b604949697c003827ed09fee1a4dbd9ebda9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/lists.rs": {
       "bytes": 6947,
       "sha256": "821f48aa4d7a18847bf9d6a5887d9e30123b13aba2223f60179de164ec8e88ee"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/mod.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/mod.rs": {
       "bytes": 10358,
       "sha256": "18e1390ea7f75cee7e03b1ae84234eec57a6309c329829b3f344cc1683ad0fd7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/pages.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/pages.rs": {
       "bytes": 2151,
       "sha256": "865963a98a1bbf8be02d6c3df2a5958ddf4121bcaa6da36c1c98659c4278c77b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/tests.rs": {
       "bytes": 12463,
       "sha256": "049e1028f60f27a6734ea59c92e3878a56b652e68e34080191193c29d44da929"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact/text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact/text.rs": {
       "bytes": 6928,
       "sha256": "4d859ef942374758265b3b803a2d60dd7a9e2b93f5d56f3c3645364851e6ed2b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/compact_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/compact_generated.rs": {
       "bytes": 814702,
       "sha256": "94a9757e78f318843bcbeaf52a102da4ff848786890c26b5c358d10823348190"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/data_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/data_generated.rs": {
       "bytes": 108706,
       "sha256": "8563c53e83fe66ea8d7a353102858dabdb5d570556150be53f96ec57f5879428"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/declaration_lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/declaration_lists.rs": {
       "bytes": 19119,
       "sha256": "916293efa97ec37e16c4d203f9fcc208b96ed4b1d5c92b93f980be9694318e3b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/diagnostic.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/diagnostic.rs": {
       "bytes": 3699,
       "sha256": "978fa40584f7d1e19394f921bd7eae4b79ff97feff9780568f21d88d4b01b259"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/diagnostic_order.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/diagnostic_order.rs": {
       "bytes": 6377,
       "sha256": "e4a1aa9068d55c180534b8689dffd047825ee4a0345e16b9abe3737fe96991a7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/diagnostic_order_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/diagnostic_order_tests.rs": {
       "bytes": 8247,
       "sha256": "b8f6f7dbfd8642ab9770d4fa3258609b3408c69669d1ea06fc4235311f5b5f5b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/factory.rs": {
       "bytes": 13077,
       "sha256": "a4111b3b9bd66605be0e1e64fa3188b76eab075379919e4c67cbe2ec71afc26a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/factory_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/factory_generated.rs": {
       "bytes": 606604,
       "sha256": "617dd18666619dd28d7c6fe6ac89fe460a100b99ffb8c808bcdb922f0d4c2680"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/flow.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/flow.rs": {
       "bytes": 6560,
       "sha256": "2b6bb4013e599f07f0b500cae24bc1f5261020212d0ed0ece58a7051e06ca184"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/flow/storage.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/flow/storage.rs": {
       "bytes": 21980,
       "sha256": "669f27a9df9ad7ec7cd6ad04558a41a9efef207e325775b3d65c86b0b224a9cf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/jsdoc.rs": {
       "bytes": 1143,
       "sha256": "f9acc8ea75f81982be823e0a8e86ed329b147935133e062b8c0c8be5bb9132ce"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/kinds_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/kinds_generated.rs": {
       "bytes": 75195,
       "sha256": "4b28d852a3d6934fd5fe3b2c625aba4b997afdccb790c13c1b406c51f9ad2a07"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/lib.rs": {
       "bytes": 10594,
       "sha256": "390f66e126a2318ca747cfd992400c533d40e7f613edc5e48e89c29ff6dac762"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/lists.rs": {
       "bytes": 11747,
       "sha256": "903aaad37e40fff0c33fa3c60f2fe8d93d7d456d40a772ab0d7860fa97486d4b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/metadata.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/metadata.rs": {
       "bytes": 6402,
       "sha256": "c753475bfdcab0c904d35d1c3e4ba3dd12cd038159f29abc098cb58ddd205b5b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/modifier_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/modifier_flags.rs": {
       "bytes": 2653,
       "sha256": "b24d0213f60508ada317579759b1ce4061c4ae74557003ba8436ab8c98b50aa9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_access.rs": {
       "bytes": 49950,
       "sha256": "2f64a62b369566871ca3660f754a37cc51fcf8f45fab65f1fcb6316a9f755ee1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_accessors.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_accessors.rs": {
       "bytes": 18028,
       "sha256": "cf29d8520115c34ee865a01e5e3005390d84f71332d077c112a1fcb6a95ba53d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_flags.rs": {
       "bytes": 2576,
       "sha256": "9596f9573bd94c6a804f1d98df40e850547ffb7523fabaaefeb9f95303f9ecf2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_index.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_index.rs": {
       "bytes": 4082,
       "sha256": "0ca7d220b434c6322981623961de0294ddb3522d66114b9530e8815996f4aa0e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_kind.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_kind.rs": {
       "bytes": 2318,
       "sha256": "fc59513b515a452eb6f7ba793f1a3592ce628cca2c79585ddc152dcde6909dd6"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_map.rs": {
       "bytes": 778,
       "sha256": "e96e761f1a25a7c609060b8fcb526eafad4821f3ace6d79790b1f94c35bdd554"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_mut.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_mut.rs": {
       "bytes": 4769,
       "sha256": "d9ce16583cc87f7697f5e5307c15b95564af661dfee831364e80a3af1e12e1db"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_read.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_read.rs": {
       "bytes": 13623,
       "sha256": "0fc50fb8fc9da8951427de3f96d6fd4e81d13b99ca97a3e9f2ae90329e9ab71b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_read/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_read/tests.rs": {
       "bytes": 13896,
       "sha256": "680feb5f14c8939678423cea2f5567e3b019608aeadf92f41a4e67f8ec4aefee"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_read_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_read_generated.rs": {
       "bytes": 1077876,
       "sha256": "b4ad0a8a5fb16af87f3b662a818860b0d26672f0769cace955b4a3456d79afc4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/node_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/node_text.rs": {
       "bytes": 8168,
       "sha256": "36c772c75efaf6ca385ba4325136a312b5d090fce2026798d5f2e6331c78be79"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/precedence.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/precedence.rs": {
       "bytes": 2588,
       "sha256": "91a839ceb4560c8c1c76bc673911a2f6fb74dc7992b42c0f2268ec13c2e866e7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/runtime_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/runtime_generated.rs": {
       "bytes": 314422,
       "sha256": "eab8712978374e0ffc18c70631577d48ab16eb95cf41b612e93fcd5a295a8223"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/runtime_id.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/runtime_id.rs": {
       "bytes": 1549,
       "sha256": "7b7b627fa71a91af08dc7dcbffa818e7ed96a0a978566633d261913c6219029b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/source_cache.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/source_cache.rs": {
       "bytes": 2814,
       "sha256": "e928122c419eccd948aaa093127d4cf97f128623fb9dbeddb5f53f43c14153f1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/source_file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/source_file.rs": {
       "bytes": 29677,
       "sha256": "ec8631d098ec22eb56b8be431d8c819e2fcf2611eace806093473cde7e5c51fa"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/storage.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/storage.rs": {
       "bytes": 57898,
       "sha256": "223e913beaabac3741ff0ebe5981c53be51fe06b742de67b0a150d1b3dc4c6eb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/storage/parent_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/storage/parent_tests.rs": {
       "bytes": 15430,
       "sha256": "71a6ef5d0dfc5a61600c89dbb5a571ce5c9c171f7fabff646a2ba02c9449cd3b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/storage_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/storage_tests.rs": {
       "bytes": 50157,
       "sha256": "86c379ef17910d95d9cd3cb15109b65dc07caf36098b60437355fed125ad3068"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/subtree_facts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/subtree_facts.rs": {
       "bytes": 46726,
       "sha256": "e9a1840cbaeb8dffd850e0e5a2a46ed39e20b1d695a455c2d2a88957b6978355"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/subtree_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/subtree_generated.rs": {
       "bytes": 20542,
       "sha256": "b87170d4277becfe8d6fef324747d630c1cc27f725b0560022ede7aed0ebb63d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/symbol_access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/symbol_access.rs": {
       "bytes": 8004,
       "sha256": "ee1c8f72f96aeb602ad21f81938f1d786a83b783d8afb7a7dee19ed1ab716749"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/symbol_flags.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/symbol_flags.rs": {
       "bytes": 4440,
       "sha256": "b858d284062ae5820fe9f11c062e0a9cef5ae5cf58097a7a8ba8405d62c76004"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/symbol_store.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/symbol_store.rs": {
       "bytes": 30913,
       "sha256": "e3d2121a1bd4f5ce4b8c081e0848306c859a59d889d6771df0fd6d3bcd36488b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/symbol_tables.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/symbol_tables.rs": {
       "bytes": 27776,
       "sha256": "e237dc99b0a35c756b5a72932602bf9615220b457c40a7f4a39fe4ca3ce793ff"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/symbols.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/symbols.rs": {
       "bytes": 23428,
       "sha256": "2917c5d27d364976617c773e310de31ce6bef44799331f800a3105b3bd2b18b9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/tests.rs": {
       "bytes": 10026,
       "sha256": "ca45da0f4956b1e343a9a6838bff94cd0db0dbf3be16a7cf05febdc5e298f5dc"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/tokens.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/tokens.rs": {
       "bytes": 2575,
       "sha256": "736373a7cf837554476cdfe7c0a1b52327ca9d6f2273d5409e66974869f25bca"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/transform_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/transform_generated.rs": {
       "bytes": 147909,
       "sha256": "e2de7f1a1cba21758cad6aca834d3c53c8cb6ddd170c89894b4c03e4532d2013"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/utilities.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/utilities.rs": {
       "bytes": 41180,
       "sha256": "788fdc0306d97d04ff4948ba59d6cc19c4803babb438fb5a70e208db9a7e704e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/utilities_middle.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/utilities_middle.rs": {
       "bytes": 31303,
       "sha256": "7d248d05f4f66ac678063d7c86218147dbe09be42221b1e9d9a9106c8c54b7cb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/utilities_middle_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/utilities_middle_tests.rs": {
       "bytes": 14992,
       "sha256": "0c157ec06dbf72ec71a8072851935c93268a90425d2395af217e05a04c8eb0da"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/utilities_tail.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/utilities_tail.rs": {
       "bytes": 16319,
       "sha256": "bacae41e80d643e6990b103d470a946a0d15a028161d863b8356a60ec95faa97"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/visitor.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/visitor.rs": {
       "bytes": 25886,
       "sha256": "1fafbf24caf63ec127635c7ed43b32300ac10bd97c21171f5bcd4c238f963366"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/src/visitors_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/src/visitors_generated.rs": {
       "bytes": 135286,
       "sha256": "4f70f5ece61d42eb092a0a336c217f5141c90799e9905487046f1bed752718b6"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/generated_runtime.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/generated_runtime.rs": {
       "bytes": 15823,
       "sha256": "32ab86af8ae5a9eac40e4ffd553145db9bb1f392322b46a646d06aa5b3a221ff"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/node_accessors.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/node_accessors.rs": {
       "bytes": 43017,
       "sha256": "f7db8652ef6b12706d73118631486f609593aa8765b104057f71f2b412aa18e5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/source_file.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/source_file.rs": {
       "bytes": 6605,
       "sha256": "976aab181129b1138d4c1e0fcd48b651f988c9f3833aab143838ea3d787a1056"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/source_file_quote.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/source_file_quote.rs": {
       "bytes": 1393,
       "sha256": "cd1a87da77361ad555ea17c7076c288d40d14eaacefe323b71f838e3cc9b0896"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/subtree_facts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/subtree_facts.rs": {
       "bytes": 4871,
       "sha256": "24739cf67262ba4e8f4d38bfc430b01389b69df6e7d12c9fe8028126935a01e3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/utilities_front.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/utilities_front.rs": {
       "bytes": 22221,
       "sha256": "87b43fb2450baaec4081c3267b9e53d6cab5925c4036dca3fa796b5d31c5a6dc"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/utilities_tail.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/utilities_tail.rs": {
       "bytes": 13960,
       "sha256": "b0cb0b90bdc18d32f11dc02f292c5666cb43ff1109ea02aa0fdf656df6c61ccf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_ast/tests/visitor.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_ast/tests/visitor.rs": {
       "bytes": 8768,
       "sha256": "69502e18de6e520410e4a2dbf1ea8710b5406b539a1ed1a07e5a30e141c138d5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bench/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bench/Cargo.toml": {
       "bytes": 891,
       "sha256": "adebda3951ce4cf52fb875a26f9853902cec3f24c5cf4383e09c5be70e49b472"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bench/examples/allocation_probe.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bench/examples/allocation_probe.rs": {
       "bytes": 2444,
       "sha256": "45243d90db254cc125c4c6594df7ec997b7259929598706e4f53254a0cf92bc5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bench/src/main.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bench/src/main.rs": {
       "bytes": 16249,
       "sha256": "1c5e996f6661e8df961262b708673df25c7521784ca0a1fa9b35af2f827c1f53"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bench/src/workload_graph.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bench/src/workload_graph.rs": {
       "bytes": 3849,
       "sha256": "006b1f4d21f5fa1c05851c9da41de94d0094c46e5dd2d082beb562d8efc182e3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/Cargo.toml": {
       "bytes": 703,
       "sha256": "10f0af4951de460699133b6e09fd3c6c520c6faeafd39311f13047dba1b4768f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/examples/binder.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/examples/binder.rs": {
       "bytes": 3712,
       "sha256": "a9e3c06aa1733c348622d9cba92636c1766d3a985110a4acbe97df6352090627"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/examples/support/graph.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/examples/support/graph.rs": {
       "bytes": 20373,
       "sha256": "04ddf8c491f6e6cb13e9e91613f3da235b1badee460c1ee12aa71625ff7e6153"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/examples/support/graph_stream.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/examples/support/graph_stream.rs": {
       "bytes": 1026,
       "sha256": "1aa5a6f258c71ec07d69e9c329fb25de2a6c028c060bb855eaf6e1d74131dfcc"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/examples/support/syntax_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/examples/support/syntax_generated.rs": {
       "bytes": 85388,
       "sha256": "8db07241835078b22fd1b312c2216dedf5ba330ba070ec80ddfdcd37f63004d7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/binary_trampoline.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/binary_trampoline.rs": {
       "bytes": 5381,
       "sha256": "be1795ccad7f466e9e3a93318199b48fcc62621bc4a96651dbe09f7247fb2857"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/bindings.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/bindings.rs": {
       "bytes": 12664,
       "sha256": "ffe1b044581caefc0cc15bf5c65e7d7b8f761be3ad1a1d7eb4170b138e053da4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/bound_factory_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/bound_factory_tests.rs": {
       "bytes": 4702,
       "sha256": "69360329f881d5d610c4049e292da9f912a00dd7deda6833e2ceb6b706342d02"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/containers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/containers.rs": {
       "bytes": 31602,
       "sha256": "6b7ffd2517b2f8e2a9c5e4c8961f95f5365f1147d4ec7af03ff2c77ebe3eb441"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/declarations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/declarations.rs": {
       "bytes": 24336,
       "sha256": "5797bed22943069d02fcd53baf4942b9f9abfbf15cab66a7708ad8990ba836ab"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/diagnostics.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/diagnostics.rs": {
       "bytes": 11429,
       "sha256": "5326cbb8c585ed5a7fc9bf2409440c2525a6d0ef3b9f9a2b1e9f193cce230c22"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/dispatch.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/dispatch.rs": {
       "bytes": 9784,
       "sha256": "bdf74dc270a8097f6faf0eda83c27f9ad313899f8db7ce901105016f6bf95efe"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/exclusive_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/exclusive_tests.rs": {
       "bytes": 18004,
       "sha256": "81be0401a479199b75d6ed179c353e0b4f58b7af6543b0cd79034f3684f28acd"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/expando.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/expando.rs": {
       "bytes": 13745,
       "sha256": "ef34814302be9775cbc9f84939b01d1317b44a83a81ceda686ba22b21685ecaf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/expressions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/expressions.rs": {
       "bytes": 29203,
       "sha256": "90d292b73fda85eeb125307ad04fb6eba2de960f461bf0ed1edaad9feb20e163"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/flow.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/flow.rs": {
       "bytes": 15437,
       "sha256": "af3d4b3714f85134376e7fdc17e1e693a320850a18d2fb47db04dbb6d6f7bc52"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/lib.rs": {
       "bytes": 2845,
       "sha256": "275e1bcc443614d1b5991f9426c668616454d6054eb22941bb6cb97e63836c5e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/modules.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/modules.rs": {
       "bytes": 12717,
       "sha256": "0fb3e6e0fbe08a1d5d44018b67fff25cd29d7e1db8eefdc9b87eaebf4298e521"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/name_resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/name_resolver.rs": {
       "bytes": 40969,
       "sha256": "d3bd02c3a3c11d5d9483fb1d607da745c82a8156d9977a4dc0f98396daaaf68d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/recursion.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/recursion.rs": {
       "bytes": 1882,
       "sha256": "8cd18c8ab38f278fba26d774b63fbc0e479c65f491a2e59e953e610ede8997b8"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/recursion_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/recursion_tests.rs": {
       "bytes": 6561,
       "sha256": "65287004d63ee75e1d1aeb17f90b3191bdfc55c30f5016bc10545e2470b1dd79"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/reference_resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/reference_resolver.rs": {
       "bytes": 16739,
       "sha256": "37fef0f9f612d0e4a6684c369212560740a8d7d0a7fbd741b79f7ec586299435"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/resolver_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/resolver_tests.rs": {
       "bytes": 31638,
       "sha256": "366f10a9fcb27e1d269b35c7d80fbcddccce3390f8ff107f937f9455234ff49c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/state.rs": {
       "bytes": 6799,
       "sha256": "e2e2c79fdae2c875f80b5b5e61a1c3625912152892c1b7050dd70a399be3d581"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_binder/src/statements.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_binder/src/statements.rs": {
       "bytes": 19924,
       "sha256": "80ffe20c438b6be945f6de0d78b559e3fab5018a10257d90b2f38aa13c5fd9b8"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bundled/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bundled/Cargo.toml": {
       "bytes": 307,
       "sha256": "9b1c687e03a49ff0049706417ea38e5b5d34a04ae1a43e037ac501dc880246cc"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_bundled/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_bundled/src/lib.rs": {
       "bytes": 18399,
       "sha256": "ece20c8660e7c21d452b87b630dbefc2e7e4d0628ded6414d6a6c20e85c239cf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/Cargo.toml": {
       "bytes": 1014,
       "sha256": "4feeb8f3ef8ec597dc1b32caae768de8c7a7c72faf7131f3356a0d2f3d048862"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/examples/program_probe.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/examples/program_probe.rs": {
       "bytes": 2608,
       "sha256": "c0fef829c6f8d4db6d797a8a8649a4300752febe837228fa99883e3aa6ad492e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/examples/s07_config.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/examples/s07_config.rs": {
       "bytes": 631,
       "sha256": "bd43bd9ba1ce5fd8a9b0bdf1f4a809eb717e35d6d68f062163b1d605ced71c34"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/boundary_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/boundary_tests.rs": {
       "bytes": 4974,
       "sha256": "dcbd39cfd0b1e4f40a8a83885959aaf7804ce0e0c3c5112b6354171a447a4f25"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/cache.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/cache.rs": {
       "bytes": 2277,
       "sha256": "3008987486e09b4994dad32d87e462afcc154ee2dc0f9c3ba77ff7398529542f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/include_reason.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/include_reason.rs": {
       "bytes": 30195,
       "sha256": "38239958f2892ac288d335177dea7dc17452825268991527e46ad8b208e27d03"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/include_reason_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/include_reason_tests.rs": {
       "bytes": 11291,
       "sha256": "9968646270634a2ad27cbf5ce70e344b2788201ec0b3974655f6fea6209cc247"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/lib.rs": {
       "bytes": 736,
       "sha256": "40613e8e9b29e925ff4f620822840cf7eea51fa428ee5952af65d183177fc42c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/loader.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/loader.rs": {
       "bytes": 44242,
       "sha256": "0f03f25795dd0f14a53d3448fa55a5aaadb15dcf9e906d32493bbfb78ed98823"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/metadata.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/metadata.rs": {
       "bytes": 11203,
       "sha256": "9ad4a0af287add44152eec14de6965427a0c2f9dac305c545d2127b06e898704"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/output_paths.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/output_paths.rs": {
       "bytes": 9280,
       "sha256": "d53e13bce2b3eefa90548233763d7186c5dfdcf1675e7229363139da515aefcf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/ownership_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/ownership_tests.rs": {
       "bytes": 5014,
       "sha256": "d78fe266008ef65c0b2ea251cc1492c182a3a2695d9e76bffaf1f8e5ca901e2e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/program_diagnostics.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/program_diagnostics.rs": {
       "bytes": 11357,
       "sha256": "9127746d4619247621c0b9e67692347c65506def3374b8e5ae7967e153cd8ae2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/resolver_host.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/resolver_host.rs": {
       "bytes": 4163,
       "sha256": "15a77755f9424210c6aa8ec280b680f8d8512ebf7bde2515b5ea9b5511d8666b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/tests.rs": {
       "bytes": 5622,
       "sha256": "e0140d753a02460d2ba6164cde6e4f04c19a19dc966e122df4f6480bdf41fe07"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/src/verify_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/src/verify_options.rs": {
       "bytes": 32825,
       "sha256": "336aaa43578d5d100839fd83637a4fcbc9cd607e40b99d85043eead429a9b130"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/tests/config_source_parity.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/tests/config_source_parity.rs": {
       "bytes": 738,
       "sha256": "a2bd3188aebbaf5dbd7269d85e27118d609fc307d81a3ba8f89f78b798205bef"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_compiler/tests/verify_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_compiler/tests/verify_options.rs": {
       "bytes": 1148,
       "sha256": "a678ee8cdae1da14e39655591a064418406ac8760b79f926c7e16c470b9bf3b1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/Cargo.toml": {
       "bytes": 253,
       "sha256": "c770d0652338c9df47832ef78b73ab70c9c8b61d7d8e938d17b119fe7d17981e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/compiler_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/compiler_options.rs": {
       "bytes": 15006,
       "sha256": "852f73c80a72987458aed2f278bc2ffe2aaf7d959c78bf3952e3aa43d2bb6517"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/go_sort.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/go_sort.rs": {
       "bytes": 8095,
       "sha256": "6ce269db5e2e18f820381b3834fa8ebfa3302fcbdca19c55325de53c9397aa28"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/go_sort/fixtures.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/go_sort/fixtures.rs": {
       "bytes": 544324,
       "sha256": "1fc5503d0f16200e1ae51ed9c71bc81c8e15193a4b92270997495f31f9fd8d7d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/go_sort/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/go_sort/tests.rs": {
       "bytes": 3461,
       "sha256": "94fa2c7d2b7b9e7841860cf4924eefe068e7ca3744bd427e286da495e52f59d4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/lib.rs": {
       "bytes": 5496,
       "sha256": "25057a7cc0782cd07dfe50dd35eee50c1e39318267f2b8ea6090ca8537026ea3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/path.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/path.rs": {
       "bytes": 6612,
       "sha256": "c03edb5bd8e003794d06a1d55a0a43cd275be47e25192c2c93514a4fe452796b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/src/pattern.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/src/pattern.rs": {
       "bytes": 4579,
       "sha256": "b1ef99c4a2ae50204318684a809a524bdad475807ffe414a85e0f2bee416a296"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_core/tests/ranges.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_core/tests/ranges.rs": {
       "bytes": 418,
       "sha256": "420a7b25da675a45b7c4aaee06cdd095b290932e16ba4c848c84d9e417a41485"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_diagnostics/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_diagnostics/Cargo.toml": {
       "bytes": 183,
       "sha256": "26a877f6ead43f7d51ef3f8e916815cbd324a81b130f88481568fc7b5c937713"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_diagnostics/src/generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_diagnostics/src/generated.rs": {
       "bytes": 1080829,
       "sha256": "f3370a8cf9b3626c7a6d91e6c581b7f26e5f6ed3f1d93b82043436032e524d9d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_diagnostics/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_diagnostics/src/lib.rs": {
       "bytes": 1327,
       "sha256": "4bcd28bb76616d4bda3a9798bfd0892587ddadbcf2d3851fc38831a157cf4326"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_diagnostics/tests/messages.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_diagnostics/tests/messages.rs": {
       "bytes": 2125,
       "sha256": "bc572ea21ae17b0e08a8c6312ebf366191dea703a4ba45ac667fbeea8517a1b5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/Cargo.toml": {
       "bytes": 558,
       "sha256": "9e657d4b529e9ab3957beac26577e729da80a71220461475405cf78d59800ddd"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/examples/s06_codec.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/examples/s06_codec.rs": {
       "bytes": 351,
       "sha256": "61bb4789b3e43560c6d8fa0f690b06ea7ba8585d57b3c8092911c80c91c3e976"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/examples/support/codec.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/examples/support/codec.rs": {
       "bytes": 14684,
       "sha256": "854769a9318bead230eb75657341a76bcf52652bf919e7a107eb2a27729c2c4c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/examples/support/component.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/examples/support/component.rs": {
       "bytes": 8090,
       "sha256": "4f517c1a868a1b85296cc6d2f852dc6b4266e4847d0c563e84a55ed425627c2e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/examples/support/protocol.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/examples/support/protocol.rs": {
       "bytes": 9424,
       "sha256": "987d04f6a19fa8cc128ac5fa18a3cc9eeee1253d2732879ba0a3475d6b6eb84c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/decoder.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/decoder.rs": {
       "bytes": 14311,
       "sha256": "25e37d9b72f057f95738367605ecf022225adb6e11eb23b6853b6ecd59d609fd"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/encode.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/encode.rs": {
       "bytes": 17421,
       "sha256": "8c007597ddaf6313e96bda597eb4503364bec9d86706671a1d180cb2b1be0b94"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/generated.rs": {
       "bytes": 146057,
       "sha256": "9f48a3153523794208f7aa19da142fc84adbe9fbf70bbcb4e046963424224215"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/lib.rs": {
       "bytes": 2524,
       "sha256": "9efd0effe21ad4d116021062893329d556feea731edd6870ceec884f9adaa6e6"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/runtime_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/runtime_generated.rs": {
       "bytes": 296543,
       "sha256": "2ec5a9f91fe1f738f9e1e6bba86f676d5dcd247d285e9a952c9812a2b654c04a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/string_table.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/string_table.rs": {
       "bytes": 2663,
       "sha256": "1e50f2cfa6581f1ec81770058cd846b1a2fa8423b694c3b959a0f85402e3b2bb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/structured.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/structured.rs": {
       "bytes": 4993,
       "sha256": "9ab5145a432dcddf112c9f079a6d86b68735282604c233689af5940efe596052"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/src/walk.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/src/walk.rs": {
       "bytes": 3274,
       "sha256": "cf92d217c53b421d173eb3c908b2c5a403ad330bb9659f02df10eef951775264"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_encoder/tests/layouts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_encoder/tests/layouts.rs": {
       "bytes": 4656,
       "sha256": "98b7a985c7ae15ee798d4c8dfb7a11f5146e6c7d5c42c79d2d5013b6b4562d5d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsnum/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsnum/Cargo.toml": {
       "bytes": 314,
       "sha256": "37403cdb8a1c117564da9fb73485c21b806933ecbaacad5f600f85d945f3e4e4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsnum/src/bigint.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsnum/src/bigint.rs": {
       "bytes": 3304,
       "sha256": "7b09ebb7f0b61509b9730252841e7f0c28c10259b43755fedb9821a59b09c92d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsnum/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsnum/src/lib.rs": {
       "bytes": 1562,
       "sha256": "d8c72a19c7bad5437f30a435f30942c2b4b2c447bf88eda792c0230019a94462"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsnum/src/string.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsnum/src/string.rs": {
       "bytes": 8016,
       "sha256": "9768de8ee11510db578e0bb6c65d1ec1940e66c4fe0093bd8f13f67f61f5c45b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsnum/tests/contracts.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsnum/tests/contracts.rs": {
       "bytes": 2367,
       "sha256": "28dae470a81702e1422e30d199ff786d473b58a7d47875f1f6f27032779295c6"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/Cargo.toml": {
       "bytes": 266,
       "sha256": "8a01237168087dca6418ee34fc75a3bb2b22a7ec9dfa173060b92a6f322a254f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/examples/e4.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/examples/e4.rs": {
       "bytes": 14804,
       "sha256": "09e8c30c22460005ab594148cdbf64d8c8a93d06f85bcc7cdfb38b2a54a828eb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/case_tables.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/case_tables.rs": {
       "bytes": 174266,
       "sha256": "8f15bdc816ce897d49d4339f16e8cfd9c8e800da8f95ae6bbab631bc872fb14c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/escape.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/escape.rs": {
       "bytes": 6368,
       "sha256": "70af910d3e0013a956f813483abf79f17b62a3074e598887ec839b25cb9fcfde"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/go_fold_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/go_fold_generated.rs": {
       "bytes": 60386,
       "sha256": "08677ddcc7a94fb1cad65720dd8c6fefc34359180223e233c5f34e15583aa87a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/go_print_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/go_print_generated.rs": {
       "bytes": 17026,
       "sha256": "08b0d3211960d705991ee2ab4021dba91139e268c81afceb6855743a2a2ba202"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/go_quote.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/go_quote.rs": {
       "bytes": 2992,
       "sha256": "0157beb12f4ba6663c4267e882d06069bd71afd9a5b5949ec1aab4ab47723af1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/helpers.rs": {
       "bytes": 5804,
       "sha256": "1cadc3f0d89dea0d377aadf629108ee4041b66f4e48d134dcaad48969ab2ae2b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/jsstring.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/jsstring.rs": {
       "bytes": 4586,
       "sha256": "49a0699d71b2e2f72988d154b9b651cab9414be9337179d4c246b6a33ba533a2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/lib.rs": {
       "bytes": 717,
       "sha256": "fe7678f38c17a48ccd19608a38997b85c20f115363a38e998ff6720e3e0f2493"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/line_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/line_map.rs": {
       "bytes": 6958,
       "sha256": "8736565b640c276f90fbc00c181aaa9bc48bb407eda6096d153313b44b940bb2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/lsp.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/lsp.rs": {
       "bytes": 2726,
       "sha256": "cf8c9eb289d64a42f2da3bfa6ab8d10b53cef397f0f6e2e76c91ef44fe2f2f22"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/position_map.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/position_map.rs": {
       "bytes": 2233,
       "sha256": "b82362aeaeff4d28a3a432a2880d1b4c955f7a6fc282986324ee9e24c30f9008"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/scanner_positions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/scanner_positions.rs": {
       "bytes": 5562,
       "sha256": "8cdb3de20df076f605973402b34a0ebcf015ccc1b619e942676941af061aee9f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/simple_fold.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/simple_fold.rs": {
       "bytes": 1170,
       "sha256": "282205fa4b890b9483c44a9b5989518eedfb4db8670a043cb98a105bfdb7c28b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/source_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/source_text.rs": {
       "bytes": 3294,
       "sha256": "d0bd8314992bc1c2a986db758b9d407082fa0a5baa700e5e54198a813d98a4ca"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/src/wtf8.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/src/wtf8.rs": {
       "bytes": 5289,
       "sha256": "e94eafa75fdf557f16d3c378362b9199280cb3890e4ad27be60377d183f1f034"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/tests/core_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/tests/core_helpers.rs": {
       "bytes": 11457,
       "sha256": "ca7083023fdfba68fef755fa16b7f4cb0cccfabc4cab79911b820f4d38f37fcd"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_jsstring/tests/positions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_jsstring/tests/positions.rs": {
       "bytes": 11059,
       "sha256": "8092d3f21635dd607c3431a918342279097c9417c4e091aa180a1762dbcbec1f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/Cargo.toml": {
       "bytes": 741,
       "sha256": "50c88ec1b0c91a1e051da01ffb4288dfd4576757291b6ef142409150377379fb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/config_mapper.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/config_mapper.rs": {
       "bytes": 4153,
       "sha256": "8d862644d4551fa8bc570704703f59d824c3fa88aebc54ea05ca091d83a42176"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/diagnostic.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/diagnostic.rs": {
       "bytes": 1861,
       "sha256": "c78b8a94f28dfb1c71ca66a831cd83168bd5eb23d71fb7b0361c264cdb12c149"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/lib.rs": {
       "bytes": 794,
       "sha256": "f422b9840cbadf3fa71c54cb41e4f397143f1bcd74705371d8eb262f4a84d8e0"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/package_json.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/package_json.rs": {
       "bytes": 20592,
       "sha256": "93cc1fa531b120d1b9e1b56a02ab79241ccb317cf6e4f58978ccb477086c31bb"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/package_maps.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/package_maps.rs": {
       "bytes": 32643,
       "sha256": "837cdbd5018d2bfd1619d434219287f1a6eb10904045976b7fff98a9cf36391c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/paths.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/paths.rs": {
       "bytes": 7485,
       "sha256": "80ffc1fae5afd48fab4c3bf52f59f14a18cac9e31a3cbd0cac34957c1eef6b7a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/resolver.rs": {
       "bytes": 31499,
       "sha256": "27d938ca4d464e8a13828344cb3611a496aa062bcdf50f6ddd2928accc275c1b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/trace.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/trace.rs": {
       "bytes": 6493,
       "sha256": "d2feb3c30ab953d38ed24400ba32b84d475df82a8078000559b11c6f4cb055da"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/trace_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/trace_tests.rs": {
       "bytes": 7202,
       "sha256": "f1565a9e32758ec9b5faf19827c58a4a23d328c481251e1c4cc4c4cf6d577569"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/src/type_references.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/src/type_references.rs": {
       "bytes": 18352,
       "sha256": "ef73957f0b14afeb0c53c03aa56bd2a197fe0440ffce4ade54f32fd66b46b8d8"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/tests/config_mappers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/tests/config_mappers.rs": {
       "bytes": 6726,
       "sha256": "c16e6f39acd4bb72b43a18d35078ee2255e0b89896a1afd5693a61685412ed43"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_module/tests/config_resolver.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_module/tests/config_resolver.rs": {
       "bytes": 2048,
       "sha256": "9541a515b141c05d2ffb9fda99bd15f10d8c7c4214bb1f0ccf87cd9501b38b7d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/Cargo.toml": {
       "bytes": 760,
       "sha256": "88fd4877d2e03dc7bd4375f1d6d81fc0b64001e455168ae8a8aa650b6ebddd63"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/examples/s06.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/examples/s06.rs": {
       "bytes": 7245,
       "sha256": "3868e1b47d0aa3f9151b2c946b032eb999e5bee86c42a189234e01ee323eea6c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/access.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/access.rs": {
       "bytes": 22563,
       "sha256": "32fb42cd7d334e10e05b4e0378706cfa023aff600c584abbc6a757c868bd7179"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/ambiguity.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/ambiguity.rs": {
       "bytes": 15457,
       "sha256": "31fd2fa681f317b1f6973121b4aaff52bcf57c10b1cc2f3f3d0589c04d52ed40"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/bindings.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/bindings.rs": {
       "bytes": 9538,
       "sha256": "ae1e13573d3eb95bcdb1ff0d7b05bd92e835a6dbe3ce80cd6cb366472742f004"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/classes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/classes.rs": {
       "bytes": 21215,
       "sha256": "9036a310936df319df9d1953766aa1709c1ce2a3bd38013d08eda76fb3f1c016"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/declarations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/declarations.rs": {
       "bytes": 13290,
       "sha256": "4011c8062f50d60af8438f6b997ba37628559dbf955f9cc1b29a309a3f3a1c34"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/diagnostics.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/diagnostics.rs": {
       "bytes": 8528,
       "sha256": "56d1046ec6b505b04f5141770a84cfc4a7724c239f1acc0789a134ebd6aa94c3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/expressions.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/expressions.rs": {
       "bytes": 24217,
       "sha256": "6827de05d2e2cf56eb5797384bdd5c5ba3cff01e29ad3436b0d783314a221c3d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/factory.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/factory.rs": {
       "bytes": 3071,
       "sha256": "a77e228cf131b89231df5da0f81f9ab8cbd3f27269bb07b81d1ebd5257579ecc"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/factory_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/factory_tests.rs": {
       "bytes": 6273,
       "sha256": "ec67e1ae69a5cf453827290e0c5265f4d0084f19d5f88db812e3364e701cc777"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/identifiers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/identifiers.rs": {
       "bytes": 9013,
       "sha256": "cf2b5f13e05b46d81c089a2a838222fe25ec2659a2056597d48a868b9611f762"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/imports.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/imports.rs": {
       "bytes": 18554,
       "sha256": "d43ace673479bd8547bf8376468b7d1cc01d8c264b83b4f51782f554ec12ca68"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/js_syntax.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/js_syntax.rs": {
       "bytes": 21980,
       "sha256": "ee9efb045275b6e7b428aa398ead01da180f65d9ac2743be984c12568c699410"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/jsdoc.rs": {
       "bytes": 68109,
       "sha256": "1a4c7e3aaf5438a8e138e3843fdab3b595ab0df9ce600a1a0e034b4e6e1fc170"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/jsdoc_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/jsdoc_tests.rs": {
       "bytes": 7315,
       "sha256": "f8516a863d4166dba708c6a1b8988bbf9f0f9a18b80a61334629d081b385f19e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/json.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/json.rs": {
       "bytes": 9246,
       "sha256": "f8d1a9c36294a7f44a6e86f693cf3192ad0ddf709e254d3805a7b1405ea2a43e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/jsx.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/jsx.rs": {
       "bytes": 25089,
       "sha256": "a83e41dfbeabf303172f899ad53f3adb93ebd11ceb05cebc308229d3a5778e82"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/lazy_jsdoc.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/lazy_jsdoc.rs": {
       "bytes": 3124,
       "sha256": "977aa7920371a65ea5d36fc942fb5f1b13e576f52ac48f9dafc860eda5012514"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/lazy_jsdoc_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/lazy_jsdoc_tests.rs": {
       "bytes": 6588,
       "sha256": "2a3226eedec26e7e09e1399b518e344c5dab06ec5944e6247a2a06479844b7a6"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/lib.rs": {
       "bytes": 1489,
       "sha256": "4c818a055e81b73b9dba92448c200df6b1606f8347a87ba2ebcc7c082a556a8e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/list_buffer.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/list_buffer.rs": {
       "bytes": 5530,
       "sha256": "98c11206f94669871328bd29328a2598120b4e814e181a0a3d02e13b204f2866"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/lists.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/lists.rs": {
       "bytes": 16421,
       "sha256": "ffa71d62a516dbea998827db346213bdce8dd6db6539443b37e5d354b7a41a6c"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/lists_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/lists_tests.rs": {
       "bytes": 5478,
       "sha256": "639693e612b9578e7c646ce0d90498262047d2596cb51d231c5e50404ade1d1b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/modifiers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/modifiers.rs": {
       "bytes": 9158,
       "sha256": "6d65bc46b8896c7bf49d5d5235771b5099d541e4e6805086b184387cb23b62e7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/orchestration.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/orchestration.rs": {
       "bytes": 14460,
       "sha256": "591d1fd921ebb1d3cca02509cd45742105e741903ec00f1cbf5d54076faf16c5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/pipeline_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/pipeline_tests.rs": {
       "bytes": 14332,
       "sha256": "0fb47e4ec0543df24178788c5dfed42926c630947fedd4ee370843a70c345861"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/pragmas.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/pragmas.rs": {
       "bytes": 11796,
       "sha256": "bd0c765e9aeae53e2096691aa4d2db813e97ba2bc01831e6a7fc2341f6aa6fb0"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/predicates.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/predicates.rs": {
       "bytes": 16398,
       "sha256": "396abf37b37978718e3044c357f7c8683efbb15286d66da9c621d0f98e45d266"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/primary.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/primary.rs": {
       "bytes": 12361,
       "sha256": "629abbac9cfd104016587504ea325219c1aca8f7dd5d2bc4a5aa2cd063dd6780"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/recursion.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/recursion.rs": {
       "bytes": 1386,
       "sha256": "4161092b0ed0b1adc07b8eb94b3fcebd4e06e7f9e254f2e83e47178a3e011ce9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/recursion_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/recursion_tests.rs": {
       "bytes": 3557,
       "sha256": "7d19b2025b1cb48ffcc823d97d560f4e28849968025510fad854fcf7fe619358"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/references.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/references.rs": {
       "bytes": 24167,
       "sha256": "c348dabf16f37548e5b8226b11aa34444e7aefc314fcb9d0ae039ab21b9847a0"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/reparser.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/reparser.rs": {
       "bytes": 72182,
       "sha256": "6aa182f0dc9cdd59467a510c90a8411ceb3a0f606d53734b2674115d3cc09ba4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/signatures.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/signatures.rs": {
       "bytes": 27685,
       "sha256": "5f6fb8635fc3b9def4ab23385ac8d34faba6c842f88ed337412606818609927f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/source_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/source_text.rs": {
       "bytes": 4356,
       "sha256": "2e65b4e718be527e255423f27c48bcb89a102149381c0baef95961e770c42074"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/state.rs": {
       "bytes": 15889,
       "sha256": "685073128bdf99e88fca29a07048e1db25a13275b80f030472659a9790e23204"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/state_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/state_tests.rs": {
       "bytes": 7400,
       "sha256": "2f5932404a3aac08277a90ba04bb68831c79edd422efe937a83303861fd48f36"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/statements.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/statements.rs": {
       "bytes": 20867,
       "sha256": "9aeac21056aeaf4ed0358e769e6bcf054eaede519b20ba386513aa2b434fd9ae"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/tokens.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/tokens.rs": {
       "bytes": 8890,
       "sha256": "26037efa44ca41049f85aa82f45ecd00ac58ddf61a513d2b819efcf4a859f186"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/types.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/types.rs": {
       "bytes": 33487,
       "sha256": "12a742961183ab7f3e0b92aa643a7464a4ba38d7c30d76027c3181bf1cc71b10"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_parser/src/worker.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_parser/src/worker.rs": {
       "bytes": 2672,
       "sha256": "95b57aa28ae30d5d574145172986df6f40295fa27836d21a23963e1da789ad1e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/Cargo.toml": {
       "bytes": 643,
       "sha256": "574e9929dbb07b159799c649dc11514490ca0b2675a3fd120c9b739adc34c684"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/examples/s05.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/examples/s05.rs": {
       "bytes": 32906,
       "sha256": "da8fb58286c6abafb6513aaa462cfa96c24f95a8875a44c47fdf726f92ab9ed8"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/binder_helpers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/binder_helpers.rs": {
       "bytes": 13137,
       "sha256": "fc3c74140a71cc90ca7661156220fa0b820e4c7a8ef503acb331a445e68b1546"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/binder_helpers_tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/binder_helpers_tests.rs": {
       "bytes": 11852,
       "sha256": "e1018f6cc24970f8d118b95089d9edd8540b7c6e0020767144a31078bb4739c9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/escape.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/escape.rs": {
       "bytes": 11614,
       "sha256": "3332e32b61b4009102b609c17a88b5814e6365d5466dc9f1fc400c57dd433059"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/identifier.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/identifier.rs": {
       "bytes": 8787,
       "sha256": "17bf1b82603603c0fb8778e0e76f7a3f69ddd2e3abbec2c50b8a5bf3abdbdde4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/lib.rs": {
       "bytes": 1295,
       "sha256": "1c509f81ec0bc3faed0342ee700e7e14bcdf4e91c0b517be456c06276a5ffdd2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/literal.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/literal.rs": {
       "bytes": 5094,
       "sha256": "a425034d16a0a16a14d3357e158ce1e68f1b0e626d3886801d795cca4ee40ae1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/number.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/number.rs": {
       "bytes": 14089,
       "sha256": "09d0348b68c2b88d9b4a9b6fa5ffe3f18b0570cd1b866bc95639119070807dd5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/classes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/classes.rs": {
       "bytes": 17239,
       "sha256": "b7adec234e62ee8ad629f34ebe2acdefa9fd40e50c5468f6212d7cddbbaa4771"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/escapes.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/escapes.rs": {
       "bytes": 8073,
       "sha256": "9948939c835ab125c76090f1d2e3f1c511ee9973409a2b5c26f29a53d8152e57"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/grammar.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/grammar.rs": {
       "bytes": 12321,
       "sha256": "2bb6deef5844e7b1c40093892ac452043acf37385b8bdd4365310b0fa28e6229"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/mod.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/mod.rs": {
       "bytes": 9725,
       "sha256": "12b7a2edf770d6390c92481ad5fde1ae423dedc5c7cff2f1cf22660f0e70427a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/properties.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/properties.rs": {
       "bytes": 8301,
       "sha256": "9b43fd5c47282d2fbae74b355e82b43cbb114f9c8f5b2b64931e704bc0421875"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/regexp/tests.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/regexp/tests.rs": {
       "bytes": 6762,
       "sha256": "2e2c66cc771e2c1f82a20226488b4a919750fb943d6bd46f442ea3d676a49cd9"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/rescan.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/rescan.rs": {
       "bytes": 18634,
       "sha256": "e9fb6ac8c64b8208e4588a5f18515ed9feca2647ba8534f01e3bf48dbabcc41b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/scan.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/scan.rs": {
       "bytes": 23470,
       "sha256": "e12d1af95a7eff49db94686e6d5f6f584d8af258d56c6378e345758ab6ba0256"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/spelling.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/spelling.rs": {
       "bytes": 5271,
       "sha256": "28e2836af7ecc857a17308182ec2ea438eb88f81c6b4aa1a2858a962d22beec5"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/state.rs": {
       "bytes": 19441,
       "sha256": "28136383b2ae201c991b6d8717b34f83f92a1f10dadd15faf43c30caee666158"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/tables_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/tables_generated.rs": {
       "bytes": 46465,
       "sha256": "cb2b9f244c059703aef34ac66e5a17504c3eb70841f105b128e933e8cb9b966b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/trivia.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/trivia.rs": {
       "bytes": 15211,
       "sha256": "59233c84abf6d38051d97d946a949c216107c48898cbbd555aec51a30bdbf35e"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/src/utilities.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/src/utilities.rs": {
       "bytes": 4359,
       "sha256": "6f8bf7ac9be2d39488b2b9c52935929f1b3f1d8ad03595cad37daa3dd52522f1"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_scanner/tests/state.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_scanner/tests/state.rs": {
       "bytes": 8762,
       "sha256": "65c990ffe13c595516622a899a254939f56ed43d8ff9ab6931d0f90da4127c0b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_semver/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_semver/Cargo.toml": {
       "bytes": 294,
       "sha256": "a731f5f1c4907081eefde4e0c4fefb8fce967eb16468c6dba7ebb61d30ca2c58"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_semver/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_semver/src/lib.rs": {
       "bytes": 220,
       "sha256": "7d8b39810113fd1c48f8eec3f027cd8dcd095ff01c13b7312b98812c5d0d1df3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_semver/src/version.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_semver/src/version.rs": {
       "bytes": 9122,
       "sha256": "4ab4d0fbab1054ff5803168a4234cca1522ecd6b80432c1b94ae2421a5321991"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_semver/src/version_range.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_semver/src/version_range.rs": {
       "bytes": 9852,
       "sha256": "567ea8f8894f3956586717eaca1dcde7df406eea95e1f461e9e6661827edd265"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_semver/tests/source_parity.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_semver/tests/source_parity.rs": {
       "bytes": 5653,
       "sha256": "4f87ae95fb3210f659c335b019949d7390c05d1dacf28a345856c1b67251fe4d"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/Cargo.toml": {
       "bytes": 849,
       "sha256": "bc00a9c3fc0b4d53655f35e2cec98428999a3ad142e21c3489a2bcc5d10b20c4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_files.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_files.rs": {
       "bytes": 5394,
       "sha256": "da917d2de519efa47b9b91d4606fcda4b1fb3c1ee3a783da2eb96c0f2d7ee3e4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_host.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_host.rs": {
       "bytes": 621,
       "sha256": "9a559f033fb308b41b317719e2acf6ef39a4ebf9befe14605a11f8c34c3eaab7"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_json.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_json.rs": {
       "bytes": 4497,
       "sha256": "fd71744ff1305ac38ab88817d2cfa5b52fbb281167900b3a0206b9967e9de2e3"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_mappers.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_mappers.rs": {
       "bytes": 10912,
       "sha256": "10c2ac16d1a5430789d8d19236016c83a639dfc5887da0fdeb18ae50ea1875ac"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_parse.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_parse.rs": {
       "bytes": 29061,
       "sha256": "350e8bcb260666ba5eb1314fc40f6bd6f53731edea64fa965c603c8656c3b15b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_read.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_read.rs": {
       "bytes": 2061,
       "sha256": "a0a4c2b4fecaeb3cda205d51d23bf2bbbbc86cef84d41c09407d9cb2501e4960"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_specs.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_specs.rs": {
       "bytes": 4246,
       "sha256": "9c982a63a1a0a6d636b2939129fd29a2d0d4eee2723c8d9dbc317b718507cb34"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_substitution.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_substitution.rs": {
       "bytes": 3144,
       "sha256": "997cd94b1b2e2d6f09a53296d76a64d29d4b9c6f1efbcb2a8a7b73e10cb21433"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_syntax.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_syntax.rs": {
       "bytes": 7762,
       "sha256": "a6b2d24acae3fbf88ffd0a48b21015037202cc5233bae22e52a4b50fde247b7f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_text.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_text.rs": {
       "bytes": 11866,
       "sha256": "f7d9f7331d2a8f95dcb238faa8a33d37af223535d277b2a80c22159b91d29e6a"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/config_value.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/config_value.rs": {
       "bytes": 1948,
       "sha256": "9cb27d94e91cb91e076f14e6eea02f01d45ac926922a4f04a4f946b9c6e68207"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/convert_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/convert_options.rs": {
       "bytes": 11658,
       "sha256": "2a34ac06c9fe78645477cd246c0571764a7b8ab13ba54cc9d24f03e32f58fd02"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/fixture_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/fixture_options.rs": {
       "bytes": 12403,
       "sha256": "da8f58affa0f3901e1f6f123f9aea89768fec1a34b7686d5507639426c7fb4c2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/glob.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/glob.rs": {
       "bytes": 17687,
       "sha256": "3e56c89dc987734f094453fe87a3cc8ba507316533f6a310f7abd78a4978f6bf"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/lib.rs": {
       "bytes": 11652,
       "sha256": "ae4f947842f9c7399bed3b872671e1c85ef3b5dea6155dd19a21478b1200b876"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/merge_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/merge_options.rs": {
       "bytes": 7122,
       "sha256": "b9c47a1972cdddcd4974a31cf22d2ee220f1b227d795bb6c95cb68551229b8ab"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/option_declarations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/option_declarations.rs": {
       "bytes": 3240,
       "sha256": "3f6c99907f43c3a7c1b5065994fee88a49d7c3defbbbeef3f5d659c4809637c2"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/option_declarations_generated.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/option_declarations_generated.rs": {
       "bytes": 67205,
       "sha256": "778d25a8a34811186ba47eaff1a0c51c12be2c8cac247201f3f0814958fd2d21"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/options_value.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/options_value.rs": {
       "bytes": 18156,
       "sha256": "7f1a23695579a44c1bdb8e51266edd83edf32cc43a98950387f828573a9d2820"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/parse_options.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/parse_options.rs": {
       "bytes": 13447,
       "sha256": "26dda76d3c71969628f390353db346077d6e12dd832ddf1d3c5660bfc3b860ab"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tsoptions/src/raw.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tsoptions/src/raw.rs": {
       "bytes": 29360,
       "sha256": "0e9c00b442d4a01838590804007667b1a9c1206da4dbde6faf2f45a50ef2547b"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tspath/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tspath/Cargo.toml": {
       "bytes": 345,
       "sha256": "d5350591d3a129863aff550239a0d48e10fda855f36d03f66b2856988c212fa4"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tspath/src/comparison.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tspath/src/comparison.rs": {
       "bytes": 6276,
       "sha256": "a7a0b47d195cfa3c47010d3edc2dc4d055443aaaf2ef685edb22809c5df183c8"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tspath/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tspath/src/lib.rs": {
       "bytes": 4687,
       "sha256": "49a9106d6c639cfb79707c4084d7024094cabb773877a7e5726da6caf47775ab"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_tspath/tests/go_observations.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_tspath/tests/go_observations.rs": {
       "bytes": 2500,
       "sha256": "1aaa17238e5a0087fa20358364c09b45a66e452661eb1a50d0a65d644183c537"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_vfs/Cargo.toml": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_vfs/Cargo.toml": {
       "bytes": 309,
       "sha256": "b4df633933b7384eaa9e3befd06015847dbb9349e925a5dae9bf998113fef38f"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_vfs/src/lib.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_vfs/src/lib.rs": {
       "bytes": 9697,
       "sha256": "bfed205673177384b263d6e2b7f06448c568b785686020bbc4df6c1b8bf4fd93"
     },
-    "target/s07-bis/parser-list-phase-memory-build/source/crates/ts_vfs/src/os.rs": {
+    "target/s07-bis/parser-list-phase-memory-build/source/crates/tsr_vfs/src/os.rs": {
       "bytes": 2810,
       "sha256": "3ddb6644b65f2fb3df6ba97d3b56d23ee65e35d7a99264016e0dc2b82e934ba2"
     },

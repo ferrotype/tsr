@@ -1,14 +1,14 @@
 //! Equality narrowing preserves union origin, uniform enums and literal families.
 use crate::{object_flags as of, type_facts as f, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 
 impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.narrowTypeByEquality
     pub(crate) fn narrow_equality(
         &mut self,
         ty: TypeId,
-        operator: ts_ast::NodeKind,
+        operator: tsr_ast::NodeKind,
         value: NodeId,
         mut assume: bool,
     ) -> Result<TypeId, Error> {

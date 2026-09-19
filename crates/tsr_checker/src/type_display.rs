@@ -1,12 +1,12 @@
-//! Type and symbol display through synthetic AST nodes and `ts_printer`
+//! Type and symbol display through synthetic AST nodes and `tsr_printer`
 //! (`tsc/internal/checker/printer.go`). The builder cache and emit context are
 //! reused across diagnostic calls. Completed cache entries retain their AST
 //! frames; uncached request output is released. Returned bytes own no AST.
 
 use crate::{type_format_flags, CheckerState, Error, TypeAlias, TypeFormatFlags, TypeId};
-use ts_arena::SymbolId;
-use ts_ast::JsString;
-use ts_printer::{EmitTextWriter, Printer, PrinterOptions, SingleLineStringWriter, TextWriter};
+use tsr_arena::SymbolId;
+use tsr_ast::JsString;
+use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, SingleLineStringWriter, TextWriter};
 
 // Defaults used by the pinned Checker.TypeToString entry point.
 pub(crate) const DEFAULT_FLAGS: TypeFormatFlags = type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
@@ -17,12 +17,12 @@ impl CheckerState {
     pub(crate) fn symbol_to_string_at(
         &mut self,
         symbol: SymbolId,
-        enclosing: Option<ts_arena::NodeId>,
-        meaning: ts_ast::SymbolFlags,
+        enclosing: Option<tsr_arena::NodeId>,
+        meaning: tsr_ast::SymbolFlags,
         flags: crate::SymbolFormatFlags,
     ) -> Result<JsString, Error> {
         use crate::symbol_format_flags as sf;
-        use ts_nodebuilder::{flags as nf, internal_flags as inf};
+        use tsr_nodebuilder::{flags as nf, internal_flags as inf};
         let mut node_flags = nf::IGNORE_ERRORS;
         for (source, target) in [
             (
@@ -51,7 +51,7 @@ impl CheckerState {
         }
         let source = enclosing
             .map(|node| {
-                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
                     .map_err(Error::from)
             })
             .transpose()?
@@ -60,7 +60,7 @@ impl CheckerState {
             .map(|node| {
                 self.ast(node)?
                     .node(node)
-                    .map(|n| n.kind() == ts_ast::SyntaxKind::SourceFile)
+                    .map(|n| n.kind() == tsr_ast::SyntaxKind::SourceFile)
                     .map_err(Error::from)
             })
             .transpose()?
@@ -102,7 +102,7 @@ impl CheckerState {
     pub(crate) fn type_to_string_at(
         &mut self,
         ty: TypeId,
-        enclosing: Option<ts_arena::NodeId>,
+        enclosing: Option<tsr_arena::NodeId>,
         flags: TypeFormatFlags,
     ) -> Result<JsString, Error> {
         if self.serialization_level >= MAX_SERIALIZATION_LEVEL as u32 {
@@ -113,19 +113,19 @@ impl CheckerState {
                 .program
                 .as_ref()
                 .is_some_and(|program| program.host.options().no_error_truncation.is_true());
-        let mut combined = to_node_builder_flags(flags) | ts_nodebuilder::flags::IGNORE_ERRORS;
+        let mut combined = to_node_builder_flags(flags) | tsr_nodebuilder::flags::IGNORE_ERRORS;
         if no_truncation {
-            combined |= ts_nodebuilder::flags::NO_TRUNCATION;
+            combined |= tsr_nodebuilder::flags::NO_TRUNCATION;
         }
         let source = enclosing
             .map(|node| {
-                ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
+                tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))
                     .map_err(Error::from)
             })
             .transpose()?
             .flatten();
         crate::node_builder::NodeBuilder::with_cached(self, combined, |builder| {
-            builder.prepare_context(enclosing, combined, ts_nodebuilder::internal_flags::NONE)?;
+            builder.prepare_context(enclosing, combined, tsr_nodebuilder::internal_flags::NONE)?;
             builder.checker.serialization_level += 1;
             let node = builder.type_node(ty);
             builder.checker.serialization_level -= 1;
@@ -167,15 +167,15 @@ impl CheckerState {
             self.signatures.get(signature)?.flags & crate::signature_flags::CONSTRUCT != 0;
         crate::node_builder::NodeBuilder::with_cached(
             self,
-            ts_nodebuilder::flags::IGNORE_ERRORS
-                | ts_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME,
+            tsr_nodebuilder::flags::IGNORE_ERRORS
+                | tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME,
             |builder| {
                 let node = builder.signature_node(
                     signature,
                     if construct {
-                        ts_ast::SyntaxKind::ConstructSignature
+                        tsr_ast::SyntaxKind::ConstructSignature
                     } else {
-                        ts_ast::SyntaxKind::CallSignature
+                        tsr_ast::SyntaxKind::CallSignature
                     },
                     None,
                     None,
@@ -203,8 +203,8 @@ impl CheckerState {
     ) -> Result<JsString, Error> {
         crate::node_builder::NodeBuilder::with_cached(
             self,
-            ts_nodebuilder::flags::IGNORE_ERRORS
-                | ts_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
+            tsr_nodebuilder::flags::IGNORE_ERRORS
+                | tsr_nodebuilder::flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
             |builder| {
                 let node = builder.predicate_node(predicate)?;
                 let printer = Printer::new(
@@ -232,7 +232,7 @@ impl CheckerState {
     pub(crate) fn fully_qualified_name(
         &mut self,
         symbol: SymbolId,
-        location: Option<ts_arena::NodeId>,
+        location: Option<tsr_arena::NodeId>,
     ) -> Result<JsString, Error> {
         if let Some(parent) = self.symbol(symbol)?.parent() {
             let parent = self.fully_qualified_name(parent, location)?;
@@ -248,11 +248,11 @@ impl CheckerState {
     fn symbol_to_string_without_chain(
         &mut self,
         symbol: SymbolId,
-        location: Option<ts_arena::NodeId>,
+        location: Option<tsr_arena::NodeId>,
     ) -> Result<JsString, Error> {
         crate::node_builder::NodeBuilder::with_cached(
             self,
-            ts_nodebuilder::flags::IGNORE_ERRORS,
+            tsr_nodebuilder::flags::IGNORE_ERRORS,
             |builder| {
                 let node = builder.symbol_expression_without_chain(symbol, location)?;
                 let printer = Printer::new(
@@ -281,7 +281,7 @@ pub const NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH: usize = 1_000_000;
 
 /// The bits of `TypeFormatFlags` that are node-builder flags at the same positions.
 // port: tsc/internal/checker/printer.go:toNodeBuilderFlags
-pub fn to_node_builder_flags(flags: TypeFormatFlags) -> ts_nodebuilder::Flags {
+pub fn to_node_builder_flags(flags: TypeFormatFlags) -> tsr_nodebuilder::Flags {
     flags & type_format_flags::NODE_BUILDER_FLAGS_MASK
 }
 
@@ -302,8 +302,8 @@ mod tests {
     use super::*;
     use crate::{object_flags, CheckerOptions};
     use std::sync::Arc;
-    use ts_arena::{CheckerIdentity, Counters, Generation};
-    use ts_ast::{check_flags, symbol_flags, SymbolTable};
+    use tsr_arena::{CheckerIdentity, Counters, Generation};
+    use tsr_ast::{check_flags, symbol_flags, SymbolTable};
 
     fn checker() -> (CheckerState, Counters) {
         let counters = Counters::new();
@@ -328,10 +328,10 @@ mod tests {
             .unwrap();
         let fresh = state.get_fresh_type_of_literal_type(literal).unwrap();
         let number = state
-            .get_number_literal_type(ts_jsnum::Number::new(-42.0))
+            .get_number_literal_type(tsr_jsnum::Number::new(-42.0))
             .unwrap();
         let bigint = state
-            .get_big_int_literal_type(ts_jsnum::PseudoBigInt::new(b"42", true))
+            .get_big_int_literal_type(tsr_jsnum::PseudoBigInt::new(b"42", true))
             .unwrap();
         let before = counters.snapshot();
         for ty in [literal, fresh] {

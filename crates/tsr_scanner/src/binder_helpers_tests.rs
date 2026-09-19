@@ -1,8 +1,8 @@
 use super::*;
 use std::collections::BTreeMap;
-use ts_arena::Counters;
-use ts_ast::{AstBuilder, FactoryMethods, NodeData, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_ast::{AstBuilder, FactoryMethods, NodeData, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 
 fn source(f: &mut AstBuilder, text: &[u8]) -> NodeId {
     f.new_source_file(

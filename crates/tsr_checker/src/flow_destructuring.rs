@@ -2,8 +2,8 @@
 //! Their AST owner retains completed sources; flow links name the original
 //! binder owner because the checker factory does not own binder arenas.
 use crate::{type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{Factory, FactoryMethods, JsString, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{Factory, FactoryMethods, JsString, SyntaxKind as K};
 
 impl CheckerState {
     pub(crate) fn retain_flow_source(&mut self, owner: NodeId) -> Result<(), Error> {
@@ -57,7 +57,7 @@ impl CheckerState {
         let range = self.node(node)?.range();
         let literal = self.factory.new_string_literal(name, 0);
         self.factory.set_node_range(literal, range);
-        let lhs = if ts_ast::is_left_hand_side_expression(self.ast(parent_access)?, parent_access)?
+        let lhs = if tsr_ast::is_left_hand_side_expression(self.ast(parent_access)?, parent_access)?
         {
             parent_access
         } else {
@@ -101,7 +101,7 @@ impl CheckerState {
             Some(K::BinaryExpression) => Ok(read
                 .data_source()
                 .as_binary_expression()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .right()),
             _ => Ok(None),
         }
@@ -120,7 +120,7 @@ impl CheckerState {
             let data = read
                 .data_source()
                 .as_binding_element()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             data.property_name().or(data.name())
         } else if matches!(
             read.kind().known(),

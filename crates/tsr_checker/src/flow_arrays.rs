@@ -5,8 +5,8 @@ use crate::{
     types::{EvolvingArrayData, ObjectData, Payload},
     CheckerState, Error, TypeId, UnionReduction,
 };
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
 }
@@ -98,7 +98,7 @@ impl CheckerState {
             required(
                 read.data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .left(),
                 "array mutation left",
             )?
@@ -124,14 +124,14 @@ impl CheckerState {
             let binary = read
                 .data_source()
                 .as_binary_expression()
-                .ok_or(ts_arena::Error::InvalidGraph)?;
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
             let left = required(binary.left(), "array mutation left")?;
             let right = required(binary.right(), "array mutation right")?;
             let index = required(
                 self.node(left)?
                     .data_source()
                     .as_element_access_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .argument_expression(),
                 "array mutation index",
             )?;
@@ -219,7 +219,7 @@ impl CheckerState {
             let index = required(
                 read.data_source()
                     .as_element_access_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .argument_expression(),
                 "evolving array index",
             )?;
@@ -228,7 +228,7 @@ impl CheckerState {
                 let op = required(binary.operator_token(), "evolving array assignment")?;
                 if binary.left() == Some(parent)
                     && self.node(op)?.kind() == K::EqualsToken
-                    && !ts_ast::is_assignment_target(self.ast(assignment)?, assignment)?
+                    && !tsr_ast::is_assignment_target(self.ast(assignment)?, assignment)?
                 {
                     let ty = self.get_type_of_expression(index)?;
                     return self.type_assignable_to_kind(ty, tf::NUMBER_LIKE);

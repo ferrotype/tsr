@@ -1,8 +1,8 @@
 //! Known-truthy warnings inspect uses in the condition and its body before reporting.
 use crate::{type_facts as f, type_flags as tf, CheckerState, Error, LiteralValue, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(name))
 }
@@ -54,7 +54,7 @@ impl CheckerState {
         body: Option<NodeId>,
     ) -> Result<(), Error> {
         let mut location = condition;
-        if ts_ast::utilities::is_logical_or_coalescing_binary_expression(
+        if tsr_ast::utilities::is_logical_or_coalescing_binary_expression(
             self.ast(location)?,
             location,
         )? {
@@ -62,16 +62,16 @@ impl CheckerState {
                 self.node(location)?
                     .data_source()
                     .as_binary_expression()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .right(),
                 "truthy right",
             )?;
             location = self.truthy_skip_parentheses(right)?;
         }
-        if ts_ast::is_module_exports_access_expression(self.ast(location)?, location)? {
+        if tsr_ast::is_module_exports_access_expression(self.ast(location)?, location)? {
             return Ok(());
         }
-        if ts_ast::utilities::is_logical_or_coalescing_binary_expression(
+        if tsr_ast::utilities::is_logical_or_coalescing_binary_expression(
             self.ast(location)?,
             location,
         )? {
@@ -99,8 +99,8 @@ impl CheckerState {
                     LiteralValue::String(value) => !value.is_empty(),
                     LiteralValue::Number(value) => value.value() != 0.0 && !value.value().is_nan(),
                     LiteralValue::Boolean(value) => *value,
-                    LiteralValue::BigInt(value) => *value != ts_jsnum::PseudoBigInt::default(),
-                    LiteralValue::ComputedEnum => return Err(ts_arena::Error::InvalidGraph.into()),
+                    LiteralValue::BigInt(value) => *value != tsr_jsnum::PseudoBigInt::default(),
+                    LiteralValue::ComputedEnum => return Err(tsr_arena::Error::InvalidGraph.into()),
                 };
                 self.error_at(
                     Some(location),

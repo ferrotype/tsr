@@ -1,9 +1,9 @@
 //! Constructor/static-block property inference uses the same flow engine as a
 //! source property read, with a retained synthetic `this.name` reference.
 use crate::{type_facts as facts, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, Factory, FactoryMethods, JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, Factory, FactoryMethods, JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isPropertyInitializedInConstructor

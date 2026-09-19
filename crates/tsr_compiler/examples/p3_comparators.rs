@@ -5,9 +5,9 @@ use p3::{array, load, text, Result};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, sync::Arc};
-use ts_arena::{CheckerIdentity, Counters, Generation};
-use ts_checker::CheckerOwner;
-use ts_compiler::ProgramCheckerHost;
+use tsr_arena::{CheckerIdentity, Counters, Generation};
+use tsr_checker::CheckerOwner;
+use tsr_compiler::ProgramCheckerHost;
 
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
@@ -111,7 +111,7 @@ fn main() -> Result<()> {
                 }
                 let name = text(&group["type"])?;
                 let ty = types[name];
-                if op.type_flags(ty)? & ts_checker::type_flags::UNION == 0 {
+                if op.type_flags(ty)? & tsr_checker::type_flags::UNION == 0 {
                     return Err("expected union type".into());
                 }
                 let original = op.constituents(ty)?;

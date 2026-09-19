@@ -1,6 +1,6 @@
 use crate::{Parser, ParserFactory, ParsingContext};
-use ts_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
-use ts_diagnostics as diag;
+use tsr_ast::{node_flags, FactoryMethods, NodeId, NodeListId, SyntaxKind as K};
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseVariableStatement

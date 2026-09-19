@@ -1,8 +1,8 @@
 //! Diagnostic rules shared by expression operators and calls.
 use crate::{type_facts as f, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{JsString, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{JsString, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 impl CheckerState {
     // port: tsc/internal/checker/utilities.go:entityNameToString
@@ -27,7 +27,7 @@ impl CheckerState {
                     let text = if read.pos() < 0 {
                         self.node_text(node)?.into_js_string()
                     } else {
-                        ts_scanner::get_text_of_node(self.ast(node)?, node)?
+                        tsr_scanner::get_text_of_node(self.ast(node)?, node)?
                     };
                     bytes.extend_from_slice(text.as_bytes());
                 }
@@ -64,7 +64,7 @@ impl CheckerState {
         invocation: bool,
     ) -> Result<TypeId, Error> {
         if self.options.strict_null_checks && self.types.flags(ty)? & tf::UNKNOWN != 0 {
-            if ts_ast::is_entity_name_expression(self.ast(node)?, node)? {
+            if tsr_ast::is_entity_name_expression(self.ast(node)?, node)? {
                 let text = self.entity_name_text(node)?;
                 if text.len() < 100 {
                     self.error_at(Some(node), d::X_0_is_of_type_unknown, vec![text])?;
@@ -104,7 +104,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.reportObjectPossiblyNullOrUndefinedError
     fn report_possibly_null_or_undefined(&mut self, node: NodeId, facts: u32) -> Result<(), Error> {
-        let text = if ts_ast::is_entity_name_expression(self.ast(node)?, node)? {
+        let text = if tsr_ast::is_entity_name_expression(self.ast(node)?, node)? {
             self.entity_name_text(node)?
         } else {
             JsString::default()

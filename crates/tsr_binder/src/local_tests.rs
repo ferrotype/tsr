@@ -4,13 +4,13 @@ use std::{
     ops::ControlFlow,
     panic::{catch_unwind, AssertUnwindSafe},
 };
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     AstBuilder, AstView, ChildVisitor, Diagnostic, Factory, FactoryMethods, JsString, NodeId,
     NodeListId, NodeSlice, ParsedFile, SourceFileParseOptions, SyntaxKind,
 };
-use ts_core::{ScriptKind, TextRange};
-use ts_jsstring::SourceText;
+use tsr_core::{ScriptKind, TextRange};
+use tsr_jsstring::SourceText;
 
 fn panic_message(payload: &(dyn std::any::Any + Send)) -> String {
     payload
@@ -192,14 +192,15 @@ fn local_block_dispatch_preserves_checked_payload_failures() {
             .bind_and_publish(|builder| {
                 let checked_failure = {
                     let mut binder = Binder::new(builder);
-                    binder.current_flow = Some(binder.new_flow_node(ts_ast::flow_flags::START));
+                    binder.current_flow = Some(binder.new_flow_node(tsr_ast::flow_flags::START));
                     catch_unwind(AssertUnwindSafe(|| binder.bind(Some(node)))).unwrap_err()
                 };
                 builder
                     .with_local_scope(|local| {
                         let mut binder =
                             Binder::from_backend(crate::backend::Backend::Local(local));
-                        binder.current_flow = Some(binder.new_flow_node(ts_ast::flow_flags::START));
+                        binder.current_flow =
+                            Some(binder.new_flow_node(tsr_ast::flow_flags::START));
                         let local_failure =
                             catch_unwind(AssertUnwindSafe(|| binder.bind(Some(node)))).unwrap_err();
                         assert_eq!(
@@ -215,7 +216,7 @@ fn local_block_dispatch_preserves_checked_payload_failures() {
 }
 
 fn parse(bytes: &[u8]) -> ParsedFile {
-    ts_parser::parse_source_file_with_counters(
+    tsr_parser::parse_source_file_with_counters(
         SourceText::from_loaded_bytes(bytes),
         ScriptKind::TS,
         SourceFileParseOptions {
@@ -366,7 +367,7 @@ fn scoped_and_checked_node_aliases_share_identity_and_live_flags() {
                     assert!(binder.same_node(Some(local), Some(checked)));
                     assert!(binder.same_node(Some(checked), Some(local)));
                     assert!(!binder.same_node(Some(local), None));
-                    let flags = binder.node_flags(local) | ts_ast::node_flags::THIS_NODE_HAS_ERROR;
+                    let flags = binder.node_flags(local) | tsr_ast::node_flags::THIS_NODE_HAS_ERROR;
                     binder.set_binding_flags(local, flags);
                     assert_eq!(binder.node_flags(checked), flags);
                 })

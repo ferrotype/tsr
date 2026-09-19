@@ -1,6 +1,6 @@
 //! Loader configuration and the pinned option/library interpretation slice.
-use ts_core::{CompilerOptions, ScriptTarget};
-use ts_jsstring::JsString;
+use tsr_core::{CompilerOptions, ScriptTarget};
+use tsr_jsstring::JsString;
 pub const LIB_MAP: &[(&str, &str)] = &[
     ("es5", "lib.es5.d.ts"),
     ("es6", "lib.es2015.d.ts"),
@@ -124,7 +124,7 @@ pub const LIB_MAP: &[(&str, &str)] = &[
 ];
 /// port: tsc/internal/tsoptions/enummaps.go:GetLibFileName
 pub fn lib_file_name(name: &[u8]) -> Option<&'static str> {
-    let name = ts_tspath::file_name_lower_case(name);
+    let name = tsr_tspath::file_name_lower_case(name);
     LIB_MAP.iter().find_map(|(key, file)| {
         (key.as_bytes() == name.as_ref() || file.as_bytes() == name.as_ref()).then_some(*file)
     })
@@ -198,7 +198,7 @@ pub struct ParsedCommandLine {
     pub options: CompilerOptions,
     pub root_file_names: Vec<JsString>,
     pub config_file: Option<std::sync::Arc<TsConfigSourceFile>>,
-    pub errors: Vec<ts_ast::Diagnostic>,
+    pub errors: Vec<tsr_ast::Diagnostic>,
     pub raw: ConfigValue,
     pub compile_on_save: Option<bool>,
     pub config_specs: Option<ConfigFileSpecs>,
@@ -214,7 +214,7 @@ impl ParsedCommandLine {
     /// Syntax diagnostics precede option/conversion diagnostics, as in the
     /// native API; neither collection alone is the complete config phase.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetConfigFileParsingDiagnostics
-    pub fn config_file_parsing_diagnostics(&self) -> Vec<ts_ast::Diagnostic> {
+    pub fn config_file_parsing_diagnostics(&self) -> Vec<tsr_ast::Diagnostic> {
         let mut diagnostics = self.config_file.as_ref().map_or_else(Vec::new, |config| {
             config
                 .file

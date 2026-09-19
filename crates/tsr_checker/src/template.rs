@@ -8,8 +8,8 @@ use crate::{
     TemplateLiteralData, TypeId,
 };
 use std::sync::Arc;
-use ts_ast::JsString;
-use ts_jsstring::wtf8::combine_surrogate_pairs;
+use tsr_ast::JsString;
+use tsr_jsstring::wtf8::combine_surrogate_pairs;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTemplateLiteralType

@@ -20,7 +20,7 @@ python3 scripts/s08_p2.py compare --native target/s08/p2-replay/native --actual 
 To run the current Rust implementation against those original observations:
 
 ```sh
-cargo run -p ts_compiler --example p2_checker -- target/s08/p2-replay/native/requests.json target/s08/p2-replay/current-rust.json
+cargo run -p tsr_compiler --example p2_checker -- target/s08/p2-replay/native/requests.json target/s08/p2-replay/current-rust.json
 python3 scripts/s08_p2.py compare --native target/s08/p2-replay/native --actual target/s08/p2-replay/current-rust.json --output target/s08/p2-replay/current-comparison.json
 ```
 

@@ -1,12 +1,12 @@
 //! Alias diagnostics follow the source language and emitted module format;
 //! syntactic type-only declarations already carry their own JS grammar errors.
 use crate::{CheckerState, Error};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{
     modifier_flags as mf, node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K,
 };
-use ts_core::ModuleKind;
-use ts_diagnostics as d;
+use tsr_core::ModuleKind;
+use tsr_diagnostics as d;
 impl CheckerState {
     pub(crate) fn alias_property_name(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let read = self.node(node)?;
@@ -42,7 +42,7 @@ impl CheckerState {
                 d::Types_cannot_appear_in_export_declarations_in_JavaScript_files,
                 vec![],
             )?;
-            let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+            let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("alias source"))?;
             let source_symbol = self
                 .program()?
@@ -60,7 +60,7 @@ impl CheckerState {
                         .into_iter()
                         .flatten()
                     {
-                        if ts_ast::is_js_type_alias_declaration(&self.node(declaration)?) {
+                        if tsr_ast::is_js_type_alias_declaration(&self.node(declaration)?) {
                             if let Some(diagnostic) = diagnostic {
                                 let text = self.symbol(target)?.name_to_owned();
                                 let related = self.diagnostic_for_node(
@@ -183,9 +183,9 @@ impl CheckerState {
                 }
                 Some(K::ExportSpecifier) => {
                     let current =
-                        ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?;
+                        tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?;
                     let origin = match type_only {
-                        Some(declaration) => ts_ast::utilities::get_source_file_of_node(
+                        Some(declaration) => tsr_ast::utilities::get_source_file_of_node(
                             self.ast(declaration)?,
                             Some(declaration),
                         )?,
@@ -241,7 +241,7 @@ impl CheckerState {
                 .symbol(target)?
                 .value_declaration()
                 .ok_or(Error::MissingLink("const enum alias declaration"))?;
-            let source = ts_ast::utilities::get_source_file_of_node(
+            let source = tsr_ast::utilities::get_source_file_of_node(
                 self.ast(declaration)?,
                 Some(declaration),
             )?

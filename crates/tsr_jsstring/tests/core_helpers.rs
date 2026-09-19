@@ -3,15 +3,15 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 
-use ts_jsstring::escape::{
+use tsr_jsstring::escape::{
     escape_jsx_attribute_string, escape_non_ascii_string, escape_string, escape_string_with_flags,
 };
-use ts_jsstring::helpers::{lower_first_char, to_lower_js, to_upper_js, truncate_by_runes};
-use ts_jsstring::wtf8::{
+use tsr_jsstring::helpers::{lower_first_char, to_lower_js, to_upper_js, truncate_by_runes};
+use tsr_jsstring::wtf8::{
     code_point_to_surrogate_pair, code_points, combine_surrogate_pairs, decode_rune, decode_utf8,
     encode_rune, surrogate_pair_to_code_point, RUNE_ERROR,
 };
-use ts_jsstring::{
+use tsr_jsstring::{
     JsString, LiteralEscapeFlags as Flags, QuoteChar as Quote, SourceText, Validity,
 };
 

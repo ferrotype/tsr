@@ -7,7 +7,7 @@
 
 use super::{greatest_end, Session, Span, WriteKind};
 use crate::{list_format as lf, Error, ListFormat, TypePrecedence};
-use ts_ast::{operator_precedence as op, NodeId, NodeListId, SyntaxKind as K};
+use tsr_ast::{operator_precedence as op, NodeId, NodeListId, SyntaxKind as K};
 
 impl Session<'_, '_> {
     fn end_of(&self, node: Option<NodeId>) -> Result<Option<i64>, Error> {
@@ -96,7 +96,7 @@ impl Session<'_, '_> {
         let read = self.node(node)?;
         if read.kind() == K::Decorator {
             self.emit_decorator(node)
-        } else if ts_ast::utilities::is_modifier(&read) {
+        } else if tsr_ast::utilities::is_modifier(&read) {
             self.emit_keyword_node(Some(node))
         } else {
             Err(Error::UnexpectedKind {
@@ -178,7 +178,7 @@ impl Session<'_, '_> {
         if block.multi_line() {
             return Ok(false);
         }
-        if !ts_ast::utilities::node_is_synthesized(&read)
+        if !tsr_ast::utilities::node_is_synthesized(&read)
             && self.current_source.is_some()
             && !self.range_is_on_single_line(Span::of(&read))
         {
@@ -224,7 +224,7 @@ impl Session<'_, '_> {
             None => Vec::new(),
         };
         for (index, &statement) in nodes.iter().enumerate() {
-            if !ts_ast::utilities::is_prologue_directive(self.view, statement)? {
+            if !tsr_ast::utilities::is_prologue_directive(self.view, statement)? {
                 return Ok(index as i64);
             }
             self.write_line();
@@ -442,7 +442,7 @@ impl Session<'_, '_> {
         let Some((_, source)) = &self.current_source else {
             return Ok(false);
         };
-        if source.script_kind == ts_core::ScriptKind::JSON {
+        if source.script_kind == tsr_core::ScriptKind::JSON {
             return Ok(false);
         }
         let read = self.node(node)?;
@@ -547,7 +547,7 @@ impl Session<'_, '_> {
             node,
         );
         self.write_space();
-        let skipped = ts_ast::skip_partially_emitted_expressions(self.view, expression)?;
+        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, expression)?;
         // `C()` under `new` is parenthesized, so it reads `new (C())` and not
         // `new C()`.
         let precedence = if self.node(skipped)?.kind() == K::CallExpression {
@@ -650,7 +650,7 @@ impl Session<'_, '_> {
         if read.kind() == K::Block {
             return self.emit_function_body(node);
         }
-        let leftmost = ts_ast::get_leftmost_expression(self.view, node, false)?;
+        let leftmost = tsr_ast::get_leftmost_expression(self.view, node, false)?;
         if self.node(leftmost)?.kind() == K::ObjectLiteralExpression {
             self.write_punctuation(b"(");
             let leading = if self.printer.options.preserve_source_newlines {
@@ -669,7 +669,7 @@ impl Session<'_, '_> {
             self.write_punctuation(b")");
             return Ok(());
         }
-        if ts_ast::utilities::is_expression_kind(read.kind()) {
+        if tsr_ast::utilities::is_expression_kind(read.kind()) {
             return self.emit_expression(node, op::YIELD);
         }
         Err(Error::UnexpectedKind {
@@ -756,7 +756,7 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitShortCircuitExpression
     fn emit_short_circuit_expression(&mut self, node: NodeId) -> Result<(), Error> {
         // port: tsc/internal/printer/utilities.go:isBinaryOperation
-        let skipped = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
         let is_coalesce = if self.node(skipped)?.kind() == K::BinaryExpression {
             let (_, operator, _) = self.binary_parts(skipped)?;
             self.node(operator)?.kind() == K::QuestionQuestionToken
@@ -1131,12 +1131,12 @@ impl Session<'_, '_> {
     fn is_json_source(&self) -> bool {
         self.current_source
             .as_ref()
-            .is_some_and(|(_, source)| source.script_kind == ts_core::ScriptKind::JSON)
+            .is_some_and(|(_, source)| source.script_kind == tsr_core::ScriptKind::JSON)
     }
 
     // port: tsc/internal/printer/utilities.go:isImmediatelyInvokedFunctionExpressionOrArrowFunction
     fn is_immediately_invoked_function(&self, node: NodeId) -> Result<bool, Error> {
-        let call = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let call = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
         let read = self.node(call)?;
         if read.kind() != K::CallExpression {
             return Ok(false);
@@ -1144,7 +1144,7 @@ impl Session<'_, '_> {
         let Some(callee) = read.expression() else {
             return Ok(false);
         };
-        let callee = ts_ast::skip_partially_emitted_expressions(self.view, callee)?;
+        let callee = tsr_ast::skip_partially_emitted_expressions(self.view, callee)?;
         let kind = self.node(callee)?.kind();
         Ok(kind == K::FunctionExpression || kind == K::ArrowFunction)
     }
@@ -1162,7 +1162,7 @@ impl Session<'_, '_> {
             // Only the callee is parenthesized: `(function () { })()`.
             self.emit_iife_with_parenthesized_callee(expression)?;
         } else {
-            let leftmost = ts_ast::get_leftmost_expression(self.view, expression, false)?;
+            let leftmost = tsr_ast::get_leftmost_expression(self.view, expression, false)?;
             let kind = self.node(leftmost)?.kind();
             let precedence = if kind == K::FunctionExpression || kind == K::ObjectLiteralExpression
             {
@@ -1173,7 +1173,8 @@ impl Session<'_, '_> {
             self.emit_expression(expression, precedence)?;
         }
         // A JSON file takes a semicolon only after a synthesized expression.
-        if !self.is_json_source() || ts_ast::utilities::node_is_synthesized(&self.node(expression)?)
+        if !self.is_json_source()
+            || tsr_ast::utilities::node_is_synthesized(&self.node(expression)?)
         {
             self.write_trailing_semicolon();
         }
@@ -1183,7 +1184,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitIIFEWithParenthesizedCallee
     fn emit_iife_with_parenthesized_callee(&mut self, node: NodeId) -> Result<(), Error> {
-        let call = ts_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let call = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
         self.enter_node(call);
         let read = self.node(call)?;
         let data = read
@@ -1666,13 +1667,13 @@ impl Session<'_, '_> {
             .as_variable_declaration_list()
             .ok_or(Error::MissingNode("declaration list payload"))?
             .declarations();
-        if ts_ast::utilities::is_var_let(self.view, node)? {
+        if tsr_ast::utilities::is_var_let(self.view, node)? {
             self.write_keyword(b"let");
-        } else if ts_ast::utilities::is_var_const(self.view, node)? {
+        } else if tsr_ast::utilities::is_var_const(self.view, node)? {
             self.write_keyword(b"const");
-        } else if ts_ast::utilities::is_var_using(self.view, node)? {
+        } else if tsr_ast::utilities::is_var_using(self.view, node)? {
             self.write_keyword(b"using");
-        } else if ts_ast::utilities::is_var_await_using(self.view, node)? {
+        } else if tsr_ast::utilities::is_var_await_using(self.view, node)? {
             self.write_keyword(b"await");
             self.write_space();
             self.write_keyword(b"using");
@@ -2130,7 +2131,7 @@ impl Session<'_, '_> {
         if !is_export_equals {
             // A class or function expression is parenthesized so it does not
             // read as an exported declaration.
-            let leftmost = ts_ast::get_leftmost_expression(self.view, expression, false)?;
+            let leftmost = tsr_ast::get_leftmost_expression(self.view, expression, false)?;
             let kind = self.node(leftmost)?.kind();
             if kind == K::ClassExpression || kind == K::FunctionExpression {
                 precedence = op::PARENTHESES;
@@ -2528,7 +2529,7 @@ impl Session<'_, '_> {
             .dot_dot_dot_token();
         if let Some(expression) = read.expression() {
             let indented = self.current_source.is_some()
-                && !ts_ast::utilities::node_is_synthesized(&read)
+                && !tsr_ast::utilities::node_is_synthesized(&read)
                 && self.get_lines_between_positions(i64::from(read.pos()), i64::from(read.end()))
                     != 0;
             self.increase_indent_if(indented);
@@ -2618,8 +2619,8 @@ impl Session<'_, '_> {
             let clause = self.node(node)?;
             let statement = self.node(nodes[0])?;
             self.current_source.is_none()
-                || ts_ast::utilities::node_is_synthesized(&clause)
-                || ts_ast::utilities::node_is_synthesized(&statement)
+                || tsr_ast::utilities::node_is_synthesized(&clause)
+                || tsr_ast::utilities::node_is_synthesized(&statement)
                 || self
                     .range_start_positions_are_on_same_line(Span::of(&clause), Span::of(&statement))
         };

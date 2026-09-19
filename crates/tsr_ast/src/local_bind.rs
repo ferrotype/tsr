@@ -4,8 +4,8 @@ use super::{BindBuilder, BindResult, BindStorage};
 use crate::compact::{CompactSlice, CoreStore, FieldKey, StoredNode};
 use crate::{AstView, FlowId, NodeId, NodeKind};
 use std::{marker::PhantomData, num::NonZeroU32, ops::ControlFlow};
-use ts_arena::{CoreScopeMut, Error};
-use ts_jsstring::SourceText;
+use tsr_arena::{CoreScopeMut, Error};
+use tsr_jsstring::SourceText;
 
 type Brand<'scope> = PhantomData<fn(&'scope ()) -> &'scope ()>;
 
@@ -255,7 +255,7 @@ impl<'scope> LocalBind<'scope, '_> {
         }
         let _ = self.parsed_view().node_slice(slice)?;
         Ok(self.context().node_slice(CompactSlice {
-            backing: slice.backing.map_or(0, ts_arena::AuxId::slot),
+            backing: slice.backing.map_or(0, tsr_arena::AuxId::slot),
             start: slice.start,
             len: slice.len,
         }))
@@ -479,7 +479,7 @@ impl<'scope> LocalBind<'scope, '_> {
     pub fn text_slice(&self, slice: BindTextSlice<'scope>) -> crate::TextSlice {
         crate::TextSlice {
             backing: NonZeroU32::new(slice.value.backing).map(|word| {
-                ts_arena::AuxId::from_parts(self.core.auxiliary_arena(), word.get())
+                tsr_arena::AuxId::from_parts(self.core.auxiliary_arena(), word.get())
                     .expect("local text backing")
             }),
             start: slice.value.start,

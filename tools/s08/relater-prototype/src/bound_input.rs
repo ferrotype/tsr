@@ -5,15 +5,15 @@
 //! declarations into a type is the frontend's responsibility.
 
 use std::collections::{HashMap, HashSet};
-use ts_arena::{ArenaId, Error as ArenaError, SymbolId};
-use ts_ast::{
+use tsr_arena::{ArenaId, Error as ArenaError, SymbolId};
+use tsr_ast::{
     symbol_flags as flags, AstView, CompletedFile, DeclarationRead, JsString, NodeBinding,
     NodeDataRead, NodeId, NodeListId, NodeListRead, NodeRead, NodeSlice, NodeSliceRead, NodeText,
     SourceFileRead, SymbolFlags, SymbolRead, SymbolRef, SymbolTableId, SymbolTableRead,
     SyntaxKind as K,
 };
-use ts_binder::name_resolver::{NameResolver, NoNameResolverHooks, ResolverHost, ResolverOptions};
-use ts_core::{CompilerOptions, ResolutionMode, Tristate};
+use tsr_binder::name_resolver::{NameResolver, NoNameResolverHooks, ResolverHost, ResolverOptions};
+use tsr_core::{CompilerOptions, ResolutionMode, Tristate};
 
 #[derive(Clone, Copy, Debug)]
 pub struct BoundInputOptions {
@@ -147,7 +147,7 @@ impl BoundInput {
                     .flatten()
                     .copied(),
             );
-            if ts_ast::utilities_middle::is_global_source_file(view.ast(), source)? {
+            if tsr_ast::utilities_middle::is_global_source_file(view.ast(), source)? {
                 if let Some(table) = view.node_binding(source)?.and_then(|b| b.locals) {
                     for (name, symbol) in view.result().tables().get(table)? {
                         if let Some(symbol) = symbol {
@@ -165,7 +165,7 @@ impl BoundInput {
         }
         for name in augmentations {
             let declaration = input.node(name)?.parent().ok_or(ArenaError::InvalidGraph)?;
-            if !ts_ast::utilities::is_global_scope_augmentation(&input.node(declaration)?) {
+            if !tsr_ast::utilities::is_global_scope_augmentation(&input.node(declaration)?) {
                 return Err(InputError::Unsupported(
                     "external module augmentation".into(),
                 ));
@@ -345,7 +345,7 @@ impl BoundInput {
             .ok_or_else(|| InputError::Unsupported("declaration has no name".into()))?;
         let name = self.node(name)?;
         let source = self.source_file(declaration)?;
-        let start = ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(name.pos()));
+        let start = tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(name.pos()));
         let start = i32::try_from(start).map_err(|_| ArenaError::InvalidSlot)?;
         Ok((start, name.end()))
     }
@@ -559,7 +559,7 @@ impl BoundInput {
                 }
                 if self
                     .table(table)?
-                    .contains_key(ts_ast::internal_symbol_names::EXPORT_STAR)
+                    .contains_key(tsr_ast::internal_symbol_names::EXPORT_STAR)
                 {
                     return Err(InputError::Unsupported(
                         "export-star resolution in reference input".into(),
@@ -742,12 +742,12 @@ impl ResolverHost for BorrowedResolverHost<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_ast::SourceFileParseOptions;
-    use ts_core::{ModuleKind, ScriptKind};
-    use ts_jsstring::SourceText;
+    use tsr_ast::SourceFileParseOptions;
+    use tsr_core::{ModuleKind, ScriptKind};
+    use tsr_jsstring::SourceText;
 
     fn bind(path: &[u8], text: &[u8]) -> CompletedFile {
-        ts_binder::bind_parsed_file(ts_parser::parse_source_file(
+        tsr_binder::bind_parsed_file(tsr_parser::parse_source_file(
             SourceText::from_loaded_bytes(text),
             ScriptKind::TS,
             SourceFileParseOptions {

@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use ts_ast::{token_flags as flags, CommentDirective, SyntaxKind, TokenFlags};
-use ts_core::{LanguageVariant, ScriptTarget, TextRange};
-use ts_diagnostics::Message;
-use ts_jsstring::{JsString, SourceText};
+use tsr_ast::{token_flags as flags, CommentDirective, SyntaxKind, TokenFlags};
+use tsr_core::{LanguageVariant, ScriptTarget, TextRange};
+use tsr_diagnostics::Message;
+use tsr_jsstring::{JsString, SourceText};
 
 /// A scanner diagnostic argument retains the Go value's type and raw bytes.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -519,7 +519,7 @@ impl<'src> Scanner<'src> {
                 return (i32::from(byte), 1);
             }
         }
-        ts_jsstring::wtf8::decode_utf8(self.tail(self.state.pos))
+        tsr_jsstring::wtf8::decode_utf8(self.tail(self.state.pos))
     }
     /// port: tsc/internal/scanner/scanner.go:Scanner.scanASCIIWhile
     pub(crate) fn scan_ascii_while(&mut self, pred: impl Fn(u8) -> bool) {

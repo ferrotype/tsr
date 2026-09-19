@@ -1,8 +1,8 @@
 use crate::tokens::{is_keyword_or_punctuation, token_text};
 use crate::{Parser, ParserFactory};
-use ts_ast::{node_flags, FactoryMethods, NodeId, SyntaxKind};
-use ts_core::LanguageVariant;
-use ts_diagnostics as diagnostics;
+use tsr_ast::{node_flags, FactoryMethods, NodeId, SyntaxKind};
+use tsr_core::LanguageVariant;
+use tsr_diagnostics as diagnostics;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseExpression
@@ -52,7 +52,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             let pos = self.node_pos();
             let jsdoc = self.jsdoc_scanner_info();
             let expression =
-                self.parse_binary_expression_or_higher(ts_ast::operator_precedence::LOWEST);
+                self.parse_binary_expression_or_higher(tsr_ast::operator_precedence::LOWEST);
             if self.factory.node(expression).kind() == SyntaxKind::Identifier
                 && self.token == SyntaxKind::EqualsGreaterThanToken
             {
@@ -65,7 +65,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 );
             }
             if self.is_left_hand_side_expression(expression)
-                && ts_ast::is_assignment_operator(self.re_scan_greater_than_token().into())
+                && tsr_ast::is_assignment_operator(self.re_scan_greater_than_token().into())
             {
                 let operator = self.parse_token_node();
                 let right = self.parse_assignment_expression_or_higher_worker(allow_return_type);
@@ -142,7 +142,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         let mut last = left;
         loop {
             let operator = self.re_scan_greater_than_token();
-            let new_precedence = ts_ast::get_binary_operator_precedence(operator.into());
+            let new_precedence = tsr_ast::get_binary_operator_precedence(operator.into());
             if !should_consume_binary_operator(operator, new_precedence, precedence)
                 || operator == SyntaxKind::InKeyword && self.in_disallow_in_context()
             {
@@ -165,9 +165,9 @@ impl<F: ParserFactory> Parser<'_, F> {
                             .expect("binary kind has binary payload")
                             .operator_token()
                             .expect("parser binary has operator");
-                        ts_ast::get_binary_operator_precedence(self.factory.node(operator).kind())
+                        tsr_ast::get_binary_operator_precedence(self.factory.node(operator).kind())
                     } else {
-                        ts_ast::operator_precedence::HIGHEST
+                        tsr_ast::operator_precedence::HIGHEST
                     }
                 };
                 let r#type = self.parse_type();
@@ -179,7 +179,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 let next = self.re_scan_greater_than_token();
                 if should_consume_binary_operator(
                     next,
-                    ts_ast::get_binary_operator_precedence(next.into()),
+                    tsr_ast::get_binary_operator_precedence(next.into()),
                     last_precedence,
                 ) {
                     break;
@@ -235,7 +235,7 @@ impl<F: ParserFactory> Parser<'_, F> {
             let update = self.parse_update_expression();
             if self.token == SyntaxKind::AsteriskAsteriskToken {
                 return self.parse_binary_expression_rest(
-                    ts_ast::get_binary_operator_precedence(self.token.into()),
+                    tsr_ast::get_binary_operator_precedence(self.token.into()),
                     update,
                     pos,
                 );
@@ -249,7 +249,7 @@ impl<F: ParserFactory> Parser<'_, F> {
                 let node = self.factory.node(unary);
                 (node.kind(), node.range())
             };
-            let pos = ts_scanner::skip_trivia(self.source_text, range.pos());
+            let pos = tsr_scanner::skip_trivia(self.source_text, range.pos());
             if kind == SyntaxKind::TypeAssertionExpression {
                 self.parse_error_at(pos, range.end(), diagnostics::A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, vec![]);
             } else {
@@ -406,8 +406,8 @@ impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.isBinaryOperator
     pub(crate) fn is_binary_operator(&self) -> bool {
         !(self.in_disallow_in_context() && self.token == SyntaxKind::InKeyword)
-            && ts_ast::get_binary_operator_precedence(self.token.into())
-                != ts_ast::operator_precedence::INVALID
+            && tsr_ast::get_binary_operator_precedence(self.token.into())
+                != tsr_ast::operator_precedence::INVALID
     }
     /// port: tsc/internal/parser/parser.go:Parser.isStartOfExpression
     pub(crate) fn is_start_of_expression(&mut self) -> bool {

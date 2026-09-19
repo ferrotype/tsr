@@ -1,12 +1,12 @@
 //! Modifier grammar in source order. The first native grammar error wins; parse
 //! diagnostics suppress this grammar layer without suppressing semantic checks.
 use crate::{CheckerState, Error};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
-use ts_jsstring::JsString;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
+use tsr_jsstring::JsString;
 
-fn class_like(kind: ts_ast::NodeKind) -> bool {
+fn class_like(kind: tsr_ast::NodeKind) -> bool {
     matches!(kind.known(), Some(K::ClassDeclaration | K::ClassExpression))
 }
 
@@ -18,7 +18,7 @@ impl CheckerState {
         diagnostic: &'static d::Message,
         args: Vec<JsString>,
     ) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("grammar source"))?;
         if !self
             .ast(source)?
@@ -40,7 +40,7 @@ impl CheckerState {
         diagnostic: &'static d::Message,
         args: Vec<JsString>,
     ) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("grammar source"))?;
         if !self
             .ast(source)?
@@ -63,18 +63,18 @@ impl CheckerState {
         diagnostic: &'static d::Message,
         args: Vec<JsString>,
     ) -> Result<bool, Error> {
-        let source = ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+        let source = tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
             .ok_or(Error::MissingLink("grammar source"))?;
         let view = self.ast(source)?;
         if !view.source_file(source)?.diagnostics().is_empty() {
             return Ok(false);
         }
-        let range = ts_scanner::get_range_of_token_at_position(
+        let range = tsr_scanner::get_range_of_token_at_position(
             view,
             source,
             i64::from(view.node(node)?.pos()),
         )?;
-        self.add_diagnostic(ts_ast::Diagnostic::new(
+        self.add_diagnostic(tsr_ast::Diagnostic::new(
             Some(source),
             range,
             diagnostic,
@@ -307,7 +307,7 @@ impl CheckerState {
         let parent = read.parent().ok_or(Error::MissingLink("modifier parent"))?;
         let parent_kind = self.node(parent)?.kind();
         let parent_flags = self.node(parent)?.flags();
-        let private_name = ts_ast::utilities::is_private_identifier_class_element_declaration(
+        let private_name = tsr_ast::utilities::is_private_identifier_class_element_declaration(
             self.ast(node)?,
             node,
         )?;
@@ -345,7 +345,7 @@ impl CheckerState {
             let reparsed = modifier_read.flags() & nf::REPARSED != 0;
             let text = mk
                 .known()
-                .map(ts_scanner::token_to_string)
+                .map(tsr_scanner::token_to_string)
                 .ok_or(Error::MissingLink("modifier kind"))?;
             macro_rules! precede {
                 ($bit:expr, $previous:expr) => {
@@ -369,7 +369,7 @@ impl CheckerState {
                             .map(|body| {
                                 self.ast(body)?
                                     .node(body)
-                                    .map(|read| !ts_ast::node_is_present(Some(&read)))
+                                    .map(|read| !tsr_ast::node_is_present(Some(&read)))
                                     .map_err(Error::from)
                             })
                             .transpose()?
@@ -406,7 +406,7 @@ impl CheckerState {
                 }
                 if leading_decorators && flags & mf::MODIFIER != 0 {
                     let source =
-                        ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
+                        tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?
                             .ok_or(Error::MissingLink("decorator source"))?;
                     if !self
                         .ast(source)?
@@ -469,7 +469,7 @@ impl CheckerState {
                         fail!(node, A_class_member_cannot_have_the_0_keyword, "const");
                     }
                     if kind == K::TypeParameter
-                        && !(ts_ast::utilities::is_function_like_declaration_kind(parent_kind)
+                        && !(tsr_ast::utilities::is_function_like_declaration_kind(parent_kind)
                             || class_like(parent_kind)
                             || matches!(
                                 parent_kind.known(),
@@ -542,7 +542,7 @@ impl CheckerState {
                             An_accessibility_modifier_cannot_be_used_with_a_private_identifier
                         );
                     }
-                    flags |= ts_ast::modifier_to_flag(mk);
+                    flags |= tsr_ast::modifier_to_flag(mk);
                 }
                 Some(K::StaticKeyword) => {
                     if flags & mf::STATIC != 0 {
@@ -649,7 +649,7 @@ impl CheckerState {
                             .program()?
                             .host
                             .get_emit_module_format_of_file(file.file_name())?
-                            == ts_core::ModuleKind::COMMON_JS
+                            == tsr_core::ModuleKind::COMMON_JS
                         {
                             fail!(modifier, A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled);
                         }
@@ -695,7 +695,7 @@ impl CheckerState {
                             .ok_or(Error::MissingLink("default export container"))?
                     };
                     if self.node(container)?.kind() == K::ModuleDeclaration
-                        && !ts_ast::is_ambient_module(self.ast(container)?, container)?
+                        && !tsr_ast::is_ambient_module(self.ast(container)?, container)?
                     {
                         fail!(
                             modifier,

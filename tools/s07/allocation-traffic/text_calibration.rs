@@ -1,7 +1,7 @@
 
 pub(crate) fn calibrate_text_pool_traffic(snapshot: &impl Fn() -> [usize; 2]) {
     use crate::allocation_traffic_calibration::assert_accounting;
-    use ts_arena::allocation_traffic as traffic;
+    use tsr_arena::allocation_traffic as traffic;
     // Keep the shared text bytes outside this fixture: only entry/free-slot Vec
     // backing belongs to these two families, never the nested JsString storage.
     let value = JsString::from_bytes(b"shared fixture bytes".as_slice());

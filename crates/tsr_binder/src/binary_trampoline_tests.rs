@@ -1,12 +1,12 @@
 use crate::{backend::Backend, Binder};
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use ts_arena::Counters;
-use ts_ast::{
+use tsr_arena::Counters;
+use tsr_ast::{
     flow_flags as F, AstBuilder, BinaryExpressionData, Factory, FactoryMethods, JsString,
     ParsedFile, SourceFileParseOptions, SyntaxKind as K,
 };
-use ts_core::ScriptKind;
-use ts_jsstring::SourceText;
+use tsr_core::ScriptKind;
+use tsr_jsstring::SourceText;
 
 fn options() -> SourceFileParseOptions {
     SourceFileParseOptions {
@@ -146,7 +146,7 @@ fn local_binary_continuations_keep_deep_chains_off_the_native_stack() {
             .chunks_exact(2)
             .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
             .collect();
-        let parsed = ts_parser::parse_source_file(
+        let parsed = tsr_parser::parse_source_file(
             SourceText::from_loaded_bytes(bytes),
             ScriptKind::TS,
             options(),

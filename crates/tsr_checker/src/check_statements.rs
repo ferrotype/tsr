@@ -1,9 +1,9 @@
 //! Statement checks retain the native order of grammar, expressions and bodies.
 use crate::{type_flags as tf, CheckerState, Error, RelationKind};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, symbol_flags as sf, Diagnostic, SyntaxKind as K};
-use ts_core::{TextRange, Tristate};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, symbol_flags as sf, Diagnostic, SyntaxKind as K};
+use tsr_core::{TextRange, Tristate};
+use tsr_diagnostics as d;
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
 }
@@ -31,7 +31,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_for_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let initializer = data.initializer();
         let condition = data.condition();
         let incrementor = data.incrementor();
@@ -65,7 +65,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let initializer = required(data.initializer(), "iteration initializer")?;
         let await_modifier = data.await_modifier();
         let await_context = read.flags() & nf::AWAIT_CONTEXT != 0;
@@ -94,7 +94,7 @@ impl CheckerState {
                 self.node(initializer)?
                     .data_source()
                     .as_variable_declaration_list()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .declarations(),
             )?;
             if declarations.len() > 1 {
@@ -135,7 +135,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let initializer = required(data.initializer(), "for-in initializer")?;
         let expression = required(data.expression(), "for-in expression")?;
         let statement = required(data.statement(), "for-in body")?;
@@ -147,7 +147,7 @@ impl CheckerState {
                 self.node(initializer)?
                     .data_source()
                     .as_variable_declaration_list()
-                    .ok_or(ts_arena::Error::InvalidGraph)?
+                    .ok_or(tsr_arena::Error::InvalidGraph)?
                     .declarations(),
             )?;
             if let Some(&declaration) = declarations.first() {
@@ -241,7 +241,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_for_in_or_of_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let await_modifier = data.await_modifier();
         let initializer = required(data.initializer(), "for-of initializer")?;
         let statement = required(data.statement(), "for-of body")?;
@@ -318,12 +318,12 @@ impl CheckerState {
         let is_continue = read.kind() == K::ContinueStatement;
         let label = read.label();
         let label = label
-            .map(|label| self.node_text(label).map(ts_ast::NodeText::into_js_string))
+            .map(|label| self.node_text(label).map(tsr_ast::NodeText::into_js_string))
             .transpose()?;
         let mut current = Some(node);
         while let Some(id) = current {
             let read = self.node(id)?;
-            if ts_ast::utilities::is_function_like(Some(&read))
+            if tsr_ast::utilities::is_function_like(Some(&read))
                 || read.kind() == K::ClassStaticBlockDeclaration
             {
                 self.grammar_error_node(
@@ -390,7 +390,7 @@ impl CheckerState {
             self.node(node)?
                 .data_source()
                 .as_switch_statement()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .case_block(),
             "switch case block",
         )?;
@@ -399,7 +399,7 @@ impl CheckerState {
             self.node(block)?
                 .data_source()
                 .as_case_block()
-                .ok_or(ts_arena::Error::InvalidGraph)?
+                .ok_or(tsr_arena::Error::InvalidGraph)?
                 .clauses(),
         )?;
         let mut default_seen = false;
@@ -479,7 +479,7 @@ impl CheckerState {
             let mut current = self.node(node)?.parent();
             while let Some(id) = current {
                 let read = self.node(id)?;
-                if ts_ast::utilities::is_function_like(Some(&read)) {
+                if tsr_ast::utilities::is_function_like(Some(&read)) {
                     break;
                 }
                 if read.kind() == K::LabeledStatement {
@@ -519,14 +519,14 @@ impl CheckerState {
         let statement = required(read.statement(), "with statement")?;
         self.check_expression(expression)?;
         let source = required(
-            ts_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
+            tsr_ast::utilities::get_source_file_of_node(self.ast(node)?, Some(node))?,
             "with source",
         )?;
         let view = self.ast(source)?;
         let file = view.source_file(source)?;
         if file.diagnostics().is_empty() {
             let start =
-                ts_scanner::skip_trivia(file.text().as_bytes(), i64::from(view.node(node)?.pos()));
+                tsr_scanner::skip_trivia(file.text().as_bytes(), i64::from(view.node(node)?.pos()));
             let end = i64::from(view.node(statement)?.pos());
             self.add_diagnostic(Diagnostic::new(Some(source),TextRange::new(start,end),d::The_with_statement_is_not_supported_All_symbols_in_a_with_block_will_have_type_any,vec![]))?;
         }
@@ -539,7 +539,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_try_statement()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let block = required(data.try_block(), "try block")?;
         let catch = data.catch_clause();
         let finally = data.finally_block();
@@ -558,7 +558,7 @@ impl CheckerState {
         let data = read
             .data_source()
             .as_catch_clause()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
         let declaration = data.variable_declaration();
         let block = required(data.block(), "catch block")?;
         if let Some(declaration) = declaration {
@@ -592,7 +592,7 @@ impl CheckerState {
                     let names: Vec<_> = self
                         .table(locals)?
                         .iter()
-                        .map(|(name, _)| ts_ast::JsString::from_bytes(name))
+                        .map(|(name, _)| tsr_ast::JsString::from_bytes(name))
                         .collect();
                     for name in names {
                         if let Some(Some(symbol)) = self.table(block_locals)?.get(name.as_bytes()) {

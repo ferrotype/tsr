@@ -1,8 +1,8 @@
 //! Context is resolved from the native parent path. Explicit argument contexts
 //! also act as temporary barriers while an expression is checked speculatively.
 use crate::{object_flags as of, type_flags as tf, CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:someType
@@ -84,7 +84,8 @@ impl CheckerState {
                 }
                 let read = self.node(parent)?;
                 if read.kind() == K::PropertyDeclaration
-                    && read.modifier_flags(self.ast(parent)?)? & ts_ast::modifier_flags::STATIC != 0
+                    && read.modifier_flags(self.ast(parent)?)? & tsr_ast::modifier_flags::STATIC
+                        != 0
                 {
                     let class = read
                         .parent()
@@ -131,7 +132,7 @@ impl CheckerState {
                 self.contextual_expression_type_ex(parent, context_flags)
             }
             Some(K::AsExpression | K::TypeAssertionExpression) => {
-                if ts_ast::utilities_middle::is_const_assertion(self.ast(parent)?, &read)? {
+                if tsr_ast::utilities_middle::is_const_assertion(self.ast(parent)?, &read)? {
                     return self.contextual_expression_type_ex(parent, context_flags);
                 }
                 self.get_type_from_type_node(
@@ -387,7 +388,7 @@ impl CheckerState {
                         .expression()
                         .ok_or(Error::MissingLink("const access parentheses"))?;
                 }
-                if !ts_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
+                if !tsr_ast::is_entity_name_expression(self.ast(expression)?, expression)? {
                     return Ok(false);
                 }
                 let symbol = self.resolve_entity_name(expression, sf::VALUE, true)?;
@@ -409,7 +410,7 @@ impl CheckerState {
             return Ok(false);
         };
         let read = self.node(parent)?;
-        if ts_ast::utilities_middle::is_const_assertion(self.ast(parent)?, &read)? {
+        if tsr_ast::utilities_middle::is_const_assertion(self.ast(parent)?, &read)? {
             return Ok(true);
         }
         if self.is_inline_import_attributes(node)? {
@@ -520,7 +521,7 @@ impl CheckerState {
         };
         let name_read = view.node(name)?;
         if !(name_read.kind() == K::Identifier
-            || ts_ast::utilities::is_string_literal_like(&name_read))
+            || tsr_ast::utilities::is_string_literal_like(&name_read))
             || view.node_text(name)?.as_bytes() != b"with"
         {
             return Ok(false);
@@ -545,6 +546,6 @@ impl CheckerState {
             return Ok(false);
         };
         let arguments = self.source_list(import_call, view.node(import_call)?.argument_list())?;
-        Ok(arguments.len() > 1 && ts_ast::skip_parentheses(view, arguments[1])? == options)
+        Ok(arguments.len() > 1 && tsr_ast::skip_parentheses(view, arguments[1])? == options)
     }
 }

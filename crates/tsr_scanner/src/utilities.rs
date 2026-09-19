@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
-use ts_ast::{IdentifierData, SyntaxKind};
-use ts_core::LanguageVariant;
-use ts_jsstring::line_map::compute_ecma_line_starts;
-use ts_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
+use tsr_ast::{IdentifierData, SyntaxKind};
+use tsr_core::LanguageVariant;
+use tsr_jsstring::line_map::compute_ecma_line_starts;
+use tsr_jsstring::wtf8::{decode_utf8, RUNE_ERROR};
 
 use crate::identifier::{is_identifier_part_ex, is_identifier_start, keyword};
 

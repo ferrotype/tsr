@@ -41,7 +41,7 @@ Instrumentation:
 source patches, copied compiler/driver source, build commands/stdout/stderr,
 registry-lock/configuration identities and native artifacts. The frozen source
 closure lacks unrelated workspace members: the copied root manifest narrows the
-workspace, removes the parser’s uncompiled test-only `ts_encoder` dependency
+workspace, removes the parser’s uncompiled test-only `tsr_encoder` dependency
 (the encoder is absent from the frozen closure), and metadata may prune its copied
 lock offline. Every resolved registry
 version/checksum must remain identical to an entry in the original frozen lock.

@@ -1,9 +1,9 @@
 use super::transform::Transformer;
-use ts_ast::{
+use tsr_ast::{
     ChildRole, Factory, NodeData, NodeId, NodeKind, NodeListId, NodeMut, NodeRead, NodeSlice,
     RuntimeFactory, SourceFileRead, SourceFileState, VisitContext,
 };
-use ts_printer::emit_resolver::DeclarationEmitResolver;
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 /// The generated native visitor is infallible. This adapter records the first
 /// resolver error and prevents further visits; `children` returns that error
@@ -71,10 +71,10 @@ impl<R: DeclarationEmitResolver> Factory for Transformer<'_, R> {
     fn node_mut(&mut self, node: NodeId) -> NodeMut<'_> {
         Factory::node_mut(&mut *self.output, node)
     }
-    fn read_source_file(&self, node: NodeId) -> Result<SourceFileRead<'_>, ts_arena::Error> {
+    fn read_source_file(&self, node: NodeId) -> Result<SourceFileRead<'_>, tsr_arena::Error> {
         self.output.read_source_file(node)
     }
-    fn mut_source_file(&mut self, node: NodeId) -> Result<&mut SourceFileState, ts_arena::Error> {
+    fn mut_source_file(&mut self, node: NodeId) -> Result<&mut SourceFileState, tsr_arena::Error> {
         self.output.mut_source_file(node)
     }
     fn new_node(&mut self, kind: NodeKind, data: NodeData) -> NodeId {

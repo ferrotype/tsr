@@ -1,9 +1,9 @@
 use super::*;
 use crate::{AstBuilder, Factory, FactoryMethods, JsString, NodeData, NodeListId};
 use std::collections::BTreeMap;
-use ts_arena::Counters;
-use ts_core::TextRange;
-use ts_jsstring::SourceText;
+use tsr_arena::Counters;
+use tsr_core::TextRange;
+use tsr_jsstring::SourceText;
 
 fn id(f: &mut AstBuilder, text: &[u8]) -> NodeId {
     f.new_identifier(JsString::from_bytes(text))

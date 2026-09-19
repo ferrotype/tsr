@@ -1,16 +1,16 @@
 //! Persistent S06 direct parser adapter; all language behavior lives in crates.
-#[path = "../../ts_encoder/examples/support/component.rs"]
+#[path = "../../tsr_encoder/examples/support/component.rs"]
 mod component;
-#[path = "../../ts_encoder/examples/support/protocol.rs"]
+#[path = "../../tsr_encoder/examples/support/protocol.rs"]
 mod protocol;
 use protocol::{fields, hex, unhex, Session};
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, sync::Arc};
-use ts_ast::{
+use tsr_ast::{
     AstBuilder, AstView, Diagnostic, ExternalModuleIndicatorOptions, FactoryMethods, JsString,
     NodeId, NodeIndexCache, ParsedFile, SourceFileParseOptions, SyntaxKind,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 fn validate(request: &Value) -> Result<(), String> {
     if request["op"] != "parse" {
         return component::validate(request);
@@ -68,7 +68,7 @@ fn table(s: &Session, stage: &str, view: AstView<'_>, table: &NodeIndexCache) {
   });
         s.observe(stage, "node", json!({"index":index,"node":value}));
     }
-    let mut absent = AstBuilder::new(SourceText::default(), &ts_arena::Counters::new());
+    let mut absent = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());
     let id = absent.new_token(SyntaxKind::Unknown.into());
     s.observe(
         stage,
@@ -81,9 +81,9 @@ fn parse(s: &Session, r: &Value) {
     if !s.stage("parse",||{
   let source=SourceText::from_loaded_bytes(unhex(&r["source_hex"])?);
   let options=SourceFileParseOptions{file_name:JsString::from_bytes(r["filename"].as_str().expect("validated file").as_bytes()),path:JsString::from_bytes(r["path"].as_str().expect("validated path").as_bytes()),external_module_indicator_options:ExternalModuleIndicatorOptions{jsx:r["jsx"].as_bool().expect("validated jsx"),force:r["force"].as_bool().expect("validated force")}};
-  let file=ts_parser::parse_source_file(source,ts_core::ScriptKind(r["script_kind"].as_i64().expect("validated kind") as i32),options);
+  let file=tsr_parser::parse_source_file(source,tsr_core::ScriptKind(r["script_kind"].as_i64().expect("validated kind") as i32),options);
   let root=file.root();let view=file.view();let node=view.node(root).expect("parsed root owner");let sf=view.source_file(root).expect("parsed source metadata");
-  s.observe("parse","source_file",json!({"kind":node.kind().raw(),"pos":node.pos(),"end":node.end(),"flags":node.flags(),"node_count":sf.node_count,"text_count":sf.text_count,"identifier_count":sf.identifier_count,"script_kind":sf.script_kind.0,"language_variant":sf.language_variant.0,"declaration_file":sf.is_declaration_file,"hash":ts_encoder::source_file_hash(&sf)}));
+  s.observe("parse","source_file",json!({"kind":node.kind().raw(),"pos":node.pos(),"end":node.end(),"flags":node.flags(),"node_count":sf.node_count,"text_count":sf.text_count,"identifier_count":sf.identifier_count,"script_kind":sf.script_kind.0,"language_variant":sf.language_variant.0,"declaration_file":sf.is_declaration_file,"hash":tsr_encoder::source_file_hash(&sf)}));
   for (name,diagnostics) in [("parse",&sf.diagnostics),("js",&sf.js_diagnostics),("jsdoc",&sf.jsdoc_diagnostics)] {
    for (index,d) in diagnostics.iter().enumerate(){diagnostic(s,name,index,d);}
   }
@@ -92,20 +92,20 @@ fn parse(s: &Session, r: &Value) {
     let parsed = parsed.expect("successful parse");
     let root: NodeId = parsed.root();
     let view = parsed.view();
-    let mut provider = ts_parser::ParserJsDocProvider::default();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
     let mut before = None;
     if !s.stage("node_index_before",||{
-  let current=ts_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("initial node index");
-  let independent=ts_encoder::build_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?;
-  let again=ts_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("cached node index");
+  let current=tsr_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("initial node index");
+  let independent=tsr_encoder::build_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?;
+  let again=tsr_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("cached node index");
   s.observe("node_index_before","identity",json!({"independent_order_equal":current.nodes()==independent.nodes(),"cache_reused":Arc::ptr_eq(&current,&again)}));
   table(s,"node_index_before",view,&current);before=Some(current);Ok(())
  }) {return}
     let before = before.expect("successful initial index");
     let mut encoded_table = None;
     if !s.stage("encode_source_file", || {
-        let encoded =
-            ts_encoder::encode_source_file(view, root, &mut provider).map_err(|e| e.to_string())?;
+        let encoded = tsr_encoder::encode_source_file(view, root, &mut provider)
+            .map_err(|e| e.to_string())?;
         s.observe(
             "encode_source_file",
             "bytes",
@@ -124,13 +124,13 @@ fn parse(s: &Session, r: &Value) {
         return;
     }
     s.stage("node_index_after",||{
-  let after=ts_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("cached node index");
+  let after=tsr_encoder::get_node_index_table(view,root,&mut provider).map_err(|e|e.to_string())?.expect("cached node index");
   s.observe("node_index_after","identity",json!({"before_reused":Arc::ptr_eq(&before,&after),"encoded_reused":encoded_table.as_ref().is_some_and(|table|Arc::ptr_eq(table,&after))}));
   table(s,"node_index_after",view,&after);Ok(())
  });
 }
 fn execute(s: &Session, r: &Value) {
-    ts_parser::on_parser_worker(|| {
+    tsr_parser::on_parser_worker(|| {
         if r["op"] == "parse" {
             parse(s, r);
         } else {

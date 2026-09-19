@@ -6,8 +6,8 @@ use crate::{
     settings::{FormatCodeSettings, SemicolonPreference},
     Error,
 };
-use ts_ast::SyntaxKind;
-use ts_core::Tristate;
+use tsr_ast::SyntaxKind;
+use tsr_core::Tristate;
 
 type ContextFn = fn(&mut FormattingContext<'_, '_, '_>) -> Result<bool, Error>;
 type OptionSelector = fn(&FormatCodeSettings) -> Tristate;

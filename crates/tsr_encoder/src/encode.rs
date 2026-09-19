@@ -6,12 +6,12 @@ use crate::{
     DataType,
 };
 use std::{collections::BTreeMap, sync::Arc};
-use ts_arena::Error;
-use ts_ast::{
+use tsr_arena::Error;
+use tsr_ast::{
     AstView, JsDocProvider, NodeAccess, NodeId, NodeIndexCache, NodeKind, SourceFileState,
     SyntaxKind,
 };
-use ts_jsstring::PositionMap;
+use tsr_jsstring::PositionMap;
 
 #[derive(Debug)]
 pub struct Encoded {
@@ -222,7 +222,7 @@ pub fn encode_node(
             }
         }
     }
-    let mut hash = ts_ast::SourceHash::default();
+    let mut hash = tsr_ast::SourceHash::default();
     let mut options = 0;
     if root_is_file {
         let header_state = state.as_ref().expect("source context");
@@ -239,7 +239,7 @@ pub fn encode_node(
             root_state
                 .ambient_module_names()?
                 .iter()
-                .map(ts_ast::JsString::as_bytes),
+                .map(tsr_ast::JsString::as_bytes),
             &mut structured,
         );
         for (offset, value) in [
@@ -372,7 +372,7 @@ fn record_source_file(
         })
         .collect::<Result<Vec<_>, _>>()?;
     let supplements = structured::strings(
-        supplemental.iter().map(ts_ast::SourceFileRead::file_name),
+        supplemental.iter().map(tsr_ast::SourceFileRead::file_name),
         structured,
     );
     let canonical = state

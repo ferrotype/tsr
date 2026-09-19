@@ -2,8 +2,8 @@ use super::*;
 use crate::{
     flow_flags, AstBuilder, FlowNodes, FlowReduceLabelData, ParsedFile, SourceFileParseOptions,
 };
-use ts_arena::{Counters, SymbolArena};
-use ts_jsstring::SourceText;
+use tsr_arena::{Counters, SymbolArena};
+use tsr_jsstring::SourceText;
 
 fn parsed(counters: &Counters) -> ParsedFile {
     let text = SourceText::from_loaded_bytes(b"".as_slice());

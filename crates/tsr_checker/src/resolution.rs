@@ -9,7 +9,7 @@
 //! so the caller supplies that predicate; this module owns only the stack.
 
 use crate::{SignatureId, TypeId};
-use ts_arena::{NodeId, SymbolId};
+use tsr_arena::{NodeId, SymbolId};
 
 /// `TypeSystemEntity` is `any` upstream; these are the four kinds it holds.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

@@ -140,7 +140,7 @@ fn managed(path: &Path) -> bool {
     let text = path.to_string_lossy();
     text == "data/s06/generated-ast-scope.json"
         || (text.starts_with("data/s03/schema/") && text.ends_with(".json"))
-        || (["ts_ast", "ts_diagnostics", "ts_encoder"]
+        || (["tsr_ast", "tsr_diagnostics", "tsr_encoder"]
             .iter()
             .any(|krate| text.starts_with(&format!("crates/{krate}/src/")))
             && (text.ends_with("/generated.rs") || text.ends_with("_generated.rs")))
@@ -199,9 +199,9 @@ fn existing_paths(root: &Path) -> Result<Vec<PathBuf>, String> {
     for directory in [
         "data/s03/schema",
         "data/s06",
-        "crates/ts_ast/src",
-        "crates/ts_diagnostics/src",
-        "crates/ts_encoder/src",
+        "crates/tsr_ast/src",
+        "crates/tsr_diagnostics/src",
+        "crates/tsr_encoder/src",
     ] {
         visit(root, &root.join(directory), &mut paths)?;
     }
@@ -526,15 +526,15 @@ mod tests {
             "../Cargo.toml",
             "/tmp/generated.rs",
             "data/s03/schema/../../Cargo.toml",
-            "crates/ts_ast/src/lib.rs",
+            "crates/tsr_ast/src/lib.rs",
             "Cargo.toml",
         ] {
             assert!(!managed(Path::new(path)), "{path}");
         }
         for path in [
             "data/s03/schema/ast.json",
-            "crates/ts_ast/src/data_generated.rs",
-            "crates/ts_encoder/src/generated.rs",
+            "crates/tsr_ast/src/data_generated.rs",
+            "crates/tsr_encoder/src/generated.rs",
         ] {
             assert!(managed(Path::new(path)), "{path}");
         }

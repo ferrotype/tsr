@@ -2,8 +2,8 @@
 //! identities; cycles never create an owning reference back to the bind result.
 
 use crate::{NodeId, NodeKind, SyntaxKind};
-use ts_arena::{ArenaId, AuxId, Error};
-use ts_core::TextRange;
+use tsr_arena::{ArenaId, AuxId, Error};
+use tsr_core::TextRange;
 
 pub type FlowFlags = u32;
 pub mod flow_flags {
@@ -140,7 +140,7 @@ pub use storage::{FlowListMut, FlowListRead, FlowLists, FlowNodeMut, FlowNodeRea
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ts_arena::Counters;
+    use tsr_arena::Counters;
 
     #[test]
     fn synthetic_payloads_keep_discriminants_nil_edges_and_go_int32_narrowing() {

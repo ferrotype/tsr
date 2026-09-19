@@ -1,9 +1,9 @@
 use crate::tokens::token_is_identifier_or_keyword;
 use crate::{parse_flags, Parser, ParserFactory, ParsingContext};
-use ts_ast::{
+use tsr_ast::{
     node_flags, FactoryMethods, JsString, NodeDataRead, NodeId, NodeListId, SyntaxKind as K,
 };
-use ts_diagnostics as diag;
+use tsr_diagnostics as diag;
 
 impl<F: ParserFactory> Parser<'_, F> {
     /// port: tsc/internal/parser/parser.go:Parser.parseParameters
@@ -110,7 +110,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         ));
         if self.factory.node(name).range().is_empty()
             && modifiers.is_none()
-            && ts_ast::is_modifier_kind(self.token.into())
+            && tsr_ast::is_modifier_kind(self.token.into())
         {
             self.next_token();
         }
@@ -292,7 +292,7 @@ impl<F: ParserFactory> Parser<'_, F> {
         if matches!(self.token, K::DotDotDotToken | K::CloseBracketToken) {
             return true;
         }
-        if ts_ast::is_modifier_kind(self.token.into()) {
+        if tsr_ast::is_modifier_kind(self.token.into()) {
             self.next_token();
             if self.is_identifier() {
                 return true;
@@ -660,7 +660,7 @@ impl<F: ParserFactory> Parser<'_, F> {
     }
     /// port: tsc/internal/parser/parser.go:Parser.skipParameterStart
     pub(crate) fn skip_parameter_start(&mut self) -> bool {
-        if ts_ast::is_modifier_kind(self.token.into()) {
+        if tsr_ast::is_modifier_kind(self.token.into()) {
             self.parse_modifiers();
         }
         self.parse_optional(K::DotDotDotToken);

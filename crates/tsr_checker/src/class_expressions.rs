@@ -2,9 +2,9 @@
 //! lexical container before applying the existing control-flow query.
 
 use crate::{CheckerState, Error, TypeId};
-use ts_arena::NodeId;
-use ts_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
-use ts_diagnostics as d;
+use tsr_arena::NodeId;
+use tsr_ast::{modifier_flags as mf, node_flags as nf, SyntaxKind as K};
+use tsr_diagnostics as d;
 
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
@@ -60,7 +60,7 @@ impl CheckerState {
         let Some(parent) = parent else {
             return Ok(());
         };
-        if !ts_ast::utilities_tail::is_named_evaluation_source(
+        if !tsr_ast::utilities_tail::is_named_evaluation_source(
             self.ast(parent)?,
             &self.node(parent)?,
         )? {
@@ -68,7 +68,7 @@ impl CheckerState {
         }
         // Class/decorator checks run first and explicitly reject the excluded
         // decorator family. The undecorated static-element branch remains live.
-        if self.program()?.host.options().emit_script_target() >= ts_core::ScriptTarget::ESNEXT {
+        if self.program()?.host.options().emit_script_target() >= tsr_core::ScriptTarget::ESNEXT {
             return Ok(());
         }
         let transform_initializers = !self.program()?.host.options().emit_standard_class_fields();
@@ -77,7 +77,7 @@ impl CheckerState {
             let read = self.node(member)?;
             if read.kind() == K::ClassStaticBlockDeclaration
                 || read.modifier_flags(self.ast(member)?)? & mf::STATIC != 0
-                    && (ts_ast::utilities::is_private_identifier_class_element_declaration(
+                    && (tsr_ast::utilities::is_private_identifier_class_element_declaration(
                         self.ast(member)?,
                         member,
                     )? || transform_initializers
@@ -113,7 +113,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkThisExpression
     pub(crate) fn check_this_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
-        let mut container = ts_ast::get_this_container(self.ast(node)?, node, true, true)?;
+        let mut container = tsr_ast::get_this_container(self.ast(node)?, node, true, true)?;
         let mut captured = false;
         let mut computed = false;
         if self.node(container)?.kind() == K::Constructor {
@@ -122,12 +122,12 @@ impl CheckerState {
         loop {
             if self.node(container)?.kind() == K::ArrowFunction {
                 container =
-                    ts_ast::get_this_container(self.ast(container)?, container, false, !computed)?;
+                    tsr_ast::get_this_container(self.ast(container)?, container, false, !computed)?;
                 captured = true;
             }
             if self.node(container)?.kind() == K::ComputedPropertyName {
                 container =
-                    ts_ast::get_this_container(self.ast(container)?, container, !captured, false)?;
+                    tsr_ast::get_this_container(self.ast(container)?, container, !captured, false)?;
                 computed = true;
                 continue;
             }
@@ -203,10 +203,10 @@ impl CheckerState {
     ) -> Result<Option<TypeId>, Error> {
         let container = match container {
             Some(container) => container,
-            None => ts_ast::get_this_container(self.ast(node)?, node, false, false)?,
+            None => tsr_ast::get_this_container(self.ast(node)?, node, false, false)?,
         };
         let read = self.node(container)?;
-        if ts_ast::utilities::is_function_like(Some(&read)) {
+        if tsr_ast::utilities::is_function_like(Some(&read)) {
             let first = self
                 .source_list(container, read.parameter_list())?
                 .first()
@@ -236,10 +236,10 @@ impl CheckerState {
             }
         }
         if let Some(parent) = self.node(container)?.parent() {
-            if ts_ast::utilities::is_class_like(&self.node(parent)?) {
+            if tsr_ast::utilities::is_class_like(&self.node(parent)?) {
                 let symbol =
                     required(self.get_symbol_of_declaration(parent)?, "this class symbol")?;
-                let ty = if ts_ast::utilities::is_static(self.ast(container)?, container)? {
+                let ty = if tsr_ast::utilities::is_static(self.ast(container)?, container)? {
                     self.get_type_of_symbol(symbol)?
                 } else {
                     let class = self.get_declared_type_of_symbol(symbol)?;
@@ -249,7 +249,7 @@ impl CheckerState {
             }
         }
         if self.node(container)?.kind() == K::SourceFile {
-            if ts_ast::utilities::is_external_module(&*self.source_file_read(container)?) {
+            if tsr_ast::utilities::is_external_module(&*self.source_file_read(container)?) {
                 return Ok(Some(self.builtins.undefined_type));
             }
             if include_global {
@@ -298,7 +298,7 @@ impl CheckerState {
         let mut in_binding = false;
         while let Some(parent) = self.node(node)?.parent() {
             let read = self.node(parent)?;
-            if ts_ast::utilities::is_function_like(Some(&read)) {
+            if tsr_ast::utilities::is_function_like(Some(&read)) {
                 break;
             }
             if read.kind() == K::Parameter && (in_binding || read.initializer() == Some(node)) {
@@ -422,14 +422,14 @@ impl CheckerState {
                             .map(|grand| {
                                 self.ast(grand)?
                                     .node(grand)
-                                    .map(|read| ts_ast::utilities::is_class_element(&read))
+                                    .map(|read| tsr_ast::utilities::is_class_element(&read))
                                     .map_err(Error::from)
                             })
                             .transpose()?
                             .unwrap_or(false)
                     {
                         node = required(grand, "decorated parameter owner")?;
-                    } else if ts_ast::utilities::is_class_element(&self.node(parent)?) {
+                    } else if tsr_ast::utilities::is_class_element(&self.node(parent)?) {
                         node = parent;
                     }
                 }
@@ -459,10 +459,10 @@ impl CheckerState {
             Some(container) => {
                 let read = self.node(container)?;
                 if let Some(parent) = read.parent() {
-                    if ts_ast::utilities::is_class_like(&self.node(parent)?)
+                    if tsr_ast::utilities::is_class_like(&self.node(parent)?)
                         || self.node(parent)?.kind() == K::ObjectLiteralExpression
                     {
-                        if ts_ast::utilities::is_static(self.ast(container)?, container)? {
+                        if tsr_ast::utilities::is_static(self.ast(container)?, container)? {
                             matches!(
                                 read.kind().known(),
                                 Some(
@@ -528,7 +528,7 @@ impl CheckerState {
                         self.ast(owner)?
                             .node(owner)
                             .map(|read| {
-                                ts_ast::utilities::is_class_like(&read)
+                                tsr_ast::utilities::is_class_like(&read)
                                     || read.kind() == K::ObjectLiteralExpression
                             })
                             .map_err(Error::from)
@@ -590,10 +590,10 @@ impl CheckerState {
             )?;
             return Ok(self.builtins.error_type);
         }
-        if is_call || ts_ast::utilities::is_static(self.ast(container)?, container)? {
+        if is_call || tsr_ast::utilities::is_static(self.ast(container)?, container)? {
             if !is_call
                 && self.program()?.host.options().emit_script_target()
-                    <= ts_core::ScriptTarget::ES2021
+                    <= tsr_core::ScriptTarget::ES2021
                 && matches!(
                     self.node(container)?.kind().known(),
                     Some(K::PropertyDeclaration | K::ClassStaticBlockDeclaration)
@@ -618,7 +618,7 @@ impl CheckerState {
     ) -> Result<bool, Error> {
         loop {
             let read = self.node(node)?;
-            if ts_ast::utilities::is_function_like(Some(&read)) {
+            if tsr_ast::utilities::is_function_like(Some(&read)) {
                 return Ok(false);
             }
             if read.kind() == K::Parameter && read.parent() == Some(constructor) {

@@ -203,7 +203,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ts_s07_storage_pilot"
+name = "tsr_s07_storage_pilot"
 version = "0.1.0"
 dependencies = [
  "cap",

@@ -5,8 +5,8 @@
 use crate::types::Map as HashMap;
 use crate::{CheckerHost, CheckerState};
 use std::sync::Arc;
-use ts_arena::{ArenaId, Error, NodeId, SymbolId};
-use ts_ast::{
+use tsr_arena::{ArenaId, Error, NodeId, SymbolId};
+use tsr_ast::{
     AstView, BoundView, DeclarationRead, DeclarationSlice, SymbolRef, SymbolTableId,
     SymbolTableRead,
 };
@@ -40,7 +40,7 @@ pub(crate) struct ProgramContext {
     /// Per file, the shared owner and binding: a view from here is two
     /// borrows, where the host's completed file routes through its handle on
     /// every call. `None` for a bundle member, which keeps the routed path.
-    shared: Vec<Option<ts_ast::SharedBoundFile>>,
+    shared: Vec<Option<tsr_ast::SharedBoundFile>>,
     nodes: HashMap<ArenaId, usize>,
     file_indices: HashMap<NodeId, usize>,
     symbols: HashMap<ArenaId, usize>,
@@ -59,7 +59,7 @@ impl CheckerState {
     /// directly, with one slot validation instead of two and no owner
     /// selection in between.
     #[inline]
-    pub(crate) fn node(&self, node: NodeId) -> Result<ts_ast::NodeRead<'_>, crate::Error> {
+    pub(crate) fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, crate::Error> {
         if self.factory.id().arena() == node.arena() {
             return Ok(self.factory.view().node(node)?);
         }
@@ -69,7 +69,7 @@ impl CheckerState {
     /// `ast(node)?.node_text(node)?` without the view's own validation of
     /// `node`: the text read validates the id itself.
     #[inline]
-    pub(crate) fn node_text(&self, node: NodeId) -> Result<ts_ast::NodeText<'_>, crate::Error> {
+    pub(crate) fn node_text(&self, node: NodeId) -> Result<tsr_ast::NodeText<'_>, crate::Error> {
         if self.factory.id().arena() == node.arena() {
             return Ok(self.factory.view().node_text(node)?);
         }
@@ -82,7 +82,7 @@ impl CheckerState {
     pub(crate) fn source_file_read(
         &self,
         source: NodeId,
-    ) -> Result<ts_ast::SourceFileRead<'_>, crate::Error> {
+    ) -> Result<tsr_ast::SourceFileRead<'_>, crate::Error> {
         if self.factory.id().arena() == source.arena() {
             return Ok(self.factory.view().source_file(source)?);
         }
@@ -161,18 +161,18 @@ impl ProgramContext {
 
     /// The binding of the file whose core arena holds `node`, without reading
     /// the node: flow and binding lookups validate their own ids.
-    pub(crate) fn bind_result(&self, node: NodeId) -> Result<&ts_ast::BindResult, Error> {
+    pub(crate) fn bind_result(&self, node: NodeId) -> Result<&tsr_ast::BindResult, Error> {
         if let Some(index) = self.core_file_index(node) {
             if let Some(shared) = &self.shared[index] {
                 return Ok(shared.result());
             }
         }
-        self.bound(node).map(ts_ast::BoundView::result)
+        self.bound(node).map(tsr_ast::BoundView::result)
     }
 
     /// One node read by the shortest path; see `SharedBoundFile::node`.
     #[inline]
-    pub(crate) fn node(&self, node: NodeId) -> Result<ts_ast::NodeRead<'_>, Error> {
+    pub(crate) fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, Error> {
         if let Some(index) = self.core_file_index(node) {
             if let Some(shared) = &self.shared[index] {
                 return shared.node(node);

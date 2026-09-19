@@ -4,10 +4,10 @@
 //! `>=`, a regular expression, a template part or JSX.
 
 use crate::{debug_assert, Error};
-use ts_arena::NodeId;
-use ts_ast::{utilities_middle, AstView, NodeRead, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_scanner::Scanner;
+use tsr_arena::NodeId;
+use tsr_ast::{utilities_middle, AstView, NodeRead, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_scanner::Scanner;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TextRangeWithKind {
@@ -78,7 +78,7 @@ fn should_rescan_jsx_identifier(view: AstView<'_>, node: &NodeRead<'_>) -> Resul
     let Some(parent) = node.parent() else {
         return Ok(false);
     };
-    let named = ts_ast::is_keyword_kind(node.kind()) || node.kind() == K::Identifier;
+    let named = tsr_ast::is_keyword_kind(node.kind()) || node.kind() == K::Identifier;
     Ok(match view.node(parent)?.kind().known() {
         // An identifier like `module-layout` is scanned as a keyword at first;
         // the whole thing has to be scanned to get the identifier.
@@ -162,7 +162,7 @@ fn starts_with_slash_token(token: K) -> bool {
 
 // port: tsc/internal/format/scanner.go:fixTokenKind
 fn fix_token_kind(mut info: TokenInfo, container: &NodeRead<'_>) -> TokenInfo {
-    if ts_ast::is_token_kind(container.kind()) {
+    if tsr_ast::is_token_kind(container.kind()) {
         if let Some(kind) = container.kind().known() {
             if info.token.kind != kind {
                 info.token.kind = kind;
@@ -178,7 +178,7 @@ impl<'src> FormattingScanner<'src> {
     // port: tsc/internal/format/scanner.go:newFormattingScanner
     pub(crate) fn new(
         text: &'src [u8],
-        language_variant: ts_core::LanguageVariant,
+        language_variant: tsr_core::LanguageVariant,
         start_pos: i64,
         end_pos: i64,
     ) -> Self {

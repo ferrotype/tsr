@@ -54,8 +54,8 @@ def implement(name, selected, *, tuple_field=False):
         f'        self.{field}.walk(c, "{name}.{field}");' for field in selected)
     parameter = 'c' if selected else '_c'
     return f'''
-impl ts_jsstring::census::Walk for {name} {{
-    fn walk(&self,{parameter}:&mut ts_jsstring::census::Collector,_:&str) {{
+impl tsr_jsstring::census::Walk for {name} {{
+    fn walk(&self,{parameter}:&mut tsr_jsstring::census::Collector,_:&str) {{
 {statements}
     }}
 }}
@@ -75,8 +75,8 @@ def enum_walk(source, name):
     arms = '\n'.join(f'            Self::{variant}(value) => {{ c.record("{name}.{variant}.records",0,0,1,1,0); value.walk(c,"{name}.{variant}.owned"); }},'
                      for variant, _ in variants)
     return f'''
-impl ts_jsstring::census::Walk for {name} {{
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,_:&str) {{
+impl tsr_jsstring::census::Walk for {name} {{
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,_:&str) {{
         match self {{
 {arms}
         }}
@@ -95,7 +95,7 @@ def patches(stage):
         return (stage/'crates'/path).read_text()
     def add(path, text):
         additions[path] = additions.get(path, '') + text
-    add('ts_jsstring/src/lib.rs', '\npub mod census;\n')
+    add('tsr_jsstring/src/lib.rs', '\npub mod census;\n')
     # These use crate:: because census itself lives in this lowest dependency.
     for path, name, selected in [
         ('jsstring.rs','JsString',['storage']),
@@ -103,13 +103,13 @@ def patches(stage):
         ('position_map.rs','PositionMap',['entries']),
         ('position_map.rs','PositionMapEntry',[]),
     ]:
-        add('ts_jsstring/src/'+path, implement(name,selected).replace('ts_jsstring::','crate::'))
-    add('ts_core/src/pattern.rs', implement('Pattern',['text']))
-    add('ts_arena/src/ids.rs', no_heap(['NodeId','AuxId','SymbolId','ArenaId','FileId']))
+        add('tsr_jsstring/src/'+path, implement(name,selected).replace('tsr_jsstring::','crate::'))
+    add('tsr_core/src/pattern.rs', implement('Pattern',['text']))
+    add('tsr_arena/src/ids.rs', no_heap(['NodeId','AuxId','SymbolId','ArenaId','FileId']))
 
     # Generated payloads have an exhaustive enum match and a checked field-type
     # vocabulary. Unknown field types fail generation instead of disappearing.
-    data = read('ts_ast/src/data_generated.rs')
+    data = read('tsr_ast/src/data_generated.rs')
     simple = {'JsString','NodeKind','NodeSlice','TextSlice','Option<NodeId>',
               'Option<NodeListId>','bool','i32','DeferredField'}
     for name in re.findall(r'^pub struct (\w+)\s*\{',data,re.M):
@@ -117,14 +117,14 @@ def patches(stage):
         for field,ty in fs:
             if ty not in simple:
                 raise ValueError(f'unclassified generated field {name}.{field}: {ty}')
-        add('ts_ast/src/data_generated.rs',implement(name,[f for f,t in fs if t=='JsString']))
-    add('ts_ast/src/data_generated.rs',enum_walk(data,'NodeData'))
-    add('ts_ast/src/lib.rs', implement('Node',['data']) + no_heap(['DeferredField','NodeKind']))
-    add('ts_ast/src/storage.rs', implement('AstFile',['0']))
-    add('ts_ast/src/lists.rs', enum_walk(read('ts_ast/src/lists.rs'),'AstStorageData') +
+        add('tsr_ast/src/data_generated.rs',implement(name,[f for f,t in fs if t=='JsString']))
+    add('tsr_ast/src/data_generated.rs',enum_walk(data,'NodeData'))
+    add('tsr_ast/src/lib.rs', implement('Node',['data']) + no_heap(['DeferredField','NodeKind']))
+    add('tsr_ast/src/storage.rs', implement('AstFile',['0']))
+    add('tsr_ast/src/lists.rs', enum_walk(read('tsr_ast/src/lists.rs'),'AstStorageData') +
         no_heap(['NodeList','NodeListId','NodeSlice','TextSlice','FileInfo']))
-    add('ts_ast/src/metadata.rs',enum_walk(read('ts_ast/src/metadata.rs'),'SourceMetadataData'))
-    add('ts_ast/src/tokens.rs',no_heap(['CommentDirective']))
+    add('tsr_ast/src/metadata.rs',enum_walk(read('tsr_ast/src/metadata.rs'),'SourceMetadataData'))
+    add('tsr_ast/src/tokens.rs',no_heap(['CommentDirective']))
     source_types = {
         'SourceFileParseOptions':['file_name','path'],
         'FileReference':['file_name'], 'PragmaArgument':['name','value'],
@@ -135,7 +135,7 @@ def patches(stage):
         'SourceFileState':['parse_options','text','reparsed_clones','diagnostics','js_diagnostics',
             'jsdoc_diagnostics','content_mapper_info','position_map','ecma_line_map','node_index','binding'],
     }
-    source=read('ts_ast/src/source_file.rs')
+    source=read('tsr_ast/src/source_file.rs')
     for name, selected in source_types.items():
         known=dict(fields(source,name))
         if not set(selected)<=known.keys():
@@ -145,28 +145,28 @@ def patches(stage):
         for field,ty in known.items():
             if (any(word in ty for word in ('Vec<','Arc<','Map<','OnceLock<')) or ty in {'JsString','SourceText'}) and field not in selected:
                 raise ValueError(f'unwalked owning source field {name}.{field}: {ty}')
-        add('ts_ast/src/source_file.rs',implement(name,selected))
-    add('ts_ast/src/source_cache.rs',implement('SourceNodeIndexCache',['value']))
-    add('ts_ast/src/node_index.rs',implement('NodeIndexCache',['nodes','sorted']))
-    add('ts_ast/src/diagnostic.rs',implement('Diagnostic',['source','message_text','message_key','message_args','message_chain','related_information']))
-    add('ts_ast/src/symbols.rs',implement('Symbol',['name']) + implement('SymbolTables',['0']) +
+        add('tsr_ast/src/source_file.rs',implement(name,selected))
+    add('tsr_ast/src/source_cache.rs',implement('SourceNodeIndexCache',['value']))
+    add('tsr_ast/src/node_index.rs',implement('NodeIndexCache',['nodes','sorted']))
+    add('tsr_ast/src/diagnostic.rs',implement('Diagnostic',['source','message_text','message_key','message_args','message_chain','related_information']))
+    add('tsr_ast/src/symbols.rs',implement('Symbol',['name']) + implement('SymbolTables',['0']) +
         implement('DeclarationLists',['0']) + no_heap(['SymbolTableId','DeclarationSlice']))
-    add('ts_ast/src/flow.rs',implement('FlowNodes',['0'])+implement('FlowLists',['0'])+
+    add('tsr_ast/src/flow.rs',implement('FlowNodes',['0'])+implement('FlowLists',['0'])+
         no_heap(['FlowNode','FlowList','FlowId','FlowListId']))
-    add('ts_ast/src/bind_result.rs',implement('BindResult',['nodes','bindings','flow_bindings','symbols',
+    add('tsr_ast/src/bind_result.rs',implement('BindResult',['nodes','bindings','flow_bindings','symbols',
         'tables','declarations','flows','flow_lists','diagnostics','pattern_ambient_modules'])+
         implement('BindCell',['0'])+implement('PatternAmbientModule',['pattern'])+
         implement('BoundFile',['file'])+no_heap(['NodeBinding']))
-    add('ts_ast/src/lib.rs',r'''
+    add('tsr_ast/src/lib.rs',r'''
 /// Diagnostic stage-only ownership walk. Call after the native snapshot, with
 /// all workers stopped and every retained root still alive.
-pub fn retained_census(files: &[BoundFile]) -> ts_jsstring::census::Report {
-    let mut result=ts_jsstring::census::Report::default();
+pub fn retained_census(files: &[BoundFile]) -> tsr_jsstring::census::Report {
+    let mut result=tsr_jsstring::census::Report::default();
     for file in files { add_retained_file(file,&mut result); }
     result
 }
-pub fn add_retained_file(file:&BoundFile,result:&mut ts_jsstring::census::Report) {
-    ts_jsstring::census::Walk::walk(file,result,"retained.root");
+pub fn add_retained_file(file:&BoundFile,result:&mut tsr_jsstring::census::Report) {
+    tsr_jsstring::census::Walk::walk(file,result,"retained.root");
 }
 ''')
     result={}
@@ -174,17 +174,17 @@ pub fn add_retained_file(file:&BoundFile,result:&mut ts_jsstring::census::Report
         original=read(relative)
         if MARKER in original:
             raise ValueError(f'already instrumented: {relative}')
-        qualifier='crate' if relative.startswith('ts_jsstring/') else 'ts_jsstring'
+        qualifier='crate' if relative.startswith('tsr_jsstring/') else 'tsr_jsstring'
         trait_import=f'\n#[allow(unused_imports)]\nuse {qualifier}::census::Walk as _;\n'
-        extra=extra.replace('        use ts_jsstring::census::Walk;\n','')
+        extra=extra.replace('        use tsr_jsstring::census::Walk;\n','')
         result['crates/'+relative]=original+'\n'+MARKER+trait_import+extra
-    result['crates/ts_jsstring/src/census.rs']=(HERE/'collector.rs').read_text()
+    result['crates/tsr_jsstring/src/census.rs']=(HERE/'collector.rs').read_text()
     return result
 
 
 def apply(stage):
     stage=stage.resolve()
-    if stage==ROOT or (ROOT/'crates') in stage.parents or not (stage/'crates/ts_ast/Cargo.toml').is_file():
+    if stage==ROOT or (ROOT/'crates') in stage.parents or not (stage/'crates/tsr_ast/Cargo.toml').is_file():
         raise ValueError('requires an existing staged repository, never the production crates')
     changes=patches(stage); manifest=[]; patch=[]
     for relative,text in sorted(changes.items()):

@@ -1,9 +1,9 @@
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Arc, Mutex};
 
-use ts_ast::{token_flags as flags, CommentDirectiveKind, SyntaxKind};
-use ts_core::LanguageVariant;
-use ts_scanner::Scanner;
+use tsr_ast::{token_flags as flags, CommentDirectiveKind, SyntaxKind};
+use tsr_core::LanguageVariant;
+use tsr_scanner::Scanner;
 
 #[test]
 fn checkpoints_restore_values_and_directives_across_text_replacement() {
@@ -121,7 +121,7 @@ fn reset_position_beyond_end_succeeds_until_a_bounds_sensitive_accessor() {
 fn scanner_and_checkpoint_are_send() {
     fn assert_send<T: Send>() {}
     assert_send::<Scanner<'static>>();
-    assert_send::<ts_scanner::Checkpoint<'static>>();
+    assert_send::<tsr_scanner::Checkpoint<'static>>();
 }
 
 #[test]
@@ -208,7 +208,7 @@ fn buffered_delivery_matches_callbacks_and_survives_rewind() {
 
 #[test]
 fn retained_values_share_source_and_cooked_bytes_across_advancement() {
-    use ts_jsstring::SourceText;
+    use tsr_jsstring::SourceText;
     let source = SourceText::from_loaded_bytes(&b"first '\\u0061' # .5"[..]);
     let mut scanner = Scanner::new();
     scanner.set_text(source.as_bytes());
@@ -240,7 +240,7 @@ fn retained_values_share_source_and_cooked_bytes_across_advancement() {
 
 #[test]
 fn a_retained_source_slice_does_not_import_an_equal_foreign_allocation() {
-    use ts_jsstring::SourceText;
+    use tsr_jsstring::SourceText;
     let first = SourceText::from_loaded_bytes(&b"name"[..]);
     let second = SourceText::from_loaded_bytes(&b"name"[..]);
     let mut scanner = Scanner::new();

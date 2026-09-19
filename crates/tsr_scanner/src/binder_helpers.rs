@@ -1,9 +1,9 @@
 //! Source text and diagnostic ranges for the binder's AST-facing scanner calls.
 use crate::{normalize_jsdoc_type_source_text, skip_trivia, Scanner};
-use ts_arena::Error;
-use ts_ast::{node_flags, token_flags, AstView, NodeId, SourceFileState, SyntaxKind as K};
-use ts_core::TextRange;
-use ts_jsstring::{scanner_positions, JsString};
+use tsr_arena::Error;
+use tsr_ast::{node_flags, token_flags, AstView, NodeId, SourceFileState, SyntaxKind as K};
+use tsr_core::TextRange;
+use tsr_jsstring::{scanner_positions, JsString};
 
 /// port: tsc/internal/scanner/utilities.go:isJSDocTypeExpressionOrChild
 fn is_jsdoc_type_expression_or_child(view: AstView<'_>, id: NodeId) -> Result<bool, Error> {
@@ -17,7 +17,7 @@ fn is_jsdoc_type_expression_or_child(view: AstView<'_>, id: NodeId) -> Result<bo
     let mut current = Some(id);
     while let Some(id) = current {
         let node = view.node(id)?;
-        if ts_ast::utilities::is_type_node(&node) {
+        if tsr_ast::utilities::is_type_node(&node) {
             return Ok(true);
         }
         current = node.parent();
@@ -33,7 +33,7 @@ pub fn get_text_of_node_from_source_text(
     include_trivia: bool,
 ) -> Result<JsString, Error> {
     let node = id.map(|id| view.node(id)).transpose()?;
-    if ts_ast::node_is_missing(node.as_ref()) {
+    if tsr_ast::node_is_missing(node.as_ref()) {
         return Ok(JsString::default());
     }
     let node = node.expect("nil source-text node");
@@ -91,7 +91,7 @@ pub fn get_source_text_of_node_from_source_file(
 
 /// port: tsc/internal/scanner/utilities.go:GetTextOfNode
 pub fn get_text_of_node(view: AstView<'_>, node: NodeId) -> Result<JsString, Error> {
-    let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?
+    let source = tsr_ast::utilities::get_source_file_of_node(view, Some(node))?
         .expect("nil source file in GetTextOfNode");
     get_source_text_of_node_from_source_file(view, source, Some(node), false)
 }
@@ -132,15 +132,15 @@ pub fn get_token_pos_of_node(
     source: NodeId,
     id: NodeId,
     include_jsdoc: bool,
-    jsdoc: &mut dyn ts_ast::JsDocProvider,
+    jsdoc: &mut dyn tsr_ast::JsDocProvider,
 ) -> Result<i64, Error> {
     let node = view.node(id)?;
-    if ts_ast::node_is_missing(Some(&node)) {
+    if tsr_ast::node_is_missing(Some(&node)) {
         return Ok(i64::from(node.pos()));
     }
     let file = view.source_file(source)?;
     let text = file.text().as_bytes();
-    if ts_ast::utilities_middle::is_js_doc_node(&node) || node.kind() == K::JsxText {
+    if tsr_ast::utilities_middle::is_js_doc_node(&node) || node.kind() == K::JsxText {
         return Ok(crate::skip_trivia_ex(
             text,
             i64::from(node.pos()),
@@ -190,7 +190,7 @@ pub fn get_range_of_token_at_position(
 pub fn get_ecma_end_line_position(source: &SourceFileState, line: isize) -> i64 {
     let mut pos = source.ecma_line_map()[line as usize] as usize;
     loop {
-        let (rune, width) = ts_jsstring::wtf8::decode_utf8(&source.text().as_bytes()[pos..]);
+        let (rune, width) = tsr_jsstring::wtf8::decode_utf8(&source.text().as_bytes()[pos..]);
         if width == 0 || crate::utilities::is_line_break(rune) {
             return pos as i64 - 1;
         }
@@ -329,7 +329,7 @@ pub fn get_error_range_for_node(
             | K::PropertyDeclaration
             | K::PropertySignature
             | K::NamespaceImport,
-        ) => error_node = ts_ast::get_name_of_declaration(view, Some(id))?,
+        ) => error_node = tsr_ast::get_name_of_declaration(view, Some(id))?,
         Some(K::ClassExpression) => error_node = node.name(),
         Some(K::ArrowFunction) => return get_error_range_for_arrow_function(view, source, id),
         Some(K::CaseClause | K::DefaultClause) => {
@@ -387,7 +387,7 @@ pub fn get_error_range_for_node(
     };
     let error_node = view.node(error_node)?;
     let mut pos = i64::from(error_node.pos());
-    if !ts_ast::node_is_missing(Some(&error_node)) && error_node.kind() != K::JsxText {
+    if !tsr_ast::node_is_missing(Some(&error_node)) && error_node.kind() != K::JsxText {
         pos = skip_trivia(text, pos);
     }
     Ok(TextRange::new(pos, i64::from(error_node.end())))

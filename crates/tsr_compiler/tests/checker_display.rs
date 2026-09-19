@@ -53,7 +53,7 @@ fn deeply_qualified_symbol_display_runs_on_a_small_native_stack() {
     let request = serde_json::json!({"version":1,"programs":[{
         "id":"deep-namespaces", "files":{"/main.ts":source}, "roots":["/main.ts"],
         "queries":[{"id":"qualified", "declaration":"value", "context":"source",
-                    "operation":"symbol_string", "flags":0, "meaning":ts_ast::symbol_flags::VALUE}]
+                    "operation":"symbol_string", "flags":0, "meaning":tsr_ast::symbol_flags::VALUE}]
     }]});
     std::thread::Builder::new()
         .stack_size(512 * 1024)

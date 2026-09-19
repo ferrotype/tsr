@@ -4,11 +4,11 @@
 
 use crate::{Error, FormatFile};
 use std::ops::ControlFlow;
-use ts_arena::NodeId;
-use ts_ast::{
+use tsr_arena::NodeId;
+use tsr_ast::{
     node_flags, utilities, utilities_middle, ChildVisitor, NodeListId, NodeSlice, SyntaxKind as K,
 };
-use ts_astnav::ChildVisit;
+use tsr_astnav::ChildVisit;
 
 // port: tsc/internal/ls/lsutil/children.go:AssertHasRealPosition
 fn assert_has_real_position(file: &FormatFile<'_, '_>, node: NodeId) -> Result<(), Error> {
@@ -68,7 +68,7 @@ pub(crate) fn get_last_child(
     let end = i64::from(file.node(node)?.end());
     let view = file.view;
     let state = view.source_file(file.source)?;
-    let mut scanner = ts_scanner::get_scanner_for_source_file(&state, start);
+    let mut scanner = tsr_scanner::get_scanner_for_source_file(&state, start);
     let mut last_token = None;
     let mut position = start;
     while position < end {
@@ -78,7 +78,7 @@ pub(crate) fn get_last_child(
             scanner.token_end(),
         );
         let (Ok(pos), Ok(finish)) = (i32::try_from(full_start), i32::try_from(token_end)) else {
-            return Err(ts_arena::Error::InvalidTokenRange.into());
+            return Err(tsr_arena::Error::InvalidTokenRange.into());
         };
         last_token = Some(
             view.get_or_create_token(kind, pos, finish, node, scanner.token_flags())?
@@ -99,7 +99,7 @@ pub(crate) fn get_last_token(
         return Ok(None);
     };
     let kind = file.node(node)?.kind();
-    if ts_ast::is_token_kind(kind) || kind == K::Identifier {
+    if tsr_ast::is_token_kind(kind) || kind == K::Identifier {
         return Ok(None);
     }
     assert_has_real_position(file, node)?;
@@ -115,13 +115,13 @@ pub(crate) fn get_last_token(
 
 /// The first child `ForEachChild` reaches.
 struct FirstChild<'v> {
-    view: ts_ast::AstView<'v>,
+    view: tsr_ast::AstView<'v>,
     found: Option<NodeId>,
-    error: Option<ts_arena::Error>,
+    error: Option<tsr_arena::Error>,
 }
 
 impl FirstChild<'_> {
-    fn take(&mut self, nodes: Result<Option<NodeId>, ts_arena::Error>) -> ControlFlow<()> {
+    fn take(&mut self, nodes: Result<Option<NodeId>, tsr_arena::Error>) -> ControlFlow<()> {
         match nodes {
             Ok(Some(node)) => {
                 self.found = Some(node);
@@ -172,7 +172,7 @@ pub(crate) fn get_first_token(
             read.flags(),
         )
     };
-    if kind == K::Identifier || ts_ast::is_token_kind(kind) {
+    if kind == K::Identifier || tsr_ast::is_token_kind(kind) {
         return Ok(None);
     }
     assert_has_real_position(file, node)?;
@@ -199,12 +199,12 @@ pub(crate) fn get_first_token(
     if pos < token_end_position {
         let view = file.view;
         let state = view.source_file(file.source)?;
-        let scanner = ts_scanner::get_scanner_for_source_file(&state, pos);
+        let scanner = tsr_scanner::get_scanner_for_source_file(&state, pos);
         let (Ok(start), Ok(finish)) = (
             i32::try_from(scanner.token_full_start()),
             i32::try_from(scanner.token_end()),
         ) else {
-            return Err(ts_arena::Error::InvalidTokenRange.into());
+            return Err(tsr_arena::Error::InvalidTokenRange.into());
         };
         let token =
             view.get_or_create_token(scanner.token(), start, finish, node, scanner.token_flags())?;
@@ -338,7 +338,7 @@ fn node_is_asi_candidate(node: NodeId, file: &mut FormatFile<'_, '_>) -> Result<
     let top = utilities::find_ancestor(file.view, Some(node), |ancestor| {
         ancestor.parent().is_none()
     })?
-    .ok_or(ts_arena::Error::InvalidGraph)?;
+    .ok_or(tsr_arena::Error::InvalidGraph)?;
     let Some(next) = file.navigator().find_next_token(node, top)? else {
         return Ok(true);
     };
@@ -384,7 +384,7 @@ fn is_completed_node_worker(
         return Ok(false);
     };
     let read = file.node(node)?;
-    if ts_ast::node_is_missing(Some(&read)) {
+    if tsr_ast::node_is_missing(Some(&read)) {
         return Ok(false);
     }
     let data = read.data_source();
@@ -521,12 +521,12 @@ fn is_completed_node_worker(
         Some(K::TemplateSpan) => {
             let literal = data.as_template_span().and_then(|span| span.literal());
             Ok(match literal {
-                Some(literal) => ts_ast::node_is_present(Some(&file.node(literal)?)),
+                Some(literal) => tsr_ast::node_is_present(Some(&file.node(literal)?)),
                 None => false,
             })
         }
         Some(K::ExportDeclaration | K::ImportDeclaration) => Ok(match read.module_specifier() {
-            Some(specifier) => ts_ast::node_is_present(Some(&file.node(specifier)?)),
+            Some(specifier) => tsr_ast::node_is_present(Some(&file.node(specifier)?)),
             None => false,
         }),
         Some(K::PrefixUnaryExpression) => {
@@ -556,7 +556,7 @@ fn is_completed_node_worker(
 // port: tsc/internal/ls/lsutil/completednode.go:nodeEndsWith
 fn node_ends_with(file: &mut FormatFile<'_, '_>, node: NodeId, expected: K) -> Result<bool, Error> {
     let last_child = get_last_visited_child(file, node)?;
-    let mut kinds: Vec<ts_ast::NodeKind> = Vec::new();
+    let mut kinds: Vec<tsr_ast::NodeKind> = Vec::new();
     let start = match last_child {
         Some(child) => {
             let read = file.node(child)?;
@@ -568,7 +568,7 @@ fn node_ends_with(file: &mut FormatFile<'_, '_>, node: NodeId, expected: K) -> R
     let end = i64::from(file.node(node)?.end());
     let view = file.view;
     let state = view.source_file(file.source)?;
-    let mut scanner = ts_scanner::get_scanner_for_source_file(&state, start);
+    let mut scanner = tsr_scanner::get_scanner_for_source_file(&state, start);
     let mut position = start;
     while position < end {
         let (kind, full_start, token_end) = (
@@ -577,7 +577,7 @@ fn node_ends_with(file: &mut FormatFile<'_, '_>, node: NodeId, expected: K) -> R
             scanner.token_end(),
         );
         let (Ok(pos), Ok(finish)) = (i32::try_from(full_start), i32::try_from(token_end)) else {
-            return Err(ts_arena::Error::InvalidTokenRange.into());
+            return Err(tsr_arena::Error::InvalidTokenRange.into());
         };
         let token = view.get_or_create_token(kind, pos, finish, node, scanner.token_flags())?;
         kinds.push(token.kind());

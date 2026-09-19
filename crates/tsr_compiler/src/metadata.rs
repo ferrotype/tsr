@@ -1,12 +1,12 @@
 use crate::Error;
-use ts_ast::{
+use tsr_ast::{
     AstView, ExternalModuleIndicatorOptions, NodeDataRead, NodeId, SourceFileMetaData,
     SyntaxKind as K,
 };
-use ts_core::{CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, ModuleResolutionKind};
-use ts_jsstring::JsString;
-use ts_module::Resolver;
-use ts_tspath as path;
+use tsr_core::{CompilerOptions, JsxEmit, ModuleDetectionKind, ModuleKind, ModuleResolutionKind};
+use tsr_jsstring::JsString;
+use tsr_module::Resolver;
+use tsr_tspath as path;
 pub(crate) fn load(
     resolver: &mut Resolver,
     name: &[u8],
@@ -93,15 +93,15 @@ pub(crate) fn emit_syntax(
     meta: &SourceFileMetaData,
     usage: NodeId,
     options: &CompilerOptions,
-) -> Result<ModuleKind, ts_arena::Error> {
+) -> Result<ModuleKind, tsr_arena::Error> {
     let node = view.node(usage)?;
     if !matches!(
         node.kind().known(),
         Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
     ) {
-        return Err(ts_arena::Error::InvalidGraph);
+        return Err(tsr_arena::Error::InvalidGraph);
     }
-    let parent = node.parent().ok_or(ts_arena::Error::InvalidGraph)?;
+    let parent = node.parent().ok_or(tsr_arena::Error::InvalidGraph)?;
     let parent_node = view.node(parent)?;
     let import_equals = if parent_node.kind() == K::ExternalModuleReference {
         parent_node
@@ -115,16 +115,16 @@ pub(crate) fn emit_syntax(
     } else {
         false
     };
-    if ts_ast::utilities_middle::is_require_call(view, &parent_node, false)? || import_equals {
+    if tsr_ast::utilities_middle::is_require_call(view, &parent_node, false)? || import_equals {
         return Ok(ModuleKind::COMMON_JS);
     }
     let emit = emit_format(name, options, meta);
     let expression_parent =
-        ts_ast::utilities::walk_up_parenthesized_expressions(view, Some(parent))?
-            .ok_or(ts_arena::Error::InvalidGraph)?;
+        tsr_ast::utilities::walk_up_parenthesized_expressions(view, Some(parent))?
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
     let expression_parent = view.node(expression_parent)?;
     let import_call = if let NodeDataRead::CallExpression(call) = expression_parent.data() {
-        let expression = call.expression().ok_or(ts_arena::Error::InvalidGraph)?;
+        let expression = call.expression().ok_or(tsr_arena::Error::InvalidGraph)?;
         let expression_node = view.node(expression)?;
         expression_node.kind() == K::ImportKeyword
             || if let NodeDataRead::MetaProperty(meta) = expression_node.data() {
@@ -234,7 +234,7 @@ pub(crate) fn usage_mode(
     {
         return Ok(ModuleKind::NONE);
     }
-    if ts_ast::utilities_middle::is_require_call(view, &parent_node, false)?
+    if tsr_ast::utilities_middle::is_require_call(view, &parent_node, false)?
         || parent_node.kind() == K::ExternalModuleReference
     {
         return Ok(ModuleKind::COMMON_JS);
@@ -276,7 +276,7 @@ fn resolution_override(
     view: AstView<'_>,
     attributes: Option<NodeId>,
 ) -> Result<Option<ModuleKind>, Error> {
-    ts_ast::utilities_middle::import_attributes_resolution_mode(view, attributes)
+    tsr_ast::utilities_middle::import_attributes_resolution_mode(view, attributes)
         .map_err(Error::from)
 }
 
@@ -347,7 +347,7 @@ pub(crate) fn jsx_runtime_import(
     Ok(None)
 }
 
-fn pragma_argument(pragma: Option<&ts_ast::Pragma>) -> &[u8] {
+fn pragma_argument(pragma: Option<&tsr_ast::Pragma>) -> &[u8] {
     pragma
         .and_then(|p| p.args.get(b"factory".as_slice()))
         .map_or(b"".as_slice(), |arg| arg.value.as_bytes())
