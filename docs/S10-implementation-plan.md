@@ -1,7 +1,9 @@
 # S10: WebAssembly and Rust embedding
 
-Status: implementation in progress. Base: S09 `07156df`. Branch:
-`codex/s10-wasm-embedding`. The shared checkout is used directly.
+Status: interfaces and full correctness/ownership captures implemented; three
+performance gates remain unmet. See [S10-results.md](S10-results.md). Base:
+S09 `07156df`. Branch: `codex/s10-wasm-embedding`. The shared checkout is used
+directly. S09 was subsequently merged; the S10 PR targets `main`.
 
 ## 1. Contract and authority
 
@@ -322,5 +324,6 @@ remaining two (`binderBinaryExpressionStressJs` and `largeControlFlowGraph`)
 trapped in subtree-fact traversal and checker flow analysis. Both execute with
 Node's engine stack set to 4096 KiB. This host requirement is now explicit in
 toolchains.json and recorded for every capture, separate from the 16 MiB wasm
-linear stack. A fresh full capture must prove all cases under that configuration.
-Default-browser execution of these stress cases is not certified by this result.
+linear stack. The final full capture proves all 9,369 acceptance cases under
+that configuration; see the results record. Default-browser execution of these
+stress cases is not certified by this result.

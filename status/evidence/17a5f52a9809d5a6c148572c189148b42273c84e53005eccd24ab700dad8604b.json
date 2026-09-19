@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "e7",
+  "recorded_at": 1789808566,
+  "context": {
+    "revision": "09e6016839ad1d211e8e1707477c0172ac507c1e",
+    "source_sha256": "f80884ef45b3a76f314e85bd32ec58baffba9e0fc5c593ed373a459d4b4d4bc8",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "f41dacc358ff02843a978a3d45dd2a9ab90448e5d5737ce15be9e733c9c4fcc0",
+  "inputs": {
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/vscode-files.json": "4193d6fccdd2b569c3ef5d86ad8842dbe74e86c8ddca8196b12ec1f5ac6af696",
+    "data/s07/vscode-parse-options.json": "9de5a4f479a12750b6f8fa38a647ca80e31f5c3140cdfc8a69b8a1e8f4c19028",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "status/experiments.toml": "caa55766ccd9dea1c17b5f0caf87d6a08186aacf031db9f33744f39a83ba7f6a",
+    "tools/s10/toolchains.json": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"
+  },
+  "command": [
+    "python3",
+    "scripts/s10.py",
+    "e7"
+  ],
+  "target": "host",
+  "config": "S10 replay only; bare wasm32 with audited ABI imports and in-memory host; frozen full E2 checker inventory; stripped parser-only Rust and pinned GOOS=js artifacts; full frozen S07 parser corpus; interleaved pinned-Node samples with exact encoder comparison and explicit GC lifetime; immutable artifacts and source fingerprints; partial or unstable nominal passes withheld",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"parser_artifact_size_ratio\": 0.2680190590576252, \"parse_throughput_ratio\": 1.6769124958322452, \"portable_host\": true, \"checker_parity\": 1.0}}\n",
+  "stderr": "parser-measurement capture_sha256=8c15eb559361b302984d180ea235d3b998ac1c5a13a6bebbc9a61bbeec21b459\nportable capture_sha256=cf94fa56bfef904ca5ec4fc0b6d11566dc45f51c87f99a295efe840c716e3cf6\nwasm-corpus capture_sha256=c6350d0a914987533602143b28d10000ac24abb63bd59d2b780953ad810428fd\n",
+  "stdout_sha256": "239114b1662025b8e425486d0b37eefa9bafe95ad6fc6522eb030b317142fdf4",
+  "stderr_sha256": "f1abaf624a80bae48254fef38edaab0eb044be2395764161dd13a9a076a68429",
+  "valid_capture": true
+}

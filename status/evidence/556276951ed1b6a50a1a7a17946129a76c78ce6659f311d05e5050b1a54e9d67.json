@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "e8",
+  "recorded_at": 1789808660,
+  "context": {
+    "revision": "09e6016839ad1d211e8e1707477c0172ac507c1e",
+    "source_sha256": "f80884ef45b3a76f314e85bd32ec58baffba9e0fc5c593ed373a459d4b4d4bc8",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "dd53dfe6e19149bdb44b86c1d8ca0b0fbf40433bf4b85270a589db2aa0abdb0a",
+  "inputs": {
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "status/experiments.toml": "caa55766ccd9dea1c17b5f0caf87d6a08186aacf031db9f33744f39a83ba7f6a",
+    "tools/s10/lifetime-cases.json": "777426c116ade22ff284449b6b0402ee9689a2983e46346ffc19836af37ea0c5",
+    "tools/s10/parser/ten-kib.ts": "3384ea9d1b70d60f4aeb3d7c2349ab0c90e023b2f4d8ed7763f3702382eef28b",
+    "tools/s10/toolchains.json": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"
+  },
+  "command": [
+    "python3",
+    "scripts/s10.py",
+    "e8"
+  ],
+  "target": "host",
+  "config": "S10 replay only; isolated Rust consumer constructs through ts_embed and executes full frozen E2 schedule; exact public-boundary ownership inventory in debug, release, Miri and ASan; Node-API parse/encode versus real pinned --api update/get/release sequence on fresh 10240-byte inputs; exact encoder bytes, paired samples, authenticated artifacts and explicit extra socket work",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"node_parse_latency_ratio\": 0.341848023513094, \"lifetime_checks\": true, \"rust_consumer_parity\": 1.0}}\n",
+  "stderr": "node-measurement capture_sha256=7b05079e3362f72c3982563ccfe5e7d735f8093e19e593775bc48fc797945a73\nwarning: binary `s10_rust_consumer` should have a kebab-case name\n   |\n 1 | /Users/cristian/git/ts-rust/target/s04-asan/.../s10_rust_consumer\n   |                                                 ^^^^^^^^^^^^^^^^^\n   |\n   = note: `cargo::non_kebab_case_bins` is set to `warn` by default\nhelp: to change the binary name to `s10-rust-consumer`, convert `package.name`\n  --> Cargo.toml:2:8\n   |\n 2 - name = \"s10_rust_consumer\"\n 2 + name = \"s10-rust-consumer\"\n   |\nhelp: to change the binary name to `s10-rust-consumer`, specify `bin.name`\n  --> Cargo.toml:28:18\n   |\n28 ~ panic = \"unwind\"\n29 + [[bin]]\n30 + name = \"s10-rust-consumer\"\n31 + path = \"src/main.rs\"\n   |\nwarning: `s10_rust_consumer` (manifest) generated 1 warning\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s\n     Running tests/lifetime.rs (target/s04-asan/aarch64-apple-darwin/debug/build/s10_rust_consumer/6bcadeab8ccbb3d1/out/lifetime-6bcadeab8ccbb3d1)\n\nrunning 6 tests\ntest lifetime::concurrent_first_queries_share_one_checker_identity ... ok\ntest lifetime::native_unwind_retires_the_session_and_preserves_the_payload ... ok\ntest lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results ... ok\ntest lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline ... ok\ntest lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions ... ok\ntest lifetime::retire_before_initialization_cannot_create_a_checker ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s\n     Running tests/lifetime.rs (target/debug/deps/lifetime-e0a1ae9d325beae9)\n\nrunning 6 tests\ntest lifetime::concurrent_first_queries_share_one_checker_identity ... ok\ntest lifetime::native_unwind_retires_the_session_and_preserves_the_payload ... ok\ntest lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results ... ok\ntest lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline ... ok\ntest lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions ... ok\ntest lifetime::retire_before_initialization_cannot_create_a_checker ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s\n\nwarning: binary `s10_rust_consumer` should have a kebab-case name\n   |\n 1 | /Users/cristian/git/ts-rust/target/s04-miri/miri/.../s10_rust_consumer\n   |                                                      ^^^^^^^^^^^^^^^^^\n   |\n   = note: `cargo::non_kebab_case_bins` is set to `warn` by default\nhelp: to change the binary name to `s10-rust-consumer`, convert `package.name`\n  --> Cargo.toml:2:8\n   |\n 2 - name = \"s10_rust_consumer\"\n 2 + name = \"s10-rust-consumer\"\n   |\nhelp: to change the binary name to `s10-rust-consumer`, specify `bin.name`\n  --> Cargo.toml:28:18\n   |\n28 ~ panic = \"unwind\"\n29 + [[bin]]\n30 + name = \"s10-rust-consumer\"\n31 + path = \"src/main.rs\"\n   |\nwarning: `s10_rust_consumer` (manifest) generated 1 warning\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s\n     Running tests/lifetime.rs (target/s04-miri/miri/aarch64-apple-darwin/debug/build/s10_rust_consumer/ab19b292c01e05a2/out/lifetime-ab19b292c01e05a2)\nwarning: extern crate `s10_corpus` is unused in crate `lifetime`\n --> tests/lifetime.rs:3:1\n  |\n3 | #[path = \"../../../../crates/ts_embed/tests/lifetime.rs\"]\n  | ^\n  |\n  = help: remove the dependency or add `use s10_corpus as _;` to the crate root\n  = note: requested on the command line with `--force-warn unused-crate-dependencies`\n\nwarning: extern crate `serde_json` is unused in crate `lifetime`\n --> tests/lifetime.rs:3:1\n  |\n3 | #[path = \"../../../../crates/ts_embed/tests/lifetime.rs\"]\n  | ^\n  |\n  = help: remove the dependency or add `use serde_json as _;` to the crate root\n\n\nrunning 6 tests\ntest lifetime::concurrent_first_queries_share_one_checker_identity ... ok\ntest lifetime::native_unwind_retires_the_session_and_preserves_the_payload ... ok\ntest lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results ... ok\ntest lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline ... ok\ntest lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions ... ok\ntest lifetime::retire_before_initialization_cannot_create_a_checker ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 72.27s\n\nwarning: 2 warnings emitted\n\n    Finished `release` profile [optimized] target(s) in 0.06s\n     Running tests/lifetime.rs (target/release/deps/lifetime-fec021b92247aec2)\n\nrunning 6 tests\ntest lifetime::concurrent_first_queries_share_one_checker_identity ... ok\ntest lifetime::native_unwind_retires_the_session_and_preserves_the_payload ... ok\ntest lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results ... ok\ntest lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline ... ok\ntest lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions ... ok\ntest lifetime::retire_before_initialization_cannot_create_a_checker ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s\n\nlifetime capture_sha256=e7768d4ff414fb961fe925fe2538289e08e252064005a5c12763796766b132e2\nrust-corpus capture_sha256=4162dbd837a758f74aa264db0dbde2d0798a8562f4beba13ca1701cf235aa180\n",
+  "stdout_sha256": "b67fa5db342366e615c6a32698d30948548c43a3e1ec46546d5439e396384a6c",
+  "stderr_sha256": "4ba3a8f4e23341e249e0ebe3e602cc8151fb2e8b7824f4798288bbe9747c17d4",
+  "valid_capture": true
+}
