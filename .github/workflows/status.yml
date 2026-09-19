@@ -328,3 +328,58 @@ jobs:
             target/s07-program-reports/
             target/s07-subset/review/review-payload.json
           if-no-files-found: error
+
+  embedding:
+    name: bare wasm and external Rust embedding
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install pinned Rust and bare wasm target
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup target add wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Read JS ABI and Node pins
+        id: pins
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          print('bindgen=' + json.loads(Path('tools/s10/toolchains.json').read_text())['wasm_bindgen'])
+          print('node=' + json.loads(Path('upstream/package.json').read_text())['volta']['node'])
+          PY
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ steps.pins.outputs.node }}
+      - name: Install matching wasm-bindgen CLI
+        run: cargo install wasm-bindgen-cli --version "${{ steps.pins.outputs.bindgen }}" --locked
+      - name: Build and exercise the shipped parser
+        run: |
+          optimizer=$(python3 scripts/s10_toolchain.py)
+          python3 scripts/s10_build.py --wasm-bindgen "$(command -v wasm-bindgen)" --wasm-opt "$optimizer"
+          cargo build --locked --release -p ts_wasm --example parser
+          mapfile -t node_flags < <(python3 -c 'import json; print("\n".join(json.load(open("tools/s10/toolchains.json"))["node_flags"]))')
+          node "${node_flags[@]}" tools/s10/wasm/test.mjs target/s10/parser
+      - name: Build and exercise the shipped portable checker
+        run: |
+          python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
+          cargo build --locked --release -p ts_wasm --example parser
+          python3 scripts/s10_measure.py capture --kind portable --output target/s10/portable
+      - name: External consumer ownership in debug and release
+        if: ${{ !cancelled() }}
+        run: |
+          cargo test --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target --test lifetime
+          cargo test --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target --test lifetime --release
+      - name: Preserve portable observations even on failure
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: s10-portable
+          path: |
+            target/s10/portable/capture.json
+            target/s10/portable/completed.json
+            target/s10/portable/raw.json
+            target/s10/portable/stderr
+            target/s10/portable/verified.json

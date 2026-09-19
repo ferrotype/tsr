@@ -17,12 +17,22 @@ pub(super) fn bytes(value: &str) -> Vec<u8> {
 fn text(value: &[u8]) -> &str {
     std::str::from_utf8(value).expect("fixture output is valid UTF-8")
 }
+#[allow(dead_code)] // Embedding drivers use program_options with their public loader.
 pub(super) fn try_load(
     request: &Value,
     cache: &mut FileCache,
     counters: &Counters,
     parsed_config: Option<ts_tsoptions::ParsedCommandLine>,
 ) -> Result<Program, ts_compiler_error::Error> {
+    Program::load(program_options(request, parsed_config), cache, counters)
+}
+
+/// The corpus and embedding consumers share identical host/config preparation.
+/// Construction of the actual Program remains an explicit caller policy.
+pub(super) fn program_options(
+    request: &Value,
+    parsed_config: Option<ts_tsoptions::ParsedCommandLine>,
+) -> ProgramOptions {
     let mut fs = MemoryBuilder::new(
         request["cwd"].as_str().unwrap().as_bytes(),
         request["case_sensitive"].as_bool().unwrap(),
@@ -70,17 +80,13 @@ pub(super) fn try_load(
             ts_jsstring::SourceText::from_loaded_bytes(text),
         )));
     }
-    Program::load(
-        ProgramOptions {
-            config,
-            host,
-            current_directory: JsString::from_bytes(request["cwd"].as_str().unwrap().as_bytes()),
-            default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
-            skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
-        },
-        cache,
-        counters,
-    )
+    ProgramOptions {
+        config,
+        host,
+        current_directory: JsString::from_bytes(request["cwd"].as_str().unwrap().as_bytes()),
+        default_library_path: JsString::from_bytes(ts_bundled::LIB_PATH),
+        skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
+    }
 }
 fn nullable<T>(values: Vec<T>) -> Option<Vec<T>> {
     if values.is_empty() {
