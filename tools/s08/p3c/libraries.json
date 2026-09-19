@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "scope": "P3 type summaries through the actual bundled ESNext libraries; all-member display is recorded separately for P4/P5",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true
+  },
+  "programs": [
+    {
+      "id": "bundled-library-capabilities",
+      "files": {
+        "/library-capabilities.ts": "type A = ReadonlyArray<string>[number];\ntype B = Parameters<(value: string, count?: number) => boolean>;\ntype C = ReturnType<(value: string) => Promise<number>>;\ntype D = Awaited<Promise<Promise<{ value: string }>>>;\ntype E = NonNullable<string | undefined | null>;\ntype F = Required<Partial<{ value: number }>>;\ntype G = Pick<{ a: string; b: number }, \"a\">;\ntype H = Extract<string | number | boolean, string | number>;\ntype I = Exclude<\"a\" | \"b\" | \"c\", \"b\">;\ntype J = Omit<{ a: string; b: number }, \"a\">;\ntype K = Array<string>[\"map\"] extends (callback: any) => infer U ? U : never;\ntype L = IteratorObject<string, undefined, unknown>[\"next\"];\ntype M = ReadonlyMap<string, number>[\"get\"];\ntype N = ArrayBuffer[\"byteLength\"];\ntype O = Uppercase<\"hello\">;\ntype P = ThisParameterType<(this: Date, value: number) => string>;\ntype Q = OmitThisParameter<(this: Date, value: number) => string>;\n"
+      },
+      "roots": [
+        "/library-capabilities.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/library-capabilities.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "B",
+          "file": "/library-capabilities.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "C",
+          "file": "/library-capabilities.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "D",
+          "file": "/library-capabilities.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "E",
+          "file": "/library-capabilities.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "F",
+          "file": "/library-capabilities.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "G",
+          "file": "/library-capabilities.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "H",
+          "file": "/library-capabilities.ts",
+          "declaration": "H",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "I",
+          "file": "/library-capabilities.ts",
+          "declaration": "I",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "J",
+          "file": "/library-capabilities.ts",
+          "declaration": "J",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "K",
+          "file": "/library-capabilities.ts",
+          "declaration": "K",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "L",
+          "file": "/library-capabilities.ts",
+          "declaration": "L",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "M",
+          "file": "/library-capabilities.ts",
+          "declaration": "M",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "N",
+          "file": "/library-capabilities.ts",
+          "declaration": "N",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "O",
+          "file": "/library-capabilities.ts",
+          "declaration": "O",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "P",
+          "file": "/library-capabilities.ts",
+          "declaration": "P",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "Q",
+          "file": "/library-capabilities.ts",
+          "declaration": "Q",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

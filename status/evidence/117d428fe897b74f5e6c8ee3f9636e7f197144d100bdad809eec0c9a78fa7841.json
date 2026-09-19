@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run_id": "relater",
+  "recorded_at": 1789728608,
+  "context": {
+    "revision": "6fe850c5f10e637529d7c828e234e5b8fda0cb10",
+    "source_sha256": "58ccd461ad64ebcb1a9dde64e0352c40752c4deb5dc94cda08619c3998270217",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "bbea8921ef0e0f88d371b5615f312b4c32dd1583dd8581cd0e37a5b2b314533b",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s08/relater-fixtures.json": "77a0ec2aebca2d37790308b59de85fd0f3b299cf5c7b9c29c9ebd34b5298a301",
+    "data/s08/supplemental-observations.json.xz": "f066fbde457a96da5c5c6bcc81166670bb910d0e3fde915ed5d14c24ff325d7d",
+    "data/upstream.json": "c00093e1f9e8f09870cbd2d62c93651e8f065fba2f4c40c2349d48ac4b57b87f",
+    "tools/s08/contracts/relations.json": "9906e2033653b4e503f606721651d88e3f3814f9fc3438f8c8ee15c53dfae2bf",
+    "tools/s08/results/p0-contracts/native.tar.xz": "1a7a959a8e6ffb261bc46bb503427befae041200980a4304a543dfe7b20338b6"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_relater.py",
+    "producer"
+  ],
+  "target": "host",
+  "config": "S08 relater comparison (data/s08/relater-fixtures.json): consume one explicitly captured measurement at target/s08/relater on the designated quiet host; parity of the production ID relater and the isolated reference prototype against the frozen Go observations over all 21 fixtures and five modes precedes measurement; setup and relation intervals separate; 1 warmup + 7 alternating fresh-process samples per implementation for the normal and allocation executables; ratios reference/ID with max/min > 1.10 flagged; strict parity requires exact diagnostic payloads and lazy work; the reference constructs its types from the bound program and is compared on the same strict protocol, so comparison ratios become available only when both implementations match every case and execute the same group inventory",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\":{\"allocated_bytes_ratio\":1.6110460792801113,\"elapsed_ratio\":1.2756565972749212,\"parity\":1.0,\"parity_id\":1.0,\"parity_reference\":1.0,\"reference_behavior_agreement\":1.0,\"reference_unsupported_groups\":0,\"retained_bytes_ratio\":2.437409636562528,\"setup_elapsed_ratio\":1.0836390594225562,\"stable\":false,\"throughput_ratio\":0.7839100288715761}}\n",
+  "stderr": "{\"report\": {\"capture_sha256\": \"2326284061905d318f0df136c9b3538c48537d48e53ae62953ecc4f8833824fd\", \"metrics\": {\"allocated_bytes_ratio\": 1.6110460792801113, \"elapsed_ratio\": 1.2756565972749212, \"parity\": 1.0, \"parity_id\": 1.0, \"parity_reference\": 1.0, \"reference_behavior_agreement\": 1.0, \"reference_unsupported_groups\": 0, \"retained_bytes_ratio\": 2.437409636562528, \"setup_elapsed_ratio\": 1.0836390594225562, \"stable\": false, \"throughput_ratio\": 0.7839100288715761}, \"modes\": {\"alloc\": {\"relation_ns\": {\"id\": {\"coefficient_of_variation\": 0.20451403432769524, \"max_over_min\": 1.7743462758285817, \"median\": 69251334, \"samples\": [63499373, 112669876, 80576701, 67093952, 66752794, 81943800, 69251334], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.06213376311165128, \"max_over_min\": 1.2319648970077581, \"median\": 84645372, \"samples\": [74134079, 84645372, 89221792, 91330583, 85298457, 83645371, 80700921], \"unstable\": true}}, \"relation_ns_ratio\": {\"bootstrap\": {\"algorithm\": \"independent-median-ratio/order-statistic-v1\", \"confidence\": 0.95, \"lower\": 1.001541636707117, \"resamples\": 10000, \"seed\": 21255, \"threshold\": 1.0, \"upper\": 1.3298037951319368}, \"go_median\": 69251334, \"go_relative_mad\": 0.08305920865004564, \"needs_more\": true, \"ratio\": 1.2222922954812683, \"rust_median\": 84645372, \"rust_relative_mad\": 0.04659972431806431, \"samples_per_runtime\": 7, \"stable\": false}, \"relation_requested_bytes\": {\"id\": [88060295, 88060295, 88060295, 88060295, 88060295, 88060295, 88060295], \"reference\": [141869193, 141869193, 141869193, 141869193, 141869193, 141869193, 141869193]}, \"relation_requested_bytes_ratio\": {\"go_median\": 88060295, \"go_relative_mad\": 0.0, \"ratio\": 1.6110460792801113, \"rust_median\": 141869193, \"rust_relative_mad\": 0.0, \"samples_per_runtime\": 7}, \"retained_bytes\": {\"id\": [1292056038, 1292056038, 1292056038, 1292056038, 1292056038, 1292056038, 1292056038], \"reference\": [3149269838, 3149269838, 3149269838, 3149269838, 3149269838, 3149269838, 3149269838]}, \"retained_bytes_ratio\": {\"go_median\": 1292056038, \"go_relative_mad\": 0.0, \"ratio\": 2.437409636562528, \"rust_median\": 3149269838, \"rust_relative_mad\": 0.0, \"samples_per_runtime\": 7}, \"setup_ns\": {\"id\": {\"coefficient_of_variation\": 0.0789793600613371, \"max_over_min\": 1.3072897904571454, \"median\": 1796255457, \"samples\": [1603174161, 1856312629, 2095813213, 1794618005, 1707916877, 1902989789, 1796255457], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.1052789895587695, \"max_over_min\": 1.4085266768314941, \"median\": 2041337513, \"samples\": [1739567160, 1914077090, 2233597994, 2450226751, 1917660889, 2041337513, 2062733665], \"unstable\": true}}, \"setup_ns_ratio\": {\"bootstrap\": {\"algorithm\": \"independent-median-ratio/order-statistic-v1\", \"confidence\": 0.95, \"lower\": 1.0058262535427613, \"resamples\": 10000, \"seed\": 21255, \"threshold\": 1.0, \"upper\": 1.273309889005877}, \"go_median\": 1796255457, \"go_relative_mad\": 0.04917929666169972, \"needs_more\": true, \"ratio\": 1.1364405352506606, \"rust_median\": 2041337513, \"rust_relative_mad\": 0.06234168636472807, \"samples_per_runtime\": 7, \"stable\": false}, \"setup_requested_bytes\": {\"id\": [3551527280, 3551527280, 3551527280, 3551527280, 3551527280, 3551527280, 3551527280], \"reference\": [4509643990, 4509643990, 4509643990, 4509643990, 4509643990, 4509643990, 4509643990]}, \"setup_requested_bytes_ratio\": {\"go_median\": 3551527280, \"go_relative_mad\": 0.0, \"ratio\": 1.2697759680449365, \"rust_median\": 4509643990, \"rust_relative_mad\": 0.0, \"samples_per_runtime\": 7}}, \"normal\": {\"relation_ns\": {\"id\": {\"coefficient_of_variation\": 0.05662027596228184, \"max_over_min\": 1.1464412387151333, \"median\": 63640951, \"samples\": [63410543, 63640951, 62767135, 71958832, 63582582, 66722912, 71876791], \"unstable\": true}, \"reference\": {\"coefficient_of_variation\": 0.06667270659749978, \"max_over_min\": 1.2171737932974087, \"median\": 81183999, \"samples\": [77198133, 76546036, 81183999, 77334000, 81556288, 84849660, 93169829], \"unstable\": true}}, \"relation_ns_ratio\": {\"bootstrap\": {\"algorithm\": \"independent-median-ratio/order-statistic-v1\", \"confidence\": 0.95, \"lower\": 1.075924494180604, \"resamples\": 10000, \"seed\": 21255, \"threshold\": 1.0, \"upper\": 1.3344796221078281}, \"go_median\": 63640951, \"go_relative_mad\": 0.013730404500083601, \"needs_more\": false, \"ratio\": 1.2756565972749212, \"rust_median\": 81183999, \"rust_relative_mad\": 0.04742312583049771, \"samples_per_runtime\": 7, \"stable\": false}, \"setup_ns\": {\"id\": {\"coefficient_of_variation\": 0.02701595783634051, \"max_over_min\": 1.0751521855341517, \"median\": 1613431164, \"samples\": [1579642417, 1599644586, 1594689996, 1653810094, 1613431164, 1688714586, 1698355997], \"unstable\": false}, \"reference\": {\"coefficient_of_variation\": 0.0554160337663582, \"max_over_min\": 1.1658487521333034, \"median\": 1748377029, \"samples\": [1761690666, 1706995792, 1714514037, 1893952168, 1733652663, 1990098914, 1748377029], \"unstable\": true}}, \"setup_ns_ratio\": {\"bootstrap\": {\"algorithm\": \"independent-median-ratio/order-statistic-v1\", \"confidence\": 0.95, \"lower\": 1.026610818294904, \"resamples\": 10000, \"seed\": 21255, \"threshold\": 1.0, \"upper\": 1.1839831076076295}, \"go_median\": 1613431164, \"go_relative_mad\": 0.020942168314284526, \"needs_more\": false, \"ratio\": 1.0836390594225562, \"rust_median\": 1748377029, \"rust_relative_mad\": 0.019368243484283388, \"samples_per_runtime\": 7, \"stable\": false}}}, \"pin\": \"1f70213d4922b434345f639b441681e470c7cfc1\", \"smoke\": false, \"source_stable\": true, \"sources_sha256\": \"7ba4be14eb2e76d3dfe766c0af8c90be3a13fc496574b54c41f4b53314860382\", \"unavailable\": {}, \"version\": 1}}\n",
+  "stdout_sha256": "37ec5dd9f196f00cc6c37f841693153de940ad8d9b75f2326b12a75c01cf381a",
+  "stderr_sha256": "2f4d5b718509197921b65999481902bc88b5ba2c35af819aed117713c421eb26",
+  "valid_capture": true
+}

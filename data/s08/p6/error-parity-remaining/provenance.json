@@ -1,0 +1,9 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "native_control_capture_sha256": "9d15f6dcc2aa2274d0db5724f2c268a1841a5eaa25c66a9b76c11ed4665870aa",
+  "scope": "Exact native pre-emit diagnostic payloads from authenticated control. Original phase/options/files retained; type and public-display walks disabled in these diagnostic-only regressions.",
+  "sha256": {
+    "requests.json": "c8bf7eaa6fc713c5a470a541ba8022c5077bf3ec95463423e868b140d773e66d",
+    "observations.json": "16a4da33380dbe946c67726789f1df7145ab00331283443f1607f8163433d2cf"
+  }
+}

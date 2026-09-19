@@ -70,6 +70,13 @@ impl JsString {
         &self.storage[self.range()]
     }
 
+    /// Full shared backing, for retained-storage accounting. A slice can keep
+    /// bytes outside its visible range alive; callers can deduplicate backings
+    /// by this slice's address without cloning the allocation.
+    pub fn backing_bytes(&self) -> &[u8] {
+        &self.storage
+    }
+
     pub fn as_str(&self) -> Option<&str> {
         if self.validity() == Validity::Utf8 {
             // Revalidate the safe view; the crate does not need unchecked UTF-8 access.

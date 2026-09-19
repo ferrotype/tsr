@@ -8,7 +8,7 @@ mod text;
 pub(crate) use pages::RowPages;
 
 use crate::{AstStorageData, JsString, NodeId, NodeKind, NodeListId, NodeSlice, TextSlice};
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use ts_arena::{ArenaId, AuxId};
 use ts_jsstring::SourceText;
 
@@ -60,15 +60,16 @@ enum FullReference {
 pub struct CoreStore {
     pub(crate) payloads: crate::AstPayloadStore,
     pub(crate) auxiliary: crate::auxiliary::AuxStore,
-    links: HashMap<FieldKey, FullReference>,
+    links: HashMap<FieldKey, FullReference, ts_arena::hash::FastState>,
     text: text::TextPool,
     pub(crate) edges: lists::EdgePages,
     #[allow(clippy::box_collection)]
     // The cold shape-change directory costs one word in other owners.
-    parked_facts: Option<Box<HashMap<u32, u32>>>,
-    runtime_ids: std::sync::OnceLock<std::sync::Mutex<HashMap<u32, u64>>>,
+    parked_facts: Option<Box<HashMap<u32, u32, ts_arena::hash::FastState>>>,
+    runtime_ids:
+        std::sync::OnceLock<std::sync::Mutex<HashMap<u32, u64, ts_arena::hash::FastState>>>,
     binding_arenas: Option<binding::BindingArenas>,
-    binding_overrides: HashMap<u32, crate::NodeBinding>,
+    binding_overrides: HashMap<u32, crate::NodeBinding, ts_arena::hash::FastState>,
 }
 
 #[derive(Clone, Copy)]
@@ -84,7 +85,7 @@ pub(crate) struct PackingContext<'a> {
     pub(crate) auxiliary: ArenaId,
     pub(crate) source: &'a SourceText,
     pub(crate) end: i32,
-    links: &'a mut HashMap<FieldKey, FullReference>,
+    links: &'a mut HashMap<FieldKey, FullReference, ts_arena::hash::FastState>,
     text: &'a mut text::TextPool,
     binding_arenas: Option<binding::BindingArenas>,
 }
@@ -359,3 +360,33 @@ impl CoreStore {
 
 #[cfg(test)]
 mod tests;
+
+impl CoreStore {
+    /// Known structural bytes of every store the record arena owns, and the
+    /// count of entries whose allocation extent std does not expose (edge
+    /// escape entries, nested source metadata).
+    pub fn structural_bytes(&self) -> (usize, usize) {
+        self.structural_bytes_with(&mut ts_arena::StorageCensus::default())
+    }
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        let (auxiliary, auxiliary_unmeasured) = self.auxiliary.structural_bytes_with(census);
+        let (edges, escapes) = self.edges.storage_bytes();
+        let mut known = self.payloads.structural_bytes()
+            + auxiliary
+            + self.links.allocation_size()
+            + self.text.structural_bytes_with(census)
+            + edges
+            + self.binding_overrides.allocation_size();
+        if let Some(parked) = &self.parked_facts {
+            known += size_of::<HashMap<u32, u32, ts_arena::hash::FastState>>()
+                + parked.allocation_size();
+        }
+        if let Some(ids) = self.runtime_ids.get() {
+            known += ids
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .allocation_size();
+        }
+        (known, auxiliary_unmeasured + escapes)
+    }
+}

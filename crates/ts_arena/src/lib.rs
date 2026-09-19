@@ -4,6 +4,7 @@
 
 mod arena;
 mod bundle;
+mod census;
 mod counters;
 mod error;
 mod file;
@@ -19,13 +20,18 @@ mod scope;
 mod scratch;
 
 pub use bundle::{StorageBundle, StorageHandle};
+pub use census::StorageCensus;
 pub use counters::{Counters, Counts};
 pub use error::Error;
+pub mod growth;
+pub mod hash;
 pub use file::{CoreDataRead, CoreNodesMut, StorageBuilder, StorageOwner, StorageView};
 pub use ids::{ArenaId, AuxId, FileId, NodeId, SymbolId};
 pub use initialization::{InitializationDomain, InitializationGuard};
 pub use lazy::{StorageTransaction, TokenKey};
-pub use lease::{CheckerIdentity, CheckerLease, Generation};
+#[cfg(any(test, feature = "harness"))]
+pub use lease::{observe_next_lease_contention, observe_next_retirement_contention};
+pub use lease::{CheckerIdentity, CheckerLease, Generation, GenerationGuard};
 pub use node::{Node, NodeParentRecord, NodeRecord};
 pub use node_slots::NodeSlots;
 pub use owned::{OwnedArena, SymbolArena};

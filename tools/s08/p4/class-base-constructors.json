@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "scope": "S08 P4 generic and class-like base constructor constraints, accessibility and mixin checks",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "base-generic-constraint",
+      "files": {
+        "/base-generic-constraint.ts": "class A<T extends number>{x!:T;}class C extends A<string>{}const Query=0;\n"
+      },
+      "roots": [
+        "/base-generic-constraint.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-generic-constraint.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-classlike-constraint",
+      "files": {
+        "/base-classlike-constraint.ts": "interface Ctor{new<T extends number>():{x:T};}declare const A:Ctor;class C extends A<string>{}const Query=0;\n"
+      },
+      "roots": [
+        "/base-classlike-constraint.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-classlike-constraint.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-classlike-different",
+      "files": {
+        "/base-classlike-different.ts": "interface Ctor{new():{x:number};new(s:string):{y:string};}declare const A:Ctor;class C extends A{}const Query=0;\n"
+      },
+      "roots": [
+        "/base-classlike-different.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-classlike-different.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-classlike-same",
+      "files": {
+        "/base-classlike-same.ts": "interface Ctor{new():{x:number};new(s:string):{x:number};}declare const A:Ctor;class C extends A{}const Query=0;\n"
+      },
+      "roots": [
+        "/base-classlike-same.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-classlike-same.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-private-nested",
+      "files": {
+        "/base-private-nested.ts": "class A{private constructor(){}static create(){return class C extends A{};}}const Query=0;\n"
+      },
+      "roots": [
+        "/base-private-nested.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-private-nested.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-private-qualified",
+      "files": {
+        "/base-private-qualified.ts": "namespace N{export class A{private constructor(){}}}class C extends N.A{}const Query=0;\n"
+      },
+      "roots": [
+        "/base-private-qualified.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-private-qualified.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-mixin-rest",
+      "files": {
+        "/base-mixin-rest.ts": "interface Array<T>{length:number;[n:number]:T;}function mix<T extends new(...args:any[])=>{}>(Base:T){return class C extends Base{constructor(...args:any[]){super(...args);}};}const Query=0;\n"
+      },
+      "roots": [
+        "/base-mixin-rest.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-mixin-rest.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-mixin-invalid",
+      "files": {
+        "/base-mixin-invalid.ts": "interface Array<T>{length:number;[n:number]:T;}function mix<T extends new(...args:any[])=>{}>(Base:T){return class C extends Base{constructor(){super();}};}const Query=0;\n"
+      },
+      "roots": [
+        "/base-mixin-invalid.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-mixin-invalid.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "base-mixin-abstract",
+      "files": {
+        "/base-mixin-abstract.ts": "interface Array<T>{length:number;[n:number]:T;}function mix<T extends abstract new(...args:any[])=>{}>(Base:T){return class C extends Base{constructor(...args:any[]){super(...args);}};}const Query=0;\n"
+      },
+      "roots": [
+        "/base-mixin-abstract.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/base-mixin-abstract.ts",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -112,6 +112,26 @@ fn file_name<'a>(
 }
 
 impl CheckerState {
+    pub(crate) fn add_related_diagnostic(
+        &mut self,
+        index: usize,
+        diagnostic: Diagnostic,
+    ) -> Result<(), Error> {
+        validate_files(&diagnostic, &|file| {
+            file_name(self.factory.view(), self.program.as_ref(), file)
+        })?;
+        self.diagnostics
+            .entries
+            .get_mut(index)
+            .ok_or(Error::MissingLink("related diagnostic index"))?
+            .related_information
+            .push(std::sync::Arc::new(diagnostic));
+        self.diagnostics.globals.sorted = false;
+        for bucket in self.diagnostics.files.values_mut() {
+            bucket.sorted = false;
+        }
+        Ok(())
+    }
     // port: tsc/internal/checker/utilities.go:NewDiagnosticForNode
     pub(crate) fn diagnostic_for_node(
         &self,
@@ -161,13 +181,7 @@ impl CheckerState {
             return Ok(None);
         }
         let path = diagnostic.file.map_or(Ok(JsString::default()), |file| {
-            Ok::<_, Error>(
-                self.ast(file)?
-                    .source_file(file)?
-                    .parse_options()
-                    .path
-                    .clone(),
-            )
+            Ok::<_, Error>(self.source_file_read(file)?.parse_options().path.clone())
         })?;
         let factory = self.factory.view();
         let program = self.program.as_ref();
@@ -213,15 +227,7 @@ impl CheckerState {
         suggestion: bool,
     ) -> Result<Vec<&Diagnostic>, Error> {
         let path = file
-            .map(|file| {
-                Ok::<_, Error>(
-                    self.ast(file)?
-                        .source_file(file)?
-                        .parse_options()
-                        .path
-                        .clone(),
-                )
-            })
+            .map(|file| Ok::<_, Error>(self.source_file_read(file)?.parse_options().path.clone()))
             .transpose()?;
         let factory = self.factory.view();
         let program = self.program.as_ref();
@@ -315,5 +321,30 @@ impl CheckerState {
             self.duplicate_declaration_error(node, message, symbol_name, &related)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(any(test, feature = "storage-pilot"))]
+impl DiagnosticStore {
+    pub(crate) fn census(&self, census: &mut crate::census::Census) {
+        census.vec_capacity("diagnostics", &self.entries, self.entries.capacity());
+        for entry in &self.entries {
+            census.diagnostic(entry);
+        }
+        census.map("diagnostics", &self.locations);
+        for ((path, _, _), entries) in &self.locations {
+            census.text("diagnostics", path);
+            census.vec_capacity("diagnostics", entries, entries.capacity());
+        }
+        census.map("diagnostics", &self.files);
+        for (path, bucket) in &self.files {
+            census.text("diagnostics", path);
+            census.vec_capacity("diagnostics", &bucket.indices, bucket.indices.capacity());
+        }
+        census.vec_capacity(
+            "diagnostics",
+            &self.globals.indices,
+            self.globals.indices.capacity(),
+        );
     }
 }

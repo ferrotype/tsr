@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "scope": "S08 P4 constructor identity, inheritance and custom instanceof flow",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "class-branches",
+      "files": {
+        "/case.ts": "declare class A {a:number;} declare class B {b:string;} function f(x:A|B){ if(x instanceof A){const yes=x;}else{const no=x;} }"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "no",
+          "file": "/case.ts",
+          "declaration": "no",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-identity",
+      "files": {
+        "/case.ts": "declare class A {a:number;} declare class B {a:number;} function f(x:A|B){ if(x instanceof A){const yes=x;}else{const no=x;} }"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "no",
+          "file": "/case.ts",
+          "declaration": "no",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "class-inheritance",
+      "files": {
+        "/case.ts": "declare class A {a:number;} declare class B extends A {b:string;} declare class C {c:boolean;} function f(x:B|C){if(x instanceof A){const yes=x;}else{const no=x;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "no",
+          "file": "/case.ts",
+          "declaration": "no",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "generic-instance",
+      "files": {
+        "/case.ts": "declare class Box<T>{value:T;} function f(x:Box<string>|number){if(x instanceof Box){const yes=x;}else{const no=x;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "no",
+          "file": "/case.ts",
+          "declaration": "no",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "constructor-comparison",
+      "files": {
+        "/case.ts": "interface Object {constructor:Function;} interface Function {prototype:any;} declare class A {a:number;} declare class B {a:number;} function f(x:A|B){if(x.constructor===A){const dot=x;} if(x[\"constructor\"]===B){const index=x;} if(x.constructor!==A){const unequal=x;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "dot",
+          "file": "/case.ts",
+          "declaration": "dot",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "index",
+          "file": "/case.ts",
+          "declaration": "index",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "unequal",
+          "file": "/case.ts",
+          "declaration": "unequal",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "custom-predicate",
+      "files": {
+        "/case.ts": "interface SymbolConstructor {readonly hasInstance:unique symbol;} declare var Symbol:SymbolConstructor; declare const filter:{[Symbol.hasInstance](x:unknown):x is {value:string}}; function f(x:{value:string}|number){if(x instanceof filter){const yes=x;}else{const no=x;}}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "no",
+          "file": "/case.ts",
+          "declaration": "no",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "assertion-alias",
+      "files": {
+        "/case.ts": "namespace N {export function assert(x:unknown):asserts x is string {}} import assert = N.assert; function f(x:unknown){assert(x);const yes=x;}"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "yes",
+          "file": "/case.ts",
+          "declaration": "yes",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -86,8 +86,20 @@ pub fn relative_from_directory(
         (root_length(from) > 0) == (root_length(to) > 0),
         "paths must either both be absolute or both be relative"
     );
+    relative_to_directory_or_url(from, to, false, cwd, case_sensitive)
+}
+/// Relative paths accept mixed absolute/relative inputs and URL roots here;
+/// `relative_from_directory` retains its separate native precondition.
+/// port: tsc/internal/tspath/path.go:GetRelativePathToDirectoryOrUrl
+pub fn relative_to_directory_or_url(
+    from: &[u8],
+    to: &[u8],
+    absolute_path_as_url: bool,
+    cwd: &[u8],
+    case_sensitive: bool,
+) -> Vec<u8> {
     let from = normalized_components(from, cwd);
-    let to = normalized_components(to, cwd);
+    let mut to = normalized_components(to, cwd);
     let common = from
         .iter()
         .zip(&to)
@@ -101,6 +113,14 @@ pub fn relative_from_directory(
         })
         .count();
     if common == 0 {
+        if absolute_path_as_url && crate::encoded_root_length(&to[0]) > 0 {
+            let prefix = if to[0].starts_with(b"/") {
+                b"file://".as_slice()
+            } else {
+                b"file:///"
+            };
+            to[0] = [prefix, &to[0]].concat();
+        }
         return path_from_components(&to);
     }
     let mut result = vec![Vec::new()];

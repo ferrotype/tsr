@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "scope": "Small programs that exercise the census accounting rules of data/s08/type-footprint.json on both runtimes before any workload comparison: shared allocations, cycles, cache growth, unreachable retained records and bound inputs. Counts of semantic records are compared across runtimes; bytes are per-runtime structural measurements.",
+  "options": {"target": "ESNext", "module": "ESNext", "strict": true, "skipLibCheck": true},
+  "cases": [
+    {
+      "id": "sharing",
+      "rule": "One shared allocation is charged once: two aliases of one union share its constituent list; the literal 'shared' interned once is referenced from several types; both runtimes report one union and one string literal.",
+      "source": "type Shared = 'shared' | number; type A = Shared; type B = Shared; interface I { a: Shared; b: Shared; c: 'shared' } declare const i: I; export const x = i.a; export const y: B = i.c;",
+      "roots": ["A", "B", "I"]
+    },
+    {
+      "id": "cycles",
+      "rule": "Recursive structures are reached once through the identity visited set; the relation between the two recursive interfaces caches assumptions.",
+      "source": "interface Left { value: string; next: Left; back: Right } interface Right { value: string; next: Right; back: Left } type A = Left; type B = Right; declare const l: Left; export const r: Right = l;",
+      "roots": ["A", "B"]
+    },
+    {
+      "id": "cache-growth",
+      "rule": "Many distinct unions and literal types grow the interning caches past their initial capacity; the census charges the actual table capacity, not the entry count.",
+      "source": "type U0 = 'a0' | 0; type U1 = 'a1' | 1; type U2 = 'a2' | 2; type U3 = 'a3' | 3; type U4 = 'a4' | 4; type U5 = 'a5' | 5; type U6 = 'a6' | 6; type U7 = 'a7' | 7; type U8 = 'a8' | 8; type U9 = 'a9' | 9; type U10 = 'a10' | 10; type U11 = 'a11' | 11; type U12 = 'a12' | 12; type U13 = 'a13' | 13; type U14 = 'a14' | 14; type U15 = 'a15' | 15; type U16 = 'a16' | 16; type U17 = 'a17' | 17; type U18 = 'a18' | 18; type U19 = 'a19' | 19; type A = U0 | U1 | U2 | U3 | U4 | U5 | U6 | U7 | U8 | U9; type B = U10 | U11 | U12 | U13 | U14 | U15 | U16 | U17 | U18 | U19; export const a: A = 'a3'; export const b: B = 17;",
+      "roots": ["A", "B"]
+    },
+    {
+      "id": "unreachable",
+      "rule": "Types created while checking are only reachable through retained roots; the created/reachable/unreachable_occupied triple must be internally consistent on both sides and is compared across runtimes. Both checkers intern nearly every type they create, so an unreachable occupied record is the exception, not the rule.",
+      "source": "function f(x: number) { return x > 1 ? 'big' : x > 0 ? 'small' : 'none'; } export const s = f(2); export const t = [1, 'two', true, null]; type A = ReturnType<typeof f>; type B = typeof t;",
+      "roots": ["A", "B"]
+    },
+    {
+      "id": "bound-inputs",
+      "rule": "Names and literal texts that alias the source file text are bound inputs: they are reported in bound_inputs and charged to no checker family; the census must reference the fixture text at least once on both sides.",
+      "source": "export const longNamedIdentifierThatIsOnlyInSource = 'a long string literal that lives only in the source text'; type A = typeof longNamedIdentifierThatIsOnlyInSource; type B = 'a long string literal that lives only in the source text';",
+      "roots": ["A", "B"]
+    },
+    {
+      "id": "signatures-and-indexes",
+      "rule": "Signatures, index infos and their symbol lists are charged once as arena records or lists; overload lists are type-owned.",
+      "source": "interface F { (x: string): number; (x: number): string; new (x: boolean): F; [key: string]: unknown; readonly [index: number]: string } type A = F; type B = { (x: string | number): string | number }; declare const f: F; export const v = f('x');",
+      "roots": ["A", "B"]
+    }
+  ]
+}

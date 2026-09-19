@@ -242,6 +242,11 @@ impl AstBuilder {
     }
     /// Copy borrowed edges after validating every ID. An empty input receives
     /// an allocated-empty backing identity, just like the consuming constructor.
+    /// See `StorageBuilder::adopt_source`: the text of a file constructed in a
+    /// storage that was built without any.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        self.storage.adopt_source(source)
+    }
     pub fn node_slice_from_slice(&mut self, nodes: &[Option<NodeId>]) -> Result<NodeSlice, Error> {
         for &id in nodes.iter().flatten() {
             self.view().node(id)?;
@@ -453,6 +458,13 @@ impl ParsedFile {
     }
     pub fn root(&self) -> NodeId {
         self.view().file_info().root.expect("completed parse root")
+    }
+    /// Supply the host's content hash without changing syntax edges or revoking
+    /// their completed validation. Fails for a non-source-file fragment root.
+    pub fn set_source_hash(&mut self, hash: crate::SourceHash) -> Result<(), Error> {
+        let root = self.root();
+        self.builder.source_file_mut(root)?.hash = hash;
+        Ok(())
     }
     /// Parser-tool publication deliberately makes no claim that binding ran.
     pub fn publish_unbound(self) -> AstFile {
@@ -976,6 +988,14 @@ impl AstTransaction<'_, '_> {
         let header = Self::stage_node(self.storage, node);
         self.storage.push(header)
     }
+    /// A token's header and payload, staged by the token cache under the lazy
+    /// arena's publication lock.
+    pub(crate) fn stage_token(
+        storage: &mut StorageTransaction<'_, StoredNode>,
+        node: Node,
+    ) -> StoredNode {
+        Self::stage_node(storage, node)
+    }
     fn stage_node(storage: &mut StorageTransaction<'_, StoredNode>, node: Node) -> StoredNode {
         let mut header = StoredNode::fallback(&node, 0);
         let aux = storage.push_aux(AstStorageData::FallbackNode(Arc::new(node)));
@@ -1188,6 +1208,31 @@ fn validate_data(
     text: impl FnMut(TextSlice) -> Result<(), Error>,
 ) -> Result<(), Error> {
     data.validate_references(node, list, raw, text)
+}
+
+impl AstBuilder {
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        self.storage
+            .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
+    }
+    /// Structural storage of this builder's arenas and stores: known bytes and
+    /// the count of entries whose allocation extent is not exposed.
+    pub fn structural_bytes(&self) -> (usize, usize) {
+        self.storage
+            .structural_bytes(crate::compact::CoreStore::structural_bytes)
+    }
+}
+
+impl AstFile {
+    pub fn structural_bytes_with(&self, census: &mut ts_arena::StorageCensus) -> (usize, usize) {
+        self.0
+            .structural_bytes_with(&crate::compact::CoreStore::structural_bytes_with, census)
+    }
+    /// Structural storage of the published file(s) behind this handle.
+    pub fn structural_bytes(&self) -> (usize, usize) {
+        self.0
+            .structural_bytes(crate::compact::CoreStore::structural_bytes)
+    }
 }
 
 #[cfg(test)]

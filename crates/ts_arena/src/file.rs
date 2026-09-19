@@ -3,10 +3,8 @@ use crate::{
     CoreScopeMut, Counters, Error, FileId, NodeId, NodeParentRecord, NodeRecord, StorageHandle,
     StorageRead, StorageTransaction, SymbolId,
 };
-use std::{
-    collections::HashMap,
-    sync::{Arc, OnceLock},
-};
+use hashbrown::HashMap;
+use std::sync::{Arc, OnceLock};
 use ts_jsstring::{PositionMap, SourceText};
 
 /// Exclusive construction owns the same storage later transferred into a file.
@@ -102,7 +100,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
                 supplemental: Vec::new(),
                 metadata: None,
                 imports: Vec::new(),
-                imported_arenas: HashMap::new(),
+                imported_arenas: HashMap::default(),
                 _owner: counters.owner(),
             },
             counters: counters.clone(),
@@ -122,6 +120,19 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     }
     pub fn store_and_source_mut(&mut self) -> (&mut N::Store, &SourceText) {
         (&mut self.owner.store, &self.owner.source)
+    }
+    /// Give a storage that was built without text the text of the file
+    /// constructed in it, as when a decoded tree is printed and then wrapped in
+    /// a source file over the printed text. Only an empty source can be
+    /// replaced: nothing built so far can refer into it. The builder is
+    /// exclusive and unpublished, so no reader has seen the old text either.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        if !self.owner.source.as_bytes().is_empty() {
+            return Err(Error::InvalidGraph);
+        }
+        self.owner.source = source;
+        self.owner.position_map = OnceLock::new();
+        Ok(())
     }
     /// Open this exclusive core with a fresh invariant scope. Checked local
     /// handles cannot escape or be used with any other scope, even on this same
@@ -409,7 +420,7 @@ pub struct StorageOwner<N: NodeRecord, S = ()> {
     supplemental: Vec<FileId>,
     metadata: Option<AuxId>,
     imports: Vec<Box<dyn RetainedImport<N, S>>>,
-    imported_arenas: HashMap<ArenaId, usize>,
+    imported_arenas: HashMap<ArenaId, usize, crate::hash::FastState>,
     _owner: Track,
 }
 impl<N: NodeRecord, S> std::fmt::Debug for StorageOwner<N, S> {
@@ -763,16 +774,26 @@ impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
         kind: u32,
         initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
     ) -> Result<StorageRead<'a, N>, Error> {
+        let id = self.try_token_prepared_id(key, kind, initialize)?;
+        self.node(id)
+    }
+    /// The id form of [`Self::try_token_prepared`], for a caller that resolves
+    /// the token through a typed view of its own.
+    pub fn try_token_prepared_id(
+        self,
+        key: crate::TokenKey,
+        kind: u32,
+        initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
+    ) -> Result<NodeId, Error> {
         let selected = self.for_node_owner(key.parent)?;
         let parent = selected.node(key.parent)?;
-        let id = selected.owner.lazy.token_prepared(
+        selected.owner.lazy.token_prepared(
             key,
             kind,
             parent.storage_reparsed(),
             selected.owner,
             initialize,
-        )?;
-        self.node(id)
+        )
     }
 }
 #[cfg(test)]
@@ -900,5 +921,70 @@ mod construction_tests {
         .join()
         .unwrap();
         assert_eq!(builder.symbol_mut(id).unwrap().get(), 2);
+    }
+}
+
+/// Structural storage of one owner for allocation censuses: reserved arena
+/// pages and directories, the lazy arena, the record store (measured by the
+/// caller's store-specific closure) and the owner's own directories. Returns
+/// known bytes and the number of entries whose allocation extent is not
+/// exposed (a census reports those as unavailable, never as zero).
+impl<N: NodeRecord, S> StorageOwner<N, S> {
+    pub fn structural_bytes(&self, store: impl Fn(&N::Store) -> (usize, usize)) -> (usize, usize) {
+        self.structural_bytes_with(
+            &|store_value, _| store(store_value),
+            &mut crate::StorageCensus::default(),
+        )
+    }
+    pub(crate) fn structural_bytes_with(
+        &self,
+        store: &impl Fn(&N::Store, &mut crate::StorageCensus) -> (usize, usize),
+        census: &mut crate::StorageCensus,
+    ) -> (usize, usize) {
+        let (store_known, store_unmeasured) = store(&self.store, census);
+        let (lazy_known, lazy_unmeasured) = self.lazy.structural_bytes();
+        let mut known = self.core.structural_bytes()
+            + self.symbols.structural_bytes()
+            + self.auxiliary.structural_bytes()
+            + store_known
+            + lazy_known
+            + self.supplemental.capacity() * size_of::<FileId>()
+            + self.imports.capacity() * size_of::<Box<dyn RetainedImport<N, S>>>()
+            + self.imported_arenas.allocation_size()
+            + census.text(self.source.backing_bytes())
+            + self
+                .position_map
+                .get()
+                .map_or(0, PositionMap::structural_bytes);
+        let mut unmeasured = store_unmeasured + lazy_unmeasured;
+        for import in &self.imports {
+            // The box retains a handle; its referenced owner may be a bound
+            // program file or a previously published checker-created frame.
+            known += size_of_val(&**import);
+            let (bytes, unknown) = import
+                .borrowed_handle()
+                .structural_bytes_with(store, census);
+            known += bytes;
+            unmeasured += unknown;
+        }
+        (known, unmeasured)
+    }
+}
+impl<N: NodeRecord, S> StorageBuilder<N, S> {
+    pub fn structural_bytes(&self, store: impl Fn(&N::Store) -> (usize, usize)) -> (usize, usize) {
+        self.structural_bytes_with(
+            &|value, _| store(value),
+            &mut crate::StorageCensus::default(),
+        )
+    }
+    pub fn structural_bytes_with(
+        &self,
+        store: &impl Fn(&N::Store, &mut crate::StorageCensus) -> (usize, usize),
+        census: &mut crate::StorageCensus,
+    ) -> (usize, usize) {
+        if !census.owner(self.id()) {
+            return (0, 0);
+        }
+        self.owner.structural_bytes_with(store, census)
     }
 }

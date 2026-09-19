@@ -11,7 +11,7 @@
 //! handful of arenas a checker touches justifies something flatter; the count
 //! of allocated pages is exposed for that census.
 
-use std::hash::RandomState;
+use crate::types::FastState;
 use std::marker::PhantomData;
 use ts_arena::{ArenaId, NodeId, SymbolId};
 
@@ -45,7 +45,7 @@ impl LinkKey for SymbolId {
 type Page<V> = Box<[Option<V>]>;
 
 pub struct LinkStore<K: LinkKey, V> {
-    arenas: hashbrown::HashMap<ArenaId, Vec<Option<Page<V>>>, RandomState>,
+    arenas: hashbrown::HashMap<ArenaId, Vec<Option<Page<V>>>, FastState>,
     len: usize,
     _key: PhantomData<K>,
 }
@@ -77,6 +77,14 @@ impl<K: LinkKey, V> LinkStore<K, V> {
 
     pub fn is_empty(&self) -> bool {
         self.len == 0
+    }
+
+    #[cfg(any(test, feature = "storage-pilot"))]
+    pub(crate) fn values(&self) -> impl Iterator<Item = &V> {
+        self.arenas
+            .values()
+            .flat_map(|directory| directory.iter().flatten())
+            .flat_map(|page| page.iter().flatten())
     }
 
     /// Bytes held by the pages, the per-arena directories and the arena map,

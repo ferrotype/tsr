@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "selection": "CommonJS moduleExportsElementAccessAssignment variant from return-recheck-01; supplemental comparison, no new full-corpus count",
+  "ids": [
+    "conformance/jsdoc/moduleExportsElementAccessAssignment.ts#configuration=0"
+  ]
+}

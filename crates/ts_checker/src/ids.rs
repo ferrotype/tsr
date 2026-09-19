@@ -50,14 +50,25 @@ local_id!(
 );
 local_id!(AliasId, "A `TypeAlias` record in one checker's type store.");
 local_id!(
+    InferenceId,
+    "An inference context retained by checker-local mappers."
+);
+local_id!(
+    RelationFrameId,
+    "A checker-local relation continuation used by inference comparers."
+);
+local_id!(
+    ConditionalRootId,
+    "A conditional type root owned by one checker."
+);
+local_id!(MapperId, "A type mapper owned by one checker.");
+local_id!(
     IndexInfoId,
-    "An `IndexInfo` record in one checker's signature store.",
-    #[cfg(any(test, feature = "storage-pilot"))]
+    "An `IndexInfo` record in one checker's signature store."
 );
 local_id!(
     TypePredicateId,
-    "A `TypePredicate` record in one checker's signature store.",
-    #[cfg(any(test, feature = "storage-pilot"))]
+    "A `TypePredicate` record in one checker's signature store."
 );
 
 impl TypeId {

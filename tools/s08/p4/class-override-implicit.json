@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "scope": "S08 P4 noImplicitOverride class and parameter-property diagnostics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "noImplicitOverride": true
+  },
+  "programs": [
+    {
+      "id": "implicit-method",
+      "files": {
+        "/implicit-method.ts": "class A{f(){return 1;}}class C extends A{f(){return 2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-method.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-method.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-property",
+      "files": {
+        "/implicit-property.ts": "class A{x=1;}class C extends A{x=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-property.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-static",
+      "files": {
+        "/implicit-static.ts": "class A{static x=1;}class C extends A{static x=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-static.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-static.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-parameter",
+      "files": {
+        "/implicit-parameter.ts": "class A{x=1;}class C extends A{constructor(public x:number){super();}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-parameter.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-parameter.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-abstract-impl",
+      "files": {
+        "/implicit-abstract-impl.ts": "abstract class A{abstract f():number;}class C extends A{f(){return 1;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-abstract-impl.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-abstract-impl.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-abstract-redeclare",
+      "files": {
+        "/implicit-abstract-redeclare.ts": "abstract class A{abstract f():number;}abstract class C extends A{abstract f():number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-abstract-redeclare.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-abstract-redeclare.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-declare",
+      "files": {
+        "/implicit-declare.ts": "class A{x=1;}class C extends A{declare x:number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-declare.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-declare.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-ambient",
+      "files": {
+        "/implicit-ambient.ts": "declare class A{x:number;}declare class C extends A{x:number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-ambient.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-override-valid",
+      "files": {
+        "/implicit-override-valid.ts": "class A{x=1;}class C extends A{override x=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/implicit-override-valid.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/implicit-override-valid.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

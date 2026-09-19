@@ -1,0 +1,418 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 compound signature capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "union-returns",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type F = ((x: string) => {a: string}) | ((x: string) => {b: number}); type R<T> = T extends (...args: any[]) => infer U ? U : never; type P<T> = T extends (...args: infer U) => any ? U : never; type A = R<F>; type B = P<F>; type C = F extends (x: string) => {a: string} | {b: number} ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "union-parameters",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type F = ((x: string | number) => string) | ((y: number | boolean) => number); type G = ((x: string) => string) | ((x: number) => number); type A = F extends (x: number) => string | number ? true : false; type B = F extends (x: string) => string | number ? true : false; type C = G extends (x: never) => string | number ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "G",
+          "file": "/case.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "union-rest-this",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type F = ((this: {a:string}, x: number, y?: string) => string) | ((this: {b:number}, x: number, ...rest: string[]) => number); type G = ((...args: [first: number, ...rest: string[]]) => number) | ((x: number) => string); type A = F extends (this: {a:string,b:number}, x: number) => string | number ? true : false; type B = G extends (x:number, y:string) => number | string ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "G",
+          "file": "/case.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "union-overloads",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type L = { (x: string): string; (x: number): number }; type R = { (x: boolean): boolean }; type F = L | R; type Both = L | { (x: boolean): boolean; (x: null): null }; type A = F extends (x: never) => string | boolean ? true : false; type B = Both extends (...args: never[]) => unknown ? true : false; type H = (<T>(x:T) => T) | (<U>(x:U) => U); type C = H extends (x:string) => string ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Both",
+          "file": "/case.ts",
+          "declaration": "Both",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "H",
+          "file": "/case.ts",
+          "declaration": "H",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "intersection-overloads",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type F = ((x: string) => string) & ((x: number) => number); type G = ((x: string) => string) & ((x: string) => string); type A = F extends { (x:string): string; (x:number):number } ? true : false; type B = F extends (x:boolean) => boolean ? true : false; type C = G extends (x:string) => string ? true : false; type H = { f(x:string):string } & { f(x:number):number }; type D = H['f'];\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "G",
+          "file": "/case.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "H",
+          "file": "/case.ts",
+          "declaration": "H",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "compound-predicates",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type A = ((x: unknown) => x is string) | ((x: unknown) => x is number); type B = ((x: unknown) => x is string) | ((x: unknown) => false); type C = ((x: unknown) => x is string) | ((x: unknown) => boolean); type D = A extends (x:unknown) => x is string | number ? true : false; type E = B extends (x:unknown) => x is string ? true : false; type F = C extends (x:unknown) => x is string ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "E",
+          "file": "/case.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "compound-constructors",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type F = (new (x:string) => {a:string}) | (new (x:string) => {b:number}); type G = (new (x:string) => {a:string}) & (new (x:number) => {b:number}); type M = (new (...args:any[]) => {m:boolean}) & (new (x:string) => {a:string}); type A = F extends new (x:string) => {a:string} | {b:number} ? true : false; type B = M extends new (x:string) => {a:string,m:boolean} ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "G",
+          "file": "/case.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "M",
+          "file": "/case.ts",
+          "declaration": "M",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "array-member-union",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } interface Array<T> { map<U>(callback: (value:T) => U): U[]; filter<S extends T>(predicate: (value:T) => value is S): S[]; filter(predicate: (value:T) => unknown): T[] } interface ReadonlyArray<T> { map<U>(callback: (value:T) => U): U[]; filter<S extends T>(predicate: (value:T) => value is S): S[]; filter(predicate: (value:T) => unknown): T[] } type A = (string[] | number[])['map']; type B = (string[] | number[])['filter']; type C = (readonly string[] | number[])['filter']; type D = B extends (predicate: (value: string | number) => unknown) => (string | number)[] ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

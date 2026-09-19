@@ -1,0 +1,336 @@
+{
+  "version": 1,
+  "scope": "P4 CommonJS declaration export, require-import and function-expando transforms; declaration diagnostics run separately from semantic checking",
+  "options": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "exports-primitives",
+      "files": {
+        "/case.js": "exports.x=1; exports[\"space key\"]=\"a\"; exports.default=true;\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "exports-alias",
+      "files": {
+        "/case.js": "const x=1; exports.x=x; exports.renamed=x;\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-object",
+      "files": {
+        "/case.js": "module.exports={x:1, m(){return \"a\";}};\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-function",
+      "files": {
+        "/case.js": "module.exports=function named(){return 1;};\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-class",
+      "files": {
+        "/case.js": "module.exports=class Named { constructor(){this.x=1;} method(){return this.x;} };\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-self-class",
+      "files": {
+        "/case.js": "exports.A=class Inner { clone(){return new Inner();} };\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "multiple-module-exports",
+      "files": {
+        "/case.js": "module.exports=undefined; module.exports={x:1};\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "function-expando",
+      "files": {
+        "/case.js": "function f(){return 1;} f.x=1; f[\"space key\"]=\"s\"; module.exports=f;\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "variable-function-expando",
+      "files": {
+        "/case.js": "const f=function(){return 1;}; f.x=1; exports.f=f;\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "expando-reference",
+      "files": {
+        "/case.js": "const value=1; function f(){} f.value=value; f.default=2; module.exports=f;\n",
+        "/probe.ts": "type Probe=number;\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-require",
+      "files": {
+        "/case.js": "const dep=require(\"./dep\"); exports.value=dep.value;\n",
+        "/probe.ts": "type Probe=number;\n",
+        "/dep.js": "exports.value=1; exports.other=\"a\"; exports.nested={value:1};\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts",
+        "/dep.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "export-require-destructure",
+      "files": {
+        "/case.js": "const {value, other: renamed}=require(\"./dep\"); exports.value=value; exports.renamed=renamed;\n",
+        "/probe.ts": "type Probe=number;\n",
+        "/dep.js": "exports.value=1; exports.other=\"a\"; exports.nested={value:1};\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts",
+        "/dep.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mixed-require-declaration",
+      "files": {
+        "/case.js": "const dep=require(\"./dep\"), own=1; exports.dep=dep; exports.own=own;\n",
+        "/probe.ts": "type Probe=number;\n",
+        "/dep.js": "exports.value=1; exports.other=\"a\"; exports.nested={value:1};\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts",
+        "/dep.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "nested-require-destructure",
+      "files": {
+        "/case.js": "const {nested:{value}}=require(\"./dep\"); exports.value=value;\n",
+        "/probe.ts": "type Probe=number;\n",
+        "/dep.js": "exports.value=1; exports.other=\"a\"; exports.nested={value:1};\n"
+      },
+      "roots": [
+        "/case.js",
+        "/probe.ts",
+        "/dep.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/probe.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

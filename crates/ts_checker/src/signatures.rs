@@ -19,8 +19,13 @@ pub struct TypePredicate {
     pub t: Option<TypeId>,
 }
 
-/// One signature. Type mapper, composite and target fields arrive with
-/// instantiation and overload resolution (P3).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct CompositeSignature {
+    pub is_union: bool,
+    pub signatures: Arc<[SignatureId]>,
+}
+
+/// One signature, including lazy instantiated and composite results.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Signature {
     pub flags: SignatureFlags,
@@ -33,6 +38,10 @@ pub struct Signature {
     pub resolved_return_type: Option<TypeId>,
     pub resolved_type_predicate: Option<TypePredicateId>,
     pub target: Option<SignatureId>,
+    pub(crate) composite: Option<CompositeSignature>,
+    pub mapper: Option<crate::MapperId>,
+    pub erased: Option<SignatureId>,
+    pub base: Option<SignatureId>,
     pub isolated_signature_type: Option<TypeId>,
 }
 
@@ -54,6 +63,7 @@ pub struct SignatureStore {
     signatures: Vec<Signature>,
     index_infos: Vec<IndexInfo>,
     predicates: Vec<TypePredicate>,
+    pub(crate) instantiations: crate::types::Map<(SignatureId, crate::CacheKey), SignatureId>,
 }
 
 impl SignatureStore {
@@ -93,19 +103,26 @@ impl SignatureStore {
         min_argument_count: i32,
     ) -> Result<SignatureId, Error> {
         let id = SignatureId::next(0, self.signatures.len())?;
-        self.signatures.push(Signature {
-            flags,
-            min_argument_count,
-            resolved_min_argument_count: -1,
-            declaration,
-            type_parameters,
-            parameters,
-            this_parameter,
-            resolved_return_type,
-            resolved_type_predicate,
-            target: None,
-            isolated_signature_type: None,
-        });
+        ts_arena::growth::push_frugal(
+            &mut self.signatures,
+            Signature {
+                flags,
+                min_argument_count,
+                resolved_min_argument_count: -1,
+                declaration,
+                type_parameters,
+                parameters,
+                this_parameter,
+                resolved_return_type,
+                resolved_type_predicate,
+                target: None,
+                composite: None,
+                mapper: None,
+                erased: None,
+                base: None,
+                isolated_signature_type: None,
+            },
+        );
         Ok(id)
     }
 
@@ -119,14 +136,17 @@ impl SignatureStore {
         components: Option<Arc<[NodeId]>>,
     ) -> Result<IndexInfoId, Error> {
         let id = IndexInfoId::next(0, self.index_infos.len())?;
-        self.index_infos.push(IndexInfo {
-            key_type,
-            value_type,
-            is_readonly,
-            declaration,
-            index_symbol: None,
-            components,
-        });
+        ts_arena::growth::push_frugal(
+            &mut self.index_infos,
+            IndexInfo {
+                key_type,
+                value_type,
+                is_readonly,
+                declaration,
+                index_symbol: None,
+                components,
+            },
+        );
         Ok(id)
     }
 
@@ -135,7 +155,7 @@ impl SignatureStore {
         predicate: TypePredicate,
     ) -> Result<TypePredicateId, Error> {
         let id = TypePredicateId::next(0, self.predicates.len())?;
-        self.predicates.push(predicate);
+        ts_arena::growth::push_frugal(&mut self.predicates, predicate);
         Ok(id)
     }
 
@@ -145,14 +165,24 @@ impl SignatureStore {
             .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
     }
 
-    #[cfg(any(test, feature = "storage-pilot"))]
+    pub(crate) fn get_mut(&mut self, id: SignatureId) -> Result<&mut Signature, Error> {
+        id.index(0)
+            .and_then(|index| self.signatures.get_mut(index))
+            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+    }
+
     pub fn index_info(&self, id: IndexInfoId) -> Result<&IndexInfo, Error> {
         id.index(0)
             .and_then(|index| self.index_infos.get(index))
             .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
     }
 
-    #[cfg(any(test, feature = "storage-pilot"))]
+    pub(crate) fn index_info_mut(&mut self, id: IndexInfoId) -> Result<&mut IndexInfo, Error> {
+        id.index(0)
+            .and_then(|index| self.index_infos.get_mut(index))
+            .ok_or(Error::Arena(ts_arena::Error::InvalidSlot))
+    }
+
     pub fn predicate(&self, id: TypePredicateId) -> Result<&TypePredicate, Error> {
         id.index(0)
             .and_then(|index| self.predicates.get(index))

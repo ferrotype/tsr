@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "scope": "S08 P4 generator yield/return/next inference and asynchronous iteration",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "generator-basic",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* f(){yield 1;yield 2;return \"done\";}function* empty(){}const never=function*(){throw 1;};function* bare(){yield;}\ntype Query_f=typeof f;\ntype Query_empty=typeof empty;\ntype Query_never=typeof never;\ntype Query_bare=typeof bare;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "empty",
+          "file": "/case.ts",
+          "declaration": "Query_empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "never",
+          "file": "/case.ts",
+          "declaration": "Query_never",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bare",
+          "file": "/case.ts",
+          "declaration": "Query_bare",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-annotations",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* f():Generator<number,string,boolean>{const b=yield 1;return \"done\";}function* bad():Generator<number,string,boolean>{yield \"bad\";return 1;}function* v():void{}\ntype Query_f=typeof f;\ntype Query_bad=typeof bad;\ntype Query_v=typeof v;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "v",
+          "file": "/case.ts",
+          "declaration": "Query_v",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-next",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* inferred(){const b:boolean=yield 1;return b;}function* implicit(){const b=yield 1;return b;}function* twice(){const x:string=yield 1;const y:number=yield 2;return 1;}\ntype Query_inferred=typeof inferred;\ntype Query_implicit=typeof implicit;\ntype Query_twice=typeof twice;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "inferred",
+          "file": "/case.ts",
+          "declaration": "Query_inferred",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "implicit",
+          "file": "/case.ts",
+          "declaration": "Query_implicit",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "twice",
+          "file": "/case.ts",
+          "declaration": "Query_twice",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-delegation",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* a(){yield 1;return \"done\";}function* b(){const x=yield* a();return x;}function* c(){yield* [1,2];}function* bad(){yield* 1;}\ntype Query_a=typeof a;\ntype Query_b=typeof b;\ntype Query_c=typeof c;\ntype Query_bad=typeof bad;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "Query_c",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-context",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} const f:()=>Generator<\"x\",1,boolean>=function*(){yield \"x\";return 1;};const g:{f():Generator<number,void,unknown>}={*f(){yield 1;}};\ntype Query_f=typeof f;\ntype Query_g=typeof g;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-nested",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* f(){yield 1;const nested=function*(){yield \"a\";};const obj={*g(){yield true;}};return \"done\";}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-async",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}declare var Promise:{new<T>(fn:()=>T):Promise<T>;};interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<IteratorResult<T,R>>;return?(value:R):Promise<IteratorResult<T,R>>;throw?(error:any):Promise<IteratorResult<T,R>>;}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterableIterator<T,R=any,N=any> extends AsyncIterator<T,R,N>{[Symbol.asyncIterator]():AsyncIterableIterator<T,R,N>;}interface AsyncGenerator<T=unknown,R=any,N=any> extends AsyncIterator<T,R,N>{[Symbol.asyncIterator]():AsyncGenerator<T,R,N>;} async function* f(){yield 1;return \"done\";}async function* empty(){}async function* delegate(){yield* [1,2];}\ntype Query_f=typeof f;\ntype Query_empty=typeof empty;\ntype Query_delegate=typeof delegate;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "empty",
+          "file": "/case.ts",
+          "declaration": "Query_empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "delegate",
+          "file": "/case.ts",
+          "declaration": "Query_delegate",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-async-annotations",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Generator<T=unknown,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():Generator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} interface Promise<T>{then<U>(fn:(value:T)=>U):Promise<U>;}declare var Promise:{new<T>(fn:()=>T):Promise<T>;};interface PromiseLike<T>{then<U>(fn:(value:T)=>U):PromiseLike<U>;}type Awaited<T>=T extends PromiseLike<infer U>?Awaited<U>:T;interface AsyncIterator<T,R=any,N=any>{next(value?:N):Promise<IteratorResult<T,R>>;return?(value:R):Promise<IteratorResult<T,R>>;throw?(error:any):Promise<IteratorResult<T,R>>;}interface AsyncIterable<T,R=any,N=any>{[Symbol.asyncIterator]():AsyncIterator<T,R,N>;}interface AsyncIterableIterator<T,R=any,N=any> extends AsyncIterator<T,R,N>{[Symbol.asyncIterator]():AsyncIterableIterator<T,R,N>;}interface AsyncGenerator<T=unknown,R=any,N=any> extends AsyncIterator<T,R,N>{[Symbol.asyncIterator]():AsyncGenerator<T,R,N>;} async function* f():AsyncGenerator<number,string,boolean>{const b=yield 1;return \"done\";}async function* bad():AsyncGenerator<number,string,boolean>{yield \"bad\";return 1;}\ntype Query_f=typeof f;\ntype Query_bad=typeof bad;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-missing-global",
+      "files": {
+        "/case.ts": "function* f(){yield 1;return \"done\";}async function* g(){yield 1;}\ntype Query_f=typeof f;\ntype Query_g=typeof g;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generator-fallback",
+      "files": {
+        "/case.ts": "interface SymbolConstructor{readonly iterator:unique symbol;readonly asyncIterator:unique symbol;}declare var Symbol:SymbolConstructor; type IteratorResult<T,R>={done?:false,value:T}|{done:true,value:R}; interface Iterator<T,R=any,N=any>{next(value?:N):IteratorResult<T,R>;return?(value:R):IteratorResult<T,R>;throw?(error:any):IteratorResult<T,R>;} interface Iterable<T,R=any,N=any>{[Symbol.iterator]():Iterator<T,R,N>;}interface IterableIterator<T,R=any,N=any> extends Iterator<T,R,N>{[Symbol.iterator]():IterableIterator<T,R,N>;}interface Array<T>{length:number;[n:number]:T;[Symbol.iterator]():IterableIterator<T>;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;[Symbol.iterator]():IterableIterator<T>;} function* f(){yield 1;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

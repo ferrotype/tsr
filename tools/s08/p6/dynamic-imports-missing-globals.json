@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "scope": "S08 P6 dynamic import checking through real programs, diagnostics and public queries; supplemental, not E2 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "missing-promise",
+      "files": {
+        "/main.mts": "const pending = import(\"./dep.mjs\");",
+        "/dep.mts": "export const value = 42; export default \"hello\";"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "missing-promise-constructor",
+      "files": {
+        "/main.mts": "const pending = import(\"./dep.mjs\");",
+        "/dep.mts": "export const value = 42; export default \"hello\";",
+        "/promise.d.ts": "interface Promise<T> { then(onfulfilled: (value: T) => unknown): unknown; }"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts",
+        "/promise.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

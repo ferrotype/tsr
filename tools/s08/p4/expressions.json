@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "scope": "S08 P4 expression operator, flow and nullable diagnostic parity",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "logical-and",
+      "files": {
+        "/case.ts": "function f(x:string|undefined) { return x && x.length; }\ntype Query_f = typeof f;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "logical-primitives",
+      "files": {
+        "/case.ts": "function f(x:0|1) { return x && 2; } function g(x:\"\"|\"a\") { return x || \"b\"; }\ntype Query_f = typeof f;\ntype Query_g = typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "relational",
+      "files": {
+        "/case.ts": "function f(x:number,y:number) { return x > y; } function g(x:string,y:number) { return x <= y; }\ntype Query_f = typeof f;\ntype Query_g = typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "unknown-property",
+      "files": {
+        "/case.ts": "function f(x:unknown) { return x.value; }\ntype Query_f = typeof f;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nullable-property",
+      "files": {
+        "/case.ts": "function f(x:{a:number}|null|undefined) { return x.a; }\ntype Query_f = typeof f;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "null-value",
+      "files": {
+        "/case.ts": "const a = null.x; const b = undefined.x;\ntype Query_a = typeof a;\ntype Query_b = typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "number-arithmetic",
+      "files": {
+        "/case.ts": "const a=1<<33; const b=true|false; const c=2**3; const d=4>>>1;\ntype Query_a = typeof a;\ntype Query_b = typeof b;\ntype Query_c = typeof c;\ntype Query_d = typeof d;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "Query_c",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "d",
+          "file": "/case.ts",
+          "declaration": "Query_d",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "plus-null",
+      "files": {
+        "/case.ts": "const a=\"x\"+null; const b=null+\"x\"; const c=null+1;\ntype Query_a = typeof a;\ntype Query_b = typeof b;\ntype Query_c = typeof c;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "Query_c",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "arithmetic-error",
+      "files": {
+        "/case.ts": "const a=\"x\"-1; const b=1n+2; const c=1n>>>1n;\ntype Query_a = typeof a;\ntype Query_b = typeof b;\ntype Query_c = typeof c;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "Query_c",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "symbol-error",
+      "files": {
+        "/case.ts": "function f(x:symbol) { return x+\"a\"; }\ntype Query_f = typeof f;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

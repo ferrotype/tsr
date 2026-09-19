@@ -132,7 +132,7 @@ impl Live {
             .iter()
             .map(|id| {
                 let record = self.state.types.get(*id).expect("trace root");
-                match record.kind {
+                match record.kind() {
                     TypeKind::Intrinsic => {
                         let name = &self.state.types.intrinsic(*id).expect("intrinsic").name;
                         json!({"id": id.get(), "flags": record.flags, "kind": "intrinsic",

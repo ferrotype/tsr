@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "scope": "P3 late-bound members, unique symbols and tuple normalization capabilities",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "late-symbol-methods",
+      "files": {
+        "/late-symbol-methods.ts": "interface SymbolConstructor { readonly iterator: unique symbol; readonly dispose: unique symbol; }\ndeclare var Symbol: SymbolConstructor;\ninterface I { [Symbol.iterator](): string; [Symbol.dispose](): number; }\ntype A = I extends { [Symbol.iterator](): infer U } ? U : never;\ntype B = I extends { [Symbol.dispose](): infer U } ? U : never;\ntype C = keyof I;\n"
+      },
+      "roots": [
+        "/late-symbol-methods.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/late-symbol-methods.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/late-symbol-methods.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "late-string-methods",
+      "files": {
+        "/late-string-methods.ts": "declare const method: \"run\";\ninterface I { [method](value: number): string; }\ntype A = I[\"run\"];\ntype B = keyof I;\n"
+      },
+      "roots": [
+        "/late-string-methods.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/late-string-methods.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/late-string-methods.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "unique-symbols",
+      "files": {
+        "/unique-symbols.ts": "declare const first: unique symbol;\ndeclare const second: unique symbol;\ninterface X { readonly id: unique symbol; }\ntype A = X[\"id\"];\n"
+      },
+      "roots": [
+        "/unique-symbols.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/unique-symbols.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "unique-invalid",
+      "files": {
+        "/unique-invalid.ts": "declare let wrong: unique symbol;\ninterface Bad { value: unique symbol; }\ntype A = Bad[\"value\"];\n"
+      },
+      "roots": [
+        "/unique-invalid.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/unique-invalid.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-rest-collapse",
+      "files": {
+        "/tuple-rest-collapse.ts": "interface Array<T> { length: number; [n: number]: T; } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T; }\ntype Join<T extends unknown[]> = [...string[], ...T, ...number[]];\ntype A = Join<[boolean]>;\ntype B = Join<[boolean?]>;\ntype M<T extends unknown[]> = [...{ [K in keyof T]: T[K] }];\ntype C = M<[string, number?]>;\n"
+      },
+      "roots": [
+        "/tuple-rest-collapse.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-rest-collapse.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/tuple-rest-collapse.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/tuple-rest-collapse.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

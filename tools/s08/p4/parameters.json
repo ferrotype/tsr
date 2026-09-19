@@ -1,0 +1,250 @@
+{
+  "version": 1,
+  "scope": "S08 P4 parameter syntax, initializer and contextual inference, native diagnostics and type display",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "parameter-initializers",
+      "files": {
+        "/case.ts": "function f(x=1,y:string=\"s\"){return x;} function wrong(x:number=\"s\"){} type F=(x:number=1)=>number; const g=(x=1)=>x;\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-optional",
+      "files": {
+        "/case.ts": "function f(x?:number){return x;} function g(x:number=1,y:string){return y;}\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-context-defaults",
+      "files": {
+        "/case.ts": "let f:(x:1)=>number=(x=2)=>x; let g:(x:number)=>number=(x=1)=>x;\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-this",
+      "files": {
+        "/case.ts": "function f(x:number,this:{a:number}){} const g=(this:{a:number})=>1; type C=new(this:{a:number})=>object;\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-properties",
+      "files": {
+        "/case.ts": "class C {constructor(public x:number, private y:string=\"s\"){} } function f(public x:number){} class D {constructor(public constructor:number){} }\ntype Query_C=typeof C;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "Query_C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-iife",
+      "files": {
+        "/case.ts": "const a=((x)=>x)(1); const b=((x=1)=>x)(); const c=((x)=>x)();\ntype Query_a=typeof a;\ntype Query_b=typeof b;\ntype Query_c=typeof c;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "c",
+          "file": "/case.ts",
+          "declaration": "Query_c",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-rest",
+      "files": {
+        "/case.ts": "interface Array<T>{length:number;[n:number]:T;} interface ReadonlyArray<T>{readonly length:number;readonly [n:number]:T;} function f(...x:number){} function g(...x:number[]){return x;}\ntype Query_f=typeof f;\ntype Query_g=typeof g;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-bindings",
+      "files": {
+        "/case.ts": "function f({a,b=1}:{a:string,b?:number}){return a;} function g([x,y]:[number,string]){return y;} const h=({a=1})=>a;\ntype Query_f=typeof f;\ntype Query_g=typeof g;\ntype Query_h=typeof h;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "h",
+          "file": "/case.ts",
+          "declaration": "Query_h",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

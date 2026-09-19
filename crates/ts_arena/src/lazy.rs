@@ -529,6 +529,31 @@ impl<N: NodeRecord> LazyArena<N> {
     }
 }
 
+impl<T> Pages<T> {
+    /// Reserved page bytes plus the directory's capacity.
+    fn structural_bytes(&self) -> usize {
+        // Each page is one `Arc` allocation: the strong and weak counts precede
+        // the slots.
+        self.directory.capacity() * size_of::<Arc<Page<T>>>()
+            + self.directory.len() * (16 + size_of::<Page<T>>())
+    }
+}
+
+impl<N: NodeRecord> LazyArena<N> {
+    /// Known structural bytes and the count of B-tree entries whose
+    /// allocation extent std does not expose.
+    pub(crate) fn structural_bytes(&self) -> (usize, usize) {
+        let state = self
+            .state
+            .read()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        (
+            state.pages.structural_bytes() + state.auxiliary.structural_bytes(),
+            state.jsdoc.len() + state.tokens.len(),
+        )
+    }
+}
+
 #[cfg(test)]
 mod prepared_token_tests {
     use super::*;

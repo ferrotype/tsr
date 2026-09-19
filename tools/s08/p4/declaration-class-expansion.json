@@ -1,0 +1,298 @@
+{
+  "version": 1,
+  "scope": "P4 declaration class structural expansion, private base reports, recursive anonymous/function types, unique symbols and global Symbol identities",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "programs": [
+    {
+      "id": "anonymous-private-kinds",
+      "files": {
+        "/case.ts": "export const C = class { private x=1; protected y=\"a\"; #z=2; private static k=3; };\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "returned-private-class",
+      "files": {
+        "/case.ts": "export function make(){return class {private x=1; y=2;};}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "returned-abstract-class",
+      "files": {
+        "/case.ts": "export function make(){abstract class Base {private x=1; abstract f():number;} return Base;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "abstract-static-members",
+      "files": {
+        "/case.ts": "export function make(){abstract class Base {static x=1; abstract f():number;} return Base;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "private-nested-instance",
+      "files": {
+        "/case.ts": "export function make(){class Local {private x=1;} return {value:new Local()};}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "recursive-local-object",
+      "files": {
+        "/case.ts": "export function make(){type Local={value:number;next:Local}; return null as any as Local;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "recursive-top-function",
+      "files": {
+        "/case.ts": "export function make(){return make;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "recursive-local-function",
+      "files": {
+        "/case.ts": "export function make(){ const value=()=>value; return value;}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "static-method-function-type",
+      "files": {
+        "/case.ts": "export class C {static method(){return C.method;}} export const f=C.method;\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "local-unique-value",
+      "files": {
+        "/case.ts": "const key=Symbol(); export function make(){return {key};}\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "global-symbol-computed",
+      "files": {
+        "/case.ts": "export const value={ [Symbol.iterator](){return [1][Symbol.iterator]();} };\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "global-this-symbol-computed",
+      "files": {
+        "/case.ts": "export const value={ [globalThis.Symbol.iterator](){return [1][Symbol.iterator]();} };\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "shadowed-symbol-computed",
+      "files": {
+        "/case.ts": "function create(){const Symbol={iterator:\"local\" as const};return { [Symbol.iterator](){return 1;} };} export const value=create();\ntype Probe=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "external-unique-value",
+      "files": {
+        "/dep.ts": "const key=Symbol(); export const inner={key};",
+        "/case.ts": "import {inner} from \"./dep\"; export const outer=inner; type Probe=number;"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/case.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

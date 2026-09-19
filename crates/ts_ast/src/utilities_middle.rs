@@ -859,6 +859,57 @@ impl FileNameInfo {
     }
 }
 
+// port: tsc/internal/ast/ast.go:ImportAttributesNode.GetResolutionModeOverride
+/// Read the first resolution-mode attribute without emitting grammar errors.
+/// Invalid values return no override, preserving the caller's ordinary mode.
+pub fn import_attributes_resolution_mode(
+    view: AstView<'_>,
+    attributes: Option<NodeId>,
+) -> Result<Option<ts_core::ResolutionMode>, Error> {
+    import_attributes_resolution_mode_with_invalid_value(view, attributes).map(|(mode, _)| mode)
+}
+
+/// Also return the node passed to the native grammar-error callback. Returning
+/// its identity lets a checker report after releasing this immutable AST view.
+pub fn import_attributes_resolution_mode_with_invalid_value(
+    view: AstView<'_>,
+    attributes: Option<NodeId>,
+) -> Result<(Option<ts_core::ResolutionMode>, Option<NodeId>), Error> {
+    let Some(attributes) = attributes else {
+        return Ok((None, None));
+    };
+    let read = view.node(attributes)?;
+    let data = read
+        .data_source()
+        .as_import_attributes()
+        .ok_or(Error::InvalidGraph)?;
+    let list = data.attributes().ok_or(Error::InvalidGraph)?;
+    for node in view.node_slice(view.list(list)?.nodes())?.iter() {
+        let read = view.node(node.ok_or(Error::InvalidGraph)?)?;
+        let data = read
+            .data_source()
+            .as_import_attribute()
+            .ok_or(Error::InvalidGraph)?;
+        let name = data.name().ok_or(Error::InvalidGraph)?;
+        if view.node_text(name)?.as_bytes() != b"resolution-mode" {
+            continue;
+        }
+        let value = data.value().ok_or(Error::InvalidGraph)?;
+        if !matches!(
+            view.node(value)?.kind().known(),
+            Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
+        ) {
+            return Ok((None, None));
+        }
+        return Ok(match view.node_text(value)?.as_bytes() {
+            b"import" => (Some(ts_core::ResolutionMode::ESNEXT), None),
+            b"require" => (Some(ts_core::ResolutionMode::COMMON_JS), None),
+            _ => (None, Some(value)),
+        });
+    }
+    Ok((None, None))
+}
+
 #[cfg(test)]
 #[path = "utilities_middle_tests.rs"]
 mod tests;

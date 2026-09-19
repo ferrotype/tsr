@@ -401,6 +401,61 @@ struct Record {
     stderr_sha256: String,
     valid_capture: bool,
 }
+
+/// Historical snapshots must keep their original artifacts, even when their
+/// inputs are stale. Validate identity and bytes, without regrading old runs.
+pub fn validate_history(root: &Path) -> Result<()> {
+    let path = root.join("status/history.jsonl");
+    let text = match fs::read_to_string(&path) {
+        Ok(text) => text,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(error) => return Err(format!("history.jsonl: {error}")),
+    };
+    let mut checked = BTreeSet::new();
+    for (index, line) in text.lines().enumerate() {
+        let mut check = || -> Result<()> {
+            let snapshot: serde_json::Value =
+                serde_json::from_str(line).map_err(|e| e.to_string())?;
+            let Some(artifacts) = snapshot.get("evidence_artifacts") else {
+                return Ok(()); // Early snapshots predate content-addressed evidence.
+            };
+            let artifacts = artifacts.as_object().ok_or("invalid evidence_artifacts")?;
+            for (id, value) in artifacts {
+                let path = value.as_str().ok_or("invalid artifact path")?;
+                let digest = path
+                    .strip_prefix("status/evidence/")
+                    .and_then(|name| name.strip_suffix(".json"))
+                    .filter(|digest| {
+                        digest.len() == 64
+                            && digest
+                                .bytes()
+                                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                    })
+                    .ok_or("invalid historical artifact path")?;
+                if !checked.insert((id.to_owned(), path.to_owned())) {
+                    continue;
+                }
+                let bytes = read(&root.join(path))?;
+                if hash(&bytes) != digest {
+                    return Err(format!("historical artifact checksum mismatch: {path}"));
+                }
+                let record: Record = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+                if record.schema_version != 1
+                    || record.run_id != *id
+                    || record.stdout_sha256 != hash(record.stdout.as_bytes())
+                    || record.stderr_sha256 != hash(record.stderr.as_bytes())
+                {
+                    return Err(format!(
+                        "historical record identity/contents mismatch: {path}"
+                    ));
+                }
+            }
+            Ok(())
+        };
+        check().map_err(|e| format!("history.jsonl:{}: {e}", index + 1))?;
+    }
+    Ok(())
+}
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct ProducerReport {

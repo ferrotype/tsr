@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native private-es2022 helper and deferred collision semantics",
+  "options": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "private-read",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:C){return c.#x;}}const x=new C().f(new C());type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-static",
+      "files": {
+        "/main.ts": "class C{static #x=1;static f(){return C.#x;}}const x=C.f();type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-outside",
+      "files": {
+        "/main.ts": "class C{#x=1;}declare const c:C;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-outside",
+      "files": {
+        "/main.ts": "declare const c:any;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-inside",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:any){return c.#x;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-write",
+      "files": {
+        "/main.ts": "class C{#x=1; f(){this.#x=2;this.#x+=3;return ++this.#x;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-method",
+      "files": {
+        "/main.ts": "class C{#f(){return 1;}f(){return this.#f();}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-accessor",
+      "files": {
+        "/main.ts": "class C{#v=1;get #x(){return this.#v;}set #x(v:number){this.#v=v;}f(){this.#x=3;return this.#x;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in",
+      "files": {
+        "/main.ts": "class C{#x=1;f(v:object){return #x in v;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-variable",
+      "files": {
+        "/main.ts": "var WeakMap=1;class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

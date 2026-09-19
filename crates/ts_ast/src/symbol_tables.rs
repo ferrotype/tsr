@@ -8,8 +8,9 @@
 #![allow(clippy::option_option)]
 
 use std::collections::HashMap;
-use std::hash::{BuildHasher, RandomState};
+use std::hash::BuildHasher;
 use std::ops::Range;
+use ts_arena::hash::FastState;
 
 use hashbrown::HashTable;
 use ts_arena::{ArenaId, AuxId, Counters, Error, OwnedArena, SymbolId};
@@ -17,6 +18,12 @@ use ts_jsstring::JsString;
 
 /// Owned construction input. Stored tables expose borrowed byte keys instead.
 pub type SymbolTable = HashMap<JsString, Option<SymbolId>>;
+/// The hash every store's name pool gives `bytes`: the hasher carries no
+/// per-pool state, so a caller can hash a name once for a lookup in one table
+/// and an insert into another.
+pub fn name_hash(bytes: &[u8]) -> u64 {
+    FastState::default().hash_one(bytes)
+}
 pub(crate) type NameId = usize;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -63,7 +70,7 @@ struct NamePool {
     #[allow(clippy::box_collection)]
     wide_ranges: Option<Box<HashMap<NameId, Range<usize>>>>,
     names: HashTable<NameId>,
-    hash_builder: RandomState,
+    hash_builder: FastState,
 }
 impl std::fmt::Debug for NamePool {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -84,7 +91,7 @@ impl NamePool {
             ranges: Vec::new(),
             wide_ranges: None,
             names: HashTable::new(),
-            hash_builder: RandomState::new(),
+            hash_builder: FastState::default(),
         }
     }
     fn hash(&self, bytes: &[u8]) -> u64 {
@@ -169,7 +176,7 @@ struct FullEntry {
     name: NameId,
     symbol: Option<SymbolId>,
 }
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum TableRecord {
     Compact(HashTable<CompactEntry>),
     Full(HashTable<FullEntry>),
@@ -200,6 +207,14 @@ impl TableRecord {
             Self::Full(table) => table
                 .find(hash, |entry| equal_name(entry.name))
                 .map(|entry| entry.symbol),
+        }
+    }
+    fn reserve(&mut self, additional: usize, hash_name: impl Fn(NameId) -> u64) {
+        match self {
+            Self::Compact(table) => {
+                table.reserve(additional, |entry| hash_name(entry.name as usize));
+            }
+            Self::Full(table) => table.reserve(additional, |entry| hash_name(entry.name)),
         }
     }
     fn make_full(&mut self, symbols: Option<ArenaId>, hash_name: &impl Fn(NameId) -> u64) {
@@ -329,6 +344,52 @@ impl SymbolTables {
         }
         id
     }
+    /// A new table with the entries of one of this store's own tables. Names
+    /// and symbol slots are already encoded for this store, so the hash table
+    /// is copied wholesale with nothing rehashed.
+    pub fn clone_own(&mut self, source: SymbolTableId) -> Result<SymbolTableId, Error> {
+        let record = self.tables.get(source.0)?.clone();
+        Ok(SymbolTableId(self.tables.push(record)))
+    }
+    /// A new table with the entries of a table from another store: every name
+    /// is interned here once, into a table sized for its final length so that
+    /// no growth rehashes it. The caller keeps `source` off this store.
+    pub fn clone_foreign(&mut self, source: SymbolTableRead<'_>) -> SymbolTableId {
+        debug_assert!(
+            !std::ptr::eq(source.names, &raw const self.names),
+            "own table cloned as foreign"
+        );
+        let id = SymbolTableId(
+            self.tables
+                .push(TableRecord::Compact(HashTable::with_capacity(source.len()))),
+        );
+        let mut table = self.get_mut(id).expect("new symbol table belongs to owner");
+        for (name, symbol) in source {
+            table.insert_bytes(name, symbol);
+        }
+        id
+    }
+    /// Room in the shared name pool for `additional` more distinct names.
+    pub fn reserve_names(&mut self, additional: usize) {
+        let NamePool {
+            bytes,
+            ranges,
+            wide_ranges,
+            names,
+            hash_builder,
+        } = &mut self.names;
+        names.reserve(additional, |&name| {
+            let range = ranges[name - 1];
+            let range = if range.is_escape() {
+                wide_ranges.as_ref().expect("wide ranges")[&name].clone()
+            } else {
+                let start = range.start as usize;
+                start..start + range.len as usize
+            };
+            hash_builder.hash_one(&bytes[range])
+        });
+        ranges.reserve(additional);
+    }
     pub fn get(&self, id: SymbolTableId) -> Result<SymbolTableRead<'_>, Error> {
         Ok(SymbolTableRead {
             table: self.tables.get(id.0)?,
@@ -382,6 +443,18 @@ impl SymbolTables {
     pub fn table_count(&self) -> usize {
         self.tables.len()
     }
+    /// Bytes reserved by one table's own hash storage, for censuses that
+    /// attribute a member table to the record owning it. `None` for a table of
+    /// another store.
+    pub fn table_structural_bytes(&self, id: SymbolTableId) -> Option<usize> {
+        if id.arena() != self.tables.id() {
+            return None;
+        }
+        self.tables.get(id.0).ok().map(|record| match record {
+            TableRecord::Compact(table) => table.allocation_size(),
+            TableRecord::Full(table) => table.allocation_size(),
+        })
+    }
     pub fn iter(&self) -> impl Iterator<Item = (SymbolTableId, SymbolTableRead<'_>)> {
         self.tables.iter().map(|(id, table)| {
             (
@@ -398,7 +471,7 @@ impl SymbolTables {
         &mut self,
         id: &mut Option<SymbolTableId>,
     ) -> Result<SymbolTableMut<'_>, Error> {
-        let id = *id.get_or_insert_with(|| self.alloc(SymbolTable::new()));
+        let id = *id.get_or_insert_with(|| self.alloc(SymbolTable::default()));
         self.get_mut(id)
     }
 }
@@ -419,10 +492,13 @@ impl<'a> SymbolTableRead<'a> {
     /// Absent entries and present entries containing a null symbol differ.
     #[allow(clippy::option_option)]
     pub fn get(self, bytes: &[u8]) -> Option<Option<SymbolId>> {
+        self.get_hashed(bytes, self.names.hash(bytes))
+    }
+    /// `get` with `hash` from [`name_hash`], for callers that hash once.
+    pub fn get_hashed(self, bytes: &[u8], hash: u64) -> Option<Option<SymbolId>> {
+        debug_assert_eq!(hash, self.names.hash(bytes));
         self.table
-            .find(self.names.hash(bytes), self.symbols, |name| {
-                self.names.bytes(name) == bytes
-            })
+            .find(hash, self.symbols, |name| self.names.bytes(name) == bytes)
     }
     pub fn contains_key(self, bytes: &[u8]) -> bool {
         self.get(bytes).is_some()
@@ -436,6 +512,22 @@ impl<'a> SymbolTableRead<'a> {
             entries,
             names: self.names,
             symbols: self.symbols,
+        }
+    }
+    /// The stored symbols alone, without decoding any name: the accessibility
+    /// walk filters tables by symbol flags and never looks at the keys.
+    pub fn symbols(self) -> impl ExactSizeIterator<Item = Option<SymbolId>> + 'a {
+        let symbols = self.symbols;
+        let (compact, full) = match self.table {
+            TableRecord::Compact(table) => (Some(table.iter()), None),
+            TableRecord::Full(table) => (None, Some(table.iter())),
+        };
+        let len = self.len();
+        SymbolsOnly {
+            compact,
+            full,
+            symbols,
+            remaining: len,
         }
     }
     pub fn keys(self) -> impl ExactSizeIterator<Item = &'a [u8]> {
@@ -486,8 +578,27 @@ impl SymbolTableMut<'_> {
     /// Insertion stores the exact input identity without target validation.
     #[allow(clippy::option_option, clippy::needless_pass_by_value)]
     pub fn insert(&mut self, name: JsString, symbol: Option<SymbolId>) -> Option<Option<SymbolId>> {
-        let hash = self.names.hash(name.as_bytes());
-        let name = self.names.intern_hashed(name.as_bytes(), hash);
+        self.insert_bytes(name.as_bytes(), symbol)
+    }
+    /// `insert` for a name already held as bytes; the pool copies what it
+    /// keeps, so no owning string is needed on the way in.
+    #[allow(clippy::option_option)]
+    pub fn insert_bytes(
+        &mut self,
+        name: &[u8],
+        symbol: Option<SymbolId>,
+    ) -> Option<Option<SymbolId>> {
+        self.insert_bytes_hashed(name, self.names.hash(name), symbol)
+    }
+    /// `insert_bytes` with `hash` from [`name_hash`], for callers that hash once.
+    pub fn insert_bytes_hashed(
+        &mut self,
+        name: &[u8],
+        hash: u64,
+        symbol: Option<SymbolId>,
+    ) -> Option<Option<SymbolId>> {
+        debug_assert_eq!(hash, self.names.hash(name));
+        let name = self.names.intern_hashed(name, hash);
         if let Some(symbol) = symbol {
             self.symbols.get_or_insert(symbol.arena());
         }
@@ -495,6 +606,13 @@ impl SymbolTableMut<'_> {
             .insert(name, symbol, *self.symbols, hash, |name| {
                 self.names.hash(self.names.bytes(name))
             })
+    }
+    /// Room for `additional` more entries, so a table whose final size is
+    /// known up front (the globals of a program) is never rehashed while it
+    /// fills; the census charges the same capacity either way.
+    pub fn reserve(&mut self, additional: usize) {
+        self.table
+            .reserve(additional, |name| self.names.hash(self.names.bytes(name)));
     }
     #[allow(clippy::option_option)]
     pub fn remove(&mut self, bytes: &[u8]) -> Option<Option<SymbolId>> {
@@ -509,6 +627,33 @@ enum Entries<'a> {
     Compact(hashbrown::hash_table::Iter<'a, CompactEntry>),
     Full(hashbrown::hash_table::Iter<'a, FullEntry>),
 }
+struct SymbolsOnly<'a> {
+    compact: Option<hashbrown::hash_table::Iter<'a, CompactEntry>>,
+    full: Option<hashbrown::hash_table::Iter<'a, FullEntry>>,
+    symbols: Option<ArenaId>,
+    remaining: usize,
+}
+impl Iterator for SymbolsOnly<'_> {
+    type Item = Option<SymbolId>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = match (&mut self.compact, &mut self.full) {
+            (Some(entries), _) => entries
+                .next()
+                .map(|entry| decode_symbol(entry.symbol, self.symbols)),
+            (_, Some(entries)) => entries.next().map(|entry| entry.symbol),
+            (None, None) => None,
+        };
+        if next.is_some() {
+            self.remaining -= 1;
+        }
+        next
+    }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.remaining, Some(self.remaining))
+    }
+}
+impl ExactSizeIterator for SymbolsOnly<'_> {}
+
 pub struct SymbolTableIter<'a> {
     entries: Entries<'a>,
     names: &'a NamePool,
@@ -557,6 +702,36 @@ mod tests {
     }
 
     #[test]
+    fn cloned_tables_keep_entries_across_and_within_stores() {
+        let counters = Counters::new();
+        let mut symbols = SymbolArena::new(&counters);
+        let a = symbols.push(());
+        let b = symbols.push(());
+        let mut binder = SymbolTables::new(&counters);
+        let source = binder.alloc(SymbolTable::from_iter([
+            (js(b"a"), Some(a)),
+            (js(b"b"), Some(b)),
+            (js(b"null"), None),
+        ]));
+        let mut checker = SymbolTables::new(&counters);
+        let foreign = checker.clone_foreign(binder.get(source).unwrap());
+        let own = checker.clone_own(foreign).unwrap();
+        for id in [foreign, own] {
+            let read = checker.get(id).unwrap();
+            assert_eq!(read.len(), 3);
+            assert_eq!(read.get(b"a"), Some(Some(a)));
+            assert_eq!(read.get(b"b"), Some(Some(b)));
+            assert_eq!(read.get(b"null"), Some(None));
+            assert_eq!(read.get(b"c"), None);
+        }
+        // The clones are independent tables: a later insert stays local.
+        checker.get_mut(own).unwrap().insert_bytes(b"c", Some(a));
+        assert_eq!(checker.get(foreign).unwrap().len(), 3);
+        assert_eq!(checker.get(own).unwrap().len(), 4);
+        assert_eq!(binder.get(source).unwrap().len(), 3);
+    }
+
+    #[test]
     fn canonical_names_compare_selected_bytes_and_outlive_inputs() {
         let counters = Counters::new();
         let mut tables = SymbolTables::new(&counters);
@@ -600,8 +775,8 @@ mod tests {
         let mut tables = SymbolTables::new(&counters);
         tables.configure_symbols(symbols.id());
         let name = tables.intern_name(js(b"same"));
-        let one = tables.alloc(SymbolTable::from([(js(b"same"), None)]));
-        let two = tables.alloc(SymbolTable::from([(js(b"same"), Some(symbol))]));
+        let one = tables.alloc(SymbolTable::from_iter([(js(b"same"), None)]));
+        let two = tables.alloc(SymbolTable::from_iter([(js(b"same"), Some(symbol))]));
         assert_eq!(tables.names.ranges.len(), 1);
         assert_eq!(tables.name_bytes(name), b"same");
         assert_eq!(tables.get(one).unwrap().get(b"same"), Some(None));
@@ -635,8 +810,8 @@ mod tests {
         let full_slot = SymbolId::from_parts(symbols.id(), u32::MAX).unwrap();
         let foreign_id = SymbolId::from_parts(foreign.id(), 1).unwrap();
         let mut tables = SymbolTables::new(&counters);
-        let first = tables.alloc(SymbolTable::from([(js(b"empty"), None)]));
-        let untouched = tables.alloc(SymbolTable::new());
+        let first = tables.alloc(SymbolTable::from_iter([(js(b"empty"), None)]));
+        let untouched = tables.alloc(SymbolTable::default());
         assert!(tables.symbols.is_none());
         assert_eq!(tables.get(first).unwrap().get(b"empty"), Some(None));
         tables
@@ -731,8 +906,8 @@ mod tests {
         let foreign = SymbolId::from_parts(other.id(), 9).unwrap();
         let mut tables = SymbolTables::new(&counters);
         tables.configure_symbols(symbols.id());
-        let id = tables.alloc(SymbolTable::new());
-        let mut expected = SymbolTable::new();
+        let id = tables.alloc(SymbolTable::default());
+        let mut expected = SymbolTable::default();
         for index in 0u32..300 {
             let name = index.to_le_bytes();
             let value = if index % 3 == 0 { None } else { Some(local) };
@@ -809,7 +984,7 @@ mod tests {
         };
         assert_eq!(counters.snapshot(), before);
         let mut replacement = SymbolTables::new(&counters);
-        replacement.alloc(SymbolTable::new());
+        replacement.alloc(SymbolTable::default());
         assert!(matches!(replacement.get(stale), Err(Error::WrongOwner)));
         assert!(matches!(replacement.get_mut(stale), Err(Error::WrongOwner)));
         assert_eq!(std::mem::size_of::<CompactEntry>(), 8);

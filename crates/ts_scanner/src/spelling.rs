@@ -19,13 +19,30 @@ pub fn get_spelling_suggestion_for_strings<'candidate>(
     name: &[u8],
     candidates: impl IntoIterator<Item = &'candidate [u8]>,
 ) -> Option<&'candidate [u8]> {
+    get_spelling_suggestion(name, candidates, |value| value, Ord::cmp, 0)
+}
+
+/// The same distance search with the caller's identity tie-breaker. A nonzero
+/// candidate limit abandons the suggestion if the iterator exceeds the limit.
+/// port: tsc/internal/core/core.go:GetSpellingSuggestionWithMaxCandidateCount
+pub fn get_spelling_suggestion<'name, T: Copy>(
+    name: &[u8],
+    candidates: impl IntoIterator<Item = T>,
+    get_name: impl Fn(T) -> &'name [u8],
+    compare: impl Fn(T, T) -> std::cmp::Ordering,
+    maximum_candidates: usize,
+) -> Option<T> {
     let name_runes = runes(name);
     let name_lower = runes(&to_lower_go(name));
     let maximum_length_difference = 2.max((name_runes.len() as f64 * 0.34) as usize);
     let mut best_distance = (name_runes.len() as f64 * 0.4).floor() + 0.9;
-    let mut best_candidate: Option<&[u8]> = None;
+    let mut best_candidate: Option<T> = None;
     let mut buffers = DistanceBuffers::default();
-    for candidate in candidates {
+    for (index, candidate_value) in candidates.into_iter().enumerate() {
+        if maximum_candidates != 0 && index >= maximum_candidates {
+            return None;
+        }
+        let candidate = get_name(candidate_value);
         // The source deliberately compares candidate BYTES with input RUNES.
         if candidate.is_empty()
             || candidate.len().abs_diff(name_runes.len()) > maximum_length_difference
@@ -51,9 +68,9 @@ pub fn get_spelling_suggestion_for_strings<'candidate>(
         );
         if distance < best_distance {
             best_distance = distance;
-            best_candidate = Some(candidate);
-        } else if best_candidate.is_none_or(|best| candidate < best) {
-            best_candidate = Some(candidate);
+            best_candidate = Some(candidate_value);
+        } else if best_candidate.is_none_or(|best| compare(candidate_value, best).is_lt()) {
+            best_candidate = Some(candidate_value);
         }
     }
     best_candidate
@@ -122,6 +139,25 @@ fn levenshtein_with_max(
 #[cfg(test)]
 mod tests {
     use super::{equal_fold, get_spelling_suggestion_for_strings};
+
+    #[test]
+    fn suggestions_use_caller_identity_and_abandon_an_over_limit_search() {
+        let candidates = [(10, b"abYde".as_slice()), (20, b"abXde".as_slice())];
+        let suggest = |limit| {
+            super::get_spelling_suggestion(
+                b"abcde",
+                candidates,
+                |entry| entry.1,
+                |a, b| a.0.cmp(&b.0),
+                limit,
+            )
+        };
+        // Equal distances use the caller's identity order, not spelling order.
+        assert_eq!(suggest(0), Some(candidates[0]));
+        assert_eq!(suggest(2), Some(candidates[0]));
+        // Exceeding the bound abandons even a previously selected candidate.
+        assert_eq!(suggest(1), None);
+    }
 
     type SuggestionCase<'a> = (&'a [u8], &'a [&'a [u8]], Option<&'a [u8]>);
 

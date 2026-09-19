@@ -1,7 +1,7 @@
 """Run the same arena scenarios in release, debug, Miri and AddressSanitizer.
 
-The seven S04 counter scenarios, S06 AST tests, and S07 binder/program groups
-become separately scoped evidence. Instrumented
+The seven S04 counter scenarios, S06 AST tests, S07 binder/program groups and
+S09 generation/pool/registry suites become separately scoped evidence. Instrumented
 runs use a separately pinned nightly, native target and reusable user caches.
 No synthetic success or skipped-test count can satisfy an instrumentation gate.
 """
@@ -16,6 +16,7 @@ from s04_common import command, strict_json_loads
 from s04_runtime import cache_home, load_toolchains
 import s06_ownership
 import s07_ownership
+import s09_ownership
 
 
 SCENARIOS = (
@@ -38,6 +39,7 @@ def validate_test_output(output):
     for scenario in SCENARIOS:
         if not re.search(rf"^test [\w:]*e3_{scenario} \.\.\. ok$", text, re.MULTILINE):
             raise ValueError(f"ownership suite did not pass {scenario}")
+    return True
 
 
 def validate_measurements(report):
@@ -105,6 +107,7 @@ def run(root):
         raise ValueError("ownership case manifest drift")
     ast_cases = s06_ownership.load_cases(root)
     program_cases = s07_ownership.load_cases(root)
+    checker_cases = s09_ownership.load_cases(root)
     base = os.environ.copy()
     base["CARGO_TERM_COLOR"] = "never"
     report = validate_measurements(strict_json_loads(invoke(root, [
@@ -118,14 +121,18 @@ def run(root):
         return report
     tests = ["test", "--package", "ts_arena", "--lib", "--locked"]
     tail = ["--", "--test-threads=1"]
-    validate_test_output(invoke(root, ["cargo", *tests, *tail], base))
-    validate_test_output(invoke(root, ["cargo", *tests, "--release", *tail], base))
+    arena_modes = {
+        "debug": validate_test_output(invoke(root, ["cargo", *tests, *tail], base)),
+        "release": validate_test_output(invoke(root, ["cargo", *tests, "--release", *tail], base)),
+    }
     ast_modes = {}
     program_modes = {}
+    checker_modes = {}
     for mode, options in (("debug", []), ("release", ["--release"])):
         ast_modes[mode] = s06_ownership.measure(root, invoke, ["cargo"], options, base, ast_cases, mode)
         report["metrics"][f"ast_runtime_{mode}"] = ast_modes[mode]
         program_modes[mode] = s07_ownership.measure(root, invoke, ["cargo"], options, base, program_cases, mode)
+        checker_modes[mode] = s09_ownership.measure(root, invoke, ["cargo"], options, base, checker_cases, mode)
     report["metrics"]["ast_runtime_tests"] = len(ast_cases)
     sys.stderr.buffer.write(invoke(root, ["cargo", "test", "--package", "ts_arena", "--doc", "--locked"], base))
     nightly = load_toolchains(root)["nightly"]
@@ -151,6 +158,7 @@ def run(root):
         report["metrics"]["miri"] = False
     else:
         report["metrics"]["miri"] = True
+    arena_modes["miri"] = report["metrics"]["miri"]
     ast_modes["miri"] = s06_ownership.measure(
         root, invoke, ["cargo", f"+{nightly}", "miri"], ["--target", host],
         miri, ast_cases, "miri")
@@ -158,6 +166,10 @@ def run(root):
     report["metrics"]["miri"] = report["metrics"]["miri"] and ast_modes["miri"]
     program_modes["miri"] = s07_ownership.measure(root, invoke, ["cargo", f"+{nightly}", "miri"], ["--target", host], miri, program_cases, "miri")
     report["metrics"]["miri"] = report["metrics"]["miri"] and all(program_modes["miri"].values())
+    checker_modes["miri"] = s09_ownership.measure(
+        root, invoke, ["cargo", f"+{nightly}", "miri"], ["--target", host],
+        miri, checker_cases, "miri")
+    report["metrics"]["miri"] = report["metrics"]["miri"] and all(checker_modes["miri"].values())
     asan = {**instrument, "CARGO_TARGET_DIR": str(root / "target/s04-asan"),
             "RUSTFLAGS": "-Zsanitizer=address",
             # macOS ASan does not support LeakSanitizer. Miri and measured
@@ -170,6 +182,7 @@ def run(root):
         report["metrics"]["address_sanitizer"] = False
     else:
         report["metrics"]["address_sanitizer"] = True
+    arena_modes["address_sanitizer"] = report["metrics"]["address_sanitizer"]
     ast_modes["address_sanitizer"] = s06_ownership.measure(
         root, invoke, ["cargo", f"+{nightly}"], ["-Zbuild-std", "--target", host],
         asan, ast_cases, "address_sanitizer")
@@ -178,7 +191,12 @@ def run(root):
     report["metrics"]["ast_runtime"] = all(ast_modes.values())
     program_modes["address_sanitizer"] = s07_ownership.measure(root, invoke, ["cargo", f"+{nightly}"], ["-Zbuild-std", "--target", host], asan, program_cases, "address_sanitizer")
     report["metrics"]["address_sanitizer"] = report["metrics"]["address_sanitizer"] and all(program_modes["address_sanitizer"].values())
+    checker_modes["address_sanitizer"] = s09_ownership.measure(
+        root, invoke, ["cargo", f"+{nightly}"], ["-Zbuild-std", "--target", host],
+        asan, checker_cases, "address_sanitizer")
+    report["metrics"]["address_sanitizer"] = report["metrics"]["address_sanitizer"] and all(checker_modes["address_sanitizer"].values())
     s07_ownership.publish_metrics(report, program_modes, program_cases)
+    s09_ownership.publish_metrics(report, checker_modes, arena_modes, checker_cases)
     # The native example's row inventory has already been checked for duplicate
     # IDs. The evidence runner requires its public id -> outcome map schema.
     report["tests"] = {test["id"]: test["result"] for test in report["tests"]}

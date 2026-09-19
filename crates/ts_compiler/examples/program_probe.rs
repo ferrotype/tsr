@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (index, request) in requests.iter().enumerate() {
         let id = request["id"].as_str().ok_or("missing ID")?;
         let result = catch_unwind(AssertUnwindSafe(|| {
-            match observation::try_load(request, &mut cache, &counters) {
+            match observation::try_load(request, &mut cache, &counters, None) {
                 Ok(program) => {
                     if args.len() == 4 {
                         observation::verify_options(id, &program)

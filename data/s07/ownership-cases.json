@@ -18,7 +18,8 @@
         "bind_tests::exclusive_node_reads_observe_mutations_and_reject_unretained_owners",
         "bind_tests::exclusive_node_reads_route_new_lazy_records_and_reject_failed_slots",
         "bind_tests::factory_copies_select_each_retained_logical_sources_completed_binding",
-        "bind_tests::flow_only_storage_promotes_without_losing_links_and_rejects_foreign_flows"
+        "bind_tests::flow_only_storage_promotes_without_losing_links_and_rejects_foreign_flows",
+        "bind_tests::synthetic_factory_retains_completed_edges_after_caller_drops"
       ],
       "exact": false,
       "filter": "bind_tests::",

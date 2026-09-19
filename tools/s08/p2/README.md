@@ -11,7 +11,7 @@ cargo run -p ts_compiler --example p2_checker -- target/s08/p2-native-programs/r
 python3 scripts/s08_p2.py compare --native target/s08/p2-native-programs --actual target/s08/p2-rust.json --output target/s08/p2-comparison.json
 ```
 
-The native overlay adds only a Go test driver. Programs use the original compiler
+The native overlay adds a Go test driver and a read-only existing-name-type bridge. Programs use the original compiler
 host, parser, binder and checker. The sharing host caches the original parsed
 SourceFile object, so independently constructed programs share the same bound
 base file. It does not replace type checking, merging, display or diagnostics.
@@ -28,8 +28,21 @@ Native symbol identity is normalized by original bound-file traversal and by
 checker-local discovery. Raw addresses and global numeric ids are not portable
 expectations. Symbol graph snapshots retain declaration order, value declarations,
 flags, member/export tables (including nil versus empty), parents and export
-symbols. Separate checks observe pointer identity, shared-file identity, repeated
-result identity and the before/after bound-file snapshot.
+symbols. Private symbol names replace only their process-local class number with
+`class:<hex file>:<kind>:<pos>:<end>`, retaining the `@#name` suffix. Both symbol
+names and table keys use this representation; tables sort by the normalized
+bytes. The declaring class comes from the value declaration (or first declared
+node), so separate and nested classes retain distinct private identities. A
+private key without that provenance is a harness error. Unique-symbol property
+names similarly replace only their numeric suffix with the unique symbol's
+`symbol:<hex file>:<kind>:<pos>:<end>` declaration identity. That identity comes
+from the existing `nameType` link, via a read-only overlay bridge and the Rust
+operation's validated identity read; snapshots never resolve types or create
+links. Well-known names without a numeric suffix retain their bytes. Missing or
+malformed unique-name provenance is a harness error; distinct namespace keys
+remain distinct even when both spell `key`. Separate checks observe
+pointer identity, shared-file identity, repeated result identity and the
+before/after bound-file snapshot.
 
 Every query retains native default and InTypeAlias display bytes and properties.
 Both display calls use no enclosing declaration. Rust supplies the two default

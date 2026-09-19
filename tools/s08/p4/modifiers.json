@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "scope": "S08 P4 ordered modifier grammar native capture; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "repeated-readonly",
+      "files": {
+        "/repeated-readonly.ts": "class C { readonly readonly x=1; } type T=C;\n"
+      },
+      "roots": [
+        "/repeated-readonly.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/repeated-readonly.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-order",
+      "files": {
+        "/static-order.ts": "class C { readonly static x=1; } type T=typeof C;\n"
+      },
+      "roots": [
+        "/static-order.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/static-order.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "repeated-static",
+      "files": {
+        "/repeated-static.ts": "declare class C { static static x:number; } type T=typeof C;\n"
+      },
+      "roots": [
+        "/repeated-static.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/repeated-static.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "abstract-owner",
+      "files": {
+        "/abstract-owner.ts": "class C { abstract x:number; } type T=C;\n"
+      },
+      "roots": [
+        "/abstract-owner.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/abstract-owner.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "accessibility-repeated",
+      "files": {
+        "/accessibility-repeated.ts": "declare class C { public private x:number; } type T=C;\n"
+      },
+      "roots": [
+        "/accessibility-repeated.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/accessibility-repeated.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "accessor-readonly",
+      "files": {
+        "/accessor-readonly.ts": "class C { accessor readonly x=1; } type T=C;\n"
+      },
+      "roots": [
+        "/accessor-readonly.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/accessor-readonly.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "readonly-method",
+      "files": {
+        "/readonly-method.ts": "declare class C { readonly m():number; } type T=C;\n"
+      },
+      "roots": [
+        "/readonly-method.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/readonly-method.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-constructor-static",
+      "files": {
+        "/class-constructor-static.ts": "class C { static constructor() {} } type T=C;\n"
+      },
+      "roots": [
+        "/class-constructor-static.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/class-constructor-static.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "variance-order",
+      "files": {
+        "/variance-order.ts": "interface I<out in T> { value:T; } type T=I<number>;\n"
+      },
+      "roots": [
+        "/variance-order.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/variance-order.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "const-type-parameter-owner",
+      "files": {
+        "/const-type-parameter-owner.ts": "interface I<const T> { value:T; } type T=I<number>;\n"
+      },
+      "roots": [
+        "/const-type-parameter-owner.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/const-type-parameter-owner.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

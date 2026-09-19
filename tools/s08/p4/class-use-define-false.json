@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native class-use-define-false helper and deferred collision semantics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "useDefineForClassFields": false
+  },
+  "programs": [
+    {
+      "id": "static-identifiers",
+      "files": {
+        "/main.ts": "class C{static name=1;static length=2;static caller=3;static arguments=4;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-computed-literal",
+      "files": {
+        "/main.ts": "class C{static [\"name\"]=1;static [\"length\"]=2;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-computed-const",
+      "files": {
+        "/main.ts": "const k=\"name\";class C{static [k]=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-computed-expression",
+      "files": {
+        "/main.ts": "class C{static [\"na\"+\"me\"]=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-computed-union",
+      "files": {
+        "/main.ts": "declare const k:\"name\"|\"x\";class C{static [k]=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-method-accessor",
+      "files": {
+        "/main.ts": "class C{static [\"name\"](){return 1;}static get [\"length\"](){return 2;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-private",
+      "files": {
+        "/main.ts": "class C{static #name=1;static f(){return this.#name;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-ambient",
+      "files": {
+        "/main.ts": "declare class C{static [\"name\"]:number;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

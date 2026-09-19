@@ -3,7 +3,8 @@ use std::borrow::Cow;
 mod comparison;
 pub use comparison::{
     compare_paths, contains_path, equal_fold, is_relative, normalized_components,
-    path_from_components, relative_from_directory, relative_from_file, trim_file_path_prefix,
+    path_from_components, relative_from_directory, relative_from_file,
+    relative_to_directory_or_url, trim_file_path_prefix,
 };
 pub use ts_core::path::{
     encoded_root_length, is_declaration_file_name, normalize, remove_file_extension, root_length,

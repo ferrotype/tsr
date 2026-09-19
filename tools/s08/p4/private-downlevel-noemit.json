@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native private-downlevel-noemit helper and deferred collision semantics",
+  "options": {
+    "target": "ES2021",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "noEmit": true
+  },
+  "programs": [
+    {
+      "id": "private-read",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:C){return c.#x;}}const x=new C().f(new C());type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-static",
+      "files": {
+        "/main.ts": "class C{static #x=1;static f(){return C.#x;}}const x=C.f();type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-outside",
+      "files": {
+        "/main.ts": "class C{#x=1;}declare const c:C;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-outside",
+      "files": {
+        "/main.ts": "declare const c:any;const x=c.#x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-any-inside",
+      "files": {
+        "/main.ts": "class C{#x=1;f(c:any){return c.#x;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-write",
+      "files": {
+        "/main.ts": "class C{#x=1; f(){this.#x=2;this.#x+=3;return ++this.#x;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-method",
+      "files": {
+        "/main.ts": "class C{#f(){return 1;}f(){return this.#f();}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-accessor",
+      "files": {
+        "/main.ts": "class C{#v=1;get #x(){return this.#v;}set #x(v:number){this.#v=v;}f(){this.#x=3;return this.#x;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "private-in",
+      "files": {
+        "/main.ts": "class C{#x=1;f(v:object){return #x in v;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-variable",
+      "files": {
+        "/main.ts": "var WeakMap=1;class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakset-function",
+      "files": {
+        "/main.ts": "function WeakSet(){}class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-parameter",
+      "files": {
+        "/main.ts": "function f(WeakMap:number){class C{#x=1;}return WeakMap;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-nested-outer",
+      "files": {
+        "/main.ts": "var WeakMap=1;function f(){class C{#x=1;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-sibling-scope",
+      "files": {
+        "/main.ts": "function f(){var WeakMap=1;}function g(){class C{#x=1;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-ambient",
+      "files": {
+        "/main.ts": "declare var WeakMap:number;class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-member",
+      "files": {
+        "/main.ts": "class C{WeakMap=1;#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-overload",
+      "files": {
+        "/main.ts": "function f(WeakMap:number):void;function f(x:number){class C{#x=1;}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reflect-module",
+      "files": {
+        "/main.ts": "export {};var Reflect=1;class A{static x=1;}class C extends A{static y=super.x;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reflect-script",
+      "files": {
+        "/main.ts": "var Reflect=1;class A{static x=1;}class C extends A{static y=super.x;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reflect-local",
+      "files": {
+        "/main.ts": "function f(){var Reflect=1;class A{static x=1;}class C extends A{static{let y=super.x;}}}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reflect-class-expression",
+      "files": {
+        "/main.ts": "class A{static x=1;}const C=class Reflect extends A{static y=super.x;};\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reflect-function-expression",
+      "files": {
+        "/main.ts": "const f=function Reflect(){class A{static x=1;}class C extends A{static y=super.x;}};\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-no-private",
+      "files": {
+        "/main.ts": "var WeakMap=1;class C{x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

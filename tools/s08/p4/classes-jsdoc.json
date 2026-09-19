@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "scope": "S08 P4 JavaScript class fields, constructor flow, accessors, private fields and JSDoc heritage observations",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "js-class-field",
+      "files": {
+        "/js-class-field.js": "class C{x=1;get(){return this.x;}}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-field.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-field.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-field.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-annotation",
+      "files": {
+        "/js-class-annotation.js": "class C{/** @type {number} */ x=1;}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-annotation.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-annotation.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-annotation.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-wrong-annotation",
+      "files": {
+        "/js-class-wrong-annotation.js": "class C{/** @type {number} */ x=\"wrong\";}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-wrong-annotation.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-wrong-annotation.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-wrong-annotation.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-field-flow",
+      "files": {
+        "/js-class-field-flow.js": "class C{x;constructor(){this.x=1;}}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-field-flow.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-field-flow.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-field-flow.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-static-flow",
+      "files": {
+        "/js-class-static-flow.js": "class C{static x;static{C.x=1;}}\nconst Query=C;\nconst Field=C.x;\n"
+      },
+      "roots": [
+        "/js-class-static-flow.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-static-flow.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-static-flow.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-accessor",
+      "files": {
+        "/js-class-accessor.js": "class C{get x(){return 1;}set x(value){}}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-accessor.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-accessor.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-accessor.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-extends",
+      "files": {
+        "/js-class-extends.js": "class A{x=1;}class C extends A{y=2;}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-extends.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-extends.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-extends.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-extends-tag",
+      "files": {
+        "/js-class-extends-tag.js": "class A{x=1;}/** @extends {A} */class C extends A{}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-extends-tag.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-extends-tag.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-extends-tag.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-extends-wrong",
+      "files": {
+        "/js-class-extends-wrong.js": "class A{x=1;}class B{y=2;}/** @extends {B} */class C extends A{}\nconst Query=C;\nconst Field=(new C()).x;\n"
+      },
+      "roots": [
+        "/js-class-extends-wrong.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-extends-wrong.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-extends-wrong.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-class-private",
+      "files": {
+        "/js-class-private.js": "class C{#x=1;get(){return this.#x;}}\nconst Query=C;\nconst Field=(new C()).get();\n"
+      },
+      "roots": [
+        "/js-class-private.js"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/js-class-private.js",
+          "declaration": "Query",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "field",
+          "file": "/js-class-private.js",
+          "declaration": "Field",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

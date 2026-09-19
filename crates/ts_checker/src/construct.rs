@@ -217,15 +217,13 @@ impl CheckerState {
         } else if object_flags & object_flags::REFERENCE != 0 {
             Payload::Reference(ReferenceData::default())
         } else if object_flags & object_flags::MAPPED != 0 {
-            return Err(Error::Unsupported("newObjectType: MappedType"));
+            Payload::Mapped(crate::types::MappedData::default())
         } else if object_flags & object_flags::REVERSE_MAPPED != 0 {
-            return Err(Error::Unsupported("newObjectType: ReverseMappedType"));
+            Payload::ReverseMapped(crate::types::ReverseMappedData::default())
         } else if object_flags & object_flags::EVOLVING_ARRAY != 0 {
             return Err(Error::Unsupported("newObjectType: EvolvingArrayType"));
         } else if object_flags & object_flags::INSTANTIATION_EXPRESSION_TYPE != 0 {
-            return Err(Error::Unsupported(
-                "newObjectType: InstantiationExpressionType",
-            ));
+            Payload::InstantiationExpression(crate::types::InstantiationExpressionData::default())
         } else if object_flags & object_flags::ANONYMOUS != 0 {
             Payload::Anonymous(ObjectData::default())
         } else {
@@ -296,15 +294,22 @@ impl CheckerState {
     /// ones; each group is sorted with the ported symbol comparator.
     // port: tsc/internal/checker/checker.go:Checker.getNamedMembers
     pub(crate) fn get_named_members(
-        &self,
+        &mut self,
         members: Option<SymbolTableId>,
         container: Option<SymbolId>,
     ) -> Result<Option<SymbolList>, Error> {
         let Some(members) = members else {
             return Ok(None);
         };
-        let table = self.table(members)?;
-        if table.is_empty() {
+        // Reserved names are a property of the bytes alone, so the table is
+        // read once and no name is copied out of it; Go's loop reads the map
+        // keys in place the same way.
+        let candidates: Vec<SymbolId> = self
+            .table(members)?
+            .iter()
+            .filter_map(|(name, symbol)| symbol.filter(|_| !is_reserved_member_name(name)))
+            .collect();
+        if self.table(members)?.is_empty() {
             return Ok(None);
         }
         let container_is_class_like = match container {
@@ -314,83 +319,82 @@ impl CheckerState {
             }
             None => false,
         };
-        let mut result = Vec::with_capacity(table.len());
-        let mut contained_count = 0;
-        if container_is_class_like {
-            for (id, symbol) in table {
-                let Some(symbol) = symbol else { continue };
-                if self.is_named_member(symbol, id)?
-                    && self.is_declaration_contained_by(
-                        symbol,
-                        container.expect("class-like container"),
-                    )?
-                {
-                    result.push(symbol);
-                }
+        // The container's declaration ranges do not change per member.
+        let container_ranges = if container_is_class_like {
+            self.declaration_ranges(container.expect("class-like container"))?
+        } else {
+            Vec::new()
+        };
+        let mut contained = Vec::new();
+        let mut others = Vec::with_capacity(candidates.len());
+        for symbol in candidates {
+            if !self.symbol_is_value(symbol)? {
+                continue;
             }
-            contained_count = result.len();
-        }
-        for (id, symbol) in table {
-            let Some(symbol) = symbol else { continue };
-            if self.is_named_member(symbol, id)?
-                && (!container_is_class_like
-                    || !self.is_declaration_contained_by(
-                        symbol,
-                        container.expect("class-like container"),
-                    )?)
+            if container_is_class_like
+                && self.value_declaration_within(symbol, &container_ranges)?
             {
-                result.push(symbol);
+                contained.push(symbol);
+            } else {
+                others.push(symbol);
             }
         }
-        self.sort_symbols(&mut result[..contained_count])?;
-        self.sort_symbols(&mut result[contained_count..])?;
-        Ok(Some(Arc::from(result)))
+        self.sort_symbols(&mut contained)?;
+        self.sort_symbols(&mut others)?;
+        contained.extend(others);
+        Ok(Some(Arc::from(contained)))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isNamedMember
-    pub(crate) fn is_named_member(&self, symbol: SymbolId, id: &[u8]) -> Result<bool, Error> {
+    pub(crate) fn is_named_member(&mut self, symbol: SymbolId, id: &[u8]) -> Result<bool, Error> {
         Ok(!is_reserved_member_name(id) && self.symbol_is_value(symbol)?)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.symbolIsValue
-    pub(crate) fn symbol_is_value(&self, symbol: SymbolId) -> Result<bool, Error> {
+    pub(crate) fn symbol_is_value(&mut self, symbol: SymbolId) -> Result<bool, Error> {
         self.symbol_is_value_ex(symbol, false)
     }
 
-    /// Alias symbols need `getSymbolFlagsEx`, which resolves aliases (P2).
     // port: tsc/internal/checker/checker.go:Checker.symbolIsValueEx
     pub(crate) fn symbol_is_value_ex(
-        &self,
+        &mut self,
         symbol: SymbolId,
-        _include_type_only_members: bool,
+        include_type_only_members: bool,
     ) -> Result<bool, Error> {
         let flags = self.symbol(symbol)?.flags();
-        if flags & symbol_flags::VALUE != 0 {
-            return Ok(true);
+        Ok(flags & symbol_flags::VALUE != 0
+            || flags & symbol_flags::ALIAS != 0
+                && self.module_symbol_flags(symbol, !include_type_only_members, false)?
+                    & symbol_flags::VALUE
+                    != 0)
+    }
+
+    /// The `(pos, end)` of each of `symbol`'s declarations.
+    fn declaration_ranges(&self, symbol: SymbolId) -> Result<Vec<(i32, i32)>, Error> {
+        let mut ranges = Vec::new();
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
+            let node = self.node(declaration)?;
+            ranges.push((node.pos(), node.end()));
         }
-        if flags & symbol_flags::ALIAS != 0 {
-            return Err(Error::Unsupported("getSymbolFlagsEx"));
-        }
-        Ok(false)
+        Ok(ranges)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isDeclarationContainedBy
-    fn is_declaration_contained_by(
+    /// Whether `symbol`'s value declaration lies inside one of the container
+    /// declaration `ranges` (source compares ranges, without a same-file test).
+    fn value_declaration_within(
         &self,
         symbol: SymbolId,
-        container: SymbolId,
+        ranges: &[(i32, i32)],
     ) -> Result<bool, Error> {
-        if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
-            let node = self.ast(declaration)?.node(declaration)?;
-            for declaration in self.symbol_declarations(container)?.iter().flatten() {
-                let containing = self.ast(declaration)?.node(declaration)?;
-                // Source compares ranges, without an extra same-file condition.
-                if node.pos() >= containing.pos() && node.end() <= containing.end() {
-                    return Ok(true);
-                }
-            }
-        }
-        Ok(false)
+        let Some(declaration) = self.symbol(symbol)?.value_declaration() else {
+            return Ok(false);
+        };
+        let node = self.node(declaration)?;
+        let (pos, end) = (node.pos(), node.end());
+        Ok(ranges
+            .iter()
+            .any(|&(start, stop)| pos >= start && end <= stop))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.newTypeParameter
@@ -441,7 +445,7 @@ impl CheckerState {
         readonly: bool,
     ) -> Result<TypeId, Error> {
         if element_infos.len() == 1 && element_infos[0].flags & element_flags::REST != 0 {
-            return Err(Error::Unsupported("globalArrayType"));
+            return self.array_target(readonly);
         }
         let key = tuple_key(element_infos, readonly);
         if let Some(t) = self.types.caches.tuple_types.get(&key) {
@@ -581,7 +585,7 @@ impl CheckerState {
             // No need to normalize when we only have regular required elements.
             return self.create_type_reference_ex(target, element_types, object_flags);
         }
-        Err(Error::Unsupported("TupleNormalizer"))
+        self.normalize_tuple(target, element_types, object_flags)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.createTypeReference
@@ -717,7 +721,7 @@ impl CheckerState {
     }
 
     pub(crate) fn kind(&self, t: TypeId) -> Result<TypeKind, Error> {
-        Ok(self.types.get(t)?.kind)
+        Ok(self.types.get(t)?.kind())
     }
 }
 

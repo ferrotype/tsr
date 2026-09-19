@@ -37,33 +37,208 @@
 //! Design notes: `docs/design/symbols.md`, `docs/design/ownership.md`; plan:
 //! `docs/S08-implementation-plan.md`.
 
+mod access_expressions;
+mod access_symbols;
+mod apparent;
+mod arithmetic;
+mod array_literals;
+mod arrays;
+mod assertions;
+mod assignment_context;
+mod assignment_declarations;
+mod await_expressions;
+mod binary;
+mod binding_checks;
+mod binding_rest;
+mod bindings;
+mod call_arguments;
+mod call_errors;
+mod call_failure;
+mod call_spread;
+mod call_tagged;
+mod calls;
 mod check;
+mod check_bodies;
+mod check_generics;
+mod check_indexes;
+mod check_interfaces;
+mod check_statements;
+mod check_type_syntax;
+mod class_accessibility;
+mod class_check;
+mod class_context;
+mod class_expressions;
+mod class_grammar;
+mod class_members;
+mod class_overrides;
+mod class_properties;
+mod class_property_flow;
+mod classes;
+#[cfg(feature = "relation-probe")]
+mod comparator_probe;
 mod compare;
+mod compound_signatures;
+mod conditional;
+mod constraints;
 mod construct;
+mod constructor_checks;
+mod declaration_checks;
+mod deferred_checks;
+mod delete_expressions;
+mod destructuring_assignments;
 mod diagnostics;
+mod discriminants;
+mod element_errors;
+mod emit_checks;
+mod emit_reference;
+mod emit_resolver;
+mod emit_scopes;
+mod emit_visibility;
+mod enum_eval;
+mod enums;
+mod expression_context;
+mod expression_errors;
+mod expressions;
+mod external_aliases;
+mod external_resolution;
 mod flags;
+mod flow;
+mod flow_arrays;
+mod flow_assignments;
+mod flow_destructuring;
+mod flow_discriminant;
+mod flow_effects;
+mod flow_equality;
+mod flow_facts;
+mod flow_initial;
+mod flow_instanceof;
+mod flow_narrow;
+mod flow_predicates;
+mod flow_reference;
+mod flow_switch;
+mod flow_symbol;
+mod function_symbol_checks;
+mod generators;
+mod grammar_lists;
+mod grammar_modifiers;
+mod grammar_variables;
 mod handles;
+mod higher_order_inference;
 mod host;
 mod ids;
+mod import_attributes;
+mod import_calls;
+mod import_types;
+mod index_access_errors;
+mod indexes;
+mod infer_candidates;
+mod infer_constraints;
+mod infer_helpers;
+mod infer_matching;
+mod infer_objects;
+mod infer_reverse;
+mod infer_signatures;
+mod infer_templates;
+mod infer_tuples;
+mod infer_types;
+mod inference;
 mod init;
+mod instanceof;
+mod instantiate;
+mod instantiation_expressions;
 mod intersection;
+mod iteration;
+mod iteration_protocol;
+mod jsdoc_checks;
+mod jsdoc_types;
 mod key;
+mod late_indexes;
+mod late_members;
 mod links;
+mod mapped;
+mod mapper;
 mod members;
 mod merge;
+mod meta_properties;
+mod module_alias_like;
+mod module_aliases;
+mod module_augmentations;
+mod module_exports;
+mod module_specifiers;
+mod module_wrappers;
+mod name_errors;
+mod name_qualified;
 mod name_resolution;
+mod name_scopes;
+mod narrowable_references;
 mod node_builder;
+mod normalize;
+mod object_context;
+mod object_discriminants;
+mod object_grammar;
+mod object_literals;
+mod object_members;
+mod object_spread;
+mod optional_chain;
+mod other_operators;
 mod owner;
+mod parameter_checks;
+mod private_access;
 mod program;
 mod program_init;
+mod promises;
+mod property_symbols;
 mod query;
+mod query_location;
+mod query_names;
 mod reduction;
+mod references;
+mod regular_expressions;
+mod relater;
+mod relater_compound;
+mod relater_conditional;
+mod relater_excess;
+mod relater_mapped;
+mod relater_properties;
+mod relater_signatures;
+mod relater_structure;
+mod relater_tuples;
+mod relater_variance;
+mod relation_error_target;
+mod relation_errors;
+mod relation_helpers;
 mod resolution;
+mod return_inference;
+mod signature_identity;
+mod signature_jsdoc;
+mod signature_parameters;
 mod signatures;
+mod source_alias_checks;
+mod source_imports;
+mod source_module_aliases;
+mod source_modules;
+mod source_signatures;
 mod state;
+mod string_mapping;
+mod substitution;
 mod symbols;
 mod template;
+mod template_expressions;
+mod template_relation;
+mod truthiness;
+pub mod type_facts;
+mod type_only_uses;
+mod unary;
+mod union_reduction;
+mod unreachable;
+mod value_references;
+mod variable_errors;
+mod variables;
+mod variance;
+mod widening;
+pub use relater::RelationKind;
 mod type_display;
+mod type_parameters;
 mod types;
 mod union;
 mod value_links;
@@ -78,12 +253,17 @@ pub mod storage_families;
 pub mod storage_pilot;
 
 pub use flags::*;
+#[cfg(feature = "relation-probe")]
+pub use handles::{LiteralShape, SignatureShape};
 pub use handles::{
     MemberSpec, NodeRef, RetainedNode, RetainedSignature, RetainedSymbol, RetainedType,
-    RetainedTypeList, SignatureRef, SymbolRef, TypeRef,
+    RetainedTypeList, SignatureRef, SymbolRef, TypeNodeBuilder, TypeRef,
 };
-pub use host::CheckerHost;
-pub(crate) use ids::{AliasId, IndexInfoId, SignatureId, TypeId, TypePredicateId};
+pub use host::{CheckerHost, ModuleSpecifierPath};
+pub(crate) use ids::{
+    AliasId, ConditionalRootId, IndexInfoId, InferenceId, MapperId, RelationFrameId, SignatureId,
+    TypeId, TypePredicateId,
+};
 pub(crate) use init::Builtins;
 pub use init::BUILTIN_TYPE_NAMES;
 pub(crate) use key::CacheKey;
@@ -119,8 +299,10 @@ pub(crate) use value_links::ValueSymbolLinks;
 /// through unchanged; the checker adds the failures only it can observe.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
+    Host(ts_vfs::Error),
     Arena(ts_arena::Error),
     Printer(ts_printer::Error),
+    Pseudo(ts_pseudochecker::Error),
     /// The same thread asked for a second operation on an owner whose operation
     /// it already holds. Detected before waiting; ordinary contention waits.
     Reentry,
@@ -138,6 +320,12 @@ pub enum Error {
     MissingLink(&'static str),
 }
 
+impl From<ts_vfs::Error> for Error {
+    fn from(error: ts_vfs::Error) -> Self {
+        Self::Host(error)
+    }
+}
+
 impl From<ts_arena::Error> for Error {
     fn from(error: ts_arena::Error) -> Self {
         match error {
@@ -153,11 +341,19 @@ impl From<ts_printer::Error> for Error {
     }
 }
 
+impl From<ts_pseudochecker::Error> for Error {
+    fn from(error: ts_pseudochecker::Error) -> Self {
+        Self::Pseudo(error)
+    }
+}
+
 impl std::fmt::Display for Error {
     fn fmt(&self, output: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Host(error) => error.fmt(output),
             Self::Arena(error) => error.fmt(output),
             Self::Printer(error) => error.fmt(output),
+            Self::Pseudo(error) => error.fmt(output),
             Self::Reentry => {
                 output.write_str("the checker operation is already held by this thread")
             }
@@ -177,5 +373,7 @@ impl std::error::Error for Error {}
 mod families_tests;
 #[cfg(test)]
 mod flag_tests;
+mod lib_features;
 #[cfg(test)]
 mod tests;
+mod unused_identifiers;

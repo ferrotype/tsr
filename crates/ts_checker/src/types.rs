@@ -20,7 +20,6 @@ use crate::key::CacheKey;
 use crate::{
     object_flags, AliasId, Error, IndexInfoId, ObjectFlags, SignatureId, TypeFlags, TypeId,
 };
-use std::hash::RandomState;
 use std::sync::Arc;
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{JsString, SymbolTableId};
@@ -34,7 +33,9 @@ pub type IndexInfoList = Arc<[IndexInfoId]>;
 
 /// The hash map the checker's caches use. `hashbrown` reports its exact
 /// allocation size, which the storage census charges; the hasher is `std`'s.
-pub type Map<K, V> = hashbrown::HashMap<K, V, RandomState>;
+pub use ts_arena::hash::FastState;
+pub type Map<K, V> = hashbrown::HashMap<K, V, FastState>;
+pub(crate) type Set<T> = hashbrown::HashSet<T, FastState>;
 
 /// The Go payload struct a type carries. Object kinds are also distinguished by
 /// `ObjectFlags` (`ObjectFlagsObjectTypeKindMask`), as upstream does.
@@ -66,6 +67,32 @@ pub enum TypeKind {
     Conditional,
 }
 
+impl TypeKind {
+    /// Every kind in discriminant order, for `TypeRecord::kind`.
+    pub const ALL: [TypeKind; 20] = [
+        TypeKind::Intrinsic,
+        TypeKind::Literal,
+        TypeKind::UniqueEsSymbol,
+        TypeKind::Anonymous,
+        TypeKind::Reference,
+        TypeKind::Interface,
+        TypeKind::Tuple,
+        TypeKind::Mapped,
+        TypeKind::ReverseMapped,
+        TypeKind::EvolvingArray,
+        TypeKind::InstantiationExpression,
+        TypeKind::Union,
+        TypeKind::Intersection,
+        TypeKind::TypeParameter,
+        TypeKind::Index,
+        TypeKind::IndexedAccess,
+        TypeKind::TemplateLiteral,
+        TypeKind::StringMapping,
+        TypeKind::Substitution,
+        TypeKind::Conditional,
+    ];
+}
+
 /// The common record every type has. `symbol` may belong to a file or to this
 /// checker; `alias` and the payload row are checker-local.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -74,8 +101,25 @@ pub struct TypeRecord {
     pub object_flags: ObjectFlags,
     pub symbol: Option<SymbolId>,
     pub alias: Option<AliasId>,
-    pub kind: TypeKind,
-    pub(crate) payload_row: u32,
+    /// The payload kind in the top five bits, the row in that kind's table
+    /// below: 24 bytes per record instead of 32, on every type a checker holds.
+    payload: u32,
+}
+impl TypeRecord {
+    const KIND_SHIFT: u32 = 27;
+    const ROW_MASK: u32 = (1 << Self::KIND_SHIFT) - 1;
+    fn pack(kind: TypeKind, row: u32) -> Result<u32, Error> {
+        if row > Self::ROW_MASK {
+            return Err(Error::IdExhausted);
+        }
+        Ok(row | (kind as u32) << Self::KIND_SHIFT)
+    }
+    pub fn kind(&self) -> TypeKind {
+        TypeKind::ALL[(self.payload >> Self::KIND_SHIFT) as usize]
+    }
+    pub(crate) fn payload_row(&self) -> u32 {
+        self.payload & Self::ROW_MASK
+    }
 }
 
 /// `TypeAlias`: the alias symbol and its type arguments.
@@ -116,13 +160,6 @@ pub struct LiteralData {
 
 #[derive(Debug)]
 pub struct UniqueEsSymbolData {
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P4 unique-symbol display name; the P1 census charges its owned bytes"
-        )
-    )]
     pub name: JsString,
 }
 
@@ -130,13 +167,6 @@ pub struct UniqueEsSymbolData {
 /// shared by object, union and intersection types.
 #[derive(Debug, Default)]
 pub struct StructuredMembers {
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 constraint resolution link; the P1 census retains and charges its reachability"
-        )
-    )]
     pub resolved_base_constraint: Option<TypeId>,
     pub members: Option<SymbolTableId>,
     pub properties: Option<SymbolList>,
@@ -148,20 +178,57 @@ pub struct StructuredMembers {
         not(any(test, feature = "storage-pilot")),
         allow(
             dead_code,
-            reason = "P3 abstract-constructor filtering link; the P1 census tracks its reachability"
+            reason = "P4 class expression/base checking filters abstract constructors; the census follows this retained link"
         )
     )]
     pub object_type_without_abstract_construct_signatures: Option<TypeId>,
 }
 
-/// `ObjectType`. The type mapper arrives with instantiation (P3).
+/// `ObjectType` and the non-owning mapper for an instantiation.
 #[derive(Debug, Default)]
 pub struct ObjectData {
     pub structured: StructuredMembers,
     /// Target of an instantiated type.
     pub target: Option<TypeId>,
+    pub mapper: Option<crate::MapperId>,
     /// Map of type instantiations.
     pub instantiations: Option<Box<Map<CacheKey, TypeId>>>,
+}
+
+#[derive(Debug, Default)]
+pub struct InstantiationExpressionData {
+    pub object: ObjectData,
+    pub node: Option<NodeId>,
+}
+
+/// `EvolvingArrayType`: never escapes a completed flow query before finalization.
+#[derive(Debug)]
+pub struct EvolvingArrayData {
+    pub object: ObjectData,
+    pub element_type: TypeId,
+    pub final_array_type: Option<TypeId>,
+}
+
+/// Source mapped type with independent lazy links for each instantiation.
+#[derive(Debug, Default)]
+pub struct MappedData {
+    pub object: ObjectData,
+    pub declaration: Option<NodeId>,
+    pub type_parameter: Option<TypeId>,
+    pub constraint_type: Option<TypeId>,
+    pub name_type: Option<TypeId>,
+    pub template_type: Option<TypeId>,
+    pub modifiers_type: Option<TypeId>,
+    pub resolved_apparent_type: Option<TypeId>,
+    pub contains_error: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct ReverseMappedData {
+    pub object: ObjectData,
+    pub source: Option<TypeId>,
+    pub mapped_type: Option<TypeId>,
+    pub constraint_type: Option<TypeId>,
 }
 
 /// `TypeReference`.
@@ -179,58 +246,22 @@ pub struct InterfaceData {
     pub reference: ReferenceData,
     /// Type parameters (outer + local + thisType).
     pub all_type_parameters: Option<TypeList>,
-    #[allow(
-        dead_code,
-        reason = "P3 outer type-parameter partition; retained in the P1 interface record layout"
-    )]
     pub outer_type_parameter_count: u32,
     pub this_type: Option<TypeId>,
-    #[allow(
-        dead_code,
-        reason = "P3 base-type resolution state; retained in the P1 interface record layout"
-    )]
     pub base_types_resolved: bool,
     pub declared_members_resolved: bool,
     #[cfg_attr(
         not(any(test, feature = "storage-pilot")),
         allow(
             dead_code,
-            reason = "P3 base-constructor resolution link; the P1 census tracks its reachability"
+            reason = "P4 class base-constructor resolution; the census follows this retained link"
         )
     )]
     pub resolved_base_constructor_type: Option<TypeId>,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 interface base-type list; the P1 census charges its allocation and reachability"
-        )
-    )]
     pub resolved_base_types: Option<TypeList>,
     pub declared_members: Option<SymbolTableId>,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 interface call signatures; the P1 census charges the retained list"
-        )
-    )]
     pub declared_call_signatures: Option<SignatureList>,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 interface construct signatures; the P1 census charges the retained list"
-        )
-    )]
     pub declared_construct_signatures: Option<SignatureList>,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 interface index information; the P1 census charges the retained list"
-        )
-    )]
     pub declared_index_infos: Option<IndexInfoList>,
 }
 
@@ -304,22 +335,8 @@ pub struct UnionData {
     /// Denormalized union, intersection or index type in which the union originates.
     pub origin: Option<TypeId>,
     /// Property with unique unit type that exists in every object/intersection in the union.
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 discriminant-property cache; the P1 census charges its owned bytes"
-        )
-    )]
     pub key_property_name: Option<JsString>,
     /// Constituents keyed by unit type discriminants.
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 discriminant-constituent cache; the P1 census charges its allocation and reachability"
-        )
-    )]
     pub constituent_map: Option<Box<Map<TypeId, TypeId>>>,
 }
 
@@ -328,62 +345,75 @@ pub struct UnionData {
 pub struct IntersectionData {
     pub common: UnionOrIntersectionMembers,
     pub types: TypeList,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 intersection apparent-type link; the P1 census tracks its reachability"
-        )
-    )]
     pub resolved_apparent_type: Option<TypeId>,
     /// Instantiation with type parameters mapped to the never type.
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 intersection instantiation link; the P1 census tracks its reachability"
-        )
-    )]
     pub unique_literal_filled_instantiation: Option<TypeId>,
 }
 
 /// `TypeParameter`. The type mapper arrives with instantiation (P3).
 #[derive(Debug, Default)]
 pub struct TypeParameterData {
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 constraint resolution link; the P1 census retains and charges its reachability"
-        )
-    )]
+    pub mapper: Option<crate::MapperId>,
     pub resolved_base_constraint: Option<TypeId>,
     pub constraint: Option<TypeId>,
     pub target: Option<TypeId>,
     pub is_this_type: bool,
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 generic default-type link; the P1 census tracks its reachability"
-        )
-    )]
     pub resolved_default_type: Option<TypeId>,
 }
 
 /// `TemplateLiteralType`: `texts` is always one longer than `types`.
 #[derive(Debug)]
 pub struct TemplateLiteralData {
-    #[cfg_attr(
-        not(any(test, feature = "storage-pilot")),
-        allow(
-            dead_code,
-            reason = "P3 constraint resolution link; the P1 census retains and charges its reachability"
-        )
-    )]
     pub resolved_base_constraint: Option<TypeId>,
     pub texts: Arc<[JsString]>,
     pub types: TypeList,
+}
+
+/// The payload a new type carries; each variant fills one table.
+#[derive(Clone, Copy, Debug)]
+pub struct IndexData {
+    pub resolved_base_constraint: Option<TypeId>,
+    pub target: TypeId,
+    pub index_flags: u32,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct IndexedAccessData {
+    pub resolved_base_constraint: Option<TypeId>,
+    pub object_type: TypeId,
+    pub index_type: TypeId,
+    pub access_flags: crate::AccessFlags,
+}
+
+/// A constrained intrinsic string transform.
+#[derive(Clone, Copy, Debug)]
+pub struct StringMappingData {
+    pub resolved_base_constraint: Option<TypeId>,
+    pub target: TypeId,
+}
+
+/// `SubstitutionType`: a conditional-flow constraint, or `NoInfer<T>`.
+#[derive(Clone, Copy, Debug)]
+pub struct SubstitutionData {
+    pub resolved_base_constraint: Option<TypeId>,
+    pub base: TypeId,
+    pub constraint: TypeId,
+}
+
+/// `ConditionalType`, sharing the original syntax and instantiation cache by ID.
+#[derive(Clone, Copy, Debug)]
+pub struct ConditionalData {
+    pub root: crate::ConditionalRootId,
+    pub check_type: TypeId,
+    pub extends_type: TypeId,
+    pub mapper: Option<crate::MapperId>,
+    pub combined_mapper: Option<crate::MapperId>,
+    pub resolved_base_constraint: Option<TypeId>,
+    pub true_type: Option<TypeId>,
+    pub false_type: Option<TypeId>,
+    pub inferred_true_type: Option<TypeId>,
+    pub default_constraint: Option<TypeId>,
+    pub distributive_constraint: Option<TypeId>,
 }
 
 /// The payload a new type carries; each variant fills one table.
@@ -397,6 +427,10 @@ pub(crate) enum Payload {
     )]
     UniqueEsSymbol(UniqueEsSymbolData),
     Anonymous(ObjectData),
+    EvolvingArray(EvolvingArrayData),
+    Mapped(MappedData),
+    ReverseMapped(ReverseMappedData),
+    InstantiationExpression(InstantiationExpressionData),
     Reference(ReferenceData),
     Interface(InterfaceData),
     Tuple(TupleData),
@@ -404,6 +438,11 @@ pub(crate) enum Payload {
     Intersection(IntersectionData),
     TypeParameter(TypeParameterData),
     TemplateLiteral(TemplateLiteralData),
+    Index(IndexData),
+    IndexedAccess(IndexedAccessData),
+    StringMapping(StringMappingData),
+    Substitution(SubstitutionData),
+    Conditional(ConditionalData),
 }
 
 /// A `jsnum.Number` map key with Go's float-key semantics: `-0` and `+0` are one
@@ -438,10 +477,20 @@ pub struct TypeCaches {
     pub nan_type: Option<TypeId>,
     pub bigint_literal_types: Map<PseudoBigInt, TypeId>,
     pub union_types: Map<CacheKey, TypeId>,
+    pub subtype_reductions: Map<CacheKey, TypeList>,
     pub union_of_union_types: Map<UnionOfUnionKey, TypeId>,
     pub tuple_types: Map<CacheKey, TypeId>,
     pub intersection_types: Map<CacheKey, TypeId>,
     pub template_literal_types: Map<CacheKey, TypeId>,
+    pub index_types: Map<(TypeId, u32), TypeId>,
+    pub simplified_types: Map<(TypeId, bool), TypeId>,
+    pub equivalent_bases: Map<TypeId, TypeId>,
+    pub literal_union_bases: Map<TypeId, TypeId>,
+    pub substitution_types: Map<(TypeId, TypeId), TypeId>,
+    pub regular_object_literals: Map<TypeId, TypeId>,
+    pub string_mapping_types: Map<(SymbolId, TypeId), TypeId>,
+    pub indexed_access_types: Map<CacheKey, TypeId>,
+    pub property_types: Map<(TypeId, TypeFlags, bool, bool), TypeId>,
 }
 
 #[derive(Debug, Default)]
@@ -454,6 +503,10 @@ pub struct TypeStore {
     literals: Vec<LiteralData>,
     unique_symbols: Vec<UniqueEsSymbolData>,
     anonymous: Vec<ObjectData>,
+    mapped: Vec<MappedData>,
+    reverse_mapped: Vec<ReverseMappedData>,
+    evolving_arrays: Vec<EvolvingArrayData>,
+    instantiation_expressions: Vec<InstantiationExpressionData>,
     references: Vec<ReferenceData>,
     interfaces: Vec<InterfaceData>,
     tuples: Vec<TupleData>,
@@ -461,6 +514,11 @@ pub struct TypeStore {
     intersections: Vec<IntersectionData>,
     type_parameters: Vec<TypeParameterData>,
     template_literals: Vec<TemplateLiteralData>,
+    indexes: Vec<IndexData>,
+    indexed_accesses: Vec<IndexedAccessData>,
+    string_mappings: Vec<StringMappingData>,
+    substitutions: Vec<SubstitutionData>,
+    conditionals: Vec<ConditionalData>,
     pub(crate) caches: TypeCaches,
 }
 
@@ -477,27 +535,27 @@ macro_rules! payload_accessors {
         $(#[$attr])*
         pub fn $get(&self, id: TypeId) -> Result<&$data, Error> {
             let record = self.get(id)?;
-            if record.kind != TypeKind::$kind {
+            if record.kind() != TypeKind::$kind {
                 return Err(Error::UnexpectedType {
                     context: stringify!($get),
-                    kind: record.kind,
+                    kind: record.kind(),
                 });
             }
-            self.$table.get(row(record.payload_row)).ok_or_else(invalid)
+            self.$table.get(row(record.payload_row())).ok_or_else(invalid)
         }
 
     };
     (write $get_mut:ident, $table:ident, $kind:ident, $data:ty) => {
         pub fn $get_mut(&mut self, id: TypeId) -> Result<&mut $data, Error> {
             let record = *self.get(id)?;
-            if record.kind != TypeKind::$kind {
+            if record.kind() != TypeKind::$kind {
                 return Err(Error::UnexpectedType {
                     context: stringify!($get_mut),
-                    kind: record.kind,
+                    kind: record.kind(),
                 });
             }
             self.$table
-                .get_mut(row(record.payload_row))
+                .get_mut(row(record.payload_row()))
                 .ok_or_else(invalid)
         }
     };
@@ -547,6 +605,8 @@ impl TypeStore {
         Ok(&mut self.records[index])
     }
 
+    payload_accessors!(read unique_symbol, unique_symbols, UniqueEsSymbol, UniqueEsSymbolData);
+
     pub fn flags(&self, id: TypeId) -> Result<TypeFlags, Error> {
         Ok(self.get(id)?.flags)
     }
@@ -570,21 +630,24 @@ impl TypeStore {
             | object_flags::COULD_CONTAIN_TYPE_VARIABLES
             | object_flags::MEMBERS_RESOLVED;
         let (kind, payload_row) = self.push_payload(payload)?;
-        self.records.push(TypeRecord {
-            flags,
-            object_flags: object_flags & !flags_to_clear,
-            symbol: None,
-            alias: None,
-            kind,
-            payload_row,
-        });
+        let payload = TypeRecord::pack(kind, payload_row)?;
+        ts_arena::growth::push_frugal(
+            &mut self.records,
+            TypeRecord {
+                flags,
+                object_flags: object_flags & !flags_to_clear,
+                symbol: None,
+                alias: None,
+                payload,
+            },
+        );
         Ok(id)
     }
 
     fn push_payload(&mut self, payload: Payload) -> Result<(TypeKind, u32), Error> {
         fn push<T>(table: &mut Vec<T>, value: T) -> Result<u32, Error> {
             let row = u32::try_from(table.len()).map_err(|_| Error::IdExhausted)?;
-            table.push(value);
+            ts_arena::growth::push_frugal(table, value);
             Ok(row)
         }
         Ok(match payload {
@@ -593,6 +656,19 @@ impl TypeStore {
             Payload::UniqueEsSymbol(data) => (
                 TypeKind::UniqueEsSymbol,
                 push(&mut self.unique_symbols, data)?,
+            ),
+            Payload::Mapped(data) => (TypeKind::Mapped, push(&mut self.mapped, data)?),
+            Payload::ReverseMapped(data) => (
+                TypeKind::ReverseMapped,
+                push(&mut self.reverse_mapped, data)?,
+            ),
+            Payload::InstantiationExpression(data) => (
+                TypeKind::InstantiationExpression,
+                push(&mut self.instantiation_expressions, data)?,
+            ),
+            Payload::EvolvingArray(data) => (
+                TypeKind::EvolvingArray,
+                push(&mut self.evolving_arrays, data)?,
             ),
             Payload::Anonymous(data) => (TypeKind::Anonymous, push(&mut self.anonymous, data)?),
             Payload::Reference(data) => (TypeKind::Reference, push(&mut self.references, data)?),
@@ -610,12 +686,27 @@ impl TypeStore {
                 TypeKind::TemplateLiteral,
                 push(&mut self.template_literals, data)?,
             ),
+            Payload::Index(data) => (TypeKind::Index, push(&mut self.indexes, data)?),
+            Payload::IndexedAccess(data) => (
+                TypeKind::IndexedAccess,
+                push(&mut self.indexed_accesses, data)?,
+            ),
+            Payload::Substitution(data) => {
+                (TypeKind::Substitution, push(&mut self.substitutions, data)?)
+            }
+            Payload::Conditional(data) => {
+                (TypeKind::Conditional, push(&mut self.conditionals, data)?)
+            }
+            Payload::StringMapping(data) => (
+                TypeKind::StringMapping,
+                push(&mut self.string_mappings, data)?,
+            ),
         })
     }
 
     pub fn push_alias(&mut self, alias: TypeAlias) -> Result<AliasId, Error> {
         let id = AliasId::next(0, self.aliases.len())?;
-        self.aliases.push(alias);
+        ts_arena::growth::push_frugal(&mut self.aliases, alias);
         Ok(id)
     }
 
@@ -633,6 +724,10 @@ impl TypeStore {
             .transpose()
     }
 
+    payload_accessors!(read substitution, substitutions, Substitution, SubstitutionData);
+    payload_accessors!(write substitution_mut, substitutions, Substitution, SubstitutionData);
+    payload_accessors!(read conditional, conditionals, Conditional, ConditionalData);
+    payload_accessors!(write conditional_mut, conditionals, Conditional, ConditionalData);
     payload_accessors!(read intrinsic, intrinsics, Intrinsic, IntrinsicData);
     payload_accessors!(read literal, literals, Literal, LiteralData);
     payload_accessors!(write literal_mut, literals, Literal, LiteralData);
@@ -644,7 +739,7 @@ impl TypeStore {
     payload_accessors!(write intersection_mut, intersections, Intersection, IntersectionData);
 
     pub(crate) fn compound_types(&self, id: TypeId) -> Result<&TypeList, Error> {
-        match self.get(id)?.kind {
+        match self.get(id)?.kind() {
             TypeKind::Union => Ok(&self.union(id)?.types),
             TypeKind::Intersection => Ok(&self.intersection(id)?.types),
             _ => Err(invalid()),
@@ -655,7 +750,7 @@ impl TypeStore {
         &self,
         id: TypeId,
     ) -> Result<&UnionOrIntersectionMembers, Error> {
-        match self.get(id)?.kind {
+        match self.get(id)?.kind() {
             TypeKind::Union => Ok(&self.union(id)?.common),
             TypeKind::Intersection => Ok(&self.intersection(id)?.common),
             _ => Err(invalid()),
@@ -666,25 +761,47 @@ impl TypeStore {
         &mut self,
         id: TypeId,
     ) -> Result<&mut UnionOrIntersectionMembers, Error> {
-        match self.get(id)?.kind {
+        match self.get(id)?.kind() {
             TypeKind::Union => Ok(&mut self.union_mut(id)?.common),
             TypeKind::Intersection => Ok(&mut self.intersection_mut(id)?.common),
             _ => Err(invalid()),
         }
     }
     payload_accessors!(
-        read #[cfg(any(test, feature = "storage-pilot"))]
+        read
         type_parameter, type_parameters, TypeParameter, TypeParameterData
     );
     payload_accessors!(write type_parameter_mut, type_parameters, TypeParameter, TypeParameterData);
     payload_accessors!(read template_literal, template_literals, TemplateLiteral, TemplateLiteralData);
+    payload_accessors!(write template_literal_mut, template_literals, TemplateLiteral, TemplateLiteralData);
+    payload_accessors!(read index_type, indexes, Index, IndexData);
+    payload_accessors!(write index_type_mut, indexes, Index, IndexData);
+    payload_accessors!(read mapped, mapped, Mapped, MappedData);
+    payload_accessors!(write mapped_mut, mapped, Mapped, MappedData);
+    payload_accessors!(read instantiation_expression, instantiation_expressions, InstantiationExpression, InstantiationExpressionData);
+    payload_accessors!(write instantiation_expression_mut, instantiation_expressions, InstantiationExpression, InstantiationExpressionData);
+    payload_accessors!(read evolving_array, evolving_arrays, EvolvingArray, EvolvingArrayData);
+    payload_accessors!(write evolving_array_mut, evolving_arrays, EvolvingArray, EvolvingArrayData);
+    payload_accessors!(read reverse_mapped, reverse_mapped, ReverseMapped, ReverseMappedData);
+    payload_accessors!(write reverse_mapped_mut, reverse_mapped, ReverseMapped, ReverseMappedData);
+    payload_accessors!(read string_mapping, string_mappings, StringMapping, StringMappingData);
+    payload_accessors!(write string_mapping_mut, string_mappings, StringMapping, StringMappingData);
+    payload_accessors!(read indexed_access, indexed_accesses, IndexedAccess, IndexedAccessData);
+    payload_accessors!(write indexed_access_mut, indexed_accesses, IndexedAccess, IndexedAccessData);
 
     /// `Type.AsObjectType()`: the `ObjectType` part of any object kind.
     pub fn object(&self, id: TypeId) -> Result<&ObjectData, Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
+            TypeKind::InstantiationExpression => self
+                .instantiation_expressions
+                .get(index)
+                .map(|data| &data.object),
             TypeKind::Anonymous => self.anonymous.get(index),
+            TypeKind::EvolvingArray => self.evolving_arrays.get(index).map(|data| &data.object),
+            TypeKind::Mapped => self.mapped.get(index).map(|data| &data.object),
+            TypeKind::ReverseMapped => self.reverse_mapped.get(index).map(|data| &data.object),
             TypeKind::Reference => self.references.get(index).map(|data| &data.object),
             TypeKind::Interface => self
                 .interfaces
@@ -706,9 +823,22 @@ impl TypeStore {
 
     pub fn object_mut(&mut self, id: TypeId) -> Result<&mut ObjectData, Error> {
         let record = *self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
+            TypeKind::InstantiationExpression => self
+                .instantiation_expressions
+                .get_mut(index)
+                .map(|data| &mut data.object),
             TypeKind::Anonymous => self.anonymous.get_mut(index),
+            TypeKind::EvolvingArray => self
+                .evolving_arrays
+                .get_mut(index)
+                .map(|data| &mut data.object),
+            TypeKind::Mapped => self.mapped.get_mut(index).map(|data| &mut data.object),
+            TypeKind::ReverseMapped => self
+                .reverse_mapped
+                .get_mut(index)
+                .map(|data| &mut data.object),
             TypeKind::Reference => self.references.get_mut(index).map(|data| &mut data.object),
             TypeKind::Interface => self
                 .interfaces
@@ -732,8 +862,8 @@ impl TypeStore {
     /// interface or tuple type.
     pub fn type_reference(&self, id: TypeId) -> Result<&ReferenceData, Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Reference => self.references.get(index),
             TypeKind::Interface => self.interfaces.get(index).map(|data| &data.reference),
             TypeKind::Tuple => self.tuples.get(index).map(|data| &data.interface.reference),
@@ -749,8 +879,8 @@ impl TypeStore {
 
     pub fn type_reference_mut(&mut self, id: TypeId) -> Result<&mut ReferenceData, Error> {
         let record = *self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Reference => self.references.get_mut(index),
             TypeKind::Interface => self
                 .interfaces
@@ -773,8 +903,8 @@ impl TypeStore {
     /// `Type.AsInterfaceType()`: the `InterfaceType` part of an interface or tuple.
     pub fn interface(&self, id: TypeId) -> Result<&InterfaceData, Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Interface => self.interfaces.get(index),
             TypeKind::Tuple => self.tuples.get(index).map(|data| &data.interface),
             kind => {
@@ -789,8 +919,8 @@ impl TypeStore {
 
     pub fn interface_mut(&mut self, id: TypeId) -> Result<&mut InterfaceData, Error> {
         let record = *self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Interface => self.interfaces.get_mut(index),
             TypeKind::Tuple => self.tuples.get_mut(index).map(|data| &mut data.interface),
             kind => {
@@ -806,8 +936,8 @@ impl TypeStore {
     /// `Type.AsStructuredType()`: member state of object, union and intersection types.
     pub fn structured(&self, id: TypeId) -> Result<&StructuredMembers, Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Union => self.unions.get(index).map(|data| &data.common.structured),
             TypeKind::Intersection => self
                 .intersections
@@ -820,8 +950,8 @@ impl TypeStore {
 
     pub fn structured_mut(&mut self, id: TypeId) -> Result<&mut StructuredMembers, Error> {
         let record = *self.get(id)?;
-        let index = row(record.payload_row);
-        match record.kind {
+        let index = row(record.payload_row());
+        match record.kind() {
             TypeKind::Union => self
                 .unions
                 .get_mut(index)
@@ -839,8 +969,8 @@ impl TypeStore {
     // port: tsc/internal/checker/types.go:Type.Types
     pub fn types_of(&self, id: TypeId) -> Result<&[TypeId], Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        Ok(match record.kind {
+        let index = row(record.payload_row());
+        Ok(match record.kind() {
             TypeKind::Union => &self.unions.get(index).ok_or_else(invalid)?.types,
             TypeKind::Intersection => &self.intersections.get(index).ok_or_else(invalid)?.types,
             _ => &[],
@@ -852,17 +982,14 @@ impl TypeStore {
     // port: tsc/internal/checker/types.go:Type.Target
     pub fn target(&self, id: TypeId) -> Result<TypeId, Error> {
         let record = self.get(id)?;
-        let index = row(record.payload_row);
-        let target = match record.kind {
+        let index = row(record.payload_row());
+        let target = match record.kind() {
             TypeKind::Reference | TypeKind::Interface | TypeKind::Tuple => {
                 self.type_reference(id)?.object.target
             }
             TypeKind::TypeParameter => self.type_parameters.get(index).ok_or_else(invalid)?.target,
-            TypeKind::Index | TypeKind::StringMapping => {
-                return Err(Error::Unsupported(
-                    "Type.Target for index and string mapping types",
-                ));
-            }
+            TypeKind::Index => Some(self.index_type(id)?.target),
+            TypeKind::StringMapping => Some(self.string_mapping(id)?.target),
             _ => return Ok(id),
         };
         target.ok_or(Error::MissingLink("Type.Target"))
@@ -872,6 +999,16 @@ impl TypeStore {
     pub(crate) fn tables(&self) -> TableView<'_> {
         TableView {
             records: &self.records,
+            mapped: &self.mapped,
+            reverse_mapped: &self.reverse_mapped,
+            evolving_arrays: &self.evolving_arrays,
+            instantiation_expressions: &self.instantiation_expressions,
+            indexes: &self.indexes,
+            indexed_accesses: &self.indexed_accesses,
+            string_mappings: &self.string_mappings,
+            substitutions: &self.substitutions,
+            conditionals: &self.conditionals,
+
             aliases: &self.aliases,
             intrinsics: &self.intrinsics,
             literals: &self.literals,
@@ -892,6 +1029,16 @@ impl TypeStore {
 #[cfg(any(test, feature = "storage-pilot"))]
 pub(crate) struct TableView<'a> {
     pub records: &'a Vec<TypeRecord>,
+    pub mapped: &'a Vec<MappedData>,
+    pub reverse_mapped: &'a Vec<ReverseMappedData>,
+    pub evolving_arrays: &'a Vec<EvolvingArrayData>,
+    pub instantiation_expressions: &'a Vec<InstantiationExpressionData>,
+    pub indexes: &'a Vec<IndexData>,
+    pub indexed_accesses: &'a Vec<IndexedAccessData>,
+    pub string_mappings: &'a Vec<StringMappingData>,
+    pub substitutions: &'a Vec<SubstitutionData>,
+    pub conditionals: &'a Vec<ConditionalData>,
+
     pub aliases: &'a Vec<TypeAlias>,
     pub intrinsics: &'a Vec<IntrinsicData>,
     pub literals: &'a Vec<LiteralData>,
@@ -909,6 +1056,14 @@ pub(crate) struct TableView<'a> {
 #[cfg(test)]
 mod store_tests {
     use super::*;
+
+    #[test]
+    fn type_record_is_three_words() {
+        assert_eq!(std::mem::size_of::<TypeRecord>(), 24);
+        for (index, kind) in TypeKind::ALL.iter().enumerate() {
+            assert_eq!(*kind as usize, index);
+        }
+    }
     use crate::type_flags;
 
     #[test]

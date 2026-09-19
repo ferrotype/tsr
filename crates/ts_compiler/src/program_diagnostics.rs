@@ -3,7 +3,7 @@
 use crate::{Error, Program};
 use std::{collections::BTreeMap, sync::OnceLock};
 use ts_arena::Error as AstError;
-use ts_ast::{Diagnostic, NodeId};
+use ts_ast::{Diagnostic, NodeId, SourceFileRead};
 use ts_jsstring::JsString;
 type LocationIndex<'a> = BTreeMap<(&'a [u8], i64, i64, i32), Vec<usize>>;
 
@@ -114,14 +114,15 @@ impl Snapshot {
         Ok(())
     }
 }
-fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
-    let state = if let Some(config) = program
+fn source_state(program: &Program, source: NodeId) -> Result<SourceFileRead<'_>, AstError> {
+    if let Some(config) = program
         .config()
         .config_file
-        .as_ref()
-        .filter(|config| config.root == source)
+        .iter()
+        .chain(&program.config().config_dependencies)
+        .find(|config| config.root == source)
     {
-        config.file.view().source_file(source)?
+        config.file.view().source_file(source)
     } else {
         let index = program
             .owners
@@ -131,8 +132,11 @@ fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), Ast
             .bound()
             .view()
             .ast()
-            .source_file(source)?
-    };
+            .source_file(source)
+    }
+}
+fn source_names(program: &Program, source: NodeId) -> Result<(&[u8], &[u8]), AstError> {
+    let state = source_state(program, source)?;
     Ok((state.file_name(), state.parse_options().path.as_bytes()))
 }
 
@@ -202,6 +206,43 @@ fn compact_and_merge_related_infos<'a>(
     result
 }
 impl Program {
+    /// Sort and merge an already-produced diagnostic set without running queries.
+    /// File IDs remain checked against this program, including related records.
+    /// port: tsc/internal/compiler/program.go:SortAndDeduplicateDiagnostics
+    pub fn sort_and_deduplicate_diagnostics(
+        &self,
+        diagnostics: &[Diagnostic],
+    ) -> Result<Vec<Diagnostic>, Error> {
+        let file_name = |id| source_names(self, id).map(|(name, _)| name);
+        validate_owners(diagnostics, &file_name)?;
+        let mut sorted = diagnostics.to_vec();
+        ts_core::sort_like_go(&mut sorted, &mut |a, b| {
+            ts_ast::compare_diagnostics(a, b, &file_name).expect("validated diagnostic owners")
+        });
+        Ok(compact_and_merge_related_infos(sorted, &file_name))
+    }
+    /// Unnecessary-code reports on content-mapped files survive only when their
+    /// span maps back to original text; that span translation is not ported.
+    /// port: tsc/internal/compiler/program.go:filterAndSortDiagnostics
+    pub(crate) fn filter_and_sort_diagnostics(
+        &self,
+        diagnostics: &[Diagnostic],
+    ) -> Result<Vec<Diagnostic>, Error> {
+        for diagnostic in diagnostics {
+            let Some(file) = diagnostic.file else {
+                continue;
+            };
+            if diagnostic.reports_unnecessary
+                && diagnostic.source.is_empty()
+                && source_state(self, file)?.span_map().is_some()
+            {
+                return Err(Error::Unsupported(
+                    "filterAndSortDiagnostics content-map span fidelity",
+                ));
+            }
+        }
+        self.sort_and_deduplicate_diagnostics(diagnostics)
+    }
     /// Source Program.GetProgramDiagnostics: direct verifier diagnostics plus
     /// only the include processor's global diagnostics. Checker work is absent.
     /// port: tsc/internal/compiler/program.go:Program.GetProgramDiagnostics
@@ -234,6 +275,28 @@ mod tests {
     use serde_json::{json, Value};
     use std::sync::Arc;
     use ts_core::TextRange;
+    fn program() -> Program {
+        let mut files = ts_vfs::MemoryBuilder::new(b"/", true);
+        files.insert_loaded(b"/file.ts", b"let value = 1;".as_slice());
+        Program::load(
+            crate::ProgramOptions {
+                config: ts_tsoptions::ParsedCommandLine::new(
+                    ts_core::CompilerOptions {
+                        no_lib: ts_core::Tristate::TRUE,
+                        ..Default::default()
+                    },
+                    vec![JsString::from_bytes(b"/file.ts".as_slice())],
+                ),
+                host: Arc::new(files.finish()),
+                current_directory: JsString::from_bytes(b"/".as_slice()),
+                default_library_path: JsString::from_bytes(b"/missing".as_slice()),
+                skip_module_resolution: true,
+            },
+            &mut crate::FileCache::new(),
+            &ts_arena::Counters::new(),
+        )
+        .unwrap()
+    }
     fn observe(diagnostic: &Diagnostic) -> Value {
         use std::fmt::Write;
         let arguments: Vec<_> = diagnostic
@@ -260,10 +323,10 @@ mod tests {
         ))
         .unwrap();
         assert_eq!(requests.len(), expected.len());
-        let name = |_| Err::<&[u8], _>(AstError::WrongOwner);
+        let program = program();
         for (request, expected) in requests.iter().zip(expected) {
             assert_eq!(request["id"], expected["id"]);
-            let mut diagnostics: Vec<_> = request["diagnostics"].as_array().unwrap().iter().map(|recipe| {
+            let diagnostics: Vec<_> = request["diagnostics"].as_array().unwrap().iter().map(|recipe| {
                 let mut diagnostic = Diagnostic::compiler(ts_diagnostics::File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files,vec![JsString::from_bytes(b"same".as_slice()),JsString::from_bytes(b"root".as_slice())]);
                 let external = |code| Arc::new(Diagnostic::external(None,TextRange::new(-1,-1),JsString::default(),1,code,JsString::from_bytes(b"x".as_slice())));
                 let chain = i32::try_from(recipe["Chain"].as_i64().unwrap()).unwrap();
@@ -271,10 +334,9 @@ mod tests {
                 diagnostic.related_information = recipe["Related"].as_array().unwrap().iter().map(|value|external(8000+i32::try_from(value.as_i64().unwrap()).unwrap())).collect();
                 diagnostic
             }).collect();
-            ts_core::sort_like_go(&mut diagnostics, &mut |a, b| {
-                ts_ast::compare_diagnostics(a, b, &name).unwrap()
-            });
-            let diagnostics = compact_and_merge_related_infos(diagnostics, &name);
+            let diagnostics = program
+                .sort_and_deduplicate_diagnostics(&diagnostics)
+                .unwrap();
             assert_eq!(
                 json!({"id":request["id"],"diagnostics":diagnostics.iter().map(observe).collect::<Vec<_>>()}),
                 expected,
@@ -282,5 +344,32 @@ mod tests {
                 request["id"]
             );
         }
+    }
+
+    #[test]
+    fn public_aggregation_rejects_foreign_related_file_before_sorting() {
+        let first = program();
+        let second = program();
+        let diagnostic = Diagnostic::external(
+            Some(second.files()[0].source()),
+            TextRange::new(0, 1),
+            JsString::default(),
+            1,
+            9999,
+            JsString::from_bytes(b"message".as_slice()),
+        );
+        assert!(first
+            .sort_and_deduplicate_diagnostics(std::slice::from_ref(&diagnostic))
+            .is_err());
+        let mut parent = Diagnostic::external(
+            None,
+            TextRange::new(-1, -1),
+            JsString::default(),
+            1,
+            9999,
+            JsString::default(),
+        );
+        parent.related_information.push(Arc::new(diagnostic));
+        assert!(first.sort_and_deduplicate_diagnostics(&[parent]).is_err());
     }
 }

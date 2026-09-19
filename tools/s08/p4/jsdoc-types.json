@@ -1,0 +1,297 @@
+{
+  "version": 1,
+  "scope": "S08 P4 reparsed JavaScript annotation types and TypeScript JSDoc grammar; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "js-string",
+      "files": {
+        "/case.js": "/** @type {String} */ let value = \"x\";\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-number",
+      "files": {
+        "/case.js": "/** @type {Number} */ let value = 1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-boolean",
+      "files": {
+        "/case.js": "/** @type {Boolean} */ let value = true;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-nullable",
+      "files": {
+        "/case.js": "/** @type {?number} */ let value = null;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-star",
+      "files": {
+        "/case.js": "/** @type {*} */ let value = 1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-generic-primitive",
+      "files": {
+        "/case.js": "/** @type {String<number>} */ let value = \"x\";\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-record",
+      "files": {
+        "/case.js": "/** @type {Object<string, number>} */ let value = {};\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-nonnullable",
+      "files": {
+        "/case.js": "/** @type {!number} */ let value = 1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-empty-array",
+      "files": {
+        "/case.js": "const value = [];\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "js-type-mismatch",
+      "files": {
+        "/case.js": "/** @type {Number} */ let value = \"x\";\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "ts-prefix-null",
+      "files": {
+        "/case.ts": "type T=?number; const value=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "ts-suffix-null",
+      "files": {
+        "/case.ts": "type T=number?; const value=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "ts-nonnull",
+      "files": {
+        "/case.ts": "type T=!number; const value=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "ts-star",
+      "files": {
+        "/case.ts": "type T=*; const value=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "declaration": "value",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

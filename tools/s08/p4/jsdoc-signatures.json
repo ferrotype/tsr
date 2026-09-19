@@ -1,0 +1,248 @@
+{
+  "version": 1,
+  "scope": "S08 P4 JavaScript function signatures, reparsed JSDoc and module return inference",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "programs": [
+    {
+      "id": "jsdoc-module",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @param {string} value @returns {number} */ export function length(value) { return value.length; }",
+        "/main.ts": "import { length } from \"./jsdoc.js\";type A=ReturnType<typeof length>;type B=typeof length;const value=length(\"a\");"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        },
+        {
+          "id": "B",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "B",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-return-error",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @param {string} value @returns {string} */ export function f(value){return value.length;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-full-signature",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @type {(value:string)=>number} */ export function f(value){return value.length;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;const a=f(\"s\");const b=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-full-arity",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @type {(value:string)=>number} */ export function f(value, extra){return value.length;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-generic",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @template T @param {T} value @returns {T} */ export function f(value){return value;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";const a=f(\"x\");type A=typeof f;type B=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        },
+        {
+          "id": "B",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "B",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-optional",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @param {string=} value */ export function f(value){return value===undefined?0:value.length;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;const a=f();"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-rest",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @param {...number} values */ export function f(...values){return values[0];}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;const a=f(1,2);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "jsdoc-missing-param",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "/** @param {string} missing @returns {number} */ export function f(value){return 1;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    },
+    {
+      "id": "js-untyped",
+      "files": {
+        "/globals.d.ts": "interface String{length:number;}interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}type ReturnType<T extends (...args:any)=>any>=T extends (...args:any)=>infer R?R:any;",
+        "/jsdoc.js": "export function f(a,b){return a;}",
+        "/main.ts": "import {f} from \"./jsdoc.js\";type A=typeof f;const a=f();const b=f(1);"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "operation": "declared_type",
+          "file": "/main.ts",
+          "declaration": "A",
+          "target": "name"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

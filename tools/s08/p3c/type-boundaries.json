@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "scope": "P3 tuple and mapped-type boundaries, circular diagnostics, predicate and generic constraint errors",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true
+  },
+  "programs": [
+    {
+      "id": "mapped-any",
+      "files": {
+        "/mapped-any.ts": "type M<T> = { [K in keyof T]: T[K] }; type A = M<any>; type B = M<unknown>; type C = M<never>;\n"
+      },
+      "roots": [
+        "/mapped-any.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-any.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "B",
+          "file": "/mapped-any.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "C",
+          "file": "/mapped-any.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mapped-any-array",
+      "files": {
+        "/mapped-any-array.ts": "type M<T extends readonly unknown[]> = { [K in keyof T]: T[K] }; type A = M<any>; type B = M<readonly [string, number]>;\n"
+      },
+      "roots": [
+        "/mapped-any-array.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-any-array.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "B",
+          "file": "/mapped-any-array.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "known-tuple-keys",
+      "files": {
+        "/known-tuple-keys.ts": "type Keys<T extends unknown[]> = keyof [string, ...T]; type Has<T extends unknown[]> = \"0\" extends keyof [string, ...T] ? true : false; type A = Keys<[number]>; type B = Has<[]>; type C = Has<[number, boolean]>;\n"
+      },
+      "roots": [
+        "/known-tuple-keys.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/known-tuple-keys.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "B",
+          "file": "/known-tuple-keys.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "C",
+          "file": "/known-tuple-keys.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mapped-renamed-keys",
+      "files": {
+        "/mapped-renamed-keys.ts": "type M<T extends { a: string }> = { [K in keyof T as `get${Capitalize<K & string>}`]: T[K] }; type Check<T extends { a: string }> = \"getA\" extends keyof M<T> ? true : false; type A = Check<{a: string}>; type B = keyof M<{a: string, b: number}>;\n"
+      },
+      "roots": [
+        "/mapped-renamed-keys.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-renamed-keys.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        },
+        {
+          "id": "B",
+          "file": "/mapped-renamed-keys.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mapped-circular",
+      "files": {
+        "/mapped-circular.ts": "type M<T> = { [K in keyof T]: M<T>[K] }; type A = M<{a: string}>[\"a\"];\n"
+      },
+      "roots": [
+        "/mapped-circular.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-circular.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "circular-tuple-args",
+      "files": {
+        "/circular-tuple-args.ts": "type A = [A[0]];\n"
+      },
+      "roots": [
+        "/circular-tuple-args.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/circular-tuple-args.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mapped-members-grammar",
+      "files": {
+        "/mapped-members-grammar.ts": "type A = { [K in \"a\"]: string; other: number };\n"
+      },
+      "roots": [
+        "/mapped-members-grammar.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-members-grammar.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "mapped-implicit-any",
+      "files": {
+        "/mapped-implicit-any.ts": "type A = { [K in \"a\"] };\n"
+      },
+      "roots": [
+        "/mapped-implicit-any.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/mapped-implicit-any.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "predicate-error",
+      "files": {
+        "/predicate-error.ts": "type A = (x: string) => x is number;\n"
+      },
+      "roots": [
+        "/predicate-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/predicate-error.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "constraint-error",
+      "files": {
+        "/constraint-error.ts": "type Box<T extends { a: string }> = T; type A = Box<{ a: number }>; type B<T extends { a: string } = { a: number }> = T;\n"
+      },
+      "roots": [
+        "/constraint-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/constraint-error.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-size-limit",
+      "files": {
+        "/tuple-size-limit.ts": "type T0 = [1];\ntype T1 = [...T0, ...T0];\ntype T2 = [...T1, ...T1];\ntype T3 = [...T2, ...T2];\ntype T4 = [...T3, ...T3];\ntype T5 = [...T4, ...T4];\ntype T6 = [...T5, ...T5];\ntype T7 = [...T6, ...T6];\ntype T8 = [...T7, ...T7];\ntype T9 = [...T8, ...T8];\ntype T10 = [...T9, ...T9];\ntype T11 = [...T10, ...T10];\ntype T12 = [...T11, ...T11];\ntype T13 = [...T12, ...T12];\ntype T14 = [...T13, ...T13];\ntype A = T14;\n\ntype Safe = number;\n"
+      },
+      "roots": [
+        "/tuple-size-limit.ts"
+      ],
+      "queries": [
+        {
+          "id": "Safe",
+          "file": "/tuple-size-limit.ts",
+          "declaration": "Safe",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

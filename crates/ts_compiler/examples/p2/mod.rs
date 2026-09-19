@@ -86,7 +86,10 @@ pub fn panic_error(payload: &(dyn std::any::Any + Send)) -> Error {
 pub fn failure(error: &Error, operation: &str) -> Value {
     let unsupported = match error {
         Error::Checker(ts_checker::Error::Unsupported(name))
-        | Error::Compiler(ts_compiler::Error::Unsupported(name))
+        | Error::Compiler(
+            ts_compiler::Error::Checker(ts_checker::Error::Unsupported(name))
+            | ts_compiler::Error::Unsupported(name),
+        )
         | Error::Unsupported(name) => Some(*name),
         _ => None,
     };
@@ -129,6 +132,54 @@ pub fn load(
     cache: &mut FileCache,
     counters: &Counters,
 ) -> Result<Arc<Program>> {
+    load_with_libraries(
+        files,
+        roots,
+        cache,
+        counters,
+        false,
+        FixtureOptions::default(),
+    )
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct FixtureOptions {
+    unchecked: bool,
+    isolated: bool,
+    verbatim: bool,
+    unreachable: Option<bool>,
+    allow_js: bool,
+    check_js: bool,
+    implicit_override: bool,
+    synthetic_defaults: Option<bool>,
+    module_interop: Option<bool>,
+    resolve_json: Option<bool>,
+    declaration: bool,
+    isolated_declarations: bool,
+    strip_internal: bool,
+    target: Option<ScriptTarget>,
+    module: Option<ModuleKind>,
+    use_define: Option<bool>,
+    import_helpers: Option<bool>,
+    no_emit: Option<bool>,
+}
+
+fn tristate(value: Option<bool>) -> Tristate {
+    match value {
+        Some(true) => Tristate::TRUE,
+        Some(false) => Tristate::FALSE,
+        None => Tristate::UNKNOWN,
+    }
+}
+
+pub fn load_with_libraries(
+    files: &Value,
+    roots: &Value,
+    cache: &mut FileCache,
+    counters: &Counters,
+    libraries: bool,
+    overrides: FixtureOptions,
+) -> Result<Arc<Program>> {
     let mut fs = ts_vfs::MemoryBuilder::new(b"/", true);
     for (name, source) in files
         .as_object()
@@ -137,10 +188,75 @@ pub fn load(
         fs.insert_loaded(name.as_bytes(), text(source)?.as_bytes());
     }
     let options = CompilerOptions {
-        target: ScriptTarget::ESNEXT,
-        module: ModuleKind::ESNEXT,
+        allow_synthetic_default_imports: tristate(overrides.synthetic_defaults),
+        es_module_interop: tristate(overrides.module_interop),
+        resolve_json_module: tristate(overrides.resolve_json),
+        declaration: if overrides.declaration {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        isolated_declarations: if overrides.isolated_declarations {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        strip_internal: if overrides.strip_internal {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        use_define_for_class_fields: tristate(overrides.use_define),
+        import_helpers: tristate(overrides.import_helpers),
+        no_emit: tristate(overrides.no_emit),
+        target: overrides.target.unwrap_or(ScriptTarget::ESNEXT),
+        module: overrides.module.unwrap_or(ModuleKind::ESNEXT),
         strict: Tristate::TRUE,
-        no_lib: Tristate::TRUE,
+        allow_js: if overrides.allow_js {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        no_implicit_override: if overrides.implicit_override {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        check_js: if overrides.check_js {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        allow_unreachable_code: match overrides.unreachable {
+            Some(true) => Tristate::TRUE,
+            Some(false) => Tristate::FALSE,
+            None => Tristate::UNKNOWN,
+        },
+        no_unchecked_indexed_access: if overrides.unchecked {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        isolated_modules: if overrides.isolated {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        verbatim_module_syntax: if overrides.verbatim {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
+        no_lib: if libraries {
+            Tristate::FALSE
+        } else {
+            Tristate::TRUE
+        },
+        skip_lib_check: if libraries {
+            Tristate::TRUE
+        } else {
+            Tristate::UNKNOWN
+        },
         ..Default::default()
     };
     let config = ts_tsoptions::ParsedCommandLine::new(
@@ -150,12 +266,21 @@ pub fn load(
             .map(|name| Ok(JsString::from_bytes(text(name)?.as_bytes())))
             .collect::<Result<Vec<_>>>()?,
     );
+    let host: Arc<dyn ts_vfs::FileSystem> = if libraries {
+        Arc::new(ts_bundled::BundledFs::new(Arc::new(fs.finish())))
+    } else {
+        Arc::new(fs.finish())
+    };
     Ok(Arc::new(Program::load(
         ProgramOptions {
             config,
-            host: Arc::new(fs.finish()),
+            host,
             current_directory: JsString::from_bytes(b"/".as_slice()),
-            default_library_path: JsString::from_bytes(b"/no-default-lib".as_slice()),
+            default_library_path: JsString::from_bytes(if libraries {
+                ts_bundled::LIB_PATH
+            } else {
+                b"/no-default-lib"
+            }),
             skip_module_resolution: false,
         },
         cache,
@@ -181,26 +306,138 @@ pub fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     }
     let raw = std::fs::read(&args[1])?;
     let spec: Value = serde_json::from_slice(&raw)?;
-    let mut canonical = serde_json::to_vec(&spec)?;
+    // Match the native producer's ensure_ascii=True wire representation.
+    // Serde's default formatter leaves non-ASCII text unescaped.
+    let mut canonical = canonical_ascii_request(&spec)?;
     canonical.push(b'\n');
     // A canonical wire request rejects duplicate keys as well as trailing data;
     // the checked Python producer supplies this exact representation.
     if raw != canonical {
         return Err("P2 requires the canonical native request bytes".into());
     }
+    let mut selected_options = spec["options"].clone();
+    let target = match text(&spec["options"]["target"])? {
+        "ES5" => ScriptTarget::ES5,
+        "ES2015" => ScriptTarget::ES2015,
+        "ES2016" => ScriptTarget::ES2016,
+        "ES2017" => ScriptTarget::ES2017,
+        "ES2018" => ScriptTarget::ES2018,
+        "ES2019" => ScriptTarget::ES2019,
+        "ES2020" => ScriptTarget::ES2020,
+        "ES2021" => ScriptTarget::ES2021,
+        "ES2022" => ScriptTarget::ES2022,
+        "ES2023" => ScriptTarget::ES2023,
+        "ES2024" => ScriptTarget::ES2024,
+        "ES2025" => ScriptTarget::ES2025,
+        "ESNext" => ScriptTarget::ESNEXT,
+        _ => return Err("unknown target".into()),
+    };
+    let module = match text(&spec["options"]["module"])? {
+        "None" => ModuleKind::NONE,
+        "CommonJS" => ModuleKind::COMMON_JS,
+        "AMD" => ModuleKind::AMD,
+        "UMD" => ModuleKind::UMD,
+        "System" => ModuleKind::SYSTEM,
+        "ES2015" => ModuleKind::ES2015,
+        "ES2020" => ModuleKind::ES2020,
+        "ES2022" => ModuleKind::ES2022,
+        "ESNext" => ModuleKind::ESNEXT,
+        "Node16" => ModuleKind::NODE16,
+        "Node18" => ModuleKind::NODE18,
+        "Node20" => ModuleKind::NODE20,
+        "NodeNext" => ModuleKind::NODE_NEXT,
+        "Preserve" => ModuleKind::PRESERVE,
+        _ => return Err("unknown module format".into()),
+    };
+    selected_options["target"] = json!("ESNext");
+    selected_options["module"] = json!("ESNext");
+    let mut option = |name: &str| -> std::result::Result<bool, Box<dyn std::error::Error>> {
+        match selected_options
+            .as_object_mut()
+            .and_then(|options| options.remove(name))
+        {
+            Some(value) => value
+                .as_bool()
+                .ok_or_else(|| format!("{name} must be boolean").into()),
+            None => Ok(false),
+        }
+    };
+    let overrides = FixtureOptions {
+        target: Some(target),
+        module: Some(module),
+        use_define: spec["options"]
+            .get("useDefineForClassFields")
+            .map(|_| option("useDefineForClassFields"))
+            .transpose()?,
+        import_helpers: spec["options"]
+            .get("importHelpers")
+            .map(|_| option("importHelpers"))
+            .transpose()?,
+        no_emit: spec["options"]
+            .get("noEmit")
+            .map(|_| option("noEmit"))
+            .transpose()?,
+        declaration: option("declaration")?,
+        isolated_declarations: option("isolatedDeclarations")?,
+        strip_internal: option("stripInternal")?,
+        unchecked: option("noUncheckedIndexedAccess")?,
+        isolated: option("isolatedModules")?,
+        verbatim: option("verbatimModuleSyntax")?,
+        allow_js: option("allowJs")?,
+        check_js: option("checkJs")?,
+        implicit_override: option("noImplicitOverride")?,
+        synthetic_defaults: spec["options"]
+            .get("allowSyntheticDefaultImports")
+            .map(|_| option("allowSyntheticDefaultImports"))
+            .transpose()?,
+        module_interop: spec["options"]
+            .get("esModuleInterop")
+            .map(|_| option("esModuleInterop"))
+            .transpose()?,
+        resolve_json: spec["options"]
+            .get("resolveJsonModule")
+            .map(|_| option("resolveJsonModule"))
+            .transpose()?,
+        unreachable: match selected_options
+            .as_object_mut()
+            .and_then(|options| options.remove("allowUnreachableCode"))
+        {
+            Some(value) => Some(
+                value
+                    .as_bool()
+                    .ok_or("allowUnreachableCode must be boolean")?,
+            ),
+            None => None,
+        },
+    };
     if spec["version"] != 1
-        || spec["options"]
+        || (selected_options
             != json!({"target":"ESNext","module":"ESNext","strict":true,"noLib":true})
+            && selected_options
+                != json!({"target":"ESNext","module":"ESNext","strict":true,"noLib":false,"skipLibCheck":true}))
     {
         return Err("unsupported P2 protocol/options".into());
     }
+    let program_diagnostics = match spec.get("diagnostic_mode") {
+        None => false,
+        Some(Value::String(mode)) if mode == "checker" => false,
+        Some(Value::String(mode)) if mode == "program" => true,
+        _ => return Err("invalid diagnostic mode".into()),
+    };
     let counters = Counters::new();
     let generation = Generation::new(&counters);
     let mut programs = Vec::new();
     let mut ownership = Vec::new();
     for request in array(&spec["programs"])? {
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            queries::program(request, &generation, &counters)
+            queries::program(
+                request,
+                &generation,
+                &counters,
+                spec["options"]["noLib"] == false,
+                overrides,
+                program_diagnostics,
+            )
         }))
         .map_err(|payload| panic_error(payload.as_ref()))
         .and_then(|value| value);
@@ -243,4 +480,21 @@ pub fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     bytes.push(b'\n');
     std::fs::write(&args[2], bytes)?;
     Ok(())
+}
+
+fn canonical_ascii_request(value: &Value) -> serde_json::Result<Vec<u8>> {
+    let serialized = serde_json::to_string(value)?;
+    let mut bytes = Vec::with_capacity(serialized.len());
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    for unit in serialized.encode_utf16() {
+        if unit < 0x7f {
+            bytes.push(unit as u8);
+        } else {
+            bytes.extend_from_slice(b"\\u");
+            for shift in [12, 8, 4, 0] {
+                bytes.push(HEX[usize::from((unit >> shift) & 15)]);
+            }
+        }
+    }
+    Ok(bytes)
 }

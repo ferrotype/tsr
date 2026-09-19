@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "private-member-write-access-kinds",
+      "no_unused_locals": true,
+      "files": {
+        "/main.ts": "export class C {\n    private coalesce: number | undefined;\n    private either: number | undefined;\n    private both: number | undefined;\n    private asserted: number | undefined;\n    private spread: number[] = [];\n    private rest: object = {};\n    private indexed: number | undefined;\n    private plain: number | undefined;\n    private compound = 0;\n    m() {\n        this.coalesce ??= 1;\n        this.either ||= 1;\n        this.both &&= 1;\n        this.asserted! = 1;\n        [...this.spread] = [1];\n        ({ ...this.rest } = {});\n        this[\"indexed\"] ??= 1;\n        this.plain = 1;\n        this.compound += 1;\n    }\n}\n"
+      },
+      "roots": ["/main.ts"]
+    },
+    {
+      "id": "private-setter-accessibility",
+      "no_unused_locals": false,
+      "files": {
+        "/main.ts": "class A {\n    get x(): number { return 1; }\n    private set x(v: number) {}\n}\ndeclare const a: A;\na.x! = 1;\na.x = 1;\n(a.x) = 1;\n"
+      },
+      "roots": ["/main.ts"]
+    },
+    {
+      "id": "accessor-write-type",
+      "no_unused_locals": false,
+      "files": {
+        "/main.ts": "declare const o: { get x(): string; set x(v: string | number) };\no.x! = 1;\no.x = 1;\n(o.x) = 1;\n"
+      },
+      "roots": ["/main.ts"]
+    }
+  ]
+}

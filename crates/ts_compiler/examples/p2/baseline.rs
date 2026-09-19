@@ -84,15 +84,13 @@ fn remove_prefixes(text: &str) -> String {
     value
 }
 fn lines(text: &str) -> Result<(Vec<&str>, Vec<usize>)> {
-    if !text.is_ascii()
+    if text.chars().any(|ch| matches!(ch, '\u{2028}' | '\u{2029}'))
         || text.bytes().enumerate().any(|(i, b)| {
             (b == b'\r' && text.as_bytes().get(i + 1) != Some(&b'\n'))
                 || (b < 32 && !matches!(b, b'\n' | b'\r' | b'\t'))
         })
     {
-        return Err(Error::Unsupported(
-            "baseline non-ASCII or unsupported line delimiter",
-        ));
+        return Err(Error::Unsupported("baseline unsupported line delimiter"));
     }
     let mut starts = vec![0];
     for (i, b) in text.bytes().enumerate() {
@@ -114,12 +112,12 @@ fn append_line(output: &mut String, first: &mut bool, line: &str) {
     *first = false;
     output.push_str(line);
 }
-fn error_text(output: &mut String, first: &mut bool, d: &Diagnostic) -> Result<()> {
-    if !d.related_information.is_empty() {
-        return Err(Error::Unsupported(
-            "baseline related-information decoration",
-        ));
-    }
+fn error_text(
+    program: &Program,
+    output: &mut String,
+    first: &mut bool,
+    d: &Diagnostic,
+) -> Result<()> {
     for line in remove_prefixes(&flattened(d, 0)?).split('\n') {
         let line = line.strip_suffix('\r').unwrap_or(line);
         if !line.is_empty() {
@@ -129,6 +127,44 @@ fn error_text(output: &mut String, first: &mut bool, d: &Diagnostic) -> Result<(
                 &format!("!!! {} TS{}: {}", category(d)?, d.code, line),
             );
         }
+    }
+    for related in &d.related_information {
+        let location = if let Some(id) = related.file {
+            let source = source(program, id)?.view().source_file()?;
+            let text = utf8(source.text().as_bytes())?;
+            let (_, starts) = lines(text)?;
+            let pos = usize::try_from(related.loc.pos())
+                .map_err(|_| Error::Unsupported("baseline negative related position"))?;
+            if pos > text.len() || !text.is_char_boundary(pos) {
+                return Err(Error::Unsupported(
+                    "baseline related position outside source boundary",
+                ));
+            }
+            let line = starts.partition_point(|&p| p <= pos) - 1;
+            let file = utf8(file_name(program, id)?)?;
+            if file.starts_with("bundled:///libs/") {
+                format!(" {}:--:--", remove_prefixes(file))
+            } else {
+                format!(
+                    " {}:{}:{}",
+                    remove_prefixes(file),
+                    line + 1,
+                    text[starts[line]..pos].encode_utf16().count() + 1
+                )
+            }
+        } else {
+            String::new()
+        };
+        append_line(
+            output,
+            first,
+            &format!(
+                "!!! related TS{}{}: {}",
+                related.code,
+                location,
+                flattened(related, 0)?
+            ),
+        );
     }
     Ok(())
 }
@@ -142,11 +178,6 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
     }
     let mut top = String::new();
     for d in diagnostics {
-        if !d.related_information.is_empty() {
-            return Err(Error::Unsupported(
-                "baseline related-information decoration",
-            ));
-        }
         if let Some(id) = d.file {
             let source = source(program, id)?.view().source_file()?;
             let text = utf8(source.text().as_bytes())?;
@@ -157,11 +188,16 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
                 return Err(Error::Protocol("diagnostic position outside source".into()));
             }
             let line = starts.partition_point(|&p| p <= pos) - 1;
+            if !text.is_char_boundary(pos) {
+                return Err(Error::Unsupported(
+                    "baseline diagnostic bisects a UTF-8 code point",
+                ));
+            }
             top.push_str(&format!(
                 "{}({},{}): ",
                 utf8(file_name(program, id)?)?,
                 line + 1,
-                pos - starts[line] + 1
+                text[starts[line]..pos].encode_utf16().count() + 1
             ));
         }
         let prefix = if d.source.is_empty() {
@@ -185,19 +221,17 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
     let mut first = true;
     let mut reported = 0;
     for d in diagnostics.iter().filter(|d| d.file.is_none()) {
-        error_text(&mut decorated, &mut first, d)?;
+        error_text(program, &mut decorated, &mut first, d)?;
         reported += 1;
     }
     let mut names = std::collections::HashSet::new();
     for file in program.files() {
         let source = file.bound().view().source_file()?;
         let name = utf8(source.parse_options().file_name.as_bytes())?;
+        // The native adapter passes every Program.SourceFile, including loaded
+        // libraries, to GetErrorBaseline. Prefix removal happens when printed.
         let lower = name.to_ascii_lowercase();
         if !names.insert(lower.clone())
-            || lower
-                .rsplit('/')
-                .next()
-                .is_some_and(|s| s.starts_with("lib.") && s.ends_with(".d.ts"))
             || (lower.contains("tsconfig") && lower.contains("json"))
             || !source.content_mapper().is_empty()
         {
@@ -242,6 +276,13 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
                     let squiggle_end = (squiggle_start + length)
                         .min(line.len())
                         .max(squiggle_start);
+                    if !line.is_char_boundary(squiggle_start)
+                        || !line.is_char_boundary(squiggle_end)
+                    {
+                        return Err(Error::Unsupported(
+                            "baseline diagnostic bisects a UTF-8 code point",
+                        ));
+                    }
                     let prefix: String = line[..squiggle_start]
                         .chars()
                         .map(|c| if c == '\t' || c == ' ' { c } else { ' ' })
@@ -252,11 +293,11 @@ pub fn render(program: &Program, diagnostics: &[Diagnostic]) -> Result<Value> {
                         &format!(
                             "    {}{}",
                             prefix,
-                            "~".repeat(squiggle_end - squiggle_start)
+                            "~".repeat(line[squiggle_start..squiggle_end].chars().count())
                         ),
                     );
                     if index == lines.len() - 1 || next > end {
-                        error_text(&mut decorated, &mut first, d)?;
+                        error_text(program, &mut decorated, &mut first, d)?;
                         marked += 1;
                         reported += 1;
                     }

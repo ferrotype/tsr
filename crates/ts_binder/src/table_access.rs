@@ -50,7 +50,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         match &mut self.builder {
             Backend::Local(local) => BindingTable::Local(local.new_table()),
             Backend::Checked(builder) => {
-                BindingTable::Checked(builder.tables_mut().alloc(SymbolTable::new()))
+                BindingTable::Checked(builder.tables_mut().alloc(SymbolTable::default()))
             }
         }
     }

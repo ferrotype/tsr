@@ -230,12 +230,16 @@ impl CheckerState {
             return Ok(true);
         }
         if flags & type_flags::STRING_MAPPING != 0 {
-            return Err(Error::Unsupported("StringMappingType"));
+            return self.is_pattern_literal_placeholder_type(self.types.target(t)?);
         }
         Ok(false)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isGenericIndexType
+    pub(crate) fn is_generic_type(&mut self, t: TypeId) -> Result<bool, Error> {
+        Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_TYPE != 0)
+    }
+
     pub(crate) fn is_generic_index_type(&mut self, t: TypeId) -> Result<bool, Error> {
         Ok(self.get_generic_object_flags(t)? & object_flags::IS_GENERIC_INDEX_TYPE != 0)
     }
@@ -254,7 +258,9 @@ impl CheckerState {
                         combined_flags |= self.get_generic_object_flags(u)?;
                     }
                 } else {
-                    return Err(Error::Unsupported("SubstitutionType"));
+                    let data = *self.types.substitution(t)?;
+                    combined_flags = self.get_generic_object_flags(data.base)?
+                        | self.get_generic_object_flags(data.constraint)?;
                 }
                 self.types.get_mut(t)?.object_flags |=
                     object_flags::IS_GENERIC_TYPE_COMPUTED | combined_flags;
@@ -273,15 +279,6 @@ impl CheckerState {
             combined_flags |= object_flags::IS_GENERIC_INDEX_TYPE;
         }
         Ok(combined_flags)
-    }
-
-    /// Mapped types arrive in P3; a non-mapped type is never a generic mapped type.
-    // port: tsc/internal/checker/checker.go:Checker.isGenericMappedType
-    pub(crate) fn is_generic_mapped_type(&self, t: TypeId) -> Result<bool, Error> {
-        if self.types.object_flags(t)? & object_flags::MAPPED != 0 {
-            return Err(Error::Unsupported("isGenericMappedType"));
-        }
-        Ok(false)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isGenericTupleType

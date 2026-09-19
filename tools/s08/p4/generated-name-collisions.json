@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native generated-name-collisions helper and deferred collision semantics",
+  "options": {
+    "target": "ES2021",
+    "module": "CommonJS",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "require-variable",
+      "files": {
+        "/main.ts": "export {};var require=1;\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "exports-variable",
+      "files": {
+        "/main.ts": "export {};var exports=1;\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-function",
+      "files": {
+        "/main.ts": "export {};function Object(){}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-class",
+      "files": {
+        "/main.ts": "class Object{}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-namespace",
+      "files": {
+        "/main.ts": "namespace WeakMap{export const x=1;}class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "weakmap-type-namespace",
+      "files": {
+        "/main.ts": "namespace WeakMap{export interface X{}}class C{#x=1;}\ntype Query=number;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Query",
+          "file": "/main.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

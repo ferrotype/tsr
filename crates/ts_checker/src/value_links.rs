@@ -12,6 +12,7 @@ pub struct ValueSymbolLinks {
     pub resolved_type: Option<TypeId>,
     pub write_type: Option<TypeId>,
     pub target: Option<SymbolId>,
+    pub mapper: Option<crate::MapperId>,
     pub name_type: Option<TypeId>,
     /// Mapped type for mapped type property, containing union or intersection
     /// type for synthetic property.

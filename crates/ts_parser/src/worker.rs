@@ -1,9 +1,12 @@
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 use std::{cell::Cell, panic::resume_unwind, thread};
 
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 thread_local! { static ON_PARSER_WORKER: Cell<bool> = const { Cell::new(false) }; }
 
 /// Start one reserved-stack worker for a scoped batch. Parser and binder entry
 /// points invoked by this worker run inline for the lifetime of the batch.
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 pub fn spawn_parser_worker<'scope, 'env, T: Send + 'scope>(
     scope: &'scope thread::Scope<'scope, 'env>,
     operation: impl FnOnce() -> T + Send + 'scope,
@@ -24,6 +27,7 @@ pub fn spawn_parser_worker<'scope, 'env, T: Send + 'scope>(
 ///
 /// Nested parser operations run inline, so they cannot enqueue work behind a
 /// transaction held by their own worker. Unwinds retain their original payload.
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 pub fn on_parser_worker<T: Send>(operation: impl FnOnce() -> T + Send) -> T {
     if ON_PARSER_WORKER.get() {
         return operation();
@@ -38,7 +42,17 @@ pub fn on_parser_worker<T: Send>(operation: impl FnOnce() -> T + Send) -> T {
     })
 }
 
-#[cfg(test)]
+/// A bare wasm instance has no native thread service. The embedding host owns
+/// its stack configuration and must discard the instance after a trap. Reserve
+/// one linear-memory stack segment for the complete call: without this scope,
+/// stacker cannot discover an initial wasm stack limit and each outer grammar
+/// guard would allocate its own segment. Nested guards still grow when needed.
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+pub fn on_parser_worker<T: Send>(operation: impl FnOnce() -> T + Send) -> T {
+    stacker::maybe_grow(crate::STACK_RED_ZONE, crate::STACK_SEGMENT, operation)
+}
+
+#[cfg(all(test, not(all(target_arch = "wasm32", target_os = "unknown"))))]
 mod tests {
     use super::on_parser_worker;
     use std::{

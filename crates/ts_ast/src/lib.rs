@@ -16,6 +16,7 @@ mod symbol_access;
 pub mod symbol_flags;
 mod symbol_store;
 mod symbol_tables;
+pub use symbol_tables::name_hash;
 mod symbols;
 pub use flow::*;
 pub use symbol_access::{SymbolAccess, SymbolRef};
@@ -64,6 +65,7 @@ mod source_metadata;
 mod storage;
 mod subtree_facts;
 mod subtree_generated;
+mod token_cache;
 mod tokens;
 mod transform_generated;
 mod visitor;
@@ -72,6 +74,7 @@ mod visitors_generated;
 pub use bind_result::{
     BindBuilder, BindError, BindResult, BoundFile, BoundView, CompletedFile, CompletedNode,
     CompletedSymbol, NodeBinding, PatternAmbientModule, RetainedBoundNode, RetainedSymbol,
+    SharedBoundFile,
 };
 pub use clone::{
     clone_node, deep_clone_node, deep_clone_reparse, deep_clone_reparse_modifiers,
@@ -95,7 +98,10 @@ pub use node_kind::NodeKind;
 pub use node_read::NodeRead;
 pub use node_read_generated::*;
 pub use node_text::NodeText;
-pub use precedence::{get_binary_operator_precedence, operator_precedence};
+pub use precedence::{
+    get_binary_operator_precedence, get_expression_precedence, get_leftmost_expression,
+    get_operator_precedence, operator_precedence, operator_precedence_flags,
+};
 pub use runtime_generated::*;
 pub use runtime_id::{existing_runtime_node_id, runtime_node_id};
 pub use source_file::*;

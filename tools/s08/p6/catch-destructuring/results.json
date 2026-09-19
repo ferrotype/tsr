@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "scope": "Development comparison of the frozen 32-variant catch-destructuring selection; no full E2 metrics emitted.",
+  "control_corpus_capture_sha256": "f3d539156384f4a1a5cbf58063e36fdca98bd0ee4bf55dd66632ad318f57b18d",
+  "candidate_capture_sha256": "65bc44f6f051c6fef85cd7264abb6c8d8568c47e9a29364f1dd8ad73f092cbf9",
+  "candidate_sources_sha256": "255f60e4305990cbb1ce8b28cec6ed9bc90241967bb23dd4436be8f23cc89e51",
+  "selection_sha256": "d6996b33ac14566c5d3e07c5615f07750b168f0462a71f551602a0e5b13c4e38",
+  "source_stable": true,
+  "counts_before": {
+    "types_parity": {
+      "match": 29,
+      "different": 3
+    },
+    "errors_parity": {
+      "match": 21,
+      "different": 11
+    },
+    "type_to_string_parity": {
+      "match": 31,
+      "different": 1
+    }
+  },
+  "counts_after": {
+    "types_parity": {
+      "match": 31,
+      "different": 1
+    },
+    "errors_parity": {
+      "match": 32
+    },
+    "type_to_string_parity": {
+      "match": 31,
+      "different": 1
+    }
+  },
+  "changes": {
+    "types_parity": {
+      "improved": [
+        "conformance/async/es6/asyncWithVarShadowing_es6.ts#configuration=0",
+        "conformance/es6/destructuring/destructuringCatch.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "errors_parity": {
+      "improved": [
+        "compiler/catchClauseRestProperties.ts#configuration=0",
+        "compiler/destructureCatchClause.ts#configuration=0",
+        "compiler/destructureCatchClause.ts#configuration=1",
+        "compiler/destructureCatchClause.ts#configuration=2",
+        "compiler/destructureCatchClause.ts#configuration=3",
+        "compiler/redeclareParameterInCatchBlock.ts#configuration=0",
+        "conformance/async/es6/asyncWithVarShadowing_es6.ts#configuration=0",
+        "conformance/es6/destructuring/destructuringCatch.ts#configuration=0",
+        "conformance/jsdoc/jsdocCatchClauseWithTypeAnnotation.ts#configuration=0",
+        "conformance/statements/tryStatements/catchClauseWithTypeAnnotation.ts#configuration=0",
+        "conformance/types/rest/objectRestCatchES5.ts#configuration=0"
+      ],
+      "regressed": []
+    },
+    "type_to_string_parity": {
+      "improved": [],
+      "regressed": []
+    }
+  },
+  "remaining": [
+    {
+      "id": "compiler/implicitAnyInCatch.ts#configuration=0",
+      "acceptance_tier": "acceptance",
+      "checks": {
+        "types_parity": {
+          "state": "different",
+          "differences": [
+            "types",
+            "queries"
+          ],
+          "native_queries": 45,
+          "rust_queries": 45,
+          "accepted": false,
+          "native_sha256": "972826f07278d5f7c0e8446fb671274151b4557d70f3fd22620a50f08e3554e5",
+          "rust_sha256": "a0d879ea0f562581fe29db55a257079d7e2a59c8330c03241465451b9b26f7a9"
+        },
+        "errors_parity": {
+          "state": "match",
+          "differences": [],
+          "native_diagnostics": 0,
+          "rust_diagnostics": 0,
+          "emit": "not_executed",
+          "accepted": true
+        },
+        "type_to_string_parity": {
+          "state": "different",
+          "native_queries": 13,
+          "rust_queries": 13,
+          "accepted": false,
+          "native_sha256": "d7aac96d4fb6474d80b2bc18e338792a16bdfc2546968aea3d1a120d786e5a42",
+          "rust_sha256": "5e9667b4d1bb47f1971a6b9adba4da4b8aa932800a3585eddd32aad97c246bac"
+        }
+      }
+    }
+  ],
+  "target_diagnostic": {
+    "code": 1182,
+    "affected_variants": 11,
+    "all_counts_match_after": true,
+    "variants": [
+      {
+        "id": "compiler/catchClauseRestProperties.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/destructureCatchClause.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 21,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/destructureCatchClause.ts#configuration=1",
+        "native_count": 0,
+        "before_count": 21,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/destructureCatchClause.ts#configuration=2",
+        "native_count": 0,
+        "before_count": 21,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/destructureCatchClause.ts#configuration=3",
+        "native_count": 0,
+        "before_count": 21,
+        "after_count": 0
+      },
+      {
+        "id": "compiler/redeclareParameterInCatchBlock.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 2,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/async/es6/asyncWithVarShadowing_es6.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/es6/destructuring/destructuringCatch.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 4,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/jsdoc/jsdocCatchClauseWithTypeAnnotation.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 7,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/statements/tryStatements/catchClauseWithTypeAnnotation.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 7,
+        "after_count": 0
+      },
+      {
+        "id": "conformance/types/rest/objectRestCatchES5.ts#configuration=0",
+        "native_count": 0,
+        "before_count": 1,
+        "after_count": 0
+      }
+    ]
+  }
+}

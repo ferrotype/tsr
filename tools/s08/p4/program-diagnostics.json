@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "scope": "S08 P4 program semantic selection and directives around bind/check diagnostics; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true,
+    "allowJs": true
+  },
+  "programs": [
+    {
+      "id": "expect-error-used",
+      "files": {
+        "/case.ts": "// @ts-expect-error\nlet value: number = \"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "expect-error-unused",
+      "files": {
+        "/case.ts": "// @ts-expect-error\nlet value: number = 1;\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "ignore-blank-comment",
+      "files": {
+        "/case.ts": "// @ts-ignore\n// explanation\n\nlet value: number = \"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "intervening-code",
+      "files": {
+        "/case.ts": "// @ts-ignore\nlet other=0;\nlet value: number = \"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "intervening-block-comment",
+      "files": {
+        "/case.ts": "// @ts-ignore\n/* intervening block */\nlet value: number = \"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "multiple-errors",
+      "files": {
+        "/case.ts": "// @ts-expect-error\nlet value:number=\"bad\",other:string=1;\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "bind-error-ignore",
+      "files": {
+        "/case.ts": "const value=1;\n// @ts-ignore\nconst value=2;\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "no-check-source",
+      "files": {
+        "/case.ts": "// @ts-nocheck\nlet value:number=\"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.ts",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "plain-js-type-error",
+      "files": {
+        "/case.js": "/** @type {number} */ let value=\"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "checked-js-type-error",
+      "files": {
+        "/case.js": "// @ts-check\n/** @type {number} */ let value=\"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "plain-js-bind-error",
+      "files": {
+        "/case.js": "const value=1;const value=2;\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "checked-js-expect",
+      "files": {
+        "/case.js": "// @ts-check\n// @ts-expect-error\n/** @type {number} */ let value=\"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "no-check-js",
+      "files": {
+        "/case.js": "// @ts-nocheck\n/** @type {number} */ let value=\"bad\";\nconst probe=1;\n"
+      },
+      "roots": [
+        "/case.js"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "declaration": "probe",
+          "file": "/case.js",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

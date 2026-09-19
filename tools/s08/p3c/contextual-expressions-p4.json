@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "scope": "Informational P4 expression dependency probes; contextual relation algorithms are exercised separately through conditional type nodes",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "contextual-identity",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } declare let generic: <T>(x: T) => T; let text: (x: string) => string = generic; let numeric: (x: number) => number = generic; let union: (x: string | number) => string | number = generic;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "generic",
+          "file": "/case.ts",
+          "declaration": "generic",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "text",
+          "file": "/case.ts",
+          "declaration": "text",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "numeric",
+          "file": "/case.ts",
+          "declaration": "numeric",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "union",
+          "file": "/case.ts",
+          "declaration": "union",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "contextual-constraints",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } declare let generic: <T extends string>(x: T) => T; let text: (x: \"a\" | \"b\") => string = generic; declare let make: <T = string>() => T; let value: () => string = make;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "generic",
+          "file": "/case.ts",
+          "declaration": "generic",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "text",
+          "file": "/case.ts",
+          "declaration": "text",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "make",
+          "file": "/case.ts",
+          "declaration": "make",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "value",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "contextual-rest",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } declare let generic: <T extends unknown[]>(...args: T) => T; let pair: (a: number, b: string) => [number,string] = generic; declare let first: <T>(x: T, ...rest: T[]) => T; let strings: (x: string, y: string) => string = first;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "generic",
+          "file": "/case.ts",
+          "declaration": "generic",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pair",
+          "file": "/case.ts",
+          "declaration": "pair",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "first",
+          "file": "/case.ts",
+          "declaration": "first",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "strings",
+          "file": "/case.ts",
+          "declaration": "strings",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "contextual-reverse",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Boxed<T> = {[P in keyof T]: {value: T[P]}}; declare let unbox: <T>(x: Boxed<T>) => T; let objects: (x: {a: {value: number}; b: {value: string}}) => unknown = unbox; let tuples: (x: [{value: 1}, {value: \"x\"}]) => unknown = unbox;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "unbox",
+          "file": "/case.ts",
+          "declaration": "unbox",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "objects",
+          "file": "/case.ts",
+          "declaration": "objects",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "tuples",
+          "file": "/case.ts",
+          "declaration": "tuples",
+          "target": "name",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

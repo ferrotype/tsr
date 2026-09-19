@@ -173,6 +173,13 @@ impl DeclarationLists {
     pub fn id(&self) -> ArenaId {
         self.backings.id()
     }
+
+    /// Known structural bytes and unmeasured escape-tree entries. The latter
+    /// must be reported as unavailable by an allocation census, not as zero.
+    pub fn storage_bytes(&self) -> (usize, usize) {
+        let (pages, escapes) = self.pages.storage_bytes();
+        (self.backings.structural_bytes() + pages, escapes)
+    }
     fn node_arena(&self) -> ArenaId {
         // Without a nonnil node all stored words are zero, so this temporary
         // namespace cannot affect a decoded identity.

@@ -194,32 +194,41 @@ fn type_tag_sets_the_full_signature_edge_and_its_immediate_parent() {
 
 #[test]
 fn nested_jsdoc_namespaces_grow_the_stack_during_parse_and_reparse() {
-    let result = std::thread::Builder::new()
-        .stack_size(512 * 1024)
-        .spawn(|| {
-            let text = format!("/** @typedef {{string}} {}Z */", "A.".repeat(6000));
-            let source = SourceText::from_loaded_bytes(text.into_bytes());
-            let factory = ts_ast::AstBuilder::new(source.clone(), &ts_arena::Counters::default());
-            let mut parser = crate::Parser::new(
-                SourceFileParseOptions {
-                    file_name: JsString::from_bytes(b"/depth.js".as_slice()),
-                    ..Default::default()
-                },
-                &source,
-                ScriptKind::JS,
-                factory,
-            );
-            crate::recursion::take_observations();
-            parser.next_token();
-            let root = parser.parse_source_file_worker();
-            assert!(parser.diagnostics.is_empty());
-            assert!(parser.jsdoc_diagnostics.is_empty());
-            parser.factory.complete(root).unwrap();
-            crate::recursion::take_observations()
-        })
-        .unwrap()
-        .join()
-        .unwrap();
-    assert!(result.entries > 12_000, "{result:?}");
-    assert!(result.growths > 0, "{result:?}");
+    // Optimized frame sizes differ by target: 6,000 levels fit in the initial
+    // stack on Linux/x86_64. Increase input depth until growth is observed,
+    // keeping the production guard and the initial stack size unchanged.
+    for depth in [6000, 12_000, 24_000, 48_000] {
+        let result = std::thread::Builder::new()
+            .stack_size(512 * 1024)
+            .spawn(move || {
+                let text = format!("/** @typedef {{string}} {}Z */", "A.".repeat(depth));
+                let source = SourceText::from_loaded_bytes(text.into_bytes());
+                let factory =
+                    ts_ast::AstBuilder::new(source.clone(), &ts_arena::Counters::default());
+                let mut parser = crate::Parser::new(
+                    SourceFileParseOptions {
+                        file_name: JsString::from_bytes(b"/depth.js".as_slice()),
+                        ..Default::default()
+                    },
+                    &source,
+                    ScriptKind::JS,
+                    factory,
+                );
+                crate::recursion::take_observations();
+                parser.next_token();
+                let root = parser.parse_source_file_worker();
+                assert!(parser.diagnostics.is_empty());
+                assert!(parser.jsdoc_diagnostics.is_empty());
+                parser.factory.complete(root).unwrap();
+                crate::recursion::take_observations()
+            })
+            .unwrap()
+            .join()
+            .unwrap();
+        assert!(result.entries > 2 * depth, "depth {depth}: {result:?}");
+        if result.growths > 0 {
+            return;
+        }
+        assert!(depth < 48_000, "depth {depth}: {result:?}");
+    }
 }

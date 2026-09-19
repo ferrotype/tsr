@@ -12,7 +12,7 @@ use std::sync::Arc;
 use ts_ast::symbol_flags as sf;
 
 pub(crate) const NO_SUPERTYPE_REDUCTION: u32 = 1;
-const NO_CONSTRAINT_REDUCTION: u32 = 2;
+pub(crate) const NO_CONSTRAINT_REDUCTION: u32 = 2;
 
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getIntersectionType
@@ -96,12 +96,59 @@ impl CheckerState {
         if set.len() == 1 {
             return Ok(set[0]);
         }
-        if flags & NO_CONSTRAINT_REDUCTION == 0 {
-            for &ty in &set {
-                if self.types.flags(ty)? & tf::TYPE_VARIABLE != 0 {
-                    return Err(Error::Unsupported(
-                        "getIntersectionType: base constraint reduction",
-                    ));
+        let mut object_flags = of::NONE;
+        if set.len() == 2 && flags & NO_CONSTRAINT_REDUCTION == 0 {
+            let variable_index = usize::from(self.types.flags(set[0])? & tf::TYPE_VARIABLE == 0);
+            let variable = set[variable_index];
+            let primitive = set[1 - variable_index];
+            if self.types.flags(variable)? & tf::TYPE_VARIABLE != 0
+                && (self.types.flags(primitive)? & (tf::PRIMITIVE | tf::NON_PRIMITIVE) != 0
+                    && !self.is_generic_string_like_type(primitive)?
+                    || includes & tf::INCLUDES_EMPTY_OBJECT != 0)
+            {
+                if let Some(constraint) = self.base_constraint_of_type(variable)? {
+                    let parts = if self.types.flags(constraint)? & tf::UNION != 0 {
+                        self.types.compound_types(constraint)?.clone()
+                    } else {
+                        vec![constraint].into()
+                    };
+                    let mut valid = true;
+                    for &part in parts.iter() {
+                        valid &= self.types.flags(part)? & (tf::PRIMITIVE | tf::NON_PRIMITIVE) != 0
+                            || self.is_empty_anonymous_object_type(part)?;
+                    }
+                    if valid {
+                        if self.is_type_related_to(
+                            constraint,
+                            primitive,
+                            crate::RelationKind::StrictSubtype,
+                        )? {
+                            return Ok(variable);
+                        }
+                        let mut some_subtype = false;
+                        if self.types.flags(constraint)? & tf::UNION != 0 {
+                            for &part in parts.iter() {
+                                if self.is_type_related_to(
+                                    part,
+                                    primitive,
+                                    crate::RelationKind::StrictSubtype,
+                                )? {
+                                    some_subtype = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if !some_subtype
+                            && !self.is_type_related_to(
+                                primitive,
+                                constraint,
+                                crate::RelationKind::StrictSubtype,
+                            )?
+                        {
+                            return Ok(self.builtins.never_type);
+                        }
+                        object_flags = of::IS_CONSTRAINED_TYPE_VARIABLE;
+                    }
                 }
             }
         }
@@ -156,7 +203,7 @@ impl CheckerState {
             }
         } else {
             let propagating = self.get_propagating_flags_of_types(types, tf::NULLABLE)?;
-            let result = self.new_intersection_type(propagating, &set)?;
+            let result = self.new_intersection_type(object_flags | propagating, &set)?;
             self.types.get_mut(result)?.alias = alias;
             result
         };
@@ -258,7 +305,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.removeRedundantSupertypes
     fn remove_redundant_supertypes(
-        &self,
+        &mut self,
         types: &mut Vec<TypeId>,
         includes: u32,
     ) -> Result<(), Error> {
@@ -281,8 +328,8 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.IsEmptyAnonymousObjectType
-    pub(crate) fn is_empty_anonymous_object_type(&self, ty: TypeId) -> Result<bool, Error> {
-        let record = self.types.get(ty)?;
+    pub(crate) fn is_empty_anonymous_object_type(&mut self, ty: TypeId) -> Result<bool, Error> {
+        let record = *self.types.get(ty)?;
         if record.object_flags & of::ANONYMOUS == 0 {
             return Ok(false);
         }
@@ -297,9 +344,9 @@ impl CheckerState {
             }
         }
         if let Some(symbol) = record.symbol {
-            let symbol = self.symbol(symbol)?;
-            if symbol.flags() & sf::TYPE_LITERAL != 0 {
-                return Ok(match symbol.members() {
+            if self.symbol(symbol)?.flags() & sf::TYPE_LITERAL != 0 {
+                // getMembersOfSymbol resolves late-bound members first.
+                return Ok(match self.members_of_symbol(symbol)? {
                     Some(table) => self.table(table)?.is_empty(),
                     None => true,
                 });

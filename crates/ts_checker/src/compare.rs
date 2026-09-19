@@ -33,16 +33,39 @@ impl CheckerState {
 
     // port: tsc/internal/checker/utilities.go:Checker.sortSymbols
     pub(crate) fn sort_symbols(&self, symbols: &mut [SymbolId]) -> Result<(), Error> {
-        let failure: Cell<Option<Error>> = Cell::new(None);
-        symbols.sort_by(|a, b| match self.compare_symbols(Some(*a), Some(*b)) {
-            Ok(order) => order,
-            Err(error) => {
-                if failure.get().is_none() {
-                    failure.set(Some(error));
+        // `compareSymbols` orders by the first declaration's file and position
+        // before names and ids. Each symbol's key is computed once; only equal
+        // keys fall back to the full comparison, which decides by name and id.
+        let mut keyed = Vec::with_capacity(symbols.len());
+        for &symbol in symbols.iter() {
+            let read = self.symbol(symbol)?;
+            let key = if read.declarations().is_empty() {
+                (1u8, 0, 0)
+            } else {
+                let first = self.declaration_slice(read.declarations())?.at(0);
+                match first {
+                    Some(first) => (0u8, self.node_file_index(first)?, self.node(first)?.pos()),
+                    None => (1u8, 0, 0),
                 }
-                Ordering::Equal
-            }
+            };
+            keyed.push((key, symbol));
+        }
+        let failure: Cell<Option<Error>> = Cell::new(None);
+        keyed.sort_by(|a, b| {
+            a.0.cmp(&b.0)
+                .then_with(|| match self.compare_symbols(Some(a.1), Some(b.1)) {
+                    Ok(order) => order,
+                    Err(error) => {
+                        if failure.get().is_none() {
+                            failure.set(Some(error));
+                        }
+                        Ordering::Equal
+                    }
+                })
         });
+        for (slot, (_, symbol)) in symbols.iter_mut().zip(keyed) {
+            *slot = symbol;
+        }
         failure.get().map_or(Ok(()), Err)
     }
 
@@ -85,13 +108,31 @@ impl CheckerState {
             if r1.object_flags & object_flags::INSTANTIATION_EXPRESSION_TYPE != 0
                 && r2.object_flags & object_flags::INSTANTIATION_EXPRESSION_TYPE != 0
             {
-                return Err(Error::Unsupported(
-                    "CompareTypes: instantiation expression types",
-                ));
-            }
-            let c = self.compare_symbols(r1.symbol, r2.symbol)?;
-            if c != Ordering::Equal {
-                return Ok(c);
+                let first_declaration = |symbol| -> Result<Option<NodeId>, Error> {
+                    match symbol {
+                        Some(symbol) => {
+                            Ok(self.symbol_declarations(symbol)?.iter().next().flatten())
+                        }
+                        None => Ok(None),
+                    }
+                };
+                let order = self
+                    .compare_nodes(first_declaration(r1.symbol)?, first_declaration(r2.symbol)?)?;
+                if order != Ordering::Equal {
+                    return Ok(order);
+                }
+                let order = self.compare_nodes(
+                    self.types.instantiation_expression(t1)?.node,
+                    self.types.instantiation_expression(t2)?.node,
+                )?;
+                if order != Ordering::Equal {
+                    return Ok(order);
+                }
+            } else {
+                let order = self.compare_symbols(r1.symbol, r2.symbol)?;
+                if order != Ordering::Equal {
+                    return Ok(order);
+                }
             }
             // When object types have the same or no symbol, order by kind. We order type references before other kinds.
             let ref1 = r1.object_flags & object_flags::REFERENCE != 0;
@@ -138,7 +179,13 @@ impl CheckerState {
                     if c != Ordering::Equal {
                         return Ok(c);
                     }
-                    return Err(Error::Unsupported("compareTypeMappers"));
+                    let c = self.compare_type_mappers(
+                        self.types.object(t1)?.mapper,
+                        self.types.object(t2)?.mapper,
+                    )?;
+                    if c != Ordering::Equal {
+                        return Ok(c);
+                    }
                 }
             } else if ref1 {
                 return Ok(Ordering::Less);
@@ -151,7 +198,13 @@ impl CheckerState {
                 if c != 0 {
                     return Ok(ordering(c));
                 }
-                // Type mappers arrive with instantiation (P3); until then no object type has one.
+                let c = self.compare_type_mappers(
+                    self.types.object(t1)?.mapper,
+                    self.types.object(t2)?.mapper,
+                )?;
+                if c != Ordering::Equal {
+                    return Ok(c);
+                }
             }
         } else if flags & type_flags::UNION != 0 {
             // Unions are ordered by origin and then constituent type lists.
@@ -215,6 +268,28 @@ impl CheckerState {
             if c != Ordering::Equal {
                 return Ok(c);
             }
+        } else if flags & type_flags::INDEX != 0 {
+            let a = self.types.index_type(t1)?;
+            let b = self.types.index_type(t2)?;
+            let ordering = self.compare_types(a.target, b.target)?;
+            if ordering != Ordering::Equal {
+                return Ok(ordering);
+            }
+            let ordering = a.index_flags.cmp(&b.index_flags);
+            if ordering != Ordering::Equal {
+                return Ok(ordering);
+            }
+        } else if flags & type_flags::INDEXED_ACCESS != 0 {
+            let a = self.types.indexed_access(t1)?;
+            let b = self.types.indexed_access(t2)?;
+            let ordering = self.compare_types(a.object_type, b.object_type)?;
+            if ordering != Ordering::Equal {
+                return Ok(ordering);
+            }
+            let ordering = self.compare_types(a.index_type, b.index_type)?;
+            if ordering != Ordering::Equal {
+                return Ok(ordering);
+            }
         } else if flags & type_flags::TEMPLATE_LITERAL != 0 {
             let (texts1, types1) = {
                 let d = self.types.template_literal(t1)?;
@@ -235,18 +310,36 @@ impl CheckerState {
             if c != Ordering::Equal {
                 return Ok(c);
             }
-        } else if flags
-            & (type_flags::INDEX
-                | type_flags::INDEXED_ACCESS
-                | type_flags::CONDITIONAL
-                | type_flags::SUBSTITUTION
-                | type_flags::STRING_MAPPING)
-            != 0
-        {
-            return Err(Error::UnexpectedType {
-                context: "CompareTypes",
-                kind: r1.kind,
-            });
+        } else if flags & type_flags::STRING_MAPPING != 0 {
+            let ordering = self.compare_types(self.types.target(t1)?, self.types.target(t2)?)?;
+            if ordering != Ordering::Equal {
+                return Ok(ordering);
+            }
+        } else if flags & type_flags::CONDITIONAL != 0 {
+            let a = self.types.conditional(t1)?;
+            let b = self.types.conditional(t2)?;
+            let order = self.compare_nodes(
+                Some(self.conditional_root(a.root)?.node),
+                Some(self.conditional_root(b.root)?.node),
+            )?;
+            if order != Ordering::Equal {
+                return Ok(order);
+            }
+            let order = self.compare_type_mappers(a.mapper, b.mapper)?;
+            if order != Ordering::Equal {
+                return Ok(order);
+            }
+        } else if flags & type_flags::SUBSTITUTION != 0 {
+            let a = self.types.substitution(t1)?;
+            let b = self.types.substitution(t2)?;
+            let order = self.compare_types(a.base, b.base)?;
+            if order != Ordering::Equal {
+                return Ok(order);
+            }
+            let order = self.compare_types(a.constraint, b.constraint)?;
+            if order != Ordering::Equal {
+                return Ok(order);
+            }
         }
         // Fall back to type IDs. This results in type creation order for built-in types.
         Ok(t1.get().cmp(&t2.get()))
@@ -349,7 +442,7 @@ impl CheckerState {
             }
         }
         for (e1, e2) in d1.element_infos.iter().zip(d2.element_infos.iter()) {
-            let c = Self::compare_element_labels(e1.labeled_declaration, e2.labeled_declaration)?;
+            let c = self.compare_element_labels(e1.labeled_declaration, e2.labeled_declaration)?;
             if c != Ordering::Equal {
                 return Ok(c);
             }
@@ -357,15 +450,34 @@ impl CheckerState {
         Ok(Ordering::Equal)
     }
 
-    /// Label text comparison needs node reads (P2); unlabeled elements compare equal.
     // port: tsc/internal/checker/utilities.go:compareElementLabels
-    fn compare_element_labels(n1: Option<NodeId>, n2: Option<NodeId>) -> Result<Ordering, Error> {
+    fn compare_element_labels(
+        &self,
+        n1: Option<NodeId>,
+        n2: Option<NodeId>,
+    ) -> Result<Ordering, Error> {
         match (n1, n2) {
             (None, None) => Ok(Ordering::Equal),
             (None, Some(_)) => Ok(Ordering::Less),
             (Some(_), None) => Ok(Ordering::Greater),
             (Some(a), Some(b)) if a == b => Ok(Ordering::Equal),
-            (Some(_), Some(_)) => Err(Error::Unsupported("compareElementLabels")),
+            (Some(a), Some(b)) => {
+                let a = self
+                    .ast(a)?
+                    .node(a)?
+                    .name()
+                    .ok_or(Error::MissingLink("tuple label name"))?;
+                let b = self
+                    .ast(b)?
+                    .node(b)?
+                    .name()
+                    .ok_or(Error::MissingLink("tuple label name"))?;
+                Ok(self
+                    .ast(a)?
+                    .node_text(a)?
+                    .as_bytes()
+                    .cmp(self.node_text(b)?.as_bytes()))
+            }
         }
     }
 
@@ -416,24 +528,36 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.compareNodes
-    fn compare_nodes(&self, n1: Option<NodeId>, n2: Option<NodeId>) -> Result<Ordering, Error> {
+    pub(crate) fn compare_nodes(
+        &self,
+        n1: Option<NodeId>,
+        n2: Option<NodeId>,
+    ) -> Result<Ordering, Error> {
         match (n1, n2) {
             (None, None) => Ok(Ordering::Equal),
             (None, Some(_)) => Ok(Ordering::Greater),
             (Some(_), None) => Ok(Ordering::Less),
             (Some(a), Some(b)) if a == b => Ok(Ordering::Equal),
             (Some(a), Some(b)) => {
-                let v1 = self.ast(a)?;
-                let v2 = self.ast(b)?;
-                let s1 = ts_ast::utilities::get_source_file_of_node(v1, Some(a))?;
-                let s2 = ts_ast::utilities::get_source_file_of_node(v2, Some(b))?;
-                if s1 != s2 {
-                    let program = self.program()?;
-                    return Ok(program.file_index(s1).cmp(&program.file_index(s2)));
+                let (f1, f2) = (self.node_file_index(a)?, self.node_file_index(b)?);
+                if f1 != f2 {
+                    return Ok(f1.cmp(&f2));
                 }
-                Ok(v1.node(a)?.pos().cmp(&v2.node(b)?.pos()))
+                Ok(self.ast(a)?.node(a)?.pos().cmp(&self.node(b)?.pos()))
             }
         }
+    }
+
+    /// `fileIndexMap[GetSourceFileOfNode(node)]`: a core node's file comes from
+    /// the arena index; other nodes walk their ancestors as Go does.
+    fn node_file_index(&self, node: NodeId) -> Result<usize, Error> {
+        let program = self.program()?;
+        if let Some(index) = program.core_file_index(node) {
+            return Ok(index);
+        }
+        let view = self.ast(node)?;
+        let source = ts_ast::utilities::get_source_file_of_node(view, Some(node))?;
+        Ok(program.file_index(source))
     }
 
     fn literal_string(&self, t: TypeId) -> Result<&[u8], Error> {

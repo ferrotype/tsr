@@ -1,0 +1,402 @@
+# S09-3 formatter port: plan
+
+Owner decision, 2026-09-18: pull the formatter port forward so S09-3 can close,
+rather than split `api_scratch_disposal` into a printing half and a formatting
+half. This plan covers what that means, in what order, and how each step is
+proved. Nothing here changes a threshold, a criterion or a sprint dependency.
+
+## 1. What the criterion needs
+
+`exp.E3.api_scratch_disposal` asserts that repeated API printing and insertion
+formatting match Go, release their scratch arenas after returning text, register
+no synthetic handles and do not grow session arena counts. Printing is done
+([S09-3](S09-3.md)). Insertion formatting is the pinned
+`handleFormatNodeForInsertion` (`api/session.go:3045`), which does this:
+
+1. decodes the node and converts the target position from UTF-16 to UTF-8;
+2. `printer.PrintAndPositionNode`: prints with `NeverAsciiEscape`,
+   `PreserveSourceNewlines` and `TerminateUnterminatedLiterals` through a
+   `ChangeTrackerWriter`, then clones the tree with the recorded positions;
+3. `printer.CreateSyntheticSourceFile` around the positioned clone;
+4. `format.GetLineStartPositionForPosition` and `format.GetIndentation` on the
+   **target** file, which is the smart indenter;
+5. `format.ShouldIndentChildNode` for the delta;
+6. `format.FormatNodeGivenIndentation` over the synthetic file, which is the
+   span worker, the formatting scanner and the whole rule table;
+7. `core.ApplyBulkEdits`.
+
+Steps 4 and 6 between them reach every file of `internal/format`. There is no
+useful subset: the insertion path is a thin entry into the full formatter.
+
+## 2. Inventory
+
+Go, at pin `1f70213d`, from the port ledger:
+
+| file | crate in ledger | loc | functions |
+| --- | --- | --- | --- |
+| `format/span.go` | `ts_format` | 1,262 | 44 |
+| `format/indent.go` | `ts_format` | 821 | 32 |
+| `format/rulecontext.go` | `ts_format` | 629 | 88 |
+| `format/rules.go` | `ts_format` | 450 | 4 (one rule table) |
+| `format/scanner.go` | `ts_format` | 374 | 23 |
+| `format/api.go` | `ts_format` | 189 | 12 |
+| `format/rulesmap.go` | `ts_format` | 156 | 7 |
+| `format/util.go` | `ts_format` | 148 | 8 |
+| `format/context.go` | `ts_format` | 121 | 11 |
+| `format/rule.go` | `ts_format` | 109 | 6 |
+| `astnav/tokens.go` | `ts_astnav` | 793 | 18 |
+| `printer/changetrackerwriter.go` | `ts_printer` | 250 | 36 |
+| `printer/syntheticfile.go` | `ts_printer` | 53 | 2 |
+| `core/textchange.go` | `ts_core` | 30 | 2 |
+| `ls/lsutil/formatcodeoptions.go` | `ts_ls` | 141 | 5 |
+| `ls/lsutil/{utilities,children,completednode}.go` | `ts_ls` | 486 | partly used |
+
+About 6,000 Go lines, all `planned` today. Printer work inside `printer.go` comes
+on top: 20 references to `PreserveSourceNewlines`, the six emit hooks
+(`OnBefore`/`OnAfter` for node, node list and token) and
+`TerminateUnterminatedLiterals`.
+
+**Correction, found when F2 started.** The first version of this plan called the
+Rust printer "about two thirds of Go's" from a line count. That was wrong in the
+way that matters: the Rust printer does not print statements at all. Its
+fallthrough is the named refusal `statements, declarations and JSDoc nodes`. It
+covers type nodes, type members and the expressions the node builder needs.
+Measured function by function against `printer.go`:
+
+| | functions | Go lines |
+| --- | --- | --- |
+| `emit*` functions in Go | 286 | 4,364 |
+| with a Rust counterpart by name | 105 | 1,648 |
+| without | 181 | 2,716 |
+
+The missing 2,716 lines split into statements 496, declarations 624, JSX 195 and
+other 1,392. "Other" includes comment and source-map emission, which positioned
+printing does not need because it passes no source file, so the part F2 really
+needs is about 1,900 to 2,200 lines. Insertion formatting exists to insert
+statements and declarations, so there is no way around it: pulling the formatter
+forward also pulls the statement printer forward from Phase 3. The whole port is
+therefore about 8,000 Go lines, not 6,000.
+
+What the format package calls outside itself: from `astnav`,
+`FindPrecedingToken(Ex)`, `GetTokenAtPosition`, `FindNextToken`,
+`FindChildOfKind`, `GetStartOfNode`; from `scanner`, the ECMA line helpers
+(`GetECMALineOfPosition` 31 times, `GetECMALineStarts`,
+`GetECMALineAndByteOffsetOfPosition`, `GetECMAEndLinePosition`,
+`GetECMAPositionOfLineAndByteOffset`), `GetTokenPosOfNode`, `SkipTrivia`, the
+comment ranges and a scanner over a source file; from `lsutil`,
+`FormatCodeSettings`, `EditorSettings`, the indent style and semicolon
+preference enums, `PositionIsASICandidate`, `PositionBelongsToNode` and
+`GetFirstToken`.
+
+Rust today:
+
+| have | missing |
+| --- | --- |
+| scanner with every rescan the formatting scanner uses, `skip_trivia`, comment ranges | `ts_astnav`, entirely |
+| ECMA line map on the source file, UTF-16 to UTF-8 position map | `ts_format`, entirely |
+| printer at about 4,200 lines against Go's 6,345, with `get_lines_between_nodes` and `get_leading_line_terminator_count` | emit hooks; `PreserveSourceNewlines` is a named `Unsupported`; the separating, closing and effective line helpers |
+| protocol-8 decoder into a request-owned `AstBuilder` | `ChangeTrackerWriter`, position assignment, synthetic source file |
+| | `TextChange`, `ApplyBulkEdits`, format settings |
+
+The printer has 12 named unsupported boundaries. Positioned printing passes no
+source file, so the `comment emission` boundary is not on this path.
+
+## 3. Placement
+
+Crates follow `PLAN.md` section 8 and the ledger: a new `ts_astnav`, a new
+`ts_format`, positioned printing in `ts_printer`, text changes in `ts_core`. The
+`lsutil` pieces are ledgered to `ts_ls`, which does not exist and should not be
+created for four small files. They go in `ts_format::settings` and
+`ts_format::lsutil` with `// port:` markers naming the `lsutil` functions.
+`ts_ls` re-exports them when it arrives. Their ledger rows keep `crate = "ts_ls"`,
+because that column is generated from the package map and validation rejects a
+hand edit; the row's `rust` field records where the code actually lives.
+
+Phases in the ledger do not move. These files are ported early; their rows
+become `ported` with a note, and the phase column keeps recording where the
+roadmap put them.
+
+## 4. Steps
+
+Each step ends on a parity check against frozen native observations, with the
+denominator fixed before the Rust code exists. No step is "done" on unit tests.
+
+**F0. Oracle and frozen observations.** Done for the corpus; see
+`tools/s09/README.md` for what was built. It differs from the sketch below in
+two ways. The corpus comparison is a live differential, as E1's is, so no
+per-file observation is committed: the oracle is a persistent process built
+inside a fresh export of the pinned tree, and `data/s09/format-probes.json`
+freezes the inventory digest, the operation and variant contract and the digest
+of the whole native stream. And the denominator is the S06 parser inventory
+reduced to its 16,120 distinct parser inputs. Positioned printing and insertion
+are corpus-wide probes too, over each file's leading statements, rather than a
+handful of fixtures. The scanner and rule probes were added when F3 and F4
+started. The fourslash recording was replaced by the corpus-wide `entry` probe
+(see F6).
+
+The original sketch: a Go overlay beside
+`tools/s09/printing_test.go`, run with Go 1.27.1 and `GOTOOLCHAIN=local`, that
+writes under `data/s09/format-*`:
+
+- navigation probes: for every file of a fixed corpus, at sampled positions and
+  at every token boundary, the results of the five `astnav` entry points as
+  kind, pos and end;
+- indentation probes: `GetIndentation` at every line start and at sampled
+  in-line positions, under the default settings and two variants (tabs, and
+  indent size 2);
+- document formatting: `FormatDocument` on every corpus file, recorded as the
+  ordered edit list, not just the resulting text;
+- fourslash-derived cases: the pinned fourslash tests that format (177 calls to
+  `FormatDocument` and 28 to `FormatSelection` across about 190 files). The
+  overlay runs them natively with a recording hook at the formatter's entry
+  points, capturing source text, settings, entry point, range and the edit
+  list. This gets the corpus without porting fourslash or the language service;
+- positioned printing: text plus the position of every node for the decode
+  fixtures S09-3 already freezes, extended with multi-line and nested cases;
+- insertion cases: full `handleFormatNodeForInsertion` inputs and outputs,
+  including non-zero initial indentation, mid-line positions and both newline
+  kinds.
+
+The corpus is the S07 subset source inventory, which is already frozen and
+already parses identically (E1). Manifests carry request and source hashes, as
+the printing fixture does, so stale observations cannot certify new code.
+
+**F1. `ts_astnav`.** The five entry points and what they need. Exit: every
+navigation probe matches.
+
+Done. `compare --ops nav` reports 16,120 of 16,120 inputs, 35.1 million rows,
+including the one row where the pinned navigation asserts. The first complete
+run stood at 15,840. All 280 differences had one cause: upstream's
+`VisitEachChild` visits a JSDoc parameter tag's name before its type whatever
+order they were written in, while `ForEachChild` follows `IsNameFirst`, and
+navigation uses the former. Alongside the crate, the AST gained the token cache
+entry point (`SourceFile.GetOrCreateToken`) and the scanner crate
+`GetTokenPosOfNode`. `findRightmostNode` has no caller upstream and is not
+ported.
+
+**F2. Positioned printing.** First the statement, declaration and JSX
+printer described in the correction above, which is the bulk of this step and is
+proved the same way: the `position` probe prints each file's leading statements,
+so its text rows are a printer parity check over the corpus. Then the six emit
+hooks; `PreserveSourceNewlines`, which
+needs the three missing line-terminator helpers and removes the named boundary;
+`TerminateUnterminatedLiterals`; `ChangeTrackerWriter` with its last-non-trivia
+position rule; `AssignPositionsToNode`; `CreateSyntheticSourceFile`. Exit: text
+and every node position match for all positioned-printing observations, and the
+existing printing fixture still passes.
+
+Done. The printer now covers statements, declarations, class members, the
+expressions type display never produces, JSX and clauses: about 120 functions in
+`printer_statements.rs`, ports of the upstream functions of the same names. The
+62 emit functions that existed gained upstream's enter and exit calls, inserted
+by a script that matched each Rust function to its Go original and then checked
+by the compiler. The six notifications are part of the writer contract rather
+than a second handler object, because their only provider upstream is the change
+tracker's writer, whose handlers read the writer's own state. With no source
+file `PreserveSourceNewlines` only turns on the line-preserving branches of the
+list helpers; with one it measures lines between nodes and their comments, which
+stays a named boundary. A whole `SourceFile` root, which brings comments,
+shebang, helpers and triple-slash directives, stays one too.
+
+Positions are assigned to the decoded tree in place instead of to a clone.
+Upstream clones so that the caller's node can be printed again; the one caller
+here decodes a tree per request and drops it. The visible consequence of the
+clone is kept: upstream's visitor lifts an absent embedded statement into an
+empty synthesized block, so an `if` without `else` comes out with one, and the
+formatter then refuses it.
+
+The `position` probe was widened from the first four statements of a file to
+every top-level statement, and `compare --ops position` reports 16,120 of 16,120.
+The first complete run over four statements reported 16,069. Every difference
+had one of four causes: upstream allows a trailing comma in the type parameters
+of an arrow function, so `<T,>` stays; an instantiation expression emits its
+operand at member precedence, which the existing Rust code had one level too
+low; and two kinds of upstream panic whose text the port has to reproduce, a
+statement kind with no case (`KindJSImportDeclaration`) and an unchecked
+conversion of a function body or a label that a decoded tree filled with another
+node. Widening the probe found one more of the last kind. Mutations over the
+whole inventory: dropping the lifted `else` block makes 576 inputs differ, the
+trailing-whitespace trim of the last non-trivia position 101, the leading line
+count of an embedded statement 168. Dropping the list-end notification changes
+nothing in this probe, which prints node positions only; the insertion probe
+sees it (7,046 inputs).
+
+With the wider probe the frozen file holds 54,657,319 rows, reproduced by a
+second run.
+
+The checker's type display goes through the same printer. The E4 checker-text
+comparison of both runtimes still reports 64 probes and no mismatch.
+
+**F3. Formatter foundations.** Settings, `TextChange` and `ApplyBulkEdits`,
+`rule.go`, `context.go`, `util.go`, and the formatting scanner. Exit: a scanner
+probe (token, trivia and rescan decisions per corpus file) matches. That probe
+is added to F0 when this step starts, since its shape depends on the port.
+
+Done. The `scan` probe drives the formatting scanner over each whole file, with
+the token-level node from navigation as the container of every token, which is
+what gives the rescan predicates realistic input. The oracle reaches the
+unexported scanner through a bridge file copied into the export's
+`internal/format`. `compare --ops scan,nav` reports 16,120 of 16,120 at the first
+complete run; with the greater-than rescan disabled, 13 of the first 3,000
+inputs differ, so the check can fail. `ApplyBulkEdits` returns the slice bounds
+upstream panics on instead of panicking. The crate carries a temporary
+`allow(dead_code)`, because the rules, the indenter and the span worker that
+consume these foundations are the next steps; it goes away with F6.
+
+**F4. Rules.** `rules.go`, `rulesmap.go` and the 88 predicates of
+`rulecontext.go`. Exit: for every adjacent token pair in the corpus, the rules
+selected and their order match. This isolates a wrong predicate from a wrong
+span walk, which otherwise look the same in the output.
+
+Done. Two probes. `rulesmap` lists every non-empty bucket of the map in order,
+so the construction is compared directly: 27,724 buckets, identical digest. It
+is a fact about the implementation rather than about an input, so it is asked
+once. `rules` pairs up every token of a file, with the comments of its trivia,
+and asks which rules apply in the context of the pair's lowest common ancestor,
+under all five settings. `compare --ops rules` reports 16,120 of 16,120 at the
+first complete run. Forcing one predicate true makes an input differ, and
+swapping two rules that share a bucket changes the map's digest, so both checks
+can fail; swapping two rules that never share one does not, which is correct,
+since order only matters within a bucket.
+
+The 135-rule table was generated from `rules.go` by a script rather than
+retyped, then committed as ordinary source. One upstream quirk is reproduced on
+purpose: `anyTokenIncludingMultilineComments` and `anyTokenIncludingEOF` are
+both built by appending to `allTokens`, which has room for exactly one more
+element, so the two appends write the same slot and both ranges end in
+`EndOfFile`. The predicates also pulled in the language-service helpers they
+call: `GetFirstToken`, `GetLastToken`, `GetLastChild` and
+`PositionIsASICandidate`.
+
+**F5. Smart indenter.** `indent.go`. Exit: every indentation probe matches in
+all three settings variants.
+
+Done. `compare --ops indent` reports 16,120 of 16,120 at the first complete run.
+Ignoring whether a list indents its children makes 1,340 of the first 3,000
+inputs differ, so the check can fail. Disabling the restoration of a call
+argument's true start line changes nothing in those 3,000: that path needs an
+argument on the callee's line under a parent that would add a level, which is
+rare, so the probe says little about it. The indenter pulled in
+`PositionBelongsToNode` and `IsCompletedNode` from the language-service
+helpers. One upstream quirk is kept: when it measures leading whitespace a tab
+advances the column by `tabSize + column % tabSize`, not to the next tab stop,
+while the span worker's own `characterToColumn` uses the tab stop.
+
+**F6. Span worker and entry points.** `span.go` and `api.go`. Exit: every
+`FormatDocument` edit list and every case of the other entry points matches,
+byte for byte and edit for edit.
+
+Done. `compare --ops format` reports 16,120 of 16,120 under all five settings at
+the first complete run, including the 1,529 inputs whose edit lists overlap and
+cannot be applied, with the same failure text. The other five entry points are
+held by a new corpus-wide probe, `entry`, instead of the fourslash recording
+sketched in F0: `FormatOnEnter` at the first 64 line starts, `FormatSelection`
+between sampled offsets, and the three typed-character entry points after the
+first 24 occurrences of their character, under three settings. That is
+1,896,084 rows over the whole inventory against some two hundred recorded
+calls, and it reaches partial ranges, which the document probe cannot.
+`compare --ops entry` reports 16,120 of 16,120 at the first complete run.
+
+Mutations, over the whole inventory: applying the rules in forward order makes
+1,680 inputs differ; dropping the trailing edit at the end of the range, 14,253;
+dropping the line-break adjustment of `FormatOnEnter`, 154; dropping the
+fallback of the scan start to the enclosing node, 14. Processing a modifier
+list as a list instead of modifier by modifier, which is how upstream's visitor
+treats it, changes nothing: for modifiers the two paths compute the same
+indentation, so that choice follows the source and is not observable.
+
+Upstream shares dynamic indenters by pointer and mutates them when a rule adds
+or removes a line; here they live in a vector owned by the worker and are named
+by index. The visit order is `VisitEachChild`'s, exposed from `ts_astnav`. The
+temporary `allow(dead_code)` is gone.
+
+**F7. API and ownership.** `ts_api` gains insertion formatting beside printing.
+The request owns the decoded tree, the positioned clone, the synthetic source
+file, the formatting scanner and the edit list; the target file is borrowed
+from the snapshot and never copied into scratch. Disposal tests mirror the
+printing ones: output outlives scratch, decoder errors and panics, unsupported
+printer input, formatter errors, repeated requests beside a live registry with
+no arena growth and no registered handle. `scripts/s09_ownership.py` then
+publishes `api_scratch_disposal` as printing and formatting together, in all
+four modes, and the informational printing metric stays as its component.
+
+Done. `ts_api::format_node_for_insertion` is the pinned handler after transport:
+decode, print and position, wrap the tree in a synthetic source file over the
+printed text, take the indentation at the target position, format the node with
+it, apply the edits. `compare --ops insert` reports 16,120 of 16,120 under both
+settings. Its first working run reported 1,990 of 2,000, and every difference
+was one defect outside the formatter: the Rust decoder built modifier lists
+without the modifier flags upstream's `NewModifierList` computes, so a decoded
+class did not know it had decorators. Mutations: dropping the list-end
+notification makes 7,046 inputs differ, the node's own delta 4,967, and flipping
+the line-start test 820.
+
+Two storage facts shaped it. The arena checks a token's range against the text
+of the storage that holds its parent, and a decoded tree's storage has none, so
+a builder with an empty source can now adopt one (`adopt_source`); nothing built
+so far can refer into an empty text. And a tree that has been given positions is
+not printed a second time, so the request consumes its decoded tree.
+
+Six tests in `crates/ts_api/src/formatting/scratch_checks.rs` hold the ownership
+contract against frozen native rows (`data/s09/insertion-*.json`, four sources,
+64 answers, from `scripts/s09_format.py fixtures`): native outputs and failures,
+live scratch until the text returns, sixteen repeated requests beside a live
+registry, a formatter failure, printer and decoder errors, and a decoder panic.
+After every request the tracked counters are back where they were.
+`scripts/s09_ownership.py` publishes `api_scratch_disposal` from the printing
+and insertion suites together, each in all four modes, and verifies the frozen
+rows against their inputs before the tests that read them run.
+
+## 5. How failure shows up
+
+- Exact equality against native observations everywhere. No tolerance, no
+  normalization of whitespace, no comparing final text where an edit list exists.
+- A construct the port does not handle returns a named `Unsupported`; it never
+  formats "approximately". The count of distinct named boundaries is reported.
+- Each step's parity check is mutation-checked once, as S09-1 and S09-2 were.
+- Miri and AddressSanitizer run the ownership suites, not the corpus. The corpus
+  runs in debug and release.
+
+## 6. Evidence and ledger
+
+Every ported function carries a `// port:` marker; ledger rows flip as each file
+completes; `cargo xtask validate` stays clean throughout. The formatter parity
+numbers are published as informational metrics on the `e3` run, the way the
+printing metric is. A formatter parity gate of its own would be a new criterion
+in `status/experiments.toml`, which is the owner's call; this plan adds none.
+
+## 7. Risks
+
+- **Printer coverage.** The insertion path prints arbitrary decoded statements,
+  and the Rust printer prints none; see the correction in section 2. After F2
+  the remaining named boundaries (decorators, accessor bodies, generated names)
+  still refuse, and the `position` probe turns that into a count.
+- **`PreserveSourceNewlines`** changes list emission and line-break decisions
+  across the printer, so F2 can disturb S08 display parity. The S08 printing
+  and display suites run after every F2 change.
+- **Columns are UTF-16** in the writer and the formatter's line math. The
+  position map exists; the places that need it are easy to miss, so F0 includes
+  non-ASCII corpus files and insertion cases.
+- **Tree-shape dependence.** The formatter walks the parse tree and rescans
+  tokens. Parse parity is already at 1 on this corpus (E1), which is why the
+  corpus is reused rather than invented.
+- **Size.** The format package alone is 4,259 lines against the scanner's
+  4,330, and the dependencies bring the total to about 6,000, so this is a
+  sprint of its own. F1 and F2 are independent and small; F4 is wide but
+  mechanical; F5 and F6 carry the subtle logic.
+
+## 8. Order of work
+
+F0 first, because it fixes every denominator. F1 next: the rule predicates, the
+indenter and the span worker all call into navigation. Then F3, F4, F5, F6 in
+that order, since each consumes the previous. None of those touches the printer.
+F2 is independent of all of them and, after the correction in section 2, the
+largest single step; it is needed by F7 only. F7 last. S09-5 can close once F7's metric is
+true and the E3 evidence is refreshed.
+
+## 9. Decisions this plan assumes
+
+1. The `lsutil` pieces live in `ts_format` until `ts_ls` exists.
+2. No new gate; formatter parity is reported, not enforced, until the owner adds
+   a criterion.
+3. The corpus is the S07 subset plus the recorded fourslash formatting calls.

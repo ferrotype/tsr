@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "scope": "P3 computed index aggregation and explicit-index precedence",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "computed-string-index",
+      "files": {
+        "/computed-string-index.ts": "declare const key: string; interface I { [key](): number; stable(): string; } type A = I[string]; type B = keyof I;\n"
+      },
+      "roots": [
+        "/computed-string-index.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/computed-string-index.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/computed-string-index.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-number-index",
+      "files": {
+        "/computed-number-index.ts": "declare const key: number; interface I { [key](): number; 1(): string; stable(): boolean; } type A = I[number]; type B = keyof I;\n"
+      },
+      "roots": [
+        "/computed-number-index.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/computed-number-index.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/computed-number-index.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-symbol-index",
+      "files": {
+        "/computed-symbol-index.ts": "declare const key: symbol; interface I { [key](): number; stable(): boolean; } type A = I[symbol]; type B = keyof I;\n"
+      },
+      "roots": [
+        "/computed-symbol-index.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/computed-symbol-index.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/computed-symbol-index.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-explicit-index",
+      "files": {
+        "/computed-explicit-index.ts": "declare const key: string; interface I { [key](): number; [name: string]: () => number; stable(): number; } type A = I[string]; type B = keyof I;\n"
+      },
+      "roots": [
+        "/computed-explicit-index.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/computed-explicit-index.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/computed-explicit-index.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-property-error",
+      "files": {
+        "/index-property-error.ts": "interface I { [name: string]: number; bad: string; } type A = I[string];\n"
+      },
+      "roots": [
+        "/index-property-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/index-property-error.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-type-error",
+      "files": {
+        "/index-type-error.ts": "interface I { [name: string]: string; [index: number]: number; } type A = I[number];\n"
+      },
+      "roots": [
+        "/index-type-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/index-type-error.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-duplicate",
+      "files": {
+        "/index-duplicate.ts": "interface I { [name: string]: number; [other: string]: number; } type A = I[string];\n"
+      },
+      "roots": [
+        "/index-duplicate.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/index-duplicate.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-inherited-valid",
+      "files": {
+        "/index-inherited-valid.ts": "interface Base { [name: string]: number; ok: number; } interface Derived extends Base {} type A = Derived[string];\n"
+      },
+      "roots": [
+        "/index-inherited-valid.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/index-inherited-valid.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-inherited-error",
+      "files": {
+        "/index-inherited-error.ts": "interface Base { [name: string]: number; } interface Derived extends Base { bad: string; } type A = Derived[string];\n"
+      },
+      "roots": [
+        "/index-inherited-error.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/index-inherited-error.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

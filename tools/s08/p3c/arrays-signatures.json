@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 array, tuple and signature capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "array-types",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Names = string[]; type Counts = ReadonlyArray<number>; type Box<T> = T[]; type Text = Box<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Names",
+          "file": "/case.ts",
+          "declaration": "Names",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Counts",
+          "file": "/case.ts",
+          "declaration": "Counts",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Box",
+          "file": "/case.ts",
+          "declaration": "Box",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-types",
+      "files": {
+        "/case.ts": "type Pair = [string, number]; type Optional = [string, number?]; type Rest = [string, ...number[]]; type Named = [name: string, count?: number]; type Read = readonly [string, number];\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Pair",
+          "file": "/case.ts",
+          "declaration": "Pair",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Optional",
+          "file": "/case.ts",
+          "declaration": "Optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Rest",
+          "file": "/case.ts",
+          "declaration": "Rest",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Named",
+          "file": "/case.ts",
+          "declaration": "Named",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Read",
+          "file": "/case.ts",
+          "declaration": "Read",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-spread",
+      "files": {
+        "/case.ts": "type First = [string, ...[number, boolean]]; type Second = [...[string?], number]; type Choices = [string, ...([number] | [boolean, boolean])];\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "First",
+          "file": "/case.ts",
+          "declaration": "First",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Second",
+          "file": "/case.ts",
+          "declaration": "Second",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Choices",
+          "file": "/case.ts",
+          "declaration": "Choices",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "source-signatures",
+      "files": {
+        "/case.ts": "type Fn = (value: string) => number; type Optional = (value?: string) => number; type Generic = <T>(value: T) => T; type Call<T> = { (value: T): T }; type Text = Call<string>; type New<T> = new (value: T) => {value: T}; type Constructor = New<number>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Fn",
+          "file": "/case.ts",
+          "declaration": "Fn",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Optional",
+          "file": "/case.ts",
+          "declaration": "Optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Generic",
+          "file": "/case.ts",
+          "declaration": "Generic",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Call",
+          "file": "/case.ts",
+          "declaration": "Call",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "New",
+          "file": "/case.ts",
+          "declaration": "New",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Constructor",
+          "file": "/case.ts",
+          "declaration": "Constructor",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "method-signatures",
+      "files": {
+        "/case.ts": "type Methods<T> = { get(value: T): T; map<U>(value: U): T }; type Text = Methods<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Methods",
+          "file": "/case.ts",
+          "declaration": "Methods",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "index-signatures",
+      "files": {
+        "/case.ts": "type Dictionary<T> = { [key: string]: T }; type Text = Dictionary<string>; type Numeric = { [key: number]: boolean };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Dictionary",
+          "file": "/case.ts",
+          "declaration": "Dictionary",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Numeric",
+          "file": "/case.ts",
+          "declaration": "Numeric",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native constructor/static property inference and definite assignment; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "constructor-assigned",
+      "files": {
+        "/constructor-assigned.ts": "class C {x:number;constructor(){this.x=1;}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-assigned.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-assigned.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-assigned.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-branch-missing",
+      "files": {
+        "/constructor-branch-missing.ts": "class C {x:number;constructor(b:boolean){if(b){this.x=1;}}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-branch-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-branch-missing.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-branch-missing.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-branch-complete",
+      "files": {
+        "/constructor-branch-complete.ts": "class C {x:number;constructor(b:boolean){if(b){this.x=1;}else{this.x=2;}}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-branch-complete.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-branch-complete.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-branch-complete.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-inferred",
+      "files": {
+        "/constructor-inferred.ts": "class C {x;constructor(){this.x=1;}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-inferred.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-inferred.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-inferred.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-null-only",
+      "files": {
+        "/constructor-null-only.ts": "class C {x;constructor(){this.x=null;}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-null-only.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-null-only.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-null-only.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-inferred-union",
+      "files": {
+        "/constructor-inferred-union.ts": "class C {x;constructor(b:boolean){if(b){this.x=1;}else{this.x=\"s\";}}} type T=C; type X=C[\"x\"];\n"
+      },
+      "roots": [
+        "/constructor-inferred-union.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-inferred-union.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/constructor-inferred-union.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "static-block-inferred",
+      "files": {
+        "/static-block-inferred.ts": "class C {static x;static {this.x=1;}} type T=typeof C; type X=typeof C.x;\n"
+      },
+      "roots": [
+        "/static-block-inferred.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/static-block-inferred.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "X",
+          "file": "/static-block-inferred.ts",
+          "declaration": "X",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

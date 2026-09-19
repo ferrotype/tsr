@@ -1,0 +1,118 @@
+{
+  "scope": "All five remaining type/symbol failures from display-recheck-01; supplemental comparison, no new full-corpus count",
+  "complete": true,
+  "source_stable": true,
+  "requests": 5,
+  "capture_sha256": "659bc1edcb2c5939a804d3729560e82f8b11bbdeeaf93d9c2d409826dca4c380",
+  "control_capture_sha256": "7a3ad89e12e38c8ffd5c5286ff25522213255d92b7d82fe6cefe6c772469515b",
+  "binary_sha256": "8274ac4bb82306c727e0a293b26b0d849d2e099388d3c9d073c5024c902f97f7",
+  "counts_by_tier": {
+    "acceptance": {
+      "different": 2,
+      "match": 3
+    },
+    "informational": {}
+  },
+  "rows": [
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 20,
+        "rust_diagnostics": 20,
+        "state": "different"
+      },
+      "id": "compiler/computedPropertiesInDestructuring1.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 505,
+        "rust_queries": 505,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [
+          "pre_diagnostics",
+          "post_diagnostics",
+          "render_diagnostics",
+          "bytes"
+        ],
+        "emit": "not_executed",
+        "native_diagnostics": 20,
+        "rust_diagnostics": 20,
+        "state": "different"
+      },
+      "id": "compiler/computedPropertiesInDestructuring1_ES6.ts#configuration=0",
+      "state": "different",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 523,
+        "rust_queries": 523,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "compiler/promiseAllOnAny01.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 44,
+        "rust_queries": 44,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "compiler/unknownLikeUnionObjectFlagsNotPropagated.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 106,
+        "rust_queries": 106,
+        "state": "match"
+      }
+    },
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 0,
+        "rust_diagnostics": 0,
+        "state": "match"
+      },
+      "id": "conformance/controlFlow/controlFlowParameter.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 155,
+        "rust_queries": 155,
+        "state": "match"
+      }
+    }
+  ]
+}

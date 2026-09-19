@@ -1,0 +1,259 @@
+{
+  "version": 1,
+  "scope": "S08 P4 destructuring assignment writes, defaults, rest and flow; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "object-write",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a:number=0; let b:string=\"\"; ({a,b}={a:1,b:\"x\"}); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-rename",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; ({x:a}={x:2}); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-default",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let b=\"\"; ({a=1,b=\"x\"}={} as {a?:number,b?:string}); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-errors",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nconst a=0; let b=\"\"; ({a,b}={a:1,b:2}); ({missing:b}={known:1}); type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-rest",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let rest:{b:string}={b:\"\"}; ({a,...rest}={a:1,b:\"x\"}); type R=typeof rest;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "R",
+          "file": "/case.ts",
+          "declaration": "R",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "array-write",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let b=\"\"; [a,b]=[1,\"x\"]; type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "array-default",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let b=0; [a=1,b=2]=[]; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "array-rest",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let rest:number[]=[]; [a,...rest]=[1,2,3]; type R=typeof rest;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "R",
+          "file": "/case.ts",
+          "declaration": "R",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nested-write",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let b=\"\"; ({x:[a],y:{z:b}}={x:[1],y:{z:\"x\"}}); type A=typeof a;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "array-readonly",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let b=\"\"; const source=[1,\"x\"] as const; [a,b]=source; type B=typeof b;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "bad-rest",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\nlet a=0; let r:number[]=[]; [...r,a]=[1,2]; [...r=[]]=[1]; type R=typeof r;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "R",
+          "file": "/case.ts",
+          "declaration": "R",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "empty-object",
+      "files": {
+        "/case.ts": "interface Array<T>{[n:number]:T;length:number;} interface ReadonlyArray<T>{readonly[n:number]:T;readonly length:number;}\n({}=null); ({}=undefined); type T=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/case.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

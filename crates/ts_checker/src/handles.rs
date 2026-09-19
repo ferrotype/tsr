@@ -21,6 +21,10 @@ use ts_arena::{ArenaId, NodeId, SymbolId};
 use ts_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
 use ts_jsnum::{Number, PseudoBigInt};
 
+#[path = "handles_display.rs"]
+mod display;
+pub use display::TypeNodeBuilder;
+
 /// A type of one checker, usable inside an operation on that checker.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypeRef {
@@ -159,6 +163,103 @@ pub struct MemberSpec<'a> {
 }
 
 impl Operation<'_> {
+    /// Compares two results owned by this checker in the selected production
+    /// relation. Types retained from another checker are rejected first.
+    pub fn is_type_related_to(
+        &mut self,
+        source: TypeRef,
+        target: TypeRef,
+        mode: crate::RelationKind,
+    ) -> Result<bool, Error> {
+        let source = self.check_type(source)?;
+        let target = self.check_type(target)?;
+        self.state_mut().is_type_related_to(source, target, mode)
+    }
+
+    /// Rust's Ordering preserves the sign of Go's integer comparator. Both
+    /// non-null handles are validated before comparing, including equal refs.
+    pub fn compare_type_order(
+        &self,
+        source: Option<TypeRef>,
+        target: Option<TypeRef>,
+    ) -> Result<std::cmp::Ordering, Error> {
+        let source = source.map(|t| self.check_type(t)).transpose()?;
+        let target = target.map(|t| self.check_type(t)).transpose()?;
+        match (source, target) {
+            (None, None) => Ok(std::cmp::Ordering::Equal),
+            (None, Some(_)) => Ok(std::cmp::Ordering::Less),
+            (Some(_), None) => Ok(std::cmp::Ordering::Greater),
+            (Some(source), Some(target)) => self.state().compare_types(source, target),
+        }
+    }
+
+    /// Constructs only the supplemental comparator-domain records described
+    /// by P0; every result comes from the production comparator.
+    #[cfg(feature = "relation-probe")]
+    pub fn observe_residual_comparators(
+        &mut self,
+        first: NodeId,
+        second: NodeId,
+    ) -> Result<serde_json::Value, Error> {
+        self.state().ast(first)?.node(first)?;
+        self.state().ast(second)?.node(second)?;
+        self.state_mut().residual_comparators(first, second)
+    }
+
+    /// Diagnostic-only access to the frozen relation observation contract.
+    #[cfg(feature = "relation-probe")]
+    pub fn observe_type_relation(
+        &mut self,
+        source: TypeRef,
+        target: TypeRef,
+        mode: crate::RelationKind,
+        error_node: Option<NodeId>,
+    ) -> Result<(bool, Vec<crate::Ternary>, Option<ts_ast::Diagnostic>), Error> {
+        let source = self.check_type(source)?;
+        let target = self.check_type(target)?;
+        let state = self.state_mut();
+        if state.relations.observer.is_some() {
+            return Err(Error::MissingLink("relation observer already installed"));
+        }
+        if let Some(node) = error_node {
+            state.node(node)?;
+        }
+        state.relations.observer = Some(Vec::new());
+        let result = state.check_type_related_ex(source, target, mode, error_node, None);
+        let calls = state
+            .relations
+            .observer
+            .take()
+            .expect("observer installed above");
+        result.map(|(result, diagnostic)| (result, calls, diagnostic))
+    }
+
+    /// Owned counter/cache snapshot. It cannot warm a type or relation cache.
+    #[cfg(feature = "relation-probe")]
+    pub fn relation_state(&self) -> serde_json::Value {
+        let state = self.state();
+        let mut caches = serde_json::Map::new();
+        for (index, name) in [
+            "identity",
+            "assignable",
+            "subtype",
+            "strict_subtype",
+            "comparable",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let cache = &state.relations.caches[index];
+            let mut flags = cache.values().copied().collect::<Vec<_>>();
+            flags.sort_unstable();
+            caches.insert(
+                (*name).to_string(),
+                serde_json::json!({"entries":cache.len(),"result_flags":flags}),
+            );
+        }
+        serde_json::json!({"types_created":state.types.len(),"signatures_created":state.signatures.len(),"instantiations":state.instantiation.total_count,"caches":caches})
+    }
+
     /// Imports the exact identity only if the checker retains its symbol store.
     /// This preserves raw symbol observation, like Go's symbol-taking APIs;
     /// it does not substitute a merged clone. Source name/location queries
@@ -186,6 +287,24 @@ impl Operation<'_> {
     pub fn get_type_at_location(&mut self, node: NodeId) -> Result<TypeRef, Error> {
         let ty = self.state_mut().get_type_at_location(node)?;
         Ok(self.type_ref(ty))
+    }
+
+    /// Whether this source node participates in an expression query. The
+    /// contextual cases share the classifier used by checker name resolution.
+    pub fn is_expression_node(&self, node: NodeId) -> Result<bool, Error> {
+        crate::query::is_expression_node(self.state().ast(node)?, node)
+    }
+
+    /// Native `IsPartOfTypeNode`, including qualified names and heritage nodes.
+    pub fn is_part_of_type_node(&self, node: NodeId) -> Result<bool, Error> {
+        self.state().is_part_of_type_node(node)
+    }
+
+    /// The intrinsic spelling is distinct from printed type syntax. In
+    /// particular the native baseline walker bypasses the builder for `any`.
+    pub fn intrinsic_type_name(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        Ok(self.state().types.intrinsic(ty)?.name.clone())
     }
 
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
@@ -232,7 +351,8 @@ impl Operation<'_> {
     /// Context-free `TypeToStringEx`: flags are explicit and there is no
     /// enclosing declaration. Go's `TypeToString` defaults are
     /// `ALLOW_UNIQUE_ES_SYMBOL_TYPE | USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE`.
-    /// Context-sensitive qualification/annotation reuse is not implemented yet.
+    /// Use `type_to_string_at` for qualification and annotation reuse in an
+    /// enclosing declaration.
     pub fn type_to_string(
         &mut self,
         ty: TypeRef,
@@ -264,12 +384,13 @@ impl Operation<'_> {
             .collect())
     }
 
-    /// Suggestions already produced by queries/checking. This does not execute
-    /// the additional unused-code pass of Go's GetSuggestionDiagnostics.
+    /// Suggestions produced by queries and checking, including the
+    /// unused-identifier pass Go's GetSuggestionDiagnostics requests.
     pub fn recorded_suggestions(
         &mut self,
         source: NodeId,
     ) -> Result<Vec<ts_ast::Diagnostic>, Error> {
+        self.state_mut().check_source_file_ex(source, true)?;
         Ok(self
             .state_mut()
             .suggestions_for_file(Some(source))?
@@ -344,6 +465,15 @@ impl Operation<'_> {
             .map(|id| self.type_ref(id))
     }
 
+    /// The structural storage census of this checker with `roots` as the
+    /// retained results (`data/s08/type-footprint.json`). Read-only: no
+    /// resolution, links or caches are created.
+    #[cfg(feature = "storage-pilot")]
+    pub fn census(&self, roots: &[TypeRef]) -> Result<serde_json::Value, Error> {
+        let roots = self.check_types(roots)?;
+        self.state().census(&roots)
+    }
+
     /// `Checker.TypeCount`.
     pub fn type_count(&self) -> usize {
         self.state().types.len()
@@ -372,6 +502,19 @@ impl Operation<'_> {
     pub fn type_kind(&self, t: TypeRef) -> Result<TypeKind, Error> {
         let id = self.check_type(t)?;
         self.state().kind(id)
+    }
+
+    /// Existing computed-name identity, without creating links or resolving a type.
+    /// The operation validates the symbol owner before observing its name type;
+    /// this read is suitable for snapshots that must not warm checker queries.
+    pub fn symbol_name_type(&self, symbol: SymbolRef) -> Result<Option<TypeRef>, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        Ok(self
+            .state()
+            .value_symbol_links
+            .try_get(symbol)
+            .and_then(|links| links.name_type)
+            .map(|ty| self.type_ref(ty)))
     }
 
     /// The symbol of a type, if it has one.
@@ -632,6 +775,35 @@ impl Operation<'_> {
         Ok(self.node_ref(node))
     }
 
+    /// `createSyntheticExpression` through its port in `call_spread.rs`: a
+    /// checker-created expression whose parent and range come from a node of
+    /// the checker's program. The parent stays an id into a retained file; a
+    /// node this checker's file set does not hold is rejected before anything
+    /// is created.
+    pub fn synthetic_expression_at(
+        &mut self,
+        parent: NodeId,
+        t: TypeRef,
+        is_spread: bool,
+    ) -> Result<NodeRef, Error> {
+        let id = self.check_type(t)?;
+        let node = self
+            .state_mut()
+            .synthetic_call_argument(parent, id, is_spread, None)?;
+        Ok(self.node_ref(node))
+    }
+
+    /// The parent of a checker-created node and its kind, resolved through the
+    /// checker's own arena or through its retained file set.
+    pub fn node_parent(&self, node: NodeRef) -> Result<Option<(NodeId, NodeKind)>, Error> {
+        let id = self.check_node(node)?;
+        let Some(parent) = self.state().factory.view().node(id)?.parent() else {
+            return Ok(None);
+        };
+        let kind = self.state().node(parent)?.kind();
+        Ok(Some((parent, kind)))
+    }
+
     /// The type a synthetic expression embeds.
     pub fn synthetic_expression_type(&self, node: NodeRef) -> Result<TypeRef, Error> {
         let id = self.check_node(node)?;
@@ -674,6 +846,25 @@ impl Operation<'_> {
     pub fn import_symbol(&self, retained: &RetainedSymbol) -> Result<SymbolId, Error> {
         self.check_import(&retained.owner)?;
         self.check_symbol(retained.id)
+    }
+
+    /// Retains a symbol this checker returned from a query. It may live in a
+    /// bound file rather than in the checker's own arena; the owner retains
+    /// that file set, so the result keeps the file alive too.
+    pub fn retain_symbol_ref(&self, symbol: SymbolRef) -> Result<RetainedSymbol, Error> {
+        let id = self.check_symbol_ref(symbol)?;
+        Ok(RetainedSymbol {
+            owner: self.owner().clone(),
+            id,
+        })
+    }
+
+    /// The exact-checker reference of a retained symbol, for the queries that
+    /// take one. Another checker's operation rejects it before any read, even
+    /// when both checkers share the bound file the symbol lives in.
+    pub fn import_symbol_ref(&self, retained: &RetainedSymbol) -> Result<SymbolRef, Error> {
+        self.check_import(&retained.owner)?;
+        self.symbol_ref(retained.id)
     }
 
     pub fn retain_signature(&self, s: SignatureRef) -> Result<RetainedSignature, Error> {
@@ -732,5 +923,139 @@ impl Operation<'_> {
         }
         self.lease().validate_identity(owner.identity().id())?;
         Ok(())
+    }
+}
+
+/// One signature's shape for the S08 relater prototype's translation
+/// (`docs/S08-P7.md`): the prototype constructs its own graph from these
+/// read-only shapes and never delegates a relation to this checker.
+#[cfg(feature = "relation-probe")]
+#[derive(Clone, Debug)]
+pub struct SignatureShape {
+    pub parameters: Vec<TypeRef>,
+    pub min_argument_count: usize,
+    pub has_rest_parameter: bool,
+    pub type_parameters: usize,
+    pub this_type: Option<TypeRef>,
+    pub return_type: TypeRef,
+    pub is_abstract: bool,
+    /// Raw `SyntaxKind` of the declaration, when there is one.
+    pub declaration_kind: Option<i16>,
+}
+
+/// A literal type's value, for the same translation.
+#[cfg(feature = "relation-probe")]
+#[derive(Clone, Debug, PartialEq)]
+pub enum LiteralShape {
+    String(Vec<u8>),
+    Number(f64),
+    Boolean(bool),
+    BigInt { negative: bool, digits: Vec<u8> },
+    Unknown,
+}
+
+#[cfg(feature = "relation-probe")]
+impl Operation<'_> {
+    /// Resolved index signatures as (key type, value type, readonly).
+    pub fn index_infos(&mut self, t: TypeRef) -> Result<Vec<(TypeRef, TypeRef, bool)>, Error> {
+        let id = self.check_type(t)?;
+        let infos = self.state_mut().index_infos_of_type(id)?;
+        let state = self.state();
+        let mut result = Vec::with_capacity(infos.len());
+        for info in infos {
+            let info = state.signatures.index_info(info)?;
+            result.push((
+                self.type_ref(info.key_type),
+                self.type_ref(info.value_type),
+                info.is_readonly,
+            ));
+        }
+        Ok(result)
+    }
+
+    /// Resolved call (or construct) signatures in upstream order.
+    pub fn signatures_of_type(
+        &mut self,
+        t: TypeRef,
+        construct: bool,
+    ) -> Result<Vec<SignatureRef>, Error> {
+        let id = self.check_type(t)?;
+        Ok(self
+            .state_mut()
+            .signatures_of_type(id, construct)?
+            .into_iter()
+            .map(|id| self.signature_ref(id))
+            .collect())
+    }
+
+    pub fn signature_shape(&mut self, s: SignatureRef) -> Result<SignatureShape, Error> {
+        let id = self.check_signature(s)?;
+        let (parameters, this_parameter, flags, type_parameters, declaration) = {
+            let sig = self.state().signatures.get(id)?;
+            (
+                sig.parameters.as_deref().unwrap_or(&[]).to_vec(),
+                sig.this_parameter,
+                sig.flags,
+                sig.type_parameters.as_ref().map_or(0, |list| list.len()),
+                sig.declaration,
+            )
+        };
+        let mut parameter_types = Vec::with_capacity(parameters.len());
+        for parameter in parameters {
+            let ty = self.state_mut().type_of_parameter(parameter)?;
+            parameter_types.push(self.type_ref(ty));
+        }
+        let this_type = match this_parameter {
+            Some(symbol) => {
+                let ty = self.state_mut().get_type_of_symbol(symbol)?;
+                Some(self.type_ref(ty))
+            }
+            None => None,
+        };
+        let return_type = self.state_mut().return_type_of_signature(id)?;
+        let min_argument_count = self.state_mut().min_argument_count(id)?;
+        let declaration_kind = match declaration {
+            Some(node) => Some(self.state().ast(node)?.node(node)?.kind().raw()),
+            None => None,
+        };
+        Ok(SignatureShape {
+            parameters: parameter_types,
+            min_argument_count,
+            has_rest_parameter: flags & crate::signature_flags::HAS_REST_PARAMETER != 0,
+            type_parameters,
+            this_type,
+            return_type: self.type_ref(return_type),
+            is_abstract: flags & crate::signature_flags::ABSTRACT != 0,
+            declaration_kind,
+        })
+    }
+
+    /// A literal type's value and whether this is the fresh form.
+    pub fn literal_shape(&self, t: TypeRef) -> Result<(LiteralShape, bool), Error> {
+        let id = self.check_type(t)?;
+        let state = self.state();
+        let data = state.types.literal(id)?;
+        let value = match &data.value {
+            crate::LiteralValue::String(text) => LiteralShape::String(text.as_bytes().to_vec()),
+            crate::LiteralValue::Number(value) => LiteralShape::Number(value.value()),
+            crate::LiteralValue::Boolean(value) => LiteralShape::Boolean(*value),
+            crate::LiteralValue::BigInt(value) => LiteralShape::BigInt {
+                negative: value.negative,
+                digits: value.base10_value.clone(),
+            },
+            crate::LiteralValue::ComputedEnum => LiteralShape::Unknown,
+        };
+        Ok((value, state.is_fresh_literal_type(id)?))
+    }
+
+    pub fn is_readonly_symbol(&mut self, symbol: SymbolRef) -> Result<bool, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        self.state_mut().is_readonly_symbol(symbol)
+    }
+
+    /// The alias symbol a type displays through, if any.
+    pub fn alias_symbol(&self, t: TypeRef) -> Result<Option<SymbolId>, Error> {
+        let id = self.check_type(t)?;
+        Ok(self.state().types.alias_of(id)?.map(|alias| alias.symbol))
     }
 }

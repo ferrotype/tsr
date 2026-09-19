@@ -1,0 +1,475 @@
+{
+  "version": 1,
+  "scope": "S08 P4 class inheritance, abstract members, override modifiers and property/accessor diagnostics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "override-valid",
+      "files": {
+        "/override-valid.ts": "class A{x=1;f(){return 1;}}class C extends A{override x=2;override f(){return 2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-valid.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-valid.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-no-base",
+      "files": {
+        "/override-no-base.ts": "class C{override x=1;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-no-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-no-base.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-missing",
+      "files": {
+        "/override-missing.ts": "class A{x=1;}class C extends A{override other=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-missing.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-suggestion",
+      "files": {
+        "/override-suggestion.ts": "class A{value=1;}class C extends A{override vlaue=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-suggestion.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-suggestion.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-dynamic",
+      "files": {
+        "/override-dynamic.ts": "declare const name:string;class A{}class C extends A{override [name]=1;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-dynamic.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-dynamic.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-static",
+      "files": {
+        "/override-static.ts": "class A{static value=1;}class C extends A{static override value=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-static.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-static.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-parameter",
+      "files": {
+        "/override-parameter.ts": "class A{x=1;}class C extends A{constructor(public override x:number){super();}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-parameter.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-parameter.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-private",
+      "files": {
+        "/override-private.ts": "class A{private x=1;}class C extends A{private x=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-private.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-private.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-accessor-property",
+      "files": {
+        "/override-accessor-property.ts": "class A{get x(){return 1;}}class C extends A{x=2;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-accessor-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-accessor-property.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-property-accessor",
+      "files": {
+        "/override-property-accessor.ts": "class A{x=1;}class C extends A{get x(){return 2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-property-accessor.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-property-accessor.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-method-accessor",
+      "files": {
+        "/override-method-accessor.ts": "class A{f(){return 1;}}class C extends A{get f(){return ()=>2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-method-accessor.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-method-accessor.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-accessor-method",
+      "files": {
+        "/override-accessor-method.ts": "class A{get f(){return ()=>1;}}class C extends A{f(){return 2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-accessor-method.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-accessor-method.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-property-method",
+      "files": {
+        "/override-property-method.ts": "class A{f=()=>1;}class C extends A{f(){return 2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-property-method.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-property-method.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-uninitialized",
+      "files": {
+        "/override-uninitialized.ts": "class A{x=1;}class C extends A{x!:number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-uninitialized.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-uninitialized.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-constructor-init",
+      "files": {
+        "/override-constructor-init.ts": "class A{x=1;}class C extends A{x:number;constructor(){super();this.x=2;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-constructor-init.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-constructor-init.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-declare",
+      "files": {
+        "/override-declare.ts": "class A{x=1;}class C extends A{declare x:number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-declare.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-declare.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-abstract-one",
+      "files": {
+        "/override-abstract-one.ts": "abstract class A{abstract f():number;}class C extends A{}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-abstract-one.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-abstract-one.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-abstract-two",
+      "files": {
+        "/override-abstract-two.ts": "abstract class A{abstract f():number;abstract x:number;}class C extends A{}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-abstract-two.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-abstract-two.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-abstract-many",
+      "files": {
+        "/override-abstract-many.ts": "abstract class A{abstract a:number;abstract b:number;abstract c:number;abstract d:number;abstract e:number;abstract f:number;}class C extends A{}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-abstract-many.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-abstract-many.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-abstract-expression",
+      "files": {
+        "/override-abstract-expression.ts": "abstract class A{abstract f():number;}const C=class extends A{};type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-abstract-expression.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-abstract-expression.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-abstract-allowed",
+      "files": {
+        "/override-abstract-allowed.ts": "abstract class A{abstract x:number;}class C extends A{get x(){return 1;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-abstract-allowed.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-abstract-allowed.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "override-interface-base",
+      "files": {
+        "/override-interface-base.ts": "class A{} interface A{x:number;}class C extends A{get x(){return 1;}}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/override-interface-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/override-interface-base.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "inheritance-private-base",
+      "files": {
+        "/inheritance-private-base.ts": "class A{private constructor(){}}class C extends A{}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/inheritance-private-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/inheritance-private-base.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "inheritance-implements-reference",
+      "files": {
+        "/inheritance-implements-reference.ts": "interface I{x:number;}abstract class C implements I{abstract x:number;}type Query=typeof C;\n"
+      },
+      "roots": [
+        "/inheritance-implements-reference.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/inheritance-implements-reference.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "deny",
+  "recorded_at": 1789777239,
+  "context": {
+    "revision": "c3201ae3c5affb93eeb0a5f7bab268b3c83887aa",
+    "source_sha256": "fe2e9508bd768f169a78c163d5b208f32371eeb1bc751621d6b7e9ca73a6486b",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "82d8f44574fe8b378658ca5ea21f32edee42e294f91b069ee5e6e1b833a9e55e",
+  "inputs": {
+    "Cargo.lock": "006554e2f9521b4021c5dcbe6a91b5719b6b575b25db9c3572b3c588f84e22bd",
+    "deny.toml": "169a444cb9b24a1b618a73cef7a1ea9f1ba6026351aed27e70a786e13a3ae490"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "deny"
+  ],
+  "target": "host",
+  "config": "advisories, licenses, bans, sources",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": false}}\n",
+  "stderr": "cargo-deny 0.20.2\n+ cargo deny --locked check\n2026-09-19 00:20:39 [ERROR] failed to acquire advisory database lock: failed to obtain lock file '/Users/cristian/.cargo/advisory-dbs/db.lock': attempted to take an exclusive lock on a read-only path\n",
+  "stdout_sha256": "1318826661716f34caf8ce065c4e3ba12281a47295653734f15191232661db21",
+  "stderr_sha256": "2b1e40da5b700f09f0b909b918b4a4e8e74b46e085ba6ff95ad0520bc2fc75bd",
+  "valid_capture": true
+}

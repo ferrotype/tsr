@@ -1,0 +1,364 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 generic declarations, references, defaults and inheritance capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "generic-alias",
+      "files": {
+        "/case.ts": "type Box<T> = { value: T }; type Text = Box<string>; type Count = Box<number>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Box",
+          "file": "/case.ts",
+          "declaration": "Box",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Count",
+          "file": "/case.ts",
+          "declaration": "Count",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-interface",
+      "files": {
+        "/case.ts": "interface Box<T> { value: T; next: Box<T> } type Text = Box<string>; type Count = Box<number>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Box",
+          "file": "/case.ts",
+          "declaration": "Box",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Count",
+          "file": "/case.ts",
+          "declaration": "Count",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-default",
+      "files": {
+        "/case.ts": "type Pair<A, B = A> = { first: A; second: B }; type Default = Pair<string>; type Explicit = Pair<number, boolean>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Pair",
+          "file": "/case.ts",
+          "declaration": "Pair",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Default",
+          "file": "/case.ts",
+          "declaration": "Default",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Explicit",
+          "file": "/case.ts",
+          "declaration": "Explicit",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "interface-default",
+      "files": {
+        "/case.ts": "interface Pair<A, B = A> { first: A; second: B } type Default = Pair<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Pair",
+          "file": "/case.ts",
+          "declaration": "Pair",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Default",
+          "file": "/case.ts",
+          "declaration": "Default",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-union",
+      "files": {
+        "/case.ts": "type Maybe<T> = T | undefined; type Nested<T> = { v: Maybe<T> }; type Result = Nested<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Maybe",
+          "file": "/case.ts",
+          "declaration": "Maybe",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Nested",
+          "file": "/case.ts",
+          "declaration": "Nested",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Result",
+          "file": "/case.ts",
+          "declaration": "Result",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-anonymous-nested",
+      "files": {
+        "/case.ts": "type Box<T> = { inner: { value: T } }; type Text = Box<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Box",
+          "file": "/case.ts",
+          "declaration": "Box",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "interface-inheritance",
+      "files": {
+        "/case.ts": "interface Base<T> { value: T } interface Derived<T> extends Base<T> { count: number } type Text = Derived<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Base",
+          "file": "/case.ts",
+          "declaration": "Base",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Derived",
+          "file": "/case.ts",
+          "declaration": "Derived",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "this-intersection",
+      "files": {
+        "/case.ts": "interface Chain { self: this } type Combined = Chain & { count: number };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Chain",
+          "file": "/case.ts",
+          "declaration": "Chain",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Combined",
+          "file": "/case.ts",
+          "declaration": "Combined",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constraint-default",
+      "files": {
+        "/case.ts": "type Box<T extends string = \"x\"> = { value: T }; type Good = Box<\"a\">; type Bad = Box<number>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Box",
+          "file": "/case.ts",
+          "declaration": "Box",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Good",
+          "file": "/case.ts",
+          "declaration": "Good",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Bad",
+          "file": "/case.ts",
+          "declaration": "Bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constraint-cycle",
+      "files": {
+        "/case.ts": "type Loop<T extends T> = { value: T };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Loop",
+          "file": "/case.ts",
+          "declaration": "Loop",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-cycle",
+      "files": {
+        "/case.ts": "type Loop<T = T> = { value: T };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Loop",
+          "file": "/case.ts",
+          "declaration": "Loop",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-forward",
+      "files": {
+        "/case.ts": "type Forward<A = B, B = string> = { a: A; b: B };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Forward",
+          "file": "/case.ts",
+          "declaration": "Forward",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

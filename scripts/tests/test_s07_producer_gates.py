@@ -1,12 +1,128 @@
 """Named S07 contract gates must observe their complete measured obligations."""
 import copy
+import json
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s07_producers import GRAPH_CONTRACT_TESTS, binder_contract_metrics
+from s07_producers import GRAPH_CONTRACT_TESTS, binder_contract_metrics, program
+import s07_program_helpers as helpers
+import s06_utilities as utilities
+
+
+class ProgramPreflightTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        (self.root / 'data/s07').mkdir(parents=True)
+        (self.root / 'data/upstream.json').write_text(json.dumps({'pin': 'test-pin'}))
+        self.manifest = {'schema': 1, 'upstream_pin': 'test-pin', 'checks': helpers.CHECKS,
+                         'groups': [{'package': 'ts_compiler', 'target': 'helpers',
+                                     'prefix': 'named::', 'tests': ['named::first', 'named::second']}]}
+        self.binary = str(self.root / 'helper-tests')
+        self.build = json.dumps({'reason': 'compiler-artifact', 'profile': {'test': True},
+                                 'executable': self.binary,
+                                 'manifest_path': str(self.root / 'crates/ts_compiler/Cargo.toml'),
+                                 'target': {'kind': ['test'], 'name': 'helpers'}}).encode()
+        self.valid_inventory = b'named::first: test\nnamed::second: test\n'
+
+    def write_manifest(self):
+        raw = json.dumps(self.manifest).encode()
+        (self.root / 'data/s07/program-helper-tests.json').write_bytes(raw)
+        return raw
+
+    def test_valid_manifest_and_binary_inventory_pass_real_preflight(self):
+        raw = self.write_manifest()
+        with patch.object(helpers, 'ROOT', self.root), \
+                patch.object(helpers, 'setup', side_effect=[self.build, self.valid_inventory]) as setup:
+            prepared = helpers.preflight(self.root / 'capture')
+        self.assertEqual(prepared, (raw, self.manifest, {('ts_compiler', 'helpers'): self.binary}))
+        self.assertEqual(setup.call_count, 2)
+        self.assertEqual(setup.call_args_list[1].args[0], [self.binary, '--list', '--format=terse'])
+
+    def test_builds_only_manifest_targets_with_separate_build_budget(self):
+        self.manifest['groups'] += [
+            {'package': 'ts_compiler', 'target': 'lib', 'prefix': 'compiler::', 'tests': ['compiler::check']},
+            {'package': 'ts_module', 'target': 'lib', 'prefix': 'module::', 'tests': ['module::check']},
+            {'package': 'ts_module', 'target': 'lib', 'prefix': 'trace::', 'tests': ['trace::check']},
+        ]
+        self.write_manifest()
+        def run(args, **kwargs):
+            if args[0] == 'cargo':
+                package = args[args.index('--package') + 1]
+                targets = sorted({g['target'] for g in self.manifest['groups'] if g['package'] == package})
+                rows = [{'reason': 'compiler-artifact', 'profile': {'test': True},
+                         'executable': f'/{package}-{target}',
+                         'manifest_path': str(self.root / 'crates' / package / 'Cargo.toml'),
+                         'target': {'kind': ['lib'] if target == 'lib' else ['test'],
+                                    'name': package if target == 'lib' else target}}
+                        for target in targets]
+                output = b'\n'.join(json.dumps(row).encode() for row in rows)
+            else:
+                output = ''.join(name + ': test\n' for g in self.manifest['groups']
+                                 if args[0] == f"/{g['package']}-{g['target']}" for name in g['tests']).encode()
+            return subprocess.CompletedProcess(args, 0, output, b'')
+        # Exercise setup/invoke as well as preflight so the budget must actually
+        # reach subprocess.run, rather than merely appear at a mocked setup call.
+        with patch.object(helpers, 'ROOT', self.root), \
+                patch.object(utilities.subprocess, 'run', side_effect=run) as invoked:
+            _, _, binaries = helpers.preflight(self.root / 'capture')
+        base = ['cargo', 'test', '--locked', '--release', '--no-run', '--message-format=json', '--package']
+        self.assertEqual([call.args[0] for call in invoked.call_args_list[:2]], [
+            base + ['ts_compiler', '--test', 'helpers', '--lib'],
+            base + ['ts_module', '--lib'],
+        ])
+        self.assertEqual([call.kwargs['timeout'] for call in invoked.call_args_list],
+                         [1800, 1800, 300, 300, 300])
+        self.assertEqual(set(binaries), {('ts_compiler', 'helpers'), ('ts_compiler', 'lib'), ('ts_module', 'lib')})
+
+    def test_build_timeout_stops_before_subset_capture(self):
+        self.write_manifest()
+        with patch('s07_program_compare.input_fingerprints', return_value={}), \
+                patch('s07_producers.ROOT', self.root), patch.object(helpers, 'ROOT', self.root), \
+                patch.object(utilities.subprocess, 'run', side_effect=subprocess.TimeoutExpired(['cargo'], 1800)), \
+                patch('s07_producers.prepare_subset') as subset:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                program()
+        subset.assert_not_called()
+
+    def test_inventory_drift_stops_before_subset_or_source_capture(self):
+        self.write_manifest()
+        for inventory in (b'named::first: test\n',
+                          self.valid_inventory + b'named::unexpected: test\n',
+                          self.valid_inventory + b'named::first: test\n'):
+            with self.subTest(inventory=inventory), \
+                    patch('s07_program_compare.input_fingerprints', return_value={}), \
+                    patch('s07_producers.ROOT', self.root), \
+                    patch.object(helpers, 'ROOT', self.root), \
+                    patch.object(helpers, 'setup', side_effect=[self.build, inventory]) as setup, \
+                    patch('s07_producers.prepare_subset', side_effect=AssertionError('subset reached')) as subset, \
+                    patch('s07_producers.command', side_effect=AssertionError('source capture reached')) as command:
+                with self.assertRaisesRegex(ValueError, 'named test inventory drift'):
+                    program()
+                self.assertEqual(setup.call_count, 2)
+                subset.assert_not_called()
+                command.assert_not_called()
+
+    def test_manifest_drift_stops_before_build_or_capture(self):
+        self.manifest['upstream_pin'] = 'another-pin'
+        self.write_manifest()
+        with patch('s07_program_compare.input_fingerprints', return_value={}), \
+                patch('s07_producers.ROOT', self.root), \
+                patch.object(helpers, 'ROOT', self.root), \
+                patch.object(helpers, 'setup') as setup, \
+                patch('s07_producers.prepare_subset', side_effect=AssertionError('subset reached')) as subset, \
+                patch('s07_producers.command', side_effect=AssertionError('source capture reached')) as command:
+            with self.assertRaisesRegex(ValueError, 'helper checker inventory changed'):
+                program()
+            setup.assert_not_called()
+            subset.assert_not_called()
+            command.assert_not_called()
 
 
 class BinderGateTests(unittest.TestCase):

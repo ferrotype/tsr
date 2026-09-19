@@ -1,4 +1,4 @@
-# Phase 0, sprint 10. Producers to register: e7, e8.
+# Phase 0, sprint 10. Registered replay producers: e7, e8.
 #   run.e7.parser_artifact_size_ratio, run.e7.parse_throughput_ratio, run.e7.checker_parity, run.e7.portable_host
 #   run.e8.node_parse_latency_ratio, run.e8.rust_consumer_parity, run.e8.lifetime_checks
 # The Go GOOS=js parser baseline is built from the pin; the Rust consumer lives outside the workspace.

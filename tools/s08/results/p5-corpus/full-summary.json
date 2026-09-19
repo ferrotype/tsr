@@ -1,0 +1,130 @@
+{
+  "scope": "Development corpus comparison of diagnostics and native baseline bytes; emit not executed; no E2 gate claim",
+  "rust_revision": "5e93fce",
+  "complete": true,
+  "source_stable": true,
+  "requested": 10728,
+  "rust_capture_sha256": "2079e9a0a81aa00a5df7bfc916d1b68e5a4cc255c34afc85aec1ce909903e20d",
+  "rust_binary_sha256": "0cd93b5d521fcbd8d572faca632180bb807da34d6a95de5677bf226059a976fa",
+  "native_observations_sha256": "a942296deb914902af487e65dbeaec07d5e642f3d63339bf7b64e80590f37262",
+  "build_command": [
+    "cargo",
+    "build",
+    "--locked",
+    "-p",
+    "ts_compiler",
+    "--example",
+    "p5_inventory",
+    "--message-format=json",
+    "--config",
+    "profile.dev.opt-level=1",
+    "--config",
+    "profile.dev.debug-assertions=true",
+    "--config",
+    "profile.dev.overflow-checks=true"
+  ],
+  "tiers": {
+    "acceptance": {
+      "variants": 9369,
+      "combined": {
+        "match": 7216,
+        "failed": 555,
+        "different": 1598
+      },
+      "type_symbols": {
+        "match": 7369,
+        "failed": 555,
+        "different": 1247,
+        "disabled": 198
+      },
+      "errors": {
+        "match": 8786,
+        "different": 582,
+        "failed": 1
+      },
+      "type_difference_dimensions": {
+        "types": 1203,
+        "queries": 268,
+        "symbols": 98
+      },
+      "error_difference_dimensions": {
+        "pre_diagnostics": 582,
+        "post_diagnostics": 582,
+        "render_diagnostics": 582,
+        "bytes": 572
+      },
+      "type_symbols_failure_buckets": [
+        {
+          "class": "walker_error",
+          "reason": "printer does not support expressions outside literal types and entity names yet",
+          "variants": 488
+        },
+        {
+          "class": "walker_error",
+          "reason": "unsupported checker operation: TypeAlias.ToTypeReferenceNode: parent chain",
+          "variants": 64
+        },
+        {
+          "class": "walker_error",
+          "reason": "unsupported checker operation: mapped display: modifier preserving wrapper",
+          "variants": 2
+        },
+        {
+          "class": "baseline_prerequisite",
+          "reason": "requested diagnostics did not complete before baseline walk",
+          "variants": 1
+        }
+      ],
+      "errors_failure_buckets": [
+        {
+          "class": "baseline_prerequisite",
+          "reason": "requested diagnostics did not complete before baseline walk",
+          "variants": 1
+        }
+      ]
+    },
+    "informational": {
+      "variants": 1359,
+      "combined": {
+        "match": 1030,
+        "different": 213,
+        "native_unavailable": 34,
+        "failed": 82
+      },
+      "type_symbols": {
+        "disabled": 107,
+        "match": 982,
+        "different": 154,
+        "failed": 82
+      },
+      "errors": {
+        "match": 1236,
+        "different": 89
+      },
+      "type_difference_dimensions": {
+        "types": 149,
+        "queries": 52,
+        "symbols": 34
+      },
+      "error_difference_dimensions": {
+        "pre_diagnostics": 89,
+        "post_diagnostics": 89,
+        "render_diagnostics": 89,
+        "bytes": 87
+      },
+      "type_symbols_failure_buckets": [
+        {
+          "class": "walker_error",
+          "reason": "printer does not support expressions outside literal types and entity names yet",
+          "variants": 78
+        },
+        {
+          "class": "walker_error",
+          "reason": "unsupported checker operation: TypeAlias.ToTypeReferenceNode: parent chain",
+          "variants": 4
+        }
+      ],
+      "errors_failure_buckets": []
+    }
+  }
+}

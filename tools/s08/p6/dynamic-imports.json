@@ -1,0 +1,521 @@
+{
+  "version": 1,
+  "scope": "S08 P6 dynamic import checking through real programs, diagnostics and public queries; supplemental, not E2 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "programs": [
+    {
+      "id": "namespace-and-awaited",
+      "files": {
+        "/main.mts": "const pending = import(\"./dep.mjs\"); const result = await pending; const value = result.value;",
+        "/dep.mts": "export const value = 42; export default \"hello\";"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "result.name",
+          "file": "/main.mts",
+          "declaration": "result",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "result.initializer",
+          "file": "/main.mts",
+          "declaration": "result",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.name",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.initializer",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "attributed-patterns",
+      "files": {
+        "/main.mts": "const plain = import(\"plain.resource\"); const typed = import(\"typed/file.resource\", { with: { type: \"text\" } }); const options = { with: { type: \"text\" as const } }; const parenthesized = import(\"typed/other.resource\", ({ with: { type: \"text\" } })); const indirect = import(\"typed/more.resource\", options); const fallback = import(\"typed/none.resource\");",
+        "/dep.mts": "export const value = 42; export default \"hello\";",
+        "/types.d.ts": "declare module \"*.resource\" { export const kind: \"plain\"; } declare module \"typed/*.resource\" with { type: \"text\" } { export const kind: \"text\"; }"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts",
+        "/types.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "plain.name",
+          "file": "/main.mts",
+          "declaration": "plain",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "plain.initializer",
+          "file": "/main.mts",
+          "declaration": "plain",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "typed.name",
+          "file": "/main.mts",
+          "declaration": "typed",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "typed.initializer",
+          "file": "/main.mts",
+          "declaration": "typed",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "parenthesized.name",
+          "file": "/main.mts",
+          "declaration": "parenthesized",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "parenthesized.initializer",
+          "file": "/main.mts",
+          "declaration": "parenthesized",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "indirect.name",
+          "file": "/main.mts",
+          "declaration": "indirect",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "indirect.initializer",
+          "file": "/main.mts",
+          "declaration": "indirect",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "fallback.name",
+          "file": "/main.mts",
+          "declaration": "fallback",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "fallback.initializer",
+          "file": "/main.mts",
+          "declaration": "fallback",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "json-default-only",
+      "files": {
+        "/main.mts": "const pending = import(\"./settings.json\", { with: { type: \"json\" } }); const value = await pending;",
+        "/dep.mts": "export const value = 42; export default \"hello\";",
+        "/settings.json": "{\"name\":\"example\",\"count\":1}"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts",
+        "/settings.json"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.name",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.initializer",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "commonjs-namespace",
+      "files": {
+        "/main.mts": "const pending = import(\"./legacy.cjs\"); const value = await pending;",
+        "/dep.mts": "export const value = 42; export default \"hello\";",
+        "/legacy.cts": "const legacy = { item: 1 }; export = legacy;"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts",
+        "/legacy.cts"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.name",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "value.initializer",
+          "file": "/main.mts",
+          "declaration": "value",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "nonliteral-and-invalid-specifiers",
+      "files": {
+        "/main.mts": "declare const name: string; const dynamic = import(name); const invalid = import(42); const nullable = import(null); const absent = import(\"./missing.mjs\");",
+        "/dep.mts": "export const value = 42; export default \"hello\";"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts"
+      ],
+      "queries": [
+        {
+          "id": "dynamic.name",
+          "file": "/main.mts",
+          "declaration": "dynamic",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "dynamic.initializer",
+          "file": "/main.mts",
+          "declaration": "dynamic",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "invalid.name",
+          "file": "/main.mts",
+          "declaration": "invalid",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "invalid.initializer",
+          "file": "/main.mts",
+          "declaration": "invalid",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "nullable.name",
+          "file": "/main.mts",
+          "declaration": "nullable",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "nullable.initializer",
+          "file": "/main.mts",
+          "declaration": "nullable",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "absent.name",
+          "file": "/main.mts",
+          "declaration": "absent",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "absent.initializer",
+          "file": "/main.mts",
+          "declaration": "absent",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "argument-grammar",
+      "files": {
+        "/main.mts": "const empty = import(); const extra = import(\"./dep.mjs\", {}, missing); const spread = import(...[\"./dep.mjs\"]); const generic = import<string>(\"./dep.mjs\");",
+        "/dep.mts": "export const value = 42; export default \"hello\";"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts"
+      ],
+      "queries": [
+        {
+          "id": "empty.name",
+          "file": "/main.mts",
+          "declaration": "empty",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "empty.initializer",
+          "file": "/main.mts",
+          "declaration": "empty",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "extra.name",
+          "file": "/main.mts",
+          "declaration": "extra",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "extra.initializer",
+          "file": "/main.mts",
+          "declaration": "extra",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "spread.name",
+          "file": "/main.mts",
+          "declaration": "spread",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "spread.initializer",
+          "file": "/main.mts",
+          "declaration": "spread",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "generic.name",
+          "file": "/main.mts",
+          "declaration": "generic",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "generic.initializer",
+          "file": "/main.mts",
+          "declaration": "generic",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "option-diagnostics",
+      "files": {
+        "/main.mts": "const invalid = import(\"./dep.mjs\", { with: { type: 42 } }); const legacy = import(\"./dep.mjs\", { assert: { type: \"json\" } }); const missingOptions = import(\"./dep.mjs\", undefined);",
+        "/dep.mts": "export const value = 42; export default \"hello\";"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts"
+      ],
+      "queries": [
+        {
+          "id": "invalid.name",
+          "file": "/main.mts",
+          "declaration": "invalid",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "invalid.initializer",
+          "file": "/main.mts",
+          "declaration": "invalid",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "legacy.name",
+          "file": "/main.mts",
+          "declaration": "legacy",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "legacy.initializer",
+          "file": "/main.mts",
+          "declaration": "legacy",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "missingOptions.name",
+          "file": "/main.mts",
+          "declaration": "missingOptions",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "missingOptions.initializer",
+          "file": "/main.mts",
+          "declaration": "missingOptions",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    },
+    {
+      "id": "deferred-import-mode",
+      "files": {
+        "/main.mts": "const pending = import.defer(\"./dep.mjs\"); const typed = import.defer(\"typed/file.resource\", { with: { type: \"text\" } }); const parenthesized = import.defer(\"typed/other.resource\", ({ with: { type: \"text\" } }));",
+        "/dep.mts": "export const value = 42; export default \"hello\";",
+        "/types.d.ts": "declare module \"*.resource\" { export const kind: \"plain\"; } declare module \"typed/*.resource\" with { type: \"text\" } { export const kind: \"text\"; }"
+      },
+      "roots": [
+        "/main.mts",
+        "/dep.mts",
+        "/types.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "pending.name",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "pending.initializer",
+          "file": "/main.mts",
+          "declaration": "pending",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "typed.name",
+          "file": "/main.mts",
+          "declaration": "typed",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "typed.initializer",
+          "file": "/main.mts",
+          "declaration": "typed",
+          "target": "initializer",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "parenthesized.name",
+          "file": "/main.mts",
+          "declaration": "parenthesized",
+          "target": "name",
+          "operation": "type_at_location"
+        },
+        {
+          "id": "parenthesized.initializer",
+          "file": "/main.mts",
+          "declaration": "parenthesized",
+          "target": "initializer",
+          "operation": "type_at_location"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

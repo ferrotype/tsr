@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 contextual signature and reverse mapped inference capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "contextual-identity",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Generic = <T>(x: T) => T; type A = Generic extends (x: string) => string ? true : false; type B = Generic extends (x: number) => number ? true : false; type C = Generic extends (x: string | number) => string | number ? true : false; type Bad = Generic extends (x: string) => number ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Bad",
+          "file": "/case.ts",
+          "declaration": "Bad",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "contextual-constraints",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Generic = <T extends string>(x: T) => T; type A = Generic extends (x: \"a\" | \"b\") => string ? true : false; type Make = <T = string>() => T; type B = Make extends () => string ? true : false; type Bad = Generic extends (x: number) => number ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Bad",
+          "file": "/case.ts",
+          "declaration": "Bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "contextual-rest",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Generic = <T extends unknown[]>(...args: T) => T; type A = Generic extends (a: number, b: string) => [number,string] ? true : false; type First = <T>(x: T, ...rest: T[]) => T; type B = First extends (x: string, y: string) => string ? true : false; type Bad = Generic extends (a: number, b: string) => [string,number] ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Bad",
+          "file": "/case.ts",
+          "declaration": "Bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reverse-properties",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Boxed<T> = {[P in keyof T]: {value: T[P]}}; type Unbox<T> = T extends Boxed<infer U> ? U : never; type A = Unbox<{a: {value: number}; b: {value: string}}>; type B = Unbox<{readonly a?: {value: number}}>; type C = Unbox<{[s: string]: {value: boolean}}>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Boxed",
+          "file": "/case.ts",
+          "declaration": "Boxed",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Unbox",
+          "file": "/case.ts",
+          "declaration": "Unbox",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reverse-tuples",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Boxed<T> = {[P in keyof T]: {value: T[P]}}; type Unbox<T> = T extends Boxed<infer U> ? U : never; type A = Unbox<[{value: 1},{value: \"x\"}]>; type B = Unbox<readonly [{value: 1}]>; type C = Unbox<{value: string}[]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Unbox",
+          "file": "/case.ts",
+          "declaration": "Unbox",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "reverse-modifiers",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Optional<T> = {readonly [P in keyof T]?: {value: T[P]}}; type Unbox<T> = T extends Optional<infer U> ? U : never; type A = Unbox<{readonly a?: {value: number}}>; type B = Unbox<readonly [{value: string}?]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Optional",
+          "file": "/case.ts",
+          "declaration": "Optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Unbox",
+          "file": "/case.ts",
+          "declaration": "Unbox",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "contextual-reverse",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Boxed<T> = {[P in keyof T]: {value: T[P]}}; type Unbox = <T>(x: Boxed<T>) => T; type A = Unbox extends (x: {a: {value: number}; b: {value: string}}) => unknown ? true : false; type B = Unbox extends (x: [{value: 1}, {value: \"x\"}]) => unknown ? true : false; type Bad = Unbox extends (x: {a: {value: number}}) => {a: string} ? true : false;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Bad",
+          "file": "/case.ts",
+          "declaration": "Bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

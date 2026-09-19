@@ -1,0 +1,33 @@
+[package]
+name = "ts_embed"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = ["checker"]
+checker = ["dep:ts_checker", "dep:ts_compiler"]
+
+[dependencies]
+ts_arena = { version = "0.1.0", path = "../ts_arena" }
+ts_ast = { version = "0.1.0", path = "../ts_ast" }
+ts_core = { version = "0.1.0", path = "../ts_core" }
+ts_jsstring = { version = "0.1.0", path = "../ts_jsstring" }
+ts_parser = { version = "0.1.0", path = "../ts_parser" }
+ts_encoder = { version = "0.1.0", path = "../ts_encoder" }
+ts_checker = { version = "0.1.0", path = "../ts_checker", optional = true }
+ts_compiler = { version = "0.1.0", path = "../ts_compiler", optional = true }
+xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
+
+[dev-dependencies]
+ts_tsoptions = { version = "0.1.0", path = "../ts_tsoptions" }
+ts_vfs = { version = "0.1.0", path = "../ts_vfs" }
+
+[[test]]
+name = "lifetime"
+required-features = ["checker"]
+
+[lints]
+workspace = true

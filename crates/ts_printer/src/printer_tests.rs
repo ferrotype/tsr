@@ -58,6 +58,21 @@ fn kind(name: &str) -> K {
         "TildeToken" => K::TildeToken,
         "PlusPlusToken" => K::PlusPlusToken,
         "MinusMinusToken" => K::MinusMinusToken,
+        "EqualsToken" => K::EqualsToken,
+        "CommaToken" => K::CommaToken,
+        "QuestionQuestionToken" => K::QuestionQuestionToken,
+        "BarBarToken" => K::BarBarToken,
+        "AmpersandAmpersandToken" => K::AmpersandAmpersandToken,
+        "BarToken" => K::BarToken,
+        "CaretToken" => K::CaretToken,
+        "AmpersandToken" => K::AmpersandToken,
+        "EqualsEqualsToken" => K::EqualsEqualsToken,
+        "LessThanToken" => K::LessThanToken,
+        "LessThanLessThanToken" => K::LessThanLessThanToken,
+        "AsteriskToken" => K::AsteriskToken,
+        "SlashToken" => K::SlashToken,
+        "AsteriskAsteriskToken" => K::AsteriskAsteriskToken,
+        "PlusEqualsToken" => K::PlusEqualsToken,
         other => panic!("unknown kind {other}"),
     }
 }
@@ -187,6 +202,51 @@ impl Builder<'_> {
                 let name = self.build(&v["name"]);
                 self.ast
                     .new_property_access_expression(Some(expression), None, Some(name), 0)
+            }
+            "Call" => {
+                let expression = self.build(&v["expression"]);
+                let question = self.opt_token(v, "optional", K::QuestionDotToken);
+                let types = self.list(&v["typeArguments"]);
+                let args = self.list(&v["arguments"]);
+                self.ast.new_call_expression(
+                    Some(expression),
+                    question,
+                    types,
+                    args,
+                    if flag(v, "optional") {
+                        ts_ast::node_flags::OPTIONAL_CHAIN
+                    } else {
+                        0
+                    },
+                )
+            }
+            "ElementAccess" => {
+                let expression = self.build(&v["expression"]);
+                let argument = self.build(&v["argument"]);
+                let question = self.opt_token(v, "optional", K::QuestionDotToken);
+                self.ast.new_element_access_expression(
+                    Some(expression),
+                    question,
+                    Some(argument),
+                    if flag(v, "optional") {
+                        ts_ast::node_flags::OPTIONAL_CHAIN
+                    } else {
+                        0
+                    },
+                )
+            }
+            "ParenthesizedExpression" => {
+                let inner = self.build(&v["expression"]);
+                self.ast.new_parenthesized_expression(Some(inner))
+            }
+            "Binary" => {
+                let left = self.build(&v["left"]);
+                let op = self
+                    .ast
+                    .new_token(kind(v["operator"].as_str().unwrap()).into());
+                let right = self.build(&v["right"]);
+                self.ast
+                    .new_binary_expression(None, Some(left), None, Some(op), Some(right))
             }
             "ExpressionWithTypeArguments" => {
                 let expression = self.build(&v["expression"]);
@@ -466,12 +526,12 @@ fn printer_matches_the_pinned_go_printer_on_every_case() {
         let name = case["name"].as_str().expect("case name");
         assert_eq!(Some(name), row["name"].as_str());
         let counters = Counters::new();
+        let mut context = EmitContext::new();
         let mut ast = AstBuilder::with_hooks(
             SourceText::from_bytes(&b""[..]),
             &counters,
-            EmitContext::factory_hooks(),
+            context.factory_hooks(),
         );
-        let mut context = EmitContext::new();
         let node = Builder {
             ast: &mut ast,
             context: &mut context,

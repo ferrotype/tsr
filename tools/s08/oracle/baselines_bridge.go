@@ -27,6 +27,13 @@ type S08Query struct {
 
 var S08Queries []S08Query
 
+// E2 observes default TypeToString only after the ordinary type/symbol walk.
+// Holding the already-returned types avoids replaying type queries or changing
+// the baseline walk's checker/cache order.
+var S08CollectTypeStrings bool
+var S08TypeStrings []map[string]any
+var s08PendingTypeStrings []func() map[string]any
+
 func s08Query(operation string, walker *typeWriterWalker, node *ast.Node) S08Query {
 	return S08Query{Operation: operation, File: walker.currentSourceFile.FileName(), Kind: int16(node.Kind), Pos: node.Pos(), End: node.End()}
 }
@@ -42,6 +49,13 @@ func s08GetTypeAtLocation(walker *typeWriterWalker, c *checker.Checker, node *as
 		q.TypeID = uint32(result.Id())
 	}
 	S08Queries = append(S08Queries, q)
+	if S08CollectTypeStrings && result != nil {
+		stamp := s08Query("TypeToString", walker, node)
+		s08PendingTypeStrings = append(s08PendingTypeStrings, func() map[string]any {
+			return map[string]any{"operation":stamp.Operation, "file":stamp.File, "kind":stamp.Kind,
+				"pos":stamp.Pos, "end":stamp.End, "text_hex":hex.EncodeToString([]byte(c.TypeToString(result)))}
+		})
+	}
 	restore()
 	return result
 }
@@ -87,8 +101,12 @@ func S08BaselineValue(value string) S08Baseline {
 // Same walker instance and type-before-symbol order as DoTypeAndSymbolBaseline.
 // Only the reference-file comparison/old-Strada fixups are omitted.
 func S08TypeSymbolBaselines(program compiler.ProgramLike, files []*harnessutil.TestFile, header string, hadErrors bool) (S08Baseline, S08Baseline) {
+	s08PendingTypeStrings = nil
+	S08TypeStrings = []map[string]any{}
+	defer func() { s08PendingTypeStrings = nil }()
 	walker := newTypeWriterWalker(program, hadErrors)
 	types := generateBaseline(files, walker, header, false)
 	symbols := generateBaseline(files, walker, header, true)
+	for _, display := range s08PendingTypeStrings { S08TypeStrings = append(S08TypeStrings, display()) }
 	return S08BaselineValue(types), S08BaselineValue(symbols)
 }

@@ -276,39 +276,8 @@ fn resolution_override(
     view: AstView<'_>,
     attributes: Option<NodeId>,
 ) -> Result<Option<ModuleKind>, Error> {
-    let Some(attributes) = attributes else {
-        return Ok(None);
-    };
-    let node = view.node(attributes)?;
-    let data = node
-        .data_source()
-        .as_import_attributes()
-        .ok_or(ts_arena::Error::InvalidGraph)?;
-    let list = data.attributes().ok_or(ts_arena::Error::InvalidGraph)?;
-    for id in view.node_slice(view.list(list)?.nodes())?.iter() {
-        let node = view.node(id.ok_or(ts_arena::Error::InvalidGraph)?)?;
-        let data = node
-            .data_source()
-            .as_import_attribute()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
-        let name = data.name().ok_or(ts_arena::Error::InvalidGraph)?;
-        if view.node_text(name)?.as_bytes() != b"resolution-mode" {
-            continue;
-        }
-        let value = data.value().ok_or(ts_arena::Error::InvalidGraph)?;
-        if !matches!(
-            view.node(value)?.kind().known(),
-            Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
-        ) {
-            return Ok(None);
-        }
-        return Ok(match view.node_text(value)?.as_bytes() {
-            b"import" => Some(ModuleKind::ESNEXT),
-            b"require" => Some(ModuleKind::COMMON_JS),
-            _ => None,
-        });
-    }
-    Ok(None)
+    ts_ast::utilities_middle::import_attributes_resolution_mode(view, attributes)
+        .map_err(Error::from)
 }
 
 pub(crate) fn normal_mode(

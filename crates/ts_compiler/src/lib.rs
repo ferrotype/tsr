@@ -2,10 +2,16 @@
 //! Every successful `Program::load` represents an executed loader closure;
 //! unsupported source operations fail with a named boundary.
 mod cache;
+mod checker_diagnostics;
 mod checker_host;
+mod checker_module_specifiers;
+mod declaration_diagnostics;
+pub mod diagnostic_writer;
 mod include_reason;
 mod output_paths;
+mod plain_js_errors;
 mod program_diagnostics;
+mod syntactic_diagnostics;
 mod verify_options;
 pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionVerification};
 mod loader;

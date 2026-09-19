@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "input": "data/s07/checker-obligations.json",
+  "input_sha256": "03815c24f870ff16386aa01f0f30554d2991a2889476799cf0f430b7f038aa4c",
+  "total_obligations": 675,
+  "scope": "Every frozen loaded-library family has a concrete remaining home. Capability fixtures do not certify individual corpus obligations.",
+  "families": [
+    {
+      "family": "conditional_types",
+      "obligations": 5,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/conditional.rs",
+        "crates/ts_checker/src/relater_conditional.rs"
+      ],
+      "native_suites": [
+        "conditionals",
+        "inference"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Execute conditional operations reached by every loaded declaration and body; source coverage is still pending."
+    },
+    {
+      "family": "control_flow",
+      "obligations": 21,
+      "status": "pending",
+      "production_modules": [],
+      "native_suites": [],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Return/body inference, flow narrowing, contextual expressions and statement checking."
+    },
+    {
+      "family": "declaration_members",
+      "obligations": 81,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/object_members.rs",
+        "crates/ts_checker/src/source_signatures.rs",
+        "crates/ts_checker/src/compound_signatures.rs",
+        "crates/ts_checker/src/late_members.rs"
+      ],
+      "native_suites": [
+        "compound",
+        "computed",
+        "libraries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Classes, accessors, overload implementation checking and lazy full-library member closure."
+    },
+    {
+      "family": "declarations_and_merging",
+      "obligations": 81,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/merge.rs",
+        "crates/ts_checker/src/references.rs",
+        "crates/ts_checker/src/apparent.rs"
+      ],
+      "native_suites": [
+        "generics",
+        "late"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Class/enum/module declarations, heritage diagnostics and the complete ambient merge rules."
+    },
+    {
+      "family": "explicit_type_parameters",
+      "obligations": 41,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/type_parameters.rs",
+        "crates/ts_checker/src/check_generics.rs",
+        "crates/ts_checker/src/variance.rs"
+      ],
+      "native_suites": [
+        "generics",
+        "boundaries",
+        "relation-details"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Variance/const modifier grammar and deferred annotation checking; JSDoc parameter declarations."
+    },
+    {
+      "family": "expressions_and_bindings",
+      "obligations": 18,
+      "status": "pending",
+      "production_modules": [],
+      "native_suites": [],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Expressions, binding patterns, value references and contextual inference at call sites."
+    },
+    {
+      "family": "imports_and_exports",
+      "obligations": 2,
+      "status": "pending",
+      "production_modules": [],
+      "native_suites": [],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Import aliases, reexports and module checking; declaration emit resolver/transformer obligations remain required."
+    },
+    {
+      "family": "indexed_access_types",
+      "obligations": 10,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/indexes.rs",
+        "crates/ts_checker/src/relater_structure.rs"
+      ],
+      "native_suites": [
+        "indexes",
+        "boundaries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Indexed expression writes, contextual/flow access and all frozen-option diagnostics."
+    },
+    {
+      "family": "infer_types",
+      "obligations": 2,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/infer_types.rs",
+        "crates/ts_checker/src/infer_tuples.rs",
+        "crates/ts_checker/src/infer_templates.rs",
+        "crates/ts_checker/src/infer_reverse.rs"
+      ],
+      "native_suites": [
+        "inference",
+        "contextual"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Execute inference under the full call/contextual/body checking closure."
+    },
+    {
+      "family": "jsdoc",
+      "obligations": 66,
+      "status": "pending",
+      "production_modules": [],
+      "native_suites": [],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "JavaScript/JSDoc typing and module/return inference; the frozen jsdoc-module relation case stays pending."
+    },
+    {
+      "family": "mapped_types",
+      "obligations": 6,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/mapped.rs",
+        "crates/ts_checker/src/relater_mapped.rs"
+      ],
+      "native_suites": [
+        "mapped",
+        "boundaries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Full declaration and expression consumers, modifier grammar and recovery paths."
+    },
+    {
+      "family": "non_generic_type_syntax",
+      "obligations": 70,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/union.rs",
+        "crates/ts_checker/src/intersection.rs",
+        "crates/ts_checker/src/indexes.rs",
+        "crates/ts_checker/src/normalize.rs"
+      ],
+      "native_suites": [
+        "indexes",
+        "compound",
+        "libraries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "TypeQuery, enum/class/module type resolution and recovered type/readonly grammar."
+    },
+    {
+      "family": "nonempty_type_arguments",
+      "obligations": 47,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/mapper.rs",
+        "crates/ts_checker/src/instantiate.rs",
+        "crates/ts_checker/src/references.rs"
+      ],
+      "native_suites": [
+        "generics",
+        "inference",
+        "libraries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Value call instantiation, type-query scope and JavaScript defaults at real call sites."
+    },
+    {
+      "family": "structure_and_recovery",
+      "obligations": 111,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/check_type_syntax.rs"
+      ],
+      "native_suites": [
+        "boundaries"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Full source/grammar traversal and recovery; no syntax census row is treated as executed checking."
+    },
+    {
+      "family": "template_literal_types",
+      "obligations": 3,
+      "status": "capability_executed_acceptance_pending",
+      "production_modules": [
+        "crates/ts_checker/src/template.rs",
+        "crates/ts_checker/src/template_relation.rs",
+        "crates/ts_checker/src/string_mapping.rs"
+      ],
+      "native_suites": [
+        "mapped",
+        "inference"
+      ],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Execute all loaded consumers and expression-dependent string mapping; display/accessibility completion is P5."
+    },
+    {
+      "family": "tokens_and_recovery",
+      "obligations": 111,
+      "status": "pending",
+      "production_modules": [],
+      "native_suites": [],
+      "remaining_checkpoint": "P4",
+      "remaining_work": "Complete declaration/grammar/token recovery, followed by exact P5 baseline/byte decoration."
+    }
+  ],
+  "post_action_display_checkpoint": "P5",
+  "full_contract_performance_checkpoint": "P7"
+}

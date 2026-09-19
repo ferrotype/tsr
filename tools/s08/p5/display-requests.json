@@ -1,0 +1,1963 @@
+{
+  "version": 1,
+  "scope": "P5 context-sensitive type display and explicit node-builder requests",
+  "programs": [
+    {
+      "id": "annotations-and-symbols",
+      "files": {
+        "/main.ts": "type Hex = { a: 0x10; b: 0b11; text: '\u00e9' };\nconst unique: unique symbol = Symbol();\nnamespace N { export interface Inner { n: number } }\nlet value: N.Inner;\ntype Literal = 'hello';\nlet caf\u00e9 = 1;\nnamespace N { export const inside = 0; }\nenum Keys { Named = \"x\" }\ntype EnumKeys = { [Keys.Named]: number };\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "hex-context-free",
+          "declaration": "Hex",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "hex-enclosing",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "hex-node",
+          "declaration": "Hex",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "unique-enclosing",
+          "declaration": "unique",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 1048576
+        },
+        {
+          "id": "qualified-type",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 1048576
+        },
+        {
+          "id": "qualified-node",
+          "declaration": "value",
+          "context": "source",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "literal-node",
+          "declaration": "Literal",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "symbol-qualified",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 4,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-no-chain",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 36,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-entity",
+          "declaration": "inside",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 0,
+          "meaning": 0
+        },
+        {
+          "id": "symbol-unicode",
+          "declaration": "caf\u00e9",
+          "context": "source",
+          "operation": "symbol_string",
+          "flags": 4,
+          "meaning": 0
+        },
+        {
+          "id": "enum-context-free",
+          "declaration": "EnumKeys",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "enum-enclosing",
+          "declaration": "EnumKeys",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        }
+      ]
+    },
+    {
+      "id": "mapped-modifier-wrappers",
+      "files": {
+        "/main.ts": "type KeyofMap<T> = { readonly [P in keyof T]?: T[P] };\ntype KeysMap<T, K extends keyof T> = { readonly [P in K]?: T[P] };\ntype Naked = KeyofMap<any>;\ntype KeySubset = KeysMap<{readonly a?: number; b: string}, \"a\">;\ntype Deferred<U> = KeysMap<U, keyof U>;\ntype Shadow<T> = KeyofMap<any>;\ntype Indexed<U extends { x: object }> = KeyofMap<U[\"x\"]>;\ntype IndexedShadow<T extends { x: { field: number } }> = KeyofMap<T[\"x\"]>;\ntype KeysShadow<T> = KeysMap<T, keyof T>;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "KeyofMap-generated",
+          "declaration": "KeyofMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeyofMap-plain",
+          "declaration": "KeyofMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysMap-generated",
+          "declaration": "KeysMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysMap-plain",
+          "declaration": "KeysMap",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Naked-generated",
+          "declaration": "Naked",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Naked-plain",
+          "declaration": "Naked",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeySubset-generated",
+          "declaration": "KeySubset",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeySubset-plain",
+          "declaration": "KeySubset",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Deferred-generated",
+          "declaration": "Deferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Deferred-plain",
+          "declaration": "Deferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Shadow-generated",
+          "declaration": "Shadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Shadow-plain",
+          "declaration": "Shadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "Indexed-generated",
+          "declaration": "Indexed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Indexed-plain",
+          "declaration": "Indexed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "IndexedShadow-generated",
+          "declaration": "IndexedShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "IndexedShadow-plain",
+          "declaration": "IndexedShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysShadow-generated",
+          "declaration": "KeysShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "KeysShadow-plain",
+          "declaration": "KeysShadow",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659009,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "reference-defaults-and-parameter-reuse",
+      "files": {
+        "/main.ts": "interface Iterable<T, R = any, N = any> { a: T; r: R; n: N }\ninterface IterableIterator<T, R = any, N = any> { a: T; r: R; n: N }\ninterface AsyncIterable<T, R = any, N = any> { a: T; r: R; n: N }\ninterface AsyncIterableIterator<T, R = any, N = any> { a: T; r: R; n: N }\nnamespace Local { export interface Iterable<T, R = any, N = any> { a: T; r: R; n: N } }\nlet short: Iterable<string>;\nlet explicit: Iterable<string, any, any>;\nlet different: Iterable<string, number>;\nlet local: Local.Iterable<string>;\nlet iterator: IterableIterator<string>;\nlet asynchronous: AsyncIterable<string>;\nlet asyncIterator: AsyncIterableIterator<string>;\nconst unionParameter = function(a: number | string | undefined, required: unknown) {};\nconst optionalParameter = function(a: number | string | undefined = 1, required: unknown) {};\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "short",
+          "declaration": "short",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "explicit",
+          "declaration": "explicit",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "different",
+          "declaration": "different",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "local",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "iterator",
+          "declaration": "iterator",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "asynchronous",
+          "declaration": "asynchronous",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "asyncIterator",
+          "declaration": "asyncIterator",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "unionParameter",
+          "declaration": "unionParameter",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "optionalParameter",
+          "declaration": "optionalParameter",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "lossless-source-and-regenerated-literals",
+      "files": {},
+      "file_bytes": {
+        "/main.ts": "efbbbf747970652048696768203d207b76616c75653a20225c7544383030227d3b0a74797065204c6f77203d207b76616c75653a20225c7544433030227d3b0a747970652050616972203d207b76616c75653a20225c75443833445c7544453030227d3b0a7479706520436f6e74726f6c203d207b76616c75653a20225c305c745c6e5c725c75323032385c7532303239227d3b0a7479706520526177537572726f67617465203d207b76616c75653a2022eda080227d3b0a74797065204d616c666f726d6564203d207b76616c75653a2022ffc280f09f227d3b0a7479706520556e69636f6465203d207b76616c75653a2022c3a92065cc8120f09f988020e280a8e280a9227d3b0a"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "High-None-type_string",
+          "declaration": "High",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "High-None-type_node",
+          "declaration": "High",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "High-declaration-type_string",
+          "declaration": "High",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "High-declaration-type_node",
+          "declaration": "High",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Low-None-type_string",
+          "declaration": "Low",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Low-None-type_node",
+          "declaration": "Low",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Low-declaration-type_string",
+          "declaration": "Low",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Low-declaration-type_node",
+          "declaration": "Low",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Pair-None-type_string",
+          "declaration": "Pair",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Pair-None-type_node",
+          "declaration": "Pair",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Pair-declaration-type_string",
+          "declaration": "Pair",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Pair-declaration-type_node",
+          "declaration": "Pair",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Control-None-type_string",
+          "declaration": "Control",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Control-None-type_node",
+          "declaration": "Control",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Control-declaration-type_string",
+          "declaration": "Control",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Control-declaration-type_node",
+          "declaration": "Control",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "RawSurrogate-None-type_string",
+          "declaration": "RawSurrogate",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "RawSurrogate-None-type_node",
+          "declaration": "RawSurrogate",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "RawSurrogate-declaration-type_string",
+          "declaration": "RawSurrogate",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "RawSurrogate-declaration-type_node",
+          "declaration": "RawSurrogate",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Malformed-None-type_string",
+          "declaration": "Malformed",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Malformed-None-type_node",
+          "declaration": "Malformed",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Malformed-declaration-type_string",
+          "declaration": "Malformed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Malformed-declaration-type_node",
+          "declaration": "Malformed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Unicode-None-type_string",
+          "declaration": "Unicode",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Unicode-None-type_node",
+          "declaration": "Unicode",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Unicode-declaration-type_string",
+          "declaration": "Unicode",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Unicode-declaration-type_node",
+          "declaration": "Unicode",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "cached-contexts-and-repeats",
+      "files": {
+        "/main.ts": "type Shape = { readonly quote: \"\u00e9\"; next?: Shape };\ntype Conditional<T> = T extends string ? { value: T } : { fallback: T };\ntype Recur<T> = [T, Recur<T>[]];\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "Shape-declaration-0",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-declaration-1",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-source-0",
+          "declaration": "Shape",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-source-1",
+          "declaration": "Shape",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-declaration-0",
+          "declaration": "Conditional",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-declaration-1",
+          "declaration": "Conditional",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-source-0",
+          "declaration": "Conditional",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Conditional-source-1",
+          "declaration": "Conditional",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-declaration-0",
+          "declaration": "Recur",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-declaration-1",
+          "declaration": "Recur",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-source-0",
+          "declaration": "Recur",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Recur-source-1",
+          "declaration": "Recur",
+          "context": "source",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Shape-single-quotes-0",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 276824064
+        },
+        {
+          "id": "Shape-single-quotes-1",
+          "declaration": "Shape",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 276824064
+        }
+      ]
+    },
+    {
+      "id": "module-alias-display",
+      "files": {
+        "/lib.ts": "export const marker = 1;",
+        "/main.ts": "import * as ns from \"./lib\"; const local = ns; type Remote = typeof import(\"./lib\");"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "local-None-type_string",
+          "declaration": "local",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "local-None-type_node",
+          "declaration": "local",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "local-declaration-type_string",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "local-declaration-type_node",
+          "declaration": "local",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Remote-None-type_string",
+          "declaration": "Remote",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Remote-None-type_node",
+          "declaration": "Remote",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Remote-declaration-type_string",
+          "declaration": "Remote",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Remote-declaration-type_node",
+          "declaration": "Remote",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "self-module-alias-display",
+      "files": {
+        "/main.ts": "export * as \"<Self>\" from \"./main\"; import { \"<Self>\" as selfAlias } from \"./main\"; const same = selfAlias;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "same-None-type_string",
+          "declaration": "same",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "same-None-type_node",
+          "declaration": "same",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "same-declaration-type_string",
+          "declaration": "same",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "same-declaration-type_node",
+          "declaration": "same",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "inferred-import-qualifier",
+      "files": {
+        "/lib.ts": "export interface RemoteItem { value: number }; export function make(): RemoteItem { return {value: 1}; }",
+        "/main.ts": "import { make } from \"./lib\"; const inferred = make(); const factory = make;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-none-type_string",
+          "declaration": "inferred",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-none-type_node",
+          "declaration": "inferred",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "inferred-declaration-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-declaration-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-none-type_string",
+          "declaration": "factory",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-none-type_node",
+          "declaration": "factory",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-declaration-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-declaration-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "inferred-import-namespace",
+      "files": {
+        "/lib.ts": "export namespace Nested { export const marker = 1; } export function expose() { return Nested; }",
+        "/main.ts": "import { expose } from \"./lib\"; const namespaceValue = expose();"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "namespaceValue-none-type_string",
+          "declaration": "namespaceValue",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "namespaceValue-none-type_node",
+          "declaration": "namespaceValue",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "namespaceValue-declaration-type_string",
+          "declaration": "namespaceValue",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "namespaceValue-declaration-type_node",
+          "declaration": "namespaceValue",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "signature-return-annotation",
+      "files": {
+        "/main.ts": "declare const uniqueResult: unique symbol; function uniqueReturn(): typeof uniqueResult { return uniqueResult; } const uniqueFn = uniqueReturn;\nfunction reordered(x: string | number): number | string { return x; } const orderedFn = reordered;\nfunction numericReturn(): 0x10 { return 16; } const literalFn = numericReturn;\nclass Secret { #value = 1; method(a: Secret): typeof a.#value { return a.#value; } } const privateFn = new Secret().method;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "uniqueFn-none-type_string",
+          "declaration": "uniqueFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "uniqueFn-none-type_node",
+          "declaration": "uniqueFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "uniqueFn-declaration-type_string",
+          "declaration": "uniqueFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "uniqueFn-declaration-type_node",
+          "declaration": "uniqueFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "orderedFn-none-type_string",
+          "declaration": "orderedFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "orderedFn-none-type_node",
+          "declaration": "orderedFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "orderedFn-declaration-type_string",
+          "declaration": "orderedFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "orderedFn-declaration-type_node",
+          "declaration": "orderedFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "literalFn-none-type_string",
+          "declaration": "literalFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "literalFn-none-type_node",
+          "declaration": "literalFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "literalFn-declaration-type_string",
+          "declaration": "literalFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "literalFn-declaration-type_node",
+          "declaration": "literalFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "privateFn-none-type_string",
+          "declaration": "privateFn",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "privateFn-none-type_node",
+          "declaration": "privateFn",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "privateFn-declaration-type_string",
+          "declaration": "privateFn",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "privateFn-declaration-type_node",
+          "declaration": "privateFn",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "suppressed-signature-return",
+      "files": {
+        "/main.ts": "declare const arbitrary: (callback: () => any) => any; declare const constructor: new (callback: () => any) => any;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "arbitrary-79659013",
+          "declaration": "arbitrary",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "arbitrary-79659269",
+          "declaration": "arbitrary",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659269,
+          "internal_flags": 8
+        },
+        {
+          "id": "constructor-79659013",
+          "declaration": "constructor",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "constructor-79659269",
+          "declaration": "constructor",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659269,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-node16-cts-to-mts",
+      "module": "node16",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.cts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-node16-mts-to-cts",
+      "module": "node16",
+      "files": {
+        "/lib.cts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.cjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-node16-mts-to-mts",
+      "module": "node16",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-cts-to-mts",
+      "module": "nodenext",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.cts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-mts-to-cts",
+      "module": "nodenext",
+      "files": {
+        "/lib.cts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.cjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "import-mode-nodenext-mts-to-mts",
+      "module": "nodenext",
+      "files": {
+        "/lib.mts": "export interface Remote { value: number }; export function create(): Remote { return {value: 1}; }",
+        "/main.mts": "import { create } from \"./lib.mjs\"; const inferred = create(); const factory = create;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "inferred-type_string",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "inferred-type_node",
+          "declaration": "inferred",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-attributes-virtual",
+      "files": {
+        "/types.d.ts": "declare module \"virtual\" with { type: \"css\", format: \"module\" } { export interface Style { value: number }; export function make(): Style; }",
+        "/main.ts": "import { make } from \"virtual\" with { type: \"css\", format: \"module\" }; const value = make(); const factory = make; type Annotation = import(\"virtual\", { with: { type: \"css\", format: \"module\" } }).Style;"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "value-type_string-8388608",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "value-type_node-79659013",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "value-type_node-348094469",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string-8388608",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node-79659013",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_node-348094469",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_string-8388608",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Annotation-type_node-79659013",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_node-348094469",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-attributes-button.style",
+      "files": {
+        "/types.d.ts": "declare module \"*.style\" with { type: \"css\", format: \"module\" } { export interface Style { value: number }; export function make(): Style; }",
+        "/main.ts": "import { make } from \"button.style\" with { type: \"css\", format: \"module\" }; const value = make(); const factory = make; type Annotation = import(\"button.style\", { with: { type: \"css\", format: \"module\" } }).Style;"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "value-type_string-8388608",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "value-type_node-79659013",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "value-type_node-348094469",
+          "declaration": "value",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_string-8388608",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "factory-type_node-79659013",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "factory-type_node-348094469",
+          "declaration": "factory",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_string-8388608",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "Annotation-type_node-79659013",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "Annotation-type_node-348094469",
+          "declaration": "Annotation",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 348094469,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-portability-True",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "module-portability-False",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": \"./other.d.cts\"}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "export-equals-contextual-name",
+      "module": "nodenext",
+      "files": {
+        "/lib.cts": "namespace Container { export interface Value { x: number }; export function make(): Value { return {x: 1}; } } export = Container;",
+        "/bridge.cts": "import C = require(\"./lib.cjs\"); export const derived = C.make();",
+        "/main.cts": "import {derived} from \"./bridge.cjs\"; const result = derived;"
+      },
+      "roots": [
+        "/main.cts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-None",
+          "declaration": "result",
+          "context": null,
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-None",
+          "declaration": "result",
+          "context": null,
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_string-declaration",
+          "declaration": "result",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-declaration",
+          "declaration": "result",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "original-import-attributes-file",
+      "files": {
+        "/lib.d.ts": "export interface Value { value: number }; export const value: Value;",
+        "/main.ts": "export * as one from \"./lib\" with {type: \"custom\", extra: \"one\"};\nexport * as two from \"./lib\" with {type: \"custom\", extra: \"two\"};"
+      },
+      "roots": [
+        "/lib.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "0-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "0-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "1-two-type_string",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "1-two-type_node",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "2-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "2-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "original-import-attributes-ambient",
+      "files": {
+        "/types.d.ts": "declare module \"virtual\" with {type: \"custom\"} { export interface Value { value: number }; export const value: Value; }",
+        "/main.ts": "export * as one from \"virtual\" with {type: \"custom\", extra: \"one\"};\nexport * as two from \"virtual\" with {type: \"custom\", extra: \"two\"};"
+      },
+      "roots": [
+        "/types.d.ts",
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "0-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "0-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "1-two-type_string",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "1-two-type_node",
+          "declaration": "two",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        },
+        {
+          "id": "2-one-type_string",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "2-one-type_node",
+          "declaration": "one",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 71270405,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "attribute-override-rejection",
+      "files": {
+        "/modules.d.ts": "declare module \"*.style\" with { type: \"css\" } { const sheet: number; export default sheet; }\ndeclare module \"*.style\" with { type: \"text\" } { const contents: string; export default contents; }",
+        "/main.ts": "export * as css from \"a.style\" with { type: \"css\" };\nexport * as text from \"a.style\" with { type: \"text\" };"
+      },
+      "roots": [
+        "/main.ts",
+        "/modules.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "css-type_string-0",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "css-type_node-1",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "text-type_string-2",
+          "declaration": "css",
+          "enclosing_declaration": "text",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "text-type_node-3",
+          "declaration": "css",
+          "enclosing_declaration": "text",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "css-type_string-4",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "css-type_node-5",
+          "declaration": "css",
+          "enclosing_declaration": "css",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "conditional-portability-nodenext",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "conditional-portability-node16",
+      "module": "node16",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"package\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "private-path-portability-nodenext",
+      "module": "nodenext",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    },
+    {
+      "id": "private-path-portability-node16",
+      "module": "node16",
+      "files": {
+        "/node_modules/package/package.json": "{\"name\": \"package\", \"version\": \"1.0.0\", \"exports\": {\".\": {\"import\": \"./other.d.mts\", \"require\": \"./index.d.cts\"}}}",
+        "/node_modules/package/index.d.cts": "export interface Item { value: number }; export declare function make(): Item;",
+        "/bridge.cts": "import {make} from \"./node_modules/package/index.cjs\"; export const item = make();",
+        "/main.mts": "import {item} from \"./bridge.cjs\"; const displayed = item;",
+        "/node_modules/package/other.d.mts": "export interface Other { unrelated: string };"
+      },
+      "roots": [
+        "/main.mts"
+      ],
+      "queries": [
+        {
+          "id": "type_string-8388608",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_string",
+          "flags": 8388608
+        },
+        {
+          "id": "type_node-79659013",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 79659013,
+          "internal_flags": 8
+        },
+        {
+          "id": "type_node-12550149",
+          "declaration": "displayed",
+          "context": "declaration",
+          "operation": "type_node",
+          "flags": 12550149,
+          "internal_flags": 8
+        }
+      ]
+    }
+  ]
+}

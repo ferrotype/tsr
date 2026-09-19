@@ -9,7 +9,7 @@ use ts_vfs::MemoryBuilder;
 mod observation;
 use observation::{bytes, observe};
 fn load(request: &Value, cache: &mut FileCache, counters: &Counters) -> Program {
-    observation::try_load(request, cache, counters)
+    observation::try_load(request, cache, counters, None)
         .unwrap_or_else(|e| panic!("{}: {e:?}", request["id"]))
 }
 #[test]

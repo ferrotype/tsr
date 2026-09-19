@@ -1,0 +1,28 @@
+[package]
+name = "s10_rust_consumer"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96"
+publish = false
+
+# Deliberately outside the implementation workspace: no inherited dependencies,
+# features, lints or test access to private checker internals.
+[workspace]
+
+[dependencies]
+ts_embed = { version = "0.1.0", path = "../../../crates/ts_embed" }
+s10_corpus = { version = "0.1.0", path = "../corpus-adapter" }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+[dev-dependencies]
+ts_arena = { version = "0.1.0", path = "../../../crates/ts_arena" }
+ts_checker = { version = "0.1.0", path = "../../../crates/ts_checker" }
+ts_core = { version = "0.1.0", path = "../../../crates/ts_core" }
+ts_jsstring = { version = "0.1.0", path = "../../../crates/ts_jsstring" }
+ts_tsoptions = { version = "0.1.0", path = "../../../crates/ts_tsoptions" }
+ts_vfs = { version = "0.1.0", path = "../../../crates/ts_vfs" }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "unwind"

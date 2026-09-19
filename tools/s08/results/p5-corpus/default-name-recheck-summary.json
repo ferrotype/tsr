@@ -1,0 +1,36 @@
+{
+  "scope": "CommonJS moduleExportsElementAccessAssignment variant from return-recheck-01; supplemental comparison, no new full-corpus count",
+  "raw_capture": "target/s08/p5-corpus-default-recheck-01",
+  "complete": true,
+  "source_stable": true,
+  "requests": 1,
+  "capture_sha256": "572fdbf263fd41ac1b93cac851612266345006ea3e52490fef5bf66636d2496a",
+  "control_capture_sha256": "be56feb62bff0bdbc8472152f91830952cdc6f3bc2e7ed0dcddd6bdbbd60f216",
+  "binary_sha256": "82bc6a8544ed4757c0fa8ad1a816be57708536074bf38fbb1d35188c32079c09",
+  "counts_by_tier": {
+    "acceptance": {
+      "match": 1
+    },
+    "informational": {}
+  },
+  "rows": [
+    {
+      "acceptance_tier": "acceptance",
+      "errors": {
+        "differences": [],
+        "emit": "not_executed",
+        "native_diagnostics": 2,
+        "rust_diagnostics": 2,
+        "state": "match"
+      },
+      "id": "conformance/jsdoc/moduleExportsElementAccessAssignment.ts#configuration=0",
+      "state": "match",
+      "type_symbols": {
+        "differences": [],
+        "native_queries": 252,
+        "rust_queries": 252,
+        "state": "match"
+      }
+    }
+  ]
+}

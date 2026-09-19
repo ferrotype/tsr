@@ -5,13 +5,13 @@
 use crate::{CheckerState, Error};
 use ts_arena::{NodeId, SymbolId};
 use ts_ast::{
-    symbol_flags as flags, DeclarationSlice, JsString, SymbolFlags, SymbolTable, SymbolTableId,
+    symbol_flags as flags, DeclarationSlice, SymbolFlags, SymbolRef, SymbolTable, SymbolTableId,
     SyntaxKind,
 };
 use ts_diagnostics as messages;
 
 // port: tsc/internal/checker/checker.go:getExcludedSymbolFlags
-fn excluded_symbol_flags(value: SymbolFlags) -> SymbolFlags {
+pub(crate) fn excluded_symbol_flags(value: SymbolFlags) -> SymbolFlags {
     let mut result = 0;
     for (flag, excluded) in [
         (
@@ -51,6 +51,9 @@ fn compatible(target: SymbolFlags, source: SymbolFlags) -> bool {
     target & excluded_symbol_flags(source) == 0 || (target | source) & flags::ASSIGNMENT != 0
 }
 
+/// One table's names in a single buffer, each entry a byte range and its symbol.
+pub(crate) type TableEntries = (Vec<u8>, Vec<(std::ops::Range<usize>, Option<SymbolId>)>);
+
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getMergedSymbol
     pub(crate) fn get_merged_symbol(&self, symbol: SymbolId) -> SymbolId {
@@ -88,20 +91,43 @@ impl CheckerState {
         Ok(clone)
     }
 
-    fn clone_symbol_table(
+    /// A checker-owned copy of `source` (Go's `maps.Clone` of a member or
+    /// export table). A table this checker already owns is copied wholesale;
+    /// a binder-owned one is interned into a table sized for it. Neither path
+    /// builds an intermediate owned map or an owning string per name.
+    pub(crate) fn clone_symbol_table(
         &mut self,
         source: Option<SymbolTableId>,
     ) -> Result<Option<SymbolTableId>, Error> {
-        source
-            .map(|source| {
-                let copied: SymbolTable = self
-                    .table(source)?
-                    .iter()
-                    .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
-                    .collect();
-                Ok(self.alloc_symbol_table(copied))
-            })
-            .transpose()
+        let Some(source) = source else {
+            return Ok(None);
+        };
+        if source.arena() == self.tables.id() {
+            return Ok(Some(self.tables.clone_own(source)?));
+        }
+        let program = self
+            .program
+            .as_ref()
+            .ok_or(Error::Unsupported("query without a checker program"))?;
+        Ok(Some(self.tables.clone_foreign(program.table(source)?)))
+    }
+
+    /// The entries of a table copied into one byte buffer, for a merge that
+    /// mutates the checker while it walks them: one allocation per table
+    /// instead of an owning string per entry.
+    pub(crate) fn collect_table_entries(
+        &self,
+        table: SymbolTableId,
+    ) -> Result<TableEntries, Error> {
+        let read = self.table(table)?;
+        let mut bytes = Vec::with_capacity(read.len() * 12);
+        let mut entries = Vec::with_capacity(read.len());
+        for (name, symbol) in read {
+            let start = bytes.len();
+            bytes.extend_from_slice(name);
+            entries.push((start..bytes.len(), symbol));
+        }
+        Ok((bytes, entries))
     }
 
     // port: tsc/internal/checker/checker.go:Checker.mergeGlobalSymbol
@@ -110,14 +136,38 @@ impl CheckerState {
             .builtins
             .globals
             .ok_or(Error::MissingLink("checker globals"))?;
-        let name = self.symbol(symbol)?.name_to_owned();
-        let target = self.table(globals)?.get(name.as_bytes()).flatten();
+        // The name is hashed once for the lookup and the insert, and read in
+        // place both times: the merge in between may touch anything, so the
+        // insert borrows the pool the name lives in field by field rather than
+        // copying the name out.
+        let (hash, target) = {
+            let name = self.symbol(symbol)?;
+            let name = name.name_bytes();
+            let hash = ts_ast::name_hash(name);
+            (hash, self.table(globals)?.get_hashed(name, hash).flatten())
+        };
         let merged = if let Some(target) = target {
             self.merge_symbol(target, symbol, false)?
         } else {
             self.get_merged_symbol(symbol)
         };
-        self.tables.get_mut(globals)?.insert(name, Some(merged));
+        let CheckerState {
+            program,
+            symbols,
+            tables,
+            ..
+        } = self;
+        let name = if symbol.arena() == symbols.id() {
+            SymbolRef::Owned(symbols.get(symbol)?)
+        } else {
+            program
+                .as_ref()
+                .ok_or(Error::Unsupported("query without a checker program"))?
+                .symbol(symbol)?
+        };
+        tables
+            .get_mut(globals)?
+            .insert_bytes_hashed(name.name_bytes(), hash, Some(merged));
         Ok(())
     }
 
@@ -131,13 +181,10 @@ impl CheckerState {
     ) -> Result<(), Error> {
         // Reject a source-owned mutation target before any recursive merge.
         self.tables.get(target)?;
-        let entries: Vec<_> = self
-            .table(source)?
-            .iter()
-            .map(|(name, symbol)| (JsString::from_bytes(name), symbol))
-            .collect();
-        for (name, source_symbol) in entries {
-            let target_symbol = self.table(target)?.get(name.as_bytes()).flatten();
+        let (bytes, entries) = self.collect_table_entries(source)?;
+        for (range, source_symbol) in entries {
+            let name = &bytes[range];
+            let target_symbol = self.table(target)?.get(name).flatten();
             let merged = match (target_symbol, source_symbol) {
                 (Some(target), Some(source)) => {
                     Some(self.merge_symbol(target, source, unidirectional)?)
@@ -152,7 +199,7 @@ impl CheckerState {
                     self.symbol_mut(merged)?.parent = Some(parent);
                 }
             }
-            self.tables.get_mut(target)?.insert(name, merged);
+            self.tables.get_mut(target)?.insert_bytes(name, merged);
         }
         Ok(())
     }
@@ -188,13 +235,15 @@ impl CheckerState {
         }
         if target_flags & flags::TRANSIENT == 0 {
             let symbol = self.symbol(target)?;
-            if ts_ast::is_non_local_alias(
+            let resolved_target = if ts_ast::is_non_local_alias(
                 Some(&symbol),
                 flags::VALUE | flags::TYPE | flags::NAMESPACE,
             ) {
-                return Err(Error::Unsupported("resolveAlias during mergeSymbol"));
-            }
-            let resolved_target = target;
+                // port: tsc/internal/checker/checker.go:Checker.resolveSymbol
+                self.resolve_alias(target)?
+            } else {
+                target
+            };
             if resolved_target == self.builtins.unknown_symbol {
                 return Ok(source);
             }
@@ -230,7 +279,7 @@ impl CheckerState {
             let members = if let Some(table) = self.symbol(target)?.members() {
                 table
             } else {
-                let table = self.alloc_symbol_table(SymbolTable::new());
+                let table = self.alloc_symbol_table(SymbolTable::default());
                 self.symbol_mut(target)?.members = Some(table);
                 table
             };
@@ -240,7 +289,7 @@ impl CheckerState {
             let exports = if let Some(table) = self.symbol(target)?.exports() {
                 table
             } else {
-                let table = self.alloc_symbol_table(SymbolTable::new());
+                let table = self.alloc_symbol_table(SymbolTable::default());
                 self.symbol_mut(target)?.exports = Some(table);
                 table
             };
@@ -276,15 +325,15 @@ impl CheckerState {
     }
 
     // port: tsc/internal/binder/binder.go:SetValueDeclaration
-    fn set_merged_value_declaration(
+    pub(crate) fn set_merged_value_declaration(
         &mut self,
         symbol: SymbolId,
         node: NodeId,
     ) -> Result<(), Error> {
         let previous = self.symbol(symbol)?.value_declaration();
         let replace = if let Some(previous) = previous {
-            let old_kind = self.ast(previous)?.node(previous)?.kind();
-            let new_kind = self.ast(node)?.node(node)?.kind();
+            let old_kind = self.node(previous)?.kind();
+            let new_kind = self.node(node)?.kind();
             let assignment = |kind: ts_ast::NodeKind| {
                 matches!(
                     kind.known(),

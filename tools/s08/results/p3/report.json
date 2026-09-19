@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "scope": "P3 scoped correctness and accounting; full S08 and full P0 remain pending",
+  "base_commit": "7bc3756c9a7b2d4f9bbcfa60b66fd8835541d97d",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "profile": "debug; all Rust executables built with storage-pilot and relation-probe",
+  "binaries": {
+    "p2_checker": "a09846d4b4f9580ba6a4adc00fc4061a2f7bceece58ab154672e2185f06f3ecd",
+    "p3_relations": "ae049311bdc7d8cda94413ebf9abe2dd93a9f776c584198022bccf21c6815499",
+    "p3_comparators": "763c436eb25dfee4f1daaadf2d2377dd02bee79c2f6000e4540d177c41485826",
+    "storage_families": "7a9466f06d1ba180537886a9dfa3a098bc5febfc6ddb932f6800b783155784a8"
+  },
+  "sources_sha256": "0feee47ac97740cf6d9f0918d03fad1dee86c0f6d8b00b4f815ab8f4874fb18a",
+  "capabilities": [
+    {
+      "id": "generics",
+      "native_directory": "capabilities/generics/native",
+      "programs": 12,
+      "queries": 27,
+      "actual_sha256": "879c09a4c0c469a399fa94af06a54d4dbf33d636796140396b184dbd245678d8",
+      "native_sha256": "5324d35e4aabaa654800933eb589e75a09e8ac4983d6bdddf3d9290220e469e6"
+    },
+    {
+      "id": "arrays",
+      "native_directory": "capabilities/arrays/native",
+      "programs": 6,
+      "queries": 24,
+      "actual_sha256": "e720a5ba95fa7bd209496da61fdbd6b646359b521bd30c521ecbe61eeb296488",
+      "native_sha256": "c2df499d127dcaef824c4ec36cf66c6cdf3b34e07b463661894275a010de429c"
+    },
+    {
+      "id": "indexes",
+      "native_directory": "capabilities/indexes/native",
+      "programs": 6,
+      "queries": 32,
+      "actual_sha256": "825045ebfe91ebb27217c552b59be5625e2318d82956d15ff2d8dfc684837442",
+      "native_sha256": "cc195be9a0401188cca4752db84ddc533210fd7645a2f417b369dbbe977932e4"
+    },
+    {
+      "id": "mapped",
+      "native_directory": "capabilities/mapped/native",
+      "programs": 6,
+      "queries": 30,
+      "actual_sha256": "106bc2dc2a012875206f72f5d7a3a52abc9e42760e4045f60f949bf86bb1a647",
+      "native_sha256": "8b10460a3e997b6e25a4ec90883548382255ee1db36c53b4d995e32cc8acc2c8"
+    },
+    {
+      "id": "conditional",
+      "native_directory": "capabilities/conditional/native",
+      "programs": 5,
+      "queries": 23,
+      "actual_sha256": "c55c2238645b01cfd2d9f8f2d5a9a12c370614653bf7253010b838b95a7eb201",
+      "native_sha256": "7b7c5a28cf2deb083f51945b486c64da7763d71cdee400cb89a2da049dccfb37"
+    },
+    {
+      "id": "inference",
+      "native_directory": "capabilities/inference/native",
+      "programs": 8,
+      "queries": 48,
+      "actual_sha256": "4e29c354161fdb1c8e0ead80ebddb87b7de150478f9d76f593e05fbb8f9e24b2",
+      "native_sha256": "e98fc597a3564ed3d695f6818e9e53d11888a8c37629373dff984c1148cb7d3a"
+    },
+    {
+      "id": "contextual",
+      "native_directory": "capabilities/contextual/native",
+      "programs": 7,
+      "queries": 26,
+      "actual_sha256": "a00e55304137c927aae64c05daabed5559a16df0b5a45f2fbd8259c997af7dae",
+      "native_sha256": "5bf358dd4a970054c855854df7ad05ac2bed03551df9c280492f56c74c5723e5"
+    },
+    {
+      "id": "compound",
+      "native_directory": "capabilities/compound/native",
+      "programs": 8,
+      "queries": 41,
+      "actual_sha256": "b0e3dcfb3c35e2c24cd11196d60fe0e8c463924f0979e002db53ad2b26a36051",
+      "native_sha256": "6ee658c49d3973a2d0c10d97fc710c4231028fea918e30090b94e2354d3bf392"
+    },
+    {
+      "id": "late",
+      "native_directory": "capabilities/late/native",
+      "programs": 5,
+      "queries": 9,
+      "actual_sha256": "cb553cb1f8b6236ab1b1a646cd53dcd4726b8155ad6382de084a72d37fad1934",
+      "native_sha256": "ec44a35452dd48ccbf0a36a9a33bb5ebbd3b19730631771db026e94dbbc54915"
+    },
+    {
+      "id": "computed",
+      "native_directory": "capabilities/computed/native",
+      "programs": 9,
+      "queries": 13,
+      "actual_sha256": "7dbdb00440d4713d311b23a6899000bb0142c8cc9a93cd5feeeca25e58324cbc",
+      "native_sha256": "cbd809d3dab8add5aaa5dac515ee821106b90f984b5a88105224fdb75dde955c"
+    },
+    {
+      "id": "libraries",
+      "native_directory": "capabilities/libraries/native",
+      "programs": 1,
+      "queries": 17,
+      "actual_sha256": "8c81be974c77dd5d8af1ec7fe97bdc87e9821c96b37e52865e3cac36975006ce",
+      "native_sha256": "13183e2767167b2611cb84182633e02449f75cc4de74dcb5b8147699292d216a"
+    },
+    {
+      "id": "relation-errors",
+      "native_directory": "capabilities/relation-errors/native",
+      "programs": 10,
+      "queries": 10,
+      "actual_sha256": "7c87b0057d58afd2eb4806d3bf6307abf3a26f1018ec743159c95a17996980e4",
+      "native_sha256": "57b2dfb3bc92eaed2aba87b9199e24742a249d4ac79b6d032459bdc5462c25ba"
+    },
+    {
+      "id": "boundaries",
+      "native_directory": "capabilities/boundaries/native",
+      "programs": 11,
+      "queries": 17,
+      "actual_sha256": "2cbe3b0105f80bc7dde5205fc11c193be7808377e5e23b037ac41a3f7ab3bb97",
+      "native_sha256": "a4c5081efc9c0e9873761f7111910b9583925b28ce2e1d4e5bb63189eb186704"
+    },
+    {
+      "id": "relation-details",
+      "native_directory": "capabilities/relation-details/native",
+      "programs": 14,
+      "queries": 14,
+      "actual_sha256": "97a0f475fa5f05c02f957a0e1ef714b939cf0fc3d3fd84f70e70970000518f25",
+      "native_sha256": "7421e96f31876dd709fd1971f2ecd419c4f15d663f5e8b2dad704176bb6c3202"
+    }
+  ],
+  "relations": {
+    "actual_sha256": "676eb9af77ff987d7310b2314773649554c0401d006366fdad159aa83a45a73c",
+    "executed_actions": 380,
+    "full_p0_contract_match": false,
+    "native_sha256": "911abdc8ee268be27deebcd294e2d0d403e5ce21886c8651b8b8d5ec357f9536",
+    "pending_actions": 40,
+    "pending_cases": [
+      {
+        "checkpoint": "P4",
+        "id": "flow-return-inference",
+        "mode": "identity",
+        "operation": "TypeQuery with return inference and flow checking",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "flow-return-inference",
+        "mode": "assignable",
+        "operation": "TypeQuery with return inference and flow checking",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "flow-return-inference",
+        "mode": "subtype",
+        "operation": "TypeQuery with return inference and flow checking",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "flow-return-inference",
+        "mode": "strict_subtype",
+        "operation": "TypeQuery with return inference and flow checking",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "flow-return-inference",
+        "mode": "comparable",
+        "operation": "TypeQuery with return inference and flow checking",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "jsdoc-module",
+        "mode": "identity",
+        "operation": "TypeQuery with JavaScript/JSDoc module inference",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "jsdoc-module",
+        "mode": "assignable",
+        "operation": "TypeQuery with JavaScript/JSDoc module inference",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "jsdoc-module",
+        "mode": "subtype",
+        "operation": "TypeQuery with JavaScript/JSDoc module inference",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "jsdoc-module",
+        "mode": "strict_subtype",
+        "operation": "TypeQuery with JavaScript/JSDoc module inference",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      },
+      {
+        "checkpoint": "P4",
+        "id": "jsdoc-module",
+        "mode": "comparable",
+        "operation": "TypeQuery with JavaScript/JSDoc module inference",
+        "reason": "unsupported checker operation: getTypeFromTypeNodeWorker: type family"
+      }
+    ],
+    "pending_protocol": [
+      "post_action_display",
+      "post_action_union_ordering",
+      "final_state",
+      "source_and_global_diagnostics"
+    ],
+    "request_sha256": "4e33c50c0935ddbbb47327d3b5347453a10057ac60f248ae9b2b2b225f7d731b",
+    "scope": "Exact relation results, ternary calls, state and diagnostics; not the full P0/P7/E2 contract",
+    "scoped_actions_match": true,
+    "total_actions": 420,
+    "version": 1
+  },
+  "comparators": {
+    "matched": true,
+    "request_sha256": "4e33c50c0935ddbbb47327d3b5347453a10057ac60f248ae9b2b2b225f7d731b",
+    "native_sha256": "911abdc8ee268be27deebcd294e2d0d403e5ce21886c8651b8b8d5ec357f9536",
+    "residual_families": 8,
+    "union_matrices": 7,
+    "permutations": 77,
+    "boundary": "Go panic and Rust WrongOwner both reject foreign checker handles",
+    "scope": "direct comparator signs and exact permutations; not full P0 or E2",
+    "actual_sha256": "0fe799fab70ed72a9591344f2005b57ba43a82e9b12aa246623d0aea3c1b222b"
+  },
+  "storage": [
+    {
+      "trace": 0,
+      "constructors_match": true,
+      "scope": "debug replay; no new footprint or timing ratio"
+    },
+    {
+      "trace": 1,
+      "constructors_match": true,
+      "scope": "debug replay; no new footprint or timing ratio"
+    }
+  ],
+  "tests": {
+    "rust": 98,
+    "python_protocol": 19,
+    "clippy": "pass; changed packages, all targets/features, warnings denied",
+    "msrv": "1.96.0 changed packages, all targets/features; pass"
+  },
+  "post_capture_attribution_corrections": [
+    {
+      "path": "crates/ts_checker/src/indexes.rs",
+      "captured_sha256": "8bdb6a9f5877b0cb47efc8316b3b64ddc8f96029aa728efc4309a3e0107e4f36",
+      "delivery_sha256": "f6092068f26c4ec89f4b0593713e076952d71240b72f8b6227fdd9bca57cb3c1",
+      "reason": "Go source attribution comments only; executable lines unchanged"
+    },
+    {
+      "path": "crates/ts_checker/src/signature_parameters.rs",
+      "captured_sha256": "3877e9bc184ce988559458e15646e0c91d1ed1b325e108204087bbd77f3eedbf",
+      "delivery_sha256": "2cde83a12280e9ecbc1a6e23d25144f9ddec9ae9d3276f764b39e2b2a8db1e1b",
+      "reason": "Go source attribution comments only; executable lines unchanged"
+    }
+  ],
+  "pending_archives": [
+    "contextual-expressions",
+    "library-members",
+    "oversized-tuple-query-panic"
+  ]
+}

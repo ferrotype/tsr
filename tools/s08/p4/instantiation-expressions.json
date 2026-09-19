@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "scope": "S08 P4 explicit generic instantiation of value expressions and typeof queries",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "function",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "function identity<T>(value:T):T{return value;}const f=identity<string>;const a=f(\"s\");const b=f(1);\ntype Query_f=typeof f;\ntype Query_a=typeof a;\ntype Query_b=typeof b;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "b",
+          "file": "/case.ts",
+          "declaration": "Query_b",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "type-query",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare function f<T>(x:T):T;type A=typeof f<number>;type B=typeof f<string>;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "overload-filter",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare function f<T>(x:T):T;declare function f(x:number):number;const g=f<string>;const a=g(\"s\");\ntype Query_g=typeof g;\ntype Query_a=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-arguments",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare function f<T,U=string>(a:T,b:U):[T,U];const g=f<number>;const a=g(1,\"s\");\ntype Query_g=typeof g;\ntype Query_a=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constraint-errors",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare function f<T extends string>(x:T):T;const g=f<number>;const a=g(1);\ntype Query_g=typeof g;\ntype Query_a=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "wrong-arity",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare function f(x:number):number;const g=f<string>;declare function h<T,U>(x:T,y:U):T;const z=h<string>;\ntype Query_g=typeof g;\ntype Query_z=typeof z;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "g",
+          "file": "/case.ts",
+          "declaration": "Query_g",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "z",
+          "file": "/case.ts",
+          "declaration": "Query_z",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "union",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare const source:(<T>(x:T)=>T)|((x:number)=>number);const f=source<string>;\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "intersection",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare const source:(<T>(x:T)=>T)&{label:string};const f=source<number>;const a=f(1);const label=f.label;\ntype Query_f=typeof f;\ntype Query_a=typeof a;\ntype Query_label=typeof label;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "label",
+          "file": "/case.ts",
+          "declaration": "Query_label",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "class C<T>{constructor(public value:T){} static label=\"C\";}const Factory=C<number>;const a=new Factory(1);const label=Factory.label;\ntype Query_Factory=typeof Factory;\ntype Query_a=typeof a;\ntype Query_label=typeof label;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Factory",
+          "file": "/case.ts",
+          "declaration": "Query_Factory",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "label",
+          "file": "/case.ts",
+          "declaration": "Query_label",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "any",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "declare const source:any;const f=source<string>;const a=f(1);\ntype Query_f=typeof f;\ntype Query_a=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "instanceof-instantiation",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "class C<T>{value!:T;}declare const x:unknown;const a=x instanceof C<number>;\ntype Query_a=typeof a;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "a",
+          "file": "/case.ts",
+          "declaration": "Query_a",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-constraint",
+      "files": {
+        "/globals.d.ts": "interface Array<T>{length:number;[n:number]:T;}interface ReadonlyArray<T>{length:number;readonly[n:number]:T;}interface String{length:number;}interface Function{}interface CallableFunction{}interface NewableFunction{}interface Object{}interface Boolean{}interface Number{}interface RegExp{}interface IArguments{[n:number]:any;length:number;}",
+        "/case.ts": "function f<T extends <U>(x:U)=>U>(source:T){return source<number>;}\ntype Query_f=typeof f;"
+      },
+      "roots": [
+        "/globals.d.ts",
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "f",
+          "file": "/case.ts",
+          "declaration": "Query_f",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

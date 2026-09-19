@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "scope": "S08 P4 declaration pseudo-type reuse, lexical scope and inference fallback; focused protocol, not E2 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "isolatedDeclarations": true
+  },
+  "programs": [
+    {
+      "id": "call-fallback",
+      "files": {
+        "/main.ts": "declare function external(): number; export const value = external();\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nested-call-fallback",
+      "files": {
+        "/main.ts": "declare function external(): number; export const value = { nested: { value: external() } };\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "const-tuple",
+      "files": {
+        "/main.ts": "export const value = [1, \"two\", { three: true }] as const;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-accessors",
+      "files": {
+        "/main.ts": "export const value = { get item(): string { return \"x\"; }, set item(v: string) {} };\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "inferred-predicate",
+      "files": {
+        "/main.ts": "export const isString = (value: unknown) => typeof value === \"string\";\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-arrow",
+      "files": {
+        "/main.ts": "export const identity = <T>(value: T) => value;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "rest-tuple-function",
+      "files": {
+        "/main.ts": "export const count = (...values: [number,string]) => values[0];\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "inaccessible-this",
+      "files": {
+        "/main.ts": "export class C { get value() { return { self: this }; } }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "parameter-shadow",
+      "files": {
+        "/main.ts": "declare const value: { kind: \"global\" }; export const f = (value: string) => ({ value, outer: null as unknown as typeof globalThis });\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "property-parameter-default",
+      "files": {
+        "/main.ts": "export class C { constructor(public value: number = 1, required: string) {} }\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "object-computed",
+      "files": {
+        "/main.ts": "const key = \"name\"; export const value = { [key]: 1 };\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "bigint-literal",
+      "files": {
+        "/main.ts": "export const value = { negative: -123n, positive: 45n } as const;\ntype Probe = number;\n"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "probe",
+          "file": "/main.ts",
+          "declaration": "Probe",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  },
+  "diagnostic_mode": "program"
+}

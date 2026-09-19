@@ -1704,6 +1704,576 @@ pub struct AstPayloadStore {
 }
 
 impl AstPayloadStore {
+    /// Reserved page bytes of every populated typed directory, including the
+    /// boxed directory records (storage census).
+    pub(crate) fn structural_bytes(&self) -> usize {
+        let mut bytes = 0;
+        if let Some(pages) = &self.identifier {
+            bytes += size_of::<RowPages<IdentifierRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.private_identifier {
+            bytes += size_of::<RowPages<PrivateIdentifierRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.qualified_name {
+            bytes += size_of::<RowPages<QualifiedNameRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.computed_property_name {
+            bytes += size_of::<RowPages<ComputedPropertyNameRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.decorator {
+            bytes += size_of::<RowPages<DecoratorRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.empty_statement {
+            bytes += size_of::<RowPages<EmptyStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.if_statement {
+            bytes += size_of::<RowPages<IfStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.do_statement {
+            bytes += size_of::<RowPages<DoStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.while_statement {
+            bytes += size_of::<RowPages<WhileStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.for_statement {
+            bytes += size_of::<RowPages<ForStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.for_in_or_of_statement {
+            bytes += size_of::<RowPages<ForInOrOfStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.break_statement {
+            bytes += size_of::<RowPages<BreakStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.continue_statement {
+            bytes += size_of::<RowPages<ContinueStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.return_statement {
+            bytes += size_of::<RowPages<ReturnStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.with_statement {
+            bytes += size_of::<RowPages<WithStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.switch_statement {
+            bytes += size_of::<RowPages<SwitchStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.case_block {
+            bytes += size_of::<RowPages<CaseBlockRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.case_or_default_clause {
+            bytes += size_of::<RowPages<CaseOrDefaultClauseRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.throw_statement {
+            bytes += size_of::<RowPages<ThrowStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.try_statement {
+            bytes += size_of::<RowPages<TryStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.catch_clause {
+            bytes += size_of::<RowPages<CatchClauseRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.debugger_statement {
+            bytes += size_of::<RowPages<DebuggerStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.labeled_statement {
+            bytes += size_of::<RowPages<LabeledStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.expression_statement {
+            bytes += size_of::<RowPages<ExpressionStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.block {
+            bytes += size_of::<RowPages<BlockRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.variable_statement {
+            bytes += size_of::<RowPages<VariableStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.variable_declaration {
+            bytes += size_of::<RowPages<VariableDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.variable_declaration_list {
+            bytes += size_of::<RowPages<VariableDeclarationListRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.binding_pattern {
+            bytes += size_of::<RowPages<BindingPatternRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.parameter_declaration {
+            bytes += size_of::<RowPages<ParameterDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.binding_element {
+            bytes += size_of::<RowPages<BindingElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.missing_declaration {
+            bytes += size_of::<RowPages<MissingDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.function_declaration {
+            bytes += size_of::<RowPages<FunctionDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.class_declaration {
+            bytes += size_of::<RowPages<ClassDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.class_expression {
+            bytes += size_of::<RowPages<ClassExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.heritage_clause {
+            bytes += size_of::<RowPages<HeritageClauseRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.interface_declaration {
+            bytes += size_of::<RowPages<InterfaceDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_alias_declaration {
+            bytes += size_of::<RowPages<TypeAliasDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.enum_member {
+            bytes += size_of::<RowPages<EnumMemberRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.enum_declaration {
+            bytes += size_of::<RowPages<EnumDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.module_block {
+            bytes += size_of::<RowPages<ModuleBlockRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.not_emitted_statement {
+            bytes += size_of::<RowPages<NotEmittedStatementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_declaration {
+            bytes += size_of::<RowPages<ImportDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.external_module_reference {
+            bytes += size_of::<RowPages<ExternalModuleReferenceRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.namespace_import {
+            bytes += size_of::<RowPages<NamespaceImportRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.named_imports {
+            bytes += size_of::<RowPages<NamedImportsRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.export_assignment {
+            bytes += size_of::<RowPages<ExportAssignmentRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.namespace_export_declaration {
+            bytes +=
+                size_of::<RowPages<NamespaceExportDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.namespace_export {
+            bytes += size_of::<RowPages<NamespaceExportRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.named_exports {
+            bytes += size_of::<RowPages<NamedExportsRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.export_specifier {
+            bytes += size_of::<RowPages<ExportSpecifierRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.call_signature_declaration {
+            bytes += size_of::<RowPages<CallSignatureDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.construct_signature_declaration {
+            bytes +=
+                size_of::<RowPages<ConstructSignatureDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.constructor_declaration {
+            bytes += size_of::<RowPages<ConstructorDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.get_accessor_declaration {
+            bytes += size_of::<RowPages<GetAccessorDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.set_accessor_declaration {
+            bytes += size_of::<RowPages<SetAccessorDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.index_signature_declaration {
+            bytes += size_of::<RowPages<IndexSignatureDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.method_signature_declaration {
+            bytes +=
+                size_of::<RowPages<MethodSignatureDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.method_declaration {
+            bytes += size_of::<RowPages<MethodDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.property_signature_declaration {
+            bytes +=
+                size_of::<RowPages<PropertySignatureDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.property_declaration {
+            bytes += size_of::<RowPages<PropertyDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.semicolon_class_element {
+            bytes += size_of::<RowPages<SemicolonClassElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.class_static_block_declaration {
+            bytes +=
+                size_of::<RowPages<ClassStaticBlockDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.keyword_expression {
+            bytes += size_of::<RowPages<KeywordExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.string_literal {
+            bytes += size_of::<RowPages<StringLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.numeric_literal {
+            bytes += size_of::<RowPages<NumericLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.big_int_literal {
+            bytes += size_of::<RowPages<BigIntLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.regular_expression_literal {
+            bytes += size_of::<RowPages<RegularExpressionLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.no_substitution_template_literal {
+            bytes +=
+                size_of::<RowPages<NoSubstitutionTemplateLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.binary_expression {
+            bytes += size_of::<RowPages<BinaryExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.prefix_unary_expression {
+            bytes += size_of::<RowPages<PrefixUnaryExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.postfix_unary_expression {
+            bytes += size_of::<RowPages<PostfixUnaryExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.yield_expression {
+            bytes += size_of::<RowPages<YieldExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.arrow_function {
+            bytes += size_of::<RowPages<ArrowFunctionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.function_expression {
+            bytes += size_of::<RowPages<FunctionExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.as_expression {
+            bytes += size_of::<RowPages<AsExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.satisfies_expression {
+            bytes += size_of::<RowPages<SatisfiesExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.conditional_expression {
+            bytes += size_of::<RowPages<ConditionalExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.property_access_expression {
+            bytes += size_of::<RowPages<PropertyAccessExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.element_access_expression {
+            bytes += size_of::<RowPages<ElementAccessExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.call_expression {
+            bytes += size_of::<RowPages<CallExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.new_expression {
+            bytes += size_of::<RowPages<NewExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.meta_property {
+            bytes += size_of::<RowPages<MetaPropertyRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.non_null_expression {
+            bytes += size_of::<RowPages<NonNullExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.spread_element {
+            bytes += size_of::<RowPages<SpreadElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_expression {
+            bytes += size_of::<RowPages<TemplateExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_span {
+            bytes += size_of::<RowPages<TemplateSpanRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.tagged_template_expression {
+            bytes += size_of::<RowPages<TaggedTemplateExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.parenthesized_expression {
+            bytes += size_of::<RowPages<ParenthesizedExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.array_literal_expression {
+            bytes += size_of::<RowPages<ArrayLiteralExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.object_literal_expression {
+            bytes += size_of::<RowPages<ObjectLiteralExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.spread_assignment {
+            bytes += size_of::<RowPages<SpreadAssignmentRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.property_assignment {
+            bytes += size_of::<RowPages<PropertyAssignmentRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.shorthand_property_assignment {
+            bytes +=
+                size_of::<RowPages<ShorthandPropertyAssignmentRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.delete_expression {
+            bytes += size_of::<RowPages<DeleteExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_of_expression {
+            bytes += size_of::<RowPages<TypeOfExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.void_expression {
+            bytes += size_of::<RowPages<VoidExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.await_expression {
+            bytes += size_of::<RowPages<AwaitExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_assertion {
+            bytes += size_of::<RowPages<TypeAssertionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.union_type_node {
+            bytes += size_of::<RowPages<UnionTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.intersection_type_node {
+            bytes += size_of::<RowPages<IntersectionTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.conditional_type_node {
+            bytes += size_of::<RowPages<ConditionalTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_operator_node {
+            bytes += size_of::<RowPages<TypeOperatorNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.infer_type_node {
+            bytes += size_of::<RowPages<InferTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.array_type_node {
+            bytes += size_of::<RowPages<ArrayTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.indexed_access_type_node {
+            bytes += size_of::<RowPages<IndexedAccessTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_reference_node {
+            bytes += size_of::<RowPages<TypeReferenceNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.expression_with_type_arguments {
+            bytes +=
+                size_of::<RowPages<ExpressionWithTypeArgumentsRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.literal_type_node {
+            bytes += size_of::<RowPages<LiteralTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_predicate_node {
+            bytes += size_of::<RowPages<TypePredicateNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_attribute {
+            bytes += size_of::<RowPages<ImportAttributeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_attributes {
+            bytes += size_of::<RowPages<ImportAttributesRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_query_node {
+            bytes += size_of::<RowPages<TypeQueryNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.mapped_type_node {
+            bytes += size_of::<RowPages<MappedTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_literal_node {
+            bytes += size_of::<RowPages<TypeLiteralNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.tuple_type_node {
+            bytes += size_of::<RowPages<TupleTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.named_tuple_member {
+            bytes += size_of::<RowPages<NamedTupleMemberRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.optional_type_node {
+            bytes += size_of::<RowPages<OptionalTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.rest_type_node {
+            bytes += size_of::<RowPages<RestTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.parenthesized_type_node {
+            bytes += size_of::<RowPages<ParenthesizedTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.function_type_node {
+            bytes += size_of::<RowPages<FunctionTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.constructor_type_node {
+            bytes += size_of::<RowPages<ConstructorTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_head {
+            bytes += size_of::<RowPages<TemplateHeadRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_middle {
+            bytes += size_of::<RowPages<TemplateMiddleRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_tail {
+            bytes += size_of::<RowPages<TemplateTailRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_literal_type_node {
+            bytes += size_of::<RowPages<TemplateLiteralTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.template_literal_type_span {
+            bytes += size_of::<RowPages<TemplateLiteralTypeSpanRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.synthetic_expression {
+            bytes += size_of::<RowPages<SyntheticExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.partially_emitted_expression {
+            bytes +=
+                size_of::<RowPages<PartiallyEmittedExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_element {
+            bytes += size_of::<RowPages<JsxElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_attributes {
+            bytes += size_of::<RowPages<JsxAttributesRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_namespaced_name {
+            bytes += size_of::<RowPages<JsxNamespacedNameRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_opening_element {
+            bytes += size_of::<RowPages<JsxOpeningElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_self_closing_element {
+            bytes += size_of::<RowPages<JsxSelfClosingElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_fragment {
+            bytes += size_of::<RowPages<JsxFragmentRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_attribute {
+            bytes += size_of::<RowPages<JsxAttributeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_spread_attribute {
+            bytes += size_of::<RowPages<JsxSpreadAttributeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_closing_element {
+            bytes += size_of::<RowPages<JsxClosingElementRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_expression {
+            bytes += size_of::<RowPages<JsxExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.jsx_text {
+            bytes += size_of::<RowPages<JsxTextRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.syntax_list {
+            bytes += size_of::<RowPages<SyntaxListRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc {
+            bytes += size_of::<RowPages<JSDocRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_type_expression {
+            bytes += size_of::<RowPages<JSDocTypeExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_non_nullable_type {
+            bytes += size_of::<RowPages<JSDocNonNullableTypeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_nullable_type {
+            bytes += size_of::<RowPages<JSDocNullableTypeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_variadic_type {
+            bytes += size_of::<RowPages<JSDocVariadicTypeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_optional_type {
+            bytes += size_of::<RowPages<JSDocOptionalTypeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_type_tag {
+            bytes += size_of::<RowPages<JSDocTypeTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_unknown_tag {
+            bytes += size_of::<RowPages<JSDocUnknownTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_template_tag {
+            bytes += size_of::<RowPages<JSDocTemplateTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_return_tag {
+            bytes += size_of::<RowPages<JSDocReturnTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_public_tag {
+            bytes += size_of::<RowPages<JSDocPublicTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_private_tag {
+            bytes += size_of::<RowPages<JSDocPrivateTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_protected_tag {
+            bytes += size_of::<RowPages<JSDocProtectedTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_readonly_tag {
+            bytes += size_of::<RowPages<JSDocReadonlyTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_override_tag {
+            bytes += size_of::<RowPages<JSDocOverrideTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_deprecated_tag {
+            bytes += size_of::<RowPages<JSDocDeprecatedTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_see_tag {
+            bytes += size_of::<RowPages<JSDocSeeTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_implements_tag {
+            bytes += size_of::<RowPages<JSDocImplementsTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_augments_tag {
+            bytes += size_of::<RowPages<JSDocAugmentsTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_satisfies_tag {
+            bytes += size_of::<RowPages<JSDocSatisfiesTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_throws_tag {
+            bytes += size_of::<RowPages<JSDocThrowsTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_this_tag {
+            bytes += size_of::<RowPages<JSDocThisTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_import_tag {
+            bytes += size_of::<RowPages<JSDocImportTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_callback_tag {
+            bytes += size_of::<RowPages<JSDocCallbackTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_overload_tag {
+            bytes += size_of::<RowPages<JSDocOverloadTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_typedef_tag {
+            bytes += size_of::<RowPages<JSDocTypedefTagRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_signature {
+            bytes += size_of::<RowPages<JSDocSignatureRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_name_reference {
+            bytes += size_of::<RowPages<JSDocNameReferenceRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.source_file {
+            bytes += size_of::<RowPages<SourceFileRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.module_declaration {
+            bytes += size_of::<RowPages<ModuleDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_equals_declaration {
+            bytes += size_of::<RowPages<ImportEqualsDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.export_declaration {
+            bytes += size_of::<RowPages<ExportDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_type_node {
+            bytes += size_of::<RowPages<ImportTypeNodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_clause {
+            bytes += size_of::<RowPages<ImportClauseRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.import_specifier {
+            bytes += size_of::<RowPages<ImportSpecifierRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_text {
+            bytes += size_of::<RowPages<JSDocTextRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_link {
+            bytes += size_of::<RowPages<JSDocLinkRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_link_plain {
+            bytes += size_of::<RowPages<JSDocLinkPlainRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_link_code {
+            bytes += size_of::<RowPages<JSDocLinkCodeRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.type_parameter_declaration {
+            bytes += size_of::<RowPages<TypeParameterDeclarationRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.synthetic_reference_expression {
+            bytes +=
+                size_of::<RowPages<SyntheticReferenceExpressionRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_type_literal {
+            bytes += size_of::<RowPages<JSDocTypeLiteralRow>>() + pages.structural_bytes();
+        }
+        if let Some(pages) = &self.js_doc_parameter_or_property_tag {
+            bytes +=
+                size_of::<RowPages<JSDocParameterOrPropertyTagRow>>() + pages.structural_bytes();
+        }
+        bytes
+    }
+
     pub(crate) fn shape_of(data: &NodeData) -> u16 {
         match data {
             NodeData::Token(_) => 0,

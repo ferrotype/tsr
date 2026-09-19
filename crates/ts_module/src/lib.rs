@@ -3,8 +3,9 @@
 //! remaining package-map and project-reference boundaries.
 mod resolver;
 pub use resolver::{
-    get_conditions, is_relative, resolve_config, resolve_package_directory, Error, PackageContents,
-    PackageId, PackageJson, Probe, ResolvedModule, Resolver,
+    get_conditions, get_types_package_name, is_relative, mangle_scoped_package_name,
+    resolve_config, resolve_package_directory, Error, PackageContents, PackageId, PackageJson,
+    Probe, ResolvedModule, Resolver,
 };
 
 mod diagnostic;
@@ -16,6 +17,7 @@ pub use type_references::{
 };
 
 mod package_maps;
+pub use package_maps::is_applicable_versioned_types_key;
 
 pub mod package_json;
 

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "profiles": ["debug", "release"],
+  "deep_cases": ["deep-relation-64", "deep-relation-256", "deep-relation-1024", "deep-relation-4096"],
+  "stack_bytes": 524288,
+  "comparator_counts": {"residual_families": 8, "union_matrices": 7, "permutations": 77},
+  "tests": [
+    {"package": "ts_checker", "target": "lib", "names": [
+      "tests::resolution_cycle_invalidates_the_suffix_and_pushes_nothing",
+      "tests::resolution_search_stops_at_a_produced_property_and_at_the_floor",
+      "tests::same_thread_reentry_fails_before_waiting_and_drop_allows_another_operation",
+      "tests::a_direct_identity_lease_cannot_bypass_operation_reentry_detection",
+      "tests::a_panic_inside_an_operation_retires_the_generation",
+      "node_builder::stack_tests::deep_type_display_grows_and_factory_panic_retires_the_operation"
+    ]},
+    {"package": "ts_compiler", "target": "checker_display", "names": [
+      "deeply_qualified_symbol_display_runs_on_a_small_native_stack"
+    ]},
+    {"package": "ts_compiler", "target": "checker_semantics", "names": [
+      "recursive_union_properties_keep_the_original_type_on_a_small_stack",
+      "recursive_intersection_properties_preserve_order_and_identity_on_a_small_stack",
+      "reentrant_effects_signature_resolution_terminates_like_upstream"
+    ]}
+  ]
+}

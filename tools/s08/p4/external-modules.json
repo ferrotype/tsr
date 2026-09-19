@@ -1,0 +1,530 @@
+{
+  "version": 1,
+  "scope": "S08 P4 external imports, re-exports and ambient augmentation source semantics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "named-value",
+      "files": {
+        "/case.ts": "import { value as item } from \"./mod\"; type Query=typeof item;\n",
+        "/mod.ts": "export const value=42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "named-type",
+      "files": {
+        "/case.ts": "import { Shape } from \"./mod\"; type Query=Shape;\n",
+        "/mod.ts": "export interface Shape {a:string;b:number;}\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-value",
+      "files": {
+        "/case.ts": "import value from \"./mod\"; type Query=typeof value;\n",
+        "/mod.ts": "export default 42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "default-class",
+      "files": {
+        "/case.ts": "import C from \"./mod\"; type Query=C;\n",
+        "/mod.ts": "export default class C { value=1; }\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace",
+      "files": {
+        "/case.ts": "import * as NS from \"./mod\"; type Query=typeof NS.value;\n",
+        "/mod.ts": "export const value=\"hello\"; export interface Shape {a:number;}\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-export",
+      "files": {
+        "/case.ts": "import { missing } from \"./mod\"; type Query=typeof missing;\n",
+        "/mod.ts": "export const existing=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "misspelled-export",
+      "files": {
+        "/case.ts": "import { existingg } from \"./mod\"; type Query=typeof existingg;\n",
+        "/mod.ts": "export const existing=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-default",
+      "files": {
+        "/case.ts": "import Existing from \"./mod\"; type Query=typeof Existing;\n",
+        "/mod.ts": "export class Existing {}\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "missing-module",
+      "files": {
+        "/case.ts": "import {missing} from \"./absent\"; type Query=typeof missing;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "side-effect-missing",
+      "files": {
+        "/case.ts": "import \"./absent\"; type Query=number;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "node-core-missing",
+      "files": {
+        "/case.ts": "import {readFile} from \"fs\"; type Query=typeof readFile;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "file-not-module",
+      "files": {
+        "/case.ts": "import {missing} from \"./mod\"; type Query=typeof missing;\n",
+        "/mod.ts": "const local=1;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "star-reexport",
+      "files": {
+        "/case.ts": "import {value} from \"./barrel\"; type Query=typeof value;\n",
+        "/barrel.ts": "export * from \"./mod\";\n",
+        "/mod.ts": "export const value=true;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "cyclic-stars",
+      "files": {
+        "/case.ts": "import {value} from \"./a\"; type Query=typeof value;\n",
+        "/a.ts": "export * from \"./b\"; export const own=1;\n",
+        "/b.ts": "export * from \"./a\"; export const value=\"cycle\";\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "star-conflict",
+      "files": {
+        "/case.ts": "import {value} from \"./barrel\"; type Query=typeof value;\n",
+        "/barrel.ts": "export * from \"./a\"; export * from \"./b\";\n",
+        "/a.ts": "export const value=1;\n",
+        "/b.ts": "export const value=2;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "named-reexport",
+      "files": {
+        "/case.ts": "import {renamed} from \"./barrel\"; type Query=typeof renamed;\n",
+        "/barrel.ts": "export {value as renamed} from \"./mod\";\n",
+        "/mod.ts": "export const value=42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "type-only-reexport",
+      "files": {
+        "/case.ts": "import {value} from \"./barrel\"; const bad=value; type Query=typeof value;\n",
+        "/barrel.ts": "export type {value} from \"./mod\";\n",
+        "/mod.ts": "export const value=42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "type-only-star",
+      "files": {
+        "/case.ts": "import * as NS from \"./barrel\"; const bad=NS.value; type Query=typeof NS.value;\n",
+        "/barrel.ts": "export type * from \"./mod\";\n",
+        "/mod.ts": "export const value=42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "namespace-reexport",
+      "files": {
+        "/case.ts": "import {NS} from \"./barrel\"; type Query=typeof NS.value;\n",
+        "/barrel.ts": "export * as NS from \"./mod\";\n",
+        "/mod.ts": "export const value=42;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "ambient-module",
+      "files": {
+        "/case.ts": "import {value} from \"pkg\"; type Query=typeof value;\n",
+        "/ambient.d.ts": "declare module \"pkg\" { export const value:123; }\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/ambient.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "shorthand-ambient",
+      "files": {
+        "/case.ts": "import anyName from \"pkg\"; type Query=typeof anyName;\n",
+        "/ambient.d.ts": "declare module \"pkg\";\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/ambient.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "pattern-module",
+      "files": {
+        "/case.ts": "import {value} from \"thing.foo\"; type Query=typeof value;\n",
+        "/ambient.d.ts": "declare module \"*.foo\" { export const value:123; }\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/ambient.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "merged-pattern",
+      "files": {
+        "/case.ts": "import {a,b} from \"thing.foo\"; type Query={a:typeof a;b:typeof b};\n",
+        "/a.d.ts": "declare module \"*.foo\" { export const a:1; }\n",
+        "/b.d.ts": "declare module \"*.foo\" { export const b:2; }\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/a.d.ts",
+        "/b.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "external-augmentation",
+      "files": {
+        "/case.ts": "import {Shape} from \"./mod\"; declare module \"./mod\" {interface Shape{b:number}} type Query=Shape;\n",
+        "/mod.ts": "export interface Shape{a:string}\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "pattern-augmentation",
+      "files": {
+        "/case.ts": "import {Shape as A} from \"a.foo\"; import {Shape as B} from \"b.foo\"; declare module \"a.foo\" {interface Shape{extra:number}} type Query={a:A;b:B};\n",
+        "/ambient.d.ts": "declare module \"*.foo\" { export interface Shape{base:string} }\n"
+      },
+      "roots": [
+        "/case.ts",
+        "/ambient.d.ts"
+      ],
+      "queries": [
+        {
+          "id": "query",
+          "file": "/case.ts",
+          "declaration": "Query",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

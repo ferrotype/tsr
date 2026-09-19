@@ -1,0 +1,429 @@
+{
+  "version": 1,
+  "scope": "S08 P4 call signatures, argument relations, generic inference and contextual callbacks",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "simple",
+      "files": {
+        "/case.ts": "function identity(x:number):number { return x; } const result=identity(1); const bad=identity(\"wrong\"); identity(); identity(1,2);\ntype Query_result = typeof result;\ntype Query_bad = typeof bad;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/case.ts",
+          "declaration": "Query_result",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "overloads",
+      "files": {
+        "/case.ts": "interface Callable { (x:\"a\"):1; (x:number):2; (x:string):3; } let fn:Callable; const first=fn(\"a\"); const second=fn(1); const third=fn(\"b\");\ntype Query_first = typeof first;\ntype Query_second = typeof second;\ntype Query_third = typeof third;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "first",
+          "file": "/case.ts",
+          "declaration": "Query_first",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "second",
+          "file": "/case.ts",
+          "declaration": "Query_second",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "third",
+          "file": "/case.ts",
+          "declaration": "Query_third",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic",
+      "files": {
+        "/case.ts": "function identity<T>(x:T):T { return x; } const literal=identity(1); const explicit=identity<string>(\"hi\");\ntype Query_literal = typeof literal;\ntype Query_explicit = typeof explicit;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "literal",
+          "file": "/case.ts",
+          "declaration": "Query_literal",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "explicit",
+          "file": "/case.ts",
+          "declaration": "Query_explicit",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constraints",
+      "files": {
+        "/case.ts": "function restricted<T extends string>(x:T):T { return x; } const valid=restricted(\"x\"); const bad=restricted<number>(1);\ntype Query_valid = typeof valid;\ntype Query_bad = typeof bad;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "valid",
+          "file": "/case.ts",
+          "declaration": "Query_valid",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "callback",
+      "files": {
+        "/case.ts": "function apply(fn:(x:string)=>number):number { return fn(\"x\"); } const result=apply(x => 1); const wrong=apply(x => \"wrong\");\ntype Query_result = typeof result;\ntype Query_wrong = typeof wrong;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/case.ts",
+          "declaration": "Query_result",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "wrong",
+          "file": "/case.ts",
+          "declaration": "Query_wrong",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "contextual-parameters",
+      "files": {
+        "/case.ts": "const optional:(x?:string)=>string|undefined = x=>x; const annotated:(x:string)=>number = (x:string)=>1;\ntype Query_optional = typeof optional;\ntype Query_annotated = typeof annotated;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "optional",
+          "file": "/case.ts",
+          "declaration": "Query_optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "annotated",
+          "file": "/case.ts",
+          "declaration": "Query_annotated",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "untyped",
+      "files": {
+        "/case.ts": "let fn:any; const value=fn(1); const typed=fn<string>(1);\ntype Query_value = typeof value;\ntype Query_typed = typeof typed;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "Query_value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "typed",
+          "file": "/case.ts",
+          "declaration": "Query_typed",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "this-parameter",
+      "files": {
+        "/case.ts": "interface Callable { (this:{x:number}, value:number):number; } let fn:Callable; const value=fn(1);\ntype Query_value = typeof value;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "Query_value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-callback",
+      "files": {
+        "/case.ts": "function apply<T,U>(value:T,fn:(x:T)=>U):U { return fn(value); } const inferred=apply(\"x\", x=>x); const explicit=apply<string,number>(\"x\", x=>1);\ntype Query_inferred = typeof inferred;\ntype Query_explicit = typeof explicit;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "inferred",
+          "file": "/case.ts",
+          "declaration": "Query_inferred",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "explicit",
+          "file": "/case.ts",
+          "declaration": "Query_explicit",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-contextual-result",
+      "files": {
+        "/case.ts": "function wrap<T,U>(cb:(x:T)=>U):(x:T)=>U { return cb; } const wrapped:(x:string)=>number=wrap(x=>1); function identity<T>(x:T):T { return x; } const contextual:boolean=identity(true);\ntype Query_wrapped = typeof wrapped;\ntype Query_contextual = typeof contextual;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "wrapped",
+          "file": "/case.ts",
+          "declaration": "Query_wrapped",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "contextual",
+          "file": "/case.ts",
+          "declaration": "Query_contextual",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-return-callback",
+      "files": {
+        "/case.ts": "function transform<T>(cb:()=>T):T { return cb(); } const inferred=transform(()=>1);\ntype Query_inferred = typeof inferred;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "inferred",
+          "file": "/case.ts",
+          "declaration": "Query_inferred",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-literal-context",
+      "files": {
+        "/case.ts": "function value<T>(cb:()=>T):T { return cb(); } const literal:\"x\"=value(()=>\"x\"); const bool:boolean=value(()=>true);\ntype Query_literal = typeof literal;\ntype Query_bool = typeof bool;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "literal",
+          "file": "/case.ts",
+          "declaration": "Query_literal",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bool",
+          "file": "/case.ts",
+          "declaration": "Query_bool",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructors",
+      "files": {
+        "/case.ts": "interface Construct { new(x:number):{value:number}; } let Make:Construct; const result=new Make(1); new Make(); new Make(\"wrong\"); const bad=new Make(1,2);\ntype Query_result = typeof result;\ntype Query_bad = typeof bad;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "result",
+          "file": "/case.ts",
+          "declaration": "Query_result",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "bad",
+          "file": "/case.ts",
+          "declaration": "Query_bad",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "abstract-construct",
+      "files": {
+        "/case.ts": "let Make: abstract new()=>{value:number}; const value=new Make();\ntype Query_value = typeof value;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "Query_value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "new-call-signature",
+      "files": {
+        "/case.ts": "function Constructor() {} const value=new Constructor();\ntype Query_value = typeof value;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "value",
+          "file": "/case.ts",
+          "declaration": "Query_value",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "non-callable",
+      "files": {
+        "/case.ts": "interface Function { test:string } let value:number; const called=value(); const constructed=new value(); let union:(()=>number)|number; const mixed=union();\ntype Query_called = typeof called;\ntype Query_constructed = typeof constructed;\ntype Query_mixed = typeof mixed;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "called",
+          "file": "/case.ts",
+          "declaration": "Query_called",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "constructed",
+          "file": "/case.ts",
+          "declaration": "Query_constructed",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "mixed",
+          "file": "/case.ts",
+          "declaration": "Query_mixed",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

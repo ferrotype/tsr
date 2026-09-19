@@ -1,0 +1,670 @@
+{
+  "version": 1,
+  "scope": "S08 P4 enum values, identity, fresh/regular aliases and native display/diagnostics capability capture; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "numeric-auto",
+      "files": {
+        "/numeric-auto.ts": "enum E { Zero, One, Four=4, Five } type All=E; type First=E.Zero; type Last=E.Five; type Pair=E.Zero | E.One;\ntype ZeroValue = E.Zero extends 0 ? true : false;\ntype FiveValue = E.Five extends 5 ? true : false;\n"
+      },
+      "roots": [
+        "/numeric-auto.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/numeric-auto.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "First",
+          "file": "/numeric-auto.ts",
+          "declaration": "First",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Last",
+          "file": "/numeric-auto.ts",
+          "declaration": "Last",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Pair",
+          "file": "/numeric-auto.ts",
+          "declaration": "Pair",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "ZeroValue",
+          "file": "/numeric-auto.ts",
+          "declaration": "ZeroValue",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "FiveValue",
+          "file": "/numeric-auto.ts",
+          "declaration": "FiveValue",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "numeric-alias",
+      "files": {
+        "/numeric-alias.ts": "enum E { A=0, B=0, C=-0, D=1 } type All=E; type A=E.A; type B=E.B; type C=E.C; type D=E.D;\ntype Same = E.A extends E.B ? true : false;\ntype Different = E.A extends E.D ? true : false;\n"
+      },
+      "roots": [
+        "/numeric-alias.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/numeric-alias.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/numeric-alias.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/numeric-alias.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/numeric-alias.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/numeric-alias.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Same",
+          "file": "/numeric-alias.ts",
+          "declaration": "Same",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Different",
+          "file": "/numeric-alias.ts",
+          "declaration": "Different",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "single-value-alias",
+      "files": {
+        "/single-value-alias.ts": "enum E { A=7, B=7 } type All=E; type A=E.A; type B=E.B;\n"
+      },
+      "roots": [
+        "/single-value-alias.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/single-value-alias.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/single-value-alias.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/single-value-alias.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "string-members",
+      "files": {
+        "/string-members.ts": "enum E { A=\"a\", B=\"b\", C=\"a\", \"not-id\"=\"quoted\" } type All=E; type A=E.A; type C=E.C; type Quoted=typeof E[\"not-id\"];\ntype AValue = E.A extends \"a\" ? true : false;\ntype Alias = E.A extends E.C ? true : false;\n"
+      },
+      "roots": [
+        "/string-members.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/string-members.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/string-members.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/string-members.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Quoted",
+          "file": "/string-members.ts",
+          "declaration": "Quoted",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "AValue",
+          "file": "/string-members.ts",
+          "declaration": "AValue",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Alias",
+          "file": "/string-members.ts",
+          "declaration": "Alias",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "arithmetic",
+      "files": {
+        "/arithmetic.ts": "enum E { A=1 << 31, B=-1 >>> 0, C=4294967295 | 0, D=3 ** 34, E=7%3, F=~4294967296, G=1<<33, H=5&3, I=5^3 } type All=E; type A=E.A; type B=E.B; type D=E.D;\ntype Shift = E.A extends -2147483648 ? true : false;\ntype Unsigned = E.B extends 4294967295 ? true : false;\ntype Power = E.D extends 16677181699666570 ? true : false;\ntype Wrap = E.G extends 2 ? true : false;\n"
+      },
+      "roots": [
+        "/arithmetic.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/arithmetic.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/arithmetic.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/arithmetic.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/arithmetic.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Shift",
+          "file": "/arithmetic.ts",
+          "declaration": "Shift",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Unsigned",
+          "file": "/arithmetic.ts",
+          "declaration": "Unsigned",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Power",
+          "file": "/arithmetic.ts",
+          "declaration": "Power",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Wrap",
+          "file": "/arithmetic.ts",
+          "declaration": "Wrap",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constant-references",
+      "files": {
+        "/constant-references.ts": "const one=1; const label=\"tag\"; enum E { A=one, B=A+2, C=E.B*2, D=E[\"C\"]+1, S=label+\"!\", T=`v${A}`, U=\"x\"+4 } type All=E; type A=E.A; type D=E.D; type S=E.S;\ntype DValue = E.D extends 7 ? true : false;\ntype SValue = E.S extends \"tag!\" ? true : false;\ntype TValue = E.T extends \"v1\" ? true : false;\n"
+      },
+      "roots": [
+        "/constant-references.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/constant-references.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/constant-references.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/constant-references.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/constant-references.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "DValue",
+          "file": "/constant-references.ts",
+          "declaration": "DValue",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "SValue",
+          "file": "/constant-references.ts",
+          "declaration": "SValue",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "TValue",
+          "file": "/constant-references.ts",
+          "declaration": "TValue",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nan-and-infinity",
+      "files": {
+        "/nan-and-infinity.ts": "enum E { A=0/0, B=0/0, C=1/0, D=-1/0 } type All=E; type A=E.A; type B=E.B; type C=E.C;\ntype SameNaN = E.A extends E.B ? true : false;\n"
+      },
+      "roots": [
+        "/nan-and-infinity.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/nan-and-infinity.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/nan-and-infinity.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/nan-and-infinity.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/nan-and-infinity.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "SameNaN",
+          "file": "/nan-and-infinity.ts",
+          "declaration": "SameNaN",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "const-nonfinite-errors",
+      "files": {
+        "/const-nonfinite-errors.ts": "const enum E { A=0/0, B=1/0, C=-1/0 } type All=E;\n"
+      },
+      "roots": [
+        "/const-nonfinite-errors.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/const-nonfinite-errors.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "forward-and-self",
+      "files": {
+        "/forward-and-self.ts": "enum E { A=B, B=1, C=C, D } type All=E; type A=E.A; type C=E.C;\ntype ForwardZero = E.A extends 0 ? true : false;\n"
+      },
+      "roots": [
+        "/forward-and-self.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/forward-and-self.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/forward-and-self.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/forward-and-self.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "ForwardZero",
+          "file": "/forward-and-self.ts",
+          "declaration": "ForwardZero",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "merged-auto",
+      "files": {
+        "/merged-auto.ts": "enum E { A } enum E { B } type All=E; type A=E.A; type B=E.B;\n"
+      },
+      "roots": [
+        "/merged-auto.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/merged-auto.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/merged-auto.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/merged-auto.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "merged-constant",
+      "files": {
+        "/merged-constant.ts": "enum E { A=1 } enum E { B=4, C } type All=E; type A=E.A; type C=E.C;\ntype CValue = E.C extends 5 ? true : false;\n"
+      },
+      "roots": [
+        "/merged-constant.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/merged-constant.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/merged-constant.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/merged-constant.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "CValue",
+          "file": "/merged-constant.ts",
+          "declaration": "CValue",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "empty-and-ambient",
+      "files": {
+        "/empty-and-ambient.ts": "enum Empty {} declare enum Ambient { A, B, C=4 } declare const enum Constant { A, B } type EmptyType=Empty; type AmbientType=Ambient; type A=Ambient.A; type B=Ambient.B; type C=Ambient.C; type ConstantType=Constant;\n"
+      },
+      "roots": [
+        "/empty-and-ambient.ts"
+      ],
+      "queries": [
+        {
+          "id": "EmptyType",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "EmptyType",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "AmbientType",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "AmbientType",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "ConstantType",
+          "file": "/empty-and-ambient.ts",
+          "declaration": "ConstantType",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "computed-numeric",
+      "files": {
+        "/computed-numeric.ts": "declare function value(): number; enum E { A=value(), B=1, C } type All=E; type A=E.A; type C=E.C;\n"
+      },
+      "roots": [
+        "/computed-numeric.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/computed-numeric.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/computed-numeric.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/computed-numeric.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "numeric-member-name-errors",
+      "files": {
+        "/numeric-member-name-errors.ts": "enum E { \"0\"=1, \"0x10\"=2, \"NaN\"=3, \"Infinity\"=4 } type All=E;\n"
+      },
+      "roots": [
+        "/numeric-member-name-errors.ts"
+      ],
+      "queries": [
+        {
+          "id": "All",
+          "file": "/numeric-member-name-errors.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "native-int64-power-endpoint",
+      "files": {
+        "/native-int64-power-endpoint.ts": "enum E { Endpoint=(2 ** 63) ** 3 } type Power=E.Endpoint; type Negative=E.Endpoint extends -7.846377169233351e56 ? true : false;\n"
+      },
+      "roots": [
+        "/native-int64-power-endpoint.ts"
+      ],
+      "queries": [
+        {
+          "id": "Power",
+          "file": "/native-int64-power-endpoint.ts",
+          "declaration": "Power",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Negative",
+          "file": "/native-int64-power-endpoint.ts",
+          "declaration": "Negative",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

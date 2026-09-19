@@ -15,23 +15,8 @@ use ts_arena::{NodeId, SymbolId};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum TypeSystemEntity {
     Symbol(SymbolId),
-    #[cfg_attr(
-        not(test),
-        allow(
-            dead_code,
-            reason = "P3 resolution entity; P1 cycle tests retain the complete entity schema"
-        )
-    )]
     Type(TypeId),
-    #[allow(
-        dead_code,
-        reason = "P3 signature resolution entity retained by the P1 cycle-guard schema"
-    )]
     Signature(SignatureId),
-    #[allow(
-        dead_code,
-        reason = "P3/P4 node resolution entity retained by the P1 cycle-guard schema"
-    )]
     Node(NodeId),
 }
 
@@ -69,13 +54,11 @@ impl ResolutionStack {
         Self::default()
     }
 
-    #[cfg(test)]
     pub fn depth(&self) -> usize {
         self.resolutions.len()
     }
 
     /// Sets the search floor and returns the previous one for restoration.
-    #[cfg(test)]
     pub fn set_resolution_start(&mut self, start: usize) -> usize {
         std::mem::replace(&mut self.resolution_start, start)
     }
@@ -90,9 +73,21 @@ impl ResolutionStack {
         property_name: TypeSystemPropertyName,
         has_property: impl FnMut(&TypeResolution) -> bool,
     ) -> bool {
-        if let Some(start) =
-            self.find_resolution_cycle_start_index(target, property_name, has_property)
-        {
+        let cycle_start =
+            self.find_resolution_cycle_start_index(target, property_name, has_property);
+        self.push_after_cycle_check(target, property_name, cycle_start)
+    }
+
+    /// Splits the read-only probe from mutation so the checker can consult all
+    /// of its link stores without holding a mutable borrow of this stack.
+    /// `cycle_start` must come from an immediately preceding probe of this stack.
+    pub(crate) fn push_after_cycle_check(
+        &mut self,
+        target: TypeSystemEntity,
+        property_name: TypeSystemPropertyName,
+        cycle_start: Option<usize>,
+    ) -> bool {
+        if let Some(start) = cycle_start {
             for resolution in &mut self.resolutions[start..] {
                 resolution.result = false;
             }
@@ -134,5 +129,15 @@ impl ResolutionStack {
             .pop()
             .expect("popTypeResolution pairs with a successful pushTypeResolution")
             .result
+    }
+}
+
+#[cfg(any(test, feature = "storage-pilot"))]
+impl ResolutionStack {
+    pub(crate) fn census(&self, census: &mut crate::census::Census) {
+        census.vec_capacity("resolution", &self.resolutions, self.resolutions.capacity());
+    }
+    pub(crate) fn census_entities(&self) -> impl Iterator<Item = TypeSystemEntity> + '_ {
+        self.resolutions.iter().map(|entry| entry.target)
     }
 }

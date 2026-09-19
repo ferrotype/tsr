@@ -1,0 +1,467 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 infer candidate capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "infer-properties",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Item<T> = T extends {value: infer U} ? U : never; type A = Item<{value: 1}>; type B = Item<{value: string} | {other: number}>; type C = Item<any>; type D = Item<unknown>; type E = Item<never>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Item",
+          "file": "/case.ts",
+          "declaration": "Item",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "E",
+          "file": "/case.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-variance",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Co<T> = T extends {a: infer U; b: infer U} ? U : never; type Contra<T> = T extends {a: (x: infer U) => void; b: (x: infer U) => void} ? U : never; type A = Co<{a: string; b: number}>; type B = Contra<{a: string; b: number}>; type C = Contra<{a: string; b: string}>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Co",
+          "file": "/case.ts",
+          "declaration": "Co",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Contra",
+          "file": "/case.ts",
+          "declaration": "Contra",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-signatures",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Result<T> = T extends (...args: any[]) => infer R ? R : never; type Args<T> = T extends (...args: infer P) => any ? P : never; type A = Result<(x: number) => string>; type B = Args<(x: number, y?: string) => boolean>; type C = Result<{(x: string): 1; (x: number): 2}>; type D = Result<<T>(x: T) => T>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Result",
+          "file": "/case.ts",
+          "declaration": "Result",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Args",
+          "file": "/case.ts",
+          "declaration": "Args",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-tuples",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Split<T> = T extends [infer A, ...infer R] ? [A,R] : never; type End<T> = T extends [...infer R, infer Z] ? [R,Z] : never; type A = Split<[1,2,3]>; type B = Split<[]>; type C = End<[1,2,3]>; type D = End<[]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Split",
+          "file": "/case.ts",
+          "declaration": "Split",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "End",
+          "file": "/case.ts",
+          "declaration": "End",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-template",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Split<T> = T extends `${infer A}-${infer B}` ? [A,B] : never; type Char<T> = T extends `${infer A}${infer B}` ? [A,B] : never; type A = Split<\"x-y-z\">; type B = Split<\"x\">; type C = Char<\"abc\">; type D = Char<\"\">; type E = Char<\"\ud83d\ude00x\">;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Split",
+          "file": "/case.ts",
+          "declaration": "Split",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Char",
+          "file": "/case.ts",
+          "declaration": "Char",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "E",
+          "file": "/case.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-constrained-template",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Num<T> = T extends `${infer N extends number}` ? N : never; type Big<T> = T extends `${infer N extends bigint}` ? N : never; type A = Num<\"123\">; type B = Num<\"01\">; type C = Num<\"x\">; type D = Big<\"-20\">; type E = Big<\"01\">; type F = Big<\"0\">;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Num",
+          "file": "/case.ts",
+          "declaration": "Num",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Big",
+          "file": "/case.ts",
+          "declaration": "Big",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "E",
+          "file": "/case.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-constraints",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } interface Pair<A extends string, B extends A> {a: A; b: B} type Get<T> = T extends Pair<infer A,infer B> ? [A,B] : never; type Same<T> = T extends Pair<infer U,infer U> ? U : never; type A = Get<{a: \"x\"; b: \"x\"}>; type B = Get<{a: \"x\"; b: \"y\"}>; type C = Same<{a: \"x\"; b: \"x\"}>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Get",
+          "file": "/case.ts",
+          "declaration": "Get",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Same",
+          "file": "/case.ts",
+          "declaration": "Same",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "infer-nested",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Unwrap<T> = T extends (infer U)[] ? Unwrap<U> : T; type A = Unwrap<string[][]>; type B = Unwrap<[1,2]>; type C = Unwrap<never[]>; type D = Unwrap<any>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Unwrap",
+          "file": "/case.ts",
+          "declaration": "Unwrap",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

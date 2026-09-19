@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native function/constructor overload agreement and implementation compatibility; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "valid-function-overloads",
+      "files": {
+        "/valid-function-overloads.ts": "function f(x:string):string; function f(x:number):number; function f(x:any):any {return x;} type T=typeof f;\n"
+      },
+      "roots": [
+        "/valid-function-overloads.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/valid-function-overloads.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "bad-implementation",
+      "files": {
+        "/bad-implementation.ts": "function f(x:string):string; function f(x:number):number {return x;} type T=typeof f;\n"
+      },
+      "roots": [
+        "/bad-implementation.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/bad-implementation.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constructor-overloads",
+      "files": {
+        "/constructor-overloads.ts": "class C { constructor(x:string); constructor(x:number); constructor(x:string|number) {} } type T=typeof C;\n"
+      },
+      "roots": [
+        "/constructor-overloads.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/constructor-overloads.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "method-overloads",
+      "files": {
+        "/method-overloads.ts": "class C { m(x:string):string; m(x:number):number; m(x:string|number):string|number{return x;} } type T=C;\n"
+      },
+      "roots": [
+        "/method-overloads.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/method-overloads.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nonconsecutive-overloads",
+      "files": {
+        "/nonconsecutive-overloads.ts": "function f():void; let x=1; function f():void {} type T=typeof f;\n"
+      },
+      "roots": [
+        "/nonconsecutive-overloads.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/nonconsecutive-overloads.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "mixed-static-overloads",
+      "files": {
+        "/mixed-static-overloads.ts": "class C { m():void; static m():void {} } type T=C;\n"
+      },
+      "roots": [
+        "/mixed-static-overloads.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/mixed-static-overloads.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-implementations",
+      "files": {
+        "/duplicate-implementations.ts": "function f():void {} function f():void {} type T=typeof f;\n"
+      },
+      "roots": [
+        "/duplicate-implementations.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/duplicate-implementations.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "abstract-nonconsecutive",
+      "files": {
+        "/abstract-nonconsecutive.ts": "abstract class C { abstract m():void; x=1; abstract m(x:number):void; } type T=C;\n"
+      },
+      "roots": [
+        "/abstract-nonconsecutive.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/abstract-nonconsecutive.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

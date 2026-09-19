@@ -74,3 +74,17 @@ impl<T: Default> RowPages<T> {
         ordinal
     }
 }
+
+impl<T> RowPages<T> {
+    /// Reserved row bytes and the page directory's capacity.
+    pub(crate) fn structural_bytes(&self) -> usize {
+        match &self.directory {
+            Directory::Empty => 0,
+            Directory::One(_) => ROWS_PER_PAGE * size_of::<T>(),
+            Directory::Many(pages) => {
+                pages.capacity() * size_of::<Box<[T; ROWS_PER_PAGE]>>()
+                    + pages.len() * ROWS_PER_PAGE * size_of::<T>()
+            }
+        }
+    }
+}

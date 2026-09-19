@@ -7,16 +7,34 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.initializeChecker
     pub(crate) fn initialize_program(&mut self) -> Result<(), Error> {
         let globals = self.builtins.globals.ok_or(Error::MissingLink("globals"))?;
+        let mut augmentations = Vec::new();
+        let mut ambient_modules = Vec::new();
+        // The globals table ends close to the largest global file's locals
+        // (the lib files mostly redeclare the same names), so reserving that
+        // many entries up front lands on the capacity the table would grow to
+        // anyway and spares the growth rehashes while it fills.
+        let mut largest_locals = 0;
+        for index in 0..self.program()?.host.source_file_count() {
+            let file = self.program()?.host.source_file(index);
+            let view = file.view();
+            if ast::is_external_or_common_js_module(&view.source_file()?) {
+                continue;
+            }
+            if let Some(locals) = view
+                .node_binding(file.source())?
+                .and_then(|binding| binding.locals)
+            {
+                largest_locals = largest_locals.max(self.table(locals)?.len());
+            }
+        }
+        self.tables.get_mut(globals)?.reserve(largest_locals);
+        self.tables.reserve_names(largest_locals);
         for index in 0..self.program()?.host.source_file_count() {
             let file = self.program()?.host.source_file(index);
             let view = file.view();
             let source = view.source_file()?;
-            if !source.module_augmentations()?.is_empty() {
-                return Err(Error::Unsupported("mergeModuleAugmentation"));
-            }
-            if !view.result().pattern_ambient_modules().is_empty() {
-                return Err(Error::Unsupported("mergePatternAmbientModules"));
-            }
+            augmentations.extend(source.module_augmentations()?.iter().flatten().copied());
+            let source_id = file.source();
             let locals = view
                 .node_binding(file.source())?
                 .and_then(|binding| binding.locals);
@@ -36,9 +54,8 @@ impl CheckerState {
                     if read.flags() & sf::MODULE != 0
                         && ts_ast::is_ambient_module_symbol_name(read.name_bytes())
                     {
-                        return Err(Error::Unsupported(
-                            "initializeChecker: deferred ambient modules",
-                        ));
+                        ambient_modules.push(symbol);
+                        continue;
                     }
                     if read.name_bytes() == b"globalThis" {
                         for declaration in self
@@ -64,6 +81,17 @@ impl CheckerState {
                         self.tables.get_mut(globals)?.insert(name, value);
                     }
                 }
+            }
+            self.collect_pattern_ambient_modules(source_id)?;
+        }
+        for &name in &augmentations {
+            let declaration = self
+                .ast(name)?
+                .node(name)?
+                .parent()
+                .ok_or(Error::MissingLink("augmentation parent"))?;
+            if ast::is_global_scope_augmentation(&self.node(declaration)?) {
+                self.merge_global_augmentation(declaration)?;
             }
         }
         self.add_undefined_to_globals()?;
@@ -127,6 +155,44 @@ impl CheckerState {
             .insert("anyReadonlyArrayType", any_readonly);
         let this = self.get_global_type("ThisType", 1, false)?;
         self.query.global_types.insert("ThisType", this);
+        for symbol in ambient_modules {
+            self.merge_global_symbol(symbol)?;
+        }
+        self.merge_pattern_ambient_modules()?;
+        for name in augmentations {
+            let declaration = self
+                .ast(name)?
+                .node(name)?
+                .parent()
+                .ok_or(Error::MissingLink("augmentation parent"))?;
+            if !ast::is_global_scope_augmentation(&self.node(declaration)?) {
+                self.merge_external_module_augmentation(declaration)?;
+            }
+        }
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.mergeModuleAugmentation
+    fn merge_global_augmentation(&mut self, declaration: ts_arena::NodeId) -> Result<(), Error> {
+        // The raw bound symbol accumulates all augmentations in this file.
+        // Process only its first declaration, before resolving global types.
+        let symbol = self
+            .program()?
+            .bound(declaration)?
+            .node_binding(declaration)?
+            .and_then(|binding| binding.symbol)
+            .ok_or(Error::MissingLink("augmentation symbol"))?;
+        if self.symbol_declarations(symbol)?.first().flatten() != Some(declaration) {
+            return Ok(());
+        }
+        if let Some(exports) = self.symbol(symbol)?.exports() {
+            self.merge_symbol_table(
+                self.builtins.globals.ok_or(Error::MissingLink("globals"))?,
+                exports,
+                false,
+                None,
+            )?;
+        }
         Ok(())
     }
 
@@ -154,7 +220,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getGlobalType
-    fn get_global_type(
+    pub(crate) fn get_global_type(
         &mut self,
         name: &'static str,
         arity: usize,
@@ -203,7 +269,7 @@ impl CheckerState {
     fn global_type_declaration(&self, symbol: SymbolId) -> Result<Option<ts_arena::NodeId>, Error> {
         for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             if matches!(
-                self.ast(declaration)?.node(declaration)?.kind().known(),
+                self.node(declaration)?.kind().known(),
                 Some(
                     K::ClassDeclaration
                         | K::InterfaceDeclaration
@@ -218,7 +284,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.createTypeFromGenericGlobalType
-    fn type_from_generic_global(
+    pub(crate) fn type_from_generic_global(
         &mut self,
         target: TypeId,
         argument: TypeId,

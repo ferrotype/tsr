@@ -57,32 +57,62 @@ pub fn sorted(program: &Program, mut values: Vec<Diagnostic>) -> Result<Vec<Diag
     Ok(out)
 }
 pub fn all(program: &Program, op: &mut Operation<'_>) -> Result<Value> {
-    let mut syntactic = Vec::new();
+    all_mode(program, op, false)
+}
+pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -> Result<Value> {
+    let syntactic = program.syntactic_diagnostics(None)?;
     let mut bind = Vec::new();
     let mut semantic = Vec::new();
     let mut semantic_error = None;
     for file in program.files() {
         let source = file.bound().view().source_file()?;
-        syntactic.extend_from_slice(source.diagnostics());
         bind.extend_from_slice(source.bind_diagnostics());
-        match op.semantic_diagnostics(file.source()) {
+        // The only library-enabled protocol uses skipLibCheck. Match the
+        // compiler's selection before entering checker.GetDiagnostics; lazy
+        // library types reached by source queries still execute normally.
+        if program.skip_type_checking(file, false)? {
+            continue;
+        }
+        let values = if program_mode {
+            program
+                .semantic_diagnostics_with_checker(op, file)
+                .map_err(Error::from)
+        } else {
+            op.semantic_diagnostics(file.source()).map_err(Error::from)
+        };
+        match values {
             Ok(values) => semantic.extend(values),
             Err(error) => {
                 if semantic_error.is_none() {
-                    semantic_error = Some(Error::from(error));
+                    semantic_error = Some(error);
                 }
             }
         }
     }
     let globals = op.global_diagnostics()?;
-    let phases = [
-        ("config", program.config().errors.clone()),
+    let mut phases = vec![
+        ("config", program.config().config_file_parsing_diagnostics()),
         ("program", program.program_diagnostics()?.to_vec()),
         ("syntactic", syntactic),
         ("bind", bind),
         ("semantic", semantic),
         ("global", globals),
     ];
+    let mut declaration_error = None;
+    if program.options().emit_declarations() {
+        let mut values = Vec::new();
+        for file in program.files() {
+            match program.declaration_diagnostics_with_checker(op, file) {
+                Ok(diagnostics) => values.extend(diagnostics),
+                Err(error) => {
+                    if declaration_error.is_none() {
+                        declaration_error = Some(Error::from(error));
+                    }
+                }
+            }
+        }
+        phases.push(("declaration", values));
+    }
     let mut output = json!({"state":"executed"});
     let mut combined = Vec::new();
     for (phase, values) in phases {
@@ -91,12 +121,19 @@ pub fn all(program: &Program, op: &mut Operation<'_>) -> Result<Value> {
             .iter()
             .map(|d| payload(program, d))
             .collect::<Result<Vec<_>>>()?);
-        combined.extend(values);
+        if !program_mode || phase != "bind" {
+            combined.extend(values);
+        }
     }
-    if let Some(error) = semantic_error {
-        output["semantic"] = failure(&error, "semantic_diagnostics");
+    if let Some(error) = &semantic_error {
+        output["semantic"] = failure(error, "semantic_diagnostics");
+    }
+    if let Some(error) = &declaration_error {
+        output["declaration"] = failure(error, "declaration_diagnostics");
+    }
+    if semantic_error.is_some() || declaration_error.is_some() {
         output["combined"] = failure(
-            &Error::Unsupported("combined diagnostics require completed semantic checking"),
+            &Error::Unsupported("combined diagnostics require completed diagnostic phases"),
             "combined_diagnostics",
         );
         output["baseline"] = failure(

@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "scope": "P3 reported relations through source checking: diagnostic chains and failed-cache replay",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "missing-property",
+      "files": {
+        "/missing-property.ts": "type A = { a: string }; type B = { a: string; b: number }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/missing-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/missing-property.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "missing-properties",
+      "files": {
+        "/missing-properties.ts": "type A = {}; type B = { a: string; b: number; c: boolean; d: string; e: string; f: number }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/missing-properties.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/missing-properties.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "optional-property",
+      "files": {
+        "/optional-property.ts": "type A = { a?: string }; type B = { a: string | undefined }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/optional-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/optional-property.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "weak-property",
+      "files": {
+        "/weak-property.ts": "type A = { a: string }; type B = { b?: number }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/weak-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/weak-property.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "nested-return",
+      "files": {
+        "/nested-return.ts": "type A = { fn(): { value: string } }; type B = { fn(): { value: number } }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/nested-return.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/nested-return.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "chain-property",
+      "files": {
+        "/chain-property.ts": "type A = { a: { b: string } }; type B = { a: { b: number } }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/chain-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/chain-property.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "signature-arity",
+      "files": {
+        "/signature-arity.ts": "type A = (a: string, b: number) => void; type B = (a: string) => void; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/signature-arity.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/signature-arity.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "signature-missing",
+      "files": {
+        "/signature-missing.ts": "type A = { a: string }; type B = (a: string) => void; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/signature-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/signature-missing.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "literal-suggestion",
+      "files": {
+        "/literal-suggestion.ts": "type A = \"hello\" | \"world\"; let result: A = \"helllo\";\n"
+      },
+      "roots": [
+        "/literal-suggestion.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/literal-suggestion.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "never-intersection",
+      "files": {
+        "/never-intersection.ts": "type A = { a: string }; type B = { a: string } & { a: number }; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/never-intersection.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/never-intersection.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

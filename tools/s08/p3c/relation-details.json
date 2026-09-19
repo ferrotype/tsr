@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "scope": "P3 tuple, variance and predicate relation diagnostic elaboration",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": false,
+    "skipLibCheck": true
+  },
+  "programs": [
+    {
+      "id": "tuple-short",
+      "files": {
+        "/tuple-short.ts": "type A = [string]; type B = [string, number]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-short.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-short.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-long",
+      "files": {
+        "/tuple-long.ts": "type A = [string, number]; type B = [string]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-long.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-long.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-array-short",
+      "files": {
+        "/tuple-array-short.ts": "type A = string[]; type B = [string, string]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-array-short.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-array-short.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-array-long",
+      "files": {
+        "/tuple-array-long.ts": "type A = [string, ...string[]]; type B = [string]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-array-long.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-array-long.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-optional",
+      "files": {
+        "/tuple-optional.ts": "type A = [string?]; type B = [string]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-optional.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-optional.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-position",
+      "files": {
+        "/tuple-position.ts": "type A = [string, number]; type B = [string, boolean]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-position.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-position.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-rest-position",
+      "files": {
+        "/tuple-rest-position.ts": "type A = [string, number, boolean]; type B = [string, ...string[]]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-rest-position.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-rest-position.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-readonly",
+      "files": {
+        "/tuple-readonly.ts": "type A = readonly [string]; type B = [string]; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/tuple-readonly.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-readonly.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "tuple-variadic",
+      "files": {
+        "/tuple-variadic.ts": "type A<T extends unknown[]> = [string]; type B<T extends unknown[]> = [...T]; type Source = A<[number]>; type Target = B<[number]>; declare let source: Source; let result: Target = source;\n"
+      },
+      "roots": [
+        "/tuple-variadic.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/tuple-variadic.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "invariant",
+      "files": {
+        "/invariant.ts": "interface Box<T> { input: (value: T) => void; output: () => T; } type A = Box<string | number>; type B = Box<string>; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/invariant.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/invariant.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "predicate-missing",
+      "files": {
+        "/predicate-missing.ts": "type A = (value: unknown) => boolean; type B = (value: unknown) => value is string; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/predicate-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/predicate-missing.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "predicate-parameter",
+      "files": {
+        "/predicate-parameter.ts": "type A = (a: unknown, b: unknown) => a is string; type B = (a: unknown, b: unknown) => b is string; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/predicate-parameter.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/predicate-parameter.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "predicate-type",
+      "files": {
+        "/predicate-type.ts": "type A = (a: unknown) => a is string; type B = (a: unknown) => a is number; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/predicate-type.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/predicate-type.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    },
+    {
+      "id": "predicate-kind",
+      "files": {
+        "/predicate-kind.ts": "type A = (a: unknown) => this is string; type B = (a: unknown) => a is string; declare let source: A; let result: B = source;\n"
+      },
+      "roots": [
+        "/predicate-kind.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/predicate-kind.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type_summary"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

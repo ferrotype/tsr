@@ -1,0 +1,601 @@
+{
+  "purpose": "Node worker attribution, not E8 acceptance",
+  "base_revision": "eae9ad61f7d4f2a64b940c2663d3f2a8b1c9e112",
+  "note": "Includes the uncommitted review fixes identified by context.json sources. Diagnostic only; no Go denominator, no E8 gate claim.",
+  "raw_directory": "target/s10/review-worker-probe",
+  "raw_sha256": "3dc952b1e3c035de0163d0ae34ffe36aaff31170f70a35b3df523029a7960bf4",
+  "context_sha256": "ef11fbe744a78f9281fdec60a853c46fc410691b11894648bc0c06bdf73ac38e",
+  "binary_sha256": "ee115878a41f3218da73d810628273455161b92328778c1deb9147d6f278c9ad",
+  "node": "v24.20.0",
+  "samples": 21,
+  "iterations_per_sample": 100,
+  "fresh_source_each_iteration": true,
+  "exact_outputs_match": true,
+  "source_stable": true,
+  "median_us_per_call": {
+    "normal": 370.69459,
+    "measured": 373.26,
+    "prepare": 0.6929299999999999,
+    "dispatch": 1.98991,
+    "work": 364.23469,
+    "return": 2.95039,
+    "dispatch_and_return": 4.940300000000001
+  },
+  "median_paired_instrumented_ratio": 1.0048797681699937,
+  "boundaries": {
+    "prepareNs": "input copying and sender check",
+    "dispatchNs": "reply channel creation, send, worker wakeup",
+    "workNs": "production parse, encode and request disposal on reserved stack",
+    "returnNs": "response send and caller wakeup"
+  },
+  "excluded": "N-API entry/exit, output conversion and JS bookkeeping are in wall time only",
+  "batches": [
+    {
+      "index": 0,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 66965,
+        "dispatchNs": 180534,
+        "workNs": 35705261,
+        "returnNs": 247076
+      },
+      "elapsed_ns": {
+        "normal": 36164708,
+        "measured": 36467666
+      }
+    },
+    {
+      "index": 1,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 66378,
+        "dispatchNs": 195373,
+        "workNs": 36293170,
+        "returnNs": 239246
+      },
+      "elapsed_ns": {
+        "normal": 37069459,
+        "measured": 37072667
+      }
+    },
+    {
+      "index": 2,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 66750,
+        "dispatchNs": 210630,
+        "workNs": 36025326,
+        "returnNs": 266087
+      },
+      "elapsed_ns": {
+        "normal": 36480541,
+        "measured": 36850500
+      }
+    },
+    {
+      "index": 3,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 67085,
+        "dispatchNs": 204457,
+        "workNs": 36024081,
+        "returnNs": 256214
+      },
+      "elapsed_ns": {
+        "normal": 37261584,
+        "measured": 36804917
+      }
+    },
+    {
+      "index": 4,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 96253,
+        "dispatchNs": 220412,
+        "workNs": 36436292,
+        "returnNs": 392417
+      },
+      "elapsed_ns": {
+        "normal": 36893792,
+        "measured": 38149000
+      }
+    },
+    {
+      "index": 5,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 71001,
+        "dispatchNs": 233746,
+        "workNs": 36583796,
+        "returnNs": 353709
+      },
+      "elapsed_ns": {
+        "normal": 36854000,
+        "measured": 37505958
+      }
+    },
+    {
+      "index": 6,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 69834,
+        "dispatchNs": 186207,
+        "workNs": 35961335,
+        "returnNs": 293413
+      },
+      "elapsed_ns": {
+        "normal": 36722791,
+        "measured": 36760041
+      }
+    },
+    {
+      "index": 7,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 128706,
+        "dispatchNs": 187335,
+        "workNs": 36828333,
+        "returnNs": 351120
+      },
+      "elapsed_ns": {
+        "normal": 37875875,
+        "measured": 37778625
+      }
+    },
+    {
+      "index": 8,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 69122,
+        "dispatchNs": 194587,
+        "workNs": 36512375,
+        "returnNs": 324372
+      },
+      "elapsed_ns": {
+        "normal": 37640792,
+        "measured": 37362583
+      }
+    },
+    {
+      "index": 9,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 71715,
+        "dispatchNs": 220371,
+        "workNs": 36854294,
+        "returnNs": 332416
+      },
+      "elapsed_ns": {
+        "normal": 37466750,
+        "measured": 37723375
+      }
+    },
+    {
+      "index": 10,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 68875,
+        "dispatchNs": 198991,
+        "workNs": 36423469,
+        "returnNs": 295039
+      },
+      "elapsed_ns": {
+        "normal": 36973334,
+        "measured": 37857792
+      }
+    },
+    {
+      "index": 11,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 81502,
+        "dispatchNs": 205996,
+        "workNs": 36593377,
+        "returnNs": 364454
+      },
+      "elapsed_ns": {
+        "normal": 37393000,
+        "measured": 37505167
+      }
+    },
+    {
+      "index": 12,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 73084,
+        "dispatchNs": 190663,
+        "workNs": 36422590,
+        "returnNs": 370331
+      },
+      "elapsed_ns": {
+        "normal": 37117542,
+        "measured": 37298667
+      }
+    },
+    {
+      "index": 13,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 70089,
+        "dispatchNs": 189329,
+        "workNs": 36707837,
+        "returnNs": 374202
+      },
+      "elapsed_ns": {
+        "normal": 37134416,
+        "measured": 37773792
+      }
+    },
+    {
+      "index": 14,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 77169,
+        "dispatchNs": 208374,
+        "workNs": 36876838,
+        "returnNs": 347953
+      },
+      "elapsed_ns": {
+        "normal": 37360834,
+        "measured": 37767875
+      }
+    },
+    {
+      "index": 15,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 69293,
+        "dispatchNs": 211418,
+        "workNs": 36817958,
+        "returnNs": 355668
+      },
+      "elapsed_ns": {
+        "normal": 36993875,
+        "measured": 37717000
+      }
+    },
+    {
+      "index": 16,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 67131,
+        "dispatchNs": 204579,
+        "workNs": 36348704,
+        "returnNs": 249669
+      },
+      "elapsed_ns": {
+        "normal": 36982250,
+        "measured": 37103375
+      }
+    },
+    {
+      "index": 17,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 68537,
+        "dispatchNs": 181130,
+        "workNs": 36288790,
+        "returnNs": 246038
+      },
+      "elapsed_ns": {
+        "normal": 37882500,
+        "measured": 37043541
+      }
+    },
+    {
+      "index": 18,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 66205,
+        "dispatchNs": 193957,
+        "workNs": 36173376,
+        "returnNs": 254002
+      },
+      "elapsed_ns": {
+        "normal": 36915375,
+        "measured": 36927709
+      }
+    },
+    {
+      "index": 19,
+      "order": [
+        "measured",
+        "normal"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 68664,
+        "dispatchNs": 202919,
+        "workNs": 36529625,
+        "returnNs": 270330
+      },
+      "elapsed_ns": {
+        "normal": 37056292,
+        "measured": 37326000
+      }
+    },
+    {
+      "index": 20,
+      "order": [
+        "normal",
+        "measured"
+      ],
+      "load_before": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "load_after": [
+        5.88671875,
+        5.591796875,
+        5.7509765625
+      ],
+      "totals": {
+        "prepareNs": 99336,
+        "dispatchNs": 181879,
+        "workNs": 36366948,
+        "returnNs": 269046
+      },
+      "elapsed_ns": {
+        "normal": 37550167,
+        "measured": 37150083
+      }
+    }
+  ]
+}

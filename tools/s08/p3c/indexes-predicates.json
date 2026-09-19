@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 keyof, indexed access and predicate capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "keys",
+      "files": {
+        "/case.ts": "type K = keyof { a: string; 2: boolean }; interface A { a: number; b: string } type KA = keyof A; type All = keyof any; type Empty = keyof unknown; type Both = keyof ({ a: string; b: number } | { a: number; c: boolean }); type Intersection = keyof ({ a: string } & { b: number });\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "K",
+          "file": "/case.ts",
+          "declaration": "K",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "KA",
+          "file": "/case.ts",
+          "declaration": "KA",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "All",
+          "file": "/case.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Empty",
+          "file": "/case.ts",
+          "declaration": "Empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Both",
+          "file": "/case.ts",
+          "declaration": "Both",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Intersection",
+          "file": "/case.ts",
+          "declaration": "Intersection",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed",
+      "files": {
+        "/case.ts": "type A = { a: string; b?: number; 2: boolean }; type One = A[\"a\"]; type Two = A[\"a\" | \"b\"]; type Numeric = A[2]; type Values = A[keyof A]; type Dict = { [s: string]: number }; type Value = Dict[string]; type NumberValue = Dict[number];\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "One",
+          "file": "/case.ts",
+          "declaration": "One",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Two",
+          "file": "/case.ts",
+          "declaration": "Two",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Numeric",
+          "file": "/case.ts",
+          "declaration": "Numeric",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Values",
+          "file": "/case.ts",
+          "declaration": "Values",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/case.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "NumberValue",
+          "file": "/case.ts",
+          "declaration": "NumberValue",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "generic-indexed",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } type Keys<T> = keyof T; type Read<T, K extends keyof T> = T[K]; type Text = Read<{ a: string }, \"a\">; type Value<T> = T[keyof T]; type Numeric<T extends number[]> = T[number]; type Result = Numeric<1[]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Keys",
+          "file": "/case.ts",
+          "declaration": "Keys",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Read",
+          "file": "/case.ts",
+          "declaration": "Read",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Text",
+          "file": "/case.ts",
+          "declaration": "Text",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Value",
+          "file": "/case.ts",
+          "declaration": "Value",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Numeric",
+          "file": "/case.ts",
+          "declaration": "Numeric",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Result",
+          "file": "/case.ts",
+          "declaration": "Result",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-indexed",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } type Pair = [string, number?]; type First = Pair[0]; type Optional = Pair[1]; type All = Pair[number]; type Variadic<T extends number[]> = [string, ...T]; type Expanded = Variadic<[1,2]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "First",
+          "file": "/case.ts",
+          "declaration": "First",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Optional",
+          "file": "/case.ts",
+          "declaration": "Optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "All",
+          "file": "/case.ts",
+          "declaration": "All",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Variadic",
+          "file": "/case.ts",
+          "declaration": "Variadic",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Expanded",
+          "file": "/case.ts",
+          "declaration": "Expanded",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "invalid-index",
+      "files": {
+        "/case.ts": "type T = [string]; type BadTuple = T[2]; type Negative = T[-1]; type Absent = { a: string }[\"b\"]; type Wrong = { a: string }[boolean]; type NoSignature = { a: string }[number];\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "BadTuple",
+          "file": "/case.ts",
+          "declaration": "BadTuple",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Negative",
+          "file": "/case.ts",
+          "declaration": "Negative",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Absent",
+          "file": "/case.ts",
+          "declaration": "Absent",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Wrong",
+          "file": "/case.ts",
+          "declaration": "Wrong",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "NoSignature",
+          "file": "/case.ts",
+          "declaration": "NoSignature",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "predicates",
+      "files": {
+        "/case.ts": "type Guard = (x: unknown) => x is string; type Assert = (x: unknown) => asserts x is number; type AssertOnly = (x: unknown) => asserts x; interface Guards { isText(): this is Text; } interface Text extends Guards { value: string }\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Guard",
+          "file": "/case.ts",
+          "declaration": "Guard",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Assert",
+          "file": "/case.ts",
+          "declaration": "Assert",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "AssertOnly",
+          "file": "/case.ts",
+          "declaration": "AssertOnly",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Guards",
+          "file": "/case.ts",
+          "declaration": "Guards",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

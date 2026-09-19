@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "source_commit": "09e6016",
+  "date": "2026-09-19",
+  "status": "correctness complete; E7/E8 performance targets unmet",
+  "source_inventory_sha256": "8b32eecf2cbe4904562eac2465d3c093531702e50778fee077ce2275bcb16682",
+  "thresholds_unchanged": true,
+  "artifacts": {
+    "parser/parser_bg.wasm": {
+      "bytes": 3472720,
+      "sha256": "ddcec8c14c6a3e4dd23f9e6a5285051ebe0135db966c53a70e42030d9032bddc"
+    },
+    "go/parser.wasm": {
+      "bytes": 12956989,
+      "sha256": "2ad2f1419ee518d6530aa9d218f95bad9033bc1a14d66b24c2d442a8f45195b5"
+    }
+  },
+  "captures": {
+    "parser-measurement": {
+      "path": "target/s10/parser-measurement",
+      "verification": {
+        "capture_sha256": "8c15eb559361b302984d180ea235d3b998ac1c5a13a6bebbc9a61bbeec21b459",
+        "metrics": {
+          "parse_throughput_ratio": 1.6769124958322452,
+          "parser_artifact_size_ratio": 0.2680190590576252
+        },
+        "partial": false,
+        "statistics": {
+          "bootstrap": {
+            "algorithm": "independent-median-ratio/order-statistic-v1",
+            "confidence": 0.95,
+            "lower": 0.5894608846130779,
+            "resamples": 10000,
+            "seed": 21255,
+            "threshold": 0.5,
+            "upper": 0.6023146265502013
+          },
+          "go_median": 6091004750,
+          "go_relative_mad": 0.007549459225097468,
+          "needs_more": false,
+          "ratio": 0.5963340379926645,
+          "rust_median": 3632273458,
+          "rust_relative_mad": 0.007416980112184054,
+          "samples_per_runtime": 21,
+          "stable": false
+        }
+      },
+      "completion": {
+        "adapter_tests_sha256": null,
+        "exit_code": 0,
+        "finished_at": "2026-09-19T08:58:05.759684+00:00",
+        "raw_sha256": "c8e25fc4807afce551b5a07857b5fedcb6e28428f9213a238476b0396a898ec5",
+        "source_stable": true
+      },
+      "host": {
+        "cpus": 18,
+        "platform": "macOS-26.6.1-arm64-arm-64bit",
+        "processor": "arm"
+      },
+      "started_at": "2026-09-19T08:53:56.729086+00:00",
+      "node": "v24.20.0",
+      "node_flags": [
+        "--stack-size=4096"
+      ]
+    },
+    "node-measurement": {
+      "path": "target/s10/node-measurement",
+      "verification": {
+        "capture_sha256": "7b05079e3362f72c3982563ccfe5e7d735f8093e19e593775bc48fc797945a73",
+        "metrics": {
+          "node_parse_latency_ratio": 0.341848023513094
+        },
+        "partial": false,
+        "statistics": {
+          "bootstrap": {
+            "algorithm": "independent-median-ratio/order-statistic-v1",
+            "confidence": 0.95,
+            "lower": 0.33761644119182826,
+            "resamples": 10000,
+            "seed": 21255,
+            "threshold": 0.1,
+            "upper": 0.34607788590974814
+          },
+          "go_median": 105983500,
+          "go_relative_mad": 0.013348775988715224,
+          "needs_more": false,
+          "ratio": 0.341848023513094,
+          "rust_median": 36230250,
+          "rust_relative_mad": 0.004969383319187695,
+          "samples_per_runtime": 21,
+          "stable": false
+        }
+      },
+      "completion": {
+        "adapter_tests_sha256": "4117de47d69a162ce6eaaadc3922ee5695c210fc48ffe3989ec95c843a02035b",
+        "exit_code": 0,
+        "finished_at": "2026-09-19T08:58:11.139890+00:00",
+        "raw_sha256": "fe3502121eff738a58386bc934294ac33ddddd71f51d81017a351e52aa87b365",
+        "source_stable": true
+      },
+      "host": {
+        "cpus": 18,
+        "platform": "macOS-26.6.1-arm64-arm-64bit",
+        "processor": "arm"
+      },
+      "started_at": "2026-09-19T08:58:06.302100+00:00",
+      "node": "v24.20.0",
+      "node_flags": [
+        "--stack-size=4096"
+      ]
+    },
+    "portable": {
+      "path": "target/s10/portable",
+      "verification": {
+        "capture_sha256": "cf94fa56bfef904ca5ec4fc0b6d11566dc45f51c87f99a295efe840c716e3cf6",
+        "metrics": {
+          "portable_host": true
+        },
+        "partial": false,
+        "statistics": null
+      },
+      "completion": {
+        "adapter_tests_sha256": null,
+        "exit_code": 0,
+        "finished_at": "2026-09-19T08:34:47.668592+00:00",
+        "raw_sha256": "26152e2169f04b60ba5d6c122a65c3c340750b0f2c5fd8951b7f029408530b50",
+        "source_stable": true
+      },
+      "host": {
+        "cpus": 18,
+        "platform": "macOS-26.6.1-arm64-arm-64bit",
+        "processor": "arm"
+      }
+    },
+    "wasm-corpus": {
+      "path": "target/s10/wasm-corpus",
+      "verification": {
+        "capture_sha256": "c6350d0a914987533602143b28d10000ac24abb63bd59d2b780953ad810428fd",
+        "counts": {
+          "acceptance": {
+            "errors_parity": {
+              "match": 9369
+            },
+            "type_to_string_parity": {
+              "disabled": 198,
+              "match": 9171
+            },
+            "types_parity": {
+              "disabled": 198,
+              "match": 9171
+            }
+          },
+          "informational": {
+            "errors_parity": {
+              "match": 1325,
+              "native_unavailable": 34
+            },
+            "type_to_string_parity": {
+              "disabled": 107,
+              "match": 1218,
+              "native_unavailable": 34
+            },
+            "types_parity": {
+              "disabled": 107,
+              "match": 1218,
+              "native_unavailable": 34
+            }
+          }
+        },
+        "metrics": {
+          "checker_parity": 1.0
+        },
+        "partial": false,
+        "passing_all_domains": {
+          "acceptance": 9369,
+          "informational": 1325
+        },
+        "runtime": "wasm",
+        "totals": {
+          "acceptance": 9369,
+          "informational": 1359
+        }
+      },
+      "completion": {
+        "observations_sha256": "d21e8ffaaa81587a703c6fa51b38290a8b1c00223ae6ead5a4f8bc1bfce178ba",
+        "source_stable": true
+      }
+    },
+    "rust-corpus": {
+      "path": "target/s10/rust-corpus",
+      "verification": {
+        "capture_sha256": "4162dbd837a758f74aa264db0dbde2d0798a8562f4beba13ca1701cf235aa180",
+        "counts": {
+          "acceptance": {
+            "errors_parity": {
+              "match": 9369
+            },
+            "type_to_string_parity": {
+              "disabled": 198,
+              "match": 9171
+            },
+            "types_parity": {
+              "disabled": 198,
+              "match": 9171
+            }
+          },
+          "informational": {
+            "errors_parity": {
+              "match": 1325,
+              "native_unavailable": 34
+            },
+            "type_to_string_parity": {
+              "disabled": 107,
+              "match": 1218,
+              "native_unavailable": 34
+            },
+            "types_parity": {
+              "disabled": 107,
+              "match": 1218,
+              "native_unavailable": 34
+            }
+          }
+        },
+        "metrics": {
+          "rust_consumer_parity": 1.0
+        },
+        "partial": false,
+        "passing_all_domains": {
+          "acceptance": 9369,
+          "informational": 1325
+        },
+        "runtime": "rust",
+        "totals": {
+          "acceptance": 9369,
+          "informational": 1359
+        }
+      },
+      "completion": {
+        "observations_sha256": "9b9197e5d24a9f0526416e81dacf76a542f76fcc6fa2b39d19e8d935f1a0bb90",
+        "source_stable": true
+      }
+    },
+    "lifetime": {
+      "path": "target/s10/lifetime",
+      "verification": {
+        "metrics": {
+          "lifetime_checks": true
+        },
+        "modes": {
+          "address_sanitizer": true,
+          "debug": true,
+          "miri": true,
+          "release": true
+        },
+        "cases": [
+          "lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline",
+          "lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions",
+          "lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results",
+          "lifetime::retire_before_initialization_cannot_create_a_checker",
+          "lifetime::native_unwind_retires_the_session_and_preserves_the_payload",
+          "lifetime::concurrent_first_queries_share_one_checker_identity"
+        ],
+        "capture_sha256": "e7768d4ff414fb961fe925fe2538289e08e252064005a5c12763796766b132e2"
+      },
+      "source_stable": true,
+      "host": "aarch64-apple-darwin"
+    }
+  },
+  "native_authority": {
+    "path": "target/s08/e2/corpus/native-observations.ndjson",
+    "sha256": "47303cd4697b98c4708d2b64953efd65f9f76f1ed5e9e548036a4a666690592b"
+  },
+  "toolchains": {
+    "wasm_bindgen": "0.2.126",
+    "wasm_target": "wasm32-unknown-unknown",
+    "wasm_stack_bytes": 16777216,
+    "wasm_rustflags": "-C panic=abort -C link-arg=-zstack-size=16777216",
+    "note": "Node uses a 4 MiB engine call stack for the frozen checker stress cases, separately from the 16 MiB initial wasm linear stack. Rust, Go and Node versions come from the existing repository pins. Other engines require their own stack validation.",
+    "node_flags": [
+      "--stack-size=4096"
+    ],
+    "wasm_opt_version": "132",
+    "parser_post_link_flags": [
+      "-Oz"
+    ],
+    "binaryen_archives": {
+      "Darwin/arm64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-arm64-macos.tar.gz",
+        "sha256": "98aad827847af7ef990ed7098d885725c8e5b5aae75073403635617ae4e259aa"
+      },
+      "Darwin/x86_64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-x86_64-macos.tar.gz",
+        "sha256": "40c3de90bb3766bd0282a895e139a6f50253dba49b4f5bb89e66faca162d832e"
+      },
+      "Linux/x86_64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-x86_64-linux.tar.gz",
+        "sha256": "195ddc94f9bc89f45abdabb0b9eea86023d727ba90eac8b35b80f2544fc30572"
+      },
+      "Linux/aarch64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-aarch64-linux.tar.gz",
+        "sha256": "c58562417836c5d0493d89bdefc434933bdc097db641b483df86bcfa557a107f"
+      }
+    }
+  }
+}

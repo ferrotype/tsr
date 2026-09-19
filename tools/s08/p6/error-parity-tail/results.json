@@ -1,0 +1,1825 @@
+{
+ "version": 1,
+ "scope": "Bounded development comparison of the 149 error-parity differences of the full E2 capture at 9a52b85 plus 300 sampled error-matching acceptance controls. No full E2 metrics emitted.",
+ "control_corpus_capture_sha256": "d9dfe66711662328ff9a22cde216bfaa7ca3725d09cd4f6f777d429c3b450771",
+ "candidate_capture_sha256": "9d15f6dcc2aa2274d0db5724f2c268a1841a5eaa25c66a9b76c11ed4665870aa",
+ "candidate_sources_sha256": "a61f47783b96ff18ce3851fce323d60e25526edae7153ae8205fae2b2f561b8e",
+ "selection_sha256": "c916735a7fc547ef3ea0e8a8466d33be724a8634f6ca948ed99f0b8046482550",
+ "source_stable": true,
+ "counts_before": {
+  "acceptance": {
+   "types_parity": {
+    "match": 398,
+    "different": 31,
+    "disabled": 11
+   },
+   "errors_parity": {
+    "match": 300,
+    "different": 140
+   },
+   "type_to_string_parity": {
+    "match": 403,
+    "different": 26,
+    "disabled": 11
+   }
+  },
+  "informational": {
+   "types_parity": {
+    "match": 7,
+    "different": 2
+   },
+   "errors_parity": {
+    "different": 9
+   },
+   "type_to_string_parity": {
+    "match": 7,
+    "different": 2
+   }
+  }
+ },
+ "counts_after": {
+  "acceptance": {
+   "types_parity": {
+    "match": 410,
+    "different": 19,
+    "disabled": 11
+   },
+   "errors_parity": {
+    "match": 415,
+    "different": 25
+   },
+   "type_to_string_parity": {
+    "match": 412,
+    "different": 17,
+    "disabled": 11
+   }
+  },
+  "informational": {
+   "types_parity": {
+    "match": 7,
+    "different": 2
+   },
+   "errors_parity": {
+    "match": 8,
+    "different": 1
+   },
+   "type_to_string_parity": {
+    "match": 7,
+    "different": 2
+   }
+  }
+ },
+ "regressions": [],
+ "changes": [
+  {
+   "id": "compiler/ambientExternalModuleWithRelativeModuleName.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/arrayDestructuringInSwitch1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/clodulesDerivedClasses.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitUnknownImport.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitUnknownImport.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitUnknownImport2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/declarationEmitUnknownImport2.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/differentTypesWithSameName.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/discriminantsAndNullOrUndefined.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/discriminatedUnionErrorMessage.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/errorWithSameNameType.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/esModuleInteropPrettyErrorRelatedInformation.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/exactOptionalPropertyTypesArgumentError.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/expr.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/fatarrowfunctionsOptionalArgs.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/fuzzy.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/giant.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/importDeclWithClassModifiers.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/importDeclWithExportModifier.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/importDeclWithExportModifierAndExportAssignment.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/importNonExportedMember8.ts#configuration=0",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/importNonExportedMember9.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/indexSignatureWithTrailingComma.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/intTypeCheck.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/jsPromiseNeedsJSDocHint.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/jsdocExtendsClauseMismatch.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/missingDiscriminants.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/missingDiscriminants2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/missingDiscriminants2_promoted.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/missingDiscriminants_promoted.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/namespaceDisambiguationInUnion.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/narrowingUnionWithBang.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/nativeToBoxedTypes.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/noTypeToStringRecursion.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/noTypeToStringStackOverflow.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/optionalPropertiesSyntax.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/overloadOnConstNoAnyImplementation2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/overloadOnConstNoStringImplementation2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/partialDiscriminatedUnionMemberHasGoodError.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/primitiveMembers.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/qualify.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/regexpExecAndMatchTypeUsages.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/requireTypesOnly.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/reservedWords2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "compiler/reservedWords3.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "compiler/restParamModifier.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/semicolonsInModuleDeclarations.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/strictOptionalProperties3.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/switchExhaustiveNarrowing.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/typeAliasDeclarationEmit3.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/typeInterfaceDeclarationsInBlockStatements1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/typeofAmbientExternalModules.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "compiler/typeofExternalModules.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractAssignabilityConstructorFunction.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractClinterfaceAssignability.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractConstructorAssignability.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractFactoryFunction.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractInstantiations2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractMethodInNonAbstractClass.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/classDeclarations/classAbstractKeyword/classAbstractMethodWithImplementation.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNameAndPropertySignature.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNameStaticAccessorssDerivedClasses.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNamesAndStaticFields.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNamesConstructorChain-1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNamesUnique-1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/classes/members/privateNames/privateNamesUnique-5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/controlFlow/controlFlowOptionalChain2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/enums/enumErrors.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es2022/arbitraryModuleNamespaceIdentifiers/arbitraryModuleNamespaceIdentifiers_importEmpty.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/Symbols/symbolType15.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/Symbols/symbolType9.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames12_ES5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames12_ES5.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames12_ES6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames38_ES5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames38_ES5.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames38_ES6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames39_ES5.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames39_ES5.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/computedProperties/computedPropertyNames39_ES6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/destructuring/destructuringParameterDeclaration6.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/es6/destructuring/optionalBindingParameters4.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/modules/exportStar.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/es6/modules/exportStar.ts#configuration=1",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/jsdoc/extendsTagEmit.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/jsdoc/jsdocAugmentsMissingType.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/moduleResolution/allowImportingTypesDtsExtension2.ts#configuration=2",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "disabled",
+    "errors_parity": "different",
+    "type_to_string_parity": "disabled"
+   },
+   "after": {
+    "types_parity": "disabled",
+    "errors_parity": "match",
+    "type_to_string_parity": "disabled"
+   }
+  },
+  {
+   "id": "conformance/moduleResolution/allowImportingTypesDtsExtension2.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "disabled",
+    "errors_parity": "different",
+    "type_to_string_parity": "disabled"
+   },
+   "after": {
+    "types_parity": "disabled",
+    "errors_parity": "match",
+    "type_to_string_parity": "disabled"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesDeclarationEmitWithPackageExports.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesDeclarationEmitWithPackageExports.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesDeclarationEmitWithPackageExports.ts#configuration=2",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesDeclarationEmitWithPackageExports.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesJson.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesJson.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesJson.ts#configuration=2",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/node/nodeModulesJson.ts#configuration=3",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=0",
+   "acceptance_tier": "informational",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript2018/asyncGenerators/parser.asyncGenerators.objectLiteralMethods.es2018.ts#configuration=1",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/AutomaticSemicolonInsertion/parserAutomaticSemicolonInsertion1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/ErrorRecovery/parserEqualsGreaterThanAfterFunction1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction1.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/ErrorRecovery/parserErrantEqualsGreaterThanAfterFunction2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/RealWorld/parserharness.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/RegressionTests/parser509618.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/SkippedTokens/parserSkippedTokens16.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "different",
+    "errors_parity": "different",
+    "type_to_string_parity": "different"
+   },
+   "after": {
+    "types_parity": "different",
+    "errors_parity": "match",
+    "type_to_string_parity": "different"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/Statements/parserEmptyStatement1.d.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/Statements/parserExpressionStatement1.d.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/parser/ecmascript5/parserRealSource11.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/statements/for-inStatements/for-inStatementsArrayErrors.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/literal/stringLiteralsAssertionsInEqualityComparisons02.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/members/objectTypeHidingMembersOfObjectAssignmentCompat2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/members/objectTypeWithCallSignatureHidingMembersOfFunctionAssignmentCompat.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/members/objectTypeWithConstructSignatureHidingMembersOfFunctionAssignmentCompat.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/boolean/assignFromBooleanInterface.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/boolean/assignFromBooleanInterface2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/number/assignFromNumberInterface.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/number/assignFromNumberInterface2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/string/assignFromStringInterface.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/primitives/string/assignFromStringInterface2.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/thisType/looseThisTypeInFunctions.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/thisType/unionThisTypeInFunctions.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/tuple/named/namedTupleMembersErrors.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  },
+  {
+   "id": "conformance/types/typeRelationships/assignmentCompatibility/assignmentCompatWithCallSignaturesWithRestParameters.ts#configuration=0",
+   "acceptance_tier": "acceptance",
+   "before": {
+    "types_parity": "match",
+    "errors_parity": "different",
+    "type_to_string_parity": "match"
+   },
+   "after": {
+    "types_parity": "match",
+    "errors_parity": "match",
+    "type_to_string_parity": "match"
+   }
+  }
+ ],
+ "remaining_error_differences": [
+  "compiler/abstractClassUnionInstantiation.ts#configuration=0",
+  "compiler/classFieldSuperNotAccessibleJs.ts#configuration=0",
+  "compiler/concatTuples.ts#configuration=0",
+  "compiler/conditionalReturnExpression.ts#configuration=0",
+  "compiler/constructorWithIncompleteTypeAnnotation.ts#configuration=0",
+  "compiler/declarationEmitComputedPropertyNameSymbol1.ts#configuration=0",
+  "compiler/declarationEmitComputedPropertyNameSymbol2.ts#configuration=0",
+  "compiler/declarationEmitPrivateSymbolCausesVarDeclarationEmit2.ts#configuration=0",
+  "compiler/declarationEmitReadonlyComputedProperty.ts#configuration=0",
+  "compiler/dottedModuleName.ts#configuration=0",
+  "compiler/importAttributeType1.ts#configuration=0",
+  "compiler/intersectionWithConflictingPrivates.ts#configuration=0",
+  "compiler/sameComputedNameError.ts#configuration=0",
+  "compiler/symbolObserverMismatchingPolyfillsWorkTogether.ts#configuration=0",
+  "compiler/yieldExpressionInFlowLoop.ts#configuration=0",
+  "conformance/controlFlow/controlFlowNoIntermediateErrors.ts#configuration=0",
+  "conformance/es2020/modules/exportAsNamespace5.ts#configuration=0",
+  "conformance/es6/Symbols/symbolType2.ts#configuration=0",
+  "conformance/es6/yieldExpressions/generatorNoImplicitReturns.ts#configuration=0",
+  "conformance/es6/yieldExpressions/yieldExpressionInControlFlow.ts#configuration=0",
+  "conformance/internalModules/importDeclarations/shadowedInternalModule.ts#configuration=0",
+  "conformance/node/esmModuleExports2.ts#configuration=0",
+  "conformance/node/esmModuleExports2.ts#configuration=1",
+  "conformance/node/esmModuleExports3.ts#configuration=0",
+  "conformance/parser/ecmascript5/RegressionTests/parser519458.ts#configuration=0",
+  "conformance/types/literal/literalTypesWidenInParameterPosition.ts#configuration=0"
+ ]
+}

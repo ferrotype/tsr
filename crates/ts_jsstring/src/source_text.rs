@@ -37,6 +37,10 @@ impl SourceText {
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
     }
+    /// The whole shared backing allocation; slices of this text alias it.
+    pub fn backing_bytes(&self) -> &[u8] {
+        self.0.backing_bytes()
+    }
     pub fn as_str(&self) -> Option<&str> {
         self.0.as_str()
     }

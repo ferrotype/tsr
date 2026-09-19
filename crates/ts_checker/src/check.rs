@@ -1,12 +1,11 @@
 //! Source checking over bound declarations. Each unsupported semantic branch
 //! fails explicitly; a failed file check never becomes a successful cache hit.
 
-use crate::{object_flags as of, type_flags as tf, type_format_flags, CheckerState, Error, TypeId};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
+use crate::{type_flags as tf, CheckerState, Error, TypeId};
+use ts_arena::NodeId;
+use ts_ast::{node_flags as nf, SyntaxKind as K};
 use ts_core::Tristate;
 use ts_diagnostics as messages;
-use ts_jsstring::JsString;
 
 #[derive(Clone, Copy)]
 pub(crate) enum SourceCheckStatus {
@@ -22,62 +21,81 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkSourceFile
     pub(crate) fn check_source_file(&mut self, source: NodeId) -> Result<(), Error> {
+        let options = self.program()?.host.options();
+        let check_unused = options.no_unused_locals == Tristate::TRUE
+            || options.no_unused_parameters == Tristate::TRUE;
+        self.check_source_file_ex(source, check_unused)
+    }
+
+    /// `checkUnused` is also requested by suggestion collection, which runs the
+    /// unused-identifier pass regardless of the compiler options.
+    pub(crate) fn check_source_file_ex(
+        &mut self,
+        source: NodeId,
+        check_unused: bool,
+    ) -> Result<(), Error> {
         match self.source_checks.get(&source).copied() {
-            Some(SourceCheckStatus::Complete) => return Ok(()),
+            Some(SourceCheckStatus::Complete) => {}
             Some(SourceCheckStatus::Failed(error)) => return Err(error),
             Some(SourceCheckStatus::Checking) => {
                 return Err(Error::Unsupported("recursive checkSourceFile"))
             }
-            None => {}
+            None => {
+                self.source_checks
+                    .insert(source, SourceCheckStatus::Checking);
+                let result = self.check_source_file_worker(source);
+                self.source_checks.insert(
+                    source,
+                    match result {
+                        Ok(()) => SourceCheckStatus::Complete,
+                        Err(error) => SourceCheckStatus::Failed(error),
+                    },
+                );
+                result?;
+            }
         }
-        self.source_checks
-            .insert(source, SourceCheckStatus::Checking);
-        let result = self.check_source_file_worker(source);
-        self.source_checks.insert(
-            source,
-            match result {
-                Ok(()) => SourceCheckStatus::Complete,
-                Err(error) => SourceCheckStatus::Failed(error),
-            },
-        );
-        result
+        if check_unused {
+            if let Some(&result) = self.query.unused_checks.get(&source) {
+                return result;
+            }
+            // This pass depends on a completed type check, but its own failure
+            // must not poison later requests that need only type checking.
+            let result = (|| {
+                if !self.source_file_read(source)?.is_declaration_file {
+                    let nodes = self
+                        .query
+                        .identifier_check_nodes
+                        .remove(&source)
+                        .unwrap_or_default();
+                    self.check_unused_identifiers(nodes)?;
+                }
+                Ok(())
+            })();
+            // The queue has been consumed: retrying this phase must return its
+            // recorded failure, not succeed on the now-empty queue.
+            self.query.unused_checks.insert(source, result);
+            result?;
+        }
+        Ok(())
     }
 
     fn check_source_file_worker(&mut self, source: NodeId) -> Result<(), Error> {
         let view = self.ast(source)?;
         let file = view.source_file(source)?;
-        if !file.diagnostics().is_empty() {
-            return Err(Error::Unsupported(
-                "checkSourceFile: recovered parse errors",
-            ));
+        if !matches!(
+            file.script_kind,
+            ts_core::ScriptKind::TS
+                | ts_core::ScriptKind::JS
+                | ts_core::ScriptKind::TSX
+                | ts_core::ScriptKind::JSX
+        ) {
+            return Err(Error::Unsupported("checkSourceFile: non-script input"));
         }
-        if file.is_declaration_file || view.node(source)?.flags() & nf::AMBIENT != 0 {
-            return Err(Error::Unsupported(
-                "checkGrammarSourceFile: ambient declarations",
-            ));
-        }
-        if file.script_kind != ts_core::ScriptKind::TS
-            || ts_ast::utilities::is_external_or_common_js_module(&file)
-        {
-            return Err(Error::Unsupported(
-                "checkSourceFile: JavaScript or external module",
-            ));
-        }
-        if !view.source_comments(file.comment_directives)?.is_empty()
-            || !file.diagnostic_directives()?.is_empty()
-        {
-            return Err(Error::Unsupported("checkSourceFile: diagnostic directives"));
-        }
-        let options = self.program()?.host.options();
-        if options.no_check == Tristate::TRUE
-            || options.no_unused_locals == Tristate::TRUE
-            || options.no_unused_parameters == Tristate::TRUE
-            || options.isolated_declarations == Tristate::TRUE
-        {
-            return Err(Error::Unsupported(
-                "checkSourceFile: noCheck/unused/isolated declaration options",
-            ));
-        }
+        // A TSX/JSX file can contain only ordinary declarations or imports.
+        // Reject unported JSX expressions at their operation, not by file kind.
+        self.check_grammar_source(source)?;
+        self.query.renamed_binding_elements_in_types.clear();
+        let view = self.ast(source)?;
         let statements: Vec<_> = view
             .node_slice(view.node(source)?.statements(view)?)?
             .iter()
@@ -85,27 +103,95 @@ impl CheckerState {
         for statement in statements.into_iter().flatten() {
             self.check_source_element(statement)?;
         }
+        self.finish_deferred_function_bodies(source)?;
+        if ts_ast::utilities::is_external_or_common_js_module(&self.source_file_read(source)?) {
+            self.check_external_module_exports(source)?;
+            self.register_for_unused_identifiers_check(source)?;
+        }
+        if !self.source_file_read(source)?.is_declaration_file {
+            self.check_unused_renamed_binding_elements()?;
+        }
+        self.check_deferred_diagnostics()?;
+        self.query.reported_unreachable.clear();
         Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkSourceElementWorker
-    fn check_source_element(&mut self, node: NodeId) -> Result<(), Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+    pub(crate) fn check_source_element(&mut self, node: NodeId) -> Result<(), Error> {
+        let previous = self.current_node.replace(node);
+        let previous_unreachable = self.within_unreachable_code;
+        self.instantiation.count = 0;
+        let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             self.check_source_element_worker(node)
-        })
+        });
+        self.current_node = previous;
+        self.within_unreachable_code = previous_unreachable;
+        result
     }
 
+    #[allow(
+        clippy::match_same_arms,
+        reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
+    )]
     fn check_source_element_worker(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_eager_jsdoc(node)?;
+        if !self.within_unreachable_code
+            && self.program()?.host.options().allow_unreachable_code != Tristate::TRUE
+            && self.check_source_element_unreachable(node)?
+        {
+            self.within_unreachable_code = true;
+        }
         let view = self.ast(node)?;
         let read = view.node(node)?;
-        if read.flags() & nf::HAS_JS_DOC != 0 {
-            return Err(Error::Unsupported("checkSourceElement: JSDoc"));
-        }
-        if read.modifiers().is_some() {
-            return Err(Error::Unsupported("checkGrammarModifiers"));
-        }
         match read.kind().known() {
+            Some(K::ModuleDeclaration) => self.check_module_declaration(node),
+            Some(K::ModuleBlock) => self.check_module_block(node),
+            Some(K::ExportAssignment) => self.check_export_assignment(node),
+            Some(K::ExportDeclaration) => self.check_export_declaration(node),
+            Some(K::ExportSpecifier) => self.check_export_specifier(node),
+            Some(K::ImportDeclaration | K::JSImportDeclaration) => {
+                self.check_import_declaration(node)
+            }
+            Some(K::ImportEqualsDeclaration) => self.check_import_equals_declaration(node),
+            Some(K::ClassStaticBlockDeclaration) => {
+                self.check_grammar_modifiers(node)?;
+                for child in self.source_children(node)? {
+                    self.check_source_element(child)?;
+                }
+                Ok(())
+            }
+            Some(K::ClassDeclaration) => self.check_class_declaration(node),
+            Some(K::PropertyDeclaration) => self.check_class_property(node),
+            Some(K::Parameter) => self.check_parameter(node),
+            Some(K::BindingElement) => self.check_binding_element(node),
+            Some(K::GetAccessor | K::SetAccessor) => self.check_class_accessor(node),
+            Some(K::MethodDeclaration | K::MethodSignature | K::Constructor) => {
+                self.check_function_declaration(node)
+            }
+            Some(K::FunctionDeclaration) => self.check_function_declaration(node),
+            Some(K::Block) => self.check_block_statement(node),
+            Some(K::IfStatement) => self.check_if_statement(node),
+            Some(K::ReturnStatement) => self.check_return_statement(node),
+            Some(K::ThrowStatement) => self.check_throw_statement(node),
+            Some(K::DoStatement | K::WhileStatement) => self.check_loop_statement(node),
+            Some(K::ForStatement) => self.check_for_statement(node),
+            Some(K::ForInStatement) => self.check_for_in_statement(node),
+            Some(K::ForOfStatement) => self.check_for_of_statement(node),
+            Some(K::BreakStatement | K::ContinueStatement) => self.check_jump_statement(node),
+            Some(K::SwitchStatement) => self.check_switch_statement(node),
+            Some(K::LabeledStatement) => self.check_labeled_statement(node),
+            Some(K::WithStatement) => self.check_with_statement(node),
+            Some(K::TryStatement) => self.check_try_statement(node),
+            Some(K::CatchClause) => self.check_catch_clause(node),
+            Some(K::EnumDeclaration) => self.check_enum_declaration(node),
+            Some(K::EnumMember) => self.check_enum_member(node),
+            Some(K::TypeQuery) => {
+                self.get_type_from_type_node(node)?;
+                Ok(())
+            }
             Some(K::VariableStatement) => {
+                let grammar_failed = self.check_grammar_modifiers(node)?;
+                let read = self.node(node)?;
                 let list = required(
                     read.data_source()
                         .as_variable_statement()
@@ -113,53 +199,95 @@ impl CheckerState {
                         .declaration_list(),
                     "variable declaration list",
                 )?;
+                if !grammar_failed && !self.check_grammar_variable_list(list)? {
+                    self.check_grammar_block_variable(node, list)?;
+                }
                 self.check_source_element(list)
             }
             Some(K::VariableDeclarationList) => {
-                if read.flags() & nf::USING != 0 {
-                    return Err(Error::Unsupported(
-                        "checkGrammarVariableDeclarationList: using",
-                    ));
+                // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclarationList
+                let block_scope =
+                    ts_ast::utilities::get_combined_node_flags(view, node)? & nf::BLOCK_SCOPED;
+                if (block_scope == nf::USING || block_scope == nf::AWAIT_USING)
+                    && self.program()?.host.options().emit_script_target()
+                        < ts_core::ScriptTarget::ESNEXT
+                {
+                    self.check_external_emit_helpers(
+                        node,
+                        crate::external_emit_helpers::ADD_DISPOSABLE_RESOURCE_AND_DISPOSE_RESOURCES,
+                    )?;
                 }
+                let view = self.ast(node)?;
                 let list = required(
-                    read.data_source()
+                    view.node(node)?
+                        .data_source()
                         .as_variable_declaration_list()
                         .ok_or(ts_arena::Error::InvalidGraph)?
                         .declarations(),
                     "variable declarations",
                 )?;
-                if view.list_has_trailing_comma(list)? {
-                    return Err(Error::Unsupported(
-                        "checkGrammarVariableDeclarationList: trailing comma",
-                    ));
-                }
                 let declarations: Vec<_> =
                     view.node_slice(view.list(list)?.nodes())?.iter().collect();
-                if declarations.is_empty() {
-                    return Err(Error::Unsupported(
-                        "checkGrammarVariableDeclarationList: empty",
-                    ));
-                }
                 for declaration in declarations.into_iter().flatten() {
                     self.check_source_element(declaration)?;
                 }
                 Ok(())
             }
-            Some(K::VariableDeclaration | K::PropertySignature) => self.check_variable_like(node),
-            Some(K::TypeAliasDeclaration | K::InterfaceDeclaration) => {
+            Some(K::PropertySignature) => self.check_property_signature(node),
+            Some(K::VariableDeclaration) => self.check_variable_declaration(node),
+            Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration | K::InterfaceDeclaration) => {
                 self.check_type_declaration(node)
             }
             Some(K::TypeLiteral) => {
                 self.check_object_type_members(node)?;
                 let ty = self.get_type_from_type_node(node)?;
-                self.resolve_type_members(ty)
+                self.resolve_type_members(ty)?;
+                self.check_source_index_constraints(ty, node, false)
             }
             Some(K::ParenthesizedType) => {
                 self.check_source_element(required(read.type_node(), "parenthesized type")?)
             }
+            Some(K::JSDocOptionalType | K::JSDocVariadicType) => Ok(()),
             Some(K::UnionType | K::IntersectionType) => self.check_union_or_intersection_type(node),
+            Some(K::TypeReference | K::ExpressionWithTypeArguments) => {
+                self.check_type_reference_node(node)
+            }
             Some(
-                K::TypeReference
+                K::JSDocNonNullableType
+                | K::JSDocNullableType
+                | K::JSDocAllType
+                | K::JSDocTypeLiteral,
+            ) => self.check_jsdoc_type(node),
+            Some(K::TypeParameter) => self.check_type_parameter(node),
+            Some(K::TypePredicate) => self.check_type_predicate(node),
+            Some(K::ImportType) => self.check_import_type_node(node),
+            Some(K::ConditionalType) => {
+                for child in self.source_children(node)? {
+                    self.check_source_element(child)?;
+                }
+                Ok(())
+            }
+            Some(K::InferType) => self.check_infer_type(node),
+            Some(K::MappedType) => self.check_mapped_type(node),
+            Some(K::TemplateLiteralType) => self.check_template_type(node),
+            Some(K::IndexedAccessType) => self.check_indexed_access_type(node),
+            Some(
+                K::ArrayType
+                | K::TupleType
+                | K::OptionalType
+                | K::RestType
+                | K::NamedTupleMember
+                | K::TypeOperator,
+            ) => self.check_array_tuple_syntax(node),
+            Some(
+                K::FunctionType
+                | K::ConstructorType
+                | K::CallSignature
+                | K::ConstructSignature
+                | K::IndexSignature,
+            ) => self.check_signature_syntax(node),
+            Some(
+                K::ThisType
                 | K::LiteralType
                 | K::AnyKeyword
                 | K::UnknownKeyword
@@ -172,19 +300,40 @@ impl CheckerState {
                 | K::UndefinedKeyword
                 | K::NullKeyword
                 | K::NeverKeyword
-                | K::ObjectKeyword,
+                | K::ObjectKeyword
+                | K::IntrinsicKeyword,
             ) => {
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }
-            Some(K::ExpressionStatement) => self
-                .check_assignment_expression(required(read.expression(), "expression statement")?),
-            Some(K::EmptyStatement) => Ok(()),
+            Some(K::ExpressionStatement) => {
+                let expression = required(read.expression(), "expression statement")?;
+                self.check_statement_ambient_context(node)?;
+                self.check_expression(expression).map(|_| ())
+            }
+            Some(K::EmptyStatement) => self.check_statement_ambient_context(node).map(|_| ()),
+            Some(K::DebuggerStatement) => self.check_statement_ambient_context(node).map(|_| ()),
+            Some(K::MissingDeclaration) => {
+                Self::check_missing_declaration(node);
+                Ok(())
+            }
+            // Upstream's switch has no case for these; `export as namespace` is
+            // checked through its alias target and a stray `;` class member has
+            // nothing to check.
+            Some(K::NamespaceExportDeclaration | K::SemicolonClassElement) => Ok(()),
+            // Upstream visits modifier keywords through forEachChild and its
+            // switch has no case for them.
+            _ if ts_ast::is_modifier_kind(read.kind()) && read.kind() != K::Decorator => Ok(()),
             _ => Err(Error::Unsupported(
                 "checkSourceElementWorker: statement/type family",
             )),
         }
     }
+
+    /// A missing declaration can carry modifiers but never decorators upstream
+    /// recognizes (`CanHaveDecorators`), so `checkDecorators` returns at once.
+    // port: tsc/internal/checker/checker.go:Checker.checkMissingDeclaration
+    fn check_missing_declaration(_node: NodeId) {}
 
     // port: tsc/internal/checker/checker.go:Checker.checkUnionOrIntersectionType
     fn check_union_or_intersection_type(&mut self, node: NodeId) -> Result<(), Error> {
@@ -217,13 +366,28 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeAliasDeclaration
     // port: tsc/internal/checker/checker.go:Checker.checkInterfaceDeclaration
     fn check_type_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
-        if read.type_parameter_list().is_some() {
-            return Err(Error::Unsupported("checkTypeParameters"));
+        if !self.check_grammar_modifiers(node)?
+            && self.node(node)?.kind() == K::InterfaceDeclaration
+        {
+            self.check_interface_heritage_grammar(node)?;
         }
+        self.check_type_parameters(node)?;
+        let read = self.node(node)?;
         let interface = read.kind() == K::InterfaceDeclaration;
+        let parent = required(read.parent(), "type declaration parent")?;
         let name = required(read.name(), "type declaration name")?;
-        let text = self.ast(name)?.node_text(name)?.into_js_string();
+        if !self.container_allows_block_scoped_variable(parent)? {
+            self.grammar_error_node(
+                node,
+                messages::X_0_declarations_can_only_be_declared_inside_a_block,
+                vec![ts_ast::JsString::from_bytes(if interface {
+                    b"interface".as_slice()
+                } else {
+                    b"type".as_slice()
+                })],
+            )?;
+        }
+        let text = self.node_text(name)?.into_js_string();
         if matches!(
             text.as_bytes(),
             b"any"
@@ -252,53 +416,53 @@ impl CheckerState {
             self.get_symbol_of_declaration(node)?,
             "type declaration symbol",
         )?;
-        if self.symbol(symbol)?.export_symbol().is_some() {
-            return Err(Error::Unsupported("checkExportsOnMergedDeclarations"));
-        }
+        self.check_exports_on_merged_declarations(node)?;
         if interface {
-            let ty = self.get_declared_type_of_symbol(symbol)?;
-            self.check_object_type_members(node)?;
-            self.resolve_type_members(ty)
+            self.check_interface_inheritance(name, symbol)?;
+            self.check_object_duplicate_declarations(node, false)?;
+            self.check_interface_heritage(node)?;
+            for member in self.source_list(node, self.node(node)?.member_list())? {
+                self.check_source_element(member)?;
+            }
+            self.check_class_or_interface_duplicate_indexes(node)?;
         } else {
-            let annotation = required(
-                self.ast(node)?.node(node)?.type_node(),
-                "type alias annotation",
-            )?;
-            self.check_source_element(annotation)
+            let annotation = required(self.node(node)?.type_node(), "type alias annotation")?;
+            if self.node(annotation)?.kind() == K::IntrinsicKeyword {
+                // The `intrinsic` keyword is a leaf type node with no child nodes to check.
+                return Ok(());
+            }
+            self.check_source_element(annotation)?;
         }
+        self.register_for_unused_identifiers_check(node)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkTypeLiteral
     fn check_object_type_members(&mut self, node: NodeId) -> Result<(), Error> {
-        let view = self.ast(node)?;
-        let members: Vec<_> = view
-            .node_slice(view.node(node)?.members(view)?)?
-            .iter()
-            .collect();
-        for member in members.into_iter().flatten() {
-            let symbol = required(
-                self.get_symbol_of_declaration(member)?,
-                "type member symbol",
-            )?;
-            if self.symbol_declarations(symbol)?.len() != 1 {
-                return Err(Error::Unsupported(
-                    "checkObjectTypeForDuplicateDeclarations/subsequent property declarations",
-                ));
-            }
+        self.check_object_duplicate_declarations(node, false)?;
+        for member in self.source_list(node, self.node(node)?.member_list())? {
             self.check_source_element(member)?;
         }
         Ok(())
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclaration
+    fn check_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
+        self.check_grammar_variable(node)?;
+        self.check_variable_like(node)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
-    fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
-        let read = self.ast(node)?.node(node)?;
+    pub(crate) fn check_variable_like(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
         let name = required(read.name(), "variable/property name")?;
-        let name_kind = self.ast(name)?.node(name)?.kind();
+        let name_kind = self.node(name)?.kind();
         let property = read.kind() == K::PropertySignature;
-        if !property && name_kind != K::Identifier
-            || property
-                && !ts_ast::utilities::is_property_name_literal(&self.ast(name)?.node(name)?)
+        let binding = matches!(
+            name_kind.known(),
+            Some(K::ObjectBindingPattern | K::ArrayBindingPattern)
+        );
+        if !property && name_kind != K::Identifier && !binding
+            || property && !ts_ast::utilities::is_property_name_literal(&self.node(name)?)
         {
             return Err(Error::Unsupported(
                 "checkVariableLikeDeclaration: binding/computed/private name",
@@ -309,362 +473,138 @@ impl CheckerState {
                 "checkVariableLikeDeclaration: optional declaration",
             ));
         }
-        if !property
-            && read
-                .data_source()
-                .as_variable_declaration()
-                .ok_or(ts_arena::Error::InvalidGraph)?
-                .exclamation_token()
-                .is_some()
-        {
-            return Err(Error::Unsupported(
-                "checkGrammarVariableDeclaration: definite assignment assertion",
-            ));
-        }
         let initializer = read.initializer();
-        let annotation = read.type_node();
         if property && initializer.is_some() {
             return Err(Error::Unsupported(
                 "checkGrammarProperty: signature initializer",
             ));
         }
-        if !property {
-            let parent = required(read.parent(), "variable declaration parent")?;
-            let flags = self.ast(parent)?.node(parent)?.flags();
-            if flags & nf::CONSTANT != 0 && initializer.is_none() {
-                self.error_at(
-                    Some(node),
-                    messages::X_0_declarations_must_be_initialized,
-                    vec![JsString::from_bytes(b"const".as_slice())],
-                )?;
-            } else if flags & nf::BLOCK_SCOPED != 0
-                && self.ast(name)?.node_text(name)?.as_bytes() == b"let"
-            {
-                self.error_at(Some(name), messages::X_let_is_not_allowed_to_be_used_as_a_name_in_let_or_const_declarations, vec![])?;
-            }
+        if binding {
+            self.check_binding_variable(node)
+        } else {
+            self.check_variable_initializer(node)
         }
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
+    // Shared semantic tail after declaration-specific grammar and name checks.
+    pub(crate) fn check_variable_initializer(&mut self, node: NodeId) -> Result<(), Error> {
+        let read = self.node(node)?;
+        let annotation = read.type_node();
+        let initializer = read.initializer();
         if let Some(annotation) = annotation {
             self.check_source_element(annotation)?;
+        }
+        if let Some(name) = self.node(node)?.name() {
+            if self.node(name)?.kind() == K::ComputedPropertyName {
+                self.check_computed_property_name(name)?;
+                if let Some(initializer) = initializer {
+                    self.check_expression_cached(initializer)?;
+                }
+            }
         }
         let symbol = required(
             self.get_symbol_of_declaration(node)?,
             "variable/property symbol",
         )?;
-        if self.symbol(symbol)?.value_declaration() != Some(node) {
-            return Err(Error::Unsupported(
-                "checkVariableLikeDeclaration: subsequent declaration",
-            ));
+        if self.check_require_alias_declaration(node, symbol)? {
+            return Ok(());
         }
         let target = self.get_type_of_symbol(symbol)?;
+        let target = self.auto_to_any(target)?;
+        if self.symbol(symbol)?.value_declaration() != Some(node) {
+            self.check_secondary_variable(node, symbol, target)?;
+            if !matches!(
+                self.node(node)?.kind().known(),
+                Some(K::PropertyDeclaration | K::PropertySignature)
+            ) {
+                self.check_exports_on_merged_declarations(node)?;
+                if matches!(
+                    self.node(node)?.kind().known(),
+                    Some(K::VariableDeclaration | K::BindingElement)
+                ) {
+                    self.check_var_names_not_shadowed(node)?;
+                }
+                self.check_collisions_for_declaration_name(node)?;
+            }
+            return Ok(());
+        }
         if let Some(initializer) = initializer {
-            let source = self.check_expression_cached(initializer)?;
-            self.check_assignable_at(source, target, node)?;
+            let read = self.node(node)?;
+            let for_in = if read.kind() == K::VariableDeclaration {
+                let list = required(read.parent(), "variable list")?;
+                match self.node(list)?.parent() {
+                    Some(parent) => self.node(parent)?.kind() == K::ForInStatement,
+                    None => false,
+                }
+            } else {
+                false
+            };
+            if !for_in {
+                let target = if target == self.builtins.auto_type {
+                    self.builtins.any_type
+                } else if self.query.global_types.get("autoArrayType") == Some(&target) {
+                    *self
+                        .query
+                        .global_types
+                        .get("anyArrayType")
+                        .ok_or(Error::MissingLink("any array global"))?
+                } else {
+                    target
+                };
+                let source = self.check_expression_cached(initializer)?;
+                self.check_expression_related_with_elaboration(
+                    source,
+                    target,
+                    crate::RelationKind::Assignable,
+                    Some(node),
+                    Some(initializer),
+                    None,
+                )?;
+                self.check_using_initializer(node, initializer, source)?;
+            }
+        }
+        self.check_variable_declaration_flags(node, symbol, true)?;
+        if !matches!(
+            self.node(node)?.kind().known(),
+            Some(K::PropertyDeclaration | K::PropertySignature)
+        ) {
+            self.check_exports_on_merged_declarations(node)?;
+            if matches!(
+                self.node(node)?.kind().known(),
+                Some(K::VariableDeclaration | K::BindingElement)
+            ) {
+                self.check_var_names_not_shadowed(node)?;
+            }
+            self.check_collisions_for_declaration_name(node)?;
         }
         Ok(())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkAssignmentOperator
-    fn check_assignment_expression(&mut self, expression: NodeId) -> Result<(), Error> {
-        let read = self.ast(expression)?.node(expression)?;
-        if read.kind() == K::ParenthesizedExpression {
-            return self.check_assignment_expression(required(
-                read.expression(),
-                "parenthesized assignment",
-            )?);
-        }
-        if read.kind() != K::BinaryExpression {
-            self.check_expression(expression)?;
-            return Ok(());
-        }
-        let data = read
-            .data_source()
-            .as_binary_expression()
-            .ok_or(ts_arena::Error::InvalidGraph)?;
-        let operator = required(data.operator_token(), "assignment operator")?;
-        if self.ast(operator)?.node(operator)?.kind() != K::EqualsToken {
-            return Err(Error::Unsupported(
-                "checkAssignmentOperator: compound/non-assignment",
-            ));
-        }
-        let mut left = required(data.left(), "assignment left")?;
-        let right = required(data.right(), "assignment right")?;
-        while self.ast(left)?.node(left)?.kind() == K::ParenthesizedExpression {
-            left = required(
-                self.ast(left)?.node(left)?.expression(),
-                "parenthesized reference",
-            )?;
-        }
-        if self.ast(left)?.node(left)?.kind() != K::Identifier {
-            return Err(Error::Unsupported(
-                "checkReferenceExpression: non-identifier assignment",
-            ));
-        }
-        let text = self.ast(left)?.node_text(left)?.into_js_string();
-        let symbol = self.resolve_name(
-            Some(left),
-            text.as_bytes(),
-            sf::VALUE,
-            Some(messages::Cannot_find_name_0),
-            true,
-        )?;
-        let right_type = self.check_expression(right)?;
-        let Some(symbol) = symbol else { return Ok(()) };
-        if self.symbol(symbol)?.flags() & sf::VARIABLE == 0 {
-            return Err(Error::Unsupported(
-                "checkAssignmentOperator: non-variable symbol",
-            ));
-        }
-        let declaration = required(
-            self.symbol(symbol)?.value_declaration(),
-            "assignment value declaration",
-        )?;
-        let parent = required(
-            self.ast(declaration)?.node(declaration)?.parent(),
-            "assignment declaration parent",
-        )?;
-        if self.ast(parent)?.node(parent)?.flags() & nf::CONSTANT != 0 {
-            self.error_at(
-                Some(left),
-                messages::Cannot_assign_to_0_because_it_is_a_constant,
-                vec![text],
-            )?;
-            // checkIdentifier returns errorType for a readonly assignment.
-            // The right side has already been checked; do not also relate it
-            // to the constant's literal type.
-            return Ok(());
-        }
-        let left_type = self.get_type_of_symbol(symbol)?;
-        self.check_assignable_at(right_type, left_type, left)
-    }
-
-    // port: tsc/internal/checker/relater.go:Checker.isTypeRelatedTo
-    // port: tsc/internal/checker/relater.go:Checker.isSimpleTypeRelatedTo
-    fn source_type_assignable(
+    // The previous slice used a separate limited relation. Every caller now
+    // enters the production assignability cache; recursive work stays in the
+    // relater that owns its assumption stack.
+    pub(crate) fn source_type_assignable(
         &mut self,
         source: TypeId,
         target: TypeId,
-        active: &mut Vec<(TypeId, TypeId)>,
+        _active: &mut Vec<(TypeId, TypeId)>,
     ) -> Result<bool, Error> {
-        let source = self.get_regular_type_of_literal_type(source)?;
-        let target = self.get_regular_type_of_literal_type(target)?;
-        let s = self.types.flags(source)?;
-        let t = self.types.flags(target)?;
-        if source == target
-            || t & tf::ANY != 0
-            || s & tf::NEVER != 0
-            || source == self.builtins.wildcard_type
-            || t & tf::UNKNOWN != 0
-        {
-            return Ok(true);
-        }
-        if t & tf::NEVER != 0 {
-            return Ok(false);
-        }
-        if s & tf::STRING_LIKE != 0 && t & tf::STRING != 0
-            || s & tf::NUMBER_LIKE != 0 && t & tf::NUMBER != 0
-            || s & tf::BIG_INT_LIKE != 0 && t & tf::BIG_INT != 0
-            || s & tf::BOOLEAN_LIKE != 0 && t & tf::BOOLEAN != 0
-            || s & tf::ES_SYMBOL_LIKE != 0 && t & tf::ES_SYMBOL != 0
-        {
-            return Ok(true);
-        }
-        if (s | t) & tf::ENUM_LIKE != 0 {
-            return Err(Error::Unsupported("isSimpleTypeRelatedTo: enum relation"));
-        }
-        if s & tf::UNDEFINED != 0
-            && (!self.options.strict_null_checks && t & tf::UNION_OR_INTERSECTION == 0
-                || t & (tf::UNDEFINED | tf::VOID) != 0)
-            || s & tf::NULL != 0
-                && (!self.options.strict_null_checks && t & tf::UNION_OR_INTERSECTION == 0
-                    || t & tf::NULL != 0)
-            || s & tf::OBJECT != 0 && t & tf::NON_PRIMITIVE != 0
-            || s & tf::ANY != 0
-        {
-            return Ok(true);
-        }
-        if !self.options.strict_null_checks
-            && s & tf::NULLABLE != 0
-            && target == self.builtins.boolean_type
-        {
-            // The native union relation accepts null/undefined into both
-            // constituents of the canonical boolean type in non-strict mode.
-            return Ok(true);
-        }
-        if (s | t) & tf::UNION != 0
-            && self.is_primitive_union(source)?
-            && self.is_primitive_union(target)?
-        {
-            if s & tf::UNION != 0 {
-                let types = self.types.union(source)?.types.clone();
-                for &ty in types.iter() {
-                    if !self.source_type_assignable(ty, target, active)? {
-                        return Ok(false);
-                    }
-                }
-                return Ok(true);
-            }
-            let types = self.types.union(target)?.types.clone();
-            for &ty in types.iter() {
-                if self.source_type_assignable(source, ty, active)? {
-                    return Ok(true);
-                }
-            }
-            return Ok(false);
-        }
-        if s & tf::OBJECT != 0 && t & tf::OBJECT != 0 {
-            if active.contains(&(source, target)) {
-                return Err(Error::Unsupported("recursive structured type relation"));
-            }
-            active.push((source, target));
-            let result = self.plain_properties_assignable(source, target, active);
-            active.pop();
-            return result;
-        }
-        // The canonical boolean union has the primitive boolean meaning. Other
-        // unions and structured/instantiable types require the full relater.
-        let complex = |ty, flags| {
-            ty != self.builtins.boolean_type && flags & tf::STRUCTURED_OR_INSTANTIABLE != 0
-        };
-        if complex(source, s) || complex(target, t) {
-            return Err(Error::Unsupported(
-                "checkTypeRelatedTo: structured/instantiable relation",
-            ));
-        }
-        Ok(false)
-    }
-
-    // The primitive slice can use all-source/any-target constituent relations
-    // without structural matching, constraints or recursive assumptions.
-    fn is_primitive_union(&self, ty: TypeId) -> Result<bool, Error> {
-        let flags = self.types.flags(ty)?;
-        if flags & tf::UNION != 0 {
-            for &ty in self.types.union(ty)?.types.iter() {
-                if !self.is_primitive_union(ty)? {
-                    return Ok(false);
-                }
-            }
-            return Ok(true);
-        }
-        Ok(flags & tf::STRUCTURED_OR_INSTANTIABLE == 0)
-    }
-
-    // port: tsc/internal/checker/relater.go:Relater.propertiesRelatedTo
-    // port: tsc/internal/checker/relater.go:Relater.propertyRelatedTo
-    // The supported branch has required public properties, no signatures or
-    // indices, and no excess properties on fresh literals. All other structural
-    // paths remain explicit boundaries, including richer mismatch diagnostics.
-    fn plain_properties_assignable(
-        &mut self,
-        source: TypeId,
-        target: TypeId,
-        active: &mut Vec<(TypeId, TypeId)>,
-    ) -> Result<bool, Error> {
-        self.resolve_type_members(source)?;
-        self.resolve_type_members(target)?;
-        for ty in [source, target] {
-            let record = self.types.get(ty)?;
-            if record.object_flags & (of::ANONYMOUS | of::INTERFACE) == 0 {
-                return Err(Error::Unsupported("structuredTypeRelatedTo: object family"));
-            }
-            let members = self.types.structured(ty)?;
-            if members
-                .signatures
-                .as_ref()
-                .is_some_and(|list| !list.is_empty())
-                || members
-                    .index_infos
-                    .as_ref()
-                    .is_some_and(|list| !list.is_empty())
-            {
-                return Err(Error::Unsupported(
-                    "structuredTypeRelatedTo: signatures/index signatures",
-                ));
-            }
-        }
-        let sources = self
-            .types
-            .structured(source)?
-            .properties
-            .as_deref()
-            .unwrap_or_default()
-            .to_vec();
-        let targets = self
-            .types
-            .structured(target)?
-            .properties
-            .as_deref()
-            .unwrap_or_default()
-            .to_vec();
-        if self.types.get(source)?.object_flags & of::FRESH_LITERAL != 0 {
-            for &property in &sources {
-                let name = self.symbol(property)?.name_bytes();
-                let table = self.types.structured(target)?.members;
-                if !table
-                    .map(|table| {
-                        self.table(table)
-                            .map(|table| table.get(name).flatten().is_some())
-                    })
-                    .transpose()?
-                    .unwrap_or(false)
-                {
-                    return Err(Error::Unsupported("hasExcessProperties"));
-                }
-            }
-        }
-        for target_property in targets {
-            self.require_plain_property(target_property)?;
-            let name = self.symbol(target_property)?.name_to_owned();
-            let table = self.types.structured(source)?.members;
-            let source_property = table
-                .map(|table| {
-                    self.table(table)
-                        .map(|table| table.get(name.as_bytes()).flatten())
-                })
-                .transpose()?
-                .flatten()
-                .ok_or(Error::Unsupported("reportUnmatchedProperty"))?;
-            self.require_plain_property(source_property)?;
-            let source_type = self.get_type_of_symbol(source_property)?;
-            let target_type = self.get_type_of_symbol(target_property)?;
-            if !self.source_type_assignable(source_type, target_type, active)? {
-                return Err(Error::Unsupported(
-                    "propertyRelatedTo: incompatible property diagnostic",
-                ));
-            }
-        }
-        Ok(true)
-    }
-
-    fn require_plain_property(&self, symbol: SymbolId) -> Result<(), Error> {
-        let read = self.symbol(symbol)?;
-        if read.flags() & sf::PROPERTY == 0 || read.flags() & sf::OPTIONAL != 0 {
-            return Err(Error::Unsupported(
-                "propertyRelatedTo: optional/accessor/method",
-            ));
-        }
-        for node in self.symbol_declarations(symbol)?.iter().flatten() {
-            let declaration = self.ast(node)?.node(node)?;
-            if !matches!(
-                declaration.kind().known(),
-                Some(K::PropertySignature | K::PropertyAssignment)
-            ) || declaration.modifiers().is_some()
-            {
-                return Err(Error::Unsupported(
-                    "propertyRelatedTo: declaration accessibility",
-                ));
-            }
-        }
-        Ok(())
+        self.is_type_related_to(source, target, crate::RelationKind::Assignable)
     }
 
     // port: tsc/internal/checker/relater.go:Checker.typeCouldHaveTopLevelSingletonTypes
-    fn type_could_have_top_level_singletons(&self, ty: TypeId) -> Result<bool, Error> {
+    pub(crate) fn type_could_have_top_level_singletons(
+        &mut self,
+        ty: TypeId,
+    ) -> Result<bool, Error> {
         let flags = self.types.flags(ty)?;
         if flags & tf::BOOLEAN != 0 {
             return Ok(false);
         }
         if flags & tf::UNION_OR_INTERSECTION != 0 {
-            for &ty in self.types.types_of(ty)? {
+            for &ty in self.types.compound_types(ty)?.clone().iter() {
                 if self.type_could_have_top_level_singletons(ty)? {
                     return Ok(true);
                 }
@@ -672,59 +612,97 @@ impl CheckerState {
             return Ok(false);
         }
         if flags & tf::INSTANTIABLE != 0 {
-            return Err(Error::Unsupported(
-                "typeCouldHaveTopLevelSingletonTypes: constraint",
-            ));
+            if let Some(constraint) = self.constraint_of_type(ty)? {
+                if constraint != ty {
+                    return self.type_could_have_top_level_singletons(constraint);
+                }
+            }
         }
         Ok(flags & (tf::UNIT | tf::TEMPLATE_LITERAL | tf::STRING_MAPPING) != 0)
     }
 
     // port: tsc/internal/checker/relater.go:Checker.checkTypeAssignableTo
     // port: tsc/internal/checker/relater.go:Relater.reportRelationError
-    fn check_assignable_at(
+    pub(crate) fn check_assignable_at(
         &mut self,
         source: TypeId,
         target: TypeId,
         node: NodeId,
     ) -> Result<(), Error> {
-        if self.source_type_assignable(source, target, &mut Vec::new())? {
-            return Ok(());
-        }
-        let source_flags = self.types.flags(source)?;
-        let target_flags = self.types.flags(target)?;
-        let source_for_error = if target_flags & tf::NEVER == 0
-            && !self.type_could_have_top_level_singletons(target)?
-        {
-            if source_flags & tf::STRING_LITERAL != 0 {
-                self.builtins.string_type
-            } else if source_flags & tf::NUMBER_LITERAL != 0 {
-                self.builtins.number_type
-            } else if source_flags & tf::BIG_INT_LITERAL != 0 {
-                self.builtins.bigint_type
-            } else if source_flags & tf::BOOLEAN_LITERAL != 0 {
-                self.builtins.boolean_type
-            } else {
-                source
-            }
-        } else {
-            source
-        };
-        let source_name = self.type_to_string(
-            source_for_error,
-            type_format_flags::USE_FULLY_QUALIFIED_TYPE,
-        )?;
-        let target_name =
-            self.type_to_string(target, type_format_flags::USE_FULLY_QUALIFIED_TYPE)?;
-        if source_name == target_name {
-            return Err(Error::Unsupported(
-                "reportRelationError: unrelated types with identical names",
-            ));
-        }
-        self.error_at(
+        let (_, diagnostic) = self.check_type_related_ex(
+            source,
+            target,
+            crate::RelationKind::Assignable,
             Some(node),
-            messages::Type_0_is_not_assignable_to_type_1,
-            vec![source_name, target_name],
+            None,
         )?;
+        if let Some(diagnostic) = diagnostic {
+            self.add_diagnostic(diagnostic)?;
+        }
+        Ok(())
+    }
+}
+
+impl CheckerState {
+    /// Resolved once and cached like upstream's memoized global type resolvers.
+    // port: tsc/internal/checker/checker.go:Checker.getGlobalTypeResolver
+    fn cached_global_type(&mut self, name: &'static str) -> Result<TypeId, Error> {
+        if let Some(ty) = self.query.global_types.get(name) {
+            return Ok(*ty);
+        }
+        let ty = self.get_global_type(name, 0, true)?;
+        self.query.global_types.insert(name, ty);
+        Ok(ty)
+    }
+
+    /// The `using`/`await using` branch of `checkVariableLikeDeclaration`: the
+    /// initializer must be disposable, or null or undefined.
+    // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
+    fn check_using_initializer(
+        &mut self,
+        node: NodeId,
+        initializer: NodeId,
+        initializer_type: TypeId,
+    ) -> Result<(), Error> {
+        let block_scope =
+            ts_ast::utilities::get_combined_node_flags(self.ast(node)?, node)? & nf::BLOCK_SCOPED;
+        let empty = self.builtins.empty_object_type;
+        let (mut parts, message) = if block_scope == nf::AWAIT_USING {
+            let async_disposable = self.cached_global_type("AsyncDisposable")?;
+            let disposable = self.cached_global_type("Disposable")?;
+            if async_disposable == empty || disposable == empty {
+                return Ok(());
+            }
+            (
+                vec![async_disposable, disposable],
+                messages::The_initializer_of_an_await_using_declaration_must_be_either_an_object_with_a_Symbol_asyncDispose_or_Symbol_dispose_method_or_be_null_or_undefined,
+            )
+        } else if block_scope == nf::USING {
+            let disposable = self.cached_global_type("Disposable")?;
+            if disposable == empty {
+                return Ok(());
+            }
+            (
+                vec![disposable],
+                messages::The_initializer_of_a_using_declaration_must_be_either_an_object_with_a_Symbol_dispose_method_or_be_null_or_undefined,
+            )
+        } else {
+            return Ok(());
+        };
+        parts.push(self.builtins.null_type);
+        parts.push(self.builtins.undefined_type);
+        let optional_disposable = self.get_union_type(&parts)?;
+        let widened = self.widen_type_for_variable_like(node, Some(initializer_type), false)?;
+        let (_, diagnostic) = self.check_type_related_ex(
+            widened,
+            optional_disposable,
+            crate::RelationKind::Assignable,
+            Some(initializer),
+            Some(message),
+        )?;
+        if let Some(diagnostic) = diagnostic {
+            self.add_diagnostic(diagnostic)?;
+        }
         Ok(())
     }
 }

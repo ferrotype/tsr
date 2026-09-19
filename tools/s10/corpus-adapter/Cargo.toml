@@ -1,0 +1,34 @@
+[package]
+name = "s10_corpus"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# Existing shared walker source declares these cfgs. Normal S10 builds leave
+# measurement instrumentation off.
+s08-phase-timer = []
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+ts_embed = { version = "0.1.0", path = "../../../crates/ts_embed" }
+ts_arena = { version = "0.1.0", path = "../../../crates/ts_arena" }
+ts_ast = { version = "0.1.0", path = "../../../crates/ts_ast" }
+ts_checker = { version = "0.1.0", path = "../../../crates/ts_checker" }
+ts_compiler = { version = "0.1.0", path = "../../../crates/ts_compiler" }
+ts_core = { version = "0.1.0", path = "../../../crates/ts_core" }
+ts_vfs = { version = "0.1.0", path = "../../../crates/ts_vfs" }
+ts_bundled = { version = "0.1.0", path = "../../../crates/ts_bundled" }
+ts_tsoptions = { version = "0.1.0", path = "../../../crates/ts_tsoptions" }
+ts_tspath = { version = "0.1.0", path = "../../../crates/ts_tspath" }
+ts_jsstring = { version = "0.1.0", path = "../../../crates/ts_jsstring" }
+ts_printer = { version = "0.1.0", path = "../../../crates/ts_printer" }
+ts_nodebuilder = { version = "0.1.0", path = "../../../crates/ts_nodebuilder" }
+ts_module = { version = "0.1.0", path = "../../../crates/ts_module" }
+ts_scanner = { version = "0.1.0", path = "../../../crates/ts_scanner" }
+
+[lints]
+workspace = true

@@ -13,6 +13,8 @@ use ts_tspath as path;
 
 pub struct ProgramCheckerHost {
     program: Arc<Program>,
+    pub(crate) known_symlinks:
+        OnceLock<Result<crate::checker_module_specifiers::KnownSymlinks, Error>>,
     common_source_directory: OnceLock<Result<Vec<u8>, ts_arena::Error>>,
 }
 
@@ -20,6 +22,7 @@ impl ProgramCheckerHost {
     pub fn new(program: Arc<Program>) -> Self {
         Self {
             program,
+            known_symlinks: OnceLock::new(),
             common_source_directory: OnceLock::new(),
         }
     }
@@ -134,6 +137,70 @@ impl CheckerHost for ProgramCheckerHost {
         ))
     }
 
+    // port: tsc/internal/compiler/program.go:Program.GetModeForUsageLocation
+    fn get_mode_for_usage_location(
+        &self,
+        file_name: &[u8],
+        usage: NodeId,
+    ) -> Result<ResolutionMode, Error> {
+        let file = self.required_file(file_name)?;
+        let view = file.bound().view().ast();
+        let source = view.source_file(file.source())?;
+        metadata::usage_mode(
+            view,
+            source.parse_options().file_name.as_bytes(),
+            self.file_metadata(file)?,
+            usage,
+            self.program.options(),
+        )
+        .map_err(|error| match error {
+            crate::Error::Ast(error) => error.into(),
+            crate::Error::Unsupported(operation) => Error::Unsupported(operation),
+            // Mode selection is a pure metadata/AST operation; any future
+            // dependency must extend this adapter instead of hiding failure.
+            _ => Error::Unsupported("GetModeForUsageLocation: compiler metadata failure"),
+        })
+    }
+
+    // port: tsc/internal/compiler/fileloader.go:fileLoader.createSyntheticImport
+    // port: tsc/internal/compiler/fileloader.go:getModeForUsageLocation
+    fn get_import_helpers_resolution_mode(
+        &self,
+        file_name: &[u8],
+    ) -> Result<ResolutionMode, Error> {
+        let file = self.required_file(file_name)?;
+        let source = file.bound().view().source_file()?;
+        Ok(metadata::normal_mode(
+            source.parse_options().file_name.as_bytes(),
+            self.file_metadata(file)?,
+            self.program.options(),
+        ))
+    }
+
+    // port: tsc/internal/compiler/fileloader.go:getDefaultResolutionModeForFile
+    fn get_default_resolution_mode_for_file(
+        &self,
+        file_name: &[u8],
+    ) -> Result<ResolutionMode, Error> {
+        let file = self.required_file(file_name)?;
+        let options = self.program.options();
+        let resolution = options.module_resolution_kind();
+        if (ts_core::ModuleResolutionKind::NODE16..=ts_core::ModuleResolutionKind::NODE_NEXT)
+            .contains(&resolution)
+            || options.resolve_package_json_exports()
+            || options.resolve_package_json_imports()
+        {
+            let source = file.bound().view().source_file()?;
+            Ok(metadata::implied_for_emit(
+                source.parse_options().file_name.as_bytes(),
+                options.emit_module_kind(),
+                self.file_metadata(file)?,
+            ))
+        } else {
+            Ok(ModuleKind::NONE)
+        }
+    }
+
     // port: tsc/internal/compiler/program.go:Program.GetResolvedModule
     fn get_resolved_module(
         &self,
@@ -161,6 +228,32 @@ impl CheckerHost for ProgramCheckerHost {
     // port: tsc/internal/compiler/program.go:Program.GetSourceFileMetaData
     fn get_source_file_meta_data(&self, file_name: &[u8]) -> Result<&SourceFileMetaData, Error> {
         self.file_metadata(self.required_file(file_name)?)
+    }
+
+    // port: tsc/internal/ast/ast.go:Node.JSDoc
+    fn jsdoc(
+        &self,
+        view: ts_ast::AstView<'_>,
+        source: NodeId,
+        parent: NodeId,
+    ) -> Result<ts_ast::JSDocRoots, Error> {
+        use ts_ast::JsDocProvider;
+        ts_parser::ParserJsDocProvider::default()
+            .jsdoc(view, source, parent)
+            .map_err(Error::from)
+    }
+
+    // port: tsc/internal/compiler/program.go:Program.GetPackagesMap
+    fn package_bundles_types(&self, package_name: &[u8]) -> Result<Option<bool>, Error> {
+        let mut found = None;
+        for resolution in self.program.resolutions() {
+            let module = &resolution.result;
+            if module.package_id.name.as_bytes() == package_name {
+                let bundles = found.unwrap_or(false) || module.extension.as_bytes() == b".d.ts";
+                found = Some(bundles);
+            }
+        }
+        Ok(found)
     }
 
     // port: tsc/internal/compiler/program.go:Program.SourceFileMayBeEmitted
@@ -195,8 +288,98 @@ impl CheckerHost for ProgramCheckerHost {
         file_name: &[u8],
     ) -> Result<Option<&ParsedCommandLine>, Error> {
         self.required_file(file_name)?;
-        Err(Error::Unsupported(
-            "GetRedirectForResolution: project references",
+        self.get_project_reference_from_output_dts(file_name)
+    }
+
+    // port: tsc/internal/compiler/program.go:Program.GetProjectReferenceFromOutputDts
+    fn get_project_reference_from_output_dts(
+        &self,
+        _path: &[u8],
+    ) -> Result<Option<&ParsedCommandLine>, Error> {
+        // Loader::new rejects nonempty project references before files load.
+        // This is an empty native lookup, not a fallback for an unloaded graph.
+        if self
+            .program
+            .config()
+            .project_references
+            .as_ref()
+            .is_some_and(|references| !references.is_empty())
+        {
+            return Err(Error::Unsupported(
+                "GetProjectReferenceFromOutputDts: project references",
+            ));
+        }
+        Ok(None)
+    }
+
+    // port: tsc/internal/compiler/program.go:Program.GetProjectReferenceFromSource
+    fn get_project_reference_from_source(
+        &self,
+        path: &[u8],
+    ) -> Result<Option<&ParsedCommandLine>, Error> {
+        self.get_project_reference_from_output_dts(path)
+    }
+
+    fn get_module_specifier_paths(
+        &self,
+        importer: &[u8],
+        target: &[u8],
+    ) -> Result<Vec<ts_checker::ModuleSpecifierPath>, Error> {
+        self.module_specifier_paths(importer, target)
+    }
+    // port: tsc/internal/compiler/program.go:Program.GetPackageJsonInfo
+    fn get_package_json_info(
+        &self,
+        file: &[u8],
+    ) -> Result<Option<Arc<ts_module::PackageJson>>, Error> {
+        let directory = path::directory(file);
+        let result = self
+            .program
+            .package_resolver
+            .lock()
+            .expect("retained package resolver poisoned")
+            .package_scope_untraced(&directory)?;
+        Ok(result.filter(|package| package.directory.as_bytes() == directory))
+    }
+    // port: tsc/internal/compiler/program.go:Program.GetNearestAncestorDirectoryWithPackageJson
+    fn get_nearest_ancestor_directory_with_package_json(
+        &self,
+        dir: &[u8],
+    ) -> Result<Option<ts_jsstring::JsString>, Error> {
+        Ok(self
+            .program
+            .package_resolver
+            .lock()
+            .expect("retained package resolver poisoned")
+            .package_scope_untraced(dir)?
+            .map(|package| package.directory.clone()))
+    }
+    fn get_global_typings_cache_location(&self) -> Result<ts_jsstring::JsString, Error> {
+        // ProgramOptions has no global typings-cache input and Resolver::new
+        // constructs no global cache. Package-local @types remains supported.
+        Ok(ts_jsstring::JsString::default())
+    }
+    fn get_output_js_file_name(&self, file: &[u8]) -> Result<ts_jsstring::JsString, Error> {
+        Ok(ts_jsstring::JsString::from_bytes(
+            output_paths::module_specifier_output_name(
+                file,
+                &self.program,
+                self.common_source_directory()?,
+                false,
+            ),
+        ))
+    }
+    fn get_output_declaration_file_name(
+        &self,
+        file: &[u8],
+    ) -> Result<ts_jsstring::JsString, Error> {
+        Ok(ts_jsstring::JsString::from_bytes(
+            output_paths::module_specifier_output_name(
+                file,
+                &self.program,
+                self.common_source_directory()?,
+                true,
+            ),
         ))
     }
 

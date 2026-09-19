@@ -1,0 +1,319 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 mapped and template type capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "templates",
+      "files": {
+        "/case.ts": "type T = `x${\"a\" | \"b\"}${1 | 2}`; type Pattern = `id-${number}`; type Generic<S extends string> = `pre${S}`; type Inst = Generic<\"one\" | \"two\">; type Combined = { a: `x${string}` } & { a: number };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/case.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Pattern",
+          "file": "/case.ts",
+          "declaration": "Pattern",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Generic",
+          "file": "/case.ts",
+          "declaration": "Generic",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Inst",
+          "file": "/case.ts",
+          "declaration": "Inst",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Combined",
+          "file": "/case.ts",
+          "declaration": "Combined",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "string-mapping",
+      "files": {
+        "/case.ts": "type Uppercase<S extends string> = intrinsic; type Lowercase<S extends string> = intrinsic; type Capitalize<S extends string> = intrinsic; type Uncapitalize<S extends string> = intrinsic; type A = Uppercase<\"Straße\">; type B = Lowercase<\"ΟΣΣ\">; type C = Capitalize<\"ßfoo\">; type D = Uncapitalize<\"İFOO\">; type E = Uppercase<`hello-${\"a\"|\"b\"}`>; type F<S extends string> = Capitalize<`x${S}`>; type G = Lowercase<string>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "E",
+          "file": "/case.ts",
+          "declaration": "E",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "F",
+          "file": "/case.ts",
+          "declaration": "F",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "G",
+          "file": "/case.ts",
+          "declaration": "G",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "mapped-concrete",
+      "files": {
+        "/case.ts": "type R = { [P in \"x\"|\"y\"]: number }; type O = { readonly [P in \"a\"|\"b\"]?: P }; type I = { [P in string]: P }; type N = { [P in 1|2]: P };\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "R",
+          "file": "/case.ts",
+          "declaration": "R",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "O",
+          "file": "/case.ts",
+          "declaration": "O",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "I",
+          "file": "/case.ts",
+          "declaration": "I",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "N",
+          "file": "/case.ts",
+          "declaration": "N",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "mapped-generic",
+      "files": {
+        "/case.ts": "type Copy<T> = { [P in keyof T]: T[P] }; type Optional<T> = { [P in keyof T]?: T[P] }; type Required<T> = { [P in keyof T]-?: T[P] }; type Read<T> = { readonly [P in keyof T]: T[P] }; type C = Copy<{ a: string; b?: number }>; type O = Optional<{ a: string }>; type R = Required<{ a?: string }>; type D = Read<{ a: string }>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Copy",
+          "file": "/case.ts",
+          "declaration": "Copy",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Optional",
+          "file": "/case.ts",
+          "declaration": "Optional",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Required",
+          "file": "/case.ts",
+          "declaration": "Required",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Read",
+          "file": "/case.ts",
+          "declaration": "Read",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "O",
+          "file": "/case.ts",
+          "declaration": "O",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "R",
+          "file": "/case.ts",
+          "declaration": "R",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "D",
+          "file": "/case.ts",
+          "declaration": "D",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "mapped-tuples",
+      "files": {
+        "/case.ts": "interface Array<T> { length: number; [n: number]: T } interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T } type Copy<T> = { [P in keyof T]: T[P] }; type Optional<T> = { [P in keyof T]?: T[P] }; type Read<T> = { readonly [P in keyof T]: T[P] }; type ArrayCopy = Copy<string[]>; type Pair = Copy<[string,number?]>; type Opt = Optional<[string,number]>; type RO = Read<string[]>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "ArrayCopy",
+          "file": "/case.ts",
+          "declaration": "ArrayCopy",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Pair",
+          "file": "/case.ts",
+          "declaration": "Pair",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Opt",
+          "file": "/case.ts",
+          "declaration": "Opt",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "RO",
+          "file": "/case.ts",
+          "declaration": "RO",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "mapped-remap",
+      "files": {
+        "/case.ts": "type Uppercase<S extends string> = intrinsic; type Lowercase<S extends string> = intrinsic; type Capitalize<S extends string> = intrinsic; type Uncapitalize<S extends string> = intrinsic; type Prefix<T> = { [P in keyof T & string as `get${Capitalize<P>}`]: T[P] }; type Result = Prefix<{ name: string; age: number }>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Prefix",
+          "file": "/case.ts",
+          "declaration": "Prefix",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Result",
+          "file": "/case.ts",
+          "declaration": "Result",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

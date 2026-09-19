@@ -8,14 +8,24 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from s04_common import strict_json_loads
-from s08_families import OBSERVATIONS, REQUESTS, requests, validate
+from s08_families import (
+    OBSERVATIONS,
+    REQUESTS,
+    P3_UNPAIRED_FAMILIES,
+    P4_UNPAIRED_FAMILIES,
+    P5_UNPAIRED_FAMILIES,
+    requests,
+    validate,
+)
 from s08_oracle import ROOT
 
 
-def observation(trace):
+def observation(trace, rust=False):
     """A Rust-shaped observation consistent with the frozen Go one."""
     census = {"families": {"union": {"count": 1, "bytes": 8}}, "types": {"created": 1, "reachable": 1, "unreachable_occupied": 0},
               "unavailable": ["checker_ast"]}
+    if rust:
+        census["families"].update({name:{"count":0,"bytes":0} for name in P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES | P5_UNPAIRED_FAMILIES})
     return {"roots": trace["roots"], "named": trace["named"], "counts": trace["counts"], "prefix_counts": trace["prefix_counts"],
             "census": census, "real_counts": trace["real_counts"]}
 
@@ -38,33 +48,45 @@ class S08Families(unittest.TestCase):
 
     def test_matching_observations_validate(self):
         for request, trace in zip(self.spec["traces"], self.frozen["traces"]):
-            ours = observation(trace)
-            validate(request, ours, ours)
+            ours = observation(trace, rust=True)
+            validate(request, ours, observation(trace))
+
+    def test_unpaired_families_cannot_disappear_or_become_paired_silently(self):
+        request, trace = self.spec["traces"][0], self.frozen["traces"][0]
+        go, rust = observation(trace), observation(trace, rust=True)
+        for name in P3_UNPAIRED_FAMILIES | P4_UNPAIRED_FAMILIES | P5_UNPAIRED_FAMILIES:
+            missing = copy.deepcopy(rust)
+            del missing["census"]["families"][name]
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                validate(request, missing, go)
+        with self.assertRaises(ValueError):
+            validate(request, rust, rust)
 
     def test_reordered_missing_or_altered_observations_fail(self):
         request, trace = self.spec["traces"][0], self.frozen["traces"][0]
         go = observation(trace)
-        reordered = copy.deepcopy(go)
+        ours = observation(trace, rust=True)
+        reordered = copy.deepcopy(ours)
         reordered["roots"][0], reordered["roots"][1] = reordered["roots"][1], reordered["roots"][0]
         with self.assertRaises(ValueError):
             validate(request, reordered, go)
-        short = copy.deepcopy(go)
+        short = copy.deepcopy(ours)
         short["roots"] = short["roots"][:-1]
         with self.assertRaises(ValueError):
             validate(request, short, short)
-        renamed = copy.deepcopy(go)
+        renamed = copy.deepcopy(ours)
         renamed["named"]["stringType"]["id"] += 1
         with self.assertRaises(ValueError):
             validate(request, renamed, go)
-        counted = copy.deepcopy(go)
+        counted = copy.deepcopy(ours)
         counted["prefix_counts"]["types"] -= 1
         with self.assertRaises(ValueError):
             validate(request, counted, go)
-        family = copy.deepcopy(go)
+        family = copy.deepcopy(ours)
         family["census"]["families"]["extra"] = {"count": 0, "bytes": 0}
         with self.assertRaises(ValueError):
             validate(request, family, go)
-        stringly = copy.deepcopy(go)
+        stringly = copy.deepcopy(ours)
         stringly["counts"]["types"] = str(stringly["counts"]["types"])
         with self.assertRaises(ValueError):
             validate(request, stringly, go)

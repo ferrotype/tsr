@@ -1,0 +1,259 @@
+{
+  "version": 1,
+  "scope": "S08 remaining P3 conditional and substitution capability capture; no full P3/S08 acceptance claim",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "concrete",
+      "files": {
+        "/case.ts": "type Yes = 1 extends number ? \"yes\" : \"no\"; type No = string extends number ? \"yes\" : \"no\"; type Any = any extends number ? \"yes\" : \"no\"; type Unknown = unknown extends number ? \"yes\" : \"no\"; type Never = never extends number ? \"yes\" : \"no\";\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Yes",
+          "file": "/case.ts",
+          "declaration": "Yes",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "No",
+          "file": "/case.ts",
+          "declaration": "No",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Any",
+          "file": "/case.ts",
+          "declaration": "Any",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Unknown",
+          "file": "/case.ts",
+          "declaration": "Unknown",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Never",
+          "file": "/case.ts",
+          "declaration": "Never",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "distributed",
+      "files": {
+        "/case.ts": "type Choose<T> = T extends string ? { text: T } : { value: T }; type S = Choose<\"a\">; type N = Choose<1>; type Both = Choose<\"a\" | 1>; type Empty = Choose<never>; type Top = Choose<any>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Choose",
+          "file": "/case.ts",
+          "declaration": "Choose",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/case.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "N",
+          "file": "/case.ts",
+          "declaration": "N",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Both",
+          "file": "/case.ts",
+          "declaration": "Both",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Empty",
+          "file": "/case.ts",
+          "declaration": "Empty",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Top",
+          "file": "/case.ts",
+          "declaration": "Top",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "tuple-check",
+      "files": {
+        "/case.ts": "type Same<T> = [T] extends [string] ? T : never; type S = Same<\"x\">; type N = Same<1>; type Both = Same<string | number>; type Any = Same<any>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Same",
+          "file": "/case.ts",
+          "declaration": "Same",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/case.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "N",
+          "file": "/case.ts",
+          "declaration": "N",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Both",
+          "file": "/case.ts",
+          "declaration": "Both",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "Any",
+          "file": "/case.ts",
+          "declaration": "Any",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "constraints",
+      "files": {
+        "/case.ts": "type Filter<T extends { a: string | number }> = T extends { a: string } ? T[\"a\"] : number; type S = Filter<{ a: \"x\" }>; type N = Filter<{ a: 1 }>; type V = Filter<{ a: string | number }>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "Filter",
+          "file": "/case.ts",
+          "declaration": "Filter",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/case.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "N",
+          "file": "/case.ts",
+          "declaration": "N",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "V",
+          "file": "/case.ts",
+          "declaration": "V",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "no-infer",
+      "files": {
+        "/case.ts": "type NoInfer<T> = intrinsic; type A = NoInfer<string>; type B<T> = NoInfer<T>; type C = B<{x: 1}>;\n"
+      },
+      "roots": [
+        "/case.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/case.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/case.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/case.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native lexical this/super and deferred class expression checks; not full P4 acceptance",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "explicit-this",
+      "files": {
+        "/explicit-this.ts": "function f(this: {x: number}) { return this.x; } type T=typeof f;\n"
+      },
+      "roots": [
+        "/explicit-this.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/explicit-this.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "implicit-this",
+      "files": {
+        "/implicit-this.ts": "function f() { return this; } type T=typeof f;\n"
+      },
+      "roots": [
+        "/implicit-this.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/implicit-this.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "global-arrow-this",
+      "files": {
+        "/global-arrow-this.ts": "const f = () => this; type T=typeof f;\n"
+      },
+      "roots": [
+        "/global-arrow-this.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/global-arrow-this.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-this",
+      "files": {
+        "/class-this.ts": "class C { x=1; m() { return this.x; } self() {return this;} static s() {return this;} } type T=C; type M=C[\"m\"]; type S=typeof C;\n"
+      },
+      "roots": [
+        "/class-this.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/class-this.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "M",
+          "file": "/class-this.ts",
+          "declaration": "M",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/class-this.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "nested-this",
+      "files": {
+        "/nested-this.ts": "class C { x=1; m(){ function f(){return this;} return f(); } } type T=C;\n"
+      },
+      "roots": [
+        "/nested-this.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/nested-this.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "super-member",
+      "files": {
+        "/super-member.ts": "class B { m():number{return 1;} static s():number{return 1;} } class C extends B { m(){return super.m();} static s(){return super.s();} } type T=C; type S=typeof C;\n"
+      },
+      "roots": [
+        "/super-member.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/super-member.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "S",
+          "file": "/super-member.ts",
+          "declaration": "S",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "super-no-base",
+      "files": {
+        "/super-no-base.ts": "class C { m(){return super.m();} } type T=C;\n"
+      },
+      "roots": [
+        "/super-no-base.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/super-no-base.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "super-constructor-argument",
+      "files": {
+        "/super-constructor-argument.ts": "class B {m():number{return 1;}} class C extends B { constructor(x=super.m()){super();} } type T=C;\n"
+      },
+      "roots": [
+        "/super-constructor-argument.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/super-constructor-argument.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-expression",
+      "files": {
+        "/class-expression.ts": "const C=class Named { x=1; m(){return this.x;} }; type T=typeof C;\n"
+      },
+      "roots": [
+        "/class-expression.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/class-expression.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "anonymous-class-expression",
+      "files": {
+        "/anonymous-class-expression.ts": "const C=class { x=1; m(){return this.x;} }; type T=typeof C;\n"
+      },
+      "roots": [
+        "/anonymous-class-expression.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/anonymous-class-expression.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "class-expression-errors",
+      "files": {
+        "/class-expression-errors.ts": "const C=class {x:number=\"wrong\";}; type T=typeof C;\n"
+      },
+      "roots": [
+        "/class-expression-errors.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/class-expression-errors.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

@@ -223,6 +223,31 @@ def validate_measurement_prerequisite(report_path, current_source, binaries, cur
     return {**expected, "loaded_input_sha256": loaded_input_digest(frozen["requests"])}
 
 
+def current_capture(report_path):
+    """Reuse only the exact current graph prerequisite, without rewriting it.
+
+    Use the timing consumer's full two-mode checks, including every per-file
+    result. Reading the shared normal binaries must not rebuild them: a later
+    bindworkload ledger run must preserve an existing benchmark's identities.
+    """
+    report_path = Path(report_path)
+    raw = report_path.read_bytes()
+    report = strict_json_loads(raw)
+    if not isinstance(report, dict):
+        raise ValueError("graph capture is not an object")
+    source = source_fingerprint()
+    configuration = cargo_configuration()
+    paths = {runtime: CACHE / "s07-benchmark" / name for runtime, name in
+             (("go", "go-benchmark"), ("rust", "rust-benchmark"))}
+    binaries = {runtime: sha(path.read_bytes()) for runtime, path in paths.items()}
+    validate_measurement_prerequisite(report, source, binaries, configuration)
+    if (source_fingerprint() != source or cargo_configuration() != configuration
+            or any(sha(path.read_bytes()) != binaries[runtime] for runtime, path in paths.items())
+            or report_path.read_bytes() != raw):
+        raise ValueError("graph prerequisites changed during reuse validation")
+    return report
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation",choices=("freeze","capture"));parser.add_argument("--write-manifest",action="store_true")

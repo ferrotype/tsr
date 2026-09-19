@@ -1,0 +1,359 @@
+{
+  "version": 1,
+  "scope": "S08 P4 native property/index values, visibility, flow and indexed diagnostics",
+  "options": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "noLib": true
+  },
+  "programs": [
+    {
+      "id": "private-property",
+      "files": {
+        "/private-property.ts": "class C { private x=1; get(){return this.x;} } declare const c:C; const x=c.x; type T=typeof x;\n"
+      },
+      "roots": [
+        "/private-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/private-property.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "protected-property",
+      "files": {
+        "/protected-property.ts": "class B{protected x=1;}class C extends B{m(b:B,c:C){const a=this.x;const z=c.x;return b.x;}}type T=C;\n"
+      },
+      "roots": [
+        "/protected-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/protected-property.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "readonly-property",
+      "files": {
+        "/readonly-property.ts": "class C{readonly x:number;constructor(){this.x=1;}m(){this.x=2;}}type T=C;\n"
+      },
+      "roots": [
+        "/readonly-property.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/readonly-property.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "property-initializer-order",
+      "files": {
+        "/property-initializer-order.ts": "class C{x=this.y;y=1;}type T=C;\n"
+      },
+      "roots": [
+        "/property-initializer-order.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/property-initializer-order.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "super-class-field",
+      "files": {
+        "/super-class-field.ts": "class B{x=1;}class C extends B{m(){return super.x;}}type T=C;\n"
+      },
+      "roots": [
+        "/super-class-field.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/super-class-field.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-enum",
+      "files": {
+        "/indexed-enum.ts": "enum E{A,B=2,C=2}const a=E[\"C\"];const b=E[E.A];type A=typeof a;type B=typeof b;\n"
+      },
+      "roots": [
+        "/indexed-enum.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/indexed-enum.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/indexed-enum.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-const-enum",
+      "files": {
+        "/indexed-const-enum.ts": "const enum E{A}declare const key:\"A\";const a=E[key];type A=typeof a;\n"
+      },
+      "roots": [
+        "/indexed-const-enum.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/indexed-const-enum.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-tuple",
+      "files": {
+        "/indexed-tuple.ts": "declare const t:readonly [string,number];const a=t[0];const b=t[2];t[0]=\"s\";type A=typeof a;type B=typeof b;\n"
+      },
+      "roots": [
+        "/indexed-tuple.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/indexed-tuple.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/indexed-tuple.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-signature",
+      "files": {
+        "/indexed-signature.ts": "declare let t:{readonly [k:string]:number};const a=t[\"x\"];t[\"y\"]=1;type A=typeof a;\n"
+      },
+      "roots": [
+        "/indexed-signature.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/indexed-signature.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-missing",
+      "files": {
+        "/indexed-missing.ts": "declare const t:{alpha:number};const a=t[\"alhpa\"];const b=t[\"other\"];declare const key:string;const c=t[key];type A=typeof a;type B=typeof b;type C=typeof c;\n"
+      },
+      "roots": [
+        "/indexed-missing.ts"
+      ],
+      "queries": [
+        {
+          "id": "A",
+          "file": "/indexed-missing.ts",
+          "declaration": "A",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "B",
+          "file": "/indexed-missing.ts",
+          "declaration": "B",
+          "target": "name",
+          "operation": "declared_type"
+        },
+        {
+          "id": "C",
+          "file": "/indexed-missing.ts",
+          "declaration": "C",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "indexed-union-key",
+      "files": {
+        "/indexed-union-key.ts": "declare const t:{a:number;b:string};declare const k:\"a\"|\"b\";const v=t[k];type T=typeof v;\n"
+      },
+      "roots": [
+        "/indexed-union-key.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/indexed-union-key.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "property-setter-write",
+      "files": {
+        "/property-setter-write.ts": "declare class C{get x():number;set x(v:number|string);}declare let c:C;c.x=\"s\";const v=c.x;type T=typeof v;\n"
+      },
+      "roots": [
+        "/property-setter-write.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/property-setter-write.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "access-static-suggestion",
+      "files": {
+        "/main.ts": "class C{static x=1;}declare const c:C;const x=c.x;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "access-private-suggestion-outside",
+      "files": {
+        "/main.ts": "class C{private length=1;}declare const c:C;const x=c.lenght;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "access-private-suggestion-inside",
+      "files": {
+        "/main.ts": "class C{private length=1;f(){return this.lenght;}}type T=C;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    },
+    {
+      "id": "access-private-hash-suggestion-outside",
+      "files": {
+        "/main.ts": "class C{#length=1;f(){return 1;}}declare const c:C;const x=c.lenght;type T=typeof x;"
+      },
+      "roots": [
+        "/main.ts"
+      ],
+      "queries": [
+        {
+          "id": "T",
+          "file": "/main.ts",
+          "declaration": "T",
+          "target": "name",
+          "operation": "declared_type"
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "id": "shared-interface-checker-local-merges",
+    "files": {
+      "/base.ts": "interface Shared { base: string }\n",
+      "/a.ts": "interface Shared { a: number }\n",
+      "/b.ts": "interface Shared { b: boolean }\n"
+    },
+    "shared": "/base.ts",
+    "symbol": "Shared",
+    "modes": [
+      "single-checker",
+      "repeated",
+      "separate-checker",
+      "concurrent"
+    ],
+    "single_roots": [
+      "/base.ts",
+      "/a.ts",
+      "/b.ts"
+    ],
+    "independent_roots": {
+      "A": [
+        "/base.ts",
+        "/a.ts"
+      ],
+      "B": [
+        "/base.ts",
+        "/b.ts"
+      ]
+    }
+  }
+}

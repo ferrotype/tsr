@@ -7,8 +7,10 @@
 # Nothing is committed back; evidence in the repository is captured and reviewed locally.
 #
 # The workflow requires S01/S03/S04/S05/S06 and quality checks independently of unfinished sprints.
-# The matrices cover the four ADR 0002 targets: macos-15 (arm64), macos-15-intel (x86_64),
-# ubuntu-24.04 (x86_64) and ubuntu-24.04-arm (arm64).
+# Temporarily reduced at the owner's request (2026-09-13) to macos-15 (arm64)
+# and ubuntu-24.04 (x86_64) while CI is overloaded. ADR 0002's supported targets
+# are unchanged. Restore macos-15-intel and ubuntu-24.04-arm in both matrices
+# when the temporary runner pause ends.
 name: status
 
 on:
@@ -52,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-15-intel, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -75,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-15-intel, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [macos-15, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -176,6 +178,11 @@ jobs:
           cargo test -p ts_testhost --locked --release
           python3 -m unittest discover -s scripts/tests -p test_s11.py
           cargo xtask run testhost
+      - name: Navigation and formatter contracts in debug and release
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: |
+          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked
+          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked --release
       - name: Native allocator build and original-request accounting
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
@@ -199,6 +206,9 @@ jobs:
       - name: Text leaves against the pinned Go oracle
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run e4
+      - name: Checker literal types and printer bytes against pinned Go
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: cargo xtask run checkertext
       - name: Regeneration drift and original client byte parity
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: cargo xtask run gen
@@ -227,6 +237,8 @@ jobs:
         run: |
           cargo xtask check-metrics \
             'run.workspace.build == true' \
+            'run.checkertext.token_literal_bytes == true' \
+            'run.checkertext.helper_printer_semantics == true' \
             'run.oracle.build == true' \
             'run.oracle.smoke == true' \
             'run.fmt.clean == true' \
@@ -271,6 +283,14 @@ jobs:
             'run.e2.frozen_subset == true' \
             'run.e3.shared_bound_file == true' \
             'run.e3.retained_snapshot_edit == true' \
+            'run.e3.shared_pool_panic_retirement == true' \
+            'run.e3.release_boundaries == true' \
+            'run.e3.api_print_scratch_disposal == true' \
+            'run.e3.api_scratch_disposal == true' \
+            'run.e3.checker_result_retention == true' \
+            'run.e3.checker_ast_retention == true' \
+            'run.e3.builder_cache_retention == true' \
+            'run.e3.independent_checker_merges == true' \
             'run.e3.ast_runtime == true' \
             'run.e3.id_exhaustion == true' \
             'run.e3.wrong_owner_rejected == true' \
@@ -310,6 +330,7 @@ jobs:
             status/unmapped-functions.json
             docs/status.html
             status/evidence/
+            target/s08/checkertext-*/
             target/s05-reports/
             target/s06-reports/
             target/s07-binder-reports/
@@ -317,3 +338,56 @@ jobs:
             target/s07-subset/review/review-payload.json
             target/s11-reports/
           if-no-files-found: error
+
+  embedding:
+    name: bare wasm and external Rust embedding
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install pinned Rust and bare wasm target
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup target add wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Read JS ABI and Node pins
+        id: pins
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          print('bindgen=' + json.loads(Path('tools/s10/toolchains.json').read_text())['wasm_bindgen'])
+          print('node=' + json.loads(Path('upstream/package.json').read_text())['volta']['node'])
+          PY
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ steps.pins.outputs.node }}
+      - name: Install matching wasm-bindgen CLI
+        run: cargo install wasm-bindgen-cli --version "${{ steps.pins.outputs.bindgen }}" --locked
+      - name: Build and exercise the shipped parser
+        run: |
+          optimizer=$(python3 scripts/s10_toolchain.py)
+          python3 scripts/s10_build.py --wasm-bindgen "$(command -v wasm-bindgen)" --wasm-opt "$optimizer"
+          cargo build --locked --release -p ts_wasm --example parser
+          mapfile -t node_flags < <(python3 -c 'import json; print("\n".join(json.load(open("tools/s10/toolchains.json"))["node_flags"]))')
+          node "${node_flags[@]}" tools/s10/wasm/test.mjs target/s10/parser
+      - name: Build and exercise the shipped portable checker
+        run: |
+          python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
+          cargo build --locked --release -p ts_wasm --example parser
+          # rust-cache restores target/, including old or emptied capture dirs.
+          # Keep fresh evidence outside that cache and never overwrite a capture.
+          python3 scripts/s10_measure.py capture --kind portable --output "$RUNNER_TEMP/s10-portable-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+      - name: External consumer ownership in debug and release
+        if: ${{ !cancelled() }}
+        run: |
+          cargo test --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target --test lifetime
+          cargo test --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target --test lifetime --release
+      - name: Preserve portable observations even on failure
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: s10-portable
+          # Include the authenticated artifact bundle needed for replay.
+          path: ${{ runner.temp }}/s10-portable-${{ github.run_id }}-${{ github.run_attempt }}/

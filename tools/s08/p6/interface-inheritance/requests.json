@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "programs": [
+    {
+      "id": "property-override",
+      "files": {
+        "/main.ts": "interface A { x: string } interface B extends A { x: number }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "call-and-construct",
+      "files": {
+        "/main.ts": "interface A { (x: string): string; new(x: string): A } interface B extends A { (x: string): number; new(x: string): B }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "index-override",
+      "files": {
+        "/main.ts": "interface A { [x: string]: string } interface B extends A { [x: string]: number }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "multiple-identities",
+      "files": {
+        "/main.ts": "interface A { x: string; y?: number } interface B { x: number; y: number } interface C extends A, B {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "readonly-identities",
+      "files": {
+        "/main.ts": "interface A { readonly x: string } interface B { x: string } interface C extends A, B {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "private-identities",
+      "files": {
+        "/main.ts": "declare class A { private x: string } declare class B { private x: string } interface C extends A, B {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "own-property-shadows-bases",
+      "files": {
+        "/main.ts": "interface A { x: string } interface B { x: number } interface C extends A, B { x: boolean }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "own-property-resolves-bases",
+      "files": {
+        "/main.ts": "interface A { x: string | number } interface B { x: string } interface C extends A, B { x: string }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "conflict-suppresses-base-and-index-checks",
+      "files": {
+        "/main.ts": "interface A { x: string; [n: string]: string } interface B { x: number } interface C extends A, B { y: number; [n: number]: number }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "conflict-keeps-member-and-duplicate-index-checks",
+      "files": {
+        "/main.ts": "interface A { x: string } interface B { x: number } interface C extends A, B { y: Missing; [n: string]: string; [n: string]: string }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "merged-interface-once",
+      "files": {
+        "/main.ts": "interface A { x: string } interface B extends A {} interface B { x: number }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "merged-base-conflict",
+      "files": {
+        "/main.ts": "interface A { x: string } interface B { x: number } interface C extends A {} interface C extends B {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "generic-and-polymorphic-this",
+      "files": {
+        "/main.ts": "interface A<T> { x: T; self: this } interface B<T> extends A<T> { x: number } interface Good<T> extends A<T> { self: this }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "generic-base-constraints",
+      "files": {
+        "/main.ts": "interface A<T extends string> { x: T } interface B extends A<number> {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "merged-type-parameters",
+      "files": {
+        "/main.ts": "interface A<T> {} interface A<U> {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "compatible-diamond",
+      "files": {
+        "/main.ts": "interface A { x: string; next: this } interface B extends A {} interface C extends A {} interface D extends B, C {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "recursive-bases",
+      "files": {
+        "/main.ts": "interface A extends B {} interface B extends A {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "heritage-expression",
+      "files": {
+        "/main.ts": "declare function A(): {}; interface B extends A() {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "merged-index-diagnostics",
+      "files": {
+        "/main.ts": "interface A { [s: string]: string } interface A { [s: string]: string; x: number }\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "merged-class-interface-bases",
+      "files": {
+        "/main.ts": "abstract class A { abstract x: number } interface GoodMembers { x: number } class Good extends A {} interface Good extends GoodMembers {} interface BadMembers { x: string } class Bad extends A {} interface Bad extends BadMembers {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "implements-clause",
+      "files": {
+        "/main.ts": "interface A {} interface B implements A {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "duplicate-extends-clause",
+      "files": {
+        "/main.ts": "interface A {} interface C extends A extends Missing {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "empty-extends-clause",
+      "files": {
+        "/main.ts": "interface A extends {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "trailing-extends-comma",
+      "files": {
+        "/main.ts": "interface A {} interface B extends A, {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    },
+    {
+      "id": "heritage-modifier-error-first",
+      "files": {
+        "/main.ts": "declare async interface A implements B {}\n"
+      },
+      "roots": [
+        "/main.ts"
+      ]
+    }
+  ]
+}

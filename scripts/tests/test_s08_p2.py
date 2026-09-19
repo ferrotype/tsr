@@ -68,6 +68,19 @@ class P2Protocol(unittest.TestCase):
         spec,_=self.fixture();spec['merge']['modes']=MODES[:-1]
         with self.assertRaises(ValueError):specification(spec)
 
+    def test_library_policy_and_summary_do_not_weaken_full_queries(self):
+        spec,observed=self.fixture()
+        spec['options']={'target':'ESNext','module':'ESNext','strict':True,'noLib':False,'skipLibCheck':True}
+        specification(spec)
+        first=spec['programs'][0]['queries'][0]
+        first['operation']='declared_type_summary'; first['target']='name'
+        observed['request_sha256']=digest(canonical(spec)+b'\n')
+        del observed['programs'][0]['queries'][0]['type']['properties']
+        self.assertEqual(validate(spec,observed),[])
+        first['operation']='declared_type'
+        observed['request_sha256']=digest(canonical(spec)+b'\n')
+        with self.assertRaises(ValueError):validate(spec,observed)
+
     def test_missing_queries_and_reordered_programs_fail(self):
         spec,observed=self.fixture();observed['programs'][0]['queries'].pop()
         with self.assertRaises(ValueError):validate(spec,observed)
