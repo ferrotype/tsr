@@ -39,7 +39,7 @@ config = "debug; all targets and features; -D warnings"
 [deny]
 command = ["python3", "scripts/checks.py", "deny"]
 inputs = ["deny.toml", "Cargo.lock"]
-sources = ["crates/**", "xtask/**", "Cargo.*", "deny.toml", "scripts/checks.py"]
+sources = ["crates/**", "xtask/**", "tools/**/Cargo.toml", "Cargo.*", "deny.toml", "scripts/checks.py"]
 target = "host"
 config = "advisories, licenses, bans, sources"
 
