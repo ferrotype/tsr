@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Capture S11 subprocess transport contracts and pinned Go host observations."""
 import argparse
+import base64
 import hashlib
 import io
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -164,56 +166,46 @@ def expect_progress(message, request, callback, phase):
 
 
 def initialize_peer(peer, fixture, plugins=None):
-    params = {"version":1, "caseSensitive":fixture.get("caseSensitive", True),
+    params = {"version":2, "caseSensitive":fixture.get("caseSensitive", True),
               "base":fixture.get("base", {}), "symlinks":fixture.get("symlinks", {}),
               "callbacks":[fixture["operation"]] if fixture.get("enabled") else [],
               "options":{}, "plugins":plugins or []}
     peer.send({"jsonrpc":"2.0", "id":1, "method":"test/initialize", "params":params})
-    begin, callback = peer.read(), peer.read()
-    expect_progress(begin, 1, callback["id"], "begin")
-    if not same_json_value(callback, {"jsonrpc":"2.0","id":callback["id"],
-                                     "method":"testhost/configuration","params":{"options":{}}}):
-        raise ValueError("configuration callback mismatch")
-    peer.send({"jsonrpc":"2.0", "id":callback["id"], "result":{"ready":True}})
-    expect_progress(peer.read(), 1, callback["id"], "end")
     result, signal = peer.read(), peer.read()
-    state = {"version":1,"caseSensitive":params["caseSensitive"],"options":{},
+    state = {"version":2,"caseSensitive":params["caseSensitive"],"options":{},
              "plugins":[{**p,"state":"registered"} for p in params["plugins"]]}
     check_response(result, 1, {"result":state})
-    if signal != {"jsonrpc":"2.0", "method":"testhost/initialized", "params":{"version":1}}:
+    if signal != {"jsonrpc":"2.0", "method":"testhost/initialized", "params":{"version":2}}:
         raise ValueError("initialization signal mismatch")
 
 
 def mapper_rows(binary, fixtures, observations):
     from s11_contracts import Peer
+    from s11_tunnel import open_stream, write_bytes, read_bytes, close_stream, CHUNK
     rows = []
     for fixture in fixtures:
         row = {"id":"mapper/" + fixture["id"], "category":"go-mapper", "pass":False}
         peer = Peer(binary, [])
         try:
             initialize_peer(peer, {}, [{"name":fixture["mapper"], "options":{}}])
+            peer.next_id = 2
             observation = observations[fixture["id"]]
-            if len(observation["responses"]) != len(fixture["requests"]):
-                raise ValueError("mapper oracle request coverage mismatch")
-            requests = [{"method":"spawn", "params":{}}, *fixture["requests"], {"method":"dispose", "params":{}}]
-            responses = [{"result":None}, *observation["responses"], {"result":None}]
-            for request_id, (request, response) in enumerate(zip(requests, responses), 2):
-                params = {"name":fixture["mapper"], **request}
-                peer.send({"jsonrpc":"2.0", "id":request_id, "method":"test/plugin", "params":params})
-                begin, callback = peer.read(), peer.read()
-                expect_progress(begin, request_id, callback["id"], "begin")
-                if not same_json_value(callback, {"jsonrpc":"2.0","id":callback["id"],
-                        "method":"testhost/plugin","params":{**params,"options":{}}}):
-                    raise ValueError("mapper payload changed across callback")
-                if ("result" in response) == ("error" in response):
-                    raise ValueError("mapper oracle must return exactly one result/error")
-                peer.send({"jsonrpc":"2.0", "id":callback["id"], **response})
-                expect_progress(peer.read(), request_id, callback["id"], "end")
-                actual = peer.read()
-                check_response(actual, request_id, response)
-            peer.send({"jsonrpc":"2.0", "id":100, "method":"test/shutdown", "params":{}})
-            if peer.read() != {"jsonrpc":"2.0", "id":100, "result":None}:
-                raise ValueError("mapper shutdown mismatch")
+            validate_mapper_bytes(fixture, observation)
+            stream = open_stream(peer, fixture["mapper"])
+            measured = {}
+            for key, transfer in (("server_bytes", write_bytes), ("plugin_bytes", read_bytes)):
+                data = base64.b64decode(observation[key], validate=True)
+                # First fragment cuts the native Content-Length header; subsequent
+                # chunks can cross frame boundaries. Compare concatenated bytes.
+                chunks = [data[:3]] + [data[i:i+CHUNK] for i in range(3, len(data), CHUNK)]
+                actual = b"".join(transfer(peer, stream, chunk) for chunk in chunks if chunk)
+                if actual != data:
+                    raise ValueError("mapper tunnel changed " + key)
+                measured[key] = {"bytes":len(actual), "sha256":hashlib.sha256(actual).hexdigest()}
+            row["streams"] = measured
+            close_stream(peer, stream)
+            identity = peer.request("test/shutdown", {})
+            peer.result(identity, None)
             peer.finish()
             row["pass"] = True
         except Exception as error:
@@ -225,13 +217,57 @@ def mapper_rows(binary, fixtures, observations):
     return rows
 
 
+def mapper_messages(encoded):
+    """Validate complete native frames without serializing their bytes again."""
+    data = base64.b64decode(encoded, validate=True)
+    messages = []
+    while data:
+        header, separator, rest = data.partition(b"\r\n\r\n")
+        if not separator or not header.startswith(b"Content-Length: ") or not header[16:].isdigit():
+            raise ValueError("invalid native mapper framing")
+        length = int(header[16:])
+        if length <= 0 or length > len(rest):
+            raise ValueError("truncated native mapper frame")
+        messages.append(strict_json_loads(rest[:length]))
+        data = rest[length:]
+    return messages
+
+
+def validate_mapper_bytes(fixture, observation):
+    requests = mapper_messages(observation["server_bytes"])
+    responses = mapper_messages(observation["plugin_bytes"])
+    if len(requests) != len(fixture["requests"]) or len(responses) != len(requests) or len(observation["responses"]) != len(requests):
+        raise ValueError("native byte capture lost a mapper exchange")
+    for index, (request, response, expected, outcome) in enumerate(zip(requests, responses, fixture["requests"], observation["responses"])):
+        identity = f"{fixture['id']}:{index}"
+        if not same_json_value(request, {"jsonrpc":"2.0", "id":identity, **expected}):
+            raise ValueError("native bytes differ from frozen mapper requests")
+        if not same_json_value(response, {"jsonrpc":"2.0", "id":identity, **outcome}):
+            raise ValueError("native byte capture differs from parsed mapper outcome")
+
+
+def hook_rows():
+    """Execute the delayed internal hook through the real Session API."""
+    cases = strict_json_loads((ROOT / "data/s11/hook-cases.json").read_bytes())
+    inventory([case["id"] for case in cases], "internal cases")
+    tests = inventory([case["test"] for case in cases], "internal test names")
+    output = command(["cargo", "test", "-p", "ts_testhost", "--locked", "--lib", "session::tests::", "--", "--color=never"])
+    (REPORTS / "internal-hook.stdout").write_bytes(output)
+    outcomes = re.findall(r"^test (session::tests::\w+) \.\.\. (\w+)$", output.decode(), re.MULTILINE)
+    if len(outcomes) != len(tests) or set(name for name, _ in outcomes) != set(tests):
+        raise ValueError("internal hook test inventory missing, extra or duplicated")
+    observed = dict(outcomes)
+    return [{"id":case["id"], "category":"internal-contract", "pass":observed[case["test"]] == "ok",
+             "test":case["test"], "output_sha256":hashlib.sha256(output).hexdigest()} for case in cases]
+
+
 def summarize(rows, cases):
     actual = inventory([r["id"] for r in rows], "measured cases")
     if actual != inventory(cases, "frozen cases"):
         raise ValueError("measured S11 inventory differs from frozen ordered cases")
     if any(type(r.get("pass")) is not bool for r in rows):
         raise ValueError("case outcomes must be measured booleans")
-    controls = [r for r in rows if r["category"] in ("controls", "go-mapper")]
+    controls = [r for r in rows if r["category"] in ("controls", "go-mapper", "internal-contract")]
     if not controls:
         raise ValueError("empty controls inventory")
     return {"metrics":{"controls":all(r["pass"] for r in controls)},
@@ -245,12 +281,13 @@ def capture():
     binary = rust_binary()
     fixtures = {kind:strict_json_loads((ROOT / f"data/s11/{kind}-fixtures.json").read_bytes()) for kind in ("fs", "mapper")}
     observations = {kind:validate_observations(fixtures[kind], strict_json_loads((REPORTS / f"go-{kind}.json").read_bytes()), kind) for kind in fixtures}
-    rows = fs_rows(binary, fixtures["fs"], observations["fs"]) + mapper_rows(binary, fixtures["mapper"], observations["mapper"]) + run(binary)
+    rows = fs_rows(binary, fixtures["fs"], observations["fs"]) + mapper_rows(binary, fixtures["mapper"], observations["mapper"]) + run(binary) + hook_rows()
     cases = strict_json_loads((ROOT / "data/s11/cases.json").read_bytes())
     summary = summarize(rows, cases)
     report = {"scope":"S11 transport only; no language-service or fourslash semantic assertions",
               "binary_sha256":hashlib.sha256(binary.read_bytes()).hexdigest(),
-              "oracle":observations, "rows":rows, "summary":summary}
+              "oracle":observations, "rows":rows, "summary":summary,
+              "internal_hook_output":(REPORTS / "internal-hook.stdout").read_text()}
     write(REPORTS / "report.json", report)
     print(json.dumps(report, sort_keys=True), file=sys.stderr)
     return summary

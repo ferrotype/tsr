@@ -1,0 +1,26 @@
+[
+  {
+    "id": "internal/internal-options-barrier-blocks-new-work-and-publishes-only-at-completion",
+    "test": "session::tests::internal_options_barrier_blocks_new_work_and_publishes_only_at_completion"
+  },
+  {
+    "id": "internal/canceled-options-hold-barrier-until-unapplied-or-committed-outcome",
+    "test": "session::tests::canceled_options_hold_barrier_until_unapplied_or_committed_outcome"
+  },
+  {
+    "id": "internal/failed-initialization-retries-and-tokens-do-not-alias-across-sessions-or-shutdown",
+    "test": "session::tests::failed_initialization_retries_and_tokens_do_not_alias_across_sessions_or_shutdown"
+  },
+  {
+    "id": "internal/canceled-callback-cannot-complete-reused-id-or-conflict-with-directional-ids",
+    "test": "session::tests::canceled_callback_cannot_complete_reused_id_or_conflict_with_directional_ids"
+  },
+  {
+    "id": "internal/exact-opaque-numbers-survive-internal-options-commit",
+    "test": "session::tests::exact_opaque_numbers_survive_internal_options_commit"
+  },
+  {
+    "id": "internal/non-lsp-ids-and-duplicate-live-ids-are-terminal",
+    "test": "session::tests::non_lsp_ids_and_duplicate_live_ids_are_terminal"
+  }
+]

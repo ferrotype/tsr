@@ -37,8 +37,29 @@ type s11MapperResponse struct {
 }
 
 type s11MapperObservation struct {
-	ID        string              `json:"id"`
-	Responses []s11MapperResponse `json:"responses"`
+	ID          string              `json:"id"`
+	Responses   []s11MapperResponse `json:"responses"`
+	ServerBytes []byte              `json:"server_bytes"`
+	PluginBytes []byte              `json:"plugin_bytes"`
+}
+
+// Record actual successful IO bytes before the mapper protocol parses them.
+// Read boundaries are deliberately not part of the comparison.
+type s11RecordingStream struct {
+	io.ReadWriteCloser
+	sent     bytes.Buffer
+	received bytes.Buffer
+}
+
+func (s *s11RecordingStream) Write(p []byte) (int, error) {
+	n, err := s.ReadWriteCloser.Write(p)
+	s.sent.Write(p[:n])
+	return n, err
+}
+func (s *s11RecordingStream) Read(p []byte) (int, error) {
+	n, err := s.ReadWriteCloser.Read(p)
+	s.received.Write(p[:n])
+	return n, err
 }
 
 func s11ObserveMapper(t *testing.T, fixture s11MapperFixture) s11MapperObservation {
@@ -58,7 +79,8 @@ func s11ObserveMapper(t *testing.T, fixture s11MapperFixture) s11MapperObservati
 	if !ok {
 		t.Fatal("S11 mapper spawner no longer supports bounded pipe operations")
 	}
-	protocol := ipc.NewJSONRPCProtocol(conn)
+	recorded := &s11RecordingStream{ReadWriteCloser: conn}
+	protocol := ipc.NewJSONRPCProtocol(recorded)
 	observation := s11MapperObservation{ID: fixture.ID, Responses: []s11MapperResponse{}}
 	for index, request := range fixture.Requests {
 		if request.Method == "" || len(request.Params) == 0 {
@@ -88,6 +110,8 @@ func s11ObserveMapper(t *testing.T, fixture s11MapperFixture) s11MapperObservati
 			Result: response.Result, Error: response.Error,
 		})
 	}
+	observation.ServerBytes = recorded.sent.Bytes()
+	observation.PluginBytes = recorded.received.Bytes()
 	return observation
 }
 

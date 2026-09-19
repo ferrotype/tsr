@@ -254,7 +254,7 @@ class Peer:
 
 
 def configuration(**changes):
-    value = {"version": 1, "caseSensitive": False, "base": {}, "symlinks": {},
+    value = {"version": 2, "caseSensitive": False, "base": {}, "symlinks": {},
              "callbacks": [], "options": {}, "plugins": []}
     value.update(changes)
     return value
@@ -262,7 +262,7 @@ def configuration(**changes):
 
 def state(config, states=None):
     states = states or {}
-    return {"version": 1, "caseSensitive": config["caseSensitive"],
+    return {"version": 2, "caseSensitive": config["caseSensitive"],
             "options": config["options"],
             "plugins": [dict(plugin, state=states.get(plugin["name"], "registered"))
                         for plugin in config["plugins"]]}
@@ -271,9 +271,8 @@ def state(config, states=None):
 def initialize(peer, config=None):
     config = config or configuration()
     identity = peer.request("test/initialize", config)
-    callback = peer.begin(identity, "testhost/configuration", {"options": config["options"]})
-    peer.complete(identity, callback, {"ready": True}, state(config))
-    peer.notification("testhost/initialized", {"version": 1})
+    peer.result(identity, state(config))
+    peer.notification("testhost/initialized", {"version": 2})
     return config
 
 
@@ -287,15 +286,6 @@ def start_fs(peer, operation="readFile", path="/file.ts"):
     return identity, callback
 
 
-def plugin_call(peer, method, params=None, name="mapper", options=None):
-    params = {} if params is None else params
-    identity = peer.request("test/plugin", {"name": name, "method": method, "params": params})
-    callback = peer.begin(identity, "testhost/plugin",
-                          {"name": name, "method": method, "params": params,
-                           "options": {} if options is None else options})
-    return identity, callback
-
-
 def cancel(peer, identity, callback, *, plugin=None):
     peer.notify("$/cancelRequest", {"id": identity})
     peer.notification("$/cancelRequest", {"id": callback})
@@ -303,69 +293,6 @@ def cancel(peer, identity, callback, *, plugin=None):
         peer.notification("testhost/retirePlugin", {"name": plugin})
     peer.end(identity, callback)
     peer.error(identity, -32800)
-
-
-def initialization_barrier(peer, _):
-    config = configuration(options={"strict": True, "label": "é😀"})
-    identity = peer.request("test/initialize", config)
-    callback = peer.begin(identity, "testhost/configuration", {"options": config["options"]})
-    peer.error(peer.request("test/state", {}), -32002)
-    peer.error(peer.request("test/fs", {"operation": "readFile", "path": "/x"}), -32002)
-    peer.complete(identity, callback, {"ready": True}, state(config))
-    peer.notification("testhost/initialized", {"version": 1})
-    check_state(peer, config)
-
-
-def configuration_failure_retry(peer, _):
-    config = configuration()
-    identity = peer.request("test/initialize", config)
-    callback = peer.begin(identity, "testhost/configuration", {"options": {}})
-    remote = {"code": 701, "message": "configuration unavailable", "data": {"attempt": 1}}
-    peer.reply(callback, error=remote)
-    peer.end(identity, callback)
-    peer.error(identity, -32001, remote=remote)
-    peer.error(peer.request("test/state", {}), -32002)
-    initialize(peer, config)
-
-
-def configuration_malformed_ready(peer, _):
-    identity = peer.request("test/initialize", configuration())
-    callback = peer.begin(identity, "testhost/configuration", {"options": {}})
-    peer.reply(callback, {"ready": True, "extra": 1})
-    peer.finish(failure=True)
-    require(b"invalid configuration acknowledgment" in peer.errors,
-            "ambiguous configuration acknowledgment must retire the session")
-
-
-def options_roundtrip(peer, _):
-    config = initialize(peer, configuration(options={"strict": False}))
-    replacement = {"strict": True, "target": "ESNext", "nested": {"values": [None, "😀"]}}
-    identity = peer.request("test/setOptions", {"options": replacement})
-    callback = peer.begin(identity, "testhost/configuration", {"options": replacement})
-    check_state(peer, config)
-    peer.complete(identity, callback, {"ready": True}, {"options": replacement})
-    config["options"] = replacement
-    check_state(peer, config)
-    identity = peer.request("test/setOptions", {"options": {"strict": False}})
-    callback = peer.begin(identity, "testhost/configuration", {"options": {"strict": False}})
-    remote = {"code": 702, "message": "rejected options"}
-    peer.reply(callback, error=remote)
-    peer.end(identity, callback)
-    peer.error(identity, -32001, remote=remote)
-    check_state(peer, config)
-
-
-def lifecycle_validation(peer, _):
-    peer.error(peer.request("test/setOptions", {"options": {}}), -32002)
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
-               -32002)
-    peer.error(peer.request("test/initialize", configuration(version=2)), -32602)
-    peer.error(peer.request("test/initialize", configuration(options=[])), -32602)
-    peer.error(peer.request("test/initialize", configuration(callbacks=["readFile", "readFile"])),
-               -32602)
-    initialize(peer)
-    peer.error(peer.request("test/initialize", configuration()), -32002)
-    peer.error(peer.request("test/unknown", {}), -32601)
 
 
 def all_callbacks(peer, _):
@@ -412,15 +339,6 @@ def cancellation_late_response(peer, _):
     peer.complete(identity, callback, {"content": "next"}, {"content": "next"})
 
 
-def initialization_cancel_retry(peer, _):
-    identity = peer.request("test/initialize", configuration())
-    callback = peer.begin(identity, "testhost/configuration", {"options": {}})
-    cancel(peer, identity, callback)
-    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
-    peer.error(peer.request("test/state", {}), -32002)
-    initialize(peer)
-
-
 def remote_error_no_fallback(peer, _):
     initialize(peer, configuration(base={"/file.ts": "base must not leak"}, callbacks=["readFile"]))
     identity, callback = start_fs(peer)
@@ -447,80 +365,6 @@ def options_busy(peer, _):
     peer.complete(identity, callback, {"content": "done"}, {"content": "done"})
 
 
-def options_blocks_new_work(peer, _):
-    config = initialize(peer, configuration(callbacks=["readFile"], options={"strict": False},
-                                            plugins=[{"name": "mapper", "options": {}}]))
-    identity = peer.request("test/setOptions", {"options": {"strict": True}})
-    callback = peer.begin(identity, "testhost/configuration", {"options": {"strict": True}})
-    peer.error(peer.request("test/fs", {"operation": "readFile", "path": "/file.ts"}), -32002)
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
-               -32002)
-    check_state(peer, config)
-    peer.complete(identity, callback, {"ready": True}, {"options": {"strict": True}})
-    config["options"] = {"strict": True}
-    check_state(peer, config)
-    identity, callback = start_fs(peer)
-    peer.complete(identity, callback, {"content": "ok"}, {"content": "ok"})
-    identity, callback = plugin_call(peer, "spawn")
-    peer.complete(identity, callback, None, None)
-
-
-def canceled_options_barrier(peer, _):
-    config = initialize(peer, configuration(callbacks=["readFile"], options={"strict": False},
-                                            plugins=[{"name": "mapper", "options": {}}]))
-    identity = peer.request("test/setOptions", {"options": {"strict": True}})
-    callback = peer.begin(identity, "testhost/configuration", {"options": {"strict": True}})
-    cancel(peer, identity, callback)
-    check_state(peer, config)
-    peer.error(peer.request("test/fs", {"operation": "readFile", "path": "/file.ts"}), -32002)
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
-               -32002)
-    peer.error(peer.request("test/setOptions", {"options": {}}), -32002)
-    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
-    check_state(peer, config)
-    identity, callback = start_fs(peer)
-    peer.complete(identity, callback, {"content": "after acknowledgment"},
-                  {"content": "after acknowledgment"})
-    identity, callback = plugin_call(peer, "spawn")
-    peer.complete(identity, callback, None, None)
-
-
-def canceled_initialization_barrier(peer, _):
-    identity = peer.request("test/initialize", configuration(options={"attempt": 1}))
-    callback = peer.begin(identity, "testhost/configuration", {"options": {"attempt": 1}})
-    cancel(peer, identity, callback)
-    peer.error(peer.request("test/initialize", configuration(options={"attempt": 2})), -32002)
-    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
-    peer.error(peer.request("test/state", {}), -32002)
-    initialize(peer, configuration(options={"attempt": 2}))
-
-
-def options_reserve_plugin_state_capacity(peer, _):
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": {}}]))
-    for method, result in [("spawn", None), ("initialize", {})]:
-        identity, callback = plugin_call(peer, method)
-        peer.complete(identity, callback, result, result)
-    peer.next_id = 9007199254740970
-    prospective = copy.deepcopy(config)
-    prospective["options"] = {"padding": ""}
-    envelope = {"jsonrpc": "2.0", "id": 9007199254740991,
-                "result": state(prospective, {"mapper": "ready"})}
-    prospective["options"]["padding"] = "x" * (MAX_BODY - 2 - len(json_bytes(envelope)))
-    envelope["result"] = state(prospective, {"mapper": "ready"})
-    equal(len(json_bytes(envelope)), MAX_BODY - 2)
-    # A later dispose changes "ready" to the longer "registered". Accepting
-    # these options would strand test/state after a successful lifecycle call.
-    envelope["result"] = state(prospective)
-    require(len(json_bytes(envelope)) > MAX_BODY, "fixture must overflow the registered state")
-    identity = peer.request("test/setOptions", {"options": prospective["options"]})
-    # Reject before any configuration callback or progress notification escapes.
-    peer.error(identity, -32602)
-    check_state(peer, config, {"mapper": "ready"})
-    identity, callback = plugin_call(peer, "dispose")
-    peer.complete(identity, callback, None, None)
-    check_state(peer, config)
-
-
 def conflicting_base_paths(peer, _):
     for config in [
             configuration(base={"/src/../same.ts": "first", "/same.ts": "second"}),
@@ -538,20 +382,6 @@ def invalid_query_paths(peer, _):
     for path in ("relative/file.ts", "/nul\x00file.ts"):
         for operation in operations:
             peer.error(peer.request("test/fs", {"operation": operation, "path": path}), -32602)
-
-
-def oversized_outgoing_callback(peer, _):
-    options = {"padding": "a" * (MAX_BODY // 2 + 128)}
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": options}]))
-    params = {"padding": "b" * (MAX_BODY // 2 + 128)}
-    # Both client messages are valid frames. Their merged reverse request is
-    # too large, so neither a progress begin nor a reservation may escape.
-    identity = peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": params})
-    peer.error(identity, -32602)
-    check_state(peer, config)
-    identity, callback = plugin_call(peer, "spawn", options=options)
-    peer.complete(identity, callback, None, None)
-    check_state(peer, config, {"mapper": "spawned"})
 
 
 def oversized_callback_error_wrapper(peer, _):
@@ -572,28 +402,6 @@ def oversized_callback_error_wrapper(peer, _):
     check_state(peer, config)
 
 
-def oversized_callback_result_wrapper(peer, _):
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": {}}]))
-    for method in ("spawn", "initialize"):
-        identity, callback = plugin_call(peer, method)
-        result = None if method == "spawn" else {"positionEncoding": "utf-8", "diagnosticSource": "test"}
-        peer.complete(identity, callback, result, result)
-    # A legal 16-digit client ID is longer than the callback string ID, making
-    # a near-limit raw result too large in its final client response envelope.
-    peer.next_id = 9007199254740980
-    identity, callback = plugin_call(peer, "transform")
-    result = {"padding": ""}
-    envelope = {"jsonrpc": "2.0", "id": callback, "result": result}
-    result["padding"] = "x" * (MAX_BODY - 1 - len(json_bytes(envelope)))
-    equal(len(json_bytes(envelope)), MAX_BODY - 1)
-    require(len(json_bytes({"jsonrpc": "2.0", "id": identity, "result": result})) > MAX_BODY,
-            "fixture does not overflow the client envelope")
-    peer.send(envelope)
-    peer.end(identity, callback)
-    peer.error(identity, -32001)
-    check_state(peer, config, {"mapper": "ready"})
-
-
 def pending_limit(peer, _):
     config = initialize(peer, configuration(callbacks=["readFile"]))
     pending = [start_fs(peer, path=f"/{index}") for index in range(64)]
@@ -606,81 +414,6 @@ def pending_limit(peer, _):
     for identity, callback in pending + [replacement]:
         peer.complete(identity, callback, {"content": "ok"}, {"content": "ok"})
     check_state(peer, config)
-
-
-def plugin_lifecycle(peer, _):
-    options = {"extensions": [".vue"], "strict": True}
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": options}]))
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "transform", "params": {}}),
-               -32002)
-    for method, params, result, expected_state in [
-            ("spawn", {}, None, "spawned"),
-            ("initialize", {"locale": "en"}, {"extensions": [".vue"]}, "ready"),
-            ("openProject", {"projectId": "p"}, {"accepted": True}, "ready"),
-            ("closeProject", {"projectId": "p"}, None, "ready"),
-            ("dispose", {}, None, "registered")]:
-        identity, callback = plugin_call(peer, method, params, options=options)
-        peer.complete(identity, callback, result, result)
-        check_state(peer, config, {"mapper": expected_state})
-
-
-def mapper_payload(peer, observations):
-    options = {"mode": "transport-only"}
-    initialize(peer, configuration(plugins=[{"name": "mapper", "options": options}]))
-    for method in ("spawn", "initialize"):
-        identity, callback = plugin_call(peer, method, options=options)
-        result = None if method == "spawn" else {"positionEncoding": "utf-8", "diagnosticSource": "test"}
-        peer.complete(identity, callback, result, result)
-    # The raw field round-trip is a transport contract. The producer compares
-    # independently captured Go mapper observations separately.
-    sample = (observations or {}).get("transport_fixture")
-    if sample is None:
-        sample = {"params": {"fileName": "/Component.vue", "text": "😀<script>x</script>"},
-                  "result": {"sourceFiles": [{"fileName": "/Component.vue.ts", "text": "x",
-                                              "mappings": [[0, 2, 1], [4, 0, 0]]}],
-                             "diagnostics": [{"code": 9001, "message": "raw mapper payload"}]}}
-    identity, callback = plugin_call(peer, "transform", sample["params"], options=options)
-    peer.complete(identity, callback, sample["result"], sample["result"])
-
-
-def plugin_error_and_busy(peer, _):
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": {}}]))
-    identity, callback = plugin_call(peer, "spawn")
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
-               -32002)
-    remote = {"code": 88, "message": "spawner failed", "data": {"stage": "spawn"}}
-    peer.reply(callback, error=remote)
-    peer.end(identity, callback)
-    peer.error(identity, -32001, remote=remote)
-    check_state(peer, config)
-    identity, callback = plugin_call(peer, "spawn")
-    peer.reply(callback, {"unexpected": "non-null"})
-    peer.end(identity, callback)
-    peer.error(identity, -32001)
-    check_state(peer, config)
-    identity, callback = plugin_call(peer, "spawn")
-    peer.complete(identity, callback, None, None)
-    check_state(peer, config, {"mapper": "spawned"})
-
-
-def plugin_cancel_retirement(peer, _):
-    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": {}}]))
-    identity, callback = plugin_call(peer, "spawn")
-    cancel(peer, identity, callback, plugin="mapper")
-    peer.reply(callback, None)
-    check_state(peer, config, {"mapper": "retired"})
-    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
-               -32002)
-
-
-def plugin_registration_limits(peer, _):
-    duplicate = [{"name": "mapper", "options": {}}] * 2
-    peer.error(peer.request("test/initialize", configuration(plugins=duplicate)), -32602)
-    excessive = [{"name": f"mapper-{index}", "options": {}} for index in range(33)]
-    peer.error(peer.request("test/initialize", configuration(plugins=excessive)), -32602)
-    initialize(peer, configuration(plugins=excessive[:32]))
-    peer.error(peer.request("test/plugin", {"name": "missing", "method": "spawn", "params": {}}),
-               -32602)
 
 
 def shutdown_pending(peer, _):
@@ -713,14 +446,6 @@ def fragmented_coalesced(peer, _):
     peer.wire(b"".join(encode(message) for message in messages))
     for message in messages:
         peer.result(message["id"], state(configuration()))
-
-
-def duplicate_request(peer, _):
-    initialize(peer)
-    identity = peer.request("test/state", {})
-    peer.result(identity, state(configuration()))
-    peer.request("test/state", {}, identity=identity)
-    peer.finish(failure=True, close_input=False)
 
 
 def unknown_callback(peer, _):
@@ -770,51 +495,33 @@ def invalid_utf8(peer, _):
 
 
 CASES = [
-    ("initialization-barrier", "controls", initialization_barrier),
-    ("configuration-failure-retry", "controls", configuration_failure_retry),
-    ("configuration-malformed-ready", "controls", configuration_malformed_ready),
-    ("options-roundtrip", "controls", options_roundtrip),
-    ("lifecycle-validation", "controls", lifecycle_validation),
-    ("enabled-filesystem-callbacks", "transport", all_callbacks),
-    ("progress-while-outstanding", "transport", progress_outstanding),
-    ("out-of-order-completion", "transport", out_of_order),
-    ("cancel-late-result-next-request", "transport", cancellation_late_response),
-    ("initialization-cancel-retry", "controls", initialization_cancel_retry),
-    ("remote-error-no-fallback", "transport", remote_error_no_fallback),
-    ("malformed-callback-result", "transport", malformed_callback_result),
-    ("options-busy-barrier", "controls", options_busy),
-    ("options-blocks-new-work", "controls", options_blocks_new_work),
-    ("canceled-options-barrier", "controls", canceled_options_barrier),
-    ("canceled-initialization-barrier", "controls", canceled_initialization_barrier),
-    ("options-reserve-plugin-state-capacity", "controls", options_reserve_plugin_state_capacity),
-    ("conflicting-injected-paths", "controls", conflicting_base_paths),
-    ("invalid-query-paths", "transport", invalid_query_paths),
-    ("oversized-outgoing-callback", "transport", oversized_outgoing_callback),
-    ("oversized-callback-error-wrapper", "transport", oversized_callback_error_wrapper),
-    ("oversized-callback-result-wrapper", "transport", oversized_callback_result_wrapper),
-    ("pending-limit-includes-canceled", "transport", pending_limit),
-    ("plugin-lifecycle-options", "controls", plugin_lifecycle),
-    ("mapper-payload-roundtrip", "controls", mapper_payload),
-    ("plugin-error-and-busy", "controls", plugin_error_and_busy),
-    ("plugin-cancel-retirement", "controls", plugin_cancel_retirement),
-    ("plugin-registration-limits", "controls", plugin_registration_limits),
-    ("shutdown-pending", "transport", shutdown_pending),
-    ("eof-pending", "transport", eof_pending),
-    ("fragmented-coalesced-input", "transport", fragmented_coalesced),
-    ("duplicate-client-id", "transport", duplicate_request),
-    ("unknown-callback-id", "transport", unknown_callback),
-    ("duplicate-callback-id", "transport", duplicate_callback),
-    ("malformed-envelope", "transport", malformed_envelope),
-    ("duplicate-content-length", "transport", invalid_lengths),
-    ("oversized-content-length", "transport", oversized_length),
-    ("truncated-frame-body", "transport", truncated_body),
-    ("recursive-duplicate-json-key", "transport", duplicate_json),
-    ("invalid-utf8-payload", "transport", invalid_utf8),
+    ('enabled-filesystem-callbacks', 'transport', all_callbacks),
+    ('progress-while-outstanding', 'transport', progress_outstanding),
+    ('out-of-order-completion', 'transport', out_of_order),
+    ('cancel-late-result-next-request', 'transport', cancellation_late_response),
+    ('remote-error-no-fallback', 'transport', remote_error_no_fallback),
+    ('malformed-callback-result', 'transport', malformed_callback_result),
+    ('options-busy-barrier', 'controls', options_busy),
+    ('conflicting-injected-paths', 'controls', conflicting_base_paths),
+    ('invalid-query-paths', 'transport', invalid_query_paths),
+    ('oversized-callback-error-wrapper', 'transport', oversized_callback_error_wrapper),
+    ('pending-limit-includes-canceled', 'transport', pending_limit),
+    ('shutdown-pending', 'transport', shutdown_pending),
+    ('eof-pending', 'transport', eof_pending),
+    ('fragmented-coalesced-input', 'transport', fragmented_coalesced),
+    ('unknown-callback-id', 'transport', unknown_callback),
+    ('duplicate-callback-id', 'transport', duplicate_callback),
+    ('malformed-envelope', 'transport', malformed_envelope),
+    ('duplicate-content-length', 'transport', invalid_lengths),
+    ('oversized-content-length', 'transport', oversized_length),
+    ('truncated-frame-body', 'transport', truncated_body),
+    ('recursive-duplicate-json-key', 'transport', duplicate_json),
+    ('invalid-utf8-payload', 'transport', invalid_utf8),
 ]
 
-
 from s11_followups import CASES as FOLLOWUP_CASES
-CASES += FOLLOWUP_CASES
+from s11_tunnel import CASES as TUNNEL_CASES
+CASES += FOLLOWUP_CASES + TUNNEL_CASES
 
 
 def run(binary: Path, mapper_observations: dict | None = None) -> list[dict]:

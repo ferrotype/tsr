@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
+import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import s11
@@ -73,12 +75,41 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             strict_json_loads('{"result":{"content":null,"content":""}}')
 
-    def test_frozen_full_inventory_is_composition_of_all_three_groups(self):
+    def test_internal_hook_evidence_requires_each_named_test_to_execute(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "data/s11").mkdir(parents=True)
+            (root / "data/s11/hook-cases.json").write_text(json.dumps([{"id":"internal/one","test":"session::tests::one"}]))
+            for output in (b"running 0 tests\n", b"test session::tests::other ... ok\n",
+                           b"test session::tests::one ... ok\ntest session::tests::one ... ok\n"):
+                with patch.object(s11, "ROOT", root), patch.object(s11, "REPORTS", root), patch.object(s11, "command", return_value=output), self.assertRaises(ValueError):
+                    s11.hook_rows()
+            with patch.object(s11, "ROOT", root), patch.object(s11, "REPORTS", root), patch.object(s11, "command", return_value=b"test session::tests::one ... ignored\n"):
+                self.assertFalse(s11.hook_rows()[0]["pass"])
+
+    def test_mapper_byte_capture_rejects_dropped_changed_and_truncated_streams(self):
+        import base64
+        from s11_contracts import encode
+        fixture = {"id":"fixture", "requests":[{"method":"initialize","params":{}}]}
+        request = {"jsonrpc":"2.0","id":"fixture:0","method":"initialize","params":{}}
+        response = {"jsonrpc":"2.0","id":"fixture:0","result":{"ok":True}}
+        observation = {"responses":[{"result":{"ok":True}}],
+                       "server_bytes":base64.b64encode(encode(request)).decode(),
+                       "plugin_bytes":base64.b64encode(encode(response)).decode()}
+        s11.validate_mapper_bytes(fixture, observation)
+        for key in ("server_bytes", "plugin_bytes"):
+            for data in (b"", b"Content-Length: 99\r\n\r\n{}", encode({**response,"id":"wrong"})):
+                altered = {**observation,key:base64.b64encode(data).decode()}
+                with self.subTest(key=key,data=data), self.assertRaises(ValueError):
+                    s11.validate_mapper_bytes(fixture, altered)
+
+    def test_frozen_full_inventory_is_composition_of_all_four_groups(self):
         root = s11.ROOT / "data/s11"
         fs = json.loads((root / "fs-fixtures.json").read_text())
         mapper = json.loads((root / "mapper-fixtures.json").read_text())
         transport = json.loads((root / "transport-cases.json").read_text())
-        combined = ["fs/" + f["id"] for f in fs] + ["mapper/" + f["id"] for f in mapper] + [f["id"] for f in transport]
+        hooks = json.loads((root / "hook-cases.json").read_text())
+        combined = ["fs/" + f["id"] for f in fs] + ["mapper/" + f["id"] for f in mapper] + [f["id"] for f in transport] + [f["id"] for f in hooks]
         self.assertEqual(json.loads((root / "cases.json").read_text()), combined)
         self.assertEqual(len(set(combined)), len(combined))
 
