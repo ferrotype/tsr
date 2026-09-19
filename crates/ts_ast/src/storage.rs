@@ -459,6 +459,13 @@ impl ParsedFile {
     pub fn root(&self) -> NodeId {
         self.view().file_info().root.expect("completed parse root")
     }
+    /// Supply the host's content hash without changing syntax edges or revoking
+    /// their completed validation. Fails for a non-source-file fragment root.
+    pub fn set_source_hash(&mut self, hash: crate::SourceHash) -> Result<(), Error> {
+        let root = self.root();
+        self.builder.source_file_mut(root)?.hash = hash;
+        Ok(())
+    }
     /// Parser-tool publication deliberately makes no claim that binding ran.
     pub fn publish_unbound(self) -> AstFile {
         self.try_publish_unbound()

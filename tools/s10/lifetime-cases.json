@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "consumer": "tools/s10/rust-consumer/Cargo.toml",
+  "test": "lifetime",
+  "modes": ["debug", "release", "miri", "address_sanitizer"],
+  "cases": [
+    "lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline",
+    "lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions",
+    "lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results",
+    "lifetime::retire_before_initialization_cannot_create_a_checker",
+    "lifetime::native_unwind_retires_the_session_and_preserves_the_payload",
+    "lifetime::concurrent_first_queries_share_one_checker_identity"
+  ],
+  "applicability": "E3 owner, generation, operation and retained-result contracts at the public embedding boundary, including repeated disposal counters, panic retirement, reentry and contention. Storage-internal fault injection, socket queue publication, formatting scratch and project-service replacement remain their existing E3 suites; this consumer exposes none of those services. Native unwind and contention are not claimed for wasm instances."
+}

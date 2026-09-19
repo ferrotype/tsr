@@ -18,6 +18,28 @@ mod observation;
 /// checker and every escaping result live.
 #[allow(dead_code)]
 pub trait Hooks {
+    /// Construction policy for external embedding consumers. Native producers
+    /// keep their existing loader and checker ownership/initialization timing.
+    fn load_program(
+        &mut self,
+        options: ProgramOptions,
+        cache: &mut FileCache,
+        counters: &ts_arena::Counters,
+    ) -> Result<Arc<Program>, ts_compiler_error::Error> {
+        Program::load(options, cache, counters).map(Arc::new)
+    }
+    fn create_checker(
+        &mut self,
+        program: Arc<Program>,
+        counters: &ts_arena::Counters,
+    ) -> Result<Arc<CheckerOwner>, Error> {
+        CheckerOwner::for_program(
+            ts_arena::CheckerIdentity::new(ts_arena::Generation::new(counters), counters),
+            counters,
+            Arc::new(ts_compiler::ProgramCheckerHost::new(program)),
+        )
+        .map(Arc::new)
+    }
     /// The program is loaded, parsed and bound; nothing is timed yet.
     fn loaded(&mut self, _program: &Program) {}
     fn interval_start(&mut self) {}
@@ -101,10 +123,12 @@ pub fn observe(
             return row;
         }
     };
-    let program = match observation::try_load(&request["loading"], cache, &counters, parsed_config)
-    {
+    let program = match hooks.load_program(
+        observation::program_options(&request["loading"], parsed_config),
+        cache,
+        &counters,
+    ) {
         Ok(program) => {
-            let program = Arc::new(program);
             hooks.loaded(&program);
             program
         }
@@ -152,14 +176,9 @@ pub fn observe(
     // separately applies native selection, directives and plain-JS filtering.
     row["bind_diagnostics"] = diagnostics::phase(&program, &bind);
     hooks.resume();
-    let generation = ts_arena::Generation::new(&counters);
     hooks.init_start();
-    let owner = match CheckerOwner::for_program(
-        ts_arena::CheckerIdentity::new(generation, &counters),
-        &counters,
-        Arc::new(ts_compiler::ProgramCheckerHost::new(program.clone())),
-    ) {
-        Ok(owner) => Arc::new(owner),
+    let owner = match hooks.create_checker(program.clone(), &counters) {
+        Ok(owner) => owner,
         Err(error) => {
             hooks.init_end();
             row["phases"]["semantic"] = checker_failure(error);

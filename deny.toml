@@ -33,7 +33,9 @@ allow = [
   "CC0-1.0",
 ]
 confidence-threshold = 0.9
-exceptions = []
+# The protocol's required XXH3-128 implementation uses the permissive Boost
+# license. Restrict this allowance to the reviewed direct dependency/version.
+exceptions = [{ name = "xxhash-rust", version = "=0.8.18", allow = ["BSL-1.0"] }]
 
 [bans]
 multiple-versions = "deny"
@@ -41,7 +43,10 @@ wildcards = "deny"
 highlight = "all"
 allow = []
 deny = []
-skip = []
+# S10 ABI generators still require syn 2; existing serde/futures macros require
+# syn 3. Both are build-time parsers. This exact-version exception does not
+# permit duplicate runtime crates. See docs/S10-implementation-plan.md.
+skip = [{ name = "syn", version = "=2.0.119" }]
 skip-tree = []
 
 [sources]

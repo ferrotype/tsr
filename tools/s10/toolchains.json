@@ -1,0 +1,32 @@
+{
+  "wasm_bindgen": "0.2.126",
+  "wasm_target": "wasm32-unknown-unknown",
+  "wasm_stack_bytes": 16777216,
+  "wasm_rustflags": "-C panic=abort -C link-arg=-zstack-size=16777216",
+  "note": "Node uses a 4 MiB engine call stack for the frozen checker stress cases, separately from the 16 MiB initial wasm linear stack. Rust, Go and Node versions come from the existing repository pins. Other engines require their own stack validation.",
+  "node_flags": [
+    "--stack-size=4096"
+  ],
+  "wasm_opt_version": "132",
+  "parser_post_link_flags": [
+    "-Oz"
+  ],
+  "binaryen_archives": {
+    "Darwin/arm64": {
+      "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-arm64-macos.tar.gz",
+      "sha256": "98aad827847af7ef990ed7098d885725c8e5b5aae75073403635617ae4e259aa"
+    },
+    "Darwin/x86_64": {
+      "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-x86_64-macos.tar.gz",
+      "sha256": "40c3de90bb3766bd0282a895e139a6f50253dba49b4f5bb89e66faca162d832e"
+    },
+    "Linux/x86_64": {
+      "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-x86_64-linux.tar.gz",
+      "sha256": "195ddc94f9bc89f45abdabb0b9eea86023d727ba90eac8b35b80f2544fc30572"
+    },
+    "Linux/aarch64": {
+      "url": "https://github.com/WebAssembly/binaryen/releases/download/version_132/binaryen-version_132-aarch64-linux.tar.gz",
+      "sha256": "c58562417836c5d0493d89bdefc434933bdc097db641b483df86bcfa557a107f"
+    }
+  }
+}

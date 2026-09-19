@@ -42,7 +42,9 @@ pub use orchestration::{
     parse_isolated_entity_name, parse_source_file, parse_source_file_with_counters,
 };
 pub(crate) use state::{JSDocInfo, Parser, ParsingContext};
-pub use worker::{on_parser_worker, spawn_parser_worker};
+pub use worker::on_parser_worker;
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
+pub use worker::spawn_parser_worker;
 
 pub mod parse_flags {
     pub const NONE: u32 = 0;
