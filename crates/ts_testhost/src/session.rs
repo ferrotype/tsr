@@ -201,7 +201,7 @@ impl Session {
                 if self
                     .pending
                     .values()
-                    .any(|p| !p.canceled && matches!(p.action, Action::Options(_))) =>
+                    .any(|p| matches!(p.action, Action::Options(_))) =>
             {
                 Err((-32002, "configuration update is pending".into()))
             }
@@ -226,7 +226,10 @@ impl Session {
     }
 
     fn initialize(&mut self, id: u64, params: Value) -> RequestResult {
-        if self.configuration.is_some() || self.pending.values().any(|p| !p.canceled) {
+        // Cancellation completes the client request, but the host may still be
+        // processing configuration. Keep its ordering barrier until the late
+        // callback response is consumed (or the connection is discarded).
+        if self.configuration.is_some() || !self.pending.is_empty() {
             return Err((-32002, "initialization already started or complete".into()));
         }
         let wire: Initialize = decode(params)?;
@@ -425,6 +428,12 @@ impl Session {
                 response_fits(request, &value)?;
                 let mut state = self.configuration.as_ref().unwrap().wire();
                 state["options"] = options.clone();
+                // A later dispose returns a plugin to "registered", the
+                // longest state name. Reserve that space for every plugin now
+                // so a successful lifecycle call cannot strand test/state.
+                for plugin in state["plugins"].as_array_mut().expect("wire plugin array") {
+                    plugin["state"] = json!(PluginState::Registered.text());
+                }
                 response_fits(MAX_CLIENT_ID, &state)?;
                 self.configuration.as_mut().unwrap().options = options;
                 Ok(value)

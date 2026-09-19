@@ -465,6 +465,64 @@ def options_blocks_new_work(peer, _):
     peer.complete(identity, callback, None, None)
 
 
+def canceled_options_barrier(peer, _):
+    config = initialize(peer, configuration(callbacks=["readFile"], options={"strict": False},
+                                            plugins=[{"name": "mapper", "options": {}}]))
+    identity = peer.request("test/setOptions", {"options": {"strict": True}})
+    callback = peer.begin(identity, "testhost/configuration", {"options": {"strict": True}})
+    cancel(peer, identity, callback)
+    check_state(peer, config)
+    peer.error(peer.request("test/fs", {"operation": "readFile", "path": "/file.ts"}), -32002)
+    peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
+               -32002)
+    peer.error(peer.request("test/setOptions", {"options": {}}), -32002)
+    peer.reply(callback, {"ready": True})
+    check_state(peer, config)
+    identity, callback = start_fs(peer)
+    peer.complete(identity, callback, {"content": "after acknowledgment"},
+                  {"content": "after acknowledgment"})
+    identity, callback = plugin_call(peer, "spawn")
+    peer.complete(identity, callback, None, None)
+
+
+def canceled_initialization_barrier(peer, _):
+    identity = peer.request("test/initialize", configuration(options={"attempt": 1}))
+    callback = peer.begin(identity, "testhost/configuration", {"options": {"attempt": 1}})
+    cancel(peer, identity, callback)
+    peer.error(peer.request("test/initialize", configuration(options={"attempt": 2})), -32002)
+    peer.reply(callback, {"ready": True})
+    peer.error(peer.request("test/state", {}), -32002)
+    initialize(peer, configuration(options={"attempt": 2}))
+
+
+def options_reserve_plugin_state_capacity(peer, _):
+    config = initialize(peer, configuration(plugins=[{"name": "mapper", "options": {}}]))
+    for method, result in [("spawn", None), ("initialize", {})]:
+        identity, callback = plugin_call(peer, method)
+        peer.complete(identity, callback, result, result)
+    peer.next_id = 9007199254740970
+    prospective = copy.deepcopy(config)
+    prospective["options"] = {"padding": ""}
+    envelope = {"jsonrpc": "2.0", "id": 9007199254740991,
+                "result": state(prospective, {"mapper": "ready"})}
+    prospective["options"]["padding"] = "x" * (MAX_BODY - 2 - len(json_bytes(envelope)))
+    envelope["result"] = state(prospective, {"mapper": "ready"})
+    equal(len(json_bytes(envelope)), MAX_BODY - 2)
+    # A later dispose changes "ready" to the longer "registered". Accepting
+    # these options would strand test/state after a successful lifecycle call.
+    envelope["result"] = state(prospective)
+    require(len(json_bytes(envelope)) > MAX_BODY, "fixture must overflow the registered state")
+    identity = peer.request("test/setOptions", {"options": prospective["options"]})
+    callback = peer.begin(identity, "testhost/configuration", {"options": prospective["options"]})
+    peer.reply(callback, {"ready": True})
+    peer.end(identity, callback)
+    peer.error(identity, -32001)
+    check_state(peer, config, {"mapper": "ready"})
+    identity, callback = plugin_call(peer, "dispose")
+    peer.complete(identity, callback, None, None)
+    check_state(peer, config)
+
+
 def conflicting_base_paths(peer, _):
     for config in [
             configuration(base={"/src/../same.ts": "first", "/same.ts": "second"}),
@@ -728,6 +786,9 @@ CASES = [
     ("malformed-callback-result", "transport", malformed_callback_result),
     ("options-busy-barrier", "controls", options_busy),
     ("options-blocks-new-work", "controls", options_blocks_new_work),
+    ("canceled-options-barrier", "controls", canceled_options_barrier),
+    ("canceled-initialization-barrier", "controls", canceled_initialization_barrier),
+    ("options-reserve-plugin-state-capacity", "controls", options_reserve_plugin_state_capacity),
     ("conflicting-injected-paths", "controls", conflicting_base_paths),
     ("invalid-query-paths", "transport", invalid_query_paths),
     ("oversized-outgoing-callback", "transport", oversized_outgoing_callback),
