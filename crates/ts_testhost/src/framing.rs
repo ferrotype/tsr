@@ -7,7 +7,8 @@ use std::fmt;
 use std::io::{self, BufRead, Write};
 
 use serde::de::{self, DeserializeSeed, MapAccess, SeqAccess, Visitor};
-use serde_json::{Map, Number, Value};
+use serde::{Deserialize, Deserializer};
+use serde_json::value::RawValue;
 
 pub const MAX_BODY: usize = 8 * 1024 * 1024;
 pub const MAX_HEADER: usize = 8192;
@@ -132,102 +133,88 @@ pub fn write<W: Write>(writer: &mut W, payload: &[u8]) -> io::Result<()> {
     writer.flush()
 }
 
-struct JsonSeed {
-    depth: usize,
+/// A complete frame whose JSON keys, strings and nesting have been validated.
+/// Opaque numeric tokens remain in the borrowed input instead of becoming f64.
+#[derive(Debug)]
+pub struct Message<'a> {
+    raw: &'a RawValue,
 }
-
-impl<'de> DeserializeSeed<'de> for JsonSeed {
-    type Value = Value;
-
-    fn deserialize<D: de::Deserializer<'de>>(self, deserializer: D) -> Result<Value, D::Error> {
-        deserializer.deserialize_any(self)
+impl Message<'_> {
+    pub fn as_str(&self) -> &str {
+        self.raw.get()
     }
 }
 
+struct JsonSeed {
+    depth: usize,
+}
+impl<'de> DeserializeSeed<'de> for JsonSeed {
+    type Value = ();
+
+    fn deserialize<D: de::Deserializer<'de>>(self, deserializer: D) -> Result<(), D::Error> {
+        let raw = <&RawValue>::deserialize(deserializer)?;
+        validate(raw, self.depth).map_err(de::Error::custom)
+    }
+}
 impl<'de> Visitor<'de> for JsonSeed {
-    type Value = Value;
+    type Value = ();
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str("JSON with unique object keys and bounded nesting")
     }
 
-    fn visit_bool<E: de::Error>(self, value: bool) -> Result<Value, E> {
-        Ok(Value::Bool(value))
+    fn visit_seq<A: SeqAccess<'de>>(self, mut sequence: A) -> Result<(), A::Error> {
+        while sequence
+            .next_element_seed(Self {
+                depth: self.depth + 1,
+            })?
+            .is_some()
+        {}
+        Ok(())
     }
 
-    fn visit_i64<E: de::Error>(self, value: i64) -> Result<Value, E> {
-        Ok(Value::Number(value.into()))
-    }
-
-    fn visit_u64<E: de::Error>(self, value: u64) -> Result<Value, E> {
-        Ok(Value::Number(value.into()))
-    }
-
-    fn visit_f64<E: de::Error>(self, value: f64) -> Result<Value, E> {
-        Number::from_f64(value)
-            .map(Value::Number)
-            .ok_or_else(|| E::custom("non-finite JSON number"))
-    }
-
-    fn visit_str<E: de::Error>(self, value: &str) -> Result<Value, E> {
-        Ok(Value::String(value.into()))
-    }
-
-    fn visit_string<E: de::Error>(self, value: String) -> Result<Value, E> {
-        Ok(Value::String(value))
-    }
-
-    fn visit_unit<E: de::Error>(self) -> Result<Value, E> {
-        Ok(Value::Null)
-    }
-
-    fn visit_seq<A: SeqAccess<'de>>(self, mut sequence: A) -> Result<Value, A::Error> {
-        if self.depth == MAX_JSON_DEPTH {
-            return Err(de::Error::custom("JSON nesting exceeds depth limit"));
-        }
-        let mut values = Vec::new();
-        while let Some(value) = sequence.next_element_seed(Self {
-            depth: self.depth + 1,
-        })? {
-            values.push(value);
-        }
-        Ok(Value::Array(values))
-    }
-
-    fn visit_map<A: MapAccess<'de>>(self, mut object: A) -> Result<Value, A::Error> {
-        if self.depth == MAX_JSON_DEPTH {
-            return Err(de::Error::custom("JSON nesting exceeds depth limit"));
-        }
-        let mut values = Map::new();
+    fn visit_map<A: MapAccess<'de>>(self, mut object: A) -> Result<(), A::Error> {
+        let mut keys = std::collections::BTreeSet::new();
         while let Some(key) = object.next_key::<String>()? {
-            if values.contains_key(&key) {
-                return Err(de::Error::custom(format!(
-                    "duplicate JSON object key: {key}"
-                )));
+            if !keys.insert(key) {
+                return Err(de::Error::custom("duplicate JSON object key"));
             }
-            let value = object.next_value_seed(Self {
+            object.next_value_seed(Self {
                 depth: self.depth + 1,
             })?;
-            values.insert(key, value);
         }
-        Ok(Value::Object(values))
+        Ok(())
     }
 }
 
-/// Decode one complete JSON value, rejecting recursively duplicated keys.
+fn validate(raw: &RawValue, depth: usize) -> serde_json::Result<()> {
+    // RawValue validates JSON syntax without evaluating numbers. Visit containers
+    // to reject duplicate keys and strings to reject unpaired Unicode surrogates.
+    // Subtree scans borrow the input; repeated scanning is bounded by depth 64.
+    match raw.get().as_bytes()[0] {
+        b'{' | b'[' if depth == MAX_JSON_DEPTH => {
+            Err(de::Error::custom("JSON nesting exceeds depth limit"))
+        }
+        b'{' => serde_json::Deserializer::from_str(raw.get()).deserialize_map(JsonSeed { depth }),
+        b'[' => serde_json::Deserializer::from_str(raw.get()).deserialize_seq(JsonSeed { depth }),
+        b'"' => serde_json::from_str::<String>(raw.get()).map(|_| ()),
+        _ => Ok(()),
+    }
+}
+
+/// Validate one complete JSON value, retaining its exact numeric tokens.
 ///
-/// The body size and nesting limits also apply to direct callers. Invalid UTF-8,
-/// non-finite numbers and trailing non-whitespace bytes are errors.
-pub fn parse_json(bytes: &[u8]) -> io::Result<Value> {
+/// Invalid UTF-8, unpaired surrogates, duplicate keys, excessive nesting,
+/// non-JSON numbers (NaN/Infinity) and trailing values are rejected. Finite
+/// decimal values such as 1e400 do not need to fit a machine float.
+pub fn parse_json(bytes: &[u8]) -> io::Result<Message<'_>> {
     if bytes.len() > MAX_BODY {
         return Err(invalid("testhost body exceeds byte limit"));
     }
-    let mut deserializer = serde_json::Deserializer::from_slice(bytes);
-    let value = JsonSeed { depth: 0 }
-        .deserialize(&mut deserializer)
-        .map_err(invalid)?;
-    deserializer.end().map_err(invalid)?;
-    Ok(value)
+    let text = std::str::from_utf8(bytes).map_err(invalid)?;
+    let raw = serde_json::from_str::<&RawValue>(text).map_err(invalid)?;
+    validate(raw, 0).map_err(invalid)?;
+    Ok(Message { raw })
 }
 
 #[cfg(test)]
@@ -350,8 +337,8 @@ mod tests {
                 .contains("duplicate JSON object key"));
         }
         assert_eq!(
-            parse_json(br#"[{"a":1},{"a":2}]"#).unwrap(),
-            serde_json::json!([{ "a": 1 }, { "a": 2 }])
+            parse_json(br#"[{"a":1},{"a":2}]"#).unwrap().as_str(),
+            r#"[{"a":1},{"a":2}]"#
         );
     }
 
@@ -361,14 +348,40 @@ mod tests {
             b"{} []".as_slice(),
             b"NaN",
             b"Infinity",
-            b"1e400",
             b"{\"x\":\"\xff\"}",
             br#""\ud800""#,
             b"",
         ] {
             assert!(parse_json(bytes).is_err(), "payload: {bytes:?}");
         }
-        assert_eq!(parse_json(b"\r\nnull \t").unwrap(), Value::Null);
+        assert_eq!(parse_json(b"\r\nnull \t").unwrap().as_str(), "null");
+    }
+
+    #[test]
+    fn raw_validation_preserves_numbers_without_reserved_object_keys() {
+        for text in [
+            "123456789012345678901234567890",
+            "-0",
+            "1e400",
+            "1e-400",
+            "0.123456789012345678901234567890",
+            r#"{"$serde_json::private::Number":"123"}"#,
+            r#"{"$serde_json::private::RawValue":"[1,2]"}"#,
+        ] {
+            assert_eq!(parse_json(text.as_bytes()).unwrap().as_str(), text);
+        }
+        for bytes in [
+            br#"{"opaque":["\ud800"]}"#.as_slice(),
+            br#"{"opaque":{"\ud800":1}}"#,
+            br#"{"opaque":{"$serde_json::private::Number":1,"$serde_json::private::Number":2}}"#,
+            b"[01]",
+            b"[1e]",
+            b"[1.]",
+            b"[+1]",
+            b"[-Infinity]",
+        ] {
+            assert!(parse_json(bytes).is_err(), "payload: {bytes:?}");
+        }
     }
 
     #[test]

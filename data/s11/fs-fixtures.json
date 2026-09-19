@@ -4,6 +4,7 @@
   {"id":"read-fallback-empty","caseSensitive":true,"base":{"/work/empty.ts":""},"symlinks":{},"operation":"readFile","path":"/work/empty.ts","enabled":true,"response":null},
   {"id":"read-callback-content","caseSensitive":true,"base":{"/work/main.ts":"base"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":true,"response":{"content":"callback"}},
   {"id":"read-callback-missing-shadows-base","caseSensitive":true,"base":{"/work/main.ts":"base"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":true,"response":{"content":null}},
+  {"id":"read-callback-omitted-content-shadows-base","caseSensitive":true,"base":{"/work/main.ts":"base"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":true,"response":{}},
   {"id":"read-callback-empty-shadows-base","caseSensitive":true,"base":{"/work/main.ts":"base"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":true,"response":{"content":""}},
   {"id":"read-disabled-skips-callback","caseSensitive":true,"base":{"/work/main.ts":"base"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":false,"response":{"content":"unused"}},
   {"id":"read-base-strips-bom","caseSensitive":true,"base":{"/work/main.ts":"\ufeffconst value = 1;"},"symlinks":{},"operation":"readFile","path":"/work/main.ts","enabled":true,"response":null},

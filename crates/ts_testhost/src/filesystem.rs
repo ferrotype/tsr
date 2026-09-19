@@ -88,10 +88,7 @@ impl Host {
                 struct Read {
                     content: Option<String>,
                 }
-                // Option alone accepts an omitted field; the wire requires presence.
-                if result.get("content").is_none() {
-                    return Err("readFile requires content".into());
-                }
+                // Go decodes both omitted content and explicit null as missing.
                 let read: Read = serde_json::from_value(result).map_err(|e| e.to_string())?;
                 Ok(json!({"content":read.content}))
             }

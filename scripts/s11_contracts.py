@@ -53,6 +53,7 @@ class Peer:
         self.selector = selectors.DefaultSelector()
         self.output = bytearray()
         self.errors = bytearray()
+        self.last_body = b""
         self.next_id = 1
         self.closed_stdout = False
         self.finished = False
@@ -185,6 +186,7 @@ class Peer:
             self._pump(deadline)
         body = bytes(self.output[boundary:boundary + length])
         del self.output[:boundary + length]
+        self.last_body = body
         value = strict_json_loads(body.decode("utf-8"))
         require(type(value) is dict and value.get("jsonrpc") == "2.0",
                 "stdout body is not a JSON-RPC object")
@@ -327,14 +329,12 @@ def configuration_failure_retry(peer, _):
 
 
 def configuration_malformed_ready(peer, _):
-    for result in ({"ready": False}, {"ready": "true"}, {"ready": True, "extra": 1}):
-        identity = peer.request("test/initialize", configuration())
-        callback = peer.begin(identity, "testhost/configuration", {"options": {}})
-        peer.reply(callback, result)
-        peer.end(identity, callback)
-        peer.error(identity, -32001)
-        peer.error(peer.request("test/state", {}), -32002)
-    initialize(peer)
+    identity = peer.request("test/initialize", configuration())
+    callback = peer.begin(identity, "testhost/configuration", {"options": {}})
+    peer.reply(callback, {"ready": True, "extra": 1})
+    peer.finish(failure=True)
+    require(b"invalid configuration acknowledgment" in peer.errors,
+            "ambiguous configuration acknowledgment must retire the session")
 
 
 def options_roundtrip(peer, _):
@@ -416,7 +416,7 @@ def initialization_cancel_retry(peer, _):
     identity = peer.request("test/initialize", configuration())
     callback = peer.begin(identity, "testhost/configuration", {"options": {}})
     cancel(peer, identity, callback)
-    peer.reply(callback, {"ready": True})
+    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
     peer.error(peer.request("test/state", {}), -32002)
     initialize(peer)
 
@@ -476,7 +476,7 @@ def canceled_options_barrier(peer, _):
     peer.error(peer.request("test/plugin", {"name": "mapper", "method": "spawn", "params": {}}),
                -32002)
     peer.error(peer.request("test/setOptions", {"options": {}}), -32002)
-    peer.reply(callback, {"ready": True})
+    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
     check_state(peer, config)
     identity, callback = start_fs(peer)
     peer.complete(identity, callback, {"content": "after acknowledgment"},
@@ -490,7 +490,7 @@ def canceled_initialization_barrier(peer, _):
     callback = peer.begin(identity, "testhost/configuration", {"options": {"attempt": 1}})
     cancel(peer, identity, callback)
     peer.error(peer.request("test/initialize", configuration(options={"attempt": 2})), -32002)
-    peer.reply(callback, {"ready": True})
+    peer.reply(callback, error={"code": -32800, "message": "configuration not applied"})
     peer.error(peer.request("test/state", {}), -32002)
     initialize(peer, configuration(options={"attempt": 2}))
 
@@ -513,10 +513,8 @@ def options_reserve_plugin_state_capacity(peer, _):
     envelope["result"] = state(prospective)
     require(len(json_bytes(envelope)) > MAX_BODY, "fixture must overflow the registered state")
     identity = peer.request("test/setOptions", {"options": prospective["options"]})
-    callback = peer.begin(identity, "testhost/configuration", {"options": prospective["options"]})
-    peer.reply(callback, {"ready": True})
-    peer.end(identity, callback)
-    peer.error(identity, -32001)
+    # Reject before any configuration callback or progress notification escapes.
+    peer.error(identity, -32602)
     check_state(peer, config, {"mapper": "ready"})
     identity, callback = plugin_call(peer, "dispose")
     peer.complete(identity, callback, None, None)
@@ -813,6 +811,10 @@ CASES = [
     ("recursive-duplicate-json-key", "transport", duplicate_json),
     ("invalid-utf8-payload", "transport", invalid_utf8),
 ]
+
+
+from s11_followups import CASES as FOLLOWUP_CASES
+CASES += FOLLOWUP_CASES
 
 
 def run(binary: Path, mapper_observations: dict | None = None) -> list[dict]:

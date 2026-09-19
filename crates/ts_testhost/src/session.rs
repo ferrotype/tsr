@@ -1,7 +1,9 @@
 use std::{collections::BTreeMap, io};
 
 use serde::{de::DeserializeOwned, Deserialize};
-use serde_json::{json, Value};
+use serde_json::value::RawValue;
+
+use crate::wire::{self, raw, wire, Json};
 
 use crate::filesystem::{Host, OPERATIONS};
 
@@ -17,14 +19,14 @@ struct Initialize {
     base: BTreeMap<String, String>,
     symlinks: BTreeMap<String, String>,
     callbacks: Vec<String>,
-    options: Value,
+    options: Json,
     plugins: Vec<Registration>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Registration {
     name: String,
-    options: Value,
+    options: Json,
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum PluginState {
@@ -49,7 +51,7 @@ struct Plugin {
 }
 struct Configuration {
     host: Host,
-    options: Value,
+    options: Json,
     plugins: Vec<Plugin>,
 }
 impl Configuration {
@@ -57,7 +59,7 @@ impl Configuration {
         if wire.version != 1 {
             return Err("unsupported test-host version".into());
         }
-        if !wire.options.is_object() {
+        if !wire::object(&wire.options) {
             return Err("options must be an object".into());
         }
         if wire.plugins.len() > MAX_PLUGINS {
@@ -65,7 +67,9 @@ impl Configuration {
         }
         let mut names = std::collections::BTreeSet::new();
         for plugin in &wire.plugins {
-            if plugin.name.is_empty() || !names.insert(&plugin.name) || !plugin.options.is_object()
+            if plugin.name.is_empty()
+                || !names.insert(&plugin.name)
+                || !wire::object(&plugin.options)
             {
                 return Err("plugins require unique nonempty names and object options".into());
             }
@@ -90,24 +94,32 @@ impl Configuration {
             plugins,
         })
     }
-    fn wire(&self) -> Value {
+    fn wire(&self) -> Json {
+        self.wire_with_options(&self.options, false)
+    }
+
+    fn wire_with_options(&self, options: &RawValue, reserve_states: bool) -> Json {
         let plugins: Vec<_> = self
             .plugins
             .iter()
             .map(|plugin| {
-                json!({
-                    "name":plugin.registration.name,"options":plugin.registration.options,
-                    "state":plugin.state.text(),
-                })
+                let state = if reserve_states {
+                    PluginState::Registered
+                } else {
+                    plugin.state
+                };
+                wire!({"name": plugin.registration.name, "options": plugin.registration.options,
+                   "state": state.text()})
             })
             .collect();
-        json!({"version":1,"caseSensitive":self.host.case_sensitive,"options":self.options,"plugins":plugins})
+        wire!({"version": 1, "caseSensitive": self.host.case_sensitive,
+               "options": options, "plugins": plugins})
     }
 }
 
 enum Action {
     Initialize(Box<Configuration>),
-    Options(Value),
+    Options(Json),
     File { operation: String, path: String },
     Plugin { index: usize, method: String },
 }
@@ -135,63 +147,70 @@ impl Session {
         !self.pending.is_empty()
     }
 
-    pub fn receive(&mut self, message: &Value) -> io::Result<Vec<Value>> {
+    pub fn receive(&mut self, message: &crate::framing::Message<'_>) -> io::Result<Vec<Json>> {
         if self.closed {
             return Err(invalid("message on closed test-host session"));
         }
-        let envelope = message
-            .as_object()
-            .ok_or_else(|| invalid("expected JSON-RPC object"))?;
-        if envelope.get("jsonrpc") != Some(&json!("2.0")) {
+        let envelope: BTreeMap<String, &RawValue> =
+            serde_json::from_str(message.as_str()).map_err(invalid)?;
+        let string = |name: &str| {
+            envelope
+                .get(name)
+                .and_then(|value| serde_json::from_str::<String>(value.get()).ok())
+        };
+        if string("jsonrpc").as_deref() != Some("2.0") {
             return Err(invalid("expected jsonrpc version 2.0"));
         }
-        if let Some(method) = envelope.get("method") {
-            fields(message, &["jsonrpc", "id", "method", "params"])?;
-            let method = method
-                .as_str()
-                .ok_or_else(|| invalid("method must be a string"))?;
-            let params = envelope.get("params").cloned().unwrap_or_else(|| json!({}));
+        if envelope.contains_key("method") {
+            fields(&envelope, &["jsonrpc", "id", "method", "params"])?;
+            let method = string("method").ok_or_else(|| invalid("method must be a string"))?;
+            let default_params = wire!({});
+            let params = envelope.get("params").copied().unwrap_or(&default_params);
             if let Some(id) = envelope.get("id") {
-                let id = id
-                    .as_u64()
+                let id = serde_json::from_str::<u64>(id.get())
+                    .ok()
                     .filter(|id| *id > self.last_request && *id <= MAX_CLIENT_ID)
                     .ok_or_else(|| {
                         invalid("client request IDs must be increasing positive safe integers")
                     })?;
                 self.last_request = id;
-                Ok(self.request(id, method, params))
+                Ok(self.request(id, &method, params))
             } else {
-                self.notification(method, params)
+                self.notification(&method, params)
             }
         } else {
-            fields(message, &["jsonrpc", "id", "result", "error"])?;
-            let id = envelope
-                .get("id")
-                .and_then(Value::as_str)
-                .ok_or_else(|| invalid("callback response requires string ID"))?;
+            fields(&envelope, &["jsonrpc", "id", "result", "error"])?;
+            let id = string("id").ok_or_else(|| invalid("callback response requires string ID"))?;
             if envelope.contains_key("result") == envelope.contains_key("error") {
                 return Err(invalid("response requires exactly one result or error"));
             }
             if let Some(error) = envelope.get("error") {
-                fields(error, &["code", "message", "data"])?;
-                if error.get("code").and_then(Value::as_i64).is_none()
-                    || error.get("message").and_then(Value::as_str).is_none()
+                let error = wire::fields(error).map_err(invalid)?;
+                fields(&error, &["code", "message", "data"])?;
+                if error
+                    .get("code")
+                    .and_then(|v| serde_json::from_str::<i64>(v.get()).ok())
+                    .is_none()
+                    || error
+                        .get("message")
+                        .and_then(|v| serde_json::from_str::<String>(v.get()).ok())
+                        .is_none()
                 {
                     return Err(invalid("invalid callback error"));
                 }
             }
             self.response(
-                id,
-                envelope.get("result").cloned(),
-                envelope.get("error").cloned(),
+                &id,
+                envelope.get("result").map(|v| (*v).to_owned()),
+                envelope.get("error").map(|v| (*v).to_owned()),
             )
         }
     }
 
-    fn request(&mut self, id: u64, method: &str, params: Value) -> Vec<Value> {
+    fn request(&mut self, id: u64, method: &str, params: &RawValue) -> Vec<Json> {
         let result = match method {
             "test/initialize" => self.initialize(id, params),
-            "test/shutdown" => self.shutdown(id, &params),
+            "test/shutdown" => self.shutdown(id, params),
             "test/state" | "test/setOptions" | "test/fs" | "test/plugin"
                 if self.configuration.is_none() =>
             {
@@ -205,8 +224,8 @@ impl Session {
             {
                 Err((-32002, "configuration update is pending".into()))
             }
-            "test/state" => empty(&params)
-                .map(|()| vec![success(id, self.configuration.as_ref().unwrap().wire())]),
+            "test/state" => empty(params)
+                .map(|()| vec![success(id, &self.configuration.as_ref().unwrap().wire())]),
             "test/setOptions" => self.options(id, params),
             "test/fs" => self.file(id, params),
             "test/plugin" => self.plugin(id, params),
@@ -225,7 +244,7 @@ impl Session {
             .collect()
     }
 
-    fn initialize(&mut self, id: u64, params: Value) -> RequestResult {
+    fn initialize(&mut self, id: u64, params: &RawValue) -> RequestResult {
         // Cancellation completes the client request, but the host may still be
         // processing configuration. Keep its ordering barrier until the late
         // callback response is consumed (or the connection is discarded).
@@ -234,37 +253,47 @@ impl Session {
         }
         let wire: Initialize = decode(params)?;
         let configuration = Configuration::from_wire(wire).map_err(|error| (-32602, error))?;
-        let params = json!({"options":configuration.options});
+        response_fits(MAX_CLIENT_ID, &configuration.wire()).map_err(|error| (-32602, error))?;
+        let params = wire!({"options":configuration.options});
         self.start(
             id,
             "testhost/configuration",
-            params,
+            &params,
             Action::Initialize(Box::new(configuration)),
         )
     }
 
-    fn options(&mut self, id: u64, params: Value) -> RequestResult {
+    fn options(&mut self, id: u64, params: &RawValue) -> RequestResult {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Options {
-            options: Value,
+            options: Json,
         }
         let options: Options = decode(params)?;
-        if !options.options.is_object() {
+        if !wire::object(&options.options) {
             return Err((-32602, "options must be an object".into()));
         }
         if !self.pending.is_empty() {
             return Err((-32002, "options require an idle session".into()));
         }
+        // Check all locally-known response sizes before the host can apply a change.
+        // Registered is the longest plugin state; reserve it even for ready plugins.
+        let state = self
+            .configuration
+            .as_ref()
+            .unwrap()
+            .wire_with_options(&options.options, true);
+        response_fits(MAX_CLIENT_ID, &state).map_err(|error| (-32602, error))?;
+        response_fits(id, &wire!({"options": options.options})).map_err(|error| (-32602, error))?;
         self.start(
             id,
             "testhost/configuration",
-            json!({"options":options.options}),
+            &wire!({"options":options.options}),
             Action::Options(options.options),
         )
     }
 
-    fn file(&mut self, id: u64, params: Value) -> RequestResult {
+    fn file(&mut self, id: u64, params: &RawValue) -> RequestResult {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct File {
@@ -281,26 +310,26 @@ impl Session {
             self.start(
                 id,
                 &operation.clone(),
-                json!(path),
+                &raw(&path),
                 Action::File { operation, path },
             )
         } else {
-            host.complete(&operation, &path, Value::Null)
-                .map(|value| vec![success(id, value)])
+            host.complete(&operation, &path, serde_json::Value::Null)
+                .map(|value| vec![success(id, &raw(&value))])
                 .map_err(|error| (-32001, error))
         }
     }
 
-    fn plugin(&mut self, id: u64, params: Value) -> RequestResult {
+    fn plugin(&mut self, id: u64, params: &RawValue) -> RequestResult {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Call {
             name: String,
             method: String,
-            params: Value,
+            params: Json,
         }
         let call: Call = decode(params)?;
-        if !call.params.is_object() {
+        if !wire::object(&call.params) {
             return Err((-32602, "plugin params must be an object".into()));
         }
         let configuration = self.configuration.as_ref().unwrap();
@@ -327,11 +356,11 @@ impl Session {
         if !allowed {
             return Err((-32002, "invalid plugin lifecycle".into()));
         }
-        let params = json!({"name":call.name,"method":call.method,"params":call.params,"options":plugin.registration.options});
+        let params = wire!({"name":call.name,"method":call.method,"params":call.params,"options":plugin.registration.options});
         self.start(
             id,
             "testhost/plugin",
-            params,
+            &params,
             Action::Plugin {
                 index,
                 method: call.method,
@@ -343,7 +372,7 @@ impl Session {
         &mut self,
         request: u64,
         method: &str,
-        params: Value,
+        params: &RawValue,
         action: Action,
     ) -> RequestResult {
         if self.pending.len() == MAX_PENDING {
@@ -354,8 +383,7 @@ impl Session {
             .checked_add(1)
             .ok_or_else(|| (-32002, "callback IDs exhausted".into()))?;
         let callback = format!("callback:{}", self.next_callback);
-        let mut message = json!({"jsonrpc":"2.0","id":callback,"method":method});
-        message["params"] = params;
+        let message = wire!({"jsonrpc":"2.0","id":callback,"method":method,"params":params});
         if !fits(&message) {
             return Err((-32602, "outgoing callback exceeds frame limit".into()));
         }
@@ -373,13 +401,30 @@ impl Session {
     fn response(
         &mut self,
         callback: &str,
-        result: Option<Value>,
-        error: Option<Value>,
-    ) -> io::Result<Vec<Value>> {
+        result: Option<Json>,
+        error: Option<Json>,
+    ) -> io::Result<Vec<Json>> {
         let pending = self
             .pending
             .remove(callback)
             .ok_or_else(|| invalid("unknown or duplicate callback response"))?;
+        let configuration = matches!(pending.action, Action::Initialize(_) | Action::Options(_));
+        if configuration
+            && error.is_none()
+            && (pending.canceled || result.as_deref().is_some_and(|value| ready(value).is_err()))
+        {
+            // An error promises no applied change (or a completed rollback).
+            // A canceled success or malformed acknowledgment cannot establish
+            // agreement with the host. Even direct Session callers must stop.
+            self.closed = true;
+            self.pending.clear();
+            self.configuration = None;
+            return Err(invalid(if pending.canceled {
+                "canceled configuration may have been applied; discard session"
+            } else {
+                "invalid configuration acknowledgment; discard session"
+            }));
+        }
         if pending.canceled {
             return Ok(vec![]);
         }
@@ -403,9 +448,9 @@ impl Session {
         let value = self.complete(pending.request, pending.action, result);
         match value {
             Ok(value) => {
-                messages.push(success(pending.request, value));
+                messages.push(success(pending.request, &value));
                 if initialize {
-                    messages.push(notify("testhost/initialized", json!({"version":1})));
+                    messages.push(notify("testhost/initialized", &wire!({"version":1})));
                 }
             }
             Err(error) => messages.push(failure(pending.request, -32001, &error, None)),
@@ -413,38 +458,27 @@ impl Session {
         Ok(messages)
     }
 
-    fn complete(&mut self, request: u64, action: Action, result: Value) -> Result<Value, String> {
+    fn complete(&mut self, request: u64, action: Action, result: Json) -> Result<Json, String> {
         match action {
             Action::Initialize(configuration) => {
                 ready(&result)?;
                 let value = configuration.wire();
-                response_fits(MAX_CLIENT_ID, &value)?;
                 self.configuration = Some(*configuration);
                 Ok(value)
             }
             Action::Options(options) => {
                 ready(&result)?;
-                let value = json!({"options":options});
-                response_fits(request, &value)?;
-                let mut state = self.configuration.as_ref().unwrap().wire();
-                state["options"] = options.clone();
-                // A later dispose returns a plugin to "registered", the
-                // longest state name. Reserve that space for every plugin now
-                // so a successful lifecycle call cannot strand test/state.
-                for plugin in state["plugins"].as_array_mut().expect("wire plugin array") {
-                    plugin["state"] = json!(PluginState::Registered.text());
-                }
-                response_fits(MAX_CLIENT_ID, &state)?;
+                let value = wire!({"options":options});
                 self.configuration.as_mut().unwrap().options = options;
                 Ok(value)
             }
             Action::File { operation, path } => {
-                let value = self
-                    .configuration
-                    .as_ref()
-                    .unwrap()
-                    .host
-                    .complete(&operation, &path, result)?;
+                let value = self.configuration.as_ref().unwrap().host.complete(
+                    &operation,
+                    &path,
+                    serde_json::from_str(result.get()).map_err(|e| e.to_string())?,
+                )?;
+                let value = raw(&value);
                 response_fits(request, &value)?;
                 Ok(value)
             }
@@ -453,7 +487,7 @@ impl Session {
                 let plugin = &mut self.configuration.as_mut().unwrap().plugins[index];
                 match method.as_str() {
                     "spawn" | "dispose" => {
-                        if !result.is_null() {
+                        if result.get() != "null" {
                             return Err("spawn/dispose result must be null".into());
                         }
                         plugin.state = if method == "spawn" {
@@ -463,7 +497,7 @@ impl Session {
                         };
                     }
                     "initialize" => {
-                        if !result.is_object() {
+                        if !wire::object(&result) {
                             return Err("mapper initialize result must be an object".into());
                         }
                         plugin.state = PluginState::Ready;
@@ -475,7 +509,7 @@ impl Session {
         }
     }
 
-    fn notification(&mut self, method: &str, params: Value) -> io::Result<Vec<Value>> {
+    fn notification(&mut self, method: &str, params: &RawValue) -> io::Result<Vec<Json>> {
         match method {
             "$/cancelRequest" => {
                 #[derive(Deserialize)]
@@ -483,7 +517,7 @@ impl Session {
                 struct Cancel {
                     id: u64,
                 }
-                let cancel: Cancel = serde_json::from_value(params).map_err(invalid)?;
+                let cancel: Cancel = serde_json::from_str(params.get()).map_err(invalid)?;
                 Ok(self.cancel(cancel.id))
             }
             "test/callbackProgress" => {
@@ -491,12 +525,12 @@ impl Session {
                 #[serde(deny_unknown_fields)]
                 struct Report {
                     callback: String,
-                    value: Value,
+                    value: Json,
                 }
-                if params.get("value").is_none() {
+                if !wire::fields(params).map_err(invalid)?.contains_key("value") {
                     return Err(invalid("progress value is required"));
                 }
-                let report: Report = serde_json::from_value(params).map_err(invalid)?;
+                let report: Report = serde_json::from_str(params.get()).map_err(invalid)?;
                 let pending = self
                     .pending
                     .get(&report.callback)
@@ -504,18 +538,28 @@ impl Session {
                 if pending.canceled {
                     return Ok(vec![]);
                 }
-                Ok(vec![notify(
+                let request = pending.request;
+                let message = notify(
                     "testhost/progress",
-                    json!({
-                        "id":pending.request,"callback":report.callback,"phase":"report","value":report.value,
+                    &wire!({
+                        "id":request,"callback":report.callback,"phase":"report","value":report.value,
                     }),
-                )])
+                );
+                if fits(&message) {
+                    Ok(vec![message])
+                } else {
+                    Ok(self.interrupt(request, -32001, "progress exceeds frame limit"))
+                }
             }
             _ => Ok(vec![]),
         }
     }
 
-    fn cancel(&mut self, request: u64) -> Vec<Value> {
+    fn cancel(&mut self, request: u64) -> Vec<Json> {
+        self.interrupt(request, -32800, "request canceled")
+    }
+
+    fn interrupt(&mut self, request: u64, code: i64, message: &str) -> Vec<Json> {
         let Some((callback, pending)) = self
             .pending
             .iter_mut()
@@ -524,21 +568,21 @@ impl Session {
             return vec![];
         };
         pending.canceled = true;
-        let mut messages = vec![notify("$/cancelRequest", json!({"id":callback}))];
+        let mut messages = vec![notify("$/cancelRequest", &wire!({"id":callback}))];
         if let Action::Plugin { index, .. } = pending.action {
             let plugin = &mut self.configuration.as_mut().unwrap().plugins[index];
             plugin.state = PluginState::Retired;
             messages.push(notify(
                 "testhost/retirePlugin",
-                json!({"name":plugin.registration.name}),
+                &wire!({"name":plugin.registration.name}),
             ));
         }
         messages.push(progress(request, callback, "end"));
-        messages.push(failure(request, -32800, "request canceled", None));
+        messages.push(failure(request, code, message, None));
         messages
     }
 
-    fn shutdown(&mut self, id: u64, params: &Value) -> RequestResult {
+    fn shutdown(&mut self, id: u64, params: &RawValue) -> RequestResult {
         empty(params)?;
         let requests: Vec<_> = self.pending.values().map(|p| p.request).collect();
         let mut messages: Vec<_> = requests
@@ -550,7 +594,7 @@ impl Session {
                 if matches!(plugin.state, PluginState::Spawned | PluginState::Ready) {
                     messages.push(notify(
                         "testhost/retirePlugin",
-                        json!({"name":plugin.registration.name}),
+                        &wire!({"name":plugin.registration.name}),
                     ));
                     plugin.state = PluginState::Retired;
                 }
@@ -558,24 +602,29 @@ impl Session {
         }
         self.pending.clear();
         self.closed = true;
-        messages.push(success(id, Value::Null));
+        messages.push(success(id, &raw(&())));
         Ok(messages)
     }
 }
 
-type RequestResult = Result<Vec<Value>, (i64, String)>;
-fn decode<T: DeserializeOwned>(value: Value) -> Result<T, (i64, String)> {
-    serde_json::from_value(value).map_err(|error| (-32602, error.to_string()))
+type RequestResult = Result<Vec<Json>, (i64, String)>;
+fn decode<T: DeserializeOwned>(value: &RawValue) -> Result<T, (i64, String)> {
+    serde_json::from_str(value.get()).map_err(|error| (-32602, error.to_string()))
 }
-fn empty(value: &Value) -> Result<(), (i64, String)> {
-    if value.as_object().is_some_and(serde_json::Map::is_empty) {
+fn empty(value: &RawValue) -> Result<(), (i64, String)> {
+    if wire::fields(value).is_ok_and(|fields| fields.is_empty()) {
         Ok(())
     } else {
         Err((-32602, "expected empty params object".into()))
     }
 }
-fn ready(value: &Value) -> Result<(), String> {
-    if value == &json!({"ready":true}) {
+fn ready(value: &RawValue) -> Result<(), String> {
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct Ready {
+        ready: bool,
+    }
+    if serde_json::from_str::<Ready>(value.get()).is_ok_and(|value| value.ready) {
         Ok(())
     } else {
         Err("configuration callback must return {ready:true}".into())
@@ -584,67 +633,109 @@ fn ready(value: &Value) -> Result<(), String> {
 fn invalid(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error)
 }
-fn fields(value: &Value, allowed: &[&str]) -> io::Result<()> {
-    let object = value
-        .as_object()
-        .ok_or_else(|| invalid("expected object"))?;
+fn fields(object: &BTreeMap<String, &RawValue>, allowed: &[&str]) -> io::Result<()> {
     if object.keys().any(|key| !allowed.contains(&key.as_str())) {
         return Err(invalid("unknown envelope field"));
     }
     Ok(())
 }
-fn notify(method: &str, params: Value) -> Value {
-    let mut value = json!({"jsonrpc":"2.0","method":method});
-    value["params"] = params;
-    value
+fn notify(method: &str, params: &RawValue) -> Json {
+    wire!({"jsonrpc":"2.0","method":method,"params":params})
 }
-fn progress(id: u64, callback: &str, phase: &str) -> Value {
+fn progress(id: u64, callback: &str, phase: &str) -> Json {
     notify(
         "testhost/progress",
-        json!({"id":id,"callback":callback,"phase":phase}),
+        &wire!({"id":id,"callback":callback,"phase":phase}),
     )
 }
-fn success(id: u64, result: Value) -> Value {
-    let mut value = json!({"jsonrpc":"2.0","id":id});
-    value["result"] = result;
-    value
+fn success(id: u64, result: &RawValue) -> Json {
+    wire!({"jsonrpc":"2.0","id":id,"result":result})
 }
-fn failure(id: u64, code: i64, message: &str, data: Option<Value>) -> Value {
-    let mut error = json!({"code":code,"message":message});
-    if let Some(data) = data {
-        error["data"] = data;
-    }
-    // Deserializer errors may quote an arbitrarily large unknown field. Keep
-    // local diagnostics bounded; remote data is preflighted by the caller.
-    if message.len() > 4096 {
-        error["message"] = json!("invalid oversized protocol payload");
-    }
-    json!({"jsonrpc":"2.0","id":id,"error":error})
+fn failure(id: u64, code: i64, message: &str, data: Option<Json>) -> Json {
+    // Deserializer errors can quote an arbitrarily large unknown field.
+    let message = if message.len() > 4096 {
+        "invalid oversized protocol payload"
+    } else {
+        message
+    };
+    let error = if let Some(data) = data {
+        wire!({"code":code,"message":message,"data":data})
+    } else {
+        wire!({"code":code,"message":message})
+    };
+    wire!({"jsonrpc":"2.0","id":id,"error":error})
 }
-
-fn fits(value: &Value) -> bool {
-    // Serialize to a counting writer rather than allocate a second body. Every
-    // outgoing application payload is preflighted before committing its state.
-    struct Counter(usize);
-    impl io::Write for Counter {
-        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
-            self.0 = self
-                .0
-                .checked_add(bytes.len())
-                .filter(|n| *n <= crate::framing::MAX_BODY)
-                .ok_or_else(|| invalid("outgoing frame exceeds limit"))?;
-            Ok(bytes.len())
-        }
-        fn flush(&mut self) -> io::Result<()> {
-            Ok(())
-        }
-    }
-    serde_json::to_writer(Counter(0), value).is_ok()
+fn fits(value: &RawValue) -> bool {
+    value.get().len() <= crate::framing::MAX_BODY
 }
-fn response_fits(id: u64, value: &Value) -> Result<(), String> {
-    if fits(&json!({"jsonrpc":"2.0","id":id,"result":value})) {
+fn response_fits(id: u64, value: &RawValue) -> Result<(), String> {
+    if fits(&success(id, value)) {
         Ok(())
     } else {
-        Err("callback result exceeds frame limit".into())
+        Err("response exceeds frame limit".into())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn send(session: &mut Session, text: &str) -> io::Result<Vec<Json>> {
+        session.receive(&crate::framing::parse_json(text.as_bytes())?)
+    }
+
+    #[test]
+    fn canceled_configuration_failure_retires_the_reusable_session() {
+        let mut session = Session::default();
+        send(&mut session, r#"{"jsonrpc":"2.0","id":1,"method":"test/initialize","params":{"version":1,"caseSensitive":true,"base":{},"symlinks":{},"callbacks":[],"options":{},"plugins":[]}}"#).unwrap();
+        send(
+            &mut session,
+            r#"{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":1}}"#,
+        )
+        .unwrap();
+        assert!(send(
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":"callback:1","result":{"ready":true}}"#
+        )
+        .is_err());
+        assert!(session.is_closed());
+        assert!(!session.has_pending());
+        assert!(send(
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":2,"method":"test/state","params":{}}"#
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn malformed_configuration_acknowledgments_cannot_resume_old_state() {
+        for result in [
+            r#"{"ready":false}"#,
+            r#"{"ready":"true"}"#,
+            r#"{"ready":true,"extra":1}"#,
+        ] {
+            let mut session = Session::default();
+            send(&mut session, r#"{"jsonrpc":"2.0","id":1,"method":"test/initialize","params":{"version":1,"caseSensitive":true,"base":{},"symlinks":{},"callbacks":[],"options":{},"plugins":[]}}"#).unwrap();
+            let response = format!(r#"{{"jsonrpc":"2.0","id":"callback:1","result":{result}}}"#);
+            assert!(send(&mut session, &response).is_err());
+            assert!(session.is_closed());
+        }
+    }
+
+    #[test]
+    fn escaped_envelope_strings_and_extreme_numbers_keep_their_meaning() {
+        let mut session = Session::default();
+        let messages = send(&mut session, r#"{"jsonrpc":"2.\u0030","id":1,"method":"test\/initialize","params":{"version":1,"caseSensitive":true,"base":{},"symlinks":{},"callbacks":[],"options":{"huge":1e400,"tiny":1e-400},"plugins":[]}}"#).unwrap();
+        assert!(messages[1]
+            .get()
+            .contains(r#""options":{"huge":1e400,"tiny":1e-400}"#));
+        let messages = send(
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":"callback:\u0031","result":{"ready":true}}"#,
+        )
+        .unwrap();
+        assert!(messages[1]
+            .get()
+            .contains(r#""options":{"huge":1e400,"tiny":1e-400}"#));
     }
 }

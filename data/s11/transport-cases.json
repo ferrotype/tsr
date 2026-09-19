@@ -38,5 +38,12 @@
   {"id": "oversized-content-length", "category": "transport"},
   {"id": "truncated-frame-body", "category": "transport"},
   {"id": "recursive-duplicate-json-key", "category": "transport"},
-  {"id": "invalid-utf8-payload", "category": "transport"}
+  {"id": "invalid-utf8-payload", "category": "transport"},
+  {"id": "oversized-progress-preserves-unrelated-work", "category": "transport"},
+  {"id": "oversized-plugin-progress-retires-plugin", "category": "transport"},
+  {"id": "initialization-state-size-admission", "category": "controls"},
+  {"id": "canceled-options-applied-retires-session", "category": "controls"},
+  {"id": "canceled-initialization-applied-retires-session", "category": "controls"},
+  {"id": "canceled-configuration-ambiguous-retires-session", "category": "controls"},
+  {"id": "lossless-opaque-numbers", "category": "transport"}
 ]

@@ -19,7 +19,15 @@ Use pinned Go callbackFS semantics for the five read operations, including the
 null/delegate versus missing/empty distinctions. Fallback is restricted to an
 explicitly injected immutable filesystem. Accept strict Unicode JSON strings;
 do not silently replace arbitrary source bytes. Initialization and inferred
-options use a configuration callback as an explicit completion barrier.
+options use a configuration callback as an explicit completion barrier. Reject
+locally-known size failures before dispatch. Configuration errors guarantee no
+applied change (rollback must finish before the error). After cancellation, a
+late success or an unrecognized result retires the session instead of resuming
+with old local state. A malformed configuration acknowledgment also retires it.
+
+Retain opaque JSON numeric tokens without machine-float conversion. Bound
+forwarded progress before writing; overflow fails its owning operation while
+unrelated work remains live.
 
 Register plugin names/options at initialization and proxy their spawn,
 initialize, project, transform and disposal requests over the same connection.

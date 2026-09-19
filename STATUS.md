@@ -270,7 +270,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | relater | stale: source, pin, command or inputs changed | [result](status/evidence/981fff12bacd54eab8b02804bdb78919731df5cccb1ad6a4c0890017a369c642.json) |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/a780a5cf0cd4d6249daa7287693b4566c152cbff2d4222a1519b03cc4a36d658.json) |
 | selftest | stale: source, pin, command or inputs changed | [result](status/evidence/2d5e9ecabb86447be036777da406fb62f21fb7cef7cfae92089b668c4a9d1230.json) |
-| testhost | current | [result](status/evidence/8d45bd2869fc6348f26d38167f1afd9aa17c7092898d4bb6a51a16699226746c.json) |
+| testhost | current | [result](status/evidence/8105eeaa4a7a5a83c6cd25c326018760d97ca4478a2ce7600c202451b4ddd430.json) |
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/401b6ca3fc7962b28120333db5d71228cd24b65a96acd4406ceaa8b1dabd1df2.json) |
 
 ## Sprints

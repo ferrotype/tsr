@@ -3,6 +3,7 @@
 mod filesystem;
 pub mod framing;
 mod session;
+mod wire;
 
 pub use session::Session;
 
@@ -16,7 +17,7 @@ pub fn serve<R: std::io::BufRead, W: std::io::Write>(
     while let Some(bytes) = framing::read(reader)? {
         let message = framing::parse_json(&bytes)?;
         for response in session.receive(&message)? {
-            framing::write(writer, &serde_json::to_vec(&response)?)?;
+            framing::write(writer, response.get().as_bytes())?;
         }
         if session.is_closed() {
             return Ok(());

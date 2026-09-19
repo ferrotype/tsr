@@ -4,6 +4,7 @@
   "fs/read-fallback-empty",
   "fs/read-callback-content",
   "fs/read-callback-missing-shadows-base",
+  "fs/read-callback-omitted-content-shadows-base",
   "fs/read-callback-empty-shadows-base",
   "fs/read-disabled-skips-callback",
   "fs/read-base-strips-bom",
@@ -73,5 +74,12 @@
   "oversized-content-length",
   "truncated-frame-body",
   "recursive-duplicate-json-key",
-  "invalid-utf8-payload"
+  "invalid-utf8-payload",
+  "oversized-progress-preserves-unrelated-work",
+  "oversized-plugin-progress-retires-plugin",
+  "initialization-state-size-admission",
+  "canceled-options-applied-retires-session",
+  "canceled-initialization-applied-retires-session",
+  "canceled-configuration-ambiguous-retires-session",
+  "lossless-opaque-numbers"
 ]
