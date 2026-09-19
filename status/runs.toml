@@ -5,6 +5,14 @@
 # and S09 retention, request scratch and generation/pool/registry boundaries.
 # These and the E4/E1 leaves remain scoped, not whole-experiment completion.
 
+[testhost]
+command = ["python3", "scripts/s11.py", "capture"]
+inputs = ["data/upstream.json", ".gitmodules", "data/s04/toolchains.toml", "docs/S11.md"]
+cases = "data/s11/cases.json"
+sources = ["Cargo.*", "rust-toolchain*", ".cargo/**", "xtask/**", "crates/ts_testhost/**", "crates/ts_vfs/**", "crates/ts_tspath/**", "crates/ts_core/**", "crates/ts_jsstring/**", "scripts/s11*.py", "scripts/tests/test_s11.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/tracking-bootstrap.py", "data/s11/**", "tools/s11/**", "upstream"]
+target = "host"
+config = "S11 test-only framed subprocess transport; exact filesystem fixtures against pinned callbackFS and injected vfstest, actual contentmapper test-spawner byte streams, internal options-hook contracts, explicit control/cancellation/progress and malformed-protocol contracts; strict Unicode JSON domain, no disk fallback or compiler/language-service/fourslash semantic coverage"
+
 [workspace]
 command = ["python3", "scripts/tracking-bootstrap.py", "workspace"]
 inputs = ["Cargo.toml", "Cargo.lock"]

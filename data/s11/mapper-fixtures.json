@@ -1,0 +1,52 @@
+[
+  {
+    "id": "mapper-verbatim-ascii",
+    "mapper": "verbatim-mapper",
+    "requests": [
+      {"method":"initialize","params":{"locale":"en-US","positionEncodings":["utf-8","utf-16"]}},
+      {"method":"openProject","params":{"configFileName":"/work/tsconfig.json","projectHandle":"project-ascii","options":{},"compilerOptions":{"target":7}}},
+      {"method":"transform","params":{"fileName":"/work/component.box","content":"export const value = 1;\n","projectHandle":"project-ascii"}},
+      {"method":"closeProject","params":{"projectHandle":"project-ascii"}}
+    ]
+  },
+  {
+    "id": "mapper-verbatim-unicode",
+    "mapper": "verbatim-mapper",
+    "requests": [
+      {"method":"initialize","params":{"locale":"en-US","positionEncodings":["utf-8"]}},
+      {"method":"openProject","params":{"configFileName":"/work/tsconfig.json","projectHandle":"project-unicode","options":{"label":"café"},"compilerOptions":{}}},
+      {"method":"transform","params":{"fileName":"/work/café.box","content":"const π = '😀';\r\n","projectHandle":"project-unicode"}},
+      {"method":"closeProject","params":{"projectHandle":"project-unicode"}}
+    ]
+  },
+  {
+    "id": "mapper-module-verbatim",
+    "mapper": "module-verbatim-mapper",
+    "requests": [
+      {"method":"initialize","params":{"locale":"en-US","positionEncodings":["utf-8"]}},
+      {"method":"openProject","params":{"configFileName":"","projectHandle":"inferred-project","compilerOptions":{}}},
+      {"method":"transform","params":{"fileName":"/work/component.box","content":"export default 42;\n","projectHandle":"inferred-project"}},
+      {"method":"closeProject","params":{"projectHandle":"inferred-project"}}
+    ]
+  },
+  {
+    "id": "mapper-transform-error",
+    "mapper": "failing-mapper",
+    "requests": [
+      {"method":"initialize","params":{"locale":"en-US","positionEncodings":["utf-8"]}},
+      {"method":"openProject","params":{"configFileName":"/work/tsconfig.json","projectHandle":"project-error","options":{},"compilerOptions":{}}},
+      {"method":"transform","params":{"fileName":"/work/component.box","content":"unhandled input","projectHandle":"project-error"}},
+      {"method":"closeProject","params":{"projectHandle":"project-error"}}
+    ]
+  },
+  {
+    "id": "mapper-option-diagnostic",
+    "mapper": "verbatim-mapper",
+    "requests": [
+      {"method":"initialize","params":{"locale":"en-US","positionEncodings":["utf-8"]}},
+      {"method":"openProject","params":{"configFileName":"/work/tsconfig.json","projectHandle":"project-options","options":{"plugins":[{"name":1}]},"compilerOptions":{}}},
+      {"method":"transform","params":{"fileName":"/work/component.box","content":"const stillTransforms = true;\n","projectHandle":"project-options"}},
+      {"method":"closeProject","params":{"projectHandle":"project-options"}}
+    ]
+  }
+]

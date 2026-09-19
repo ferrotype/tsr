@@ -171,6 +171,13 @@ jobs:
         run: |
           cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked
           cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked --release
+      - name: Test-host framing and native subprocess contracts
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: |
+          cargo test -p ts_testhost --locked
+          cargo test -p ts_testhost --locked --release
+          python3 -m unittest discover -s scripts/tests -p test_s11.py
+          cargo xtask run testhost
       - name: Navigation and formatter contracts in debug and release
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
@@ -238,6 +245,8 @@ jobs:
             'run.clippy.clean == true' \
             'run.deny.clean == true' \
             'run.selftest.pass == true' \
+            'run.testhost.parity == 1' \
+            'run.testhost.controls == true' \
             'run.gen.patches_apply == true' \
             'run.gen.ast_schema == true' \
             'run.gen.drift == false' \
@@ -327,6 +336,7 @@ jobs:
             target/s07-binder-reports/
             target/s07-program-reports/
             target/s07-subset/review/review-payload.json
+            target/s11-reports/
           if-no-files-found: error
 
   embedding:
