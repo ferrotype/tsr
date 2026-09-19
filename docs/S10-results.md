@@ -169,3 +169,14 @@ source hashes and the instrumented binary remain in
 with `--features worker-probe`, copying the library to a separate `.node` file,
 and running `node tools/s10/node/worker-probe.mjs <binary.node> 21 100`.
 The feature is absent from the shipped default Node build.
+
+## CI capture isolation
+
+Run `35437940348` failed before portable-host execution because `rust-cache`
+restored `target/s10/portable`; the capture refused to overwrite that directory.
+CI now writes to a run-and-attempt-specific directory under `RUNNER_TEMP`,
+outside the Cargo cache, and uploads the complete replay bundle. Existing
+captures remain untouched. A regression exercises a restored target, two run
+attempts and duplicate-output refusal. A fresh local portable capture using the
+workflow command passes with `portable_host: true`. This fixes capture setup;
+it does not close the performance criteria or refresh the full corpus evidence.

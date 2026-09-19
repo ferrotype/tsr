@@ -2,6 +2,9 @@
 import contextlib
 import copy
 import io
+import json
+import os
+import shlex
 import subprocess
 import tempfile
 import tomllib
@@ -16,6 +19,52 @@ from s06_ownership import validate_output
 
 
 class S10Evidence(unittest.TestCase):
+    def test_ci_capture_survives_restored_target_and_uses_a_new_retry_path(self):
+        workflow = (corpus.ROOT / '.github/workflows/status.yml').read_text()
+        command = next(line.strip() for line in workflow.splitlines()
+                       if line.strip().startswith('python3 scripts/s10_measure.py capture'))
+        self.assertIn('path: ${{ runner.temp }}/s10-portable-${{ github.run_id }}-${{ github.run_attempt }}/', workflow)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / 'checkout'
+            cached = root / 'target/s10/portable'
+            cached.mkdir(parents=True)
+            marker = cached / 'prior-capture.json'
+            marker.write_text('preserve')
+            runner_temp = Path(temporary) / 'runner-temp'
+            fixture = root / 'tools/s10/parser/fixtures.json'
+            fixture.parent.mkdir(parents=True)
+            fixture.write_text('[{"id":"fixture"}]')
+            package = root / 'upstream/package.json'
+            package.parent.mkdir()
+            package.write_text('{"volta":{"node":"24.20.0"}}')
+
+            def run_child(*args, **kwargs):
+                kwargs['stdout'].write(json.dumps({'mode': 'checker', 'fixtures': 1,
+                                                   'ownership': 'passed'}).encode())
+                return subprocess.CompletedProcess(args, 0)
+
+            for attempt in ['1', '2']:
+                with patch.dict(os.environ, RUNNER_TEMP=str(runner_temp),
+                                GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT=attempt):
+                    arguments = [os.path.expandvars(arg) for arg in shlex.split(command)]
+                output = Path(arguments[arguments.index('--output') + 1])
+                self.assertEqual(output.parent, runner_temp)
+                from argparse import Namespace
+                request = Namespace(kind='portable', output=output, limit=0, samples=7, iterations=100)
+                with patch.object(measure, 'ROOT', root), patch.object(measure, 'sources', return_value={}), \
+                        patch.object(measure, 'build_files', return_value=[]), \
+                        patch.object(measure, 'node_version', return_value='v24.20.0'), \
+                        patch.object(measure, 'node_flags', return_value=[]), \
+                        patch.object(measure.platform, 'platform', return_value='test-host'), \
+                        patch.object(measure.platform, 'processor', return_value='test-cpu'), \
+                        patch.object(measure.subprocess, 'run', side_effect=run_child):
+                    self.assertTrue(measure.capture(request)['metrics']['portable_host'])
+                    with self.assertRaises(FileExistsError):
+                        measure.capture(request)
+            self.assertEqual(marker.read_text(), 'preserve')
+            self.assertTrue((runner_temp / 's10-portable-123-1/verified.json').exists())
+            self.assertTrue((runner_temp / 's10-portable-123-2/verified.json').exists())
+
     def test_all_capture_inputs_are_covered_by_consuming_ledgers(self):
         captured = set(corpus.sources())
         runs = tomllib.loads((corpus.ROOT / 'status/runs.toml').read_text())

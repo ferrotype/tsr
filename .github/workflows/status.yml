@@ -366,7 +366,9 @@ jobs:
         run: |
           python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
           cargo build --locked --release -p ts_wasm --example parser
-          python3 scripts/s10_measure.py capture --kind portable --output target/s10/portable
+          # rust-cache restores target/, including old or emptied capture dirs.
+          # Keep fresh evidence outside that cache and never overwrite a capture.
+          python3 scripts/s10_measure.py capture --kind portable --output "$RUNNER_TEMP/s10-portable-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
       - name: External consumer ownership in debug and release
         if: ${{ !cancelled() }}
         run: |
@@ -377,9 +379,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: s10-portable
-          path: |
-            target/s10/portable/capture.json
-            target/s10/portable/completed.json
-            target/s10/portable/raw.json
-            target/s10/portable/stderr
-            target/s10/portable/verified.json
+          # Include the authenticated artifact bundle needed for replay.
+          path: ${{ runner.temp }}/s10-portable-${{ github.run_id }}-${{ github.run_attempt }}/
