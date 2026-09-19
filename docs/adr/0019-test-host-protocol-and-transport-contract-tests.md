@@ -128,3 +128,6 @@ The authorities at the pin are `internal/api/callbackfs.go`,
 The frozen inventories live in `data/s11/`; access-only bridges in `tools/s11/`;
 the producer is `cargo xtask run testhost`. See [S11](../S11.md) for the exact
 wire schema, bounds, hook contract and validation scope.
+
+[S11 closure](../S11-closure.md) records the successful macOS ARM64 and Linux
+x86-64 CI captures, the satisfied S06 prerequisite and the retained evidence.

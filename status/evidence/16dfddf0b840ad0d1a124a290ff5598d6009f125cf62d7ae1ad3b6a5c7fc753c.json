@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "deny",
+  "recorded_at": 1789826594,
+  "context": {
+    "revision": "098941fd9e7a723bc606748bc85de5ad06d910c3",
+    "source_sha256": "6e5bb8902722f6c44fcb3243a6e2c7dd779ba59a4d7f2b3f9b1980d0f8bd6de5",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/runner/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/runner/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "82d8f44574fe8b378658ca5ea21f32edee42e294f91b069ee5e6e1b833a9e55e",
+  "inputs": {
+    "Cargo.lock": "4a42cf4a8d8e23ef867f7cca3c40788963b6b6b4553b53eec578d107ce28f5c3",
+    "deny.toml": "8cc4440eb7ef1604ded78918cca6cbc6aba1bcb6e7705d501e2d11448f16d7d6"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "deny"
+  ],
+  "target": "host",
+  "config": "advisories, licenses, bans, sources",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "cargo-deny 0.20.2\n+ cargo deny --locked check\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:30:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m30\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33m0BSD\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:26:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m26\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33mBSD-2-Clause\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━━━━━━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:27:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m27\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33mBSD-3-Clause\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━━━━━━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:33:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m33\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33mCC0-1.0\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:32:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m32\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33mUnicode-DFS-2016\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━━━━━━━━━━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[38;5;11mwarning[license-not-encountered]\u001b[0m\u001b[1m: license was not encountered\u001b[0m\n   \u001b[0m\u001b[36m┌─\u001b[0m /Users/runner/work/ts-rust/ts-rust/deny.toml:29:4\n   \u001b[0m\u001b[36m│\u001b[0m\n\u001b[0m\u001b[36m29\u001b[0m \u001b[0m\u001b[36m│\u001b[0m   \"\u001b[0m\u001b[33mZlib\u001b[0m\",\n   \u001b[0m\u001b[36m│\u001b[0m    \u001b[0m\u001b[33m━━━━\u001b[0m \u001b[0m\u001b[33munmatched license allowance\u001b[0m\n\nadvisories \u001b[32mok\u001b[0m, bans \u001b[32mok\u001b[0m, licenses \u001b[32mok\u001b[0m, sources \u001b[32mok\u001b[0m\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "cc2e644632232cf4eff80ae1e250054b5957e3e4e2f617446f96d9f929d5b11c",
+  "valid_capture": true
+}
