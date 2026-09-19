@@ -1,13 +1,11 @@
+use crate::api_error as error;
 use std::sync::Arc;
 use ts_arena::Counters;
 use ts_ast::Diagnostic;
+use ts_compiler::diagnostic_writer::DiagnosticWriter;
 use ts_embed::{FileCache, ProgramOptions, Session};
 use ts_jsstring::JsString;
 use wasm_bindgen::prelude::*;
-
-fn error(value: impl std::fmt::Display) -> JsValue {
-    JsValue::from_str(&value.to_string())
-}
 
 /// Explicit input snapshot. No method can fall back to the native filesystem.
 #[wasm_bindgen]
@@ -106,9 +104,13 @@ impl WasmSession {
         let values = program
             .sort_and_deduplicate_diagnostics(&diagnostics)
             .map_err(error)?;
+        let sources = DiagnosticWriter::new(
+            program,
+            ts_compiler::diagnostic_writer::FormattingOptions::default(),
+        );
         let rows: Result<Vec<_>, _> = values
             .iter()
-            .map(|value| diagnostic(program, value))
+            .map(|value| diagnostic(&sources, value))
             .collect();
         serde_json::to_vec(&rows?).map_err(error)
     }
@@ -149,38 +151,26 @@ impl WasmSession {
 }
 
 fn diagnostic(
-    program: &ts_compiler::Program,
+    sources: &DiagnosticWriter<'_>,
     value: &Diagnostic,
 ) -> Result<serde_json::Value, JsValue> {
     let file = if let Some(id) = value.file {
-        let source = program
-            .files()
-            .iter()
-            .find(|file| file.source() == id)
-            .ok_or_else(|| error("diagnostic source not in program"))?;
-        Some(
-            source
-                .bound()
-                .view()
-                .source_file()
-                .map_err(error)?
-                .parse_options()
-                .file_name
-                .as_bytes()
-                .to_vec(),
-        )
+        // Reuse the program's owner index, also handling config sources. No
+        // scan of all program files for each diagnostic or related record.
+        let source = sources.source(id).map_err(error)?;
+        Some(source.parse_options().file_name.as_bytes().to_vec())
     } else {
         None
     };
     let chain: Result<Vec<_>, _> = value
         .message_chain
         .iter()
-        .map(|v| diagnostic(program, v))
+        .map(|v| diagnostic(sources, v))
         .collect();
     let related: Result<Vec<_>, _> = value
         .related_information
         .iter()
-        .map(|v| diagnostic(program, v))
+        .map(|v| diagnostic(sources, v))
         .collect();
     Ok(serde_json::json!({
         "file": file, "start": value.loc.pos(), "end": value.loc.end(),

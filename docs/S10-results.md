@@ -5,6 +5,10 @@ tree committed as `09e6016`. S10 remains open: all three performance criteria
 miss their unchanged thresholds. The plan and API contracts are in
 [S10-implementation-plan.md](S10-implementation-plan.md) and [S10.md](S10.md).
 
+The review fixes below change the source scope and adapter code. The initial
+captures remain preserved historical results; they are not evidence for the
+amended revision, and E7/E8 must be refreshed before claiming current acceptance.
+
 ## Recorded gates
 
 | Criterion | Observed | Required | Result |
@@ -110,3 +114,58 @@ about 6.7% reduction; parser elapsed time about 16.2%; Node elapsed time about
 70.7%, if their paired Go denominators remain unchanged. These are distances,
 not predicted savings. Any retained change needs a fresh paired result and the
 same correctness/ownership gates. No thresholds, inputs or exclusions changed.
+
+## Review fixes and Node worker attribution
+
+Recoverable wasm `Result::Err` responses now become `WasmApiError`; independent
+sessions survive invalid paths, positions, options and retired-session queries.
+Unclassified exceptions and traps remain terminal, including engine stack
+exhaustion reported as `RangeError`. JSON serialization happens before consuming
+a host. Diagnostic file lookup uses the program's existing owner index rather
+than scanning all files for every record.
+
+Selftest now discovers both Python test directories, including S10 and the
+previously omitted S08 root suites, without executing legacy shim registrations
+twice. E7/E8 fingerprints share an explicit dependency manifest and tests verify
+closure coverage, ledger agreement and immunity to unrelated edits. Node's two
+entry points accept JSX/force-module options; the socket benchmark removes its
+own temporary directory even on failure.
+
+Validation: 65 tracker tests and 565 Python tests (one existing skip) pass through
+the registered selftest producer. Workspace Clippy with warnings denied passes with all features and targets. The rebuilt checker wasm passes
+ten parser fixtures plus recoverable-error, sibling-session, disposal and
+terminal-exception checks. The normal release Node module passes forty retained
+outputs over four lifecycles, plus JSX and forced-module byte comparisons with
+the native parser. A one-input socket benchmark smoke matched the encoded
+bytes and verified removal of its temporary directory.
+
+The optional `ts_node/worker-probe` feature timestamps the existing request
+path without changing the worker's reserved stack. The outer owner thread only
+joins the parser worker; it does not forward each request through another queue.
+Twenty-one alternating normal/instrumented batches used 100 fresh 10 KiB inputs
+each after one warmup. Every encoded output matched. No task builds or other
+tests ran during timing; one-minute host load was 5.89. Sources stayed stable.
+
+| Median per call | Microseconds |
+| --- | ---: |
+| Normal JS wall interval | 370.695 |
+| Instrumented JS wall interval | 373.260 |
+| Input preparation | 0.693 |
+| Channel creation, dispatch and worker wakeup | 1.990 |
+| Worker parse, encode and request disposal | 364.235 |
+| Reply and caller wakeup | 2.950 |
+
+The paired median instrumented/normal ratio was 1.00488. Dispatch plus return
+took 4.940 µs, about 1.3% of normal elapsed time. Eliminating those boundaries
+alone cannot explain or close the roughly 70% reduction needed in the initial
+paired E8 result. This is attribution, not an inline implementation experiment
+or an acceptance measurement; removing channels could also change scheduling
+and cache behavior. Next CPU work should inspect parsing/encoding on the worker.
+
+[The compact probe record](s10-node-worker-probe.json) retains every batch's
+timing and load, hashes and boundary definitions. Full input/output hashes,
+source hashes and the instrumented binary remain in
+`target/s10/review-worker-probe`. Reproduce by building `ts_node` in release
+with `--features worker-probe`, copying the library to a separate `.node` file,
+and running `node tools/s10/node/worker-probe.mjs <binary.node> 21 100`.
+The feature is absent from the shipped default Node build.

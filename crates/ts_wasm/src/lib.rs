@@ -9,6 +9,12 @@ use ts_core::ScriptKind;
 use ts_jsstring::{JsString, SourceText};
 use wasm_bindgen::prelude::*;
 
+// Private ABI tag: only an explicit Rust Result::Err uses this prefix. Unknown
+// JS exceptions (including engine RangeError stack exhaustion) remain terminal.
+fn api_error(value: impl std::fmt::Display) -> JsValue {
+    JsValue::from_str(&format!("ts-wasm-api-error:{value}"))
+}
+
 #[cfg(feature = "checker")]
 mod checker;
 #[cfg(feature = "checker")]
@@ -18,10 +24,8 @@ pub use checker::{MemoryHost, WasmSession};
 #[cfg(feature = "corpus")]
 #[wasm_bindgen]
 pub fn observe_corpus(request: &str) -> Result<Vec<u8>, JsValue> {
-    let request =
-        serde_json::from_str(request).map_err(|error| JsValue::from_str(&error.to_string()))?;
-    serde_json::to_vec(&s10_corpus::observe(&request, ts_embed::Session::load))
-        .map_err(|error| JsValue::from_str(&error.to_string()))
+    let request = serde_json::from_str(request).map_err(api_error)?;
+    serde_json::to_vec(&s10_corpus::observe(&request, ts_embed::Session::load)).map_err(api_error)
 }
 
 fn options(file_name: &[u8], jsx: bool, force: bool) -> SourceFileParseOptions {
@@ -73,5 +77,5 @@ pub fn parse_and_encode(
         ScriptKind(script_kind),
         options(file_name, jsx, force),
     )
-    .map_err(|error| JsValue::from_str(&error.to_string()))
+    .map_err(api_error)
 }

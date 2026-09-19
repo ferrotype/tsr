@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "clippy",
+  "recorded_at": 1789814060,
+  "context": {
+    "revision": "eae9ad61f7d4f2a64b940c2663d3f2a8b1c9e112",
+    "source_sha256": "a8fc4e571e9360bd64e2b2685ac7aef8f4cf574d452d2092eb0dc2bc9b217652",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "9732e9b52e5b137977563a562737345d1615edcecfae6116d97c570d960b1103",
+  "inputs": {
+    "Cargo.lock": "f8dd90814105d0b1f58e1977bb995e99c7d51fb28d18a688177f3ca414e37e44",
+    "Cargo.toml": "c81094fcfd0cd4cafd74ede00e03495e31ca7fe34e44c27be01f3a865dad5299"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "clippy"
+  ],
+  "target": "host",
+  "config": "debug; all targets and features; -D warnings",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "clippy 0.1.97 (8bab26f4f6 2026-07-14)\n+ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings\n    Checking xtask v0.1.0 (/Users/cristian/git/ts-rust/xtask)\n    Checking ts_node v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_node)\n    Checking ts_wasm v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_wasm)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.44s\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "f978235a0b1786305c8f79117dec715867164f4b4116d75676b5d86992e8a064",
+  "valid_capture": true
+}

@@ -52,7 +52,7 @@ def selftest(root):
     require(["cargo", "--version"], root)
     require(["go", "version"], root)
     passed = run(["cargo", "test", "--package", "xtask", "--locked"], root) == 0
-    passed = run([sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests", "-q"], root) == 0 and passed
+    passed = run([sys.executable, "scripts/run_tests.py"], root) == 0 and passed
     return {"pass": passed}
 
 

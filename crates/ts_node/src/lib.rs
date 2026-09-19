@@ -14,7 +14,13 @@ struct Input {
 }
 
 impl Input {
-    fn new(source: &Buffer, name: &Buffer, kind: i32) -> napi::Result<Self> {
+    fn new(
+        source: &Buffer,
+        name: &Buffer,
+        kind: i32,
+        jsx: bool,
+        force: bool,
+    ) -> napi::Result<Self> {
         if source.len() > i32::MAX as usize || name.len() > i32::MAX as usize {
             return Err(napi::Error::from_reason(
                 "input exceeds signed source positions",
@@ -26,7 +32,10 @@ impl Input {
             options: SourceFileParseOptions {
                 file_name: JsString::from_bytes(name.as_ref()),
                 path: JsString::from_bytes(name.as_ref()),
-                ..Default::default()
+                external_module_indicator_options: ts_ast::ExternalModuleIndicatorOptions {
+                    jsx,
+                    force,
+                },
             },
         })
     }
@@ -41,16 +50,46 @@ impl Input {
 }
 
 #[napi(js_name = "parseAndEncode")]
-pub fn parse_and_encode(source: Buffer, name: Buffer, kind: i32) -> napi::Result<Buffer> {
-    Input::new(&source, &name, kind)?
-        .execute()
-        .map(Buffer::from)
-        .map_err(napi::Error::from_reason)
+pub fn parse_and_encode(
+    source: Buffer,
+    name: Buffer,
+    kind: i32,
+    jsx: Option<bool>,
+    force: Option<bool>,
+) -> napi::Result<Buffer> {
+    Input::new(
+        &source,
+        &name,
+        kind,
+        jsx.unwrap_or(false),
+        force.unwrap_or(false),
+    )?
+    .execute()
+    .map(Buffer::from)
+    .map_err(napi::Error::from_reason)
 }
 
 struct Request {
     input: Input,
-    reply: Sender<Result<Vec<u8>, String>>,
+    reply: Sender<Response>,
+    #[cfg(feature = "worker-probe")]
+    measure: bool,
+}
+
+struct Response {
+    result: Result<Vec<u8>, String>,
+    #[cfg(feature = "worker-probe")]
+    work: Option<(std::time::Instant, std::time::Instant)>,
+}
+
+#[cfg(feature = "worker-probe")]
+#[napi(object)]
+pub struct WorkerMeasurement {
+    pub output: Buffer,
+    pub prepare_ns: f64,
+    pub dispatch_ns: f64,
+    pub work_ns: f64,
+    pub return_ns: f64,
 }
 
 /// A persistent reserved-stack parser worker. Calls remain synchronous from JS;
@@ -74,7 +113,16 @@ impl Parser {
                 // Its reserved stack and nested-parser contract stay unchanged.
                 ts_parser::on_parser_worker(move || {
                     while let Ok(request) = receiver.recv() {
-                        let _ = request.reply.send(request.input.execute());
+                        #[cfg(feature = "worker-probe")]
+                        let started = request.measure.then(std::time::Instant::now);
+                        let result = request.input.execute();
+                        #[cfg(feature = "worker-probe")]
+                        let work = started.map(|start| (start, std::time::Instant::now()));
+                        let _ = request.reply.send(Response {
+                            result,
+                            #[cfg(feature = "worker-probe")]
+                            work,
+                        });
                     }
                 });
             })
@@ -91,6 +139,8 @@ impl Parser {
         source: Buffer,
         name: Buffer,
         kind: i32,
+        jsx: Option<bool>,
+        force: Option<bool>,
     ) -> napi::Result<Buffer> {
         let sender = self
             .sender
@@ -99,13 +149,22 @@ impl Parser {
         let (reply, receiver) = mpsc::channel();
         sender
             .send(Request {
-                input: Input::new(&source, &name, kind)?,
+                input: Input::new(
+                    &source,
+                    &name,
+                    kind,
+                    jsx.unwrap_or(false),
+                    force.unwrap_or(false),
+                )?,
                 reply,
+                #[cfg(feature = "worker-probe")]
+                measure: false,
             })
             .map_err(|_| napi::Error::from_reason("parser worker exited"))?;
         receiver
             .recv()
             .map_err(|_| napi::Error::from_reason("parser worker exited"))?
+            .result
             .map(Buffer::from)
             .map_err(napi::Error::from_reason)
     }
@@ -118,6 +177,58 @@ impl Parser {
             // the worker even after it unwound. Drop must not itself panic.
             let _ = worker.join();
         }
+    }
+}
+
+#[cfg(feature = "worker-probe")]
+#[napi]
+impl Parser {
+    /// Attribute the existing request path without bypassing its reserved stack.
+    /// This instrumented feature is a diagnostic, never E8 acceptance evidence.
+    ///
+    /// # Panics
+    /// Panics if the worker violates the instrumented response protocol.
+    #[napi(js_name = "measureParseAndEncode")]
+    pub fn measure_parse_and_encode(
+        &self,
+        source: Buffer,
+        name: Buffer,
+        kind: i32,
+    ) -> napi::Result<WorkerMeasurement> {
+        use std::time::Instant;
+        let start = Instant::now();
+        let sender = self
+            .sender
+            .as_ref()
+            .ok_or_else(|| napi::Error::from_reason("parser is closed"))?;
+        let input = Input::new(&source, &name, kind, false, false)?;
+        let prepared = Instant::now();
+        let (reply, receiver) = mpsc::channel();
+        sender
+            .send(Request {
+                input,
+                reply,
+                measure: true,
+            })
+            .map_err(|_| napi::Error::from_reason("parser worker exited"))?;
+        let response = receiver
+            .recv()
+            .map_err(|_| napi::Error::from_reason("parser worker exited"))?;
+        let completed = Instant::now();
+        let (work_start, work_end) = response
+            .work
+            .expect("measured request has worker timestamps");
+        let ns = |duration: std::time::Duration| duration.as_secs_f64() * 1e9;
+        Ok(WorkerMeasurement {
+            output: response
+                .result
+                .map(Buffer::from)
+                .map_err(napi::Error::from_reason)?,
+            prepare_ns: ns(prepared.duration_since(start)),
+            dispatch_ns: ns(work_start.duration_since(prepared)),
+            work_ns: ns(work_end.duration_since(work_start)),
+            return_ns: ns(completed.duration_since(work_end)),
+        })
     }
 }
 

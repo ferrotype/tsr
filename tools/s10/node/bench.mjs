@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
 import { loadavg, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -18,12 +18,13 @@ assert.equal(Buffer.byteLength(template), 10240);
 // default parser options and the server's canonical path name the same file.
 const cwd = mkdtempSync(join(tmpdir(), "ts-rust-s10-node-"));
 const physicalFilename = join(cwd, "input.ts");
-writeFileSync(physicalFilename, template);
-const api = await socketServer(resolve("target/s10/go/tsgo"), cwd,
-  join(tmpdir(), `ts-rust-s10-${process.pid}.sock`));
+let api;
 let serial = 0;
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 try {
+  writeFileSync(physicalFilename, template);
+  api = await socketServer(resolve("target/s10/go/tsgo"), cwd,
+    join(cwd, "api.sock"));
   const initialized = await api.call("initialize");
   const filename = initialized.useCaseSensitiveFileNames ? physicalFilename : physicalFilename.toLowerCase();
   const name = Buffer.from(filename);
@@ -80,4 +81,7 @@ try {
     socket_extra_work: "snapshot update, program loading/binding, reference release, JSON-RPC/base64 transport",
     warmup: batches[0], samples: batches.slice(1), server_stderr: api.stderr,
   }));
-} finally { adapter.close(); await api.close(); }
+} finally {
+  try { adapter.close(); await api?.close(); }
+  finally { rmSync(cwd, { recursive: true, force: true }); }
+}

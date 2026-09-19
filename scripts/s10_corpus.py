@@ -27,16 +27,17 @@ def file_digest(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
+def source_patterns():
+    return p4.read(ROOT / 'tools/s10/sources.json')['patterns']
+
+
 def sources():
-    values = e2.sources()
-    for pattern in ('tools/s10/**/*', 'scripts/s10*.py', 'status/experiments.toml',
-                    'rust-toolchain.toml', 'status/runs.toml', 'data/divergences.toml', 'data/s07/vscode*.json',
-                    'data/workloads.toml', 'data/s04/toolchains.toml', 'scripts/s07_benchmark_stats.py',
-                    'scripts/s04_ownership.py', 'scripts/s04_runtime.py', 'scripts/s06_ownership.py'):
-        for path in ROOT.glob(pattern):
-            if path.is_file() and '__pycache__' not in path.parts:
-                values[str(path.relative_to(ROOT))] = file_digest(path)
-    return values
+    # Reviewed union of the public adapters, shared E2 walker/native authority,
+    # ownership helpers and measurement inputs. The ledger is tested against
+    # this manifest; unrelated project/API/formatter tools are not dependencies.
+    paths = {path for pattern in source_patterns() for path in ROOT.glob(pattern)
+             if path.is_file() and '__pycache__' not in path.parts}
+    return {str(path.relative_to(ROOT)): file_digest(path) for path in sorted(paths)}
 
 
 def node_flags():

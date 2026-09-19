@@ -221,13 +221,13 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 | E5: Memory | type_footprint | `run.e5.type_footprint_ratio <= 0.85` Rust / Go per-type footprint on the frozen checker subset | missing | pending |
 | E6: CPU | one_thread | `run.e6.one_thread_wall_time_ratio <= 1.25` Rust / Go wall time at one thread | missing | pending |
 | E6: CPU | eight_threads | `run.e6.eight_threads_wall_time_ratio <= 1.45` Rust / Go wall time at eight threads | missing | pending |
-| E7: WebAssembly | parser_artifact_size | `run.e7.parser_artifact_size_ratio <= 0.25` Rust wasm32 / Go GOOS=js parser artifact bytes | 0.2680190590576252 | fail |
-| E7: WebAssembly | parse_throughput | `run.e7.parse_throughput_ratio >= 2` Rust / Go parse throughput | 1.6769124958322452 | fail |
-| E7: WebAssembly | checker_parity | `run.e7.checker_parity == 1` frozen E2 cases matching both diagnostics and types / frozen E2 cases | 1 | pass |
-| E7: WebAssembly | portable_host | `run.e7.portable_host == true` checker subset runs using an in-memory host without native process/filesystem dependencies | true | pass |
-| E8: Embedding | node_parse_latency | `run.e8.node_parse_latency_ratio <= 0.1` Node in-process / --api socket parse-and-encode latency for a 10 KB file | 0.341848023513094 | fail |
-| E8: Embedding | rust_consumer_parity | `run.e8.rust_consumer_parity == 1` frozen E2 cases matching diagnostics and types through the separate Rust consumer / frozen E2 cases | 1 | pass |
-| E8: Embedding | lifetime_checks | `run.e8.lifetime_checks == true` consumer-supplied host passes applicable E3 checks through repeated create/query/drop operations | true | pass |
+| E7: WebAssembly | parser_artifact_size | `run.e7.parser_artifact_size_ratio <= 0.25` Rust wasm32 / Go GOOS=js parser artifact bytes | missing | pending |
+| E7: WebAssembly | parse_throughput | `run.e7.parse_throughput_ratio >= 2` Rust / Go parse throughput | missing | pending |
+| E7: WebAssembly | checker_parity | `run.e7.checker_parity == 1` frozen E2 cases matching both diagnostics and types / frozen E2 cases | missing | pending |
+| E7: WebAssembly | portable_host | `run.e7.portable_host == true` checker subset runs using an in-memory host without native process/filesystem dependencies | missing | pending |
+| E8: Embedding | node_parse_latency | `run.e8.node_parse_latency_ratio <= 0.1` Node in-process / --api socket parse-and-encode latency for a 10 KB file | missing | pending |
+| E8: Embedding | rust_consumer_parity | `run.e8.rust_consumer_parity == 1` frozen E2 cases matching diagnostics and types through the separate Rust consumer / frozen E2 cases | missing | pending |
+| E8: Embedding | lifetime_checks | `run.e8.lifetime_checks == true` consumer-supplied host passes applicable E3 checks through repeated create/query/drop operations | missing | pending |
 
 E1: Measured across the frozen 12,721-case corpus and 108 lib files.
 
@@ -253,23 +253,23 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | bindworkload | stale: source, pin, command or inputs changed | [result](status/evidence/85a54b34aa18160150c0b7a723fb88013bb297dc05cf53d4fb665400d4ce15d9.json) |
 | checkerbench | stale: source, pin, command or inputs changed | [result](status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json) |
 | checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/6739f19fd054699dc4b64c192e5992ee5f8a9b7c086282eaae72aef47ca4901e.json) |
-| clippy | current | [result](status/evidence/268407214571ffe2a10c8775eab67a8e66960799ee9cf449e2e58a41f2953b53.json) |
-| deny | current | [result](status/evidence/3f365558984af497987318a0319056c54df8e2de007ab88740fe248a0fd54149.json) |
+| clippy | current | [result](status/evidence/756657f4ffa4ae8072bf53187c4df2cc37fb9c5024b7f2f5efb129737cbf6a48.json) |
+| deny | stale: source, pin, command or inputs changed | [result](status/evidence/3f365558984af497987318a0319056c54df8e2de007ab88740fe248a0fd54149.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/6a4db4ddf15e6b80788a0b1a6adc28e2cf4f88cd31c96899ad4552aeb8a7b57b.json) |
 | e2 | stale: source, pin, command or inputs changed | [result](status/evidence/b5b93a54faa5b610971750c4a6278925f04e94b3f58c5c1a971925f43d5a04f1.json) |
 | e3 | stale: source, pin, command or inputs changed | [result](status/evidence/71ead1b7a32c38a277710e1718a3597e8bcd019dd920403107c90b59d0cd24e5.json) |
 | e4 | stale: source, pin, command or inputs changed | [result](status/evidence/792e7b2196fafa6d5d09371611a1a19c64ae526de8192ae998357fa0c39878ba.json) |
 | e5 | stale: source, pin, command or inputs changed | [result](status/evidence/0bf06ff8e9e2bcc77da389d9bc86c167c2ffe777ad666f3f6258f3a519963f92.json) |
 | e6 | stale: source, pin, command or inputs changed | [result](status/evidence/66ab8b7c8e5067d93ee54f115b5f9f1aacc9c66645f50992a47ac5831c39e7eb.json) |
-| e7 | current | [result](status/evidence/17a5f52a9809d5a6c148572c189148b42273c84e53005eccd24ab700dad8604b.json) |
-| e8 | current | [result](status/evidence/556276951ed1b6a50a1a7a17946129a76c78ce6659f311d05e5050b1a54e9d67.json) |
-| fmt | current | [result](status/evidence/d0d7e2f0991ce11e8575930f0e5b34a12249083dc4f1058140a4a76b1f266cea.json) |
+| e7 | stale: source, pin, command or inputs changed | [result](status/evidence/17a5f52a9809d5a6c148572c189148b42273c84e53005eccd24ab700dad8604b.json) |
+| e8 | stale: source, pin, command or inputs changed | [result](status/evidence/556276951ed1b6a50a1a7a17946129a76c78ce6659f311d05e5050b1a54e9d67.json) |
+| fmt | current | [result](status/evidence/258fd6da7731ea0569447e28a48b05d700c026e37a7eecc15b04f0dac9d88cb1.json) |
 | gen | stale: source, pin, command or inputs changed | [result](status/evidence/bc10438ec039509fb2e4e8080f495853454911000b320be681dd5d4c984598db.json) |
 | oracle | current | [result](status/evidence/31ff51a096c95375f8fc125325236e975eac2422da5c6210377531108a71f4b0.json) |
 | program | stale: source, pin, command or inputs changed | [result](status/evidence/78093500fe1ecefe935cc2ffeb4a2004caee4360d19165a0a90f89b26b2c1b22.json) |
 | relater | stale: source, pin, command or inputs changed | [result](status/evidence/981fff12bacd54eab8b02804bdb78919731df5cccb1ad6a4c0890017a369c642.json) |
 | scanner | stale: source, pin, command or inputs changed | [result](status/evidence/a780a5cf0cd4d6249daa7287693b4566c152cbff2d4222a1519b03cc4a36d658.json) |
-| selftest | current | [result](status/evidence/84896d332a70f149d743caf51fe3e2d550f1e9073fc861b256eb695f27fd82b7.json) |
+| selftest | current | [result](status/evidence/3b010ea7e281bc24d4413f743d50cf75f431ad1087f9a22eb343210567693288.json) |
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/401b6ca3fc7962b28120333db5d71228cd24b65a96acd4406ceaa8b1dabd1df2.json) |
 
 ## Sprints
@@ -308,13 +308,13 @@ Exit checks:
 - [ ] `run.workspace.build == true` (unknown metric)
 - [x] `run.fmt.clean == true`
 - [x] `run.clippy.clean == true`
-- [x] `run.deny.clean == true`
+- [ ] `run.deny.clean == true` (unknown metric)
 - [x] `run.selftest.pass == true`
 
 Items:
 
 - [ ] S02-1 Pinned stable toolchain, workspace lint configuration and release profile per ADR 0016
-- [x] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
+- [ ] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
 - [x] S02-3 Tracker self-tests (xtask and scripts) registered as a producer
 - [-] S02-4 Status workflow on macOS and Linux: validate provenance, check archived views including the worklist, enforce live producer metrics and S01, build with the minimum Rust version, publish views and evidence as artifacts (verified on GitHub, not in the ledger) [optional]
 
@@ -520,9 +520,9 @@ Exit checks:
 
 Items:
 
-- [x] S10-1 ts_wasm: wasm32-unknown-unknown build of the parser and the checker slice with a portable in-memory host
+- [ ] S10-1 ts_wasm: wasm32-unknown-unknown build of the parser and the checker slice with a portable in-memory host
 - [ ] S10-2 Parser artifact size and parse throughput against Go GOOS=js
-- [x] S10-3 ts_embed crate API and a separate Rust consumer running the subset with repeated create, query and drop operations
+- [ ] S10-3 ts_embed crate API and a separate Rust consumer running the subset with repeated create, query and drop operations
 - [ ] S10-4 Node adapter: in-process parse-and-encode latency against the --api socket path for a 10 KB file
 
 ### S11 Test-host transport prototype (open)

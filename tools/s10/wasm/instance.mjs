@@ -1,5 +1,10 @@
 // The generated bindings live in a factory, not an ES module singleton. Each
 // call gets its own wasm globals and can release its instance on dispose/trap.
+export class WasmApiError extends Error {
+  constructor(message) { super(message); this.name = "WasmApiError"; }
+}
+const API_ERROR = "ts-wasm-api-error:";
+
 export function createInstance(createBindings, module) {
   let bindings = createBindings();
   bindings.initSync({ module });
@@ -10,6 +15,11 @@ export function createInstance(createBindings, module) {
     try {
       return operation();
     } catch (error) {
+      if (typeof error === "string" && error.startsWith(API_ERROR)) {
+        // Rust returned normally with Err, releasing its operation scope.
+        // A retired session stays retired; independent sessions remain usable.
+        throw new WasmApiError(error.slice(API_ERROR.length));
+      }
       // Rust aborts do not run destructors. Never reenter a possibly poisoned
       // instance. Owned output copies from earlier successful calls stay valid.
       bindings = null;
@@ -103,7 +113,13 @@ export function createInstance(createBindings, module) {
           sourceArgs(target, path, 0);
           object.use(raw => raw.add_symlink(path, target));
         },
-        compile(options) { return session(object.consume(raw => raw.compile(JSON.stringify(options)))); },
+        compile(options) {
+          // Serialization can fail before Rust consumes the host. Keep the
+          // host and its finalizer registered on these JS validation errors.
+          const json = JSON.stringify(options);
+          if (json === undefined) throw new TypeError("compiler options must be JSON");
+          return session(object.consume(raw => raw.compile(json)));
+        },
         dispose: () => object.dispose(),
       });
     },
