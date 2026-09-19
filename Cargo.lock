@@ -238,6 +238,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "s09_format_harness"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "sha2",
+ "ts_api",
+ "ts_arena",
+ "ts_ast",
+ "ts_astnav",
+ "ts_core",
+ "ts_encoder",
+ "ts_format",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_printer",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.229"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -373,6 +391,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
+name = "ts_api"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "ts_arena",
+ "ts_ast",
+ "ts_checker",
+ "ts_core",
+ "ts_encoder",
+ "ts_format",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_printer",
+ "ts_project",
+]
+
+[[package]]
 name = "ts_arena"
 version = "0.1.0"
 dependencies = [
@@ -391,6 +426,18 @@ dependencies = [
  "ts_core",
  "ts_diagnostics",
  "ts_jsstring",
+]
+
+[[package]]
+name = "ts_astnav"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_ast",
+ "ts_core",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_scanner",
 ]
 
 [[package]]
@@ -515,6 +562,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ts_format"
+version = "0.1.0"
+dependencies = [
+ "stacker",
+ "ts_arena",
+ "ts_ast",
+ "ts_astnav",
+ "ts_core",
+ "ts_jsstring",
+ "ts_parser",
+ "ts_scanner",
+]
+
+[[package]]
 name = "ts_jsnum"
 version = "0.1.0"
 dependencies = [
@@ -587,6 +648,20 @@ dependencies = [
  "ts_jsstring",
  "ts_nodebuilder",
  "ts_scanner",
+]
+
+[[package]]
+name = "ts_project"
+version = "0.1.0"
+dependencies = [
+ "ts_arena",
+ "ts_ast",
+ "ts_checker",
+ "ts_compiler",
+ "ts_core",
+ "ts_jsstring",
+ "ts_tsoptions",
+ "ts_vfs",
 ]
 
 [[package]]

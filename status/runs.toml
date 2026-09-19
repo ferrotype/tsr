@@ -1,8 +1,9 @@
 # Commands emit one JSON object to stdout: {"metrics": { ... }}.
 # The runner binds successful executions to command, inputs, target, configuration
 # and repository provenance. Failed or stale runs cannot pass gates.
-# E3 measures S04 arena, S06 AST storage, two S07 program-owner groups and S08 independent checker merges; E4 leaves and E1 codec criteria
-# remain scoped measurements, not completion of future experiments.
+# E3 measures S04 arena, S06 AST, S07 program owners, S08 independent checker merges
+# and S09 retention, request scratch and generation/pool/registry boundaries.
+# These and the E4/E1 leaves remain scoped, not whole-experiment completion.
 
 [workspace]
 command = ["python3", "scripts/tracking-bootstrap.py", "workspace"]
@@ -38,14 +39,14 @@ config = "debug; all targets and features; -D warnings"
 [deny]
 command = ["python3", "scripts/checks.py", "deny"]
 inputs = ["deny.toml", "Cargo.lock"]
-sources = ["crates/**", "xtask/**", "Cargo.*", "deny.toml", "scripts/checks.py"]
+sources = ["crates/**", "xtask/**", "tools/**/Cargo.toml", "Cargo.*", "deny.toml", "scripts/checks.py"]
 target = "host"
 config = "advisories, licenses, bans, sources"
 
 [selftest]
 command = ["python3", "scripts/checks.py", "selftest"]
 inputs = ["Cargo.toml", "Cargo.lock"]
-sources = ["xtask/**", "scripts/**", "Cargo.*", "rust-toolchain*", "data/**", "status/runs.toml", ".github/workflows/status.yml"]
+sources = ["xtask/**", "scripts/**", "Cargo.*", "rust-toolchain*", "data/**", ".github/workflows/status.yml", "status/runs.toml"]
 target = "host"
 config = "debug"
 
@@ -53,9 +54,9 @@ config = "debug"
 command = ["python3", "scripts/s08_ownership.py"]
 inputs = ["data/s04/toolchains.toml", "docs/design/ownership.md", "docs/design/symbols.md", "docs/adr/0012-panics--recovery-and-generation-retirement.md"]
 cases = "data/s04/e3-cases.json"
-sources = ["crates/ts_arena/**", "crates/ts_ast/**", "crates/ts_core/**", "crates/ts_diagnostics/**", "crates/ts_jsstring/**", "Cargo.*", ".cargo/**", "rust-toolchain*", "xtask/**", "scripts/s04.py", "scripts/s04_ownership.py", "scripts/s06_ownership.py", "scripts/s07_ownership.py", "data/s07/ownership-cases.json", "data/s06/ownership-cases.json", "crates/ts_jsnum/**", "crates/ts_scanner/**", "crates/ts_parser/**", "crates/ts_binder/**", "crates/ts_tspath/**", "crates/ts_vfs/**", "crates/ts_bundled/**", "crates/ts_tsoptions/**", "crates/ts_semver/**", "crates/ts_module/**", "crates/ts_compiler/**", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/s08_ownership.py", "scripts/s08_p2.py", "scripts/s08_oracle.py", "crates/ts_checker/**", "crates/ts_printer/**", "crates/ts_nodebuilder/**", "crates/ts_transformers/**", "data/s08/p2/review-fixes.json", "data/s08/p2/review-fixes.tar.xz", "data/upstream.json"]
+sources = ["crates/ts_arena/**", "crates/ts_ast/**", "crates/ts_core/**", "crates/ts_diagnostics/**", "crates/ts_jsstring/**", "Cargo.*", ".cargo/**", "rust-toolchain*", "xtask/**", "scripts/s04.py", "scripts/s04_ownership.py", "scripts/s06_ownership.py", "scripts/s07_ownership.py", "scripts/s09_ownership.py", "data/s09/ownership-cases.json", "crates/ts_encoder/**", "data/s09/printing*.json", "tools/s09/printing*", "tools/s09/printing*/**", "scripts/s09_printing.py", "data/upstream.json", "scripts/s08_oracle.py", "crates/ts_checker/**", "crates/ts_pseudochecker/**", "crates/ts_nodebuilder/**", "crates/ts_printer/**", "crates/ts_project/**", "crates/ts_api/**", "crates/ts_astnav/**", "crates/ts_format/**", "crates/ts_transformers/**", "scripts/s09_format.py", "data/s09/insertion-cases.json", "data/s09/insertion-observations.json", "tools/s09/format_oracle/**", "crates/**/Cargo.toml", "data/s07/ownership-cases.json", "data/s06/ownership-cases.json", "crates/ts_jsnum/**", "crates/ts_scanner/**", "crates/ts_parser/**", "crates/ts_binder/**", "crates/ts_tspath/**", "crates/ts_vfs/**", "crates/ts_bundled/**", "crates/ts_tsoptions/**", "crates/ts_semver/**", "crates/ts_module/**", "crates/ts_compiler/**", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/s08_ownership.py", "scripts/s08_p2.py", "data/s08/p2/review-fixes.json", "data/s08/p2/review-fixes.tar.xz"]
 target = "host"
-config = "S04 arena contracts, exact S06 AST ownership inventory, and separately gated S07 shared-bound-file/retained-edit ownership, plus S08 independent checker merges compared with the authenticated P2 native archive through the production p2_checker adapter; debug and release; measured per-scenario outcomes and final-drop counters; manifest-pinned nightly Miri strict provenance with production std::sync locks (host I/O enabled for the P2 request/output files) and AddressSanitizer with rebuilt std; native target; caller Cargo/Rustup configuration retained, optional S04_RUSTUP_HOME override"
+config = "S04 arena contracts, exact S06 AST ownership inventory, separately gated S07 shared-bound-file/retained-edit ownership, S08 independent checker merges compared with the authenticated P2 native archive through the production p2_checker adapter, exact S09 generation/checker-pool/snapshot/registry retirement and publication suites, checker result and AST retention, builder cache retention, and request-owned printing/insertion-formatting scratch; debug and release; measured per-suite outcomes and S04 final-drop counters; manifest-pinned nightly Miri strict provenance with production std::sync locks (host I/O enabled for the P2 request/output files) and AddressSanitizer with rebuilt std; native target; caller Cargo/Rustup configuration retained, optional S04_RUSTUP_HOME override"
 
 [e4]
 command = ["python3", "scripts/s04.py", "e4"]

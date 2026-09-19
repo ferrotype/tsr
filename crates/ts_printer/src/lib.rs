@@ -19,6 +19,7 @@
 //! contract (`docs/design/text.md`) forbids lossy conversion, so writers accept
 //! and return `[u8]` and count columns in UTF-16 units the way upstream does.
 
+mod change_tracker_writer;
 mod emit_context;
 pub mod emit_flags;
 pub mod emit_resolver;
@@ -31,6 +32,9 @@ mod single_line_string_writer;
 mod text_writer;
 mod type_precedence;
 
+pub use change_tracker_writer::{
+    create_synthetic_source_file, print_and_position_node, ChangeTrackerWriter,
+};
 pub use emit_context::{
     generated_identifier_flags, AutoGenerateId, AutoGenerateInfo, AutoGenerateOptions, EmitContext,
     SynthesizedComment,
@@ -60,6 +64,12 @@ pub enum Error {
     },
     /// A required child or payload was absent.
     MissingNode(&'static str),
+    /// A child holds another kind of node than the field is typed for, where
+    /// upstream's unchecked conversion panics.
+    InterfaceConversion {
+        found: ts_ast::NodeKind,
+        expected: &'static str,
+    },
 }
 
 impl From<ts_arena::Error> for Error {
@@ -73,15 +83,40 @@ impl std::fmt::Display for Error {
         match self {
             Self::Arena(error) => error.fmt(output),
             Self::Unsupported(name) => write!(output, "printer does not support {name} yet"),
-            Self::UnexpectedKind { context, kind } => {
-                write!(output, "unexpected node kind {kind:?} in {context}")
-            }
+            // Upstream's panic text: the context names the switch that had no
+            // case for the kind.
+            Self::UnexpectedKind { context, kind } => write!(output, "{context}: {kind:?}"),
             Self::MissingNode(what) => write!(output, "missing {what}"),
+            Self::InterfaceConversion { found, expected } => write!(
+                output,
+                "interface conversion: ast.nodeData is *ast.{}, not *ast.{expected}",
+                node_data_name(*found)
+            ),
         }
     }
 }
 
 impl std::error::Error for Error {}
+
+/// The name of upstream's payload struct for a kind, as its panic prints it:
+/// the kind's name, with `Node` appended for type nodes, and one shared struct
+/// for the keyword types.
+fn node_data_name(kind: ts_ast::NodeKind) -> String {
+    use ts_ast::SyntaxKind as K;
+    let name = format!("{kind:?}");
+    let name = name.strip_prefix("Kind").unwrap_or(&name).to_owned();
+    match kind.known() {
+        Some(kind)
+            if (K::FirstTypeNode as u16..=K::LastTypeNode as u16).contains(&(kind as u16)) =>
+        {
+            format!("{name}Node")
+        }
+        Some(kind) if (K::FirstKeyword as u16..=K::LastKeyword as u16).contains(&(kind as u16)) => {
+            "KeywordTypeNode".to_owned()
+        }
+        _ => name,
+    }
+}
 
 #[cfg(test)]
 mod printer_tests;

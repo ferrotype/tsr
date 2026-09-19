@@ -171,6 +171,11 @@ jobs:
         run: |
           cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked
           cargo test -p ts_arena -p ts_checker -p ts_nodebuilder -p ts_printer -p s08_relater_prototype --all-features --locked --release
+      - name: Navigation and formatter contracts in debug and release
+        if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
+        run: |
+          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked
+          cargo test -p ts_astnav -p ts_format --all-targets --all-features --locked --release
       - name: Native allocator build and original-request accounting
         if: ${{ !cancelled() && steps.validate.outcome == 'success' }}
         run: |
@@ -269,6 +274,13 @@ jobs:
             'run.e2.frozen_subset == true' \
             'run.e3.shared_bound_file == true' \
             'run.e3.retained_snapshot_edit == true' \
+            'run.e3.shared_pool_panic_retirement == true' \
+            'run.e3.release_boundaries == true' \
+            'run.e3.api_print_scratch_disposal == true' \
+            'run.e3.api_scratch_disposal == true' \
+            'run.e3.checker_result_retention == true' \
+            'run.e3.checker_ast_retention == true' \
+            'run.e3.builder_cache_retention == true' \
             'run.e3.independent_checker_merges == true' \
             'run.e3.ast_runtime == true' \
             'run.e3.id_exhaustion == true' \

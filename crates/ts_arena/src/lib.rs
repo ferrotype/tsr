@@ -29,7 +29,9 @@ pub use file::{CoreDataRead, CoreNodesMut, StorageBuilder, StorageOwner, Storage
 pub use ids::{ArenaId, AuxId, FileId, NodeId, SymbolId};
 pub use initialization::{InitializationDomain, InitializationGuard};
 pub use lazy::{StorageTransaction, TokenKey};
-pub use lease::{CheckerIdentity, CheckerLease, Generation};
+#[cfg(any(test, feature = "harness"))]
+pub use lease::{observe_next_lease_contention, observe_next_retirement_contention};
+pub use lease::{CheckerIdentity, CheckerLease, Generation, GenerationGuard};
 pub use node::{Node, NodeParentRecord, NodeRecord};
 pub use node_slots::NodeSlots;
 pub use owned::{OwnedArena, SymbolArena};

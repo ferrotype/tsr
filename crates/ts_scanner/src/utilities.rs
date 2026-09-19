@@ -23,12 +23,13 @@ pub(crate) fn is_ascii_letter(ch: i32) -> bool {
         || (i32::from(b'A')..=i32::from(b'Z')).contains(&ch)
 }
 
-pub(crate) fn is_line_break(ch: i32) -> bool {
+/// port: tsc/internal/stringutil/util.go:IsLineBreak
+pub fn is_line_break(ch: i32) -> bool {
     matches!(ch, 0x0a | 0x0d | 0x2028 | 0x2029)
 }
 
 /// port: tsc/internal/stringutil/util.go:IsWhiteSpaceSingleLine
-pub(crate) fn is_white_space_single_line(ch: i32) -> bool {
+pub fn is_white_space_single_line(ch: i32) -> bool {
     matches!(
         ch,
         0x20 | 0x09 | 0x0b | 0x0c | 0x85 | 0xa0 | 0x1680 | 0x2000

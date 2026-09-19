@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "clippy",
+  "recorded_at": 1789776696,
+  "context": {
+    "revision": "c3201ae3c5affb93eeb0a5f7bab268b3c83887aa",
+    "source_sha256": "f9e90bc2816ab4121eadb15ca398aec802c7c67908d872d8280807453d71ac71",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "9732e9b52e5b137977563a562737345d1615edcecfae6116d97c570d960b1103",
+  "inputs": {
+    "Cargo.lock": "006554e2f9521b4021c5dcbe6a91b5719b6b575b25db9c3572b3c588f84e22bd",
+    "Cargo.toml": "d815e9c6e332c32840dbdf5c573b3f00208003b8a0b3679d362b01ad7c24ee07"
+  },
+  "command": [
+    "python3",
+    "scripts/checks.py",
+    "clippy"
+  ],
+  "target": "host",
+  "config": "debug; all targets and features; -D warnings",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"clean\": true}}\n",
+  "stderr": "clippy 0.1.97 (8bab26f4f6 2026-07-14)\n+ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings\n    Checking ts_arena v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_arena)\n    Checking ts_tspath v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_tspath)\n    Checking ts_semver v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_semver)\n    Checking ts_diagnostics v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_diagnostics)\n    Checking ts_core v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_core)\n    Checking ts_jsnum v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_jsnum)\n    Checking ts_jsstring v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_jsstring)\n    Checking xtask v0.1.0 (/Users/cristian/git/ts-rust/xtask)\n    Checking ts_vfs v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_vfs)\n    Checking ts_ast v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_ast)\n    Checking ts_bundled v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_bundled)\n    Checking ts_scanner v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_scanner)\n    Checking ts_nodebuilder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_nodebuilder)\n    Checking ts_pseudochecker v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_pseudochecker)\n    Checking ts_encoder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_encoder)\n    Checking ts_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_parser)\n    Checking ts_printer v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_printer)\n    Checking ts_astnav v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_astnav)\n    Checking ts_format v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_format)\n    Checking ts_transformers v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_transformers)\n    Checking ts_binder v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_binder)\n    Checking ts_tsoptions v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_tsoptions)\n    Checking s08_relater_prototype v0.1.0 (/Users/cristian/git/ts-rust/tools/s08/relater-prototype)\n    Checking ts_bench v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_bench)\n    Checking ts_module v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_module)\n    Checking ts_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_checker)\n    Checking ts_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_compiler)\n    Checking ts_project v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_project)\n    Checking ts_api v0.1.0 (/Users/cristian/git/ts-rust/crates/ts_api)\n    Checking s09_format_harness v0.1.0 (/Users/cristian/git/ts-rust/tools/s09/format-harness)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 54.85s\n",
+  "stdout_sha256": "1cbfcf47216ecd3003591dc9b4f187162a15b6928eb7916ccdf71e348ae7bbb3",
+  "stderr_sha256": "c6b28335ae016634d69949890faa4759434f6365a70e08f7feaa518c6e967523",
+  "valid_capture": true
+}

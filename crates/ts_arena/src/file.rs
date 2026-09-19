@@ -121,6 +121,19 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     pub fn store_and_source_mut(&mut self) -> (&mut N::Store, &SourceText) {
         (&mut self.owner.store, &self.owner.source)
     }
+    /// Give a storage that was built without text the text of the file
+    /// constructed in it, as when a decoded tree is printed and then wrapped in
+    /// a source file over the printed text. Only an empty source can be
+    /// replaced: nothing built so far can refer into it. The builder is
+    /// exclusive and unpublished, so no reader has seen the old text either.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        if !self.owner.source.as_bytes().is_empty() {
+            return Err(Error::InvalidGraph);
+        }
+        self.owner.source = source;
+        self.owner.position_map = OnceLock::new();
+        Ok(())
+    }
     /// Open this exclusive core with a fresh invariant scope. Checked local
     /// handles cannot escape or be used with any other scope, even on this same
     /// builder. The callback does not grant growth or publication capabilities.
@@ -761,16 +774,26 @@ impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
         kind: u32,
         initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
     ) -> Result<StorageRead<'a, N>, Error> {
+        let id = self.try_token_prepared_id(key, kind, initialize)?;
+        self.node(id)
+    }
+    /// The id form of [`Self::try_token_prepared`], for a caller that resolves
+    /// the token through a typed view of its own.
+    pub fn try_token_prepared_id(
+        self,
+        key: crate::TokenKey,
+        kind: u32,
+        initialize: impl FnOnce(&mut StorageTransaction<'_, N>, NodeId) -> Result<N, Error>,
+    ) -> Result<NodeId, Error> {
         let selected = self.for_node_owner(key.parent)?;
         let parent = selected.node(key.parent)?;
-        let id = selected.owner.lazy.token_prepared(
+        selected.owner.lazy.token_prepared(
             key,
             kind,
             parent.storage_reparsed(),
             selected.owner,
             initialize,
-        )?;
-        self.node(id)
+        )
     }
 }
 #[cfg(test)]

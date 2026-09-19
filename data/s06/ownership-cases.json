@@ -1,4 +1,5 @@
 [
+  "storage_tests::a_storage_without_text_adopts_one_and_a_storage_with_text_keeps_its_own",
   "storage_tests::borrowed_node_slice_rejection_preserves_error_order_and_inserts_nothing",
   "storage_tests::borrowed_node_slices_copy_nil_edges_and_keep_allocated_empty_identity",
   "storage_tests::compact_syntax_backings_span_pages_and_keep_imported_and_lazy_context",

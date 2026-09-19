@@ -36,6 +36,6 @@ pub use utilities::{
 
 pub(crate) use state::{escape_flags, IdentifierVariant, TokenValue};
 
-pub use utilities::is_white_space_like;
+pub use utilities::{is_line_break, is_white_space_like, is_white_space_single_line};
 
 pub use binder_helpers::*;

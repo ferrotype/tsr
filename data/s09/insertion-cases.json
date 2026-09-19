@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "cases": [
+    {"name": "function-and-class", "source": "function f(a, b) { if (a) { return b; } else { return a; } }\nclass C {\n    m() {\n        return 1;\n    }\n}\n"},
+    {"name": "if-without-else", "source": "if (x) { y(); }\nfoo();\n"},
+    {"name": "nested-literals", "source": "const o = { a: 1, f: (x) => ({ y: x }) };\nnamespace N {\n    export const v = [1, 2,\n        3];\n}\n"},
+    {"name": "decorated-member", "source": "class D {\n    @dec()\n    m(): void { }\n}\nfor (const k of xs) {\n    try { use(k); } catch (e) { } finally { done(); }\n}\n"}
+  ]
+}

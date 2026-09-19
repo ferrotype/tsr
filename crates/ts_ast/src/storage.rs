@@ -242,6 +242,11 @@ impl AstBuilder {
     }
     /// Copy borrowed edges after validating every ID. An empty input receives
     /// an allocated-empty backing identity, just like the consuming constructor.
+    /// See `StorageBuilder::adopt_source`: the text of a file constructed in a
+    /// storage that was built without any.
+    pub fn adopt_source(&mut self, source: SourceText) -> Result<(), Error> {
+        self.storage.adopt_source(source)
+    }
     pub fn node_slice_from_slice(&mut self, nodes: &[Option<NodeId>]) -> Result<NodeSlice, Error> {
         for &id in nodes.iter().flatten() {
             self.view().node(id)?;
@@ -975,6 +980,14 @@ impl AstTransaction<'_, '_> {
     pub(crate) fn push_node(&mut self, node: Node) -> NodeId {
         let header = Self::stage_node(self.storage, node);
         self.storage.push(header)
+    }
+    /// A token's header and payload, staged by the token cache under the lazy
+    /// arena's publication lock.
+    pub(crate) fn stage_token(
+        storage: &mut StorageTransaction<'_, StoredNode>,
+        node: Node,
+    ) -> StoredNode {
+        Self::stage_node(storage, node)
     }
     fn stage_node(storage: &mut StorageTransaction<'_, StoredNode>, node: Node) -> StoredNode {
         let mut header = StoredNode::fallback(&node, 0);

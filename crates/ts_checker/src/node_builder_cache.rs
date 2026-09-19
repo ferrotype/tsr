@@ -52,6 +52,52 @@ pub(crate) struct CachedBuilder {
 }
 
 impl CachedBuilder {
+    /// Drops the side-table entries whose nodes no cache root retains any
+    /// longer. The cache entries are the roots: each owns its published frame,
+    /// and a frame retains the frames it cloned from, so a clone's `original`
+    /// link keeps resolving after the entry it was cloned from is replaced or
+    /// removed. The sweep refuses to leave a live key with an unretained
+    /// dependency rather than let the link dangle.
+    fn sweep(&mut self) -> Result<(), Error> {
+        // An AstFile retains its source/import closure. This predicate covers
+        // all cached frames and their dependencies, including metadata keys.
+        // Resolve a metadata arena once per sweep, rather than probing every
+        // cache entry for every metadata key. Still check each node's slot.
+        let mut owners: Map<_, Option<&AstFile>> = self
+            .entries
+            .values()
+            .map(|entry| (entry.value.node.arena(), Some(&entry.owner)))
+            .collect();
+        let entries = &self.entries;
+        let mut retained = |node: NodeId| {
+            owners
+                .entry(node.arena())
+                .or_insert_with(|| {
+                    entries
+                        .values()
+                        .find(|entry| entry.owner.view().node(node).is_ok())
+                        .map(|entry| &entry.owner)
+                })
+                .is_some_and(|owner| owner.view().node(node).is_ok())
+        };
+        self.emit.retain_metadata(&mut retained)?;
+        self.identifiers.retain(|&node, _| retained(node));
+        Ok(())
+    }
+
+    /// Removes one cache root, as replacement by a later publication does, and
+    /// sweeps when no construction frame is active. No production path evicts
+    /// an entry on its own today; the retention contract has to hold for the
+    /// day one does, so the ownership suite drives this directly.
+    #[cfg(test)]
+    fn remove(&mut self, key: &SerializedKey) -> Result<bool, Error> {
+        let removed = self.entries.remove(key).is_some();
+        if self.active == 0 {
+            self.sweep()?;
+        }
+        Ok(removed)
+    }
+
     #[cfg(any(test, feature = "storage-pilot"))]
     pub(crate) fn type_roots(&self) -> impl Iterator<Item = TypeId> + '_ {
         self.entries.keys().map(|key| key.ty)
@@ -184,30 +230,7 @@ impl<'a> NodeBuilder<'a> {
             Ok(())
         };
         if checker.display_builder.active == 0 {
-            let cache = &mut checker.display_builder;
-            // An AstFile retains its source/import closure. This predicate covers
-            // all cached frames and their dependencies, including metadata keys.
-            // Resolve a metadata arena once per sweep, rather than probing every
-            // cache entry for every metadata key. Still check each node's slot.
-            let mut owners: Map<_, Option<&AstFile>> = cache
-                .entries
-                .values()
-                .map(|entry| (entry.value.node.arena(), Some(&entry.owner)))
-                .collect();
-            let mut retained = |node: NodeId| {
-                owners
-                    .entry(node.arena())
-                    .or_insert_with(|| {
-                        cache
-                            .entries
-                            .values()
-                            .find(|entry| entry.owner.view().node(node).is_ok())
-                            .map(|entry| &entry.owner)
-                    })
-                    .is_some_and(|owner| owner.view().node(node).is_ok())
-            };
-            cache.emit.retain_metadata(&mut retained)?;
-            cache.identifiers.retain(|&node, _| retained(node));
+            checker.display_builder.sweep()?;
         }
         publication
     }
@@ -339,6 +362,9 @@ impl<'a> NodeBuilder<'a> {
     }
 }
 
+#[cfg(test)]
+#[path = "node_builder_retention_tests.rs"]
+mod retention;
 #[cfg(test)]
 #[path = "node_builder_cache_tests.rs"]
 mod tests;
