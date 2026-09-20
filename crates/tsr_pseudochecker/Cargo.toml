@@ -5,8 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = ["crates-io"]
-description = "Syntax-based type builder support for ts-rust"
+description = "Syntax-based type builder support for tsr"
 repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 

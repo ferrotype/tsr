@@ -1,5 +1,7 @@
 # tsr_arena
 
+Part of [tsr](https://github.com/iantocristian/ts-rust). Requires **Rust 1.96 or newer**.
+
 Storage and ownership primitives follow the accepted
 [ownership contract](https://github.com/iantocristian/ts-rust/blob/main/docs/design/ownership.md). `StorageBuilder<R, S>`
 stores a concrete `NodeRecord` directly; its associated auxiliary record type
@@ -136,3 +138,6 @@ borrow from the index without cloning an owner. Inputs must already be published
 so a new owner can only depend on older owners and cannot form an ownership cycle.
 Dropping its last retained handle can release a transitive chain of imported
 owners; retaining an imported mapped member keeps every member of that bundle.
+
+For application integration, start with
+[`tsr_embed`](https://github.com/iantocristian/ts-rust/tree/main/crates/tsr_embed).
