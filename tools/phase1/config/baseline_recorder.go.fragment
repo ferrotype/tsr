@@ -1,0 +1,41 @@
+// Access-only instrumentation inserted into the pinned
+// internal/testutil/baseline/baseline.go at capture time.
+//
+// It records which test produced which baseline output, and the digest of the
+// content that test rendered. It changes observation only: the original
+// recordBaseline/writeComparison calls still run, so a rendering that does not
+// reproduce the committed reference still fails the pinned test. Nothing here
+// reads an expected file or repairs a result.
+//
+// scripts/phase1_invocations.py asserts the anchor it replaces is present in
+// the pinned source, so this fragment cannot silently stop applying.
+
+func phase1RecordInvocation(t *testing.T, subfolder string, fileName string, actual string) {
+	destination := os.Getenv("PHASE1_BASELINE_RECORD")
+	if destination == "" {
+		return
+	}
+	sum := sha256.Sum256([]byte(actual))
+	line, err := json.Marshal(map[string]any{
+		"test":      t.Name(),
+		"subfolder": subfolder,
+		"file":      fileName,
+		"sha256":    hex.EncodeToString(sum[:]),
+		"bytes":     len(actual),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	phase1RecordMutex.Lock()
+	defer phase1RecordMutex.Unlock()
+	handle, err := os.OpenFile(destination, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.Close()
+	if _, err := handle.Write(append(line, '\n')); err != nil {
+		t.Fatal(err)
+	}
+}
+
+var phase1RecordMutex sync.Mutex

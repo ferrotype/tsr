@@ -9,6 +9,7 @@ subprocess helpers rather than re-implementing them.
     python3 scripts/phase1.py inventory --check
     python3 scripts/phase1.py prepare --family FAMILY --output DIRECTORY
     python3 scripts/phase1.py freeze --from DIRECTORY
+    python3 scripts/phase1.py map-baselines --output DIRECTORY [--write]
     python3 scripts/phase1.py capture --family FAMILY --output DIRECTORY [--case ID ...]
     python3 scripts/phase1.py compare --capture DIRECTORY [--require-parity]
     python3 scripts/phase1.py report --captures DIRECTORY ... --output FILE
@@ -29,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import phase1_baselines as baselines  # noqa: E402
 import phase1_capture as capture_module  # noqa: E402
+import phase1_invocations as invocations  # noqa: E402
 import phase1_scope as scope_module  # noqa: E402
 from s08_oracle import ROOT  # noqa: E402
 
@@ -92,6 +94,23 @@ def inventory_check() -> dict:
         for group, value in index["groups"].items()
         if value["authority"]["status"] != "established"
     ]
+    mapping = index.get("invocation_mapping", {})
+    verified = mapping.get("verified_outputs", 0)
+    # F0's checklist requires a verified invocation mapping for *all* 309
+    # outputs. Reporting readiness from the manifests alone would let a blocked
+    # group pass unnoticed, so completion is computed and stated, never assumed.
+    outstanding = []
+    if problems:
+        outstanding.append(f"{len(problems)} manifest problem(s)")
+    if verified != index["total_outputs"]:
+        outstanding.append(
+            f"{index['total_outputs'] - verified} of {index['total_outputs']} reference outputs "
+            "have no verified invocation mapping"
+        )
+    for group in blocked:
+        outstanding.append(
+            f"group {group} is blocked on {index['groups'][group]['authority'].get('blocker')}"
+        )
     return {
         "pin": pin,
         "operations": scope["total_operations"],
@@ -101,8 +120,11 @@ def inventory_check() -> dict:
         "cases": len(cases.get("cases", [])),
         "families_declared": list(capture_module.DECLARED_FAMILIES),
         "families_prepared": sorted(capture_module.FAMILIES),
+        "baseline_outputs_verified": verified,
         "problems": problems,
         "ok": not problems,
+        "f0_complete": not outstanding,
+        "f0_outstanding": outstanding,
     }
 
 
@@ -156,6 +178,12 @@ def main() -> int:
     compare_parser.add_argument("--capture", type=Path, required=True)
     compare_parser.add_argument("--require-parity", action="store_true")
 
+    map_parser = commands.add_parser("map-baselines")
+    map_parser.add_argument("--output", type=Path, required=True,
+                            help="staging directory for the instrumented native run")
+    map_parser.add_argument("--write", action="store_true",
+                            help="install the attributed index into data/phase1/")
+
     report_parser = commands.add_parser("report")
     report_parser.add_argument("--captures", type=Path, nargs="+", required=True)
     report_parser.add_argument("--output", type=Path, required=True)
@@ -172,6 +200,12 @@ def main() -> int:
         result = freeze(args.source)
     elif args.command == "capture":
         result = capture_module.capture(args.family, args.output, args.case or None)
+    elif args.command == "map-baselines":
+        rows = invocations.record(args.output)
+        index = invocations.attribute(rows, baselines.build())
+        if args.write:
+            BASELINES.write_text(json.dumps(index, indent=2, sort_keys=True) + "\n")
+        result = index["invocation_mapping"]
     elif args.command == "compare":
         result = capture_module.compare(args.capture, args.require_parity)
     else:

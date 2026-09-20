@@ -4,20 +4,25 @@
       "authority": {
         "blocker": "phase1-matchfiles-baseline-authority",
         "invocation": null,
+        "mapping_complete": false,
         "native_semantic_authority": "tsc/internal/vfs/vfsmatch/vfsmatch_test.go::TestReadDirectory and TestReadDirectoryMatchesTypeScriptBaselines assert ordered matchFiles() results",
         "output_name_rule": "<title> with {json,jsonSourceFile} api.js",
         "output_relationship": "unknown until authority is decided",
         "reason": "No pinned Go test writes baseline.Options{Subfolder: \"config/matchFiles\"}, and the group's envelope (a 'config:' heading followed by the whole ParsedCommandLine as JSON, with no 'FileNames::' section) matches no renderer in the pin. baselineParseConfigWith emits configFileName::/CompilerOptions::/FileNames::/Errors:: instead. The vfsmatch tests reference tsc/testdata/fixtures/testRunner/unittests/config/matchFiles.ts, which is absent at this pin. These are promoted TypeScript outputs whose renderer was not ported.",
         "renderer": null,
         "status": "blocked",
-        "subfolder": "config/matchFiles"
+        "subfolder": "config/matchFiles",
+        "verified_outputs": 0
       },
       "expected_outputs": 142,
       "outputs": [
         {
           "bytes": 1211,
+          "invocation": null,
           "name": "Expands z to z/starstart/star with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/Expands z to z/starstart/star with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -28,8 +33,11 @@
         },
         {
           "bytes": 1183,
+          "invocation": null,
           "name": "Expands z to z/starstart/star with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/Expands z to z/starstart/star with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -40,8 +48,11 @@
         },
         {
           "bytes": 1242,
+          "invocation": null,
           "name": "always include literal files with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/always include literal files with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -52,8 +63,11 @@
         },
         {
           "bytes": 1214,
+          "invocation": null,
           "name": "always include literal files with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/always include literal files with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -64,8 +78,11 @@
         },
         {
           "bytes": 784,
+          "invocation": null,
           "name": "and empty exclude with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and empty exclude with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -76,8 +93,11 @@
         },
         {
           "bytes": 756,
+          "invocation": null,
           "name": "and empty exclude with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and empty exclude with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -88,8 +108,11 @@
         },
         {
           "bytes": 816,
+          "invocation": null,
           "name": "and exclusions with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and exclusions with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -100,8 +123,11 @@
         },
         {
           "bytes": 788,
+          "invocation": null,
           "name": "and exclusions with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and exclusions with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -112,8 +138,11 @@
         },
         {
           "bytes": 838,
+          "invocation": null,
           "name": "and explicit recursive include with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit recursive include with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -124,8 +153,11 @@
         },
         {
           "bytes": 810,
+          "invocation": null,
           "name": "and explicit recursive include with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit recursive include with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -136,8 +168,11 @@
         },
         {
           "bytes": 811,
+          "invocation": null,
           "name": "and explicit wildcard include with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit wildcard include with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -148,8 +183,11 @@
         },
         {
           "bytes": 783,
+          "invocation": null,
           "name": "and explicit wildcard include with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit wildcard include with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -160,8 +198,11 @@
         },
         {
           "bytes": 748,
+          "invocation": null,
           "name": "and no exclusions with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and no exclusions with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -172,8 +213,11 @@
         },
         {
           "bytes": 720,
+          "invocation": null,
           "name": "and no exclusions with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and no exclusions with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -184,8 +228,11 @@
         },
         {
           "bytes": 727,
+          "invocation": null,
           "name": "and wildcard include with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and wildcard include with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -196,8 +243,11 @@
         },
         {
           "bytes": 699,
+          "invocation": null,
           "name": "and wildcard include with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/and wildcard include with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -208,8 +258,11 @@
         },
         {
           "bytes": 1160,
+          "invocation": null,
           "name": "are not removed due to excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/are not removed due to excludes with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -220,8 +273,11 @@
         },
         {
           "bytes": 1132,
+          "invocation": null,
           "name": "are not removed due to excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/are not removed due to excludes with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -232,8 +288,11 @@
         },
         {
           "bytes": 1145,
+          "invocation": null,
           "name": "can exclude dirs whose pattern starts with starstar with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can exclude dirs whose pattern starts with starstar with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -244,8 +303,11 @@
         },
         {
           "bytes": 1117,
+          "invocation": null,
           "name": "can exclude dirs whose pattern starts with starstar with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can exclude dirs whose pattern starts with starstar with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -256,8 +318,11 @@
         },
         {
           "bytes": 1187,
+          "invocation": null,
           "name": "can include dirs whose pattern starts with starstart with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include dirs whose pattern starts with starstart with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -268,8 +333,11 @@
         },
         {
           "bytes": 1159,
+          "invocation": null,
           "name": "can include dirs whose pattern starts with starstart with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include dirs whose pattern starts with starstart with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -280,8 +348,11 @@
         },
         {
           "bytes": 561,
+          "invocation": null,
           "name": "can include files in the same order on multiple platforms case insensitive with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case insensitive with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -292,8 +363,11 @@
         },
         {
           "bytes": 531,
+          "invocation": null,
           "name": "can include files in the same order on multiple platforms case insensitive with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case insensitive with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -304,8 +378,11 @@
         },
         {
           "bytes": 644,
+          "invocation": null,
           "name": "can include files in the same order on multiple platforms case sensitive with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case sensitive with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -316,8 +393,11 @@
         },
         {
           "bytes": 614,
+          "invocation": null,
           "name": "can include files in the same order on multiple platforms case sensitive with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case sensitive with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -328,8 +408,11 @@
         },
         {
           "bytes": 1148,
+          "invocation": null,
           "name": "case sensitive with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/case sensitive with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -340,8 +423,11 @@
         },
         {
           "bytes": 1120,
+          "invocation": null,
           "name": "case sensitive with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/case sensitive with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -352,8 +438,11 @@
         },
         {
           "bytes": 1370,
+          "invocation": null,
           "name": "exclude .js files when allowJs=false with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .js files when allowJs=false with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -364,8 +453,11 @@
         },
         {
           "bytes": 1342,
+          "invocation": null,
           "name": "exclude .js files when allowJs=false with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .js files when allowJs=false with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -376,8 +468,11 @@
         },
         {
           "bytes": 1312,
+          "invocation": null,
           "name": "exclude .min.js files using wildcards with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .min.js files using wildcards with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -388,8 +483,11 @@
         },
         {
           "bytes": 1284,
+          "invocation": null,
           "name": "exclude .min.js files using wildcards with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .min.js files using wildcards with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -400,8 +498,11 @@
         },
         {
           "bytes": 1208,
+          "invocation": null,
           "name": "exclude files with .. in their name with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude files with .. in their name with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -412,8 +513,11 @@
         },
         {
           "bytes": 1180,
+          "invocation": null,
           "name": "exclude files with .. in their name with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude files with .. in their name with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -424,8 +528,11 @@
         },
         {
           "bytes": 1222,
+          "invocation": null,
           "name": "exclude folders with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude folders with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -436,8 +543,11 @@
         },
         {
           "bytes": 1194,
+          "invocation": null,
           "name": "exclude folders with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude folders with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -448,8 +558,11 @@
         },
         {
           "bytes": 1283,
+          "invocation": null,
           "name": "exclude paths outside of the project using relative paths with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude paths outside of the project using relative paths with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -460,8 +573,11 @@
         },
         {
           "bytes": 1255,
+          "invocation": null,
           "name": "exclude paths outside of the project using relative paths with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude paths outside of the project using relative paths with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -472,8 +588,11 @@
         },
         {
           "bytes": 1407,
+          "invocation": null,
           "name": "in excludes after a subdirectory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes after a subdirectory with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -484,8 +603,11 @@
         },
         {
           "bytes": 1487,
+          "invocation": null,
           "name": "in excludes after a subdirectory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes after a subdirectory with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -496,8 +618,11 @@
         },
         {
           "bytes": 1401,
+          "invocation": null,
           "name": "in excludes immediately after with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes immediately after with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -508,8 +633,11 @@
         },
         {
           "bytes": 1477,
+          "invocation": null,
           "name": "in excludes immediately after with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes immediately after with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -520,8 +648,11 @@
         },
         {
           "bytes": 1201,
+          "invocation": null,
           "name": "in excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -532,8 +663,11 @@
         },
         {
           "bytes": 1173,
+          "invocation": null,
           "name": "in excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -544,8 +678,11 @@
         },
         {
           "bytes": 1265,
+          "invocation": null,
           "name": "in excludes with trailing recursive directory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with trailing recursive directory with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -556,8 +693,11 @@
         },
         {
           "bytes": 1237,
+          "invocation": null,
           "name": "in excludes with trailing recursive directory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with trailing recursive directory with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -568,8 +708,11 @@
         },
         {
           "bytes": 1376,
+          "invocation": null,
           "name": "in includes after a subdirectory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes after a subdirectory with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -580,8 +723,11 @@
         },
         {
           "bytes": 1460,
+          "invocation": null,
           "name": "in includes after a subdirectory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes after a subdirectory with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -592,8 +738,11 @@
         },
         {
           "bytes": 1368,
+          "invocation": null,
           "name": "in includes immediately after with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes immediately after with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -604,8 +753,11 @@
         },
         {
           "bytes": 1448,
+          "invocation": null,
           "name": "in includes immediately after with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes immediately after with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -616,8 +768,11 @@
         },
         {
           "bytes": 1201,
+          "invocation": null,
           "name": "in includes with multiple recursive directory patterns with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with multiple recursive directory patterns with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -628,8 +783,11 @@
         },
         {
           "bytes": 1173,
+          "invocation": null,
           "name": "in includes with multiple recursive directory patterns with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with multiple recursive directory patterns with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -640,8 +798,11 @@
         },
         {
           "bytes": 1302,
+          "invocation": null,
           "name": "in includes with trailing recursive directory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with trailing recursive directory with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -652,8 +813,11 @@
         },
         {
           "bytes": 1372,
+          "invocation": null,
           "name": "in includes with trailing recursive directory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with trailing recursive directory with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -664,8 +828,11 @@
         },
         {
           "bytes": 1246,
+          "invocation": null,
           "name": "include .js files when allowJs=true with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include .js files when allowJs=true with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -676,8 +843,11 @@
         },
         {
           "bytes": 1218,
+          "invocation": null,
           "name": "include .js files when allowJs=true with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include .js files when allowJs=true with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -688,8 +858,11 @@
         },
         {
           "bytes": 1269,
+          "invocation": null,
           "name": "include explicitly listed .min.js files when allowJs=true with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include explicitly listed .min.js files when allowJs=true with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -700,8 +873,11 @@
         },
         {
           "bytes": 1241,
+          "invocation": null,
           "name": "include explicitly listed .min.js files when allowJs=true with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include explicitly listed .min.js files when allowJs=true with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -712,8 +888,11 @@
         },
         {
           "bytes": 1144,
+          "invocation": null,
           "name": "include files with .. in their name with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include files with .. in their name with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -724,8 +903,11 @@
         },
         {
           "bytes": 1116,
+          "invocation": null,
           "name": "include files with .. in their name with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include files with .. in their name with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -736,8 +918,11 @@
         },
         {
           "bytes": 1189,
+          "invocation": null,
           "name": "include paths outside of the project using relative paths with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project using relative paths with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -748,8 +933,11 @@
         },
         {
           "bytes": 1161,
+          "invocation": null,
           "name": "include paths outside of the project using relative paths with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project using relative paths with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -760,8 +948,11 @@
         },
         {
           "bytes": 1226,
+          "invocation": null,
           "name": "include paths outside of the project with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -772,8 +963,11 @@
         },
         {
           "bytes": 1198,
+          "invocation": null,
           "name": "include paths outside of the project with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -784,8 +978,11 @@
         },
         {
           "bytes": 1354,
+          "invocation": null,
           "name": "is sorted in include order, then in alphabetical order with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/is sorted in include order, then in alphabetical order with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -796,8 +993,11 @@
         },
         {
           "bytes": 1326,
+          "invocation": null,
           "name": "is sorted in include order, then in alphabetical order with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/is sorted in include order, then in alphabetical order with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -808,8 +1008,11 @@
         },
         {
           "bytes": 1092,
+          "invocation": null,
           "name": "missing files are still present with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/missing files are still present with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -820,8 +1023,11 @@
         },
         {
           "bytes": 1064,
+          "invocation": null,
           "name": "missing files are still present with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/missing files are still present with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -832,8 +1038,11 @@
         },
         {
           "bytes": 1124,
+          "invocation": null,
           "name": "question matches only a single character with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/question matches only a single character with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -844,8 +1053,11 @@
         },
         {
           "bytes": 1096,
+          "invocation": null,
           "name": "question matches only a single character with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/question matches only a single character with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -856,8 +1068,11 @@
         },
         {
           "bytes": 1135,
+          "invocation": null,
           "name": "same named declarations are excluded with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations are excluded with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -868,8 +1083,11 @@
         },
         {
           "bytes": 1107,
+          "invocation": null,
           "name": "same named declarations are excluded with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations are excluded with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -880,8 +1098,11 @@
         },
         {
           "bytes": 911,
+          "invocation": null,
           "name": "same named declarations with include dts tsx with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include dts tsx with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -892,8 +1113,11 @@
         },
         {
           "bytes": 883,
+          "invocation": null,
           "name": "same named declarations with include dts tsx with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include dts tsx with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -904,8 +1128,11 @@
         },
         {
           "bytes": 905,
+          "invocation": null,
           "name": "same named declarations with include ts dts with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts dts with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -916,8 +1143,11 @@
         },
         {
           "bytes": 877,
+          "invocation": null,
           "name": "same named declarations with include ts dts with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts dts with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -928,8 +1158,11 @@
         },
         {
           "bytes": 922,
+          "invocation": null,
           "name": "same named declarations with include ts tsx with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts tsx with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -940,8 +1173,11 @@
         },
         {
           "bytes": 894,
+          "invocation": null,
           "name": "same named declarations with include ts tsx with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts tsx with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -952,8 +1188,11 @@
         },
         {
           "bytes": 875,
+          "invocation": null,
           "name": "same named declarations with include ts with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -964,8 +1203,11 @@
         },
         {
           "bytes": 847,
+          "invocation": null,
           "name": "same named declarations with include ts with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -976,8 +1218,11 @@
         },
         {
           "bytes": 911,
+          "invocation": null,
           "name": "same named declarations with include tsx dts with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx dts with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -988,8 +1233,11 @@
         },
         {
           "bytes": 883,
+          "invocation": null,
           "name": "same named declarations with include tsx dts with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx dts with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1000,8 +1248,11 @@
         },
         {
           "bytes": 922,
+          "invocation": null,
           "name": "same named declarations with include tsx ts with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx ts with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1012,8 +1263,11 @@
         },
         {
           "bytes": 894,
+          "invocation": null,
           "name": "same named declarations with include tsx ts with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx ts with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1024,8 +1278,11 @@
         },
         {
           "bytes": 839,
+          "invocation": null,
           "name": "same named declarations with include tsx with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1036,8 +1293,11 @@
         },
         {
           "bytes": 811,
+          "invocation": null,
           "name": "same named declarations with include tsx with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1048,8 +1308,11 @@
         },
         {
           "bytes": 1129,
+          "invocation": null,
           "name": "star matches only ts files with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/star matches only ts files with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1060,8 +1323,11 @@
         },
         {
           "bytes": 1101,
+          "invocation": null,
           "name": "star matches only ts files with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/star matches only ts files with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1072,8 +1338,11 @@
         },
         {
           "bytes": 821,
+          "invocation": null,
           "name": "that are not explicitly included with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/that are not explicitly included with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1084,8 +1353,11 @@
         },
         {
           "bytes": 793,
+          "invocation": null,
           "name": "that are not explicitly included with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/that are not explicitly included with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1096,8 +1368,11 @@
         },
         {
           "bytes": 580,
+          "invocation": null,
           "name": "when recursive symlinked directories are present with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/when recursive symlinked directories are present with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1108,8 +1383,11 @@
         },
         {
           "bytes": 550,
+          "invocation": null,
           "name": "when recursive symlinked directories are present with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/when recursive symlinked directories are present with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1120,8 +1398,11 @@
         },
         {
           "bytes": 1173,
+          "invocation": null,
           "name": "with case sensitive exclude with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with case sensitive exclude with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1132,8 +1413,11 @@
         },
         {
           "bytes": 1145,
+          "invocation": null,
           "name": "with case sensitive exclude with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with case sensitive exclude with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1144,8 +1428,11 @@
         },
         {
           "bytes": 984,
+          "invocation": null,
           "name": "with common package folders and empty exclude with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and empty exclude with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1156,8 +1443,11 @@
         },
         {
           "bytes": 956,
+          "invocation": null,
           "name": "with common package folders and empty exclude with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and empty exclude with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1168,8 +1458,11 @@
         },
         {
           "bytes": 1040,
+          "invocation": null,
           "name": "with common package folders and exclusions with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and exclusions with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1180,8 +1473,11 @@
         },
         {
           "bytes": 1012,
+          "invocation": null,
           "name": "with common package folders and exclusions with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and exclusions with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1192,8 +1488,11 @@
         },
         {
           "bytes": 984,
+          "invocation": null,
           "name": "with common package folders and no exclusions with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and no exclusions with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1204,8 +1503,11 @@
         },
         {
           "bytes": 956,
+          "invocation": null,
           "name": "with common package folders and no exclusions with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and no exclusions with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1216,8 +1518,11 @@
         },
         {
           "bytes": 693,
+          "invocation": null,
           "name": "with defaults with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with defaults with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1228,8 +1533,11 @@
         },
         {
           "bytes": 663,
+          "invocation": null,
           "name": "with defaults with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with defaults with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1240,8 +1548,11 @@
         },
         {
           "bytes": 854,
+          "invocation": null,
           "name": "with jsx=none, allowJs=false with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=false with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1252,8 +1563,11 @@
         },
         {
           "bytes": 826,
+          "invocation": null,
           "name": "with jsx=none, allowJs=false with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=false with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1264,8 +1578,11 @@
         },
         {
           "bytes": 890,
+          "invocation": null,
           "name": "with jsx=none, allowJs=true with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=true with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1276,8 +1593,11 @@
         },
         {
           "bytes": 862,
+          "invocation": null,
           "name": "with jsx=none, allowJs=true with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=true with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1288,8 +1608,11 @@
         },
         {
           "bytes": 916,
+          "invocation": null,
           "name": "with jsx=preserve, allowJs=false with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=false with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1300,8 +1623,11 @@
         },
         {
           "bytes": 888,
+          "invocation": null,
           "name": "with jsx=preserve, allowJs=false with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=false with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1312,8 +1638,11 @@
         },
         {
           "bytes": 952,
+          "invocation": null,
           "name": "with jsx=preserve, allowJs=true with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=true with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1324,8 +1653,11 @@
         },
         {
           "bytes": 924,
+          "invocation": null,
           "name": "with jsx=preserve, allowJs=true with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=true with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1336,8 +1668,11 @@
         },
         {
           "bytes": 924,
+          "invocation": null,
           "name": "with jsx=react-native, allowJs=false with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=false with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1348,8 +1683,11 @@
         },
         {
           "bytes": 896,
+          "invocation": null,
           "name": "with jsx=react-native, allowJs=false with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=false with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1360,8 +1698,11 @@
         },
         {
           "bytes": 960,
+          "invocation": null,
           "name": "with jsx=react-native, allowJs=true with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=true with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1372,8 +1713,11 @@
         },
         {
           "bytes": 932,
+          "invocation": null,
           "name": "with jsx=react-native, allowJs=true with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=true with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1384,8 +1728,11 @@
         },
         {
           "bytes": 1145,
+          "invocation": null,
           "name": "with literal excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with literal excludes with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1396,8 +1743,11 @@
         },
         {
           "bytes": 1117,
+          "invocation": null,
           "name": "with literal excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with literal excludes with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1408,8 +1758,11 @@
         },
         {
           "bytes": 1230,
+          "invocation": null,
           "name": "with missing files are excluded with literal include list with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with literal include list with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1420,8 +1773,11 @@
         },
         {
           "bytes": 1202,
+          "invocation": null,
           "name": "with missing files are excluded with literal include list with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with literal include list with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1432,8 +1788,11 @@
         },
         {
           "bytes": 1252,
+          "invocation": null,
           "name": "with missing files are excluded with wildcard include list with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with wildcard include list with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1444,8 +1803,11 @@
         },
         {
           "bytes": 1224,
+          "invocation": null,
           "name": "with missing files are excluded with wildcard include list with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with wildcard include list with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1456,8 +1818,11 @@
         },
         {
           "bytes": 1283,
+          "invocation": null,
           "name": "with multiple recursive directories with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with multiple recursive directories with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1468,8 +1833,11 @@
         },
         {
           "bytes": 1255,
+          "invocation": null,
           "name": "with multiple recursive directories with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with multiple recursive directories with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1480,8 +1848,11 @@
         },
         {
           "bytes": 1230,
+          "invocation": null,
           "name": "with non .ts file extensions are excluded with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with non .ts file extensions are excluded with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1492,8 +1863,11 @@
         },
         {
           "bytes": 1202,
+          "invocation": null,
           "name": "with non .ts file extensions are excluded with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with non .ts file extensions are excluded with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1504,8 +1878,11 @@
         },
         {
           "bytes": 1171,
+          "invocation": null,
           "name": "with recursive directory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive directory with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1516,8 +1893,11 @@
         },
         {
           "bytes": 1143,
+          "invocation": null,
           "name": "with recursive directory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive directory with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1528,8 +1908,11 @@
         },
         {
           "bytes": 1323,
+          "invocation": null,
           "name": "with recursive excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive excludes with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1540,8 +1923,11 @@
         },
         {
           "bytes": 1295,
+          "invocation": null,
           "name": "with recursive excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive excludes with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1552,8 +1938,11 @@
         },
         {
           "bytes": 801,
+          "invocation": null,
           "name": "with recursive wildcards that match directories with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match directories with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1564,8 +1953,11 @@
         },
         {
           "bytes": 773,
+          "invocation": null,
           "name": "with recursive wildcards that match directories with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match directories with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1576,8 +1968,11 @@
         },
         {
           "bytes": 837,
+          "invocation": null,
           "name": "with recursive wildcards that match nothing with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match nothing with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1588,8 +1983,11 @@
         },
         {
           "bytes": 809,
+          "invocation": null,
           "name": "with recursive wildcards that match nothing with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match nothing with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1600,8 +1998,11 @@
         },
         {
           "bytes": 893,
+          "invocation": null,
           "name": "with wildcard excludes that implicitly exclude dotted files with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes that implicitly exclude dotted files with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1612,8 +2013,11 @@
         },
         {
           "bytes": 865,
+          "invocation": null,
           "name": "with wildcard excludes that implicitly exclude dotted files with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes that implicitly exclude dotted files with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1624,8 +2028,11 @@
         },
         {
           "bytes": 1362,
+          "invocation": null,
           "name": "with wildcard excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1636,8 +2043,11 @@
         },
         {
           "bytes": 1334,
+          "invocation": null,
           "name": "with wildcard excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1648,8 +2058,11 @@
         },
         {
           "bytes": 1092,
+          "invocation": null,
           "name": "without exclusions with literal file list with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal file list with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1660,8 +2073,11 @@
         },
         {
           "bytes": 1064,
+          "invocation": null,
           "name": "without exclusions with literal file list with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal file list with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1672,8 +2088,11 @@
         },
         {
           "bytes": 1096,
+          "invocation": null,
           "name": "without exclusions with literal include list with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal include list with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1684,8 +2103,11 @@
         },
         {
           "bytes": 1068,
+          "invocation": null,
           "name": "without exclusions with literal include list with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal include list with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1696,8 +2118,11 @@
         },
         {
           "bytes": 750,
+          "invocation": null,
           "name": "without wildcards with json api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without wildcards with json api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1708,8 +2133,11 @@
         },
         {
           "bytes": 722,
+          "invocation": null,
           "name": "without wildcards with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/matchFiles/without wildcards with jsonSourceFile api.js",
+          "rendering_status": "no pinned test rendered this output",
+          "rendering_verified": false,
           "sections": [
             "Errors::",
             "Fs::",
@@ -1724,19 +2152,27 @@
     "parseBuildOptions": {
       "authority": {
         "invocation": "tsc/internal/tsoptions/commandlineparser_test.go::createSubScenario('parseBuildOptions', name, args)",
+        "mapping_complete": true,
         "native_test_source": "tsc/internal/tsoptions/commandlineparser_test.go",
         "output_name_rule": "<group>/<sub-scenario name>.js",
         "output_relationship": "one invocation renders exactly one output",
         "renderer": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaselineBuild",
         "status": "established",
-        "subfolder": "tsoptions/commandLineParsing"
+        "subfolder": "tsoptions/commandLineParsing",
+        "verified_outputs": 27
       },
       "expected_outputs": 27,
       "outputs": [
         {
           "bytes": 182,
+          "invocation": {
+            "rendered_bytes": 182,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/--clean_and_--force_together_is_invalid"
+          },
           "name": "--clean and --force together is invalid.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --force together is invalid.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1744,8 +2180,14 @@
         },
         {
           "bytes": 188,
+          "invocation": {
+            "rendered_bytes": 188,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/--clean_and_--verbose_together_is_invalid"
+          },
           "name": "--clean and --verbose together is invalid.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --verbose together is invalid.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1753,8 +2195,14 @@
         },
         {
           "bytes": 181,
+          "invocation": {
+            "rendered_bytes": 181,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/--clean_and_--watch_together_is_invalid"
+          },
           "name": "--clean and --watch together is invalid.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --watch together is invalid.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1762,8 +2210,14 @@
         },
         {
           "bytes": 145,
+          "invocation": {
+            "rendered_bytes": 145,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/--singleThreaded_and_--builders_together"
+          },
           "name": "--singleThreaded and --builders together.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--singleThreaded and --builders together.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1771,8 +2225,14 @@
         },
         {
           "bytes": 175,
+          "invocation": {
+            "rendered_bytes": 175,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/--watch_and_--dry_together_is_invalid"
+          },
           "name": "--watch and --dry together is invalid.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--watch and --dry together is invalid.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1780,8 +2240,14 @@
         },
         {
           "bytes": 148,
+          "invocation": {
+            "rendered_bytes": 148,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/Parse_multiple_flags_with_input_projects_at_the_end"
+          },
           "name": "Parse multiple flags with input projects at the end.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects at the end.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1789,8 +2255,14 @@
         },
         {
           "bytes": 148,
+          "invocation": {
+            "rendered_bytes": 148,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/Parse_multiple_flags_with_input_projects_in_the_beginning"
+          },
           "name": "Parse multiple flags with input projects in the beginning.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the beginning.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1798,8 +2270,14 @@
         },
         {
           "bytes": 148,
+          "invocation": {
+            "rendered_bytes": 148,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/Parse_multiple_flags_with_input_projects_in_the_middle"
+          },
           "name": "Parse multiple flags with input projects in the middle.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the middle.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1807,8 +2285,14 @@
         },
         {
           "bytes": 137,
+          "invocation": {
+            "rendered_bytes": 137,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/Parse_multiple_options"
+          },
           "name": "Parse multiple options.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple options.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1816,8 +2300,14 @@
         },
         {
           "bytes": 173,
+          "invocation": {
+            "rendered_bytes": 173,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/Parse_option_with_invalid_option"
+          },
           "name": "Parse option with invalid option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse option with invalid option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1825,8 +2315,14 @@
         },
         {
           "bytes": 247,
+          "invocation": {
+            "rendered_bytes": 247,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/errors_on_invalid_excludeDirectories"
+          },
           "name": "errors on invalid excludeDirectories.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeDirectories.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1834,8 +2330,14 @@
         },
         {
           "bytes": 241,
+          "invocation": {
+            "rendered_bytes": 241,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/errors_on_invalid_excludeFiles"
+          },
           "name": "errors on invalid excludeFiles.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeFiles.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1843,8 +2345,14 @@
         },
         {
           "bytes": 334,
+          "invocation": {
+            "rendered_bytes": 334,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/errors_on_missing_argument"
+          },
           "name": "errors on missing argument.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on missing argument.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1852,8 +2360,14 @@
         },
         {
           "bytes": 104,
+          "invocation": {
+            "rendered_bytes": 104,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--builders"
+          },
           "name": "parse --builders.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --builders.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1861,8 +2375,14 @@
         },
         {
           "bytes": 107,
+          "invocation": {
+            "rendered_bytes": 107,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--excludeFiles"
+          },
           "name": "parse --excludeFiles.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --excludeFiles.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1870,8 +2390,14 @@
         },
         {
           "bytes": 141,
+          "invocation": {
+            "rendered_bytes": 141,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--fallbackPolling"
+          },
           "name": "parse --fallbackPolling.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --fallbackPolling.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1879,8 +2405,14 @@
         },
         {
           "bytes": 131,
+          "invocation": {
+            "rendered_bytes": 131,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--synchronousWatchDirectory"
+          },
           "name": "parse --synchronousWatchDirectory.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --synchronousWatchDirectory.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1888,8 +2420,14 @@
         },
         {
           "bytes": 144,
+          "invocation": {
+            "rendered_bytes": 144,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--watchDirectory"
+          },
           "name": "parse --watchDirectory.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --watchDirectory.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1897,8 +2435,14 @@
         },
         {
           "bytes": 130,
+          "invocation": {
+            "rendered_bytes": 130,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_--watchFile"
+          },
           "name": "parse --watchFile.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --watchFile.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1906,8 +2450,14 @@
         },
         {
           "bytes": 121,
+          "invocation": {
+            "rendered_bytes": 121,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_build_with_--incremental"
+          },
           "name": "parse build with --incremental.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --incremental.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1915,8 +2465,14 @@
         },
         {
           "bytes": 119,
+          "invocation": {
+            "rendered_bytes": 119,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_build_with_--locale_en-us"
+          },
           "name": "parse build with --locale en-us.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --locale en-us.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1924,8 +2480,14 @@
         },
         {
           "bytes": 228,
+          "invocation": {
+            "rendered_bytes": 228,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_build_with_--tsBuildInfoFile"
+          },
           "name": "parse build with --tsBuildInfoFile.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --tsBuildInfoFile.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1933,8 +2495,14 @@
         },
         {
           "bytes": 75,
+          "invocation": {
+            "rendered_bytes": 75,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/parse_build_without_any_options_"
+          },
           "name": "parse build without any options .js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build without any options .js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1942,8 +2510,14 @@
         },
         {
           "bytes": 163,
+          "invocation": {
+            "rendered_bytes": 163,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/reports_error_when_--builders_is_0"
+          },
           "name": "reports error when --builders is 0.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is 0.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1951,8 +2525,14 @@
         },
         {
           "bytes": 169,
+          "invocation": {
+            "rendered_bytes": 169,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/reports_error_when_--builders_is_invalid_type"
+          },
           "name": "reports error when --builders is invalid type.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is invalid type.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1960,8 +2540,14 @@
         },
         {
           "bytes": 164,
+          "invocation": {
+            "rendered_bytes": 164,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/reports_error_when_--builders_is_negative"
+          },
           "name": "reports error when --builders is negative.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is negative.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1969,8 +2555,14 @@
         },
         {
           "bytes": 158,
+          "invocation": {
+            "rendered_bytes": 158,
+            "test": "TestParseBuildCommandLine/parseBuildOptions/reports_other_common_may_not_be_used_with_--build_flags"
+          },
           "name": "reports other common may not be used with --build flags.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports other common may not be used with --build flags.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -1982,19 +2574,27 @@
     "parseCommandLine": {
       "authority": {
         "invocation": "tsc/internal/tsoptions/commandlineparser_test.go::createSubScenario('parseCommandLine', name, args)",
+        "mapping_complete": true,
         "native_test_source": "tsc/internal/tsoptions/commandlineparser_test.go",
         "output_name_rule": "<group>/<sub-scenario name>.js",
         "output_relationship": "one invocation renders exactly one output",
         "renderer": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaseline",
         "status": "established",
-        "subfolder": "tsoptions/commandLineParsing"
+        "subfolder": "tsoptions/commandLineParsing",
+        "verified_outputs": 53
       },
       "expected_outputs": 53,
       "outputs": [
         {
           "bytes": 244,
+          "invocation": {
+            "rendered_bytes": 244,
+            "test": "TestCommandLineParseResult/parseCommandLine/Handles_did_you_mean_for_misspelt_flags"
+          },
           "name": "Handles did you mean for misspelt flags.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Handles did you mean for misspelt flags.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2004,8 +2604,14 @@
         },
         {
           "bytes": 473,
+          "invocation": {
+            "rendered_bytes": 473,
+            "test": "TestCommandLineParseResult/parseCommandLine/Handles_may_only_be_used_with_--build_flags"
+          },
           "name": "Handles may only be used with --build flags.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Handles may only be used with --build flags.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2015,8 +2621,14 @@
         },
         {
           "bytes": 116,
+          "invocation": {
+            "rendered_bytes": 116,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_--lib_option_with_extra_comma"
+          },
           "name": "Parse --lib option with extra comma.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with extra comma.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2026,8 +2638,14 @@
         },
         {
           "bytes": 117,
+          "invocation": {
+            "rendered_bytes": 117,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_--lib_option_with_trailing_white-space"
+          },
           "name": "Parse --lib option with trailing white-space.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with trailing white-space.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2037,8 +2655,14 @@
         },
         {
           "bytes": 249,
+          "invocation": {
+            "rendered_bytes": 249,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--jsx"
+          },
           "name": "Parse empty options of --jsx.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --jsx.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2048,8 +2672,14 @@
         },
         {
           "bytes": 140,
+          "invocation": {
+            "rendered_bytes": 140,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--lib"
+          },
           "name": "Parse empty options of --lib.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --lib.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2059,8 +2689,14 @@
         },
         {
           "bytes": 305,
+          "invocation": {
+            "rendered_bytes": 305,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--module"
+          },
           "name": "Parse empty options of --module.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --module.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2070,8 +2706,14 @@
         },
         {
           "bytes": 255,
+          "invocation": {
+            "rendered_bytes": 255,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--moduleResolution"
+          },
           "name": "Parse empty options of --moduleResolution.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --moduleResolution.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2081,8 +2723,14 @@
         },
         {
           "bytes": 209,
+          "invocation": {
+            "rendered_bytes": 209,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--newLine"
+          },
           "name": "Parse empty options of --newLine.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --newLine.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2092,8 +2740,14 @@
         },
         {
           "bytes": 319,
+          "invocation": {
+            "rendered_bytes": 319,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_options_of_--target"
+          },
           "name": "Parse empty options of --target.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --target.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2103,8 +2757,14 @@
         },
         {
           "bytes": 87,
+          "invocation": {
+            "rendered_bytes": 87,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_empty_string_of_--lib"
+          },
           "name": "Parse empty string of --lib.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty string of --lib.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2114,8 +2774,14 @@
         },
         {
           "bytes": 121,
+          "invocation": {
+            "rendered_bytes": 121,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_explicit_boolean_flag_value"
+          },
           "name": "Parse explicit boolean flag value.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse explicit boolean flag value.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2125,8 +2791,14 @@
         },
         {
           "bytes": 115,
+          "invocation": {
+            "rendered_bytes": 115,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_immediately_following_command_line_argument_of_--lib"
+          },
           "name": "Parse immediately following command line argument of --lib.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse immediately following command line argument of --lib.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2136,8 +2808,14 @@
         },
         {
           "bytes": 99,
+          "invocation": {
+            "rendered_bytes": 99,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_implicit_boolean_flag_value"
+          },
           "name": "Parse implicit boolean flag value.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse implicit boolean flag value.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2147,8 +2825,14 @@
         },
         {
           "bytes": 1995,
+          "invocation": {
+            "rendered_bytes": 1995,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_invalid_option_of_library_flags"
+          },
           "name": "Parse invalid option of library flags.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse invalid option of library flags.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2158,8 +2842,14 @@
         },
         {
           "bytes": 193,
+          "invocation": {
+            "rendered_bytes": 193,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_multiple_compiler_flags_with_input_files_at_the_end"
+          },
           "name": "Parse multiple compiler flags with input files at the end.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files at the end.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2169,8 +2859,14 @@
         },
         {
           "bytes": 228,
+          "invocation": {
+            "rendered_bytes": 228,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_multiple_compiler_flags_with_input_files_in_the_middle"
+          },
           "name": "Parse multiple compiler flags with input files in the middle.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files in the middle.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2180,8 +2876,14 @@
         },
         {
           "bytes": 262,
+          "invocation": {
+            "rendered_bytes": 262,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_multiple_library_compiler_flags_"
+          },
           "name": "Parse multiple library compiler flags .js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple library compiler flags .js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2191,8 +2893,14 @@
         },
         {
           "bytes": 163,
+          "invocation": {
+            "rendered_bytes": 163,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_multiple_options_of_library_flags"
+          },
           "name": "Parse multiple options of library flags.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple options of library flags.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2202,8 +2910,14 @@
         },
         {
           "bytes": 112,
+          "invocation": {
+            "rendered_bytes": 112,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_non_boolean_argument_after_boolean_flag"
+          },
           "name": "Parse non boolean argument after boolean flag.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse non boolean argument after boolean flag.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2213,8 +2927,14 @@
         },
         {
           "bytes": 107,
+          "invocation": {
+            "rendered_bytes": 107,
+            "test": "TestCommandLineParseResult/parseCommandLine/Parse_single_option_of_library_flag"
+          },
           "name": "Parse single option of library flag.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse single option of library flag.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2224,8 +2944,14 @@
         },
         {
           "bytes": 107,
+          "invocation": {
+            "rendered_bytes": 107,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/allows_setting_option_type_boolean_to_false"
+          },
           "name": "allows setting option type boolean to false.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/allows setting option type boolean to false.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2235,8 +2961,14 @@
         },
         {
           "bytes": 156,
+          "invocation": {
+            "rendered_bytes": 156,
+            "test": "TestCommandLineParseResult/parseCommandLine/allows_tsconfig_only_option_to_be_set_to_null"
+          },
           "name": "allows tsconfig only option to be set to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/allows tsconfig only option to be set to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2246,8 +2978,14 @@
         },
         {
           "bytes": 263,
+          "invocation": {
+            "rendered_bytes": 263,
+            "test": "TestCommandLineParseResult/parseCommandLine/errors_on_invalid_excludeDirectories"
+          },
           "name": "errors on invalid excludeDirectories.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeDirectories.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2257,8 +2995,14 @@
         },
         {
           "bytes": 251,
+          "invocation": {
+            "rendered_bytes": 251,
+            "test": "TestCommandLineParseResult/parseCommandLine/errors_on_invalid_excludeFiles"
+          },
           "name": "errors on invalid excludeFiles.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeFiles.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2268,8 +3012,14 @@
         },
         {
           "bytes": 300,
+          "invocation": {
+            "rendered_bytes": 300,
+            "test": "TestCommandLineParseResult/parseCommandLine/errors_on_missing_argument_to_--fallbackPolling"
+          },
           "name": "errors on missing argument to --fallbackPolling.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on missing argument to --fallbackPolling.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2279,8 +3029,14 @@
         },
         {
           "bytes": 105,
+          "invocation": {
+            "rendered_bytes": 105,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_boolean_allows_setting_it_to_null"
+          },
           "name": "option of type boolean allows setting it to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean allows setting it to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2290,8 +3046,14 @@
         },
         {
           "bytes": 250,
+          "invocation": {
+            "rendered_bytes": 250,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_boolean_errors_if_its_followed_by_another_option"
+          },
           "name": "option of type boolean errors if its followed by another option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its followed by another option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2301,8 +3063,14 @@
         },
         {
           "bytes": 205,
+          "invocation": {
+            "rendered_bytes": 205,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_boolean_errors_if_its_last_option"
+          },
           "name": "option of type boolean errors if its last option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its last option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2312,8 +3080,14 @@
         },
         {
           "bytes": 213,
+          "invocation": {
+            "rendered_bytes": 213,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_boolean_errors_if_non_null_value_is_passed"
+          },
           "name": "option of type boolean errors if non null value is passed.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if non null value is passed.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2323,8 +3097,14 @@
         },
         {
           "bytes": 103,
+          "invocation": {
+            "rendered_bytes": 103,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_list_allows_setting_it_to_null"
+          },
           "name": "option of type list allows setting it to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list allows setting it to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2334,8 +3114,14 @@
         },
         {
           "bytes": 237,
+          "invocation": {
+            "rendered_bytes": 237,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_list_errors_if_its_followed_by_another_option"
+          },
           "name": "option of type list errors if its followed by another option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its followed by another option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2345,8 +3131,14 @@
         },
         {
           "bytes": 192,
+          "invocation": {
+            "rendered_bytes": 192,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_list_errors_if_its_last_option"
+          },
           "name": "option of type list errors if its last option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its last option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2356,8 +3148,14 @@
         },
         {
           "bytes": 203,
+          "invocation": {
+            "rendered_bytes": 203,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_list_errors_if_non_null_value_is_passed"
+          },
           "name": "option of type list errors if non null value is passed.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if non null value is passed.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2367,8 +3165,14 @@
         },
         {
           "bytes": 107,
+          "invocation": {
+            "rendered_bytes": 107,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_number_allows_setting_it_to_null"
+          },
           "name": "option of type number allows setting it to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number allows setting it to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2378,8 +3182,14 @@
         },
         {
           "bytes": 241,
+          "invocation": {
+            "rendered_bytes": 241,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_number_errors_if_its_followed_by_another_option"
+          },
           "name": "option of type number errors if its followed by another option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its followed by another option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2389,8 +3199,14 @@
         },
         {
           "bytes": 196,
+          "invocation": {
+            "rendered_bytes": 196,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_number_errors_if_its_last_option"
+          },
           "name": "option of type number errors if its last option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its last option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2400,8 +3216,14 @@
         },
         {
           "bytes": 202,
+          "invocation": {
+            "rendered_bytes": 202,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_number_errors_if_non_null_value_is_passed"
+          },
           "name": "option of type number errors if non null value is passed.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if non null value is passed.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2411,8 +3233,14 @@
         },
         {
           "bytes": 97,
+          "invocation": {
+            "rendered_bytes": 97,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_object_allows_setting_it_to_null"
+          },
           "name": "option of type object allows setting it to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object allows setting it to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2422,8 +3250,14 @@
         },
         {
           "bytes": 231,
+          "invocation": {
+            "rendered_bytes": 231,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_object_errors_if_its_followed_by_another_option"
+          },
           "name": "option of type object errors if its followed by another option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its followed by another option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2433,8 +3267,14 @@
         },
         {
           "bytes": 186,
+          "invocation": {
+            "rendered_bytes": 186,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_object_errors_if_its_last_option"
+          },
           "name": "option of type object errors if its last option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its last option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2444,8 +3284,14 @@
         },
         {
           "bytes": 107,
+          "invocation": {
+            "rendered_bytes": 107,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_string_allows_setting_it_to_null"
+          },
           "name": "option of type string allows setting it to null.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string allows setting it to null.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2455,8 +3301,14 @@
         },
         {
           "bytes": 241,
+          "invocation": {
+            "rendered_bytes": 241,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_string_errors_if_its_followed_by_another_option"
+          },
           "name": "option of type string errors if its followed by another option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its followed by another option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2466,8 +3318,14 @@
         },
         {
           "bytes": 196,
+          "invocation": {
+            "rendered_bytes": 196,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_string_errors_if_its_last_option"
+          },
           "name": "option of type string errors if its last option.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its last option.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2477,8 +3335,14 @@
         },
         {
           "bytes": 205,
+          "invocation": {
+            "rendered_bytes": 205,
+            "test": "TestParseCommandLineVerifyNull/parseCommandLine/option_of_type_string_errors_if_non_null_value_is_passed"
+          },
           "name": "option of type string errors if non null value is passed.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if non null value is passed.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2488,8 +3352,14 @@
         },
         {
           "bytes": 133,
+          "invocation": {
+            "rendered_bytes": 133,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--excludeDirectories"
+          },
           "name": "parse --excludeDirectories.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --excludeDirectories.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2499,8 +3369,14 @@
         },
         {
           "bytes": 131,
+          "invocation": {
+            "rendered_bytes": 131,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--excludeFiles"
+          },
           "name": "parse --excludeFiles.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --excludeFiles.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2510,8 +3386,14 @@
         },
         {
           "bytes": 126,
+          "invocation": {
+            "rendered_bytes": 126,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--fallbackPolling"
+          },
           "name": "parse --fallbackPolling.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --fallbackPolling.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2521,8 +3403,14 @@
         },
         {
           "bytes": 101,
+          "invocation": {
+            "rendered_bytes": 101,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--incremental"
+          },
           "name": "parse --incremental.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --incremental.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2532,8 +3420,14 @@
         },
         {
           "bytes": 129,
+          "invocation": {
+            "rendered_bytes": 129,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--synchronousWatchDirectory"
+          },
           "name": "parse --synchronousWatchDirectory.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --synchronousWatchDirectory.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2543,8 +3437,14 @@
         },
         {
           "bytes": 145,
+          "invocation": {
+            "rendered_bytes": 145,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--tsBuildInfoFile"
+          },
           "name": "parse --tsBuildInfoFile.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --tsBuildInfoFile.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2554,8 +3454,14 @@
         },
         {
           "bytes": 128,
+          "invocation": {
+            "rendered_bytes": 128,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--watchDirectory"
+          },
           "name": "parse --watchDirectory.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --watchDirectory.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2565,8 +3471,14 @@
         },
         {
           "bytes": 109,
+          "invocation": {
+            "rendered_bytes": 109,
+            "test": "TestCommandLineParseResult/parseCommandLine/parse_--watchFile"
+          },
           "name": "parse --watchFile.js",
           "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --watchFile.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2580,20 +3492,28 @@
     "tsconfigParsing": {
       "authority": {
         "invocation": "tsc/internal/tsoptions/tsconfigparsing_test.go::TestParseJsonConfigFileContent and TestParseJsonSourceFileConfigFileContent, plus their variant callers",
+        "mapping_complete": true,
         "native_test_source": "tsc/internal/tsoptions/tsconfigparsing_test.go",
         "output_name_rule": "<title> with {json,jsonSourceFile} api.js, or \"<title> jsonParse.js\"",
         "output_relationship": "one invocation renders one output, but a single output may concatenate several parsed configs: baselineParseConfigWith loops over input []testConfig",
         "renderer": "tsc/internal/tsoptions/tsconfigparsing_test.go::baselineParseConfigWith",
         "secondary_renderer": "tsc/internal/tsoptions/tsconfigparsing_test.go::TestParseConfigFileTextToJson (inline assembly)",
         "status": "established",
-        "subfolder": "config/tsconfigParsing"
+        "subfolder": "config/tsconfigParsing",
+        "verified_outputs": 87
       },
       "expected_outputs": 87,
       "outputs": [
         {
           "bytes": 473,
+          "invocation": {
+            "rendered_bytes": 473,
+            "test": "TestParseTypeAcquisition/Convert_correctly_format_tsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2606,8 +3526,14 @@
         },
         {
           "bytes": 473,
+          "invocation": {
+            "rendered_bytes": 473,
+            "test": "TestParseTypeAcquisition/Convert_correctly_format_tsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2620,8 +3546,14 @@
         },
         {
           "bytes": 362,
+          "invocation": {
+            "rendered_bytes": 362,
+            "test": "TestParseTypeAcquisition/Convert_default_jsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert default jsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2634,8 +3566,14 @@
         },
         {
           "bytes": 362,
+          "invocation": {
+            "rendered_bytes": 362,
+            "test": "TestParseTypeAcquisition/Convert_default_jsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2648,8 +3586,14 @@
         },
         {
           "bytes": 254,
+          "invocation": {
+            "rendered_bytes": 254,
+            "test": "TestParseTypeAcquisition/Convert_default_tsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert default tsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2662,8 +3606,14 @@
         },
         {
           "bytes": 254,
+          "invocation": {
+            "rendered_bytes": 254,
+            "test": "TestParseTypeAcquisition/Convert_default_tsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2676,8 +3626,14 @@
         },
         {
           "bytes": 503,
+          "invocation": {
+            "rendered_bytes": 503,
+            "test": "TestParseTypeAcquisition/Convert_incorrect_format_jsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2690,8 +3646,14 @@
         },
         {
           "bytes": 636,
+          "invocation": {
+            "rendered_bytes": 636,
+            "test": "TestParseTypeAcquisition/Convert_incorrect_format_jsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2704,8 +3666,14 @@
         },
         {
           "bytes": 394,
+          "invocation": {
+            "rendered_bytes": 394,
+            "test": "TestParseTypeAcquisition/Convert_incorrect_format_tsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2718,8 +3686,14 @@
         },
         {
           "bytes": 527,
+          "invocation": {
+            "rendered_bytes": 527,
+            "test": "TestParseTypeAcquisition/Convert_incorrect_format_tsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2732,8 +3706,14 @@
         },
         {
           "bytes": 521,
+          "invocation": {
+            "rendered_bytes": 521,
+            "test": "TestParseTypeAcquisition/Convert_jsconfig.json_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert jsconfig.json to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2746,8 +3726,14 @@
         },
         {
           "bytes": 521,
+          "invocation": {
+            "rendered_bytes": 521,
+            "test": "TestParseTypeAcquisition/Convert_jsconfig.json_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2760,8 +3746,14 @@
         },
         {
           "bytes": 409,
+          "invocation": {
+            "rendered_bytes": 409,
+            "test": "TestParseTypeAcquisition/Convert_jsconfig.json_with_only_enable_property_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2774,8 +3766,14 @@
         },
         {
           "bytes": 409,
+          "invocation": {
+            "rendered_bytes": 409,
+            "test": "TestParseTypeAcquisition/Convert_jsconfig.json_with_only_enable_property_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2788,8 +3786,14 @@
         },
         {
           "bytes": 317,
+          "invocation": {
+            "rendered_bytes": 317,
+            "test": "TestParseTypeAcquisition/Convert_tsconfig.json_with_only_enable_property_to_typeAcquisition__with_json_api"
+          },
           "name": "Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2802,8 +3806,14 @@
         },
         {
           "bytes": 317,
+          "invocation": {
+            "rendered_bytes": 317,
+            "test": "TestParseTypeAcquisition/Convert_tsconfig.json_with_only_enable_property_to_typeAcquisition__with_jsonSourceFile_api"
+          },
           "name": "Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -2816,8 +3826,14 @@
         },
         {
           "bytes": 345,
+          "invocation": {
+            "rendered_bytes": 345,
+            "test": "TestParseJsonConfigFileContent/allow_dotted_files_and_folders_when_explicitly_requested_with_json_api"
+          },
           "name": "allow dotted files and folders when explicitly requested with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2828,8 +3844,14 @@
         },
         {
           "bytes": 345,
+          "invocation": {
+            "rendered_bytes": 345,
+            "test": "TestParseJsonSourceFileConfigFileContent/allow_dotted_files_and_folders_when_explicitly_requested_with_jsonSourceFile_api"
+          },
           "name": "allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2840,8 +3862,14 @@
         },
         {
           "bytes": 221,
+          "invocation": {
+            "rendered_bytes": 221,
+            "test": "TestParseJsonConfigFileContent/does_not_generate_errors_for_empty_files_list_when_one_or_more_references_are_provided_with_json_api"
+          },
           "name": "does not generate errors for empty files list when one or more references are provided with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2852,8 +3880,14 @@
         },
         {
           "bytes": 221,
+          "invocation": {
+            "rendered_bytes": 221,
+            "test": "TestParseJsonSourceFileConfigFileContent/does_not_generate_errors_for_empty_files_list_when_one_or_more_references_are_provided_with_jsonSourceFile_api"
+          },
           "name": "does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2864,8 +3898,14 @@
         },
         {
           "bytes": 594,
+          "invocation": {
+            "rendered_bytes": 594,
+            "test": "TestParseJsonConfigFileContent/exclude_declarationDir_unless_overridden_with_json_api"
+          },
           "name": "exclude declarationDir unless overridden with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude declarationDir unless overridden with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2876,8 +3916,14 @@
         },
         {
           "bytes": 594,
+          "invocation": {
+            "rendered_bytes": 594,
+            "test": "TestParseJsonSourceFileConfigFileContent/exclude_declarationDir_unless_overridden_with_jsonSourceFile_api"
+          },
           "name": "exclude declarationDir unless overridden with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude declarationDir unless overridden with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2888,8 +3934,14 @@
         },
         {
           "bytes": 525,
+          "invocation": {
+            "rendered_bytes": 525,
+            "test": "TestParseJsonConfigFileContent/exclude_outDir_unless_overridden_with_json_api"
+          },
           "name": "exclude outDir unless overridden with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude outDir unless overridden with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2900,8 +3952,14 @@
         },
         {
           "bytes": 525,
+          "invocation": {
+            "rendered_bytes": 525,
+            "test": "TestParseJsonSourceFileConfigFileContent/exclude_outDir_unless_overridden_with_jsonSourceFile_api"
+          },
           "name": "exclude outDir unless overridden with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude outDir unless overridden with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2912,8 +3970,14 @@
         },
         {
           "bytes": 304,
+          "invocation": {
+            "rendered_bytes": 304,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_directory_with_no_.ts_files_with_json_api"
+          },
           "name": "generates errors for directory with no .ts files with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for directory with no .ts files with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2924,8 +3988,14 @@
         },
         {
           "bytes": 304,
+          "invocation": {
+            "rendered_bytes": 304,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_directory_with_no_.ts_files_with_jsonSourceFile_api"
+          },
           "name": "generates errors for directory with no .ts files with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for directory with no .ts files with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2936,8 +4006,14 @@
         },
         {
           "bytes": 371,
+          "invocation": {
+            "rendered_bytes": 371,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_empty_directory_with_json_api"
+          },
           "name": "generates errors for empty directory with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty directory with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2948,8 +4024,14 @@
         },
         {
           "bytes": 371,
+          "invocation": {
+            "rendered_bytes": 371,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_empty_directory_with_jsonSourceFile_api"
+          },
           "name": "generates errors for empty directory with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty directory with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2960,8 +4042,14 @@
         },
         {
           "bytes": 298,
+          "invocation": {
+            "rendered_bytes": 298,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_empty_files_list_when_no_references_are_provided_with_json_api"
+          },
           "name": "generates errors for empty files list when no references are provided with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list when no references are provided with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2972,8 +4060,14 @@
         },
         {
           "bytes": 438,
+          "invocation": {
+            "rendered_bytes": 438,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_empty_files_list_when_no_references_are_provided_with_jsonSourceFile_api"
+          },
           "name": "generates errors for empty files list when no references are provided with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list when no references are provided with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2984,8 +4078,14 @@
         },
         {
           "bytes": 264,
+          "invocation": {
+            "rendered_bytes": 264,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_empty_files_list_with_json_api"
+          },
           "name": "generates errors for empty files list with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -2996,8 +4096,14 @@
         },
         {
           "bytes": 403,
+          "invocation": {
+            "rendered_bytes": 403,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_empty_files_list_with_jsonSourceFile_api"
+          },
           "name": "generates errors for empty files list with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3008,8 +4114,14 @@
         },
         {
           "bytes": 328,
+          "invocation": {
+            "rendered_bytes": 328,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_empty_include_with_json_api"
+          },
           "name": "generates errors for empty include with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty include with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3020,8 +4132,14 @@
         },
         {
           "bytes": 328,
+          "invocation": {
+            "rendered_bytes": 328,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_empty_include_with_jsonSourceFile_api"
+          },
           "name": "generates errors for empty include with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty include with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3032,8 +4150,14 @@
         },
         {
           "bytes": 520,
+          "invocation": {
+            "rendered_bytes": 520,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_include_with_parent_directory_after_recursive_wildcard_with_json_api"
+          },
           "name": "generates errors for include with parent directory after recursive wildcard with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3044,8 +4168,14 @@
         },
         {
           "bytes": 686,
+          "invocation": {
+            "rendered_bytes": 686,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_include_with_parent_directory_after_recursive_wildcard_with_jsonSourceFile_api"
+          },
           "name": "generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3056,8 +4186,14 @@
         },
         {
           "bytes": 439,
+          "invocation": {
+            "rendered_bytes": 439,
+            "test": "TestParseJsonConfigFileContent/generates_errors_for_includes_with_outDir_with_json_api"
+          },
           "name": "generates errors for includes with outDir with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for includes with outDir with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3068,8 +4204,14 @@
         },
         {
           "bytes": 439,
+          "invocation": {
+            "rendered_bytes": 439,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_for_includes_with_outDir_with_jsonSourceFile_api"
+          },
           "name": "generates errors for includes with outDir with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for includes with outDir with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3080,8 +4222,14 @@
         },
         {
           "bytes": 266,
+          "invocation": {
+            "rendered_bytes": 266,
+            "test": "TestParseJsonConfigFileContent/generates_errors_when_commandline_option_is_in_tsconfig_with_json_api"
+          },
           "name": "generates errors when commandline option is in tsconfig with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when commandline option is in tsconfig with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3092,8 +4240,14 @@
         },
         {
           "bytes": 376,
+          "invocation": {
+            "rendered_bytes": 376,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_when_commandline_option_is_in_tsconfig_with_jsonSourceFile_api"
+          },
           "name": "generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3104,8 +4258,14 @@
         },
         {
           "bytes": 343,
+          "invocation": {
+            "rendered_bytes": 343,
+            "test": "TestParseJsonConfigFileContent/generates_errors_when_files_is_not_string_with_json_api"
+          },
           "name": "generates errors when files is not string with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when files is not string with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3116,8 +4276,14 @@
         },
         {
           "bytes": 642,
+          "invocation": {
+            "rendered_bytes": 642,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_when_files_is_not_string_with_jsonSourceFile_api"
+          },
           "name": "generates errors when files is not string with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when files is not string with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3128,8 +4294,14 @@
         },
         {
           "bytes": 440,
+          "invocation": {
+            "rendered_bytes": 440,
+            "test": "TestParseJsonConfigFileContent/generates_errors_when_include_is_not_string_with_json_api"
+          },
           "name": "generates errors when include is not string with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when include is not string with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3140,8 +4312,14 @@
         },
         {
           "bytes": 644,
+          "invocation": {
+            "rendered_bytes": 644,
+            "test": "TestParseJsonSourceFileConfigFileContent/generates_errors_when_include_is_not_string_with_jsonSourceFile_api"
+          },
           "name": "generates errors when include is not string with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when include is not string with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3152,8 +4330,14 @@
         },
         {
           "bytes": 268,
+          "invocation": {
+            "rendered_bytes": 268,
+            "test": "TestParseJsonConfigFileContent/handles_empty_types_array_with_json_api"
+          },
           "name": "handles empty types array with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles empty types array with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3166,8 +4350,14 @@
         },
         {
           "bytes": 268,
+          "invocation": {
+            "rendered_bytes": 268,
+            "test": "TestParseJsonSourceFileConfigFileContent/handles_empty_types_array_with_jsonSourceFile_api"
+          },
           "name": "handles empty types array with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles empty types array with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3180,8 +4370,14 @@
         },
         {
           "bytes": 308,
+          "invocation": {
+            "rendered_bytes": 308,
+            "test": "TestParseConfigFileTextToJson/handles_escaped_characters_in_strings_correctly"
+          },
           "name": "handles escaped characters in strings correctly jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles escaped characters in strings correctly jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3189,8 +4385,14 @@
         },
         {
           "bytes": 216,
+          "invocation": {
+            "rendered_bytes": 216,
+            "test": "TestParseJsonConfigFileContent/ignore_dotted_files_and_folders_with_json_api"
+          },
           "name": "ignore dotted files and folders with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/ignore dotted files and folders with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3201,8 +4403,14 @@
         },
         {
           "bytes": 216,
+          "invocation": {
+            "rendered_bytes": 216,
+            "test": "TestParseJsonSourceFileConfigFileContent/ignore_dotted_files_and_folders_with_jsonSourceFile_api"
+          },
           "name": "ignore dotted files and folders with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/ignore dotted files and folders with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3213,8 +4421,14 @@
         },
         {
           "bytes": 248,
+          "invocation": {
+            "rendered_bytes": 248,
+            "test": "TestParseJsonConfigFileContent/implicitly_exclude_common_package_folders_with_json_api"
+          },
           "name": "implicitly exclude common package folders with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/implicitly exclude common package folders with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3225,8 +4439,14 @@
         },
         {
           "bytes": 248,
+          "invocation": {
+            "rendered_bytes": 248,
+            "test": "TestParseJsonSourceFileConfigFileContent/implicitly_exclude_common_package_folders_with_jsonSourceFile_api"
+          },
           "name": "implicitly exclude common package folders with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/implicitly exclude common package folders with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3237,8 +4457,14 @@
         },
         {
           "bytes": 2756,
+          "invocation": {
+            "rendered_bytes": 2756,
+            "test": "TestParseJsonConfigFileContent/issue_1267_scenario_-_extended_files_not_picked_up_with_json_api"
+          },
           "name": "issue 1267 scenario - extended files not picked up with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/issue 1267 scenario - extended files not picked up with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3251,8 +4477,14 @@
         },
         {
           "bytes": 2756,
+          "invocation": {
+            "rendered_bytes": 2756,
+            "test": "TestParseJsonSourceFileConfigFileContent/issue_1267_scenario_-_extended_files_not_picked_up_with_jsonSourceFile_api"
+          },
           "name": "issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3265,8 +4497,14 @@
         },
         {
           "bytes": 311,
+          "invocation": {
+            "rendered_bytes": 311,
+            "test": "TestParseConfigFileTextToJson/keeps_string_content_untouched"
+          },
           "name": "keeps string content untouched jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/keeps string content untouched jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3274,8 +4512,14 @@
         },
         {
           "bytes": 505,
+          "invocation": {
+            "rendered_bytes": 505,
+            "test": "TestParseJsonConfigFileContent/null_overrides_in_extended_tsconfig_-_array_fields_with_json_api"
+          },
           "name": "null overrides in extended tsconfig - array fields with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - array fields with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3288,8 +4532,14 @@
         },
         {
           "bytes": 505,
+          "invocation": {
+            "rendered_bytes": 505,
+            "test": "TestParseJsonSourceFileConfigFileContent/null_overrides_in_extended_tsconfig_-_array_fields_with_jsonSourceFile_api"
+          },
           "name": "null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3302,8 +4552,14 @@
         },
         {
           "bytes": 641,
+          "invocation": {
+            "rendered_bytes": 641,
+            "test": "TestParseJsonConfigFileContent/null_overrides_in_extended_tsconfig_-_mixed_field_types_with_json_api"
+          },
           "name": "null overrides in extended tsconfig - mixed field types with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3316,8 +4572,14 @@
         },
         {
           "bytes": 641,
+          "invocation": {
+            "rendered_bytes": 641,
+            "test": "TestParseJsonSourceFileConfigFileContent/null_overrides_in_extended_tsconfig_-_mixed_field_types_with_jsonSourceFile_api"
+          },
           "name": "null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3330,8 +4592,14 @@
         },
         {
           "bytes": 457,
+          "invocation": {
+            "rendered_bytes": 457,
+            "test": "TestParseJsonConfigFileContent/null_overrides_in_extended_tsconfig_-_string_fields_with_json_api"
+          },
           "name": "null overrides in extended tsconfig - string fields with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - string fields with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3344,8 +4612,14 @@
         },
         {
           "bytes": 457,
+          "invocation": {
+            "rendered_bytes": 457,
+            "test": "TestParseJsonSourceFileConfigFileContent/null_overrides_in_extended_tsconfig_-_string_fields_with_jsonSourceFile_api"
+          },
           "name": "null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3358,8 +4632,14 @@
         },
         {
           "bytes": 642,
+          "invocation": {
+            "rendered_bytes": 642,
+            "test": "TestParseJsonConfigFileContent/null_overrides_in_middle_level_of_extends_chain_with_json_api"
+          },
           "name": "null overrides in middle level of extends chain with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in middle level of extends chain with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3372,8 +4652,14 @@
         },
         {
           "bytes": 642,
+          "invocation": {
+            "rendered_bytes": 642,
+            "test": "TestParseJsonSourceFileConfigFileContent/null_overrides_in_middle_level_of_extends_chain_with_jsonSourceFile_api"
+          },
           "name": "null overrides in middle level of extends chain with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in middle level of extends chain with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3386,8 +4672,14 @@
         },
         {
           "bytes": 639,
+          "invocation": {
+            "rendered_bytes": 639,
+            "test": "TestParseJsonConfigFileContent/null_overrides_with_multiple_extends_levels_with_json_api"
+          },
           "name": "null overrides with multiple extends levels with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides with multiple extends levels with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3400,8 +4692,14 @@
         },
         {
           "bytes": 639,
+          "invocation": {
+            "rendered_bytes": 639,
+            "test": "TestParseJsonSourceFileConfigFileContent/null_overrides_with_multiple_extends_levels_with_jsonSourceFile_api"
+          },
           "name": "null overrides with multiple extends levels with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides with multiple extends levels with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3414,8 +4712,14 @@
         },
         {
           "bytes": 1134,
+          "invocation": {
+            "rendered_bytes": 1134,
+            "test": "TestParseJsonConfigFileContent/parses_tsconfig_with_compilerOptions,_files,_include,_and_exclude_with_json_api"
+          },
           "name": "parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3428,8 +4732,14 @@
         },
         {
           "bytes": 1134,
+          "invocation": {
+            "rendered_bytes": 1134,
+            "test": "TestParseJsonSourceFileConfigFileContent/parses_tsconfig_with_compilerOptions,_files,_include,_and_exclude_with_jsonSourceFile_api"
+          },
           "name": "parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3442,8 +4752,14 @@
         },
         {
           "bytes": 854,
+          "invocation": {
+            "rendered_bytes": 854,
+            "test": "TestParseJsonConfigFileContent/parses_tsconfig_with_extends_and_configDir_with_json_api"
+          },
           "name": "parses tsconfig with extends and configDir with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends and configDir with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3456,8 +4772,14 @@
         },
         {
           "bytes": 854,
+          "invocation": {
+            "rendered_bytes": 854,
+            "test": "TestParseJsonSourceFileConfigFileContent/parses_tsconfig_with_extends_and_configDir_with_jsonSourceFile_api"
+          },
           "name": "parses tsconfig with extends and configDir with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends and configDir with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3470,8 +4792,14 @@
         },
         {
           "bytes": 811,
+          "invocation": {
+            "rendered_bytes": 811,
+            "test": "TestParseJsonConfigFileContent/parses_tsconfig_with_extends,_files,_include_and_other_options_with_json_api"
+          },
           "name": "parses tsconfig with extends, files, include and other options with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends, files, include and other options with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3484,8 +4812,14 @@
         },
         {
           "bytes": 811,
+          "invocation": {
+            "rendered_bytes": 811,
+            "test": "TestParseJsonSourceFileConfigFileContent/parses_tsconfig_with_extends,_files,_include_and_other_options_with_jsonSourceFile_api"
+          },
           "name": "parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3498,8 +4832,14 @@
         },
         {
           "bytes": 243,
+          "invocation": {
+            "rendered_bytes": 243,
+            "test": "TestParseJsonConfigFileContent/reports_error_for_an_unknown_option_with_json_api"
+          },
           "name": "reports error for an unknown option with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports error for an unknown option with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3510,8 +4850,14 @@
         },
         {
           "bytes": 359,
+          "invocation": {
+            "rendered_bytes": 359,
+            "test": "TestParseJsonSourceFileConfigFileContent/reports_error_for_an_unknown_option_with_jsonSourceFile_api"
+          },
           "name": "reports error for an unknown option with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports error for an unknown option with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3522,8 +4868,14 @@
         },
         {
           "bytes": 1669,
+          "invocation": {
+            "rendered_bytes": 1669,
+            "test": "TestParseJsonConfigFileContent/reports_errors_for_incorrectly_cased_option_names_with_json_api"
+          },
           "name": "reports errors for incorrectly cased option names with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for incorrectly cased option names with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3536,8 +4888,14 @@
         },
         {
           "bytes": 3050,
+          "invocation": {
+            "rendered_bytes": 3050,
+            "test": "TestParseJsonSourceFileConfigFileContent/reports_errors_for_incorrectly_cased_option_names_with_jsonSourceFile_api"
+          },
           "name": "reports errors for incorrectly cased option names with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for incorrectly cased option names with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "CompilerOptions::",
             "Errors::",
@@ -3550,8 +4908,14 @@
         },
         {
           "bytes": 687,
+          "invocation": {
+            "rendered_bytes": 687,
+            "test": "TestParseJsonConfigFileContent/reports_errors_for_wrong_type_option_and_invalid_enum_value_with_json_api"
+          },
           "name": "reports errors for wrong type option and invalid enum value with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for wrong type option and invalid enum value with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3562,8 +4926,14 @@
         },
         {
           "bytes": 1166,
+          "invocation": {
+            "rendered_bytes": 1166,
+            "test": "TestParseJsonSourceFileConfigFileContent/reports_errors_for_wrong_type_option_and_invalid_enum_value_with_jsonSourceFile_api"
+          },
           "name": "reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3574,8 +4944,14 @@
         },
         {
           "bytes": 259,
+          "invocation": {
+            "rendered_bytes": 259,
+            "test": "TestParseJsonConfigFileContent/reports_spelling_suggestion_for_an_unknown_option_with_json_api"
+          },
           "name": "reports spelling suggestion for an unknown option with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports spelling suggestion for an unknown option with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3586,8 +4962,14 @@
         },
         {
           "bytes": 368,
+          "invocation": {
+            "rendered_bytes": 368,
+            "test": "TestParseJsonSourceFileConfigFileContent/reports_spelling_suggestion_for_an_unknown_option_with_jsonSourceFile_api"
+          },
           "name": "reports spelling suggestion for an unknown option with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports spelling suggestion for an unknown option with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3598,8 +4980,14 @@
         },
         {
           "bytes": 461,
+          "invocation": {
+            "rendered_bytes": 461,
+            "test": "TestParseConfigFileTextToJson/returns_config_object_without_comments"
+          },
           "name": "returns config object without comments jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns config object without comments jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3607,8 +4995,14 @@
         },
         {
           "bytes": 85,
+          "invocation": {
+            "rendered_bytes": 85,
+            "test": "TestParseConfigFileTextToJson/returns_empty_config_for_file_with_comments_only"
+          },
           "name": "returns empty config for file with comments only jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config for file with comments only jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3616,8 +5010,14 @@
         },
         {
           "bytes": 64,
+          "invocation": {
+            "rendered_bytes": 64,
+            "test": "TestParseConfigFileTextToJson/returns_empty_config_for_file_with_only_whitespaces"
+          },
           "name": "returns empty config for file with only whitespaces jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config for file with only whitespaces jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3625,8 +5025,14 @@
         },
         {
           "bytes": 33,
+          "invocation": {
+            "rendered_bytes": 33,
+            "test": "TestParseConfigFileTextToJson/returns_empty_config_when_config_is_empty_object"
+          },
           "name": "returns empty config when config is empty object jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config when config is empty object jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3634,8 +5040,14 @@
         },
         {
           "bytes": 470,
+          "invocation": {
+            "rendered_bytes": 470,
+            "test": "TestParseJsonConfigFileContent/returns_error_when_tsconfig_have_excludes_with_json_api"
+          },
           "name": "returns error when tsconfig have excludes with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns error when tsconfig have excludes with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3646,8 +5058,14 @@
         },
         {
           "bytes": 618,
+          "invocation": {
+            "rendered_bytes": 618,
+            "test": "TestParseJsonSourceFileConfigFileContent/returns_error_when_tsconfig_have_excludes_with_jsonSourceFile_api"
+          },
           "name": "returns error when tsconfig have excludes with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns error when tsconfig have excludes with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3658,8 +5076,14 @@
         },
         {
           "bytes": 379,
+          "invocation": {
+            "rendered_bytes": 379,
+            "test": "TestParseConfigFileTextToJson/returns_object_when_users_correctly_specify_library"
+          },
           "name": "returns object when users correctly specify library jsonParse.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns object when users correctly specify library jsonParse.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::"
           ],
@@ -3667,8 +5091,14 @@
         },
         {
           "bytes": 558,
+          "invocation": {
+            "rendered_bytes": 558,
+            "test": "TestParseJsonConfigFileContent/with_outDir_from_base_tsconfig_with_json_api"
+          },
           "name": "with outDir from base tsconfig with json api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/with outDir from base tsconfig with json api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3679,8 +5109,14 @@
         },
         {
           "bytes": 558,
+          "invocation": {
+            "rendered_bytes": 558,
+            "test": "TestParseJsonSourceFileConfigFileContent/with_outDir_from_base_tsconfig_with_jsonSourceFile_api"
+          },
           "name": "with outDir from base tsconfig with jsonSourceFile api.js",
           "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/with outDir from base tsconfig with jsonSourceFile api.js",
+          "rendering_status": "the pinned test rendered exactly the committed reference bytes",
+          "rendering_verified": true,
           "sections": [
             "Errors::",
             "FileNames::",
@@ -3692,6 +5128,13 @@
       ],
       "subdirectory": "tsc/testdata/baselines/reference/config/tsconfigParsing"
     }
+  },
+  "invocation_mapping": {
+    "outputs_rendered_but_not_indexed": [],
+    "problem_outputs": 0,
+    "recorded_invocations": 167,
+    "unrendered_outputs": 142,
+    "verified_outputs": 167
   },
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "total_outputs": 309,

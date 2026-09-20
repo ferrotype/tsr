@@ -5,63 +5,65 @@ not a second plan. Each step records what was completed, what is still missing
 and the exact command that reproduces it.
 
 Pin `1f70213d4922b434345f639b441681e470c7cfc1`. Gitlink, `data/upstream.json`
-and the initialized submodule HEAD all agree.
+and the initialized submodule HEAD all agree, and a capture records both so a
+moved pin invalidates it.
 
 | Step | State |
 | --- | --- |
-| F0 — inventory, manifests and executable setup | complete, with one named blocker |
+| F0 — inventory, manifests and executable setup | **incomplete**: blocked on the `config/matchFiles` authority decision |
 | F1a — foundation leaf tests | not started |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
 
-Stage A preparation is **not** Phase 1 implementation. No production behavior
-was added or changed in F0.
+`python3 scripts/phase1.py inventory --check` computes this: it reports
+`f0_complete: false` with the outstanding items, separately from whether the
+manifests are internally consistent. Stage A preparation is not Phase 1
+implementation; no production behavior has been added or changed.
 
-## F0 completion checklist
+## F0 checklist
 
 | Requirement | Result |
 | --- | --- |
-| Scope has zero unclassified operations | 1,678 operations, every one carrying a disposition and a recorded basis |
-| All 309 outputs have verified invocation mappings | 167 of 309 mapped to a Go invocation and renderer; **142 blocked**, see below |
-| Manifests and failure tests pass | 31 Phase 1 tests, plus the extended discovery regression |
-| The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations |
-| Replay is read-only | `compare` runs no child process; a test substitutes `subprocess.run` to prove it |
-| The pending queue is generated from concrete rows | queue below is derived from `data/phase1/scope.json` |
+| Scope has zero unclassified operations | 4,795 operations, each with a disposition, basis, case links and dependencies |
+| All 309 outputs have verified invocation mappings | **167 of 309.** 142 blocked; see below |
+| Manifests and failure tests pass | 61 Phase 1 tests, plus the extended discovery regression |
+| The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations, each with a native expectation |
+| Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
+| The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
 
 ## Blocker: `config/matchFiles` baseline authority
 
 **The 142 `config/matchFiles` reference outputs have no Go invocation and no Go
 renderer at this pin.** The plan anticipated this and required it be named
-rather than papered over. Evidence, each independently re-derivable:
+rather than papered over. Five independent checks, each re-derivable:
 
 1. No pinned test writes that subfolder. Across every `*_test.go` under `tsc/`,
    the only `baseline.Options{Subfolder: ...}` values are
    `config/tsconfigParsing` and `tsoptions/commandLineParsing`.
-   `phase1_baselines.verify_written_subfolders()` re-derives this on each
-   `inventory --check`, so the claim cannot rot silently.
-2. The envelope does not match any renderer in the pin. The 142 outputs carry
-   `config:`, `Fs::`, `configFileName::` and `Errors::`, and dump the whole
-   parsed result as JSON. `baselineParseConfigWith`
-   (`tsconfigparsing_test.go:1503`) instead emits `configFileName::`,
-   `CompilerOptions::`, `TypeAcquisition::`, `FileNames::` and `Errors::`, and
-   has no `config:` heading.
-3. The titles do not overlap. Zero of the 142 names appear in the 87
-   `config/tsconfigParsing` outputs, so they are distinct content, not a
-   re-homed copy.
-4. `vfsmatch_test.go` references
-   `tsc/testdata/fixtures/testRunner/unittests/config/matchFiles.ts`, which is
-   absent at this pin. These are promoted TypeScript outputs whose renderer was
-   not ported.
+   `phase1_baselines.verify_written_subfolders()` re-derives this on every
+   `inventory --check`.
+2. **Executed, not just inspected.** Running the whole pinned `tsoptions` test
+   package with `baseline.Run` instrumented records exactly 167 invocations:
+   87 `config/tsconfigParsing` and 80 `tsoptions/commandLineParsing`. Zero
+   write `config/matchFiles`.
+3. The envelope matches no renderer in the pin. The 142 carry `config:`,
+   `Fs::`, `configFileName::` and `Errors::`, and dump the whole parsed result
+   as JSON. `baselineParseConfigWith` emits `configFileName::`,
+   `CompilerOptions::`, `TypeAcquisition::`, `FileNames::` and `Errors::`, with
+   no `config:` heading.
+4. The titles do not overlap. Zero of the 142 names appear in the 87
+   `config/tsconfigParsing` outputs.
+5. `vfsmatch_test.go` references
+   `tsc/testdata/fixtures/testRunner/unittests/config/matchFiles.ts`, absent at
+   this pin. These are promoted TypeScript outputs whose renderer was not ported.
 
-What does exist is the **semantic** authority: `vfsmatch_test.go`'s
-`TestReadDirectory` and `TestReadDirectoryMatchesTypeScriptBaselines` assert
-ordered `matchFiles()` results against the pinned implementation. The F0 pilot
-already compares Rust to that authority and matches.
+The **semantic** authority does exist: `vfsmatch_test.go`'s `TestReadDirectory`
+and `TestReadDirectoryMatchesTypeScriptBaselines` assert ordered `matchFiles()`
+results, and the pilot already matches Rust against it.
 
-This is an owner decision, listed under the plan's stop conditions as "an
-upstream baseline whose authority cannot be established". The options:
+This is an owner decision under the plan's stop conditions. The options:
 
 - **A.** Keep 309 as the byte-baseline denominator and carry a reviewed
   test-format implementation for the matchFiles envelope, verifying it
@@ -72,97 +74,130 @@ upstream baseline whose authority cannot be established". The options:
 - **C.** Treat the 142 as unreachable at this pin and record them as a standing
   qualification.
 
-F0 does not choose. The index records the group as `blocked` with its reason,
-`inventory --check` reports it, and nothing reconstructs expected results from
-Rust in the meantime.
+F0 does not choose, and F0 is not complete until one is chosen.
 
-## The 309 index
+## The 309 index and its per-output mapping
 
-`data/phase1/config-baselines.json` records every output's exact path, byte
-length and hash, plus per-group authority.
+`data/phase1/config-baselines.json` records every output's path, byte length,
+hash, **and the concrete test that renders it**. The mapping is produced by
+`phase1.py map-baselines`, which runs the pinned `tsoptions` package with an
+access-only instrumentation patch inserted into
+`internal/testutil/baseline/baseline.go`. The patch records the calling test,
+the output and a digest of the rendered content. Because the pinned
+`writeComparison` still runs, a recorded digest equal to the frozen file's
+digest is an observation that the native rendering reproduces the committed
+bytes — not an assumption about a generic renderer.
 
-| Group | Outputs | Authority | Invocation → output |
-| --- | ---: | --- | --- |
-| `config/matchFiles` | 142 | **blocked** | unknown |
-| `config/tsconfigParsing` | 87 | `baselineParseConfigWith`, plus inline assembly in `TestParseConfigFileTextToJson` | one invocation renders one output, but a single output may concatenate several parsed configs |
-| `tsoptions/commandLineParsing/parseCommandLine` | 53 | `formatNewBaseline` | one invocation renders exactly one output |
-| `tsoptions/commandLineParsing/parseBuildOptions` | 27 | `formatNewBaselineBuild` | one invocation renders exactly one output |
+| Group | Outputs | Verified | Authority |
+| --- | ---: | ---: | --- |
+| `config/matchFiles` | 142 | **0** | blocked |
+| `config/tsconfigParsing` | 87 | 87 | `baselineParseConfigWith`, plus inline assembly in `TestParseConfigFileTextToJson` |
+| `.../parseCommandLine` | 53 | 53 | `formatNewBaseline` |
+| `.../parseBuildOptions` | 27 | 27 | `formatNewBaselineBuild` |
+
+Each verified row names its subtest, for example
+`TestCommandLineParseResult/parseCommandLine/Handles_did_you_mean_for_misspelt_flags`.
+The instrumentation asserts the exact pinned `Run` body it hooks, so a moved
+pin fails loudly instead of silently recording nothing.
 
 Two `config/matchFiles` outputs live under a nested directory, because the
 originating title contains a slash (`Expands z to z/star...`). A depth-1 glob
-enumerates 140 and silently shrinks the denominator; `outputs()` walks
+enumerates 140 and silently shrinks the denominator; enumeration walks
 recursively and a test asserts both nested rows are indexed.
 
 ## Scope
 
-`data/phase1/scope.json` covers every Go function in the Phase 1 ledger
-packages, built from `data/go-functions.tsv` — the complete inventory, not the
-unmapped remainder. That distinction matters: building only from
-`status/unmapped-functions.json` hides a *mapped* operation that has no
-behavioral witness, which is half of what F0 exists to separate.
+`data/phase1/scope.json` covers **4,795 operations** across
+45 packages.
+
+Membership is declared against the plan's section 2 scope, not the ledger's
+`phase` column. Taking the ledger literally was wrong in both directions: it
+excluded AST, scanner, parser and the compiler runner's syntactic operations
+(labelled phase 0) while retaining editor, emit and API test helpers the plan
+pushes to later phases. Every one of the 97 pinned packages now carries an
+explicit membership decision with a reason, and the 52
+excluded packages each record a destination phase.
+
+`internal/compiler` is `partial`: only the runner's parse/bind/syntactic
+operations are Phase 1 obligations, and F4a enumerates that exact surface.
 
 | Disposition | Count |
 | --- | ---: |
-| `covered` | 58 |
-| `implemented_untested` | 831 |
-| `missing` | 774 |
+| `covered` | 2,703 |
+| `implemented_untested` | 747 |
+| `missing` | 1,327 |
 | `equivalent_rust` | 0 |
-| `later_phase` | 15 |
-| **total** | **1,678** |
+| `later_phase` | 18 |
 
-Every disposition carries a `basis` string and a `basis_kind`. All F0 rows are
-`basis_kind: "rule"`; none is a review. `equivalent_rust` is deliberately 0 and
-cannot be reached by rule — `verify()` rejects an `equivalent_rust` row that is
-not marked as reviewed, because the plan requires a behavioral witness for it.
+Every row carries a `basis`, a `basis_kind`, the cases that witness it and its
+package's internal dependencies read from the pinned Go imports. All F0 rows
+are `basis_kind: "rule"`; none is a review. `equivalent_rust` is 0 and cannot be
+reached by rule — `verify()` rejects an `equivalent_rust` row not marked
+reviewed, because the plan requires a behavioral witness for it.
 
 Counts are an audit starting point, not a task list. The rules are conservative
-in both directions: a Go name whose snake form is short or generic (`find`,
-`identity`) is **not** treated as evidence of a Rust implementation, and where a
-package's behavior lives somewhere other than its planned crate the real home is
-recorded on the row (`actual_home`) rather than the row being called missing for
-the wrong reason.
-
-Missing operations by package, top of the queue:
-
-| Package | Missing | Recorded actual home |
-| --- | ---: | --- |
-| `internal/tsoptions` | 143 | `tsr_tsoptions` (command-line entry points absent) |
-| `internal/core` | 126 | `tsr_core` |
-| `internal/collections` | 84 | `tsr_core` and consumer-local collections |
-| `internal/module` | 76 | `tsr_module` |
-| `internal/tspath` | 56 | `tsr_tspath` |
-| `internal/packagejson` | 37 | `tsr_module::package_json` / `package_maps` |
-| `internal/bundled` | 27 | `tsr_bundled` |
-| `internal/vfs/osvfs` | 22 | `tsr_vfs` |
-| `internal/stringutil` | 21 | `tsr_jsstring` |
-| `internal/semver` | 19 | `tsr_semver` |
-| `internal/vfs/cachedvfs` | 16 | no Rust home at this pin |
-| `internal/glob` | 15 | no Rust home; the LSP/test glob is a separate dialect |
+in both directions: a generic name (`find`, `identity`) is not treated as
+evidence of a Rust implementation, and where a package's behavior lives outside
+its planned crate the real home is recorded on the row.
 
 ## Pilot
 
-The pilot runs real native Go and real production Rust over one request set:
+Real native Go and real production Rust over one request set. Four Go probes
+serve the schedule — `vfs/vfsmatch`, `tsoptions`, `json` and `locale` — so every
+case has a native expectation, including the ones Rust cannot yet answer:
 
 ```
 match              pilot/matching/include-star-ts
 match              pilot/matching/recursive-exclude
-not_implemented    pilot/commandline/parse-composite-false
-not_implemented    pilot/commandline/parse-build-verbose
-not_implemented    pilot/json/marshal-ordered
-not_implemented    pilot/locale/select-ja
+not_implemented    pilot/commandline/parse-composite-false   (native: observed)
+not_implemented    pilot/commandline/parse-build-verbose     (native: observed)
+not_implemented    pilot/json/marshal-ordered                (native: observed)
+not_implemented    pilot/locale/select-ja                    (native: observed)
 ```
 
-The two matches call `tsr_tsoptions::glob::read_directory` against the pinned
-`vfsmatch.ReadDirectory` through an access-only probe. The four
-`not_implemented` rows each name the operation, its Go authority, the intended
-Rust signature and the production home; the driver does not emulate any of them.
-`tsoptions.parseCommandLine` and `parseBuildCommandLine` confirm the plan's gap
-2 by execution rather than by inspection: `tsr_tsoptions` has substantial config
-parsing but no command-line entry point.
+The command-line probe is also the **renderer pilot**. It compiles into the
+pinned `tsoptions_test` package, so it calls the original `formatNewBaseline`
+and `formatNewBaselineBuild` instead of reimplementing their section assembly.
+Its rendered envelope for `--composite false 0.ts` reproduces
+`parseCommandLine/allows setting option type boolean to false.js` byte for byte.
 
-Requests carry their matching dialect, and both the Go probe and the Rust driver
-refuse a request whose dialect is not `vfsmatch`, so the configuration matcher
-and the `internal/glob` grammar cannot dispatch to each other silently.
+That probe cannot be built with `-trimpath`: the package links
+`internal/testutil/baseline`, whose `init` calls `repo.TestDataPath()`, and
+`repo` panics under `-trimpath`. `run_probe` drops the flag for that probe only
+and records the choice in provenance.
+
+## Capture integrity
+
+Two properties are enforced, both with regression tests and both verified
+end to end:
+
+**A production change stales the capture.** The source closure is derived from
+`cargo metadata`, not hand-listed, so it contains the driver package's whole
+workspace dependency closure — 322 inputs, including
+`crates/tsr_tsoptions/src/glob.rs`, all of `tsr_vfs`, the example target,
+`Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `.cargo/**` and the shared
+oracle helpers. Appending a comment to `glob.rs` makes `compare` fail with
+`capture input crates/tsr_tsoptions/src/glob.rs changed after the capture`.
+Replay recomputes the expected key set rather than trusting the recorded one,
+so a capture that recorded too few inputs cannot authenticate; the workspace
+package list is itself authenticated, and a dependency added since the capture
+is caught through the `Cargo.toml`/`Cargo.lock` hashes.
+
+**A malformed response cannot reach parity.** Each response is validated as an
+ordered sequence before anything is indexed by case id, checking count, order,
+case identity, operation identity, per-side status vocabulary and payload
+shape. Indexing first accepted duplicates, extra rows, reordering and unknown
+statuses. Against a real capture:
+
+| Tamper | Result |
+| --- | --- |
+| duplicate row | `rust response has 7 rows for 6 requests` |
+| extra failing row | `rust response has 7 rows for 6 requests` |
+| reordered rows | `row 0 reports case '...' where the request schedule has '...'` |
+| unknown status | `unknown rust status 'looks_fine'; allowed statuses are ...` |
+
+A side may only report its own statuses: a Rust driver cannot claim
+`native_unavailable`, and a native probe cannot claim `not_implemented`.
 
 ## Commands
 
@@ -170,6 +205,7 @@ and the `internal/glob` grammar cannot dispatch to each other silently.
 export PATH="$(mise where go)/bin:$PATH"
 
 python3 scripts/phase1.py inventory --check
+python3 scripts/phase1.py map-baselines --output target/phase1/invocations [--write]
 python3 scripts/phase1.py capture --family pilot --output target/phase1/pilot
 python3 scripts/phase1.py compare --capture target/phase1/pilot
 python3 scripts/phase1.py compare --capture target/phase1/pilot --require-parity   # fails: 4 missing operations
@@ -177,33 +213,23 @@ python3 scripts/phase1.py report --captures target/phase1/pilot --output target/
 python3 -m unittest discover -s scripts/tests -p 'test_phase1*.py'
 ```
 
-`inventory --check` validates the committed manifests, hashes and baseline
-mapping against the pin without building anything, and preflights `go` and
-`cargo` with an actionable message instead of downloading a toolchain.
-`capture` refuses a family with no adapter and names the declared families.
-`compare` authenticates every artifact and source input before reading them.
-
 ## Implementation queue from F0
-
-Each row names the reproducer, the native authority and the production home.
 
 | Operation | Native authority | Intended Rust home | Owner |
 | --- | --- | --- | --- |
 | `tsoptions.parseCommandLine` | `commandlineparser.go:ParseCommandLine` | `crates/tsr_tsoptions/src/command_line.rs` (absent) | F3b |
 | `tsoptions.parseBuildCommandLine` | `commandlineparser.go:ParseBuildCommandLine` | `crates/tsr_tsoptions/src/command_line.rs` (absent) | F3b |
 | `json.marshalOrdered` | `internal/json/json.go:Marshal` | no dedicated home; order-sensitive readers live in consumers | F1b |
-| `locale.selectTranslation` | `internal/locale/locale.go` | no Rust home at this pin | F1b |
-
-Reproduce any of them with:
+| `locale.selectTranslation` | `internal/locale/locale.go:Parse` | no Rust home at this pin | F1b |
 
 ```sh
 python3 scripts/phase1.py capture --family pilot --output target/phase1/queue --case pilot/commandline/parse-composite-false
 python3 scripts/phase1.py compare --capture target/phase1/queue
 ```
 
-A selected capture is marked `partial` and its unselected cases report
-`not_run`; `--require-parity` rejects such a report, so a bounded smoke can
-never stand in for a family gate.
+A selected capture is `partial` and its unselected cases report `not_run`;
+`--require-parity` rejects such a report, so a bounded smoke can never stand in
+for a family gate.
 
 ## Producers and sprints
 
@@ -211,11 +237,9 @@ never stand in for a family gate.
 metrics. Every item is open and no metric is populated.
 
 The `foundations`, `config` and `syntax` producers are **not** registered in
-`status/runs.toml` at F0. The plan registers a producer only once it can
-validate its complete declared inventory and report honest failures; only the
-`pilot` family has an adapter today. F1a–F5a register them as their family
-adapters land, and F5a demonstrates the grouped-producer freshness behavior the
-plan describes.
+`status/runs.toml`. The plan registers a producer only once it can validate its
+complete declared inventory and report honest failures; only the `pilot` family
+has an adapter. F1a–F5a register them as their family adapters land.
 
 `cargo xtask validate` and `cargo xtask status --check-committed` both pass with
-P1A registered, and the tracker still reports 13 sprints with S01–S12 unchanged.
+P1A registered, and S01–S12 are unchanged.

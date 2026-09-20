@@ -181,6 +181,12 @@ def pin() -> str:
 def verify(index: dict) -> list[str]:
     """Re-enumerate the pin and report every disagreement with a committed index."""
     problems: list[str] = []
+    mapping = index.get("invocation_mapping")
+    if mapping is None:
+        problems.append(
+            "the index has no invocation mapping; run `phase1.py map-baselines` so each "
+            "output names the test that renders it"
+        )
     if index.get("pin") != pin():
         problems.append(f"index pin {index.get('pin')!r} is not the repository pin {pin()!r}")
     for group, (subdirectory, expected) in GROUPS.items():
@@ -204,6 +210,33 @@ def verify(index: dict) -> list[str]:
         for name in sorted(set(actual) & set(recorded)):
             if actual[name] != recorded[name]:
                 problems.append(f"{group}: {name} hash differs from the pin")
+
+        # Every output must carry a per-output mapping decision, and a group may
+        # only claim a completed mapping when each of its outputs was rendered
+        # by a pinned test and reproduced the committed bytes.
+        verified = 0
+        for row in committed["outputs"]:
+            if "rendering_verified" not in row or "invocation" not in row:
+                problems.append(f"{group}: {row['name']} has no per-output invocation record")
+                continue
+            if row["rendering_verified"]:
+                if not row.get("invocation"):
+                    problems.append(
+                        f"{group}: {row['name']} claims verified rendering with no invocation"
+                    )
+                verified += 1
+        authority = committed.get("authority", {})
+        if authority.get("verified_outputs") != verified:
+            problems.append(
+                f"{group}: authority claims {authority.get('verified_outputs')} verified outputs, "
+                f"rows record {verified}"
+            )
+        if authority.get("mapping_complete") != (verified == len(committed["outputs"])):
+            problems.append(f"{group}: mapping_complete disagrees with its own rows")
+        if authority.get("status") == "established" and not authority.get("mapping_complete"):
+            problems.append(
+                f"{group}: authority is established but its per-output mapping is incomplete"
+            )
     return problems
 
 

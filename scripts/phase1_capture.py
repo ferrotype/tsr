@@ -7,13 +7,24 @@ so a replay is read-only. Neither step may change the reviewed inventory.
 The result vocabulary is the plan's: match, different, not_implemented,
 native_unavailable, harness_failed and not_run. Only `match` is feature parity;
 `harness_failed` invalidates a capture rather than counting as a non-match.
+
+Two properties this module has to get right, because getting them wrong lets a
+capture claim parity it has not earned:
+
+* The source closure must contain every input that can change an observation,
+  including the production Rust the driver links. A capture that omits
+  `tsr_tsoptions/src/glob.rs` would keep reporting `match` after the matcher
+  changed. The closure is derived from `cargo metadata`, not hand-listed, and
+  replay recomputes the expected key set rather than trusting the recorded one.
+* A response document is validated as an ordered sequence before it is indexed
+  by case id. Indexing first would silently accept duplicate rows, extra rows,
+  a reordered response or an unknown status.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-import os
 import platform
 import subprocess
 import sys
@@ -21,20 +32,60 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from s04 import go_environment, verified_upstream  # noqa: E402
 from s04_common import command, strict_json_loads  # noqa: E402
-from s08_oracle import ROOT, canonical, digest, run_overlay  # noqa: E402
+from s08_oracle import ROOT, canonical, digest  # noqa: E402
 
 RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run")
-PARITY_RESULTS = ("match",)
+
+# Each side may only report the statuses it can legitimately produce. A Rust
+# driver cannot declare the native authority unavailable, and the native probe
+# cannot declare a Rust entry point missing.
+RUST_STATUSES = ("observed", "not_implemented", "harness_failed")
+NATIVE_STATUSES = ("observed", "native_unavailable", "harness_failed")
+
+# Shared helpers whose behavior changes an observation even though they are not
+# family specific.
+SHARED_SCRIPTS = (
+    "scripts/phase1_capture.py",
+    "scripts/phase1.py",
+    "scripts/s04_common.py",
+    "scripts/s08_oracle.py",
+)
+# Build inputs that select the toolchain, dependency versions and codegen.
+BUILD_INPUTS = ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "data/upstream.json")
 
 FAMILIES = {
     "pilot": {
         "requests": "data/phase1/requests/pilot.json",
-        "native_package": "vfs/vfsmatch",
-        "native_probe": "tools/phase1/pilot/vfsmatch_probe_test.go",
-        "native_test": "TestPhase1PilotReadDirectory",
+        "native_probes": [
+            {
+                "package": "vfs/vfsmatch",
+                "probe": "tools/phase1/pilot/vfsmatch_probe_test.go",
+                "test": "TestPhase1PilotReadDirectory",
+            },
+            {
+                "package": "tsoptions",
+                "probe": "tools/phase1/pilot/commandline_probe_test.go",
+                "test": "TestPhase1PilotCommandLine",
+                # Compiles into the pinned tsoptions_test package to reach the
+                # real formatNewBaseline renderer; see run_probe.
+                "trimpath": False,
+            },
+            {
+                "package": "json",
+                "probe": "tools/phase1/pilot/json_probe_test.go",
+                "test": "TestPhase1PilotJson",
+            },
+            {
+                "package": "locale",
+                "probe": "tools/phase1/pilot/locale_probe_test.go",
+                "test": "TestPhase1PilotLocale",
+            },
+        ],
         "rust_package": "tsr_tsoptions",
         "rust_example": "phase1_pilot",
+        "rust_target": "crates/tsr_tsoptions/examples/phase1_pilot.rs",
         "rust_driver": "tools/phase1/pilot/rust_observation.rs",
     },
 }
@@ -43,31 +94,130 @@ FAMILIES = {
 # rather than silently omitting them.
 DECLARED_FAMILIES = ("leaves", "filesystem", "config", "syntax", "utilities", "integration")
 
+_METADATA: dict | None = None
+
 
 def sha_file(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def source_closure(family: str) -> dict[str, str]:
-    """Every tracked input whose change invalidates this family's capture.
+def pin() -> str:
+    return strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
 
-    Collected recursively so a file under a nested adapter directory is not
-    silently excluded by a shallow glob.
+
+def gitlink() -> str:
+    """The recorded upstream submodule commit, so a moved pin invalidates a capture."""
+    entry = subprocess.run(
+        ["git", "ls-files", "--stage", "--", "upstream"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split()
+    if len(entry) < 2 or entry[0] != "160000":
+        raise ValueError("upstream is not a gitlink; the pin cannot be authenticated")
+    return entry[1]
+
+
+def metadata() -> dict:
+    global _METADATA
+    if _METADATA is None:
+        _METADATA = json.loads(
+            subprocess.run(
+                ["cargo", "metadata", "--locked", "--offline", "--format-version", "1"],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+        )
+    return _METADATA
+
+
+def workspace_closure(package: str) -> list[Path]:
+    """Every workspace package directory the named package links, transitively.
+
+    Third-party crates are pinned by Cargo.lock, which is hashed separately, so
+    only repository-owned sources need enumerating here.
+    """
+    document = metadata()
+    packages = {p["id"]: p for p in document["packages"]}
+    local = {pid for pid, p in packages.items() if p.get("source") is None}
+    nodes = {n["id"]: n for n in document["resolve"]["nodes"]}
+    roots = [pid for pid, p in packages.items() if p["name"] == package]
+    if not roots:
+        raise ValueError(f"cargo metadata has no workspace package named {package!r}")
+    seen: set[str] = set()
+    stack = list(roots)
+    while stack:
+        current = stack.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        for dep in nodes[current]["deps"]:
+            if dep["pkg"] in local:
+                stack.append(dep["pkg"])
+    return sorted(Path(packages[pid]["manifest_path"]).parent for pid in seen)
+
+
+def workspace_package_paths(package: str) -> list[str]:
+    return [str(p.relative_to(ROOT)) for p in workspace_closure(package)]
+
+
+def source_closure(family: str, packages: list[str] | None = None) -> dict[str, str]:
+    """Every input whose change can alter this family's observations.
+
+    Derived, not hand-listed: the Rust half comes from the driver package's
+    workspace dependency closure, so production code such as
+    `tsr_tsoptions/src/glob.rs` and the whole `tsr_vfs` crate is covered. A
+    capture that silently omitted them could keep reporting `match` after the
+    matcher changed.
     """
     spec = FAMILIES[family]
-    paths = [Path(spec["requests"]), Path(spec["native_probe"]), Path(spec["rust_driver"])]
-    for directory in (Path("tools/phase1") / family,):
-        if (ROOT / directory).is_dir():
-            paths.extend(
-                p.relative_to(ROOT) for p in sorted((ROOT / directory).rglob("*")) if p.is_file()
-            )
-    paths.append(Path("scripts/phase1_capture.py"))
-    paths.append(Path(".cargo/config.toml"))
-    closure = {}
-    for rel in sorted({str(p) for p in paths}):
-        path = ROOT / rel
+    paths: set[Path] = set()
+
+    paths.add(Path(spec["requests"]))
+    paths.add(Path(spec["rust_driver"]))
+    paths.add(Path(spec["rust_target"]))
+    for probe in spec["native_probes"]:
+        paths.add(Path(probe["probe"]))
+
+    # Everything under the family's adapter directory, recursively, so a file
+    # in a nested directory is not missed by a shallow glob.
+    adapter = ROOT / "tools/phase1" / family
+    if adapter.is_dir():
+        paths.update(p.relative_to(ROOT) for p in adapter.rglob("*") if p.is_file())
+
+    for name in (*SHARED_SCRIPTS, *BUILD_INPUTS):
+        paths.add(Path(name))
+    cargo_config = ROOT / ".cargo"
+    if cargo_config.is_dir():
+        paths.update(p.relative_to(ROOT) for p in cargo_config.rglob("*") if p.is_file())
+
+    # At capture time the package set is resolved from cargo metadata. On
+    # replay it comes from the authenticated provenance instead, so `compare`
+    # spawns no build tool: a dependency added since the capture still fails,
+    # because Cargo.toml and Cargo.lock are hashed above.
+    directories = (
+        [ROOT / p for p in packages]
+        if packages is not None
+        else workspace_closure(spec["rust_package"])
+    )
+    for directory in directories:
+        for path in directory.rglob("*"):
+            if not path.is_file():
+                continue
+            relative = path.relative_to(ROOT)
+            if relative.parts[0] == "target" or "target" in relative.parts[:2]:
+                continue
+            if path.suffix in (".rs", ".toml") or path.name in ("README.md", "NOTICE", "LICENSE"):
+                paths.add(relative)
+
+    closure: dict[str, str] = {}
+    for relative in sorted({str(p) for p in paths}):
+        path = ROOT / relative
         if path.is_file():
-            closure[rel] = sha_file(path)
+            closure[relative] = sha_file(path)
     return closure
 
 
@@ -96,6 +246,116 @@ def build_rust(family: str) -> Path:
     return Path(executable)
 
 
+def run_probe(directory: Path, package: str, source: str, request: dict, test: str,
+              trimpath: bool = True) -> dict:
+    """Run one access-only Go probe under an overlay and authenticate its output.
+
+    This mirrors `s08_oracle.run_overlay`, which is reused wherever it fits. It
+    exists because `run_overlay` always passes `-trimpath`, and a probe that
+    compiles into the pinned `tsoptions_test` package cannot: that package links
+    `internal/testutil/baseline`, whose `init` calls `repo.TestDataPath()`, and
+    `repo` panics with "repo root cannot be found when built with -trimpath".
+    Sharing that package is the whole point of the renderer seam, so the flag is
+    dropped for those probes and the choice is recorded in provenance.
+    """
+    directory = Path(directory).resolve()
+    directory.mkdir(parents=True, exist_ok=False)
+    upstream = verified_upstream()
+    env = go_environment()
+    source_path = directory / "export_test.go"
+    source_path.write_text(source)
+    request_path = directory / "requests.json"
+    request_bytes = canonical(request) + b"\n"
+    request_path.write_bytes(request_bytes)
+    output = directory / "observations.json"
+    virtual = upstream / "tsc/internal" / package / "phase1_probe_export_test.go"
+    if virtual.exists():
+        raise ValueError(f"overlay would replace a source file: {virtual}")
+    overlay = directory / "overlay.json"
+    overlay.write_bytes(canonical({"Replace": {str(virtual): str(source_path)}}))
+    env.update(S08_REQUESTS=str(request_path), S08_OUTPUT=str(output))
+    arguments = ["go", "test", "-mod=readonly"]
+    if trimpath:
+        arguments.append("-trimpath")
+    arguments += ["-overlay", str(overlay), f"./internal/{package}", "-run", f"^{test}$",
+                  "-count=1", "-timeout=5m"]
+    stdout = command(arguments, cwd=upstream / "tsc", env=env)
+    (directory / "go-test.stdout").write_bytes(stdout)
+    verified_upstream()
+    report = strict_json_loads(output.read_bytes())
+    if report["request_sha256"] != digest(request_bytes):
+        raise ValueError(f"the {package} probe observed a different request inventory")
+    (directory / "provenance.json").write_bytes(canonical({
+        "pin": pin(), "package": package, "test": test, "trimpath": trimpath,
+        "source_sha256": digest(source.encode()),
+        "request_sha256": digest(request_bytes),
+        "output_sha256": digest(output.read_bytes()),
+        "go": report["go"], "goos": report["goos"], "goarch": report["goarch"],
+        "toolchain_local": env["GOTOOLCHAIN"] == "local",
+    }) + b"\n")
+    return report
+
+
+def validate_response(document: object, requests: list[dict], side: str) -> list[dict]:
+    """Validate an observation document as an ordered sequence.
+
+    Called before anything is indexed by case id. Indexing first would accept a
+    duplicated row, an extra failing row, a reordered response or an unknown
+    status, because the later dictionary build would quietly drop or reorder
+    them.
+    """
+    statuses = RUST_STATUSES if side == "rust" else NATIVE_STATUSES
+    if not isinstance(document, dict):
+        raise ValueError(f"{side} response is not a JSON object")
+    rows = document.get("observations")
+    if not isinstance(rows, list):
+        raise ValueError(f"{side} response has no observations array")
+    if len(rows) != len(requests):
+        raise ValueError(
+            f"{side} response has {len(rows)} rows for {len(requests)} requests"
+        )
+    seen: set[str] = set()
+    for index, (row, request) in enumerate(zip(rows, requests)):
+        where = f"{side} row {index}"
+        if not isinstance(row, dict):
+            raise ValueError(f"{where} is not an object")
+        case = row.get("case")
+        if case != request["case"]:
+            raise ValueError(
+                f"{where} reports case {case!r} where the request schedule has "
+                f"{request['case']!r}; the response is reordered or substituted"
+            )
+        if case in seen:
+            raise ValueError(f"{where} duplicates case {case!r}")
+        seen.add(case)
+        operation = row.get("operation")
+        if operation != request.get("operation"):
+            raise ValueError(
+                f"{where} reports operation {operation!r} for case {case!r}, "
+                f"but the request asked for {request.get('operation')!r}"
+            )
+        result = row.get("result")
+        if result not in statuses:
+            raise ValueError(
+                f"{where} reports unknown {side} status {result!r}; "
+                f"allowed statuses are {', '.join(statuses)}"
+            )
+        if result == "observed" and "observation" not in row:
+            raise ValueError(f"{where} is observed but carries no observation payload")
+        if result == "not_implemented":
+            missing = row.get("missing_operation")
+            required = ("operation", "go_authority", "intended_signature", "production_home")
+            if not isinstance(missing, dict) or any(not missing.get(k) for k in required):
+                raise ValueError(
+                    f"{where} is not_implemented without a complete missing_operation record"
+                )
+        if result == "native_unavailable" and not row.get("reason"):
+            raise ValueError(f"{where} is native_unavailable without a recorded reason")
+        if result == "harness_failed" and not (row.get("error") or row.get("reason")):
+            raise ValueError(f"{where} is harness_failed without a recorded cause")
+    return rows
+
+
 def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if family not in FAMILIES:
         raise ValueError(
@@ -107,6 +367,10 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     output.mkdir(parents=True, exist_ok=False)
 
     before = source_closure(family)
+    recorded_pin, recorded_gitlink = pin(), gitlink()
+    if recorded_pin != recorded_gitlink:
+        raise ValueError("data/upstream.json and the upstream gitlink disagree on the pin")
+
     document = strict_json_loads((ROOT / spec["requests"]).read_bytes())
     selected = document["requests"]
     partial = False
@@ -120,46 +384,65 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
 
     # The children read exactly these bytes; hash the serialized request, not an
     # earlier in-memory object.
-    request_document = {
-        "version": document["version"],
-        "family": family,
-        "requests": selected,
-    }
+    request_document = {"version": document["version"], "family": family, "requests": selected}
     request_bytes = canonical(request_document) + b"\n"
     request_path = output / "requests.json"
     request_path.write_bytes(request_bytes)
 
-    native = run_overlay(
-        output / "native",
-        spec["native_package"],
-        (ROOT / spec["native_probe"]).read_text(),
-        request_document,
-        spec["native_test"],
-    )
+    # One native probe per Go package. Each sees the whole schedule and declines
+    # the operations it does not serve, so every case has a native row.
+    native_reports = {}
+    for probe in spec["native_probes"]:
+        name = probe["package"].replace("/", "-")
+        report = run_probe(
+            output / "native" / name,
+            probe["package"],
+            (ROOT / probe["probe"]).read_text(),
+            request_document,
+            probe["test"],
+            probe.get("trimpath", True),
+        )
+        validate_response(report, selected, "native")
+        native_reports[probe["package"]] = {
+            "directory": f"native/{name}",
+            "observations_sha256": sha_file(output / "native" / name / "observations.json"),
+            "go": report.get("go"),
+            "goos": report.get("goos"),
+            "goarch": report.get("goarch"),
+            "trimpath": probe.get("trimpath", True),
+        }
 
     executable = build_rust(family)
     rust_path = output / "rust-observations.json"
     command([str(executable), str(request_path), str(rust_path)], cwd=ROOT)
+    validate_response(strict_json_loads(rust_path.read_bytes()), selected, "rust")
 
     after = source_closure(family)
     if before != after:
-        raise ValueError("a source input changed while capturing; the capture is invalid")
+        changed = sorted(
+            set(before) ^ set(after)
+            | {k for k in set(before) & set(after) if before[k] != after[k]}
+        )
+        raise ValueError(
+            "a source input changed while capturing; the capture is invalid: "
+            + ", ".join(changed[:5])
+        )
 
     provenance = {
-        "version": 1,
+        "version": 2,
         "family": family,
-        "pin": strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"],
+        "pin": recorded_pin,
+        "upstream_gitlink": recorded_gitlink,
         "partial": partial,
         "selected_cases": sorted(r["case"] for r in selected),
         "requests_sha256": digest(request_bytes),
-        "native_observations_sha256": sha_file(output / "native/observations.json"),
+        "native_probes": native_reports,
         "rust_observations_sha256": sha_file(rust_path),
         "rust_binary_sha256": sha_file(executable),
+        "workspace_packages": workspace_package_paths(spec["rust_package"]),
         "source_closure": before,
+        "source_closure_size": len(before),
         "host": {"platform": platform.platform(), "python": platform.python_version()},
-        "go": native.get("go"),
-        "goos": native.get("goos"),
-        "goarch": native.get("goarch"),
     }
     (output / "provenance.json").write_bytes(canonical(provenance) + b"\n")
     return provenance
@@ -167,22 +450,79 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
 
 def _authenticate(directory: Path) -> dict:
     provenance = strict_json_loads((directory / "provenance.json").read_bytes())
+    if provenance.get("version") != 2:
+        raise ValueError(
+            f"capture provenance version {provenance.get('version')!r} is not readable by this "
+            "comparator; recapture the family"
+        )
+    family = provenance["family"]
+
+    if provenance.get("pin") != pin():
+        raise ValueError("capture pin differs from the repository pin")
+    if provenance.get("upstream_gitlink") != gitlink():
+        raise ValueError("capture was taken against a different upstream gitlink")
+
     checks = {
         "requests.json": provenance["requests_sha256"],
-        "native/observations.json": provenance["native_observations_sha256"],
         "rust-observations.json": provenance["rust_observations_sha256"],
     }
+    for probe in provenance["native_probes"].values():
+        checks[f"{probe['directory']}/observations.json"] = probe["observations_sha256"]
     for name, expected in checks.items():
-        actual = sha_file(directory / name)
-        if actual != expected:
+        if sha_file(directory / name) != expected:
             raise ValueError(f"capture artifact {name} does not match its recorded hash")
-    for rel, expected in provenance["source_closure"].items():
-        path = ROOT / rel
+
+    # Recompute the expected closure rather than trusting the recorded one: a
+    # capture that recorded too few inputs must not authenticate just because
+    # the few it recorded are unchanged.
+    expected_closure = source_closure(family, provenance.get("workspace_packages"))
+    recorded = provenance["source_closure"]
+    if len(recorded) != provenance.get("source_closure_size"):
+        raise ValueError("capture source closure size disagrees with its own contents")
+    absent = sorted(set(expected_closure) - set(recorded))
+    if absent:
+        raise ValueError(
+            f"capture omitted {len(absent)} source input(s) that can change its observations: "
+            + ", ".join(absent[:5])
+        )
+    extra = sorted(set(recorded) - set(expected_closure))
+    if extra:
+        raise ValueError(
+            f"capture recorded {len(extra)} input(s) that are no longer part of the closure: "
+            + ", ".join(extra[:5])
+        )
+    for relative, expected in recorded.items():
+        path = ROOT / relative
         if not path.is_file():
-            raise ValueError(f"capture input {rel} no longer exists")
+            raise ValueError(f"capture input {relative} no longer exists")
         if sha_file(path) != expected:
-            raise ValueError(f"capture input {rel} changed after the capture")
+            raise ValueError(f"capture input {relative} changed after the capture")
     return provenance
+
+
+def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> dict[str, dict]:
+    """One native row per case, taking the probe that actually served it.
+
+    Every probe reports every case; the one that owns an operation returns
+    `observed` and the rest return `native_unavailable`. Two probes claiming the
+    same case is a contradiction, not a merge.
+    """
+    merged: dict[str, dict] = {}
+    for package, probe in sorted(provenance["native_probes"].items()):
+        document = strict_json_loads((directory / probe["directory"] / "observations.json").read_bytes())
+        rows = validate_response(document, requests, "native")
+        for row in rows:
+            case = row["case"]
+            if row["result"] != "observed":
+                merged.setdefault(case, row)
+                continue
+            existing = merged.get(case)
+            if existing is not None and existing.get("result") == "observed":
+                raise ValueError(
+                    f"two native probes both observed case {case}; the authority is ambiguous"
+                )
+            merged[case] = dict(row, native_package=package)
+    return merged
 
 
 def compare(directory: Path, require_parity: bool = False) -> dict:
@@ -190,20 +530,24 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
     directory = Path(directory).resolve()
     provenance = _authenticate(directory)
     requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
-    native_rows = {
-        row["case"]: row
-        for row in strict_json_loads((directory / "native/observations.json").read_bytes())[
-            "observations"
-        ]
-    }
+    native_rows = _merge_native(directory, provenance, requests)
     rust_rows = {
         row["case"]: row
-        for row in strict_json_loads((directory / "rust-observations.json").read_bytes())[
-            "observations"
-        ]
+        for row in validate_response(
+            strict_json_loads((directory / "rust-observations.json").read_bytes()),
+            requests,
+            "rust",
+        )
     }
-    all_cases = [r["case"] for r in strict_json_loads((ROOT / FAMILIES[provenance["family"]]["requests"]).read_bytes())["requests"]]
+
+    inventory = strict_json_loads((ROOT / FAMILIES[provenance["family"]]["requests"]).read_bytes())
+    all_cases = [r["case"] for r in inventory["requests"]]
     selected = {r["case"] for r in requests}
+    unknown = selected - set(all_cases)
+    if unknown:
+        raise ValueError(
+            "captured cases are absent from the frozen inventory: " + ", ".join(sorted(unknown))
+        )
 
     rows = []
     for case in all_cases:
@@ -219,6 +563,10 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         if rust["result"] == "harness_failed":
             rows.append({"case": case, "result": "harness_failed", "reason": rust.get("error", "")})
             continue
+        if native["result"] == "harness_failed":
+            rows.append({"case": case, "result": "harness_failed",
+                         "reason": native.get("error") or native.get("reason", "")})
+            continue
         if rust["result"] == "not_implemented":
             rows.append({"case": case, "result": "not_implemented",
                          "missing_operation": rust.get("missing_operation"),
@@ -227,10 +575,6 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
             continue
         if native["result"] == "native_unavailable":
             rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
-            continue
-        if native["result"] != "observed":
-            rows.append({"case": case, "result": "harness_failed",
-                         "reason": f"unexpected native result {native['result']!r}"})
             continue
         same = canonical(native.get("observation")) == canonical(rust.get("observation"))
         rows.append({
@@ -242,19 +586,19 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
     counts = {result: 0 for result in RESULTS}
     for row in rows:
         counts[row["result"]] += 1
+    required_non_match = counts["different"] + counts["not_implemented"] + counts["native_unavailable"]
     report = {
-        "version": 1,
+        "version": 2,
         "family": provenance["family"],
         "pin": provenance["pin"],
         "partial": provenance["partial"],
         "capture": str(directory),
         "requests_sha256": provenance["requests_sha256"],
         "counts": counts,
+        "parity": counts["match"] / len(rows) if rows else 0.0,
+        "required_non_match": required_non_match,
         "rows": rows,
     }
-    required_non_match = counts["different"] + counts["not_implemented"] + counts["native_unavailable"]
-    report["parity"] = counts["match"] / len(rows) if rows else 0.0
-    report["required_non_match"] = required_non_match
     if counts["harness_failed"]:
         raise ValueError(
             f"{counts['harness_failed']} case(s) failed in the harness; the capture is invalid"
@@ -292,7 +636,7 @@ def join(reports: list[dict], selection_required: bool = False) -> dict:
     if selection_required and counts["not_run"]:
         raise ValueError(f"full-family acceptance rejects {counts['not_run']} unrun case(s)")
     return {
-        "version": 1,
+        "version": 2,
         "families": sorted(families),
         "counts": counts,
         "total": len(rows),

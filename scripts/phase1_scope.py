@@ -67,6 +67,141 @@ def snake(name: str) -> str:
     return out.lower()
 
 
+
+# ---------------------------------------------------------------------------
+# Phase 1 membership.
+#
+# The ledger's `phase` column is a coarse label, not this plan's scope. Taking
+# it literally both *excludes* work the plan puts in Phase 1 (AST, scanner,
+# parser and the compiler runner's syntactic operations are labelled phase 0)
+# and *includes* editor, emit and API test helpers the plan explicitly pushes to
+# later phases. Membership is therefore declared here against the plan's
+# section 2 scope, with a reason per package, and the ledger is used only as an
+# audit input.
+#
+# Value is (membership, reason). Membership is "full", "partial" or a phase
+# number for work that belongs to a later phase.
+# ---------------------------------------------------------------------------
+MEMBERSHIP: dict[str, tuple[object, str]] = {
+    # Core, collections, text, numbers and paths.
+    "internal/core": ("full", "core helpers and option semantics"),
+    "internal/collections": ("full", "ordered maps/sets and copy-on-write scopes"),
+    "internal/tspath": ("full", "path operations"),
+    "internal/nativepath": ("full", "native path helpers"),
+    "internal/stringutil": ("full", "string helpers; actual home is tsr_jsstring"),
+    "internal/jsnum": ("full", "number semantics"),
+    "internal/semver": ("full", "semver parse and ranges"),
+    "internal/debug": ("full", "shared debug helpers used by in-scope packages"),
+    "internal/osutil": ("full", "OS helpers used by the VFS family"),
+    "internal/symlinks": ("full", "symlink resolution used by module resolution"),
+    # JSON and locale.
+    "internal/json": ("full", "caller-visible JSON contract"),
+    "internal/locale": ("full", "locale parse, canonicalization and fallback"),
+    # Diagnostics and library assets.
+    "internal/diagnostics": ("full", "generated message identities and localization"),
+    "internal/diagnosticwriter": (
+        "full",
+        "the formatting slice the config baselines render through",
+    ),
+    "internal/bundled": ("full", "packaged library access"),
+    # Both glob dialects, kept separate on purpose.
+    "internal/glob": ("full", "the LSP/test glob grammar"),
+    "internal/vfs/vfsmatch": ("full", "the configuration matching dialect"),
+    # Package JSON.
+    "internal/packagejson": ("full", "package JSON; actual home is tsr_module"),
+    # The VFS family.
+    "internal/vfs/internal": ("full", "shared VFS internals"),
+    "internal/vfs/osvfs": ("full", "live OS filesystem"),
+    "internal/vfs/iovfs": ("full", "io/fs-backed filesystem"),
+    "internal/vfs/cachedvfs": ("full", "caching wrapper"),
+    "internal/vfs/trackingvfs": ("full", "tracking wrapper"),
+    "internal/vfs/wrapvfs": ("full", "wrapping adapter"),
+    "internal/vfs/vfstest": ("full", "deterministic test filesystem used by the traces"),
+    "internal/vfs/vfsmock": ("full", "mock filesystem, audited separately from OS behavior"),
+    # Syntax.
+    "internal/ast": ("full", "AST utilities, owners and lazy storage"),
+    "internal/scanner": ("full", "scanner"),
+    "internal/parser": ("full", "parser and JSDoc"),
+    "internal/binder": ("full", "file-owned binding"),
+    "internal/astnav": ("full", "syntax navigation"),
+    "internal/evaluator": ("full", "the reusable constant evaluator"),
+    # Options and module resolution.
+    "internal/tsoptions": ("full", "config, command-line and build-option parsing"),
+    "internal/tsoptions/tsoptionstest": ("full", "the pinned config test host"),
+    "internal/module": ("full", "module resolution"),
+    # The compiler runner, partially.
+    "internal/compiler": (
+        "partial",
+        "only the runner's parse/bind/syntactic operations are Phase 1; program "
+        "orchestration for checking and emit belongs to phases 2 and 3. F4a enumerates "
+        "the exact syntactic surface",
+    ),
+    # Test infrastructure this phase's own comparisons run through.
+    "internal/testrunner": ("full", "corpus expansion used by the parser/binder inventories"),
+    "internal/testutil": ("full", "shared test helpers"),
+    "internal/testutil/baseline": ("full", "the baseline renderer the 309 outputs go through"),
+    "internal/testutil/filefixture": ("full", "fixture loading used by the config tests"),
+    "internal/testutil/harnessutil": ("full", "option and skip policy used by the corpus"),
+    "internal/testutil/parsetestutil": ("full", "parser test helpers"),
+    "internal/testutil/stringtestutil": ("full", "string test helpers"),
+    "internal/testutil/tsbaseline": ("full", "baseline helpers used by syntactic comparisons"),
+    "internal/repo": ("full", "repository path resolution used by every native probe"),
+    # Later phases. Named so the inventory records a destination and a reason
+    # instead of silently dropping them.
+    "internal/checker": (2, "checker semantics"),
+    "internal/pseudochecker": (2, "syntactic-only checker slice owned by phase 2"),
+    "internal/printer": (3, "emit printing"),
+    "internal/transformers": (3, "transforms"),
+    "internal/transformers/declarations": (3, "declaration emit"),
+    "internal/transformers/estransforms": (3, "ES transforms"),
+    "internal/transformers/inliners": (3, "emit inliners"),
+    "internal/transformers/jsxtransforms": (3, "JSX transforms"),
+    "internal/transformers/moduletransforms": (3, "module transforms"),
+    "internal/transformers/tstransforms": (3, "TypeScript transforms"),
+    "internal/sourcemap": (3, "source maps"),
+    "internal/outputpaths": (3, "emit output paths"),
+    "internal/transpile": (3, "transpilation"),
+    "internal/testutil/emittestutil": (3, "emit test helpers"),
+    "cmd/tsc": (4, "CLI execution"),
+    "internal/execute": (4, "CLI execution"),
+    "internal/execute/build": (4, "build scheduling"),
+    "internal/execute/incremental": (4, "incremental build state"),
+    "internal/execute/tsc": (4, "CLI driver"),
+    "internal/execute/tsctests": (4, "CLI test harness"),
+    "internal/execute/watchmanager": (4, "watch"),
+    "internal/fswatch": (4, "native file watching"),
+    "internal/tracing": (4, "tracing"),
+    "internal/pprof": (4, "profiling"),
+    "internal/testutil/jstest": (4, "JS execution test helpers"),
+    "internal/ls": (5, "language service"),
+    "internal/ls/autoimport": (5, "auto-import service"),
+    "internal/ls/change": (5, "language service change tracking"),
+    "internal/ls/lsconv": (5, "language service conversions"),
+    "internal/ls/lsutil": (5, "language service helpers"),
+    "internal/lsp": (5, "LSP server"),
+    "internal/lsp/lsproto": (5, "LSP protocol"),
+    "internal/lsp/lspwatcher": (5, "LSP watcher"),
+    "internal/fourslash": (5, "fourslash"),
+    "internal/project": (5, "project system"),
+    "internal/project/ata": (5, "automatic type acquisition"),
+    "internal/project/background": (5, "project background work"),
+    "internal/project/dirty": (5, "project dirty tracking"),
+    "internal/project/logging": (5, "project logging"),
+    "internal/contentmapper": (5, "content mapper execution"),
+    "internal/ipc": (5, "IPC transport"),
+    "internal/jsonrpc": (5, "JSON-RPC"),
+    "internal/spanmap": (5, "span mapping"),
+    "internal/modulespecifiers": (5, "module specifier generation for the language service"),
+    "internal/format": (5, "formatting services"),
+    "internal/testutil/autoimporttestutil": (5, "auto-import test helpers"),
+    "internal/testutil/lsptestutil": (5, "LSP test helpers"),
+    "internal/testutil/projecttestutil": (5, "project test helpers"),
+    "internal/testutil/contentmappertest": (5, "content mapper test helpers"),
+    "internal/testutil/fsbaselineutil": (5, "filesystem baseline helpers for the project system"),
+    "internal/api": (6, "API server"),
+    "internal/api/encoder": (6, "API wire encoder"),
+}
+
 # Planned ledger crates whose behavior actually lives elsewhere today. The plan
 # records these boundaries explicitly (section 1, gap 6); an absent crate
 # directory is a location observation, not proof the behavior is missing.
@@ -138,35 +273,86 @@ def classify(entry: dict, symbol: str, mapped: bool, index: dict[str, list[str]]
     return "missing", "unmapped in the audit input and absent from every Rust crate by name"
 
 
+def package_dependencies() -> dict[str, list[str]]:
+    """Internal package imports, read from the pinned Go sources.
+
+    Recorded per operation so a gap queue can be ordered by real dependency,
+    not by guesswork about which leaf to port first.
+    """
+    upstream = ROOT / "upstream"
+    dependencies: dict[str, set[str]] = {}
+    for package in MEMBERSHIP:
+        directory = upstream / "tsc" / package
+        if not directory.is_dir():
+            continue
+        found: set[str] = set()
+        for path in directory.glob("*.go"):
+            text = path.read_text(errors="replace")
+            for match in re.finditer(r'"github\.com/microsoft/TypeScript/tsc/(internal/[^"]+)"', text):
+                if match.group(1) != package:
+                    found.add(match.group(1))
+        dependencies[package] = found
+    return {k: sorted(v) for k, v in dependencies.items()}
+
+
+def cases_by_operation() -> dict[str, list[str]]:
+    """Invert the committed case manifest so each operation names its cases."""
+    path = ROOT / "data/phase1/cases.json"
+    if not path.is_file():
+        return {}
+    document = json.loads(path.read_text())
+    inverted: dict[str, list[str]] = {}
+    for case in document.get("cases", []):
+        for operation in case.get("operations", []):
+            inverted.setdefault(operation, []).append(case["id"])
+    return {k: sorted(v) for k, v in inverted.items()}
+
+
 def build() -> dict:
     rows: list[dict] = []
     index = workspace_symbol_index()
     missing_ids = unmapped_ids()
-    entries = {e["go"]: e for e in ledger() if e.get("phase") == PHASE}
+    entries = {e["go"]: e for e in ledger()}
+    dependencies = package_dependencies()
+    case_links = cases_by_operation()
     for function in inventory():
-        entry = entries.get(function["file"])
-        if entry is None:
+        package = function["package"]
+        membership, reason = MEMBERSHIP[package]
+        if membership not in ("full", "partial"):
             continue
+        entry = entries.get(function["file"]) or {
+            "package": package, "status": None, "crate": None, "rust": [], "verify": [],
+        }
         identity = function["id"]
         symbol = (
             f'{function["receiver"]}.{function["name"]}' if function.get("receiver") else function["name"]
         )
         mapped = identity not in missing_ids
         disposition, basis = classify(entry, symbol, mapped, index)
+        linked = case_links.get(identity, [])
+        if linked and disposition == "missing":
+            # A case exists for it, so the gap is witnessed rather than merely
+            # inferred from the audit input.
+            basis += f"; witnessed by {len(linked)} prepared case(s)"
         rows.append(
             {
                 "id": identity,
                 "go_source": function["file"],
-                "go_package": function["package"],
+                "go_package": package,
                 "symbol": symbol,
+                "membership": membership,
+                "membership_reason": reason,
                 "mapped_in_ledger": mapped,
                 "ledger_status": entry.get("status"),
+                "ledger_phase": entry.get("phase"),
                 "ledger_crate": entry.get("crate"),
                 "rust_home": list(entry.get("rust") or []),
-                "actual_home": KNOWN_HOMES.get(entry["package"]),
+                "actual_home": KNOWN_HOMES.get(package),
                 "disposition": disposition,
                 "basis": basis,
                 "basis_kind": "rule",
+                "cases": linked,
+                "depends_on": dependencies.get(package, []),
                 "destination_phase": PHASE if disposition != "later_phase" else None,
             }
         )
@@ -174,8 +360,19 @@ def build() -> dict:
     counts: dict[str, int] = {d: 0 for d in DISPOSITIONS}
     for row in rows:
         counts[row["disposition"]] += 1
+    later = {
+        package: {"destination_phase": membership, "reason": reason}
+        for package, (membership, reason) in sorted(MEMBERSHIP.items())
+        if membership not in ("full", "partial")
+    }
     return {
-        "version": 1,
+        "version": 2,
+        "membership": {
+            package: {"membership": membership, "reason": reason}
+            for package, (membership, reason) in sorted(MEMBERSHIP.items())
+            if membership in ("full", "partial")
+        },
+        "excluded_packages": later,
         "pin": json.loads((ROOT / "data/upstream.json").read_text())["pin"],
         "phase": PHASE,
         "dispositions": list(DISPOSITIONS),
