@@ -131,6 +131,14 @@ class SyntheticCapture:
              "observation": r["native"]} for r in rows]}
         native_bytes = canonical(native) + b"\n"
         (probe_directory / "observations.json").write_bytes(native_bytes)
+        # Each probe carries its own provenance in a real capture; freeze
+        # installs both files per probe.
+        (probe_directory / "provenance.json").write_bytes(canonical({
+            "pin": capture.pin(), "package": "vfs/vfsmatch",
+            "test": "TestPhase1PilotReadDirectory", "trimpath": True,
+            "output_sha256": sha(native_bytes),
+            "go": "go1.27.1", "goos": "darwin", "goarch": "arm64",
+        }) + b"\n")
 
         rust = {"version": 1, "observations": [
             {"case": r["case"], "operation": "vfsmatch.readDirectory", **r["rust"]} for r in rows]}
@@ -216,7 +224,8 @@ class ComparisonTests(unittest.TestCase):
         rows = [{"case": "a", "native": {"files": []},
                  "rust": {"result": "harness_failed", "error": "driver panicked"}}]
         self.with_inventory(["a"])
-        with self.assertRaisesRegex(ValueError, "failed in the harness"):
+        # Raised by validate_capture before any comparison happens.
+        with self.assertRaisesRegex(ValueError, "Rust harness failure"):
             capture.compare(self.build("harness", rows))
 
     def test_partial_capture_leaves_unselected_cases_not_run(self):
@@ -754,6 +763,81 @@ class FreezeTests(unittest.TestCase):
         SyntheticCapture(directory, rows, partial=True)
         with self.assertRaisesRegex(ValueError, "partial capture cannot be frozen"):
             phase1.freeze(directory)
+
+    def snapshot(self, directory):
+        """Every file under a directory, by relative path and bytes."""
+        if not directory.is_dir():
+            return None
+        return {
+            str(p.relative_to(directory)): p.read_bytes()
+            for p in sorted(directory.rglob("*"))
+            if p.is_file()
+        }
+
+    def build_capture(self, name, rows, **kwargs):
+        directory = Path(self.temporary) / name
+        SyntheticCapture(directory, rows, **kwargs)
+        return directory
+
+    def test_freeze_rejects_a_native_harness_failure(self):
+        """A correctly hashed capture can still record a failed observation."""
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "observed", "observation": {"files": []}}}]
+        directory = self.build_capture("native-failed", rows, native_rows=[
+            {"case": "a", "operation": "vfsmatch.readDirectory",
+             "result": "harness_failed", "error": "probe crashed"}])
+        with self.assertRaisesRegex(ValueError, "native harness failure"):
+            phase1.freeze(directory)
+
+    def test_freeze_rejects_a_rust_harness_failure(self):
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "harness_failed", "error": "driver panicked"}}]
+        directory = self.build_capture("rust-failed", rows)
+        with self.assertRaisesRegex(ValueError, "Rust harness failure"):
+            phase1.freeze(directory)
+
+    def test_freeze_accepts_not_implemented(self):
+        """Preparation legitimately freezes native truth for absent Rust APIs."""
+        rows = [{"case": "a", "native": {"files": ["/x.ts"]},
+                 "rust": {"result": "not_implemented",
+                          "missing_operation": {
+                              "operation": "tsoptions.parseCommandLine",
+                              "go_authority": "commandlineparser.go:ParseCommandLine",
+                              "intended_signature": "pub fn parse_command_line(...)",
+                              "production_home": "crates/tsr_tsoptions/src/command_line.rs"}}}]
+        directory = self.build_capture("not-implemented", rows)
+        original = self.snapshot(ROOT / "data/phase1/native/pilot")
+        self.addCleanup(self.restore, ROOT / "data/phase1/native/pilot", original)
+        result = phase1.freeze(directory)
+        self.assertEqual(result["frozen"], "pilot")
+
+    def restore(self, directory, original):
+        if original is None:
+            shutil.rmtree(directory, ignore_errors=True)
+            return
+        shutil.rmtree(directory, ignore_errors=True)
+        for relative, body in original.items():
+            target = directory / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(body)
+
+    def test_a_rejected_freeze_preserves_the_existing_frozen_inventory(self):
+        installed = ROOT / "data/phase1/native/pilot"
+        before = self.snapshot(installed)
+        self.assertIsNotNone(before, "expected committed frozen observations to protect")
+
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "observed", "observation": {"files": []}}}]
+        directory = self.build_capture("rejected", rows, native_rows=[
+            {"case": "a", "operation": "vfsmatch.readDirectory",
+             "result": "harness_failed", "error": "probe crashed"}])
+        with self.assertRaises(ValueError):
+            phase1.freeze(directory)
+
+        self.assertEqual(self.snapshot(installed), before,
+                         "a rejected freeze must not touch the frozen inventory")
+        for leftover in ("pilot.incoming", "pilot.outgoing"):
+            self.assertFalse((ROOT / "data/phase1/native" / leftover).exists(), leftover)
 
     def test_the_committed_frozen_layout_is_per_probe(self):
         installed = ROOT / "data/phase1/native/pilot"

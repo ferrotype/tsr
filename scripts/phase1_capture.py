@@ -564,20 +564,51 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
     return merged
 
 
-def compare(directory: Path, require_parity: bool = False) -> dict:
-    """Compare stored outputs. Runs no child process."""
+def validate_capture(directory: Path) -> tuple[dict, list[dict], dict[str, dict], dict[str, dict]]:
+    """Full validation of a stored capture, short of comparing the two sides.
+
+    Authentication alone checks bytes, pin, gitlink and the source closure; it
+    never reads a row. That is not enough to accept a capture, because a
+    correctly hashed capture can still contain a `harness_failed` row. This
+    adds the content checks:
+
+    * every response is a valid ordered sequence for the request schedule, and
+    * neither side reports a harness failure.
+
+    Rust parity is deliberately *not* required. `not_implemented` is the
+    expected preparation-time result for an operation this phase has still to
+    write; `harness_failed` means the observation never happened at all.
+    """
     directory = Path(directory).resolve()
     provenance = _authenticate(directory)
     requests = strict_json_loads((directory / "requests.json").read_bytes())["requests"]
+    # _merge_native raises on any native harness failure, across every probe.
     native_rows = _merge_native(directory, provenance, requests)
-    rust_rows = {
-        row["case"]: row
-        for row in validate_response(
-            strict_json_loads((directory / "rust-observations.json").read_bytes()),
-            requests,
-            "rust",
+    rust_list = validate_response(
+        strict_json_loads((directory / "rust-observations.json").read_bytes()), requests, "rust"
+    )
+    failures = [
+        f"{row['case']}: {row.get('error') or row.get('reason') or 'no cause recorded'}"
+        for row in rust_list
+        if row["result"] == "harness_failed"
+    ]
+    if failures:
+        raise ValueError(
+            f"{len(failures)} Rust harness failure(s) invalidate this capture: "
+            + "; ".join(failures[:5])
         )
-    }
+    missing_rows = sorted({r["case"] for r in requests} - set(native_rows))
+    if missing_rows:
+        raise ValueError(
+            "a native probe produced no row for selected case(s): " + ", ".join(missing_rows[:5])
+        )
+    return provenance, requests, native_rows, {row["case"]: row for row in rust_list}
+
+
+def compare(directory: Path, require_parity: bool = False) -> dict:
+    """Compare stored outputs. Runs no child process."""
+    directory = Path(directory).resolve()
+    provenance, requests, native_rows, rust_rows = validate_capture(directory)
 
     inventory = strict_json_loads((ROOT / FAMILIES[provenance["family"]]["requests"]).read_bytes())
     all_cases = [r["case"] for r in inventory["requests"]]

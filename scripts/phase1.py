@@ -155,32 +155,49 @@ def freeze(source: Path) -> dict:
     its provenance are installed.
     """
     source = Path(source).resolve()
-    # Authenticate before installing anything: freezing an unverified capture
-    # would put unchecked bytes into the reviewed inventory.
-    provenance = capture_module.authenticate(source)
+    # Validate contents, not just bytes. Authentication alone would accept a
+    # correctly hashed capture containing a `harness_failed` row, which means
+    # the observation never happened. Rust parity is not required:
+    # `not_implemented` is the expected preparation-time result.
+    provenance, _requests, _native, _rust = capture_module.validate_capture(source)
     if provenance["partial"]:
         raise ValueError("a partial capture cannot be frozen as a family inventory")
     family = provenance["family"]
     destination = ROOT / "data/phase1/native" / family
-    if destination.exists():
-        shutil.rmtree(destination)
-    destination.mkdir(parents=True)
+
+    # Stage the whole tree, then swap. A rejected or failed freeze must leave
+    # the existing frozen inventory exactly as it was.
+    staging = destination.with_name(destination.name + ".incoming")
+    if staging.exists():
+        shutil.rmtree(staging)
+    staging.mkdir(parents=True)
 
     # One directory per native probe, mirroring the capture layout. A family
     # may be served by several probes, so a single observations.json is not the
     # shape on disk.
     installed = {}
-    for package, probe in sorted(provenance["native_probes"].items()):
-        probe_source = source / probe["directory"]
-        probe_destination = destination / probe["directory"].removeprefix("native/")
-        probe_destination.mkdir(parents=True, exist_ok=True)
-        for name in ("observations.json", "provenance.json"):
-            shutil.copyfile(probe_source / name, probe_destination / name)
-        installed[package] = str(probe_destination.relative_to(destination))
+    try:
+        for package, probe in sorted(provenance["native_probes"].items()):
+            probe_source = source / probe["directory"]
+            probe_destination = staging / probe["directory"].removeprefix("native/")
+            probe_destination.mkdir(parents=True, exist_ok=True)
+            for name in ("observations.json", "provenance.json"):
+                shutil.copyfile(probe_source / name, probe_destination / name)
+            installed[package] = str(probe_destination.relative_to(staging))
+        (staging / "capture-provenance.json").write_text(
+            json.dumps(provenance, indent=2, sort_keys=True) + "\n"
+        )
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
 
-    (destination / "capture-provenance.json").write_text(
-        json.dumps(provenance, indent=2, sort_keys=True) + "\n"
-    )
+    retired = destination.with_name(destination.name + ".outgoing")
+    if retired.exists():
+        shutil.rmtree(retired)
+    if destination.exists():
+        destination.rename(retired)
+    staging.rename(destination)
+    shutil.rmtree(retired, ignore_errors=True)
     return {
         "frozen": family,
         "destination": str(destination.relative_to(ROOT)),

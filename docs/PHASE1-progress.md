@@ -29,7 +29,7 @@ implementation; no production behavior has been added or changed.
 | Scope has zero unclassified operations | 4,795 operations, each with a disposition, basis, case links and dependencies |
 | `covered` carries exact case/artifact links | **1 of 4,795.** 2,720 mapped operations have only file-level producer metrics; see Scope |
 | All 309 outputs have verified invocation mappings | **167 of 309.** 142 blocked; see below |
-| Manifests and failure tests pass | 75 Phase 1 tests, plus the extended discovery regression |
+| Manifests and failure tests pass | 79 Phase 1 tests, plus the extended discovery regression |
 | The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations, each with a native expectation |
 | Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
 | The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
@@ -226,9 +226,19 @@ them two ways: an earlier `native_unavailable` won the `setdefault`, and an
 Injecting a failure into a probe that sorts before the observing one, and into
 one that sorts after, now both fail with the probe, case and cause named.
 
-**Freezing installs the multi-probe layout.** `freeze` authenticates the
-capture before installing anything, then writes one directory per probe. It
-previously copied a single `native/observations.json`, which no longer exists.
+**Freezing validates contents, not just bytes.** Authentication checks hashes,
+the pin, the gitlink and the source closure, but never reads a row, so a
+correctly hashed capture containing a `harness_failed` row would still install.
+`freeze` now runs the same full validation `compare` does: every response is a
+valid ordered sequence, and neither side reports a harness failure. Rust parity
+is deliberately not required — `not_implemented` is the expected
+preparation-time result for an operation this phase has still to write, while
+`harness_failed` means the observation never happened.
+
+It also writes one directory per probe (it previously copied a single
+`native/observations.json`, which no longer exists) and stages the whole tree
+before swapping it in, so a rejected freeze leaves the existing frozen
+inventory byte-for-byte unchanged with no staging directories left behind.
 
 ## Commands
 
