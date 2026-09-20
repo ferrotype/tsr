@@ -1,0 +1,66 @@
+{
+  "cases": [
+    {
+      "expected_contract": "ordered matched file list",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/matching/include-star-ts",
+      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "operations": [
+        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
+      ]
+    },
+    {
+      "expected_contract": "ordered matched file list",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/matching/recursive-exclude",
+      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "operations": [
+        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
+      ]
+    },
+    {
+      "expected_contract": "parsed options, file names and formatted errors",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/commandline/parse-composite-false",
+      "native_authority": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaseline",
+      "operations": [
+        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
+      ]
+    },
+    {
+      "expected_contract": "parsed build options, projects and formatted errors",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/commandline/parse-build-verbose",
+      "native_authority": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaselineBuild",
+      "operations": [
+        "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
+      ]
+    },
+    {
+      "expected_contract": "ordered member output bytes",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/json/marshal-ordered",
+      "native_authority": "tsc/internal/json (direct probe pending F1a)",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "canonical tag and selected translation",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/locale/select-ja",
+      "native_authority": "tsc/internal/locale (direct probe pending F1a)",
+      "operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ]
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "version": 1
+}

@@ -1,0 +1,3703 @@
+{
+  "groups": {
+    "matchFiles": {
+      "authority": {
+        "blocker": "phase1-matchfiles-baseline-authority",
+        "invocation": null,
+        "native_semantic_authority": "tsc/internal/vfs/vfsmatch/vfsmatch_test.go::TestReadDirectory and TestReadDirectoryMatchesTypeScriptBaselines assert ordered matchFiles() results",
+        "output_name_rule": "<title> with {json,jsonSourceFile} api.js",
+        "output_relationship": "unknown until authority is decided",
+        "reason": "No pinned Go test writes baseline.Options{Subfolder: \"config/matchFiles\"}, and the group's envelope (a 'config:' heading followed by the whole ParsedCommandLine as JSON, with no 'FileNames::' section) matches no renderer in the pin. baselineParseConfigWith emits configFileName::/CompilerOptions::/FileNames::/Errors:: instead. The vfsmatch tests reference tsc/testdata/fixtures/testRunner/unittests/config/matchFiles.ts, which is absent at this pin. These are promoted TypeScript outputs whose renderer was not ported.",
+        "renderer": null,
+        "status": "blocked",
+        "subfolder": "config/matchFiles"
+      },
+      "expected_outputs": 142,
+      "outputs": [
+        {
+          "bytes": 1211,
+          "name": "Expands z to z/starstart/star with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/Expands z to z/starstart/star with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "7749fea84b454add3786e33ddd475650570a59e6417623905bf333434e7582f3"
+        },
+        {
+          "bytes": 1183,
+          "name": "Expands z to z/starstart/star with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/Expands z to z/starstart/star with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "fe93e5edc18afefb28a514a6d3b4e76de06c510fbf8445bbc2119448a98e185d"
+        },
+        {
+          "bytes": 1242,
+          "name": "always include literal files with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/always include literal files with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0ee0adfbd11a8e0c63ceb7087076a6427a0578824dc741c4c2cb7a091462cb78"
+        },
+        {
+          "bytes": 1214,
+          "name": "always include literal files with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/always include literal files with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "74b9c59f35180a98479dc400e2fa8ed0a65fbf8595c60de8a0f96f97cb0fbff0"
+        },
+        {
+          "bytes": 784,
+          "name": "and empty exclude with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and empty exclude with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "96e0f3356152968e7bfd5067b7048228e9957819e9c261d902c83c37ed62721b"
+        },
+        {
+          "bytes": 756,
+          "name": "and empty exclude with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and empty exclude with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "efad0f9dbfb7e73729f82c8225712fec3da9ace129b722f8bab220356fc41ab2"
+        },
+        {
+          "bytes": 816,
+          "name": "and exclusions with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and exclusions with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "adfd384367a1e747fb3a1b36df744a392d448179a31c69b03e4b6cab3e79bc3c"
+        },
+        {
+          "bytes": 788,
+          "name": "and exclusions with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and exclusions with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3a857305c246e26aafe6fd9893ce511db9ba150d54bd5edfda4ddd0b5c0c4a96"
+        },
+        {
+          "bytes": 838,
+          "name": "and explicit recursive include with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit recursive include with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "bd92147b36d28eefe54409d2dcd39463d2503aaa04948310c5910910f3e20ae2"
+        },
+        {
+          "bytes": 810,
+          "name": "and explicit recursive include with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit recursive include with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "37d5a88950ac416f58ccde84aea4ff2b96f2b934f45dfdce0f8ed419353704e7"
+        },
+        {
+          "bytes": 811,
+          "name": "and explicit wildcard include with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit wildcard include with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1b822d7cd38ae3e1bf4cbe875aa85323dfd5355427303617466c1173623e00e0"
+        },
+        {
+          "bytes": 783,
+          "name": "and explicit wildcard include with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and explicit wildcard include with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "2dde8ce906669a015e6fcf4afbed6c8746c7e8e76cf9f01a3553dbba64192719"
+        },
+        {
+          "bytes": 748,
+          "name": "and no exclusions with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and no exclusions with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "6f2e5fbfd8a416cd557d9ef102679ac950776e113a84be30820d9efca8a34e99"
+        },
+        {
+          "bytes": 720,
+          "name": "and no exclusions with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and no exclusions with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "aec3196ad67fbb9787397f63b8d3549a695d09ba28a196d3111552c105f5d3a2"
+        },
+        {
+          "bytes": 727,
+          "name": "and wildcard include with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and wildcard include with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "5f8510cab5628fd5bfaa022fb8ceb4d121c65e95037d74745fee59a2a004e67b"
+        },
+        {
+          "bytes": 699,
+          "name": "and wildcard include with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/and wildcard include with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "877561824612284d23149cb74926b299c120b2b58dc10db34db90f0ad4d1ade4"
+        },
+        {
+          "bytes": 1160,
+          "name": "are not removed due to excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/are not removed due to excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "e07f685806ce03519153ab44f8e7e2a6305a094f8c7c1eb686fe0e61fb1208a7"
+        },
+        {
+          "bytes": 1132,
+          "name": "are not removed due to excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/are not removed due to excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "828414df9d75935036b569915b2852fbd9ac69661a187c631852f09a8bae342d"
+        },
+        {
+          "bytes": 1145,
+          "name": "can exclude dirs whose pattern starts with starstar with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can exclude dirs whose pattern starts with starstar with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "854a99f8fa1e9a58e47a385e222cfa3d7d284e4707e09116ca2ca66556b3b98a"
+        },
+        {
+          "bytes": 1117,
+          "name": "can exclude dirs whose pattern starts with starstar with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can exclude dirs whose pattern starts with starstar with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "8230e45e1b01ec20b5beaef665f8fc29b8f43217303e41c7d07104b0540c217a"
+        },
+        {
+          "bytes": 1187,
+          "name": "can include dirs whose pattern starts with starstart with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include dirs whose pattern starts with starstart with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "45cd264b519d354d7419b3a311f8acee345d0258bb9f7850e4b2e3d6d8675efc"
+        },
+        {
+          "bytes": 1159,
+          "name": "can include dirs whose pattern starts with starstart with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include dirs whose pattern starts with starstart with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "ca939890f66fefb71cee25b3ad9d9de34b32b0ec1feb389b1447ab725a424217"
+        },
+        {
+          "bytes": 561,
+          "name": "can include files in the same order on multiple platforms case insensitive with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case insensitive with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "af92ea983c747a3d7d8211cf86276542bda17a4686d2e70e7680b6a9b3d71259"
+        },
+        {
+          "bytes": 531,
+          "name": "can include files in the same order on multiple platforms case insensitive with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case insensitive with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "7e76a5151053cfe30a2ff3fa9791efb242d0a17aaed0967b133fd1bec832689b"
+        },
+        {
+          "bytes": 644,
+          "name": "can include files in the same order on multiple platforms case sensitive with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case sensitive with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "13a43c9a3cd2bf634c9085e573b2f45020f03f98a27fbead73b65a4d76e79e72"
+        },
+        {
+          "bytes": 614,
+          "name": "can include files in the same order on multiple platforms case sensitive with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/can include files in the same order on multiple platforms case sensitive with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a5b8c0f903ba7be1b80fc661aed97afbbd40dc2a0b71b2e073eba10c93af9c27"
+        },
+        {
+          "bytes": 1148,
+          "name": "case sensitive with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/case sensitive with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "695af089d2794f78637ac4260a35b711905daf06c8b973fbf667dfbdfde071d6"
+        },
+        {
+          "bytes": 1120,
+          "name": "case sensitive with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/case sensitive with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "eed900a81ffd38b566b70674af66254eab1aade85fd5094ff69b0526b6d10e08"
+        },
+        {
+          "bytes": 1370,
+          "name": "exclude .js files when allowJs=false with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .js files when allowJs=false with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "b21f32512a3879095a28e16669066720ed5d349112ae25960bc76626ca3e25cd"
+        },
+        {
+          "bytes": 1342,
+          "name": "exclude .js files when allowJs=false with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .js files when allowJs=false with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "05b63d1cc0b81e2f83a194c824081f0261ba93586d4ba069cc7155b2866a16bc"
+        },
+        {
+          "bytes": 1312,
+          "name": "exclude .min.js files using wildcards with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .min.js files using wildcards with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "dfa03b83374afd8b22d06bf1bd8b32586e8471cb14b6b36ba94bf2cc6c1a5947"
+        },
+        {
+          "bytes": 1284,
+          "name": "exclude .min.js files using wildcards with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude .min.js files using wildcards with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "e0ec4fcdf3e3c75de6d96b83a409ed8f2b75cd5b7e0e3eef4d9525657eda6bb4"
+        },
+        {
+          "bytes": 1208,
+          "name": "exclude files with .. in their name with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude files with .. in their name with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "7000a031a2cbf765f171ba8a1b37fd2f1d642dd254055a5efeccabcccf11d4ec"
+        },
+        {
+          "bytes": 1180,
+          "name": "exclude files with .. in their name with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude files with .. in their name with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "22414da626090140f9d6815297666da44db293a9c053828aa1ca152173861a9d"
+        },
+        {
+          "bytes": 1222,
+          "name": "exclude folders with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude folders with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "63beb3da715c4df60f53cadf637ccef9a5783e2142cd5a97235ba5c9dd70f7df"
+        },
+        {
+          "bytes": 1194,
+          "name": "exclude folders with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude folders with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "07af8d70cebd2a28c477005191646c8a77594ed9ea65c031cf85d42dd8ae2327"
+        },
+        {
+          "bytes": 1283,
+          "name": "exclude paths outside of the project using relative paths with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude paths outside of the project using relative paths with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "dbdb35582f770aabe036495911fb362d3db6047a8db2e07711b47b9f2bb47cf5"
+        },
+        {
+          "bytes": 1255,
+          "name": "exclude paths outside of the project using relative paths with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/exclude paths outside of the project using relative paths with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "adc9b6fc2a752d8370c8c2592e8e4bede50402c62ab71f9785b39ce43bdc165c"
+        },
+        {
+          "bytes": 1407,
+          "name": "in excludes after a subdirectory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes after a subdirectory with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "726eb23a09f1406b50352bc51c13452d7933c19330800ce551b516fd3eccf41c"
+        },
+        {
+          "bytes": 1487,
+          "name": "in excludes after a subdirectory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes after a subdirectory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "440232ebe07c7325780437c98240081b6f0440f1c97f365b43db526b1f49e7e6"
+        },
+        {
+          "bytes": 1401,
+          "name": "in excludes immediately after with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes immediately after with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c973b7aafed6ef3b3c11f24ecdaf6648d61e2aa4f9d1f67fec8898d9ebecdb67"
+        },
+        {
+          "bytes": 1477,
+          "name": "in excludes immediately after with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes immediately after with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "8bd12f62a30a5f9851367b5dbdfb69b06f776a21436f821b5164def55b26a412"
+        },
+        {
+          "bytes": 1201,
+          "name": "in excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3d50d0381c55911e1797cea9fba176e47554ff775ffdfef5163fb6f29928d554"
+        },
+        {
+          "bytes": 1173,
+          "name": "in excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1a566ca4a477b9efb6e1714fada2cdd221ade73e575ae05861353b9d453ec690"
+        },
+        {
+          "bytes": 1265,
+          "name": "in excludes with trailing recursive directory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with trailing recursive directory with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "8f4c5f9cd061f0a001527df03668d77d252250ca935bad8aed433450ddc5a658"
+        },
+        {
+          "bytes": 1237,
+          "name": "in excludes with trailing recursive directory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in excludes with trailing recursive directory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1847c28c03ea1d2d1fb75355f7736118a9a602fb99f19d8a3371f039066179cc"
+        },
+        {
+          "bytes": 1376,
+          "name": "in includes after a subdirectory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes after a subdirectory with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f1f1dc068a534f6936e7917e4f64bb02d5608b7f49101a7626edaa4c6ac0892e"
+        },
+        {
+          "bytes": 1460,
+          "name": "in includes after a subdirectory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes after a subdirectory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "52dd32d161bd11670f0d5a452af27c6ca1f831726021751a3fcd98848c3af382"
+        },
+        {
+          "bytes": 1368,
+          "name": "in includes immediately after with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes immediately after with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "666ae028794e0d1476df574f30153a62e89292e4029402205cddfb4c8af52556"
+        },
+        {
+          "bytes": 1448,
+          "name": "in includes immediately after with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes immediately after with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1fb041115236bab6368f50472938ddd044ad0aca8c557f7db38938ef0b3b4bbe"
+        },
+        {
+          "bytes": 1201,
+          "name": "in includes with multiple recursive directory patterns with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with multiple recursive directory patterns with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "9d12f512c9f985bfc2dedbe15c985cfc20cb7b169137ed84615309f4701be360"
+        },
+        {
+          "bytes": 1173,
+          "name": "in includes with multiple recursive directory patterns with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with multiple recursive directory patterns with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "9ae4b3417ef0393e19b00b5ea983bbadf5884c0c33a59572224236db644a154b"
+        },
+        {
+          "bytes": 1302,
+          "name": "in includes with trailing recursive directory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with trailing recursive directory with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "453eae932248dbe87ac2bbf4d05ac0d7700d8bfca0d14c626824d43b570e0a86"
+        },
+        {
+          "bytes": 1372,
+          "name": "in includes with trailing recursive directory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/in includes with trailing recursive directory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f6f830385fa8aba6a9ccb0783cb7ff321f04f970924b0d024909d0d3b9da009b"
+        },
+        {
+          "bytes": 1246,
+          "name": "include .js files when allowJs=true with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include .js files when allowJs=true with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "941a113f80d6a8fdc2c1bd252d15af8fd2b209a0939a479162f69c78f39749d9"
+        },
+        {
+          "bytes": 1218,
+          "name": "include .js files when allowJs=true with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include .js files when allowJs=true with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "011a85ebe90ecf447d4c6235efbab0b403f304acefc6c0b1ddf802f73e650e73"
+        },
+        {
+          "bytes": 1269,
+          "name": "include explicitly listed .min.js files when allowJs=true with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include explicitly listed .min.js files when allowJs=true with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "73c04ca5b19c6e44d1174030aa825df9a6af2ec99ad5598b7a233ca3cb334d82"
+        },
+        {
+          "bytes": 1241,
+          "name": "include explicitly listed .min.js files when allowJs=true with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include explicitly listed .min.js files when allowJs=true with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "39e488d4911fa5fa331d6c9650767d3173d38a02073e438fdbbcc53f2db93f85"
+        },
+        {
+          "bytes": 1144,
+          "name": "include files with .. in their name with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include files with .. in their name with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c990b41184b55c41957bfd1e504f132961d78b63e1195dae2c2b0f30f6359937"
+        },
+        {
+          "bytes": 1116,
+          "name": "include files with .. in their name with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include files with .. in their name with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "11b979a98336865fe09e534028e3e33e388e6c4070526916213c2af8f66b1bfb"
+        },
+        {
+          "bytes": 1189,
+          "name": "include paths outside of the project using relative paths with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project using relative paths with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "2faf1a6664ef59785e426a8b5902ef897842eb23f44c71f6a52cacea79f19801"
+        },
+        {
+          "bytes": 1161,
+          "name": "include paths outside of the project using relative paths with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project using relative paths with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "78128f9f7a348a1c57819259709dd06c84ff9b70f0e136a84508e312a87e86ce"
+        },
+        {
+          "bytes": 1226,
+          "name": "include paths outside of the project with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "98011248a681d60bd551d17317a3d0b1ab9873c95b1a12b7914f253ba77575b6"
+        },
+        {
+          "bytes": 1198,
+          "name": "include paths outside of the project with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/include paths outside of the project with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "580aef7d328cad7dc9840935c65bb3587c860e451878ef87db80875b930b141d"
+        },
+        {
+          "bytes": 1354,
+          "name": "is sorted in include order, then in alphabetical order with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/is sorted in include order, then in alphabetical order with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "56c21e14f221921c9378027b47435693126df0354baa26804ab490d3e788d0e7"
+        },
+        {
+          "bytes": 1326,
+          "name": "is sorted in include order, then in alphabetical order with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/is sorted in include order, then in alphabetical order with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "e4783b824131d38440c279b195298398a921705018bab57bc0749ee7d58d107a"
+        },
+        {
+          "bytes": 1092,
+          "name": "missing files are still present with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/missing files are still present with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "96a5ce663c61ffd388caf7ac0034f1ce747d0eec463bd997edfe9a80a6ac176b"
+        },
+        {
+          "bytes": 1064,
+          "name": "missing files are still present with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/missing files are still present with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "bae5f56cea6fb2d9870d618e6b537ca0ae59a9ce88894e59930c714f3dc1bf86"
+        },
+        {
+          "bytes": 1124,
+          "name": "question matches only a single character with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/question matches only a single character with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c1fb01b3eeb8613a890463b824d62c4efde3f04a19b0e033f18de4994d47fd72"
+        },
+        {
+          "bytes": 1096,
+          "name": "question matches only a single character with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/question matches only a single character with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "5e2f4c48542b2a69eb8112fcae592149a2a810945d6912f4ef550d4759060eac"
+        },
+        {
+          "bytes": 1135,
+          "name": "same named declarations are excluded with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations are excluded with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "7dfa12b337c6555178382965524ff517a9ba4fdf5fe6465d106908572d1786aa"
+        },
+        {
+          "bytes": 1107,
+          "name": "same named declarations are excluded with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations are excluded with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "866fe1dc55ed1f0c30e24c97d119bf3fbfcfa2556b431f0e7b900f8cafeb8581"
+        },
+        {
+          "bytes": 911,
+          "name": "same named declarations with include dts tsx with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include dts tsx with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "58359b29fd94f5423e82a57ec24611d6b40fd3478229d1371e34f652c76dd4d3"
+        },
+        {
+          "bytes": 883,
+          "name": "same named declarations with include dts tsx with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include dts tsx with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c53df40ca3b4f953861e720f0dcb1ade698c25bc20211f4b0eb3f1ea2e975fb9"
+        },
+        {
+          "bytes": 905,
+          "name": "same named declarations with include ts dts with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts dts with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "ad3c92338b81f8a39a0995597db969046a4761d9e16f65b5b58056c1f2f9bedd"
+        },
+        {
+          "bytes": 877,
+          "name": "same named declarations with include ts dts with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts dts with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "97ddc262512655f5e2f89bc95f349ed280a22cbca842c1f4f7ac4745c06f064e"
+        },
+        {
+          "bytes": 922,
+          "name": "same named declarations with include ts tsx with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts tsx with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "107a09366a96f0e2785f5199a3f5f7c70c5fb8b52c08ed7c83b964406b1f4ad1"
+        },
+        {
+          "bytes": 894,
+          "name": "same named declarations with include ts tsx with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts tsx with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0cc6fa347c6022457879e260c387fbea4e9c3137a09f37d57da9492cae7b863a"
+        },
+        {
+          "bytes": 875,
+          "name": "same named declarations with include ts with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "4fae1ad14db8079765fe92a56c80babff9200ca2389020f380163279099c3937"
+        },
+        {
+          "bytes": 847,
+          "name": "same named declarations with include ts with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include ts with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a2a70c8b7ffde79838233dd946119433cc587464b2e00b36bf4015ba412bae16"
+        },
+        {
+          "bytes": 911,
+          "name": "same named declarations with include tsx dts with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx dts with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "58359b29fd94f5423e82a57ec24611d6b40fd3478229d1371e34f652c76dd4d3"
+        },
+        {
+          "bytes": 883,
+          "name": "same named declarations with include tsx dts with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx dts with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c53df40ca3b4f953861e720f0dcb1ade698c25bc20211f4b0eb3f1ea2e975fb9"
+        },
+        {
+          "bytes": 922,
+          "name": "same named declarations with include tsx ts with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx ts with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "107a09366a96f0e2785f5199a3f5f7c70c5fb8b52c08ed7c83b964406b1f4ad1"
+        },
+        {
+          "bytes": 894,
+          "name": "same named declarations with include tsx ts with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx ts with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0cc6fa347c6022457879e260c387fbea4e9c3137a09f37d57da9492cae7b863a"
+        },
+        {
+          "bytes": 839,
+          "name": "same named declarations with include tsx with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "cfdb49ea6f8b3ab88ebb491ec2d16dafebe6968ab09bfccf533532b5f19f7606"
+        },
+        {
+          "bytes": 811,
+          "name": "same named declarations with include tsx with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/same named declarations with include tsx with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "177e4b99016002d4cf6ef5c55f78d4e49b7ffcdfc188d6d7e1ba7df624c858c9"
+        },
+        {
+          "bytes": 1129,
+          "name": "star matches only ts files with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/star matches only ts files with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "ccfbe34ed4e6f5203a9bef3eb98522a7944aa13ec4cb4cafc7f986d8c3969bee"
+        },
+        {
+          "bytes": 1101,
+          "name": "star matches only ts files with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/star matches only ts files with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f27778fd09c1e7f243c616c01b41eb5f731bf145af1cc8060bccf12e29c8d73e"
+        },
+        {
+          "bytes": 821,
+          "name": "that are not explicitly included with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/that are not explicitly included with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "d98e7f083c59f19863f717748636b70c34ed5dfbd983f92581c24b53c6dfbb95"
+        },
+        {
+          "bytes": 793,
+          "name": "that are not explicitly included with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/that are not explicitly included with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f4978d69a4b203677e97692a99c48e45c678168d617925e6e370ed4d319ba863"
+        },
+        {
+          "bytes": 580,
+          "name": "when recursive symlinked directories are present with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/when recursive symlinked directories are present with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "6ba5deff249c219a9af51f98e2b251093440a28c6d868dbeccc6f33dbeac0703"
+        },
+        {
+          "bytes": 550,
+          "name": "when recursive symlinked directories are present with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/when recursive symlinked directories are present with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "2700e24d4e2a04eee572d937569d671a52a67b77b6190ae3dc17fc9df8e9980a"
+        },
+        {
+          "bytes": 1173,
+          "name": "with case sensitive exclude with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with case sensitive exclude with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "d7b7442c308f559abff3c9b03cf0e24d4258ff1e27516df4971b68511ac16987"
+        },
+        {
+          "bytes": 1145,
+          "name": "with case sensitive exclude with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with case sensitive exclude with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "eb86af2038e7bf5224f4040f34fe03db660f7900c477a661bbf092bee4b9d291"
+        },
+        {
+          "bytes": 984,
+          "name": "with common package folders and empty exclude with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and empty exclude with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "95101582808682acad1c4346534270cb9d7c0d0b42d7c1084df401506942d4d5"
+        },
+        {
+          "bytes": 956,
+          "name": "with common package folders and empty exclude with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and empty exclude with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "99cf7a1409637ec8c44b3732c46f86b7c53a28b3c40d0553ae5e8924e9e4115c"
+        },
+        {
+          "bytes": 1040,
+          "name": "with common package folders and exclusions with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and exclusions with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "34de5a77db2a2896df164902b15a137b26de6e690d20a6af32d9bd9f1e3ee027"
+        },
+        {
+          "bytes": 1012,
+          "name": "with common package folders and exclusions with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and exclusions with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "56d456d474162cfe8bec5dfe03655910500dd78f131297ab5cbc47d91b2530a6"
+        },
+        {
+          "bytes": 984,
+          "name": "with common package folders and no exclusions with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and no exclusions with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "95101582808682acad1c4346534270cb9d7c0d0b42d7c1084df401506942d4d5"
+        },
+        {
+          "bytes": 956,
+          "name": "with common package folders and no exclusions with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with common package folders and no exclusions with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "99cf7a1409637ec8c44b3732c46f86b7c53a28b3c40d0553ae5e8924e9e4115c"
+        },
+        {
+          "bytes": 693,
+          "name": "with defaults with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with defaults with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3478442c4a67e951c1b45bbdca7ead0e981d0d319e10fe72e0bc52c251f5491f"
+        },
+        {
+          "bytes": 663,
+          "name": "with defaults with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with defaults with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "38320042d20eac2e32532506914230b519c7229b891228557376750199440a9c"
+        },
+        {
+          "bytes": 854,
+          "name": "with jsx=none, allowJs=false with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=false with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "b869e465dc5e18f37785eebfc6333cde37326bb4b29d19e25b29da45755dc8aa"
+        },
+        {
+          "bytes": 826,
+          "name": "with jsx=none, allowJs=false with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=false with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0b126b54edde96cdd13ead5258157ebfa4e0b4e56e332ef9737c87bfd5881ea6"
+        },
+        {
+          "bytes": 890,
+          "name": "with jsx=none, allowJs=true with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=true with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a6c4f4ddab8406f4a6af8b73fa0079b348a027800a59423314242109366caf06"
+        },
+        {
+          "bytes": 862,
+          "name": "with jsx=none, allowJs=true with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=none, allowJs=true with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "326bbe08ddd6ab7def81e3e4e580180ccdeda4e770eb914598074ef1143fcfd1"
+        },
+        {
+          "bytes": 916,
+          "name": "with jsx=preserve, allowJs=false with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=false with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "2a217627bce7d391818ff0a2b12b96fb9a40770271abbcd8a866cad1281edada"
+        },
+        {
+          "bytes": 888,
+          "name": "with jsx=preserve, allowJs=false with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=false with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "24806cf97893b2a76b3181e670a86bcf5e36ca746c559a8c46a6c8f2599b8889"
+        },
+        {
+          "bytes": 952,
+          "name": "with jsx=preserve, allowJs=true with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=true with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "e80b05f43f82ccfa431e407751885d6b267002e174d1efe8cf702fa6e6f97d28"
+        },
+        {
+          "bytes": 924,
+          "name": "with jsx=preserve, allowJs=true with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=preserve, allowJs=true with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a0966a9879cb6ddbb51a201d727cca91a54537cd346224241de246144da83bce"
+        },
+        {
+          "bytes": 924,
+          "name": "with jsx=react-native, allowJs=false with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=false with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "126a2ae0e7d72c31e00f8f93363b5e6fac44d9541857e53c01ac0ee2e14096aa"
+        },
+        {
+          "bytes": 896,
+          "name": "with jsx=react-native, allowJs=false with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=false with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "8b7e7e69388ed47da5fdc8300edae9a7792afec0fe639b40f1973054b9074b3d"
+        },
+        {
+          "bytes": 960,
+          "name": "with jsx=react-native, allowJs=true with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=true with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a59e1ee5b323766b553c79e23a9e4469f36eaadeda27a7b962f3c3dc120ad04c"
+        },
+        {
+          "bytes": 932,
+          "name": "with jsx=react-native, allowJs=true with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with jsx=react-native, allowJs=true with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "dc5a23f8ff60ded4fcfd81a3065ad4d558f0aa9eea965c651b650ffb5a81d7d8"
+        },
+        {
+          "bytes": 1145,
+          "name": "with literal excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with literal excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "2fcf2b2ab2be853525b3a03c02083357699d43aa13428961361b2e67bcd841a7"
+        },
+        {
+          "bytes": 1117,
+          "name": "with literal excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with literal excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "b128c1434b0d5e5c9ac1055758018807d0577ecc7ebcd3a7a73637a3d6041bf5"
+        },
+        {
+          "bytes": 1230,
+          "name": "with missing files are excluded with literal include list with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with literal include list with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "a2fe92305da36beb90d9135e2493a197e804f9d502e182890a30a9c1cbff7fc2"
+        },
+        {
+          "bytes": 1202,
+          "name": "with missing files are excluded with literal include list with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with literal include list with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c9d0d612546c6d60c2a3246918df5b5421a9c0f0122dbd7d3508ea6b4c8aba6d"
+        },
+        {
+          "bytes": 1252,
+          "name": "with missing files are excluded with wildcard include list with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with wildcard include list with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3992129316e5de2e51bb08771a8e0bfc7a3c6b9a1d1fc52cd9a7f10cb6d96c6a"
+        },
+        {
+          "bytes": 1224,
+          "name": "with missing files are excluded with wildcard include list with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with missing files are excluded with wildcard include list with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3d0a722eca7d270b5bbea6b18ae394d9dc407332883dd9ec111ac495807197b2"
+        },
+        {
+          "bytes": 1283,
+          "name": "with multiple recursive directories with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with multiple recursive directories with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f3564122dcb14420bbb119dfda99374bb6cfa46b49aedc77263ca3d9ba53b996"
+        },
+        {
+          "bytes": 1255,
+          "name": "with multiple recursive directories with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with multiple recursive directories with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "666b848122a3aeeef272b933ceadeb09ac4ae970c2117cba211a3c6eeba49f12"
+        },
+        {
+          "bytes": 1230,
+          "name": "with non .ts file extensions are excluded with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with non .ts file extensions are excluded with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "6156349b520ae7efd383a1d4dfc315fa21146a62572a99ec3af16a5027f173e2"
+        },
+        {
+          "bytes": 1202,
+          "name": "with non .ts file extensions are excluded with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with non .ts file extensions are excluded with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "5197b32e0215f0f71d9bfe111ea12892ce7b43698cf3821d18966c1cc51c870c"
+        },
+        {
+          "bytes": 1171,
+          "name": "with recursive directory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive directory with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "80ccaf57e9c0b7c73533430542de994aee82da3d4c4d372b13ced9c84f0aa6e2"
+        },
+        {
+          "bytes": 1143,
+          "name": "with recursive directory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive directory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "da90c1a046ba3b474812f6f441b9b642d8beb3602c3962b10da0977ece79e54f"
+        },
+        {
+          "bytes": 1323,
+          "name": "with recursive excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "cf931b1259a0470ce71a480f4b36ad74aca86962950178b52cc31a8bc3913f7f"
+        },
+        {
+          "bytes": 1295,
+          "name": "with recursive excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "3a29908496af19105138518e64a090ae03e1e7f01d7ba865a1a0ae84b25a8c23"
+        },
+        {
+          "bytes": 801,
+          "name": "with recursive wildcards that match directories with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match directories with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1c7e7288618672f7302ece0630bf5de828749592629a8043dc9c1d9694f7fb72"
+        },
+        {
+          "bytes": 773,
+          "name": "with recursive wildcards that match directories with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match directories with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "acd7298f29825f44e2f896f2c53f3b0aaafe0fe69cb367790d1a2317013802f0"
+        },
+        {
+          "bytes": 837,
+          "name": "with recursive wildcards that match nothing with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match nothing with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "f12d477a7de0b792367a12d23f5e33f81daaf3b9ff36e80def52b8214a4a785c"
+        },
+        {
+          "bytes": 809,
+          "name": "with recursive wildcards that match nothing with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with recursive wildcards that match nothing with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "4b685efc81ab7b4af779e6b2bc76df766ad3b668fc6dbc990f7db298af039bf4"
+        },
+        {
+          "bytes": 893,
+          "name": "with wildcard excludes that implicitly exclude dotted files with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes that implicitly exclude dotted files with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "1ed11055052da00c411079f21670f4c9d16e3d1de016e097bfee237726c90262"
+        },
+        {
+          "bytes": 865,
+          "name": "with wildcard excludes that implicitly exclude dotted files with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes that implicitly exclude dotted files with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "061a7fa682d769e6bdb6cec42cf0b466839c804836027178c9aebc839c683de6"
+        },
+        {
+          "bytes": 1362,
+          "name": "with wildcard excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c777386760c21d90558fa54392184c452f75d10fb1b5a0f3011cd594076281da"
+        },
+        {
+          "bytes": 1334,
+          "name": "with wildcard excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/with wildcard excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "34e9e511b42c82b2e093edec4efeb4e5fb7b391d9d64e82006efd5aee35fb8de"
+        },
+        {
+          "bytes": 1092,
+          "name": "without exclusions with literal file list with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal file list with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0d34b1378a9c4ce25e9d55d56ae152d5129413e71f91748409d053e9de4485b7"
+        },
+        {
+          "bytes": 1064,
+          "name": "without exclusions with literal file list with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal file list with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "0c3c2d1315b606c9d489ac80fb394a6c2e585856fc7d58adda7fa34e032dc3d0"
+        },
+        {
+          "bytes": 1096,
+          "name": "without exclusions with literal include list with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal include list with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "cde514e8ddd097c7e673c96c1dccbf85f98f893a8fa015c274bca9cf1d238dfc"
+        },
+        {
+          "bytes": 1068,
+          "name": "without exclusions with literal include list with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without exclusions with literal include list with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "b04010fd070a5ca806b7b187f70eac4b20f9f336618f029ae6d6aed828d316fd"
+        },
+        {
+          "bytes": 750,
+          "name": "without wildcards with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without wildcards with json api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "984c37a34a5b81d792763bfbfca7594a1baa008c89097faf0b56151213835a84"
+        },
+        {
+          "bytes": 722,
+          "name": "without wildcards with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/matchFiles/without wildcards with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "Fs::",
+            "config:",
+            "configFileName::"
+          ],
+          "sha256": "c80766ec31745d9a00ef39eceebdc7fe1cee643c6fbd59ed49a57eef28f30f6f"
+        }
+      ],
+      "subdirectory": "tsc/testdata/baselines/reference/config/matchFiles"
+    },
+    "parseBuildOptions": {
+      "authority": {
+        "invocation": "tsc/internal/tsoptions/commandlineparser_test.go::createSubScenario('parseBuildOptions', name, args)",
+        "native_test_source": "tsc/internal/tsoptions/commandlineparser_test.go",
+        "output_name_rule": "<group>/<sub-scenario name>.js",
+        "output_relationship": "one invocation renders exactly one output",
+        "renderer": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaselineBuild",
+        "status": "established",
+        "subfolder": "tsoptions/commandLineParsing"
+      },
+      "expected_outputs": 27,
+      "outputs": [
+        {
+          "bytes": 182,
+          "name": "--clean and --force together is invalid.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --force together is invalid.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "d3193aa04021143b468612529adef1bb284dc04e6d19ae17658916c624c280aa"
+        },
+        {
+          "bytes": 188,
+          "name": "--clean and --verbose together is invalid.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --verbose together is invalid.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "23dcfbdae1efaa3fd1d14497a0ed01deaec50763dd1df8a3465f33b7987b9298"
+        },
+        {
+          "bytes": 181,
+          "name": "--clean and --watch together is invalid.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--clean and --watch together is invalid.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "d82c9e5270a5607184dde7e4d66bbab2db6816f8a112149885344ba1550409c1"
+        },
+        {
+          "bytes": 145,
+          "name": "--singleThreaded and --builders together.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--singleThreaded and --builders together.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "c524e8ea43b14739356286a975d1d5400b7b5b6e7de2070364c780fed5547fb8"
+        },
+        {
+          "bytes": 175,
+          "name": "--watch and --dry together is invalid.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/--watch and --dry together is invalid.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "c0881626cb3c8bd3fc2c588028db12be1e5aee48563553ef83f6399d630275b6"
+        },
+        {
+          "bytes": 148,
+          "name": "Parse multiple flags with input projects at the end.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects at the end.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "229963b4e0fdbebf73cad0e67f55b849eaf14adcf92105877baa52ea1cc3afae"
+        },
+        {
+          "bytes": 148,
+          "name": "Parse multiple flags with input projects in the beginning.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the beginning.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "1b3385532e75ed5f029a3e48048bdbc1f593d0b2d73ba0ad897fe03f3ace9bdd"
+        },
+        {
+          "bytes": 148,
+          "name": "Parse multiple flags with input projects in the middle.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple flags with input projects in the middle.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "91f4d7d4948386666994053fafe48f33d48fe5fae8015a36dd5a1cb82447334f"
+        },
+        {
+          "bytes": 137,
+          "name": "Parse multiple options.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse multiple options.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "713a8116ab49c15c78843df4ed30a60b153324c135e26c3cdae5c028b03602c7"
+        },
+        {
+          "bytes": 173,
+          "name": "Parse option with invalid option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/Parse option with invalid option.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "b6ea3d807a021d5942e842c6d8102f8d6591c275571c54c48d5b6f52bda6944d"
+        },
+        {
+          "bytes": 247,
+          "name": "errors on invalid excludeDirectories.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeDirectories.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "3e5d70790837fab98e33e27c19e82f479b261a8d137eb75ebb485ecd877bee23"
+        },
+        {
+          "bytes": 241,
+          "name": "errors on invalid excludeFiles.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on invalid excludeFiles.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "86ce78c88819e6637f49b4101a36450ef296bec2bf440608ed75ad0a3bb00ad4"
+        },
+        {
+          "bytes": 334,
+          "name": "errors on missing argument.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/errors on missing argument.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "baa97bec900ba3287bb45d6e554c749c6f600c0d4d408ddec1b41367a37af885"
+        },
+        {
+          "bytes": 104,
+          "name": "parse --builders.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --builders.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "e8536cca21e5a5e20fa00bd277e9c0ab139d974f1ef810e58fa9c9d8b3d25d85"
+        },
+        {
+          "bytes": 107,
+          "name": "parse --excludeFiles.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --excludeFiles.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "b65cbabe21af62d7e3dd0c36a8023fd7c606418fb09602e0d648a572fbd9995f"
+        },
+        {
+          "bytes": 141,
+          "name": "parse --fallbackPolling.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --fallbackPolling.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "698feae4bb767f4881dc2f76f38b21fb407fc1b5bf0840af7662d1f67f517dd4"
+        },
+        {
+          "bytes": 131,
+          "name": "parse --synchronousWatchDirectory.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --synchronousWatchDirectory.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "e9adcceb10b4fa5dd32a508c6ffb6012bc8dc302d3e34279167ea81be2357843"
+        },
+        {
+          "bytes": 144,
+          "name": "parse --watchDirectory.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --watchDirectory.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "783c9a54b744bf4700ee36b822f56de60d39ea977030c953cfb1d4fb31130804"
+        },
+        {
+          "bytes": 130,
+          "name": "parse --watchFile.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse --watchFile.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "44069dafcc971f14fd6de67af1d212102dfaaccd95fa2f8f09a5bf4ab23ba4ea"
+        },
+        {
+          "bytes": 121,
+          "name": "parse build with --incremental.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --incremental.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "7a055a9873822f51b8108feded91657c6b359e493f3e7bdab96c6bb20cbee96a"
+        },
+        {
+          "bytes": 119,
+          "name": "parse build with --locale en-us.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --locale en-us.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "544f01b964b30cc14398a2007188eec4ce76f734ce3d3d1cb2398aa66e6bfc66"
+        },
+        {
+          "bytes": 228,
+          "name": "parse build with --tsBuildInfoFile.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build with --tsBuildInfoFile.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "fa3b4881729344f2e7bda84bdd1094c776e071c9fa17599860a3f709e25dbc9c"
+        },
+        {
+          "bytes": 75,
+          "name": "parse build without any options .js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/parse build without any options .js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "90ee4a357bb394f118a8f4dff264f18f339d7d93f1f102cac0ea514853847060"
+        },
+        {
+          "bytes": 163,
+          "name": "reports error when --builders is 0.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is 0.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "55115419d8c9dea6ee0afb52f19cbad49c6d00b9176da752ff1e5ad4cd41259a"
+        },
+        {
+          "bytes": 169,
+          "name": "reports error when --builders is invalid type.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is invalid type.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "ee2ba24a273847c7f4409272be3f85ba7e60a249acc504a18986521c2d714e93"
+        },
+        {
+          "bytes": 164,
+          "name": "reports error when --builders is negative.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports error when --builders is negative.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "2696b124fcf606b6d2edad4dc803c9002f2695032089d754587c7f48d716563a"
+        },
+        {
+          "bytes": 158,
+          "name": "reports other common may not be used with --build flags.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions/reports other common may not be used with --build flags.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "b374b1e002469b5fc64ba1940c9bfa41a78510ff88456a2835fef450a4289a69"
+        }
+      ],
+      "subdirectory": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseBuildOptions"
+    },
+    "parseCommandLine": {
+      "authority": {
+        "invocation": "tsc/internal/tsoptions/commandlineparser_test.go::createSubScenario('parseCommandLine', name, args)",
+        "native_test_source": "tsc/internal/tsoptions/commandlineparser_test.go",
+        "output_name_rule": "<group>/<sub-scenario name>.js",
+        "output_relationship": "one invocation renders exactly one output",
+        "renderer": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaseline",
+        "status": "established",
+        "subfolder": "tsoptions/commandLineParsing"
+      },
+      "expected_outputs": 53,
+      "outputs": [
+        {
+          "bytes": 244,
+          "name": "Handles did you mean for misspelt flags.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Handles did you mean for misspelt flags.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "c6d1ce249a6480de0e5e2ca8db6df7d6adc1a6de838bcd50dd5b7bf7c499bec4"
+        },
+        {
+          "bytes": 473,
+          "name": "Handles may only be used with --build flags.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Handles may only be used with --build flags.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "22c1b60e8fea862e6b50708b4f3599b079427c822a3ba18bcb57566e447677d5"
+        },
+        {
+          "bytes": 116,
+          "name": "Parse --lib option with extra comma.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with extra comma.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "91f9ff6bf7ee58f5eb5c7120bd3f03ae0c35df307ef8eeada97f47455fe4e49e"
+        },
+        {
+          "bytes": 117,
+          "name": "Parse --lib option with trailing white-space.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse --lib option with trailing white-space.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "4006729afb1794bf0cefff017d4960e59aaad503419bada55c39bb3848d4a83a"
+        },
+        {
+          "bytes": 249,
+          "name": "Parse empty options of --jsx.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --jsx.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "2bec0688f4445b1edd2dfde42bf697c1f3f90c05c21b8ce3351839e709eacf37"
+        },
+        {
+          "bytes": 140,
+          "name": "Parse empty options of --lib.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --lib.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a010e6061f11cae5103fa8e21744deb5dd891b9c5bfc5c7748c1a0fac171e82b"
+        },
+        {
+          "bytes": 305,
+          "name": "Parse empty options of --module.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --module.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "6e806215a82083c967fa16089ec9e3a489e52f47afe9abe71e15580326aa9682"
+        },
+        {
+          "bytes": 255,
+          "name": "Parse empty options of --moduleResolution.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --moduleResolution.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "b9c0a3b7fc88279e11e92534330948255113f8eb374678eb2dabaad17ed4d751"
+        },
+        {
+          "bytes": 209,
+          "name": "Parse empty options of --newLine.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --newLine.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "d3a20805124d8febb8f449324f07a54b444bbb4cab19ee08c2850af516893350"
+        },
+        {
+          "bytes": 319,
+          "name": "Parse empty options of --target.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty options of --target.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "ab47c0c077698ec8a5ecf4c2947341f0d1f3d173cbcd627bf3edd3cb3f0a8141"
+        },
+        {
+          "bytes": 87,
+          "name": "Parse empty string of --lib.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse empty string of --lib.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "70de7ace3acc4545a81906d4956284ae31ba3de0267845b56a91cb3bc6d1bdc6"
+        },
+        {
+          "bytes": 121,
+          "name": "Parse explicit boolean flag value.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse explicit boolean flag value.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "103071ce7e06b49fc6b907042930556ddb42c8de8717616dbef4758dc713499b"
+        },
+        {
+          "bytes": 115,
+          "name": "Parse immediately following command line argument of --lib.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse immediately following command line argument of --lib.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "429a55c3687461dbd6623fef1cf80177c03c5c3aa75ee40388e4684611f3b3b5"
+        },
+        {
+          "bytes": 99,
+          "name": "Parse implicit boolean flag value.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse implicit boolean flag value.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "f249842e968b318b431fb7e3f1a1d04c4886821a2143e26b5cccbca00ea27406"
+        },
+        {
+          "bytes": 1995,
+          "name": "Parse invalid option of library flags.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse invalid option of library flags.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a6342a246b0663221de87647fd021012f769a173909cb7e5218b1a3da1248dd7"
+        },
+        {
+          "bytes": 193,
+          "name": "Parse multiple compiler flags with input files at the end.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files at the end.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "e635f20bf34179c8613a99b525c9feee4aa407f9e2412a8d640aef5639e70d0a"
+        },
+        {
+          "bytes": 228,
+          "name": "Parse multiple compiler flags with input files in the middle.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple compiler flags with input files in the middle.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "2ca1a40e3f2b49f245503b4833e7cb826825fb583f0388e2b9cc3fa9c5a199eb"
+        },
+        {
+          "bytes": 262,
+          "name": "Parse multiple library compiler flags .js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple library compiler flags .js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "0c8659ea12dc76991fdf8906415cb49c23285e3138158a6368d12ca1f0938ca0"
+        },
+        {
+          "bytes": 163,
+          "name": "Parse multiple options of library flags.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse multiple options of library flags.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a9ee011b82407b6e6ec4249139b9d7f8219d2f2c28bb17b7f7a4caa897c179e9"
+        },
+        {
+          "bytes": 112,
+          "name": "Parse non boolean argument after boolean flag.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse non boolean argument after boolean flag.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "5c0988512753614f4bfeb17821533f3d60c1c526a78f52c1ba50c4d6f7d08f30"
+        },
+        {
+          "bytes": 107,
+          "name": "Parse single option of library flag.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/Parse single option of library flag.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "c62194c6dc8c5d319ffe9d2375ae84eb2cf93078a451ea5e5db2469863c072a7"
+        },
+        {
+          "bytes": 107,
+          "name": "allows setting option type boolean to false.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/allows setting option type boolean to false.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "226d90658da046842285e1530c1c27ffe155e722de0a9f7e3a0402a3de620376"
+        },
+        {
+          "bytes": 156,
+          "name": "allows tsconfig only option to be set to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/allows tsconfig only option to be set to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "1bf81be014113a3493b816febd8e80d944ff1755a5e725e58213ff683499c935"
+        },
+        {
+          "bytes": 263,
+          "name": "errors on invalid excludeDirectories.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeDirectories.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "4efdec4a35ace75911027bee6e47cf25277045e3ddb15f2e8df2f78c1cea8df5"
+        },
+        {
+          "bytes": 251,
+          "name": "errors on invalid excludeFiles.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on invalid excludeFiles.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "f2b7d9fed7266e304ba2dba7264eb5821b413b373e578227e0a0af6e68a5ab1a"
+        },
+        {
+          "bytes": 300,
+          "name": "errors on missing argument to --fallbackPolling.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/errors on missing argument to --fallbackPolling.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "09d473fadc00cba75c3758a742de1e69ea03f27733862996dcdcdbea59341fdf"
+        },
+        {
+          "bytes": 105,
+          "name": "option of type boolean allows setting it to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean allows setting it to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "8f231587a327a62795801de8a32625d4804547583cdc036f2d6a20ced5218b8e"
+        },
+        {
+          "bytes": 250,
+          "name": "option of type boolean errors if its followed by another option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its followed by another option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "c0d87e3b8f5729cf0337408bfb4e0c3bd990b7637ec3e2e46f1a1e74a199ec07"
+        },
+        {
+          "bytes": 205,
+          "name": "option of type boolean errors if its last option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if its last option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "5e35f8ab68a4665a5e82dccb9b4991083df2aa6d9efb1614199c51b4f4b01d66"
+        },
+        {
+          "bytes": 213,
+          "name": "option of type boolean errors if non null value is passed.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type boolean errors if non null value is passed.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "6f2ef89fa3a3eeb77c1ecc756eec25c63512ee77ad09c5e9f9628b5eb8551ed6"
+        },
+        {
+          "bytes": 103,
+          "name": "option of type list allows setting it to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list allows setting it to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "cc9df565a6503e2064f7a01047fe76d83f0c0a979bfae2561e3ba0070ef93bbd"
+        },
+        {
+          "bytes": 237,
+          "name": "option of type list errors if its followed by another option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its followed by another option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "e0d1186d4c5bc10fd93f567ef386f95b49fc3c05351bea86236ad8cb15a03e41"
+        },
+        {
+          "bytes": 192,
+          "name": "option of type list errors if its last option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if its last option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a85a0a5163070ea9ebf1a5ed00c19b87d6eafc8594d48ac698562f9bb02611ef"
+        },
+        {
+          "bytes": 203,
+          "name": "option of type list errors if non null value is passed.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type list errors if non null value is passed.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "3cd844d11f7a273816564fd6927738f143b535cea7e3f8986427185f4db2f310"
+        },
+        {
+          "bytes": 107,
+          "name": "option of type number allows setting it to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number allows setting it to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a37ba976c635ffc8c6fa6d9bbd0d56e4c3ce1b4f5d3ecbde085293d4299c37c4"
+        },
+        {
+          "bytes": 241,
+          "name": "option of type number errors if its followed by another option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its followed by another option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "0853613f88c109d9a147b80217943176686c773f61f1a22a9a6faa66f77eef28"
+        },
+        {
+          "bytes": 196,
+          "name": "option of type number errors if its last option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if its last option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "44a245f06d67d6e94dc83fa3de8e4bcee1a5c6cd668f214c55a810a59e8a9ebc"
+        },
+        {
+          "bytes": 202,
+          "name": "option of type number errors if non null value is passed.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type number errors if non null value is passed.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "23f2cbd997a90d7b334b306fae4d4a50b1a030ce16100e3980c5c5a983916f3d"
+        },
+        {
+          "bytes": 97,
+          "name": "option of type object allows setting it to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object allows setting it to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "7af4c78c4fa759214415fb9e895902a3d4e3c8f4add100adad7435c80a605424"
+        },
+        {
+          "bytes": 231,
+          "name": "option of type object errors if its followed by another option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its followed by another option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "77191a522609f4f9ac26243e0cba45830e62be30e8520abe5c3f958545a0e4c8"
+        },
+        {
+          "bytes": 186,
+          "name": "option of type object errors if its last option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type object errors if its last option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "5138db38f205af17a2f68d9d34462f6d61d5f38069d98dac824dae8812d0837a"
+        },
+        {
+          "bytes": 107,
+          "name": "option of type string allows setting it to null.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string allows setting it to null.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "a37ba976c635ffc8c6fa6d9bbd0d56e4c3ce1b4f5d3ecbde085293d4299c37c4"
+        },
+        {
+          "bytes": 241,
+          "name": "option of type string errors if its followed by another option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its followed by another option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "0853613f88c109d9a147b80217943176686c773f61f1a22a9a6faa66f77eef28"
+        },
+        {
+          "bytes": 196,
+          "name": "option of type string errors if its last option.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if its last option.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "44a245f06d67d6e94dc83fa3de8e4bcee1a5c6cd668f214c55a810a59e8a9ebc"
+        },
+        {
+          "bytes": 205,
+          "name": "option of type string errors if non null value is passed.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/option of type string errors if non null value is passed.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "f1099a5c7dab794d103d1ac2a3939435cc49cb984c641fa372eb07aaad094a59"
+        },
+        {
+          "bytes": 133,
+          "name": "parse --excludeDirectories.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --excludeDirectories.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "b929bfe9e3db172c6d5bc967cb919655d3648bc82a700afae955d92565dbd722"
+        },
+        {
+          "bytes": 131,
+          "name": "parse --excludeFiles.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --excludeFiles.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "7cc68f350ec92f8b3768c3802ce33399b91edb36f9b5174570ff052c3a1a250e"
+        },
+        {
+          "bytes": 126,
+          "name": "parse --fallbackPolling.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --fallbackPolling.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "2a6047e8364fff8b5835e43ff06926d299f88c28005612e1fab90f128b1b36e3"
+        },
+        {
+          "bytes": 101,
+          "name": "parse --incremental.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --incremental.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "5aa61cb3fcd1b5b4819659f8c28fa3bf8ee573b05980fece8df9f2d830092c1f"
+        },
+        {
+          "bytes": 129,
+          "name": "parse --synchronousWatchDirectory.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --synchronousWatchDirectory.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "82c75a13b2f10250e486f1eace17b61aec44d072587d06512c220ffb90356739"
+        },
+        {
+          "bytes": 145,
+          "name": "parse --tsBuildInfoFile.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --tsBuildInfoFile.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "2041f10779e50389aff7bb0fbef49a25714461651292fd69add003dbc0e86186"
+        },
+        {
+          "bytes": 128,
+          "name": "parse --watchDirectory.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --watchDirectory.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "d019b370f79fb6bac81b61267de59ccf8db507106fff6e0d541e1d3b7fe58ab9"
+        },
+        {
+          "bytes": 109,
+          "name": "parse --watchFile.js",
+          "output": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine/parse --watchFile.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::"
+          ],
+          "sha256": "38d2571ca93aa7b72430b13e4332c35088d06f28a0b78a74aed879533b9f578c"
+        }
+      ],
+      "subdirectory": "tsc/testdata/baselines/reference/tsoptions/commandLineParsing/parseCommandLine"
+    },
+    "tsconfigParsing": {
+      "authority": {
+        "invocation": "tsc/internal/tsoptions/tsconfigparsing_test.go::TestParseJsonConfigFileContent and TestParseJsonSourceFileConfigFileContent, plus their variant callers",
+        "native_test_source": "tsc/internal/tsoptions/tsconfigparsing_test.go",
+        "output_name_rule": "<title> with {json,jsonSourceFile} api.js, or \"<title> jsonParse.js\"",
+        "output_relationship": "one invocation renders one output, but a single output may concatenate several parsed configs: baselineParseConfigWith loops over input []testConfig",
+        "renderer": "tsc/internal/tsoptions/tsconfigparsing_test.go::baselineParseConfigWith",
+        "secondary_renderer": "tsc/internal/tsoptions/tsconfigparsing_test.go::TestParseConfigFileTextToJson (inline assembly)",
+        "status": "established",
+        "subfolder": "config/tsconfigParsing"
+      },
+      "expected_outputs": 87,
+      "outputs": [
+        {
+          "bytes": 473,
+          "name": "Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "948c2a0fe528c996fa4b41581df2fc2f7b73270230139574f34976e785b6ce3a"
+        },
+        {
+          "bytes": 473,
+          "name": "Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert correctly format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "948c2a0fe528c996fa4b41581df2fc2f7b73270230139574f34976e785b6ce3a"
+        },
+        {
+          "bytes": 362,
+          "name": "Convert default jsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "fc4d1c750e2b01ec655e6b16a2e4dc18a75422e942a09eddc7591ce83e7a1af0"
+        },
+        {
+          "bytes": 362,
+          "name": "Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "fc4d1c750e2b01ec655e6b16a2e4dc18a75422e942a09eddc7591ce83e7a1af0"
+        },
+        {
+          "bytes": 254,
+          "name": "Convert default tsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "b60961d8b496b42d4ffebf193882557b31a8cd423b96d1966d506f3816e61800"
+        },
+        {
+          "bytes": 254,
+          "name": "Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert default tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "b60961d8b496b42d4ffebf193882557b31a8cd423b96d1966d506f3816e61800"
+        },
+        {
+          "bytes": 503,
+          "name": "Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "3ed50f8be6c8f21a8c057415b00ee0d3636e96caf639fa4ae9a9f5661db9c0f1"
+        },
+        {
+          "bytes": 636,
+          "name": "Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "b4f259872bd44948cfca5ec19a4079b9009f650b2652b3854e36fc892bee4cec"
+        },
+        {
+          "bytes": 394,
+          "name": "Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "9162fc302e7b3b8d2b3e2b00a0ed89b3483e92536bb8b7dfb83984b8cf235757"
+        },
+        {
+          "bytes": 527,
+          "name": "Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert incorrect format tsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "cb3b025fc63d1d8183b4518e213817981c813444d07ea1ab289fab1d08a6f935"
+        },
+        {
+          "bytes": 521,
+          "name": "Convert jsconfig.json to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "bfcff3e8b21e89deaaf3cee59c6cbe4b5f7bf67ce37695a8a3b2f4ec95536be8"
+        },
+        {
+          "bytes": 521,
+          "name": "Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "bfcff3e8b21e89deaaf3cee59c6cbe4b5f7bf67ce37695a8a3b2f4ec95536be8"
+        },
+        {
+          "bytes": 409,
+          "name": "Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "a2656ad5f2cb2253d2bea61e3bdc479b1b9f02b59d8e663c3da41ab46589d990"
+        },
+        {
+          "bytes": 409,
+          "name": "Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert jsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "a2656ad5f2cb2253d2bea61e3bdc479b1b9f02b59d8e663c3da41ab46589d990"
+        },
+        {
+          "bytes": 317,
+          "name": "Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "780f5f2f22b7f96d6c0a6d04ed8d2b9737b8262ac8dcf2862f40792eb72c38b7"
+        },
+        {
+          "bytes": 317,
+          "name": "Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/Convert tsconfig.json with only enable property to typeAcquisition  with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "780f5f2f22b7f96d6c0a6d04ed8d2b9737b8262ac8dcf2862f40792eb72c38b7"
+        },
+        {
+          "bytes": 345,
+          "name": "allow dotted files and folders when explicitly requested with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/allow dotted files and folders when explicitly requested with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "832c4a8288d20a8d91c84b9c8f3871ffc5457b05a1e9930e69668f6cee10a36e"
+        },
+        {
+          "bytes": 345,
+          "name": "allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/allow dotted files and folders when explicitly requested with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "832c4a8288d20a8d91c84b9c8f3871ffc5457b05a1e9930e69668f6cee10a36e"
+        },
+        {
+          "bytes": 221,
+          "name": "does not generate errors for empty files list when one or more references are provided with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "ce515700148197b96a1868c3593f762c5dd84e7f2a4de29433290bb6043addb3"
+        },
+        {
+          "bytes": 221,
+          "name": "does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/does not generate errors for empty files list when one or more references are provided with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "ce515700148197b96a1868c3593f762c5dd84e7f2a4de29433290bb6043addb3"
+        },
+        {
+          "bytes": 594,
+          "name": "exclude declarationDir unless overridden with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude declarationDir unless overridden with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "75b9b0d1d4d9c4b9e7a06be92cfe5908ca26bfcc4312a36bad17e9f11d288e69"
+        },
+        {
+          "bytes": 594,
+          "name": "exclude declarationDir unless overridden with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude declarationDir unless overridden with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "75b9b0d1d4d9c4b9e7a06be92cfe5908ca26bfcc4312a36bad17e9f11d288e69"
+        },
+        {
+          "bytes": 525,
+          "name": "exclude outDir unless overridden with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude outDir unless overridden with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "b6bbc51b0c933016344a09c21ebeaab5f67c9e3b1e4ae6baa860f65b1d9054a3"
+        },
+        {
+          "bytes": 525,
+          "name": "exclude outDir unless overridden with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/exclude outDir unless overridden with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "b6bbc51b0c933016344a09c21ebeaab5f67c9e3b1e4ae6baa860f65b1d9054a3"
+        },
+        {
+          "bytes": 304,
+          "name": "generates errors for directory with no .ts files with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for directory with no .ts files with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "8228fa1e7705e051356317d5f063e29496af6d09fe9ff294a1b482961544c787"
+        },
+        {
+          "bytes": 304,
+          "name": "generates errors for directory with no .ts files with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for directory with no .ts files with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "8228fa1e7705e051356317d5f063e29496af6d09fe9ff294a1b482961544c787"
+        },
+        {
+          "bytes": 371,
+          "name": "generates errors for empty directory with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty directory with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "2380a97b81fc6a1563e32b38609074bcad4c682fe27f76dd65912847f4a09fef"
+        },
+        {
+          "bytes": 371,
+          "name": "generates errors for empty directory with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty directory with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "2380a97b81fc6a1563e32b38609074bcad4c682fe27f76dd65912847f4a09fef"
+        },
+        {
+          "bytes": 298,
+          "name": "generates errors for empty files list when no references are provided with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list when no references are provided with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "99a63cf3bb39b2b69fe774b501baf21865d54ac968b9b2c4cc8630377b0bd889"
+        },
+        {
+          "bytes": 438,
+          "name": "generates errors for empty files list when no references are provided with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list when no references are provided with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4c74f12329bb0af84bf9bc83f4add0e7db02f4a340748798567b1407203c4e0e"
+        },
+        {
+          "bytes": 264,
+          "name": "generates errors for empty files list with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "415d32e232412c590cc0055fa2a3efddddd99fd1d5085cb4824991c5cc09d243"
+        },
+        {
+          "bytes": 403,
+          "name": "generates errors for empty files list with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty files list with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4512dc1508aa1d8d0dd69556db317a0f2bd7c2a8633b30df9034a97fc6e0af6e"
+        },
+        {
+          "bytes": 328,
+          "name": "generates errors for empty include with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty include with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "76060d8114265d918911b37a33e8ee113b2968dbb4fcfc17b9f0a4ca8f1faa0b"
+        },
+        {
+          "bytes": 328,
+          "name": "generates errors for empty include with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for empty include with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "76060d8114265d918911b37a33e8ee113b2968dbb4fcfc17b9f0a4ca8f1faa0b"
+        },
+        {
+          "bytes": 520,
+          "name": "generates errors for include with parent directory after recursive wildcard with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "8f5648c39d6e799d2758b820917ce1480c5e4c9805d3a2be02daff68d7eac9d5"
+        },
+        {
+          "bytes": 686,
+          "name": "generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for include with parent directory after recursive wildcard with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "a18901ad65c0081ca6c3948b3b226a5a1d3dd72325df766247f746ccb4850ce0"
+        },
+        {
+          "bytes": 439,
+          "name": "generates errors for includes with outDir with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for includes with outDir with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "51971d73ce27e2e8ca9b6dd3252cc17aff85d6e0917b12a602fef526c16ac380"
+        },
+        {
+          "bytes": 439,
+          "name": "generates errors for includes with outDir with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors for includes with outDir with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "51971d73ce27e2e8ca9b6dd3252cc17aff85d6e0917b12a602fef526c16ac380"
+        },
+        {
+          "bytes": 266,
+          "name": "generates errors when commandline option is in tsconfig with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when commandline option is in tsconfig with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "cec68c7060ffb67d93b095755a060f015a8bc60793c68aa6272e06b1607e624c"
+        },
+        {
+          "bytes": 376,
+          "name": "generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when commandline option is in tsconfig with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "01dc71294a8b6530e67f51d9f461806fa54ecb9712ec61f5f01e632f921817b1"
+        },
+        {
+          "bytes": 343,
+          "name": "generates errors when files is not string with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when files is not string with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "2d89d374ead227cb074997a3ea8165161136068c52d19995a623337e7726fe42"
+        },
+        {
+          "bytes": 642,
+          "name": "generates errors when files is not string with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when files is not string with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "2a14d6d8a2afebacb3884c48102cee6e89793c2c382ece2970faed926c4aff08"
+        },
+        {
+          "bytes": 440,
+          "name": "generates errors when include is not string with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when include is not string with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "edc8aff32463aba8d562c4ada2bd548259903b780e69c38a321e9efe4189d798"
+        },
+        {
+          "bytes": 644,
+          "name": "generates errors when include is not string with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/generates errors when include is not string with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "fcab3db279e2276749211ab8e597fcb9d492209602aef1a45e832ff75572558f"
+        },
+        {
+          "bytes": 268,
+          "name": "handles empty types array with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles empty types array with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "55d758c22939f43b5a6254affdeb2cab2c8eb0c2c748c2d49b707343fef2ecee"
+        },
+        {
+          "bytes": 268,
+          "name": "handles empty types array with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles empty types array with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "55d758c22939f43b5a6254affdeb2cab2c8eb0c2c748c2d49b707343fef2ecee"
+        },
+        {
+          "bytes": 308,
+          "name": "handles escaped characters in strings correctly jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/handles escaped characters in strings correctly jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "2fd19cdc6739b5bad56237e43fc75cf0dcf00db9181bc04986c065aecfd04fd5"
+        },
+        {
+          "bytes": 216,
+          "name": "ignore dotted files and folders with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/ignore dotted files and folders with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4a5629685b3fae59c2b83829f6baed385071052195744c305676411af5086d6b"
+        },
+        {
+          "bytes": 216,
+          "name": "ignore dotted files and folders with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/ignore dotted files and folders with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4a5629685b3fae59c2b83829f6baed385071052195744c305676411af5086d6b"
+        },
+        {
+          "bytes": 248,
+          "name": "implicitly exclude common package folders with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/implicitly exclude common package folders with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "7f52bdd7647ad66ec1d7497554e319d54ff593aa163cc34f147dd30d5ca26eb3"
+        },
+        {
+          "bytes": 248,
+          "name": "implicitly exclude common package folders with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/implicitly exclude common package folders with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "7f52bdd7647ad66ec1d7497554e319d54ff593aa163cc34f147dd30d5ca26eb3"
+        },
+        {
+          "bytes": 2756,
+          "name": "issue 1267 scenario - extended files not picked up with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/issue 1267 scenario - extended files not picked up with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "c2e2af2192482dd21629a041c7af29e4cf14bf38283099a11c7f399decf330a9"
+        },
+        {
+          "bytes": 2756,
+          "name": "issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/issue 1267 scenario - extended files not picked up with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "c2e2af2192482dd21629a041c7af29e4cf14bf38283099a11c7f399decf330a9"
+        },
+        {
+          "bytes": 311,
+          "name": "keeps string content untouched jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/keeps string content untouched jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "5e8314ae9f9d81aab9a6400b4cc8b04abb49a12e55d1aee9303ad8f8f1939516"
+        },
+        {
+          "bytes": 505,
+          "name": "null overrides in extended tsconfig - array fields with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - array fields with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "cf063229c7cbfc1bc2d3e058ea5cf9096ec753535aa53e58653d73d1c7e10164"
+        },
+        {
+          "bytes": 505,
+          "name": "null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - array fields with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "cf063229c7cbfc1bc2d3e058ea5cf9096ec753535aa53e58653d73d1c7e10164"
+        },
+        {
+          "bytes": 641,
+          "name": "null overrides in extended tsconfig - mixed field types with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "feede789d715cd0432f4f024bc6ecd8a37a673001d1c6ea86bda4c62ba47597d"
+        },
+        {
+          "bytes": 641,
+          "name": "null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - mixed field types with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "feede789d715cd0432f4f024bc6ecd8a37a673001d1c6ea86bda4c62ba47597d"
+        },
+        {
+          "bytes": 457,
+          "name": "null overrides in extended tsconfig - string fields with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - string fields with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "0fa2d859506818f22c0ab1359433b07436ffcf12a94d7f4a11c07ebc4bf78a81"
+        },
+        {
+          "bytes": 457,
+          "name": "null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in extended tsconfig - string fields with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "0fa2d859506818f22c0ab1359433b07436ffcf12a94d7f4a11c07ebc4bf78a81"
+        },
+        {
+          "bytes": 642,
+          "name": "null overrides in middle level of extends chain with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in middle level of extends chain with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "45a524bd87e689910dde85584ecf3a4063f303725a75139039f9328d4b23d57c"
+        },
+        {
+          "bytes": 642,
+          "name": "null overrides in middle level of extends chain with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides in middle level of extends chain with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "45a524bd87e689910dde85584ecf3a4063f303725a75139039f9328d4b23d57c"
+        },
+        {
+          "bytes": 639,
+          "name": "null overrides with multiple extends levels with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides with multiple extends levels with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "2bdfe6414fce65d430fdcf61a0f4e171ff39cce15bdc2055d8168d40c7ac5150"
+        },
+        {
+          "bytes": 639,
+          "name": "null overrides with multiple extends levels with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/null overrides with multiple extends levels with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "2bdfe6414fce65d430fdcf61a0f4e171ff39cce15bdc2055d8168d40c7ac5150"
+        },
+        {
+          "bytes": 1134,
+          "name": "parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "b95df6961bd175f7dc70bd015940b4bea4b535f50c3fc2c96a2d5191977a6e96"
+        },
+        {
+          "bytes": 1134,
+          "name": "parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with compilerOptions, files, include, and exclude with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "b95df6961bd175f7dc70bd015940b4bea4b535f50c3fc2c96a2d5191977a6e96"
+        },
+        {
+          "bytes": 854,
+          "name": "parses tsconfig with extends and configDir with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends and configDir with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "22a4bb145afe315d4763ab504cb4d92a7e0fbebdc69551b519ae7c4ae2474b12"
+        },
+        {
+          "bytes": 854,
+          "name": "parses tsconfig with extends and configDir with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends and configDir with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "22a4bb145afe315d4763ab504cb4d92a7e0fbebdc69551b519ae7c4ae2474b12"
+        },
+        {
+          "bytes": 811,
+          "name": "parses tsconfig with extends, files, include and other options with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends, files, include and other options with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "079e801ec8cce078f7a916fe9c73c824a92e19ebb6dbab17fe45606478ed24f3"
+        },
+        {
+          "bytes": 811,
+          "name": "parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/parses tsconfig with extends, files, include and other options with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "079e801ec8cce078f7a916fe9c73c824a92e19ebb6dbab17fe45606478ed24f3"
+        },
+        {
+          "bytes": 243,
+          "name": "reports error for an unknown option with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports error for an unknown option with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "f1a9fabdfd01982b1c6006392432adc7ad974573c9c595f81e578bed97371495"
+        },
+        {
+          "bytes": 359,
+          "name": "reports error for an unknown option with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports error for an unknown option with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "90bef9ad21e4a522f7242d753461b5b16c7225e61168bf542744beec8efd4b6b"
+        },
+        {
+          "bytes": 1669,
+          "name": "reports errors for incorrectly cased option names with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for incorrectly cased option names with json api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "59e34739fa00663807d1a2a46dc8cc43f3a51cfb119281d75fbee23c555c0f46"
+        },
+        {
+          "bytes": 3050,
+          "name": "reports errors for incorrectly cased option names with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for incorrectly cased option names with jsonSourceFile api.js",
+          "sections": [
+            "CompilerOptions::",
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "TypeAcquisition::",
+            "configFileName::"
+          ],
+          "sha256": "4e17c1b2c4323d515bac74d8b72bb727e827864c92f91c89335ac574a3b97c64"
+        },
+        {
+          "bytes": 687,
+          "name": "reports errors for wrong type option and invalid enum value with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for wrong type option and invalid enum value with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4eb66cee0b34f9a97f7fe903629ecc11a5926be4ea202ba59a040649850bd679"
+        },
+        {
+          "bytes": 1166,
+          "name": "reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports errors for wrong type option and invalid enum value with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "e7b9dab104da20f79395e3229d35a4acb718ed2804e461e7ec83041df47fd00b"
+        },
+        {
+          "bytes": 259,
+          "name": "reports spelling suggestion for an unknown option with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports spelling suggestion for an unknown option with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "4c07d5c2153623487be4bea026d881f918d84074fcfde1eca100b59e257f0d04"
+        },
+        {
+          "bytes": 368,
+          "name": "reports spelling suggestion for an unknown option with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/reports spelling suggestion for an unknown option with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "35c5cab61ede2f64b5c4403bba826397ef08e877b925c3b1c679dfa7473a312c"
+        },
+        {
+          "bytes": 461,
+          "name": "returns config object without comments jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns config object without comments jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "db484802e980e03a258c235c45bbb144d5099886eba8c88b6182c1af9002f6d0"
+        },
+        {
+          "bytes": 85,
+          "name": "returns empty config for file with comments only jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config for file with comments only jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "efc97d52f35736dead2446bf6b22381c03bb08e00bf033cc2161a44c2b0cfe85"
+        },
+        {
+          "bytes": 64,
+          "name": "returns empty config for file with only whitespaces jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config for file with only whitespaces jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "f7f2877c322712113b04751645bacd0bf1191f32919764886e00cb1aeb379adc"
+        },
+        {
+          "bytes": 33,
+          "name": "returns empty config when config is empty object jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns empty config when config is empty object jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "1dc790526d904070e9cd9a7d4ea662da5bb731fce605b8e3ea8b86e42535a82b"
+        },
+        {
+          "bytes": 470,
+          "name": "returns error when tsconfig have excludes with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns error when tsconfig have excludes with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "d98b0cb2e977584f5b10280256d2d20ae51945c1057915b484024a69348bc0bf"
+        },
+        {
+          "bytes": 618,
+          "name": "returns error when tsconfig have excludes with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns error when tsconfig have excludes with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "d04bbfbe3489d41f3bad1873588bd921f583b00f59bf90df310484315b20bbba"
+        },
+        {
+          "bytes": 379,
+          "name": "returns object when users correctly specify library jsonParse.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/returns object when users correctly specify library jsonParse.js",
+          "sections": [
+            "Errors::"
+          ],
+          "sha256": "caa5d8d1affd5e5e14900a380c07ce54670e51e604640f352fcf7541367c88d5"
+        },
+        {
+          "bytes": 558,
+          "name": "with outDir from base tsconfig with json api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/with outDir from base tsconfig with json api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "7ca8e095b453083ded64806330443c660017a22a7cfcba5dac971a4dc582d550"
+        },
+        {
+          "bytes": 558,
+          "name": "with outDir from base tsconfig with jsonSourceFile api.js",
+          "output": "tsc/testdata/baselines/reference/config/tsconfigParsing/with outDir from base tsconfig with jsonSourceFile api.js",
+          "sections": [
+            "Errors::",
+            "FileNames::",
+            "Fs::",
+            "configFileName::"
+          ],
+          "sha256": "7ca8e095b453083ded64806330443c660017a22a7cfcba5dac971a4dc582d550"
+        }
+      ],
+      "subdirectory": "tsc/testdata/baselines/reference/config/tsconfigParsing"
+    }
+  },
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "total_outputs": 309,
+  "version": 1,
+  "written_subfolders": [
+    "config/tsconfigParsing",
+    "tsoptions/commandLineParsing"
+  ]
+}

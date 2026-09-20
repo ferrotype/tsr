@@ -17,4 +17,8 @@ class Discovery(unittest.TestCase):
             for case in cases(expected):
                 self.assertIn(case.id(), actual, path.name)
         self.assertTrue(any(name.startswith('test_s10.') for name in actual))
+        # Phase 1 preparation suites must be in the real gate, not only in the
+        # focused `-p 'test_phase1*.py'` command used while iterating.
+        self.assertTrue(any(name.startswith('test_phase1.') for name in actual),
+                        'the Phase 1 suite is not discovered by the quality gate')
         self.assertFalse(any('_FailedTest' in name for name in actual))
