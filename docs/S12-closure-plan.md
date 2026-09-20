@@ -1,33 +1,36 @@
 # S12 closure sequence
 
-Status: preparation on merged main `8729daff`; ADR 0020 remains Proposed.
-No threshold or evidence rule has been changed and no new measurement has
-started. The owner decision packet is [ADR 0020](adr/0020-phase-0-gate-decision.md)
-and the [full acceptance matrix](S12-acceptance.md).
+Status: closure work on merged main `e4f4dca`; ADR 0020 was accepted by the owner
+on 2026-09-20. The original packet from `d727434` is included in this branch.
+The three approved prototype thresholds are updated; evidence rules are
+unchanged and no new measurement has started. The approved decision is
+[ADR 0020](adr/0020-phase-0-gate-decision.md) and the
+[full acceptance matrix](S12-acceptance.md).
 
-## 1. Settle the policy before capturing
+## 1. Approved policy — complete
 
-Resolve the three E7/E8 performance misses explicitly. Either retain the
-existing 25% / 2 times / 10% limits and implement improvements, or approve the
-proposed 30% / 1.5 times / 40% prototype limits. Review the independent proposed
-Phase 7 budgets. Update PLAN, the experiment ledger and the decision text
-together if an amendment is approved. Do not accept the final go decision yet.
+The owner approved the 30% / 1.5 times / 40% prototype limits and the independent
+Phase 7 budgets. PLAN, the experiment ledger, ADR and its index agree. This
+completes the owner-decision item S12-3. S12-1 and S12-2 still require current
+passing evidence.
 
 The experiment ledger participates in measurement fingerprints. Changing it
 after a capture would require another refresh; settle it first. Freeze all
-source/configuration changes, including any planned crate rename, before the
-final acceptance batch. Preserve every existing capture in its original form.
+source/configuration changes before the final acceptance batch. The crate
+rename and publication preparation have now landed. Preserve every existing
+capture in its original form.
 
 ## 2. Audit reuse and prepare the final revision
 
-The S11 CI snapshot currently proves E1, E3, E4, S01–S06 and S11 in its recorded
-runner context. Current CI E2 proves only the frozen denominator. It is not a
+The S11 CI snapshot proved E1, E3, E4, S01–S06 and S11 in its recorded source and
+runner context. Normal CI E2 proves only the frozen denominator. It is not a
 replacement for the full E2 checker capture.
 
 The existing S08 measurement build records differ from main in Cargo inputs,
 AST storage and parser code; checkerbench also differs in the program-loading
 and corpus executor adapters. Existing S10 captures predate wasm error-handling,
-Node adapter and capture-scope changes. These are not revision-name-only changes.
+Node adapter and capture-scope changes. The rename and package-manifest edits
+also invalidate their declared inputs. These are not revision-name-only changes.
 Keep those records historical; do not rewrite their fingerprints.
 
 Before a long run, verify the inventory, native request ordering, source and
@@ -79,9 +82,9 @@ the final report's context. Recompute status and inspect every S02–S10 require
 item and E1–E8 criterion, not merely the aggregate experiment count.
 
 If a measured gate still fails, report its exact value and stop advancement;
-do not turn an architectural go preference into a passing observation. Once
-the owner accepts the complete decision and every non-ADR requirement passes,
-set ADR 0020 to Accepted, record the final immutable evidence identities, then
+do not turn the accepted conditional go decision into a passing observation.
+Once every non-ADR requirement passes, retain ADR 0020's approval date, record
+the final immutable evidence identities, then
 run `cargo xtask validate`, `cargo xtask status --record`,
 `cargo xtask check S12` and `cargo xtask status --check-committed`.
 

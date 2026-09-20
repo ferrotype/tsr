@@ -1,6 +1,6 @@
 # Full compiler acceptance and Phase 7 budgets
 
-Status: proposal for owner review with ADR 0020; not yet approved. This matrix
+Status: accepted by the owner with ADR 0020 on 2026-09-20. This matrix
 turns PLAN sections 5 and 9 into named acceptance obligations. It does not claim
 that Phase 0 executed full checking, emit or server workloads.
 
@@ -49,26 +49,28 @@ Rust disposal and result ownership must be declared. Do not compare wasm linear
 memory directly with a native RSS or type-census denominator. The full WASM
 process-memory comparison runs both runtimes under the same pinned Node engine.
 
-## Proposed numerical budgets
+## Approved numerical budgets
 
 The native goals below are already in PLAN and remain unchanged. The portable
-and embedding budgets are proposed release targets, not fitted conclusions from
-the Phase 0 parser data. The owner must approve them before accepting ADR 0020.
+and embedding budgets are approved release targets, not fitted conclusions from
+the Phase 0 parser data. They do not assert that the current implementation meets
+them.
 
 | Deliverable and named workload | Budget | Authority / qualification |
 | --- | --- | --- |
 | Native full checking and checking+emit, each of the five scenarios at 2/4/8 checkers | Rust elapsed / Go elapsed ≤1.0; Rust peak RSS / Go peak RSS ≤0.70 | Existing PLAN cut-over goals; Phase 0's relaxed parse/bind gates do not replace them |
-| Full WASM compiler artifact | Rust bytes / equivalent full Go `GOOS=js` artifact bytes ≤1.0 | Proposed; compare shipped uncompressed modules, declare glue separately, exclude corpus adapters from both |
-| Full WASM checking and checking+emit, each scenario at one checker in Node | Rust elapsed / Go `GOOS=js` elapsed ≤1.0 | Proposed; loaded inputs, equivalent work, identical engine and declared stack configuration |
-| Full WASM memory on those operations | Peak process RSS and retained process RSS each ≤1.0 times the corresponding Go-in-Node value | Proposed; same process/engine boundary and live results; report linear memory and allocator counters separately |
-| External Rust consumer full checking and checking+emit, each scenario at one checker | Elapsed / equivalent one-checker Go native elapsed ≤1.0; peak RSS / Go ≤0.70 | Proposed application of native goals to the public API; no CLI/IPC cost credited to the consumer |
-| External Rust consumer retained checker/results on those operations | Rust retained bytes / Go retained bytes ≤1.0 | Proposed; positive comparable baseline and the same declared live roots; stricter than the historical checker-slice retained ratio 1.413 |
-| Linked standalone Rust consumer artifact | Bytes / equivalent stripped Go benchmark-consumer executable bytes ≤1.0 | Proposed; executable plus its required runtime/library closure, not a static archive containing unused code |
+| Full WASM compiler artifact | Rust bytes / equivalent full Go `GOOS=js` artifact bytes ≤1.0 | ADR 0020; compare shipped uncompressed modules, declare glue separately, exclude corpus adapters from both |
+| Full WASM checking and checking+emit, each scenario at one checker in Node | Rust elapsed / Go `GOOS=js` elapsed ≤1.0 | ADR 0020; loaded inputs, equivalent work, identical engine and declared stack configuration |
+| Full WASM memory on those operations | Peak process RSS and retained process RSS each ≤1.0 times the corresponding Go-in-Node value | ADR 0020; same process/engine boundary and live results; report linear memory and allocator counters separately |
+| External Rust consumer full checking and checking+emit, each scenario at one checker | Elapsed / equivalent one-checker Go native elapsed ≤1.0; peak RSS / Go ≤0.70 | ADR 0020 applies native goals to the public API; no CLI/IPC cost credited to the consumer |
+| External Rust consumer retained checker/results on those operations | Rust retained bytes / Go retained bytes ≤1.0 | ADR 0020; positive comparable baseline and the same declared live roots; stricter than the historical checker-slice retained ratio 1.413 |
+| Linked standalone Rust consumer artifact | Bytes / equivalent stripped Go benchmark-consumer executable bytes ≤1.0 | ADR 0020; executable plus its required runtime/library closure, not a static archive containing unused code |
 | Public session teardown across repeated operation cycles | Zero live-owner and tracked-storage delta after final roots drop | Existing ownership requirement; process RSS is reported and need not immediately fall to baseline |
 
-The E7/E8 parser-only budgets remain separate and will use whatever explicit
-Phase 0 limits the owner adopts. They do not substitute for any full-compiler
-row above. Cold startup is reported alongside the operation budgets; no unmeasured
+The E7/E8 parser-only budgets remain separate: size ≤30% of Go, throughput
+≥1.5 times Go and Node parse latency ≤40% of the socket path. They do not
+substitute for any full-compiler row above. Cold startup is reported alongside
+the operation budgets; no unmeasured
 startup claim follows from warm parser throughput.
 
 All required release budgets and correctness checks must hold for four

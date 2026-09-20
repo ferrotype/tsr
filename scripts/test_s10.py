@@ -152,6 +152,31 @@ class S10Evidence(unittest.TestCase):
         with self.assertRaises(ValueError):
             measure.summarize(changed, 'parser', 7)
 
+    def test_timing_stability_uses_approved_parser_and_node_limits(self):
+        ledger = tomllib.loads((corpus.ROOT / 'status/experiments.toml').read_text())
+        for kind, experiment, criterion, rust_ns, approved, original in [
+                ('parser', 'E7', 'parse_throughput', 600, 1.5, 2.0),
+                ('node', 'E8', 'node_parse_latency', 350, 0.40, 0.10)]:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / 'status').mkdir()
+                path = root / 'status/experiments.toml'
+                configured = next(c['threshold'] for c in ledger[experiment]['criteria']
+                                  if c['id'] == criterion)
+                self.assertEqual(configured, approved)
+                raw = self.timing()
+                for row in raw['samples']:
+                    row['elapsed_ns']['rust'] = rust_ns
+                    if kind == 'node':
+                        row['order'].reverse()
+                with patch.object(measure, 'ROOT', root):
+                    for limit, passes in [(configured, True), (original, False)]:
+                        path.write_text(f'[[{experiment}.criteria]]\nid = "{criterion}"\nthreshold = {limit}\n')
+                        result = measure.summarize(raw, kind, 7)
+                        self.assertEqual(result['stable'], passes)
+                        expected = 1 / limit if kind == 'parser' else limit
+                        self.assertEqual(result['bootstrap']['threshold'], expected)
+
     def test_stale_source_rejected_before_raw_data_or_process_access(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
