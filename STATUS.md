@@ -254,7 +254,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | checkerbench | stale: source, pin, command or inputs changed | [result](status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json) |
 | checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/e19d93b1b2e77cd0a2bda635f9e50aecd53ca78e5e4a4c27d45adc3e2ed2dc70.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/2d09f23327466d969f3802fe696309740929a8d87f3cb4d2186d88f87cb1ba70.json) |
-| deny | stale: source, pin, command or inputs changed | [result](status/evidence/16dfddf0b840ad0d1a124a290ff5598d6009f125cf62d7ae1ad3b6a5c7fc753c.json) |
+| deny | current | [result](status/evidence/252fadf205f09448300c7aadc8187d41934e19bc7d9ba1bc618b302dfcb77140.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/79c4514b84217208c97c6f02053dd215f7c941dd1a139d25c362bdf4334b2ea2.json) |
 | e2 | stale: source, pin, command or inputs changed | [result](status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json) |
 | e3 | stale: source, pin, command or inputs changed | [result](status/evidence/e360fcedd982cc66cf6b3e9bbd5eefc299699b4fe1cc50d064741d4f1ead151d.json) |
@@ -309,13 +309,13 @@ Exit checks:
 - [ ] `run.workspace.build == true` (unknown metric)
 - [ ] `run.fmt.clean == true` (unknown metric)
 - [ ] `run.clippy.clean == true` (unknown metric)
-- [ ] `run.deny.clean == true` (unknown metric)
+- [x] `run.deny.clean == true`
 - [ ] `run.selftest.pass == true` (unknown metric)
 
 Items:
 
 - [ ] S02-1 Pinned stable toolchain, workspace lint configuration and release profile per ADR 0016
-- [ ] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
+- [x] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
 - [ ] S02-3 Tracker self-tests (xtask and scripts) registered as a producer
 - [-] S02-4 Status workflow on macOS and Linux: validate provenance, check archived views including the worklist, enforce live producer metrics and S01, build with the minimum Rust version, publish views and evidence as artifacts (verified on GitHub, not in the ledger) [optional]
 
