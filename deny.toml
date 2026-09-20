@@ -40,6 +40,10 @@ exceptions = [{ name = "xxhash-rust", version = "=0.8.18", allow = ["BSL-1.0"] }
 [bans]
 multiple-versions = "deny"
 wildcards = "deny"
+# Private tools and repository-only dev dependencies intentionally omit versions.
+# Cargo drops versionless path dev dependencies from published manifests; keep
+# registry wildcards and versionless public runtime/build dependencies denied.
+allow-wildcard-paths = true
 highlight = "all"
 allow = []
 deny = []
