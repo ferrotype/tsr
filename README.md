@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/tsr-icon.png" alt="tsr logo" width="320">
+</p>
+
 # ts-rust
 
 The Rust rewrite of the TypeScript 7 native compiler and language server (the Go module under `tsc/` in microsoft/TypeScript, codename Corsa). Upstream is consumed as a pinned dependency; this repository is the workspace.
