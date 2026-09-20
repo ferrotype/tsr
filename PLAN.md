@@ -351,6 +351,11 @@ and other sprint freshness checks remain unchanged.
 
 ### Phase 1: foundations
 
+The detailed [Phase 1 implementation plan](docs/PHASE1-implementation-plan.md)
+starts from the accepted Phase 0 evidence, identifies the remaining foundation
+contracts and separates the 309 config/options outputs from the existing
+program-subset capture.
+
 - **Scope.** Complete the foundational slices: `core`, `collections`, `tspath`, `stringutil`, `jsstring`, `jsnum`, `json`, `locale`, `glob`, `semver`, `packagejson`, the `vfs` family including `vfstest`, diagnostics, libs, the AST's owner/lazy/bundle mechanisms, scanner, parser, file-owned binder, `astnav`, `evaluator`, module resolution and options. Extend the compiler runner through complete parse/bind and syntactic `.errors.txt` coverage. Build test-host framing, initialization, server-owned option completion, filesystem callbacks and plugin byte streams in a transport endpoint that does not depend on the language service. Complete generator drift and untouched-client equality checks.
 - **Gate.** All 12,721 cases parse identically; binder symbol-table/flow-graph dumps match; the 309 config/options baselines pass. Dedicated transport tests verify case sensitivity, symlink resolution, plugin byte streams, initialization, cancellation and progress while reverse callbacks are outstanding, using representative fourslash fixtures. The synchronous filesystem bridge with blocked workers is a Phase 5 gate (ADR 0019). They assert transport/filesystem contracts only; semantic fourslash passes are a Phase 5 gate.
 

@@ -1,5 +1,10 @@
 # Phase 0 implementation plan
 
+Phase 1's proposed work and checkpoint sequence are in
+[the foundation implementation plan](../docs/PHASE1-implementation-plan.md).
+Its first checkpoint freezes the operation inventory and registers the new
+sprint checks; the existing S01–S12 milestones are retained.
+
 Phase 0 is the spike in [PLAN.md](../PLAN.md), section 9: the three contracts, the AST, scanner, parser and encoder, the dependency slices, and the eight experiments E1 to E8 with explicit thresholds. This directory holds it as sprint files that `cargo xtask check <id>` evaluates against current evidence under the [tracking contract](../docs/TRACKING.md). A sprint is done only when every exit check and every required item passes; a check that names a metric no producer emits yet cannot pass, so an unimplemented sprint stays open by construction.
 
 S12 records the **2026-09-20 Phase 0 closure** using the recent 2026-09-19
