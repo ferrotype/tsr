@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 1,
+    "covered": 12,
     "equivalent_rust": 0,
-    "implemented_untested": 3449,
+    "implemented_untested": 3444,
     "later_phase": 18,
-    "missing": 1327
+    "missing": 1321
   },
   "dispositions": [
     "covered",
@@ -145229,9 +145229,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-go-sort",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-go-sort"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -145240,7 +145242,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:DeduplicateSorted",
@@ -146215,9 +146217,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-go-sort",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-go-sort"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -146226,7 +146230,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/core.go",
       "id": "tsc/internal/core/core.go:InsertSorted",
@@ -147430,9 +147434,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-pattern",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-pattern"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -147441,7 +147447,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/pattern.go",
       "id": "tsc/internal/core/pattern.go:FindBestPatternMatch",
@@ -147457,9 +147463,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-pattern",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-pattern"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -147468,7 +147476,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/pattern.go",
       "id": "tsc/internal/core/pattern.go:Pattern.IsValid",
@@ -147484,9 +147492,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-pattern",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-pattern"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -147495,7 +147505,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/pattern.go",
       "id": "tsc/internal/core/pattern.go:Pattern.MatchedText",
@@ -147511,9 +147521,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-pattern",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-pattern"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -147522,7 +147534,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/pattern.go",
       "id": "tsc/internal/core/pattern.go:Pattern.Matches",
@@ -147538,9 +147550,11 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): witness/s07-helper-tests-pattern",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "witness/s07-helper-tests-pattern"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -147549,7 +147563,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/pattern.go",
       "id": "tsc/internal/core/pattern.go:TryParsePattern",
@@ -152649,14 +152663,14 @@
     },
     {
       "actual_home": "no dedicated Rust home; order-sensitive readers live in their consumers",
-      "basis": "unmapped and absent from the actual home for this package (no dedicated Rust home; order-sensitive readers live in their consumers); witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): pilot/json/marshal-ordered",
       "basis_kind": "rule",
       "cases": [
         "pilot/json/marshal-ordered"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/json",
       "go_source": "tsc/internal/json/json.go",
       "id": "tsc/internal/json/json.go:Marshal",
@@ -152924,14 +152938,14 @@
     },
     {
       "actual_home": "no Rust home at this pin",
-      "basis": "unmapped; `parse` matches an unrelated generic Rust helper, which is not evidence; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): pilot/locale/select-ja",
       "basis_kind": "rule",
       "cases": [
         "pilot/locale/select-ja"
       ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/locale",
       "go_source": "tsc/internal/locale/locale.go",
       "id": "tsc/internal/locale/locale.go:Parse",
@@ -205457,7 +205471,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): pilot/commandline/parse-build-verbose",
       "basis_kind": "rule",
       "cases": [
         "pilot/commandline/parse-build-verbose"
@@ -205491,7 +205505,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
@@ -205509,7 +205523,7 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name; witnessed by 1 prepared case(s)",
+      "basis": "witnessed by 1 exact link(s): pilot/commandline/parse-composite-false",
       "basis_kind": "rule",
       "cases": [
         "pilot/commandline/parse-composite-false"
@@ -205543,7 +205557,7 @@
         "internal/vfs/vfstest"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/tsoptions",
       "go_source": "tsc/internal/tsoptions/commandlineparser.go",
       "id": "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
@@ -220697,7 +220711,7 @@
     },
     {
       "actual_home": "tsr_tsoptions::glob (configuration matching dialect)",
-      "basis": "witnessed by 2 exact case link(s): pilot/matching/include-star-ts, pilot/matching/recursive-exclude",
+      "basis": "witnessed by 2 exact link(s): pilot/matching/include-star-ts, pilot/matching/recursive-exclude",
       "basis_kind": "rule",
       "cases": [
         "pilot/matching/include-star-ts",

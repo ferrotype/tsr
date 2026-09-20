@@ -108,9 +108,11 @@ def inventory_check() -> dict:
             "have no verified invocation mapping"
         )
     for group in blocked:
-        outstanding.append(
-            f"group {group} is blocked on {index['groups'][group]['authority'].get('blocker')}"
-        )
+        authority = index["groups"][group]["authority"]
+        detail = f"group {group} is blocked on {authority.get('blocker')}"
+        if authority.get("owner_decision"):
+            detail += " (the authority question is settled; the renderer is approved but unverified)"
+        outstanding.append(detail)
     # Operations whose source file carries file-level producer metrics but which
     # have no operation-level witness. F0 requires exact case/artifact links for
     # anything it calls `covered`, so connecting the existing S04-S11 evidence to

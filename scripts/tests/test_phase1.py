@@ -961,5 +961,75 @@ class ProbeRegistryTests(unittest.TestCase):
             capture.build_rust("pilot")
 
 
+class WitnessTests(unittest.TestCase):
+    """An existing artifact only confers coverage when it actually runs Rust."""
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_committed_witnesses_validate(self):
+        self.assertEqual(scope.witness_problems(), [])
+
+    def test_only_rust_gated_witnesses_confer_coverage(self):
+        self.assertEqual(scope.COVERING_WITNESS_KINDS, ("rust_gated",))
+        linked = scope.cases_by_operation()
+        for witness in self.cases.get("witnesses", []):
+            if witness["kind"] == "rust_gated":
+                continue
+            for operation in witness["operations"]:
+                self.assertNotIn(
+                    witness["id"], linked.get(operation, []),
+                    f"{witness['kind']} witness {witness['id']} must not confer coverage",
+                )
+
+    def test_go_only_producers_are_recorded_as_native_authorities(self):
+        """s07_path_helpers and s07_semver run `go test` and never execute Rust."""
+        by_id = {w["id"]: w for w in self.cases.get("witnesses", [])}
+        for identity in ("witness/s07-path-observations", "witness/s07-semver-observations"):
+            self.assertIn(identity, by_id)
+            self.assertEqual(by_id[identity]["kind"], "native_authority", identity)
+
+    def test_a_rust_gated_witness_must_name_its_gate(self):
+        forged = json.loads(json.dumps(self.cases))
+        forged["witnesses"].append({
+            "id": "witness/forged", "kind": "rust_gated",
+            "artifact": "data/phase1/cases.json", "operations": [],
+            "witnesses": "claims coverage with no gate",
+        })
+        path = ROOT / "data/phase1/cases.json"
+        original = path.read_bytes()
+        try:
+            path.write_text(json.dumps(forged))
+            problems = scope.witness_problems()
+        finally:
+            path.write_bytes(original)
+        self.assertTrue(any("must name the producer command" in p for p in problems))
+
+    def test_a_witness_pointing_at_a_missing_artifact_is_rejected(self):
+        forged = json.loads(json.dumps(self.cases))
+        forged["witnesses"].append({
+            "id": "witness/absent", "kind": "native_authority",
+            "artifact": "data/phase1/does-not-exist.json", "operations": [],
+            "witnesses": "points nowhere",
+        })
+        path = ROOT / "data/phase1/cases.json"
+        original = path.read_bytes()
+        try:
+            path.write_text(json.dumps(forged))
+            problems = scope.witness_problems()
+        finally:
+            path.write_bytes(original)
+        self.assertTrue(any("does not exist" in p for p in problems))
+
+    def test_every_covered_operation_names_a_real_link(self):
+        linked = scope.cases_by_operation()
+        for row in self.scope["operations"]:
+            if row["disposition"] != "covered":
+                continue
+            self.assertTrue(row["cases"], row["id"])
+            self.assertEqual(sorted(row["cases"]), sorted(linked[row["id"]]), row["id"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -98,8 +98,20 @@ def authority(group: str) -> dict:
         }
     # matchFiles
     return {
+        # Still blocked, deliberately. The owner settled the authority question
+        # on 2026-09-20 by approving a carried test renderer, but approval is
+        # not an observation: the group stays blocked until native results
+        # rendered through that renderer are shown to reproduce all 142 frozen
+        # files. F2a owns that work and F3a reuses the seam.
         "status": "blocked",
-        "blocker": "phase1-matchfiles-baseline-authority",
+        "blocker": "phase1-matchfiles-renderer-not-yet-verified",
+        "owner_decision": (
+            "2026-09-20: keep all 309 byte-for-byte baselines and carry a test-only "
+            "implementation of the matchFiles envelope, with pinned Go matching and "
+            "configuration behavior retained as the semantic authority. Implementation and "
+            "native-byte verification are owned by F2a; expected result sections are never "
+            "copied from the baseline."
+        ),
         "native_semantic_authority": (
             f"{VFSMATCH_TEST}::TestReadDirectory and TestReadDirectoryMatchesTypeScriptBaselines "
             "assert ordered matchFiles() results"

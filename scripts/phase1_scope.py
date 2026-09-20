@@ -264,6 +264,14 @@ def classify(
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
+    # An exact link is the strongest evidence there is, and it does not depend on
+    # whether the ledger happens to map the symbol: a rust_gated witness runs the
+    # Rust, so the operation is covered either way.
+    if coverage:
+        return (
+            "covered",
+            f"witnessed by {len(coverage)} exact link(s): " + ", ".join(coverage[:3]),
+        )
     if mapped:
         if coverage:
             return (
@@ -320,8 +328,23 @@ def package_dependencies() -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in dependencies.items()}
 
 
+# A committed artifact only witnesses Rust coverage when a producer actually
+# runs Rust against it. `data/s07/path-observations.json` and
+# `semver-observations.json` look like witnesses and are not: their producers
+# (`s07_path_helpers.py`, `s07_semver.py`) invoke `go test` only and never
+# execute Rust, so they are native authorities. Counting them would mark ~24
+# operations covered on the strength of a Go-only run.
+WITNESS_KINDS = ("rust_gated", "rust_ungated", "native_authority")
+COVERING_WITNESS_KINDS = ("rust_gated",)
+
+
 def cases_by_operation() -> dict[str, list[str]]:
-    """Invert the committed case manifest so each operation names its cases."""
+    """Invert the committed case manifest so each operation names its cases.
+
+    Prepared cases and `rust_gated` witnesses both count as exact coverage
+    links. A native authority does not: it supplies an expected value, not
+    evidence that Rust reproduces it.
+    """
     path = ROOT / "data/phase1/cases.json"
     if not path.is_file():
         return {}
@@ -330,7 +353,39 @@ def cases_by_operation() -> dict[str, list[str]]:
     for case in document.get("cases", []):
         for operation in case.get("operations", []):
             inverted.setdefault(operation, []).append(case["id"])
+    for witness in document.get("witnesses", []):
+        if witness.get("kind") not in COVERING_WITNESS_KINDS:
+            continue
+        for operation in witness.get("operations", []):
+            inverted.setdefault(operation, []).append(witness["id"])
     return {k: sorted(v) for k, v in inverted.items()}
+
+
+def witness_problems() -> list[str]:
+    """Validate the committed witness records against the repository."""
+    path = ROOT / "data/phase1/cases.json"
+    if not path.is_file():
+        return []
+    document = json.loads(path.read_text())
+    problems: list[str] = []
+    seen: set[str] = set()
+    for witness in document.get("witnesses", []):
+        identity = witness.get("id", "<unnamed>")
+        if identity in seen:
+            problems.append(f"duplicate witness id {identity}")
+        seen.add(identity)
+        if witness.get("kind") not in WITNESS_KINDS:
+            problems.append(f"{identity}: unknown witness kind {witness.get('kind')!r}")
+        artifact = witness.get("artifact", "")
+        if not artifact or not (ROOT / artifact).exists():
+            problems.append(f"{identity}: artifact {artifact!r} does not exist")
+        if witness.get("kind") == "rust_gated" and not witness.get("rust_gate"):
+            problems.append(
+                f"{identity}: a rust_gated witness must name the producer command that runs Rust"
+            )
+        if not witness.get("witnesses"):
+            problems.append(f"{identity}: no description of what it actually witnesses")
+    return problems
 
 
 def build() -> dict:
