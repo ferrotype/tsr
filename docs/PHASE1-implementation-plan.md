@@ -4,6 +4,42 @@ Status: proposed for review; implementation has not started.
 Baseline: merged main `03a55ac`, after the S12 closure, 2026-09-20.
 Upstream authority: `1f70213d4922b434345f639b441681e470c7cfc1`.
 
+## Execution order
+
+**`a` = prepare tests and checks. `b` = implement production code.**
+F0 is preparation only, so it has no `b` step. The detailed F0–F5 sections below
+supply the scope for this list.
+
+### Phase A — prepare the tests and checks
+
+1. **F0 — Inventory and setup:** identify missing behavior, freeze case identities,
+   and connect the existing test tools.
+2. **F1a — Foundation tests:** prepare checks for core/collections, strings/numbers,
+   JSON, locale, diagnostics and library access.
+3. **F2a — Filesystem tests:** prepare path, filesystem/cache and file-matching
+   comparisons, including the 142 matching baselines.
+4. **F3a — Config/resolution tests:** prepare the full 309 config/options baseline
+   comparisons and package/module-resolution probes.
+5. **F4a — Syntax/binder tests:** prepare the missing AST, parser/binder,
+   syntax-only diagnostics, navigation and evaluator checks.
+6. **F5a — Integration checks:** prepare generator/transport regression checks,
+   the final acceptance checklist and a report of what still fails or is missing.
+
+**Review the test coverage and gap report before starting production changes.**
+Tests for missing behavior remain visibly unmet at this point.
+
+### Phase B — implement production code
+
+7. **F1b — Foundation implementation:** implement the missing leaf behavior and
+   localization support against F1a's checks.
+8. **F2b — Filesystem implementation:** implement missing filesystem adapters,
+   cache behavior, paths and matching against F2a's checks.
+9. **F3b — Config/resolution implementation:** complete command-line/config parsing,
+   package handling and module resolution against F3a's checks.
+10. **F4b — Syntax/binder implementation:** fix the production gaps exposed by F4a.
+11. **F5b — Integration and closure:** fix integration failures, run the required
+    correctness checks and close Phase 1.
+
 ## 1. Objective and starting point
 
 Complete the foundation contracts needed by the full checker, emit and program
@@ -125,13 +161,14 @@ effort estimate needs F0's distinction between missing code and missing coverage
 | AST/binder/navigation/evaluator tail | Uncertain until inventory | Much already works; an unmapped function is not evidence that its behavior is absent |
 | Generation and transport regression work | Mostly integration | Existing implementations and accepted contracts should be reused |
 
-Split delivery into two separately reviewable stages. F0–F5 below remain the
-functional checkpoints; each family's preparation belongs to Stage A and its
-production changes belong to Stage B.
+The execution list at the top is the delivery order. F0–F5 name the work areas;
+`a` and `b` distinguish preparation from implementation within each area.
 
-**Stage A — prepare tests and acceptance checks.** This writes test/tooling code,
-including Python orchestration, access-only Go adapters and Rust test drivers.
-It does not implement missing compiler/library behavior.
+### What belongs in an `a` step
+
+This writes test/tooling code, including Python orchestration, access-only Go
+adapters and Rust test drivers. It does not implement missing compiler/library
+behavior.
 
 - Inventory existing coverage and missing entry points; freeze native inputs,
   expected outputs and required case identities, including the 309 baselines.
@@ -147,16 +184,17 @@ It does not implement missing compiler/library behavior.
   the command that will demonstrate the fix. Reuse valid recorded observations
   and run only the native/test work needed for the missing coverage.
 
-Stage A PRs contain manifests, fixtures, adapters, harness tests and tracker
+Phase A PRs contain manifests, fixtures, adapters, harness tests and tracker
 wiring. Access needed only by tests stays test-only. They do not contain
 semantic fixes, production refactors, weakened expected results or ignored
 failures. New feature checks remain visibly pending/failing until implemented;
 the separate harness-health check must pass. Do not make the existing CI suite
 depend on an intentionally incomplete feature gate during preparation.
 
-**Stage B — implement production behavior against those checks.** This contains
-the actual Rust ports and fixes: command-line parsing, locale/localized
-diagnostics, missing JSON/collection operations, writable and cached filesystem
+### What belongs in a `b` step
+
+This contains the actual Rust ports and fixes: command-line parsing,
+locale/localized diagnostics, missing JSON/collection operations, writable and cached filesystem
 adapters, and whichever resolver/syntax utility gaps the tests establish.
 
 - Implement one coherent family in its production home; add no test-only
@@ -169,11 +207,13 @@ adapters, and whichever resolver/syntax utility gaps the tests establish.
 - Enable the completed family as a required check and record its passing
   evidence. Preparation alone never completes a production checkpoint.
 
-Use separate preparation and implementation PRs. A family can enter Stage B
-once its Stage A contract is reviewed and runnable; it need not wait for every
-test in all of Phase 1. This keeps the split useful without spending weeks
-building a speculative all-purpose harness before fixing any actual behavior.
-The first delivery is Stage A, with no production implementation changes.
+Use separate preparation and implementation PRs, in the execution order above.
+Phase A produces runnable comparisons and the gap report; Phase B implements
+against them. Missing APIs can remain explicitly `not_implemented` in Phase A,
+so preparation does not require writing the product. Additional boundary tests
+discovered during implementation belong with the corresponding Phase B fix.
+Keep preparation bounded to these contracts rather than building a general
+replacement framework. The first delivery is Phase A only.
 
 Checkpoints describe reviewable implementation batches, not calendar estimates.
 Each can take several focused PRs. Finish and review the behavior before
@@ -188,7 +228,6 @@ starting an expensive final capture.
 | F4 | Close syntax, AST, binder, navigation and evaluator gaps | F0; required F1–F3 operations | Exact complete parse/bind inventory, syntax-only diagnostics, utility and ownership counterexamples |
 | F5 | Confirm transport/generation integration and close Phase 1 | F1–F4 | Complete Phase 1 gate report and scoped regression checks, preserving S11 boundaries |
 
-F4's inventory and narrow fixes need not wait for unrelated locale/VFS work.
 Phase 2 work can start once the AST/binder/resolution/options contracts it uses
 are ready; locale and unrelated utility work should not serialize that critical
 path. That readiness is recorded per contract and does not mark Phase 1 done.
@@ -517,8 +556,7 @@ minimal reproducer and pinned Go output.
   pre-rename captures remain accepted, and new runs follow actual behavior and
   coverage changes. No benchmark refresh is scheduled by this plan.
 
-The first preparation PR should deliver F0 and the smallest command-line
-baseline adapter that records a genuinely missing Rust operation. It should
-make the next behavior directly reproducible without implementing it. Production
-PRs then follow the reviewed Stage A contracts through F1/F2/F3; test preparation
-for later families can continue separately.
+The first preparation PR delivers F0 and a small command-line baseline adapter
+that records a genuinely missing Rust operation. Continue through F1a–F5a and
+review the resulting coverage/gap report. Production PRs then follow F1b–F5b
+in the execution list above.
