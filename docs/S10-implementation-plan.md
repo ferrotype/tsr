@@ -3,10 +3,11 @@
 Policy update, 2026-09-20: [ADR 0020](adr/0020-phase-0-gate-decision.md)
 changes the parser-size, throughput and Node-latency limits to 0.30, 1.5 and
 0.40 respectively. This original implementation plan and its initial results
-retain the former limits as history. Current acceptance uses the ledger and
-requires fresh evidence on the final S12 revision.
+retain the former limits as history. The owner accepted these historical
+results for the dated [S12 closure](S12-closure-plan.md); normal current-source
+evidence checks remain unchanged.
 
-Status: interfaces and full correctness/ownership captures implemented; three
+Original status: interfaces and full correctness/ownership captures implemented; three
 performance gates remain unmet. See [S10-results.md](S10-results.md). Base:
 S09 `07156df`. Branch: `codex/s10-wasm-embedding`. The shared checkout is used
 directly. S09 was subsequently merged; the S10 PR targets `main`.

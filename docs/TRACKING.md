@@ -131,6 +131,15 @@ Sprint checks use `<metric> <op> <value>`, with numeric comparisons, boolean equ
 
 S01 checks the reviewed contracts, provenance, registered upstream pin, actual workspace build, oracle build and version smoke. Merely having inventory entries cannot complete it. S02 to S12 are the Phase 0 implementation plan; [sprints/README.md](../sprints/README.md) gives their order, the producers each registers and the conventions they follow. ADR acceptance is a reviewed human decision; changing an `Accepted` label is not a substitute for the required design note and review.
 
+**S12 historical milestone exception (owner-approved 2026-09-20).**
+[ADR 0020](adr/0020-phase-0-gate-decision.md) accepts the exact historical records
+in [the S12 index](S12-historical-evidence.md) under the approved thresholds.
+S12's items and exit therefore check that accepted decision, rather than the
+live S02–S10 and E1–E8 freshness states. Original artifact identities and normal
+producer, experiment and other sprint checks remain unchanged. A completed S12
+alongside stale live evidence means the dated Phase 0 milestone was accepted;
+it does not certify current HEAD or allow later work to relabel old captures.
+
 ## Commands, publication and history
 
 ```sh

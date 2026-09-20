@@ -343,6 +343,12 @@ E4 progresses through leaf helpers in S04, scanner values in S05 and encoder beh
 
 - **Gate.** E1 to E4 pass; E5 to E8 meet their thresholds for the parts they measure, with the extrapolations written down as extrapolations. Otherwise stop.
 
+Phase 0 was accepted on **2026-09-20** through [ADR 0020](docs/adr/0020-phase-0-gate-decision.md).
+At the owner's direction, S12 closes on the [indexed historical evidence](docs/S12-historical-evidence.md)
+under the approved limits, without repeating the captures after the crate rename
+and publishing work. S12 records that dated milestone; current-source experiment
+and other sprint freshness checks remain unchanged.
+
 ### Phase 1: foundations
 
 - **Scope.** Complete the foundational slices: `core`, `collections`, `tspath`, `stringutil`, `jsstring`, `jsnum`, `json`, `locale`, `glob`, `semver`, `packagejson`, the `vfs` family including `vfstest`, diagnostics, libs, the AST's owner/lazy/bundle mechanisms, scanner, parser, file-owned binder, `astnav`, `evaluator`, module resolution and options. Extend the compiler runner through complete parse/bind and syntactic `.errors.txt` coverage. Build test-host framing, initialization, server-owned option completion, filesystem callbacks and plugin byte streams in a transport endpoint that does not depend on the language service. Complete generator drift and untouched-client equality checks.
