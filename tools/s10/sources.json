@@ -5,7 +5,8 @@
     "crates/tsr_embed",
     "crates/tsr_node",
     "tools/s10/corpus-adapter",
-    "tools/s10/rust-consumer"
+    "tools/s10/rust-consumer",
+    "tools/s10/wasm-corpus"
   ],
   "patterns": [
     "crates/tsr_arena/**/*",

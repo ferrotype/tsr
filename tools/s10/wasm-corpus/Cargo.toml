@@ -1,0 +1,19 @@
+[package]
+name = "s10_wasm_corpus"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "=0.2.126"
+serde_json = { version = "1", features = ["preserve_order"] }
+s10_corpus = { path = "../corpus-adapter" }
+tsr_embed = { version = "0.1.0", path = "../../../crates/tsr_embed" }
+
+[lints]
+workspace = true

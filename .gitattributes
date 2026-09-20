@@ -6,3 +6,7 @@ crates/tsr_ast/src/*_generated.rs linguist-generated=true
 crates/tsr_diagnostics/src/generated.rs linguist-generated=true
 crates/tsr_encoder/src/generated.rs linguist-generated=true
 data/s03/schema/*.json linguist-generated=true
+
+# Exact upstream library copies; check with scripts/package_assets.py.
+crates/tsr_bundled/bundled/** -text -whitespace linguist-vendored=true
+crates/tsr_bundled/bundled/manifest.json linguist-generated=true

@@ -4,7 +4,11 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-publish.workspace = true
+publish = ["crates-io"]
+description = "TypeScript program loading, diagnostics and compiler orchestration for ts-rust"
+repository.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [features]
 relation-probe = ["tsr_checker/relation-probe"]
@@ -59,4 +63,4 @@ serde_json = "1"
 sha2 = "0.10"
 mimalloc = "=0.1.48"
 cap = { version = "=0.1.2", features = ["stats"] }
-s08_relater_prototype = { version = "0.1.0", path = "../../tools/s08/relater-prototype" }
+s08_relater_prototype = { path = "../../tools/s08/relater-prototype" }

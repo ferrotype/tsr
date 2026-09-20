@@ -498,6 +498,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "s10_wasm_corpus"
+version = "0.1.0"
+dependencies = [
+ "s10_corpus",
+ "serde_json",
+ "tsr_embed",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1065,7 +1075,6 @@ dependencies = [
 name = "tsr_wasm"
 version = "0.1.0"
 dependencies = [
- "s10_corpus",
  "serde_json",
  "tsr_arena",
  "tsr_ast",

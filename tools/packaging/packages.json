@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "packages": [
+    {
+      "name": "tsr_api",
+      "manifest": "crates/tsr_api/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_arena",
+      "manifest": "crates/tsr_arena/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_ast",
+      "manifest": "crates/tsr_ast/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_astnav",
+      "manifest": "crates/tsr_astnav/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_bench",
+      "manifest": "crates/tsr_bench/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_binder",
+      "manifest": "crates/tsr_binder/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_bundled",
+      "manifest": "crates/tsr_bundled/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_checker",
+      "manifest": "crates/tsr_checker/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_compiler",
+      "manifest": "crates/tsr_compiler/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_core",
+      "manifest": "crates/tsr_core/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_diagnostics",
+      "manifest": "crates/tsr_diagnostics/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_embed",
+      "manifest": "crates/tsr_embed/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_encoder",
+      "manifest": "crates/tsr_encoder/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_format",
+      "manifest": "crates/tsr_format/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_jsnum",
+      "manifest": "crates/tsr_jsnum/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_jsstring",
+      "manifest": "crates/tsr_jsstring/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_module",
+      "manifest": "crates/tsr_module/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_node",
+      "manifest": "crates/tsr_node/Cargo.toml",
+      "publish": false,
+      "reason": "Node addon distributed separately; not a Rust library package"
+    },
+    {
+      "name": "tsr_nodebuilder",
+      "manifest": "crates/tsr_nodebuilder/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_parser",
+      "manifest": "crates/tsr_parser/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_printer",
+      "manifest": "crates/tsr_printer/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_project",
+      "manifest": "crates/tsr_project/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_pseudochecker",
+      "manifest": "crates/tsr_pseudochecker/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_scanner",
+      "manifest": "crates/tsr_scanner/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_semver",
+      "manifest": "crates/tsr_semver/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_testhost",
+      "manifest": "crates/tsr_testhost/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_transformers",
+      "manifest": "crates/tsr_transformers/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_tsoptions",
+      "manifest": "crates/tsr_tsoptions/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_tspath",
+      "manifest": "crates/tsr_tspath/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_vfs",
+      "manifest": "crates/tsr_vfs/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_wasm",
+      "manifest": "crates/tsr_wasm/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_cpu_profile",
+      "manifest": "tools/s07/cpu-profile/rust/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_memory_profile",
+      "manifest": "tools/s07/memory-profile/rust/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_access_trace_native_verify",
+      "manifest": "tools/s07/performance-experiments/access-trace-native-verify/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_access_trace",
+      "manifest": "tools/s07/performance-experiments/access-trace/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_owner_census",
+      "manifest": "tools/s07/performance-experiments/owner-census/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_bis_phases",
+      "manifest": "tools/s07/performance-experiments/phases/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_s07_storage_pilot",
+      "manifest": "tools/s07/performance-experiments/storage-pilot/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s08_relater_prototype",
+      "manifest": "tools/s08/relater-prototype/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s09_format_harness",
+      "manifest": "tools/s09/format-harness/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_corpus",
+      "manifest": "tools/s10/corpus-adapter/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_rust_consumer",
+      "manifest": "tools/s10/rust-consumer/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "s10_wasm_corpus",
+      "manifest": "tools/s10/wasm-corpus/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "xtask",
+      "manifest": "xtask/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    }
+  ]
+}
