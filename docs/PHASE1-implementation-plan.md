@@ -108,6 +108,73 @@ is part of this plan.
 
 ## 3. Delivery sequence
 
+### Complexity and separation of work
+
+This is **medium-to-large production work**, smaller than implementing the
+checker but larger than adding tests to completed code. Existing parser/binder
+coverage reduces that work substantially. The main uncertainties are missing
+leaf contracts and edge behavior, not another AST storage redesign. A reliable
+effort estimate needs F0's distinction between missing code and missing coverage.
+
+| Area | Expected difficulty | Reason |
+| --- | --- | --- |
+| Inventories, baseline mapping and report plumbing | Moderate | Reuse exists, but native test invocations must be mapped correctly and failures must stay distinguishable |
+| Command-line/config completion and diagnostic formatting | Moderate to high | Ordered merges, response files, mode-specific validation and exact baseline text interact |
+| JSON, Unicode and locale | High semantic risk | Rust libraries do not automatically reproduce the pinned Go byte, number and locale behavior |
+| Writable/cached VFS | High integration risk | Mutation, snapshots, cache invalidation, symlinks and platform errors must agree |
+| AST/binder/navigation/evaluator tail | Uncertain until inventory | Much already works; an unmapped function is not evidence that its behavior is absent |
+| Generation and transport regression work | Mostly integration | Existing implementations and accepted contracts should be reused |
+
+Split delivery into two separately reviewable stages. F0–F5 below remain the
+functional checkpoints; each family's preparation belongs to Stage A and its
+production changes belong to Stage B.
+
+**Stage A — prepare tests and acceptance checks.** This writes test/tooling code,
+including Python orchestration, access-only Go adapters and Rust test drivers.
+It does not implement missing compiler/library behavior.
+
+- Inventory existing coverage and missing entry points; freeze native inputs,
+  expected outputs and required case identities, including the 309 baselines.
+- Connect current Rust APIs to the comparisons. If an API does not exist yet,
+  record `not_implemented` with the missing operation's identity and expected
+  native result. Do not add dummy production APIs or duplicate their algorithms
+  inside a test driver to make the harness run.
+- Prepare the grouped checks, metrics and failure reports. Exercise a known
+  passing case, a controlled mismatch, a missing operation and a harness failure.
+  The runner's own tests can pass while feature parity correctly remains unmet.
+- Produce a baseline gap report and an implementation ticket per behavior
+  family: reproducer, native authority, intended Rust home, dependencies and
+  the command that will demonstrate the fix. Reuse valid recorded observations
+  and run only the native/test work needed for the missing coverage.
+
+Stage A PRs contain manifests, fixtures, adapters, harness tests and tracker
+wiring. Access needed only by tests stays test-only. They do not contain
+semantic fixes, production refactors, weakened expected results or ignored
+failures. New feature checks remain visibly pending/failing until implemented;
+the separate harness-health check must pass. Do not make the existing CI suite
+depend on an intentionally incomplete feature gate during preparation.
+
+**Stage B — implement production behavior against those checks.** This contains
+the actual Rust ports and fixes: command-line parsing, locale/localized
+diagnostics, missing JSON/collection operations, writable and cached filesystem
+adapters, and whichever resolver/syntax utility gaps the tests establish.
+
+- Implement one coherent family in its production home; add no test-only
+  substitute for code that real consumers need.
+- Turn that family's prepared failures into exact native matches, then run its
+  relevant integration, ownership and quality checks.
+- Add newly discovered boundary regressions alongside the fix. Change a frozen
+  expectation only when the native observation or request contract was wrong,
+  with that correction reviewed explicitly.
+- Enable the completed family as a required check and record its passing
+  evidence. Preparation alone never completes a production checkpoint.
+
+Use separate preparation and implementation PRs. A family can enter Stage B
+once its Stage A contract is reviewed and runnable; it need not wait for every
+test in all of Phase 1. This keeps the split useful without spending weeks
+building a speculative all-purpose harness before fixing any actual behavior.
+The first delivery is Stage A, with no production implementation changes.
+
 Checkpoints describe reviewable implementation batches, not calendar estimates.
 Each can take several focused PRs. Finish and review the behavior before
 starting an expensive final capture.
@@ -450,7 +517,8 @@ minimal reproducer and pinned Go output.
   pre-rename captures remain accepted, and new runs follow actual behavior and
   coverage changes. No benchmark refresh is scheduled by this plan.
 
-The first implementation PR should deliver F0 and the smallest command-line
-baseline adapter through a real failing Rust case. It should make the next
-missing behavior directly reproducible, then proceed into F1/F2/F3 without
-building a large replacement harness before any feature work lands.
+The first preparation PR should deliver F0 and the smallest command-line
+baseline adapter that records a genuinely missing Rust operation. It should
+make the next behavior directly reproducible without implementing it. Production
+PRs then follow the reviewed Stage A contracts through F1/F2/F3; test preparation
+for later families can continue separately.
