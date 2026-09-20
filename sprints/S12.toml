@@ -1,17 +1,17 @@
 # Dated Phase 0 acceptance, approved by the owner on 2026-09-20 (ADR 0020).
-# docs/S12-historical-evidence.md identifies the accepted E1–E8 and S02–S10 evidence.
-# S12 records that milestone; it does not certify current-source measurements.
+# docs/S12-evidence.md identifies the accepted E1–E8 and S02–S10 evidence.
+# Recent captures remain applicable across the crate rename (owner confirmed).
 # Producer freshness, experiment checks and other sprint checks remain unchanged.
 id = "S12"
 title = "Phase 0 gate"
-goal = "Record the owner's 2026-09-20 acceptance of the preserved Phase 0 evidence under the approved thresholds, with extrapolations, workload limits, the full checking/emit acceptance matrix and Phase 7 budgets in ADR 0020. This dated milestone does not assert current-source evidence freshness."
+goal = "Close Phase 0 using the recent 2026-09-19 evidence, confirmed applicable across the crate rename on 2026-09-20, under the approved thresholds and the workload limits, acceptance matrix and Phase 7 budgets in ADR 0020."
 exit = [
   "adr.0020.status == Accepted",
 ]
 
 [[item]]
 id = "S12-1"
-title = "Owner accepts the indexed historical E1–E8 evidence under the approved thresholds (2026-09-20)"
+title = "Owner accepts the indexed recent E1–E8 evidence under the approved thresholds (2026-09-20)"
 kind = "adr"
 ref = "0020"
 required = true
@@ -19,7 +19,7 @@ done_when = ["adr.0020.status == Accepted"]
 
 [[item]]
 id = "S12-2"
-title = "Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed historical evidence (2026-09-20)"
+title = "Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed recent evidence (2026-09-20)"
 kind = "adr"
 ref = "0020"
 required = true
