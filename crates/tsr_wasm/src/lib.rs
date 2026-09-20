@@ -20,14 +20,6 @@ mod checker;
 #[cfg(feature = "checker")]
 pub use checker::{MemoryHost, WasmSession};
 
-/// Capture-only entry point: the frozen S08 walker over the public embedding API.
-#[cfg(feature = "corpus")]
-#[wasm_bindgen]
-pub fn observe_corpus(request: &str) -> Result<Vec<u8>, JsValue> {
-    let request = serde_json::from_str(request).map_err(api_error)?;
-    serde_json::to_vec(&s10_corpus::observe(&request, tsr_embed::Session::load)).map_err(api_error)
-}
-
 fn options(file_name: &[u8], jsx: bool, force: bool) -> SourceFileParseOptions {
     SourceFileParseOptions {
         file_name: JsString::from_bytes(file_name),

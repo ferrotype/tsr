@@ -44,6 +44,8 @@ jobs:
       - name: Install the pinned toolchain
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@v2
+      - name: Check packaged assets and publication policy
+        run: python3 scripts/package_assets.py --check
       - name: Validate provenance and schemas
         run: cargo xtask validate
       - name: Check committed views and worklist against archived evidence
@@ -59,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # tsr_bundled embeds libraries from the pinned upstream gitlink.
+          # Repository tests and evidence tools still use the pinned upstream tree.
           submodules: true
       - name: Read and validate toolchain pins
         id: pins
@@ -89,6 +91,8 @@ jobs:
       - name: Read and validate toolchain pins
         id: pins
         run: python3 scripts/s04_runtime.py github-outputs >> "$GITHUB_OUTPUT"
+      - name: Check packaged assets and publication policy
+        run: python3 scripts/package_assets.py --check
       - name: Validate provenance and schemas
         id: validate
         if: ${{ !cancelled() }}

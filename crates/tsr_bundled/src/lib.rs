@@ -3,450 +3,436 @@ use std::sync::Arc;
 use tsr_jsstring::JsString;
 use tsr_vfs::{Entries, Error, FileContent, FileInfo, FileSystem, SnapshotId};
 pub const LIB_PATH: &[u8] = b"bundled:///libs";
-pub const COPYRIGHT: &str =
-    include_str!("../../../upstream/tsc/internal/bundled/CopyrightNotice.txt");
+pub const COPYRIGHT: &str = include_str!("../bundled/CopyrightNotice.txt");
 pub static LIBRARIES: &[(&str, &[u8])] = &[
-    (
-        "lib.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.d.ts"),
-    ),
+    ("lib.d.ts", include_bytes!("../bundled/libs/lib.d.ts")),
     (
         "lib.decorators.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.decorators.d.ts"),
+        include_bytes!("../bundled/libs/lib.decorators.d.ts"),
     ),
     (
         "lib.decorators.legacy.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.decorators.legacy.d.ts"),
+        include_bytes!("../bundled/libs/lib.decorators.legacy.d.ts"),
     ),
     (
         "lib.dom.asynciterable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.dom.asynciterable.d.ts"),
+        include_bytes!("../bundled/libs/lib.dom.asynciterable.d.ts"),
     ),
     (
         "lib.dom.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.dom.d.ts"),
+        include_bytes!("../bundled/libs/lib.dom.d.ts"),
     ),
     (
         "lib.dom.iterable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.dom.iterable.d.ts"),
+        include_bytes!("../bundled/libs/lib.dom.iterable.d.ts"),
     ),
     (
         "lib.es2015.collection.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.collection.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.collection.d.ts"),
     ),
     (
         "lib.es2015.core.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.core.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.core.d.ts"),
     ),
     (
         "lib.es2015.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.d.ts"),
     ),
     (
         "lib.es2015.generator.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.generator.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.generator.d.ts"),
     ),
     (
         "lib.es2015.iterable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.iterable.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.iterable.d.ts"),
     ),
     (
         "lib.es2015.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.promise.d.ts"),
     ),
     (
         "lib.es2015.proxy.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.proxy.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.proxy.d.ts"),
     ),
     (
         "lib.es2015.reflect.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.reflect.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.reflect.d.ts"),
     ),
     (
         "lib.es2015.symbol.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2015.symbol.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2015.symbol.d.ts"),
     ),
     (
         "lib.es2015.symbol.wellknown.d.ts",
-        include_bytes!(
-            "../../../upstream/tsc/internal/bundled/libs/lib.es2015.symbol.wellknown.d.ts"
-        ),
+        include_bytes!("../bundled/libs/lib.es2015.symbol.wellknown.d.ts"),
     ),
     (
         "lib.es2016.array.include.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2016.array.include.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2016.array.include.d.ts"),
     ),
     (
         "lib.es2016.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2016.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2016.d.ts"),
     ),
     (
         "lib.es2016.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2016.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2016.full.d.ts"),
     ),
     (
         "lib.es2016.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2016.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2016.intl.d.ts"),
     ),
     (
         "lib.es2017.arraybuffer.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.arraybuffer.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.arraybuffer.d.ts"),
     ),
     (
         "lib.es2017.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.d.ts"),
     ),
     (
         "lib.es2017.date.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.date.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.date.d.ts"),
     ),
     (
         "lib.es2017.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.full.d.ts"),
     ),
     (
         "lib.es2017.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.intl.d.ts"),
     ),
     (
         "lib.es2017.object.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.object.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.object.d.ts"),
     ),
     (
         "lib.es2017.sharedmemory.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.sharedmemory.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.sharedmemory.d.ts"),
     ),
     (
         "lib.es2017.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.string.d.ts"),
     ),
     (
         "lib.es2017.typedarrays.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2017.typedarrays.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2017.typedarrays.d.ts"),
     ),
     (
         "lib.es2018.asyncgenerator.d.ts",
-        include_bytes!(
-            "../../../upstream/tsc/internal/bundled/libs/lib.es2018.asyncgenerator.d.ts"
-        ),
+        include_bytes!("../bundled/libs/lib.es2018.asyncgenerator.d.ts"),
     ),
     (
         "lib.es2018.asynciterable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.asynciterable.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.asynciterable.d.ts"),
     ),
     (
         "lib.es2018.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.d.ts"),
     ),
     (
         "lib.es2018.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.full.d.ts"),
     ),
     (
         "lib.es2018.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.intl.d.ts"),
     ),
     (
         "lib.es2018.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.promise.d.ts"),
     ),
     (
         "lib.es2018.regexp.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2018.regexp.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2018.regexp.d.ts"),
     ),
     (
         "lib.es2019.array.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.array.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.array.d.ts"),
     ),
     (
         "lib.es2019.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.d.ts"),
     ),
     (
         "lib.es2019.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.full.d.ts"),
     ),
     (
         "lib.es2019.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.intl.d.ts"),
     ),
     (
         "lib.es2019.object.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.object.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.object.d.ts"),
     ),
     (
         "lib.es2019.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.string.d.ts"),
     ),
     (
         "lib.es2019.symbol.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2019.symbol.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2019.symbol.d.ts"),
     ),
     (
         "lib.es2020.bigint.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.bigint.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.bigint.d.ts"),
     ),
     (
         "lib.es2020.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.d.ts"),
     ),
     (
         "lib.es2020.date.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.date.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.date.d.ts"),
     ),
     (
         "lib.es2020.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.full.d.ts"),
     ),
     (
         "lib.es2020.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.intl.d.ts"),
     ),
     (
         "lib.es2020.number.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.number.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.number.d.ts"),
     ),
     (
         "lib.es2020.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.promise.d.ts"),
     ),
     (
         "lib.es2020.sharedmemory.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.sharedmemory.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.sharedmemory.d.ts"),
     ),
     (
         "lib.es2020.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2020.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2020.string.d.ts"),
     ),
     (
         "lib.es2020.symbol.wellknown.d.ts",
-        include_bytes!(
-            "../../../upstream/tsc/internal/bundled/libs/lib.es2020.symbol.wellknown.d.ts"
-        ),
+        include_bytes!("../bundled/libs/lib.es2020.symbol.wellknown.d.ts"),
     ),
     (
         "lib.es2021.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.d.ts"),
     ),
     (
         "lib.es2021.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.full.d.ts"),
     ),
     (
         "lib.es2021.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.intl.d.ts"),
     ),
     (
         "lib.es2021.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.promise.d.ts"),
     ),
     (
         "lib.es2021.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.string.d.ts"),
     ),
     (
         "lib.es2021.weakref.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2021.weakref.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2021.weakref.d.ts"),
     ),
     (
         "lib.es2022.array.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.array.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.array.d.ts"),
     ),
     (
         "lib.es2022.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.d.ts"),
     ),
     (
         "lib.es2022.error.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.error.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.error.d.ts"),
     ),
     (
         "lib.es2022.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.full.d.ts"),
     ),
     (
         "lib.es2022.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.intl.d.ts"),
     ),
     (
         "lib.es2022.object.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.object.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.object.d.ts"),
     ),
     (
         "lib.es2022.regexp.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.regexp.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.regexp.d.ts"),
     ),
     (
         "lib.es2022.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2022.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2022.string.d.ts"),
     ),
     (
         "lib.es2023.array.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2023.array.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2023.array.d.ts"),
     ),
     (
         "lib.es2023.collection.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2023.collection.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2023.collection.d.ts"),
     ),
     (
         "lib.es2023.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2023.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2023.d.ts"),
     ),
     (
         "lib.es2023.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2023.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2023.full.d.ts"),
     ),
     (
         "lib.es2023.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2023.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2023.intl.d.ts"),
     ),
     (
         "lib.es2024.arraybuffer.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.arraybuffer.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.arraybuffer.d.ts"),
     ),
     (
         "lib.es2024.collection.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.collection.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.collection.d.ts"),
     ),
     (
         "lib.es2024.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.d.ts"),
     ),
     (
         "lib.es2024.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.full.d.ts"),
     ),
     (
         "lib.es2024.object.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.object.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.object.d.ts"),
     ),
     (
         "lib.es2024.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.promise.d.ts"),
     ),
     (
         "lib.es2024.regexp.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.regexp.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.regexp.d.ts"),
     ),
     (
         "lib.es2024.sharedmemory.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.sharedmemory.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.sharedmemory.d.ts"),
     ),
     (
         "lib.es2024.string.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2024.string.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2024.string.d.ts"),
     ),
     (
         "lib.es2025.collection.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.collection.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.collection.d.ts"),
     ),
     (
         "lib.es2025.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.d.ts"),
     ),
     (
         "lib.es2025.float16.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.float16.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.float16.d.ts"),
     ),
     (
         "lib.es2025.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.full.d.ts"),
     ),
     (
         "lib.es2025.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.intl.d.ts"),
     ),
     (
         "lib.es2025.iterator.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.iterator.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.iterator.d.ts"),
     ),
     (
         "lib.es2025.promise.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.promise.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.promise.d.ts"),
     ),
     (
         "lib.es2025.regexp.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es2025.regexp.d.ts"),
+        include_bytes!("../bundled/libs/lib.es2025.regexp.d.ts"),
     ),
     (
         "lib.es5.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es5.d.ts"),
+        include_bytes!("../bundled/libs/lib.es5.d.ts"),
     ),
     (
         "lib.es6.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.es6.d.ts"),
+        include_bytes!("../bundled/libs/lib.es6.d.ts"),
     ),
     (
         "lib.esnext.array.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.array.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.array.d.ts"),
     ),
     (
         "lib.esnext.collection.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.collection.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.collection.d.ts"),
     ),
     (
         "lib.esnext.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.d.ts"),
     ),
     (
         "lib.esnext.date.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.date.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.date.d.ts"),
     ),
     (
         "lib.esnext.decorators.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.decorators.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.decorators.d.ts"),
     ),
     (
         "lib.esnext.disposable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.disposable.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.disposable.d.ts"),
     ),
     (
         "lib.esnext.error.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.error.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.error.d.ts"),
     ),
     (
         "lib.esnext.full.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.full.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.full.d.ts"),
     ),
     (
         "lib.esnext.intl.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.intl.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.intl.d.ts"),
     ),
     (
         "lib.esnext.sharedmemory.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.sharedmemory.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.sharedmemory.d.ts"),
     ),
     (
         "lib.esnext.temporal.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.temporal.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.temporal.d.ts"),
     ),
     (
         "lib.esnext.typedarrays.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.esnext.typedarrays.d.ts"),
+        include_bytes!("../bundled/libs/lib.esnext.typedarrays.d.ts"),
     ),
     (
         "lib.scripthost.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.scripthost.d.ts"),
+        include_bytes!("../bundled/libs/lib.scripthost.d.ts"),
     ),
     (
         "lib.webworker.asynciterable.d.ts",
-        include_bytes!(
-            "../../../upstream/tsc/internal/bundled/libs/lib.webworker.asynciterable.d.ts"
-        ),
+        include_bytes!("../bundled/libs/lib.webworker.asynciterable.d.ts"),
     ),
     (
         "lib.webworker.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.webworker.d.ts"),
+        include_bytes!("../bundled/libs/lib.webworker.d.ts"),
     ),
     (
         "lib.webworker.importscripts.d.ts",
-        include_bytes!(
-            "../../../upstream/tsc/internal/bundled/libs/lib.webworker.importscripts.d.ts"
-        ),
+        include_bytes!("../bundled/libs/lib.webworker.importscripts.d.ts"),
     ),
     (
         "lib.webworker.iterable.d.ts",
-        include_bytes!("../../../upstream/tsc/internal/bundled/libs/lib.webworker.iterable.d.ts"),
+        include_bytes!("../bundled/libs/lib.webworker.iterable.d.ts"),
     ),
 ];
 pub fn library(name: &[u8]) -> Option<&'static [u8]> {

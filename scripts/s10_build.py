@@ -46,9 +46,10 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
         expected = f"wasm-opt version {pin['wasm_opt_version']} (version_{pin['wasm_opt_version']})"
         if optimizer_version != expected:
             raise ValueError('wasm-opt differs from the pinned release')
-    command = ['cargo', 'build', '--locked', '--release', '--target', pin['wasm_target'], '-p', 'tsr_wasm']
-    if checker or corpus:
-        command += ['--features', 'corpus' if corpus else 'checker']
+    package = 's10_wasm_corpus' if corpus else 'tsr_wasm'
+    command = ['cargo', 'build', '--locked', '--release', '--target', pin['wasm_target'], '-p', package]
+    if checker and not corpus:
+        command += ['--features', 'checker']
     env = dict(build_environment(), CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS=pin['wasm_rustflags'])
     # Avoid a caller's global flags silently taking precedence over target flags.
     for key in ('RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS'):
@@ -56,7 +57,7 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
     subprocess.run(command, cwd=ROOT, env=env, check=True)
     output = ROOT / 'target/s10' / mode
     output.mkdir(parents=True, exist_ok=True)
-    original = ROOT / 'target' / pin['wasm_target'] / 'release/tsr_wasm.wasm'
+    original = ROOT / 'target' / pin['wasm_target'] / 'release' / (package + '.wasm')
     subprocess.run([str(bindgen), '--target', 'no-modules', '--remove-name-section', '--remove-producers-section', '--out-dir', str(output),
                     '--out-name', mode, str(original)], cwd=ROOT, check=True)
     post_link = None

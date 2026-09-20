@@ -4,7 +4,11 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-publish.workspace = true
+publish = ["crates-io"]
+description = "Snapshot-scoped compiler API handles, printing and formatting for ts-rust"
+repository.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
 tsr_arena = { version = "0.1.0", path = "../tsr_arena" }

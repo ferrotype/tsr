@@ -1,7 +1,7 @@
 # tsr_arena
 
 Storage and ownership primitives follow the accepted
-[ownership contract](../../docs/design/ownership.md). `StorageBuilder<R, S>`
+[ownership contract](https://github.com/iantocristian/ts-rust/blob/main/docs/design/ownership.md). `StorageBuilder<R, S>`
 stores a concrete `NodeRecord` directly; its associated auxiliary record type
 stores runtime list, slice and file metadata under the same owner. The S04
 `FileBuilder<T, S>` and related names remain aliases using the `Node<T>` adapter,
