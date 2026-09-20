@@ -1,0 +1,1649 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "items": [
+            "aa",
+            "b",
+            "cc"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "filter",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "ZZ"
+        },
+        {
+          "op": "read",
+          "target": "s"
+        },
+        {
+          "op": "filter",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "filter",
+          "predicate": "never",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "filter",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "filter",
+          "predicate": "never",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "t"
+        }
+      ],
+      "case": "leaves/helpers/filter-identity-and-empty-clone",
+      "discriminates": "Filter returns the INPUT SLICE ITSELF when every element passes (core.go:49), so the result aliases the caller's storage: the trace proves it twice, with Same and by writing through the result and reading the input back. When an element is rejected the result is slices.Clone(slice[:i]), which for a non-nil input is a non-nil EMPTY slice, while a nil input never reaches the clone and comes back nil -- [] and null, not one answer. A port that always collects into a fresh Vec fails both identity actions; one that returns an empty Vec for the all-rejected case and for the nil case alike collapses two distinct pinned results.",
+      "operation": "tsc/internal/core/core.go:Filter",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "op": "alias",
+          "other": "s",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "index": 1,
+          "op": "slice_from",
+          "other": "s",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "index": 1,
+          "op": "slice_from",
+          "other": "s",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "index": 0,
+          "op": "slice_to",
+          "other": "s",
+          "target": "t"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "index": 0,
+          "op": "slice_to",
+          "other": "s",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "t",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/same-is-length-then-first-element",
+      "discriminates": "Same is `len(s1)==len(s2) && (len(s1)==0 || &s1[0]==&s2[0])` (core.go:183-188), so it is NOT slice equality and NOT plain pointer equality: two empty slices are Same whatever their provenance -- a nil one and a non-nil one included -- while two distinct slices with identical contents are not. A port written as element-wise equality answers true on the equal-contents pair where Go answers false; a port written as `ptr::eq` on the data pointer answers false on the nil-versus-empty pair where Go answers true. The tail of the trace also pins that two views of the SAME array are Same only when their lengths agree.",
+      "operation": "tsc/internal/core/core.go:Same",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map",
+          "rule": "identity",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map",
+          "rule": "identity",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map",
+          "rule": "identity",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "op": "map",
+          "rule": "upper",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_index",
+          "rule": "with_index",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_index",
+          "rule": "with_index",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_index",
+          "rule": "with_index",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/map-preserves-nil",
+      "discriminates": "Map and MapIndex open with an explicit `if slice == nil { return nil }` (core.go:81-83, 107-109) and otherwise `make([]U, len(slice))`, so a nil input gives nil and a non-nil EMPTY input gives a non-nil empty slice -- null versus [] once the result is marshalled. They also always allocate: even an identity mapping returns a fresh slice, which is the opposite of SameMap and is what the trailing Same actions pin. A port over Iterator::map that returns an empty Vec for both empties, or that short-circuits an unchanged mapping by returning the input, is observably different. MapIndex's rule also pins that the callback receives the element first and the index second.",
+      "operation": "tsc/internal/core/core.go:Map",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_filtered",
+          "rule": "keep_nonempty",
+          "target": "s"
+        },
+        {
+          "op": "map_filtered",
+          "rule": "drop_all",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_filtered",
+          "rule": "keep_all",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_filtered",
+          "rule": "keep_all",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "map_filtered",
+          "rule": "keep_all",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/map-filtered-nil-accumulator",
+      "discriminates": "MapFiltered accumulates into `var result []U` (core.go:129) and never allocates up front, so it returns NIL -- not an empty slice -- for a nil input, for a non-nil empty input and for an input whose every element is dropped. That is the exact opposite of Map on the same non-nil empty input, which the neighbouring map-preserves-nil case pins, so a port that answers both with an empty Vec erases a distinction that is live inside one file. The callback is also called for every element, drop or keep, which the call counts record.",
+      "operation": "tsc/internal/core/core.go:MapFiltered",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "ab",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "flat_map",
+          "rule": "split_chars",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "flat_map",
+          "rule": "empty",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "flat_map",
+          "rule": "split_chars",
+          "target": "s"
+        },
+        {
+          "groups": [
+            [
+              "a",
+              "b"
+            ],
+            [
+              "c"
+            ]
+          ],
+          "op": "flatten"
+        },
+        {
+          "groups": [
+            [],
+            []
+          ],
+          "op": "flatten"
+        },
+        {
+          "groups": [],
+          "op": "flatten"
+        },
+        {
+          "groups": [
+            [
+              "a"
+            ],
+            null,
+            [
+              "b"
+            ]
+          ],
+          "op": "flatten"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "flatten_register",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/flatmap-and-flatten-nil-accumulator",
+      "discriminates": "FlatMap (core.go:141) and Flatten (core.go:503) both accumulate into a nil `var result []U`, so an input that contributes nothing yields nil rather than an empty slice, including when the outer slice is non-empty and every mapped piece is empty. Flatten of a SINGLE non-empty subarray still copies, because appending onto a nil accumulator allocates -- the closing Same action pins that, and it is the opposite of Concatenate, which hands back an operand. A port that returns an empty Vec for the all-empty cases, or that optimises a one-element outer slice by returning its only member, is observably different; a nil subarray in the middle of the input also has to be skipped rather than dereferenced.",
+      "operation": "tsc/internal/core/core.go:FlatMap",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "index": 1,
+          "op": "mutate",
+          "target": "result",
+          "value": "Z"
+        },
+        {
+          "op": "read",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "items": [
+            "c"
+          ],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "t"
+        },
+        {
+          "index": 0,
+          "op": "mutate",
+          "target": "result",
+          "value": "Y"
+        },
+        {
+          "op": "read",
+          "target": "t"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "items": [
+            "b"
+          ],
+          "op": "set",
+          "target": "t"
+        },
+        {
+          "op": "concatenate",
+          "other": "t",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "t"
+        }
+      ],
+      "case": "leaves/helpers/concatenate-returns-an-operand",
+      "discriminates": "Concatenate never allocates when either side is empty: it returns the OTHER OPERAND ITSELF (core.go:308-313), so the result aliases the caller's slice and writing through it is visible in the input -- pinned here for both directions. The two guards are ordered `len(s2)==0` first, which makes Concatenate(nil, empty) nil while Concatenate(empty, nil) is a non-nil empty slice: the same two arguments in the other order marshal as null and []. A port that always builds a fresh Vec fails the aliasing actions, and one that normalises both empties to a single answer fails the ordered-guard pair.",
+      "operation": "tsc/internal/core/core.go:Concatenate",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "s",
+          "value": "a"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "s",
+          "value": "c"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b",
+            "c"
+          ],
+          "op": "set",
+          "target": "base"
+        },
+        {
+          "index": 2,
+          "op": "slice_to",
+          "other": "base",
+          "target": "s"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "s",
+          "value": "z"
+        },
+        {
+          "op": "read",
+          "target": "base"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "s",
+          "value": "a"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "append_if_unique",
+          "target": "s",
+          "value": ""
+        }
+      ],
+      "case": "leaves/helpers/append-if-unique-writes-into-spare-capacity",
+      "discriminates": "AppendIfUnique returns the input slice itself when the element is already present (core.go:383-385), and otherwise calls Go's append, which writes into the input's SPARE CAPACITY: appending to a re-sliced prefix overwrites the element just past that prefix in the shared backing array, which the base register reads back. Both halves are what the pinned callers see -- binder.go:2548 assigns the result straight back over symbol.Declarations. A Rust port over Vec cannot alias, so this trace is what says which of the two behaviours the port must carry (return the input unchanged on a hit) and which it must instead prove no caller depends on.",
+      "operation": "tsc/internal/core/core.go:AppendIfUnique",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "b",
+            "a",
+            "b",
+            "a",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [
+            "",
+            "a",
+            ""
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "a"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "deduplicate",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/deduplicate-keeps-the-first-occurrence",
+      "discriminates": "Deduplicate keeps the FIRST occurrence of each value across the whole slice (core.go:831-847) and returns the input slice itself whenever nothing is removed, including for len<=1 and for nil. The leading trace element [b,a,b,a,c] is chosen to catch the port a Rust engineer reaches for first: Vec::dedup removes only CONSECUTIVE duplicates and would leave that input unchanged. A port that collects into a fresh Vec unconditionally fails the Same actions, and one that keeps the last occurrence reorders the result.",
+      "operation": "tsc/internal/core/core.go:Deduplicate",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "bb",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_last",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "items": [
+            "aa",
+            "b",
+            "cc"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_last",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "bb",
+            "cc"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_last",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "empty",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "empty",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "find",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "op": "find_last",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "op": "find_index",
+          "predicate": "always",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/find-zero-value-is-not-absence",
+      "discriminates": "Find and FindLast return the ZERO VALUE of T when nothing matches (core.go:225, 235), so on a string element type a successful match of \"\" and a failed search are the same answer and only FindIndex's -1 separates them -- the trace does exactly that, matching \"\" at index 1 and then missing entirely. FindIndex reports the FIRST index while FindLast scans from the end, which the two-match input separates. The call counts pin the scan direction independently of the values. A port returning Option<&T> is a different -- and better -- contract that every call site has to be re-read for; a port that returns 0 rather than -1 for a miss, or that scans FindLast forwards, fails outright. The a/bb/cc input is the one whose first and last matches are different elements, so there the call counts alone carry the scan direction: Find takes two calls and answers bb where FindLast takes one and answers cc. On the symmetric inputs both the count and the value agree, which is why that row is needed",
+      "operation": "tsc/internal/core/core.go:Find",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "b",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "first_or_nil",
+          "target": "s"
+        },
+        {
+          "op": "last_or_nil",
+          "target": "s"
+        },
+        {
+          "items": [
+            "x"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "first_or_nil",
+          "target": "s"
+        },
+        {
+          "op": "last_or_nil",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "first_or_nil",
+          "target": "s"
+        },
+        {
+          "op": "last_or_nil",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "first_or_nil",
+          "target": "s"
+        },
+        {
+          "op": "last_or_nil",
+          "target": "s"
+        },
+        {
+          "items": [
+            "",
+            ""
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "first_or_nil",
+          "target": "s"
+        },
+        {
+          "op": "last_or_nil",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/first-and-last-or-nil",
+      "discriminates": "FirstOrNil and LastOrNil return the zero value for an empty or nil slice (core.go:257-269): no bounds panic, no Option, and no way to tell an empty input from an input of empty strings -- the last two trace steps answer identically. The string instantiation is the pinned one at upstream/tsc/internal/vfs/vfsmatch/vfsmatch.go:145, which compares LastOrNil(parts) against \"**\" and therefore relies on the empty answer being a value rather than a panic. A port that indexes a Vec directly panics where the pin returns \"\"; a LastOrNil that returns slice[0] or reads past the end is caught by the three-element step.",
+      "operation": "tsc/internal/core/core.go:FirstOrNil",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "bb",
+            "ccc"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "never",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "len_gt_1",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "always",
+          "target": "s"
+        },
+        {
+          "items": [
+            "aa"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "some",
+          "predicate": "len_gt_1",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/some-stops-at-the-first-true",
+      "discriminates": "Some returns at the first true (core.go:190-197), so the predicate runs twice on [a,bb,ccc] and once when the first element already matches -- the recorded call count is the whole point, because a port written as `v.iter().filter(f).count() > 0`, or one that collects the matches before testing, returns exactly the right boolean for every step here and still differs. An empty and a nil input run the predicate zero times and return false.",
+      "operation": "tsc/internal/core/core.go:Some",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "b",
+            "c"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "identity",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "upper_if_c",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "upper_if_a",
+          "target": "s"
+        },
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "upper",
+          "target": "s"
+        },
+        {
+          "nil": true,
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "upper",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        },
+        {
+          "items": [],
+          "op": "set",
+          "target": "s"
+        },
+        {
+          "op": "same_map",
+          "rule": "upper",
+          "target": "s"
+        },
+        {
+          "op": "same",
+          "other": "result",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/helpers/same-map-identity-and-call-count",
+      "discriminates": "SameMap returns the input slice itself when the mapping changes nothing (core.go:164) and otherwise calls f exactly len(slice) times, never len+1: the scan's own result is reused for the element that first changed (`result[i] = mapped`, core.go:157) and the already-equal prefix is copied UNMAPPED. The trace varies where the first change falls -- last element, first element, every element -- so the count separates the implementations. A port written as `let out: Vec<_> = v.iter().map(f).collect(); if out == v { v } else { out }` produces the right values with the right count and still fails, because it allocates for the unchanged case where Same must be true.",
+      "operation": "tsc/internal/core/core.go:SameMap",
+      "order_sensitive": true,
+      "subject": "helpers.Slices"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_box",
+          "value": "a"
+        },
+        {
+          "op": "single"
+        },
+        {
+          "index": 0,
+          "op": "mutate_element",
+          "value": "Z"
+        },
+        {
+          "op": "read_box"
+        },
+        {
+          "op": "clear_box"
+        },
+        {
+          "op": "single"
+        },
+        {
+          "op": "new_box",
+          "value": ""
+        },
+        {
+          "op": "single"
+        },
+        {
+          "op": "read_box"
+        }
+      ],
+      "case": "leaves/helpers/single-element-slice-nil-and-pointer-identity",
+      "discriminates": "SingleElementSlice takes a POINTER and returns nil -- not a one-element slice holding nil, and not an empty slice -- when that pointer is nil (core.go:730-735), which matters because callers hand the result straight on as a file list (upstream/tsc/internal/execute/incremental/program.go:228). The returned slice holds the caller's own pointer, so writing through the element is visible in the caller's value, which the mutate-then-read-box pair pins. A port taking Option<&T> and returning an empty Vec for None erases the first half; one that clones the element into the Vec erases the second.",
+      "operation": "tsc/internal/core/core.go:SingleElementSlice",
+      "order_sensitive": true,
+      "subject": "helpers.SingleElementSlice"
+    },
+    {
+      "actions": [
+        {
+          "op": "memoize",
+          "value": ""
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "memoize",
+          "value": "x"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "memoize_panicking",
+          "value": "late"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "call"
+        },
+        {
+          "op": "call"
+        }
+      ],
+      "case": "leaves/helpers/memoize-runs-create-once",
+      "discriminates": "Memoize clears its `create` closure AFTER the call returns (core.go:392-395), which decides two things a port gets wrong in opposite directions. A create whose answer is the ZERO VALUE is still never run twice -- the plausible port `if value == zero { value = create() }` runs it on every call, and the pinned callers memoize *ast.Symbol lookups whose legitimate answer is nil (upstream/tsc/internal/checker/checker.go:1168). And a create that PANICS never reaches the clear, so the next call runs it again and can succeed: a port whose once-cell latches or poisons on a panicking initialiser stops there. The recorded call count, not the value, is what separates them.",
+      "operation": "tsc/internal/core/core.go:Memoize",
+      "order_sensitive": true,
+      "subject": "helpers.Memoize"
+    },
+    {
+      "actions": [
+        {
+          "flag": false,
+          "op": "must",
+          "value": "v"
+        },
+        {
+          "flag": false,
+          "op": "must",
+          "value": ""
+        },
+        {
+          "flag": true,
+          "message": "boom",
+          "op": "must",
+          "value": "v"
+        },
+        {
+          "flag": true,
+          "message": "",
+          "op": "must",
+          "value": "v"
+        }
+      ],
+      "case": "leaves/helpers/must-panics-with-the-error-value",
+      "discriminates": "Must panics if and only if err != nil (core.go:511-513) -- an error whose message is empty still panics, which is the step that catches a port testing the message rather than the presence -- and it panics WITH the error value itself, not with a rendering of it, so the recorded payload kind is `error` and the recovered value can still be type-asserted. Must(v, nil) returns v unchanged including when v is the zero value, so a port that conflates the two arguments into one nullable result fails the second step.",
+      "operation": "tsc/internal/core/core.go:Must",
+      "order_sensitive": true,
+      "subject": "helpers.Must"
+    },
+    {
+      "actions": [
+        {
+          "fallback": "d",
+          "op": "or_else",
+          "value": ""
+        },
+        {
+          "fallback": "",
+          "op": "or_else",
+          "value": "d"
+        },
+        {
+          "fallback": "",
+          "op": "or_else",
+          "value": ""
+        },
+        {
+          "fallback": "d",
+          "op": "or_else",
+          "value": "0"
+        },
+        {
+          "fallback": "d",
+          "op": "or_else",
+          "value": "false"
+        },
+        {
+          "fallback": "x",
+          "flag": true,
+          "op": "if_else",
+          "value": ""
+        },
+        {
+          "fallback": "",
+          "flag": false,
+          "op": "if_else",
+          "value": "a"
+        },
+        {
+          "fallback": "b",
+          "flag": true,
+          "op": "if_else",
+          "value": "a"
+        },
+        {
+          "fallback": "b",
+          "flag": false,
+          "op": "if_else",
+          "value": "a"
+        }
+      ],
+      "case": "leaves/helpers/or-else-tests-the-value-not-a-flag",
+      "discriminates": "OrElse's test is `value != *new(T)` (core.go:412), a zero-value test on the value itself: \"0\" and \"false\" are kept and only \"\" is replaced, so a port that models it as Option::unwrap_or -- or that applies a JavaScript falsiness test, which this file's ancestry invites -- differs on two steps. IfElse selects on the boolean alone, so IfElse(true, \"\", \"x\") is \"\" and IfElse(false, \"a\", \"\") is \"\": that is exactly where an implementation that quietly fused the two, or that transposed whenTrue and whenFalse, shows. The string instantiation is the pinned one at upstream/tsc/internal/evaluator/evaluator.go:149.",
+      "operation": "tsc/internal/core/core.go:OrElse",
+      "order_sensitive": true,
+      "subject": "helpers.Values"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "push_seq"
+        },
+        {
+          "op": "push_nil_seq"
+        },
+        {
+          "items": [
+            "c"
+          ],
+          "op": "push_seq"
+        },
+        {
+          "op": "collect"
+        },
+        {
+          "index": 2,
+          "op": "collect"
+        },
+        {
+          "index": 1,
+          "op": "collect"
+        },
+        {
+          "op": "reset_seqs"
+        },
+        {
+          "op": "push_nil_seq"
+        },
+        {
+          "op": "collect"
+        },
+        {
+          "op": "reset_seqs"
+        },
+        {
+          "op": "collect"
+        },
+        {
+          "op": "reset_seqs"
+        },
+        {
+          "items": [],
+          "op": "push_seq"
+        },
+        {
+          "items": [
+            "z"
+          ],
+          "op": "push_seq"
+        },
+        {
+          "op": "collect"
+        }
+      ],
+      "case": "leaves/helpers/concatenate-seq-skips-a-nil-operand",
+      "discriminates": "ConcatenateSeq SKIPS a nil operand instead of calling it (core.go:741-742), which is load-bearing at upstream/tsc/internal/format/indent.go:160-166: trailingRangesOfPreviousToken is declared as a bare `var ... iter.Seq[...]` and stays nil when there is no preceding token, then goes straight into this call. A consumer that stops early stops the WHOLE concatenation rather than moving on to the next operand (core.go:745-746), which the limited collects pin by the visited count. A port taking a vector of iterators cannot represent the nil operand at all, so this trace is what states the contract it must carry instead; one that eagerly drains every operand before yielding fails the early-stop counts.",
+      "operation": "tsc/internal/core/core.go:ConcatenateSeq",
+      "order_sensitive": true,
+      "subject": "helpers.ConcatenateSeq"
+    },
+    {
+      "actions": [
+        {
+          "fallback": "a",
+          "op": "strings",
+          "value": "a"
+        },
+        {
+          "fallback": "b",
+          "op": "strings",
+          "value": "a"
+        },
+        {
+          "fallback": "",
+          "op": "strings",
+          "value": ""
+        },
+        {
+          "op": "new_box",
+          "target": "p",
+          "value": "x"
+        },
+        {
+          "op": "new_box",
+          "target": "q",
+          "value": "x"
+        },
+        {
+          "op": "pointers",
+          "other": "p",
+          "target": "p"
+        },
+        {
+          "op": "pointers",
+          "other": "q",
+          "target": "p"
+        },
+        {
+          "op": "new_nil_box",
+          "target": "z"
+        },
+        {
+          "op": "pointers",
+          "other": "z",
+          "target": "z"
+        },
+        {
+          "op": "pointers",
+          "other": "z",
+          "target": "p"
+        },
+        {
+          "op": "pairs",
+          "other": "p",
+          "target": "p",
+          "value": "n"
+        },
+        {
+          "op": "pairs",
+          "other": "q",
+          "target": "p",
+          "value": "n"
+        }
+      ],
+      "case": "leaves/helpers/comparable-values-equal-is-address-equality",
+      "discriminates": "comparableValuesEqual is Go's `==` on a comparable type (core.go:766), and it is the equality DiffMaps hands to DiffMapsFunc (core.go:774). Its only non-test caller is upstream/tsc/internal/api/session.go:3845, diffing map[tspath.Path]*ast.SourceFile, so the comparison is POINTER identity: two distinct source files with identical contents are `changed`, which is what makes a reparsed file reach the client. The trace pins that on a bare pointer and on a struct that merely carries one, where == compares the address and never the pointee. A port that derives PartialEq structurally, or that compares Rc/Arc contents rather than addresses, reports `unchanged` exactly where the pinned session reports a change.",
+      "operation": "tsc/internal/core/core.go:comparableValuesEqual",
+      "order_sensitive": true,
+      "subject": "helpers.ComparableValues"
+    },
+    {
+      "actions": [
+        {
+          "hex": "6122625c633c643e2665",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        },
+        {
+          "hex": "746162096e6c0a001f2064656c7f",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        },
+        {
+          "hex": "61ff8062",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        },
+        {
+          "hex": "eda080",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        },
+        {
+          "hex": "6c696e65e280a8736570e280a9656e64",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        },
+        {
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings_nil"
+        },
+        {
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings_empty"
+        },
+        {
+          "indent": "",
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings"
+        },
+        {
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "nil_any"
+        },
+        {
+          "hex": "c3a9e4b896",
+          "indent": "",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string"
+        }
+      ],
+      "case": "leaves/helpers/stringify-json-compact-escapes",
+      "discriminates": "StringifyJson goes through upstream/tsc/internal/json, which is go-json-experiment with AllowInvalidUTF8(true) (json.go:12-20), NOT encoding/json: `<`, `>`, `&`, U+2028 and U+2029 are left unescaped, DEL is left unescaped, control bytes become lowercase \\u00xx, each invalid UTF-8 BYTE becomes one U+FFFD, and a typed nil []string encodes as [] while a nil interface encodes as null. A port written against encoding/json's defaults differs on the HTML row, the line-separator row and the nil-slice row; one that replaces a whole invalid sequence with a single U+FFFD differs on the two byte rows. Results travel as hex because the exact bytes are the contract -- this is the arm the pinned quoting caller uses (upstream/tsc/internal/ls/utilities.go:315).",
+      "operation": "tsc/internal/core/core.go:StringifyJson",
+      "order_sensitive": true,
+      "subject": "helpers.StringifyJson"
+    },
+    {
+      "actions": [
+        {
+          "indent": "",
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings"
+        },
+        {
+          "indent": "  ",
+          "items": [
+            "a",
+            "b"
+          ],
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings"
+        },
+        {
+          "indent": "  ",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings_empty"
+        },
+        {
+          "indent": "  ",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings_nil"
+        },
+        {
+          "indent": "  ",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "string",
+          "text": "plain"
+        },
+        {
+          "groups": [
+            [
+              "a"
+            ],
+            [
+              "b",
+              "c"
+            ]
+          ],
+          "indent": "  ",
+          "op": "stringify",
+          "prefix": "",
+          "shape": "nested"
+        },
+        {
+          "indent": "\t",
+          "items": [
+            "a"
+          ],
+          "op": "stringify",
+          "prefix": "",
+          "shape": "strings"
+        }
+      ],
+      "case": "leaves/helpers/stringify-json-indent-arm",
+      "discriminates": "MarshalIndent takes the indent options only when prefix or indent is non-empty (upstream/tsc/internal/json/json.go:41-47), because they imply multiline output, so the same input has two shapes in one trace: `[\"a\",\"b\"]` on the compact arm and a three-line document on the indented one. An EMPTY array stays `[]` on one line even when indented, and a bare string is unaffected -- a port that always installs an indenter, or that renders an empty array as `[\\n]`, differs there. The indented arm is the one the fourslash and completions callers use; no Rust entry point takes prefix or indent at all today, which is what makes this trace a gap record rather than a comparison.",
+      "operation": "tsc/internal/core/core.go:StringifyJson",
+      "order_sensitive": true,
+      "subject": "helpers.StringifyJson"
+    }
+  ]
+}

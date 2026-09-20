@@ -7,11 +7,13 @@ comparison in phase1_capture.py, which reuses the existing Go overlay and
 subprocess helpers rather than re-implementing them.
 
     python3 scripts/phase1.py inventory --check
+    python3 scripts/phase1.py inventory --write        # rebuild the derived manifests
     python3 scripts/phase1.py prepare --family FAMILY --output DIRECTORY
     python3 scripts/phase1.py freeze --from DIRECTORY
     python3 scripts/phase1.py map-baselines --output DIRECTORY [--write]
     python3 scripts/phase1.py capture --family FAMILY --output DIRECTORY [--case ID ...]
     python3 scripts/phase1.py compare --capture DIRECTORY [--require-parity]
+    python3 scripts/phase1.py record  --capture DIRECTORY [--write]
     python3 scripts/phase1.py report --captures DIRECTORY ... --output FILE
 
 Diagnostics go to stderr; stdout carries one JSON object so the producer
@@ -70,6 +72,7 @@ def inventory_check() -> dict:
 
     problems += scope_module.verify(scope)
     problems += scope_module.witness_problems()
+    problems += scope_module.roster_problems(scope, cases)
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
 
@@ -128,6 +131,12 @@ def inventory_check() -> dict:
             f"{unlinked} operations carry file-level producer metrics but no exact "
             "operation-level coverage link"
         )
+    preparation = scope_module.leaf_preparation(scope, cases)
+    if preparation["pending"]:
+        outstanding.append(
+            f"{len(preparation['pending'])} leaf operation(s) have neither a prepared case, "
+            "a verified witness nor a reviewed roster exemption"
+        )
     return {
         "pin": pin,
         "operations": scope["total_operations"],
@@ -142,7 +151,86 @@ def inventory_check() -> dict:
         "ok": not problems,
         "f0_complete": not outstanding,
         "f0_outstanding": outstanding,
-        "f1a_preparation": scope_module.leaf_preparation(scope, cases),
+        "f1a_preparation": preparation,
+        # The published F1a result. True only when every leaf operation is
+        # linked to a prepared case or a verified witness, or removed from the
+        # roster by a ledger entry that itself validates.
+        "leaves_prepared": preparation["complete"],
+    }
+
+
+PREPARATION = ROOT / "data/phase1/leaves-preparation.json"
+
+
+def inventory_write() -> dict:
+    """Rebuild the derived manifests so they cannot drift from their builders.
+
+    Both files are derived, and the tests assert the committed bytes equal what
+    the builders produce. Without a command to regenerate them that assertion
+    is a trap rather than a check, so it is spelled here and named in the
+    module docstring.
+    """
+    scope = scope_module.build()
+    SCOPE.write_text(json.dumps(scope, indent=2, sort_keys=True) + "\n")
+    cases = load(CASES)
+    preparation = scope_module.leaf_preparation(scope, cases)
+    PREPARATION.write_text(json.dumps(preparation, indent=2, sort_keys=True) + "\n")
+    return {
+        "wrote": [
+            str(SCOPE.relative_to(ROOT)),
+            str(PREPARATION.relative_to(ROOT)),
+        ],
+        "operations": scope["total_operations"],
+        "counts": scope["counts"],
+        "leaves_prepared": preparation["complete"],
+        "pending": len(preparation["pending"]),
+    }
+
+
+def record_results(capture: Path, write: bool) -> dict:
+    """Write each case's `last_result` from a real comparison.
+
+    `last_result` decides coverage: a case claiming `match` makes its
+    operations covered. Hand-maintaining it means the claim can be written
+    without the run ever happening, so it is derived here from a capture the
+    comparison authenticated, and the manifest and the capture must name the
+    same cases in both directions.
+    """
+    report = capture_module.compare(capture, False)
+    observed = {row["case"]: row["result"] for row in report["rows"]}
+    document = load(CASES)
+    family = report["family"]
+    declared = {case["id"] for case in document["cases"] if case.get("family") == family}
+    missing = sorted(declared - set(observed))
+    extra = sorted(set(observed) - declared)
+    if missing or extra:
+        raise ValueError(
+            f"the capture and the case manifest disagree: {len(missing)} case(s) declared but "
+            f"not run ({', '.join(missing[:3])}), {len(extra)} run but not declared "
+            f"({', '.join(extra[:3])})"
+        )
+    changed = []
+    for case in document["cases"]:
+        if case.get("family") != family:
+            continue
+        if case.get("last_result") != observed[case["id"]]:
+            changed.append({
+                "case": case["id"],
+                "was": case.get("last_result"),
+                "now": observed[case["id"]],
+            })
+            case["last_result"] = observed[case["id"]]
+    if write:
+        CASES.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+    counts: dict[str, int] = {}
+    for result in observed.values():
+        counts[result] = counts.get(result, 0) + 1
+    return {
+        "family": family,
+        "cases": len(observed),
+        "counts": dict(sorted(counts.items())),
+        "changed": changed,
+        "written": write,
     }
 
 
@@ -214,7 +302,13 @@ def main() -> int:
     commands = parser.add_subparsers(dest="command", required=True)
 
     check = commands.add_parser("inventory")
-    check.add_argument("--check", action="store_true", required=True)
+    mode = check.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--check", action="store_true")
+    mode.add_argument(
+        "--write",
+        action="store_true",
+        help="rebuild scope.json and leaves-preparation.json from their builders",
+    )
 
     prepare_parser = commands.add_parser("prepare")
     prepare_parser.add_argument("--family", required=True)
@@ -238,6 +332,10 @@ def main() -> int:
     map_parser.add_argument("--write", action="store_true",
                             help="install the attributed index into data/phase1/")
 
+    record_parser = commands.add_parser("record")
+    record_parser.add_argument("--capture", type=Path, required=True)
+    record_parser.add_argument("--write", action="store_true")
+
     report_parser = commands.add_parser("report")
     report_parser.add_argument("--captures", type=Path, nargs="+", required=True)
     report_parser.add_argument("--output", type=Path, required=True)
@@ -245,6 +343,10 @@ def main() -> int:
 
     args = parser.parse_args()
     if args.command == "inventory":
+        if args.write:
+            result = inventory_write()
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
         result = inventory_check()
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0 if result["ok"] else 1
@@ -260,6 +362,8 @@ def main() -> int:
         if args.write:
             BASELINES.write_text(json.dumps(index, indent=2, sort_keys=True) + "\n")
         result = index["invocation_mapping"]
+    elif args.command == "record":
+        result = record_results(args.capture, args.write)
     elif args.command == "compare":
         result = capture_module.compare(args.capture, args.require_parity)
     else:

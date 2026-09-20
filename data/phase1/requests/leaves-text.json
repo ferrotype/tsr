@@ -2649,10 +2649,82 @@
         {
           "left_hex": "225c22",
           "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c2222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "225c2222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "275c2727",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "275c2727",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c5c5c5c22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "225c5c5c5c22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "615c6e62",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "615c6e62",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0a6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0a5c0a6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "615c0a62",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c0a22",
+          "op": "unquote_string"
         }
       ],
       "case": "leaves/text/quote-stripping",
-      "discriminates": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a real unescape, so \\n stays the letter n.",
+      "discriminates": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a real unescape, so \\n stays the letter n. The backslash inputs reach the replacement the quoted form performs: the pinned code replaces every backslash-something pair with the something, faithfully reproducing the original regular expression rather than unescaping, so a quoted backslash-n becomes the letter n and not a line feed, a doubled backslash becomes one, and an escaped quote becomes a bare quote. A port that called a real unquote would differ on every one of them. The unquoted input with a backslash shows that the replacement runs on whatever StripQuotes returned, quoted or not. The backslash-newline inputs separate the replacement from a naive unescape in the other direction: the pinned pattern is the regular expression \\\\. and Go's dot does not match a line feed by default, so a backslash immediately before a newline is left in place where every other backslash is removed",
       "operation": "tsc/internal/stringutil/util.go:StripQuotes",
       "order_sensitive": true,
       "subject": "stringutil"
@@ -2849,6 +2921,16 @@
         {
           "op": "compare",
           "right": "1.2.3-4294967297",
+          "text": "1.2.3-4294967296"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-5",
+          "text": "1.2.3-9999999999"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-4294967295",
           "text": "1.2.3-4294967296"
         },
         {
@@ -4393,6 +4475,54 @@
         {
           "op": "from_text",
           "text_hex": "31ff"
+        },
+        {
+          "op": "from_text",
+          "text": "1.500"
+        },
+        {
+          "op": "from_text",
+          "text": "1.000"
+        },
+        {
+          "op": "from_text",
+          "text": "000.5"
+        },
+        {
+          "op": "from_text",
+          "text": "0.0"
+        },
+        {
+          "op": "from_text",
+          "text": "1e007"
+        },
+        {
+          "op": "from_text",
+          "text": "1e+0007"
+        },
+        {
+          "op": "from_text",
+          "text": "1e-007"
+        },
+        {
+          "op": "from_text",
+          "text": "0.000"
+        },
+        {
+          "op": "from_text",
+          "text": "1.0e0"
+        },
+        {
+          "op": "from_text",
+          "text": "000"
+        },
+        {
+          "op": "from_text",
+          "text": ".000"
+        },
+        {
+          "op": "from_text",
+          "text": "12.30"
         }
       ],
       "case": "leaves/text/jsnum-from-string",
@@ -5807,6 +5937,218 @@
       "operation": "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
       "order_sensitive": true,
       "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "^1.2.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.2.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.0.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.3-beta.1",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~0.2.3-rc",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^1.2.3+build.9",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.3+build.9",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-increment-drops-prerelease",
+      "discriminates": "the increment helpers build a fresh version from the incremented component alone, so the upper bound a caret or tilde range derives carries no prerelease and no build: the operand's own prerelease survives in the lower bound while the upper bound is a bare release. A port that copied the operand and bumped one field would keep them, and the rendered range would differ even where the membership answers happened to agree, which is why the rendered form is compared and not only the tests",
+      "operation": "tsc/internal/semver/version.go:Version.incrementMajor",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "not a range",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 -",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "@#$",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=1.2.3 || garbage",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 || ",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-unparsed-matches-everything",
+      "discriminates": "a range that fails to parse is still returned, carrying no alternatives, and an empty disjunction is specified to admit every version, so a failed parse yields a range that matches everything rather than nothing; a port that returned an error and defaulted to no match would invert every answer here. The rendered form is the wildcard for the same reason: the disjunction writes it when it emitted no bytes of its own",
+      "operation": "tsc/internal/semver/version_range.go:testDisjunction",
+      "order_sensitive": true,
+      "subject": "semver"
     }
   ],
   "version": 1

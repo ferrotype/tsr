@@ -134,6 +134,8 @@ FAMILIES = {
             "data/phase1/requests/leaves.json",
             "data/phase1/requests/leaves-collections.json",
             "data/phase1/requests/leaves-core.json",
+            "data/phase1/requests/leaves-options.json",
+            "data/phase1/requests/leaves-helpers.json",
             "data/phase1/requests/leaves-json.json",
             "data/phase1/requests/leaves-text.json",
             "data/phase1/requests/leaves-locale.json",
@@ -147,6 +149,15 @@ FAMILIES = {
             {"name": "core", "package": "core",
              "probe": "tools/phase1/leaves/core_probe_test.go",
              "test": "TestPhase1LeavesCore"},
+            # Three probes share package `core`: the option getters and the
+            # generic helpers are separate surfaces with separate action
+            # vocabularies, and one overlay file per probe keeps them so.
+            {"name": "options", "package": "core",
+             "probe": "tools/phase1/leaves/options_probe_test.go",
+             "test": "TestPhase1LeavesOptions"},
+            {"name": "helpers", "package": "core",
+             "probe": "tools/phase1/leaves/helpers_probe_test.go",
+             "test": "TestPhase1LeavesHelpers"},
             {"name": "json", "package": "json",
              "probe": "tools/phase1/leaves/json_probe_test.go",
              "test": "TestPhase1LeavesJson"},

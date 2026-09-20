@@ -52,6 +52,124 @@ fn filesystem() -> tsr_bundled::BundledFs {
     tsr_bundled::BundledFs::new(Arc::new(MemoryBuilder::new(b"/", true).finish()))
 }
 
+/// The inner filesystem the delegation cases wrap, matching the map the Go
+/// probe hands to `vfstest.FromMap`. Both hosts are in-memory and both are
+/// asked only for normalized, rooted, posix paths, which is the domain the two
+/// agree on; what these cases pin is the wrapper's dispatch, not either host.
+fn inner_filesystem(case_sensitive: bool) -> tsr_vfs::MemorySnapshot {
+    let mut builder = MemoryBuilder::new(b"/", case_sensitive);
+    builder.insert_physical(b"/inner/known.txt", b"phase1 inner contents\n".to_vec());
+    builder.insert_physical(b"/inner/sub/deep.txt", b"deep\n".to_vec());
+    builder.finish()
+}
+
+/// Names inside this group are ASCII: the embedded library names and the two
+/// inner paths this file writes are the only values that reach it.
+fn utf8(bytes: &[u8]) -> &str {
+    std::str::from_utf8(bytes).expect("phase1 bundled paths and entry names are UTF-8")
+}
+
+/// The delegating half of the wrapper: a path that is not under the scheme is
+/// forwarded to the inner filesystem, and a bundled path is not, even when the
+/// inner filesystem could have answered it.
+fn delegation(request: &Value) -> Outcome {
+    fn run(request: &Value) -> Result<Value, tsr_vfs::Error> {
+        let fs = tsr_bundled::BundledFs::new(Arc::new(inner_filesystem(true)));
+        let mut rows = Vec::new();
+        for action in api::actions(request) {
+            let path = api::action_str(action, "path");
+            let bytes = path.as_bytes();
+            let entries = fs.entries(bytes)?;
+            let stat = fs
+                .stat(bytes)?
+                .map(|info| json!([info.directory, info.size]));
+            // A miss is (false, -1, ""), so it stays distinct from an empty
+            // file; no real read can report a negative length.
+            let read = match fs.read_file(bytes)? {
+                Some(content) => json!([true, content.raw.len(), digest(&content.raw)]),
+                None => json!([false, -1, ""]),
+            };
+            let realpath = fs.realpath(bytes)?;
+            rows.push(json!({
+                "op": "delegate_path",
+                "path": path,
+                "directory_exists": fs.directory_exists(bytes)?,
+                "file_exists": fs.file_exists(bytes)?,
+                "files": entries.files.iter().map(|name| utf8(name.as_bytes())).collect::<Vec<_>>(),
+                "directories": entries.directories.iter().map(|name| utf8(name.as_bytes())).collect::<Vec<_>>(),
+                "stat": stat,
+                "realpath": utf8(realpath.as_bytes()),
+                "read": read,
+            }));
+        }
+        Ok(api::ordered(rows))
+    }
+    if api::actions(request)
+        .iter()
+        .any(|action| api::action_op(action) != "delegate_path")
+    {
+        return Outcome::Failed("unsupported bundled delegation action".into());
+    }
+    match run(request) {
+        Ok(value) => Outcome::Observed(value),
+        Err(error) => Outcome::Failed(error.to_string()),
+    }
+}
+
+/// Whether the wrapper answers for itself or forwards. One inner filesystem per
+/// setting is what makes the two answers discriminable; the asset probes in the
+/// same row show the embedded half does not follow the setting either way.
+fn case_sensitivity(request: &Value) -> Outcome {
+    fn run(request: &Value) -> Result<Value, tsr_vfs::Error> {
+        let mut rows = Vec::new();
+        for action in api::actions(request) {
+            // Checked by the guard below, so the value is present here.
+            let requested = action
+                .get("case_sensitive")
+                .and_then(Value::as_bool)
+                .unwrap_or_default();
+            let inner = inner_filesystem(requested);
+            let inner_answer = inner.use_case_sensitive_file_names();
+            let fs = tsr_bundled::BundledFs::new(Arc::new(inner));
+            let exact = [tsr_bundled::LIB_PATH, b"/lib.d.ts"].concat();
+            let upper = [tsr_bundled::LIB_PATH, b"/LIB.D.TS"].concat();
+            rows.push(json!({
+                "op": "use_case_sensitive_file_names",
+                "requested": requested,
+                "inner": inner_answer,
+                "wrapper": fs.use_case_sensitive_file_names(),
+                "exact_case_asset_exists": fs.file_exists(&exact)?,
+                "upper_case_asset_exists": fs.file_exists(&upper)?,
+                "inner_upper_case_file_exists": fs.file_exists(b"/inner/KNOWN.TXT")?,
+            }));
+        }
+        Ok(api::ordered(rows))
+    }
+    if api::actions(request)
+        .iter()
+        .any(|action| api::action_op(action) != "use_case_sensitive_file_names")
+    {
+        return Outcome::Failed("unsupported bundled case-sensitivity action".into());
+    }
+    // Absence is a schedule defect, not false. Defaulting would let both sides
+    // agree on a zero value without either having exercised the operation, so
+    // the key is required here and by a nil check in the Go probe.
+    if api::actions(request).iter().any(|action| {
+        action
+            .get("case_sensitive")
+            .and_then(Value::as_bool)
+            .is_none()
+    }) {
+        return Outcome::Failed(
+            "use_case_sensitive_file_names needs an explicit case_sensitive".into(),
+        );
+    }
+    match run(request) {
+        Ok(value) => Outcome::Observed(value),
+        Err(error) => Outcome::Failed(error.to_string()),
+    }
+}
+
 /// Ask the same wrapper path on both sides, including malformed asset names.
 fn lookup(request: &Value) -> Outcome {
     let fs = filesystem();
@@ -141,6 +259,27 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         "BundledReads" => Some(reads(request)),
         "BundledPath" => Some(paths(request)),
         "BundledLibPath" => Some(lib_path()),
+        "BundledDelegation" => Some(delegation(request)),
+        "BundledCaseSensitivity" => Some(case_sensitivity(request)),
+        // The walk has no counterpart to call. `tsr_vfs::FileSystem` declares
+        // no walk method at all (crates/tsr_vfs/src/lib.rs:70-95), so neither
+        // the bundled tree nor the delegated root can be walked from here, and
+        // emulating the traversal in this driver would compare the harness
+        // against the pin rather than the port against the pin.
+        "BundledWalk" => Some(Outcome::missing(
+            "tsc/internal/bundled/embed.go:wrappedFS.walkDir, reached through wrappedFS.WalkDir",
+            "a walk operation on tsr_vfs::FileSystem, say \
+             walk_dir(&self, root: &[u8], visit: &mut dyn FnMut(&[u8], &Entry) -> Walk) -> \
+             Result<(), Error>, with a Walk control value carrying io/fs.SkipDir's and \
+             fs.SkipAll's two distinct meanings, plus the BundledFs override: a bundled root \
+             yields the scheme root's single `libs` directory entry and then the libraries, \
+             joining rest + \"/\" + name onto a scheme that already ends in a slash, never \
+             emits the root itself, treats any other bundled remainder as an empty walk rather \
+             than an error, and forwards a non-bundled root to the inner filesystem unchanged",
+            "crates/tsr_bundled/src/lib.rs (BundledFs implements read_file/stat/\
+             directory_exists/entries/realpath and no traversal; crates/tsr_vfs/src/lib.rs has \
+             no walk method for it to override)",
+        )),
         // Reads are exercised separately. This mixed trace also needs the
         // absent walk API and Go-compatible mutation refusal/delegation.
         "BundledWrapper" => Some(Outcome::missing(

@@ -36,12 +36,22 @@ import (
 
 	"github.com/microsoft/TypeScript/tsc/internal/bundled"
 	"github.com/microsoft/TypeScript/tsc/internal/vfs"
+	"github.com/microsoft/TypeScript/tsc/internal/vfs/vfstest"
 )
 
 type phase1Action struct {
 	Op   string `json:"op"`
 	Name string `json:"name"`
 	Path string `json:"path"`
+	// The delegation cases only. `Root` is a walk root rather than a path
+	// because a walk is not a per-path query, and `Stop` names what the walk
+	// callback returns rather than carrying a value the probe would invent.
+	// A pointer, so absence is distinguishable from false: an absent key must
+	// fail the case rather than default, because both sides would otherwise
+	// agree on a zero value without either having exercised the operation.
+	CaseSensitive *bool  `json:"case_sensitive"`
+	Root          string `json:"root"`
+	Stop          string `json:"stop"`
 }
 
 // decodePhase1Action unmarshals a request's actions once its subject has matched.
@@ -429,6 +439,171 @@ func phase1SourceDir() map[string]any {
 	return observation
 }
 
+// phase1InnerPaths is the content of the inner filesystem the delegation cases
+// hand to WrapFS. phase1StubFS deliberately panics on every delegated call, so
+// it cannot serve a case whose subject IS the delegation; these cases need an
+// inner filesystem that answers. Both sides build the same two files: the Go
+// probe through the pinned vfstest.FromMap and the Rust driver through
+// tsr_vfs::MemoryBuilder, which is the pairing the F0 pilot already uses
+// (tools/phase1/pilot/vfsmatch_probe_test.go against
+// tools/phase1/pilot/rust_observation.rs). Every path is normalized, rooted and
+// posix, because that is the domain vfstest.FromMap accepts (vfstest.go:84-97
+// panics otherwise) and the one where the two in-memory hosts agree; what the
+// case pins is the wrapper's dispatch, not either host's normalization.
+var phase1InnerPaths = map[string]string{
+	"/inner/known.txt":    "phase1 inner contents\n",
+	"/inner/sub/deep.txt": "deep\n",
+}
+
+func phase1AnsweringFS(caseSensitive bool) vfs.FS {
+	return vfstest.FromMap(phase1InnerPaths, caseSensitive)
+}
+
+// phase1Delegation records the half of the wrapper the bundled cases never
+// reach: upstream/tsc/internal/bundled/embed.go:54, :62, :69, :81, :99 and :152
+// each forward to the inner filesystem when splitPath does not match. The last
+// action asks for a bundled asset through the same wrapper, so the trace also
+// shows that an inner filesystem which COULD answer is still not consulted for
+// a bundled path.
+func phase1Delegation(t *testing.T, request phase1Request) map[string]any {
+	t.Helper()
+	wrapped := bundled.WrapFS(phase1AnsweringFS(true))
+	rows := []any{}
+	for _, action := range decodePhase1Action(t, request.Actions) {
+		if action.Op != "delegate_path" {
+			panic("phase1: unsupported action: " + action.Op)
+		}
+		path := action.Path
+		entries := wrapped.GetAccessibleEntries(path)
+		var stat any
+		if info := wrapped.Stat(path); info != nil {
+			stat = []any{info.IsDir(), info.Size()}
+		}
+		// A miss is (false, -1, ""); no real read can produce a negative
+		// length, so a missing file stays distinct from an empty one.
+		read := []any{false, -1, ""}
+		if contents, ok := wrapped.ReadFile(path); ok {
+			read = []any{true, len(contents), phase1Digest(contents)}
+		}
+		rows = append(rows, map[string]any{
+			"op": action.Op, "path": path,
+			"directory_exists": wrapped.DirectoryExists(path),
+			"file_exists":      wrapped.FileExists(path),
+			"files":            phase1Strings(entries.Files),
+			"directories":      phase1Strings(entries.Directories),
+			"stat":             stat,
+			"realpath":         wrapped.Realpath(path),
+			"read":             read,
+		})
+	}
+	return map[string]any{"ordered": rows}
+}
+
+// phase1CaseSensitivity answers the question upstream/tsc/internal/bundled/
+// embed.go:45-47 settles: the wrapper holds no opinion of its own and returns
+// vfs.fs.UseCaseSensitiveFileNames() unconditionally, with no bundled branch at
+// all. One inner filesystem per setting is what makes that discriminable, and
+// the asset probes in the same row show the embedded half is unaffected by it.
+func phase1CaseSensitivity(t *testing.T, request phase1Request) map[string]any {
+	t.Helper()
+	rows := []any{}
+	for _, action := range decodePhase1Action(t, request.Actions) {
+		if action.Op != "use_case_sensitive_file_names" {
+			panic("phase1: unsupported action: " + action.Op)
+		}
+		if action.CaseSensitive == nil {
+			panic("phase1: use_case_sensitive_file_names needs an explicit case_sensitive")
+		}
+		inner := phase1AnsweringFS(*action.CaseSensitive)
+		wrapped := bundled.WrapFS(inner)
+		rows = append(rows, map[string]any{
+			"op":                           action.Op,
+			"requested":                    *action.CaseSensitive,
+			"inner":                        inner.UseCaseSensitiveFileNames(),
+			"wrapper":                      wrapped.UseCaseSensitiveFileNames(),
+			"exact_case_asset_exists":      wrapped.FileExists(bundled.LibPath() + "/lib.d.ts"),
+			"upper_case_asset_exists":      wrapped.FileExists(bundled.LibPath() + "/LIB.D.TS"),
+			"inner_upper_case_file_exists": wrapped.FileExists("/inner/KNOWN.TXT"),
+		})
+	}
+	return map[string]any{"ordered": rows}
+}
+
+var phase1WalkSentinel = errors.New("phase1 walk sentinel")
+
+// phase1WalkError reduces a walk result to what a port could reproduce. The
+// sentinel and the two io/fs signals are named values whose identity is the
+// contract, so they are recorded as themselves; a filesystem error is a Go
+// runtime sentence and is recorded only as its io/fs class.
+func phase1WalkError(err error) string {
+	switch {
+	case err == nil:
+		return "nil"
+	case errors.Is(err, phase1WalkSentinel):
+		return "phase1 walk sentinel"
+	case errors.Is(err, fs.SkipAll):
+		return "fs.SkipAll"
+	case errors.Is(err, fs.SkipDir):
+		return "fs.SkipDir"
+	case errors.Is(err, fs.ErrNotExist):
+		return "not-exist"
+	}
+	return "other"
+}
+
+// phase1Walk records the walk contract the wrapper cases cannot reach: the
+// delegated walk (upstream/tsc/internal/bundled/embed.go:112), the two bundled
+// roots that fall into walkDir's default branch (:122), and the two ways the
+// recursion at :138-142 ends when the callback stops inside the nested libs
+// walk. Order is the subject, so every row carries the callback sequence.
+func phase1Walk(t *testing.T, request phase1Request) map[string]any {
+	t.Helper()
+	wrapped := bundled.WrapFS(phase1AnsweringFS(true))
+	rows := []any{}
+	for _, action := range decodePhase1Action(t, request.Actions) {
+		if action.Op != "walk" {
+			panic("phase1: unsupported action: " + action.Op)
+		}
+		switch action.Stop {
+		case "none", "skip_all_at_2", "error_at_2":
+		default:
+			panic("phase1: unsupported walk stop: " + action.Stop)
+		}
+		count := 0
+		first := []any{}
+		callback := "nil"
+		err := wrapped.WalkDir(action.Root, func(path string, entry vfs.DirEntry, err error) error {
+			if err != nil {
+				// The entry is nil on an error callback, so nothing about it
+				// may be read here.
+				if callback == "nil" {
+					callback = phase1WalkError(err)
+				}
+				return err
+			}
+			count++
+			if len(first) < 64 {
+				first = append(first, []any{path, entry.Name(), entry.IsDir()})
+			}
+			if count == 2 {
+				switch action.Stop {
+				case "skip_all_at_2":
+					return fs.SkipAll
+				case "error_at_2":
+					return phase1WalkSentinel
+				}
+			}
+			return nil
+		})
+		rows = append(rows, map[string]any{
+			"op": action.Op, "root": action.Root, "stop": action.Stop,
+			"error": phase1WalkError(err), "callback_error": callback,
+			"count": count, "first": first,
+		})
+	}
+	return map[string]any{"ordered": rows}
+}
+
 func TestPhase1LeavesBundled(t *testing.T) {
 	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
 	if err != nil {
@@ -463,6 +638,15 @@ func TestPhase1LeavesBundled(t *testing.T) {
 		case "BundledWrapper":
 			row["result"] = "observed"
 			row["observation"] = phase1Wrapper(t)
+		case "BundledDelegation":
+			row["result"] = "observed"
+			row["observation"] = phase1Delegation(t, request)
+		case "BundledCaseSensitivity":
+			row["result"] = "observed"
+			row["observation"] = phase1CaseSensitivity(t, request)
+		case "BundledWalk":
+			row["result"] = "observed"
+			row["observation"] = phase1Walk(t, request)
 		case "BundledSourceDir":
 			row["result"] = "observed"
 			row["observation"] = phase1SourceDir()

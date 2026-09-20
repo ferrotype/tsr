@@ -24,7 +24,87 @@ use tsr_core::{ScriptKind, TextRange, Tristate};
 
 use crate::api::{action_i64, action_op, action_str, actions, ordered, subject, Outcome};
 
+/// The five generated `String()` methods, each with the Rust home it does not
+/// have. The port never exposes any of them: the two renderings that do exist
+/// are private helpers of consumer crates, written for one call site, and one
+/// of them is deliberately partial. Preparation records that; it renders no
+/// name here.
+const STRINGERS: &[(&str, &str, &str, &str)] = &[
+    ("core.Tristate",
+     "tsc/internal/core/tristate_stringer_generated.go:Tristate.String",
+     "a Display impl or an as_str on tsr_core::Tristate rendering TSUnknown/TSFalse/TSTrue for \
+      0/1/2 and Tristate(n) for every other byte. Tristate is a Go byte, so the generated \
+      `i < 0` guard is dead and the fallback is reached only past the index table",
+     "crates/tsr_core/src/lib.rs (Tristate implements the five predicates and default_if_unknown; \
+      it has no Display, no as_str and no name table, and a repo-wide search for the string \
+      TSUnknown across crates/ finds nothing)"),
+    ("core.ScriptKind",
+     "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String",
+     "a Display impl or an as_str on tsr_core::ScriptKind rendering the untrimmed \
+      ScriptKindUnknown/JS/JSX/TS/TSX for 0..=4 and ScriptKindJSON for 6, with ScriptKind(n) for \
+      the unnamed 5 and for everything outside the domain",
+     "crates/tsr_core/src/lib.rs (ScriptKind implements from_file_name, ensure_from_file_name \
+      and default_extension only; a repo-wide search for the string ScriptKindJSON across \
+      crates/ finds nothing)"),
+    ("core.LanguageVariant",
+     "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String",
+     "a Display impl or an as_str on tsr_core::LanguageVariant rendering the untrimmed \
+      LanguageVariantStandard and LanguageVariantJSX for 0 and 1, and LanguageVariant(n) for \
+      every other i32 including negatives",
+     "crates/tsr_core/src/lib.rs (LanguageVariant declares the two constants and nothing else; a \
+      repo-wide search for the string LanguageVariantStandard across crates/ finds nothing)"),
+    ("core.ModuleKind",
+     "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String",
+     "one shared renderer on tsr_core::ModuleKind covering all three named runs -- 0..=7, \
+      99..=102 and 199..=200 -- with the trimmed names and ModuleKind(n) for the two numeric \
+      gaps between them and for everything outside",
+     "crates/tsr_core/src/compiler_options.rs (ModuleKind declares the constants, plus \
+      is_non_node_esm and supports_import_attributes at :363-374, and no renderer). The port renders this operation in one place only, and not on the type: \
+      crates/tsr_checker/src/emit_checks.rs:514 module_kind_text is pub(crate), names all \
+      fourteen values and is marked as this operation's source, while \
+      crates/tsr_compiler/src/verify_options.rs:584 module_name is a private helper whose only \
+      call site (:564) is guarded by (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module), \
+      so inside its reachable domain it agrees with the pin, including on the unnamed values within \
+      that range. Neither rendering is reachable from outside its crate"),
+    ("core.ScriptTarget",
+     "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String",
+     "one shared renderer on tsr_core::ScriptTarget covering 0..=12 and 99..=100 with the \
+      trimmed names and ScriptTarget(n) for the gap between them and for everything outside; \
+      the aliases Latest and LatestStandard are ESNext and ES2025 and render as those",
+     "crates/tsr_core/src/lib.rs (ScriptTarget declares the constants and nothing else). The \
+      only rendering in the port is the private fn script_target_text at \
+      crates/tsr_compiler/src/include_reason.rs:684, written for one diagnostic argument and \
+      not reachable from outside that crate"),
+];
+
+/// Claims a case whose trace is entirely `String()` renderings and records the
+/// gap. A trace that mixed a rendering with an observable action could not be
+/// answered at all -- the result is one status per case -- so it is refused
+/// rather than half-answered.
+fn stringer(subject: &str, trace: &[Value]) -> Option<Outcome> {
+    let (_, authority, signature, home) = STRINGERS.iter().find(|(name, ..)| *name == subject)?;
+    let renderings = trace
+        .iter()
+        .filter(|action| action_op(action) == "string")
+        .count();
+    if renderings == 0 {
+        return None;
+    }
+    if renderings != trace.len() {
+        return Some(Outcome::Failed(format!(
+            "a {subject} case mixes {renderings} String() action(s) with {} action(s) that have \
+             a production entry point; one case carries one result, so it is either wholly the \
+             recorded gap or wholly observed",
+            trace.len() - renderings,
+        )));
+    }
+    Some(Outcome::missing(authority, signature, home))
+}
+
 pub fn observe(request: &Value) -> Option<Outcome> {
+    if let Some(outcome) = stringer(subject(request), actions(request)) {
+        return Some(outcome);
+    }
     let replayed = match subject(request) {
         "core.Tristate" => Ok(tristate(actions(request))),
         "core.TextRange" => Ok(text_range(actions(request))),

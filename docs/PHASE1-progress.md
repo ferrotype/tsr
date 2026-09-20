@@ -24,32 +24,49 @@ implementation; no production behavior has been added or changed.
 
 ## F1a — foundation leaf preparation
 
-150 leaf cases are frozen across the plan's six coverage groups, every one with
-a native observation from the pinned packages and a classified Rust result.
+**`leaves_prepared: true`.** Every operation in the leaf package roster is
+linked to a runnable prepared case, a verified rust-gated witness, or a reviewed
+exemption in `data/phase1/leaf-roster.json`, and the ledger itself validates.
+`python3 scripts/phase1.py inventory --check` publishes the result.
 
-| Group | Cases | match | not_implemented |
-| --- | ---: | ---: | ---: |
-| core/collections | 29 | 0 | 29 |
-| core | 16 | 13 | 3 |
-| JSON | 30 | 0 | 30 |
-| text/number/semver | 29 | 18 | 11 |
-| locale | 12 | 0 | 12 |
-| diagnostics | 27 | 6 | 21 |
-| bundled | 7 | 5 | 2 |
-| **total** | **150** | **42** | **108** |
+224 leaf cases are frozen, every one with a native observation from the pinned
+packages and a classified Rust result.
 
-Zero `different`, zero `native_unavailable`, zero `harness_failed`: every case
-runs on both sides. The 108 `not_implemented` rows are the honest
-preparation-time result — no `tsr_core::collections`, `tsr_json` or `tsr_locale`
-exists — and each names its Go authority, intended signature and production home.
+| Group | Cases | match | not_implemented | different |
+| --- | ---: | ---: | ---: | ---: |
+| core/collections | 42 | 0 | 42 | 0 |
+| core | 21 | 13 | 8 | 0 |
+| core helpers | 20 | 1 | 19 | 0 |
+| compiler options | 31 | 26 | 4 | 1 |
+| JSON | 30 | 0 | 30 | 0 |
+| text/number/semver | 31 | 20 | 11 | 0 |
+| locale | 12 | 0 | 12 | 0 |
+| diagnostics | 27 | 6 | 21 | 0 |
+| bundled | 10 | 7 | 3 | 0 |
+| **total** | **224** | **73** | **150** | **1** |
 
-Ten access-only Go probes drive the pinned packages: collections, core, json,
-stringutil, semver, jsnum, locale, locale-default, diagnostics and bundled. Two
-of them live in `package locale`, which the harness supports because the
-process-global default locale needs its own process to observe honestly. The
-bundled probe is registered with `trimpath: False`, because `bundledSourceDir`
-locates its package through `runtime.Caller(0)` and under `-trimpath` returns a
-wrong path silently rather than failing.
+Zero `native_unavailable`, zero `harness_failed`, zero `not_run`: every case
+runs on both sides. The single `different` is a real port defect this step
+found, recorded below rather than fixed here. The 150 `not_implemented` rows are
+the honest preparation-time result — no `tsr_core::collections`, `tsr_json` or
+`tsr_locale` exists, and neither do most of the generic helpers — and each names
+its Go authority, intended signature and production home.
+
+The roster itself: **460 leaf operations**, of which 151 are `covered` by a
+matched comparison or a rust-gated witness, and 110 are removed from the roster
+by a ledger entry. `equivalent_rust` is no longer zero: eight operations are
+recorded as reproduced exactly by a Rust language construct, each held to the
+plan's `basis_kind: "review"` bar.
+
+Twelve access-only Go probes drive the pinned packages: collections, core,
+options, helpers, json, stringutil, semver, jsnum, locale, locale-default,
+diagnostics and bundled. Three of them compile into `package core` and two into
+`package locale`, which the harness supports because one overlay file per probe
+keeps separate action vocabularies separate, and because the process-global
+default locale needs its own process to observe honestly. The bundled probe is
+registered with `trimpath: False`, because `bundledSourceDir` locates its
+package through `runtime.Caller(0)` and under `-trimpath` returns a wrong path
+silently rather than failing.
 
 ### What the adversarial pass changed
 
@@ -108,37 +125,114 @@ operations covered on the strength of a Go-only run.
 74 operations now carry a case that runs and reports the Rust entry point
 absent, which is a witnessed gap rather than an inferred one.
 
-### Remaining F1a preparation
+### The F1a roster and how it is allowed to shrink
 
-The runnable case count is not the completion criterion. `inventory --check`
-now reports `f1a_preparation.complete: false`: **222 of 460** operations in the
-leaf package roster have a classified leaf case or an exact gated witness;
-**238 remain unlinked**. The complete queue, including each intended Rust home,
-is committed in `data/phase1/leaves-preparation.json` and checked against the
-live inventory by the Phase 1 tests.
+F1a's exit condition is that *every leaf operation* is linked to a runnable
+prepared case or a verified existing witness. That makes the roster itself a
+claim: an operation dropped from it quietly is work hidden behind a green gate.
+So the roster is the whole leaf surface computed from the scope, and it shrinks
+only through `data/phase1/leaf-roster.json`, a reviewed ledger where every entry
+names a category, the owner that does have the operation, and the evidence read
+at the pin.
 
-This is a conservative package roster. Runtime helpers, generators and core
-operations that belong to a later preparation step still need explicit
-operation ownership; they have not been silently dropped to mark F1a complete.
-Pending entries need either a native case, an exact link to existing gated
-observations, or a reviewed assignment to another preparation step. Several
-operations can share one trace. F1b can use the existing cases, but they do not
-close the remaining F1a work.
+`scripts/phase1_scope.py:roster_problems` validates the ledger the way any other
+claim is validated. An entry is rejected when it names an operation outside the
+frozen scope, an operation outside the leaf packages, an unknown category, or no
+owner or evidence; when it duplicates another entry; when it claims
+`equivalent_rust` but the scope row disagrees; and — the one that has already
+caught a real mistake — when the same operation is both exempted and linked to a
+prepared case. `leaves_prepared` is false while the ledger does not validate,
+not only while operations are pending, because an exemption nobody can defend is
+not an answer.
 
-The added action maps include locale context reads, collection mutations and
-constructors, range predicates, string operations and numeric operations. Seven
-E4 action names are now linked to their exact Go and Rust entry points; this
-does not attribute the entire E4 scenario inventory to every string helper.
+The categories are:
+
+| Category | What it claims |
+| --- | --- |
+| `build_tooling` | Runs at build time and never in a compile; the port generates the same artifact elsewhere (`xtask/src/gen`, `scripts/package_assets.py`). |
+| `go_runtime` | A Go language mechanism — scheduling, sync, arenas, the `go vet` copylocks marker — with no caller-visible contract to reproduce. |
+| `generated_assertion` | Not an operation: the blank-identifier compile-time check `stringer` emits. |
+| `later_step` | A real operation that a different named step prepares. |
+| `equivalent_rust` | The Go contract is reproduced exactly by a Rust language or standard library construct. This one also updates the scope row, and is held to the plan's `basis_kind: "review"` bar. |
+| `unused_at_pin` | Exported but called by nothing at the pin, tests included, so no caller fixes the contract. |
+
+`later_step` is decided by the pinned callers, not by intuition: when every
+non-test caller of an operation is outside this step, the step that ports those
+callers owns it, because the plan requires a generic helper's callers to be read
+before its Rust contract is chosen. Two corrections came out of applying that
+rule rather than asserting it. Go method *values* — `(*core.CompilerOptions).IsIncremental`
+at `upstream/tsc/internal/tsoptions/showconfig.go:43` — are caller references
+that a search for `.IsIncremental(` does not find, so the first pass recorded a
+false "no Phase 1 caller" for four option getters. And the rule does not
+override an operation the plan names as this step's own work:
+`docs/PHASE1-implementation-plan.md:432-434` puts "tri-state/default option
+semantics" in F1 explicitly, so the compiler-option getters stay on this roster
+whoever calls them, and their contract is self-contained rather than
+caller-derived.
+
+The derived manifests are no longer hand-maintained. `python3 scripts/phase1.py
+inventory --write` rebuilds `scope.json` and `leaves-preparation.json` from
+their builders, and `python3 scripts/phase1.py record --capture DIR --write`
+writes each case's `last_result` from a real comparison, refusing a capture
+whose case set disagrees with the manifest in either direction. Before that
+command existed, `last_result` decided coverage and was written by hand, so a
+case could claim `match` without the run ever happening.
+
+### A port defect preparation found
+
+`crates/tsr_tspath/src/lib.rs:144` ends its ancestor walk with
+`if path.is_empty() { break; }`. The pinned `ForEachAncestorDirectory`
+(`upstream/tsc/internal/tspath/path.go:1116`) has no such guard: it stops only
+when the parent equals the directory, so a *relative* base yields the
+empty-string ancestor as its last step and Rust drops it. Absolute bases bottom
+out at the root and agree, which is why nothing had noticed.
+
+It is reachable through `GetEffectiveTypeRoots`: with `configFilePath` set to
+`sub/tsconfig.json`, Go answers `["sub/node_modules/@types", "node_modules/@types"]`
+and Rust answers `["sub/node_modules/@types"]`. The case
+`leaves/options/effective-type-roots-relative-and-empty-base` records it as
+`different`, which is the classification F1a asks for rather than a fix — the
+plan is explicit that production code is not ported to make this step green.
+
+The fix belongs to F2b, because `tspath` is F2a's package. Size it before
+fixing: `path::ancestors` has six other call sites
+(`tsr_module/src/type_references.rs` twice, `tsr_module/src/resolver.rs`,
+`tsr_vfs/src/lib.rs` twice, `tsr_compiler/src/checker_module_specifiers.rs`,
+`tsr_testhost/src/filesystem.rs`), and each needs checking for whether its
+input can be relative.
 
 ### F1b queue
 
-The 108 `not_implemented` rows group into coherent ports: the ordered and
+The 150 `not_implemented` rows group into coherent ports: the ordered and
 copy-on-write containers (`OrderedMap`, `OrderedSet`, `Set`, `MultiMap`,
 `CopyOnWriteMap`, `CopyOnWriteSet`, `SyncMap`, `SyncSet`), the caller-visible
 JSON contract, locale parse and fallback, and diagnostic formatting with
 argument interpolation. `CopyOnWriteMap`'s scope guard and `SyncMap`'s
 present-with-nil contract need a deliberate Rust representation decision rather
 than a mechanical port.
+
+Two groups are new to this queue and both carry a decision rather than a
+transcription:
+
+- **The generic `internal/core` helpers.** Their contract is not "filter
+  filters": it is nil versus empty, and result identity. Three neighbouring
+  functions in one file give three different answers to "nothing survived" —
+  `Filter`'s rejecting arm is `slices.Clone(slice[:i])` and yields a non-nil
+  empty slice, `Map` guards `if slice == nil` and otherwise allocates, and
+  `MapFiltered`, `FlatMap` and `Flatten` accumulate into `var result []U` and
+  yield nil. A port that collapses all three to `Vec::new()` erases a
+  distinction that survives into JSON as `[]` versus `null`. Several of them
+  also return the *input slice itself* when nothing changed, which the cases
+  witness by writing through the result and reading the input back. Where the Go
+  contract genuinely is the Rust idiom, the operation is recorded as
+  `equivalent_rust` in the roster ledger instead of being ported.
+- **The five generated enum stringers.** None of the five has a home on its type
+  in the port. Two renderings exist, both private to a consumer crate and
+  written for one call site: `module_kind_text`
+  (`crates/tsr_checker/src/emit_checks.rs:514`, complete) and
+  `script_target_text` (`crates/tsr_compiler/src/include_reason.rs:684`). The
+  gap record asks for one shared renderer per type, including the numeric
+  fallback for the values in each enum's numbering gaps.
 
 `data/phase1/locale-assets.json` maps the 13 shipped translation tables to their
 path, size, sha256 and message-key count, with each fallback obligation and the
@@ -147,8 +241,28 @@ lands in F1b.
 
 ### Known limitations
 
-- Remaining E4 and S05 action attribution is in the preparation queue. Only
-  the seven explicitly mapped E4 actions confer coverage.
+These are stated rather than hidden, because a gate that reports them is worth
+more than one that does not.
+
+- Two `jsnum` helpers are reached but not separately discriminated: trimming a
+  fraction's trailing zeros and an exponent's leading zeros cannot change the
+  value the parse produces, so no input in the corpus separates them from doing
+  nothing. They are linked because the corpus calls them, not because it pins
+  them.
+- `CompilerOptions.Clone` cannot be failed by any wrong Rust clone:
+  `tsr_core::CompilerOptions` derives `Clone`, which copies every field by
+  construction. On the Rust side the case catches a *roster* that has drifted
+  from the pinned struct; the field-by-field claim applies to the Go side.
+- Go's `Clone` is a shallow copy, so a cloned `Paths` shares backing storage
+  with its source. That is not observable through this harness and no case
+  attempts it.
+- The bundled walk has no Rust counterpart to compare against —
+  `tsr_vfs::FileSystem` declares no walk method — so that case is Go-side native
+  authority. It witnesses the pinned branches but cannot catch a wrong port
+  until the trait grows one.
+- `noembed.go:wrapFS` and `noembed.go:IsBundled` are unreachable in every build
+  this repository makes, and no case was invented for them. The ledger records
+  that as `build_variant` with the build tags as evidence.
 - Some cases record a boolean where the pinned implementation's short-circuit is
   genuinely unobservable through the API (`SyncSet.IsEmpty`,
   `CopyOnWriteMap`'s ownership restore). Those claims were narrowed to what the

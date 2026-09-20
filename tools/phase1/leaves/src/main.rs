@@ -19,8 +19,10 @@ mod bundled;
 mod collections;
 mod core;
 mod diagnostics;
+mod helpers;
 mod json_contract;
 mod locale;
+mod options;
 mod text;
 
 use api::Outcome;
@@ -32,6 +34,8 @@ type GroupHandler = fn(&Value) -> Option<Outcome>;
 const GROUPS: &[(&str, GroupHandler)] = &[
     ("collections", collections::observe),
     ("core", core::observe),
+    ("options", options::observe),
+    ("helpers", helpers::observe),
     ("json", json_contract::observe),
     ("text", text::observe),
     ("locale", locale::observe),

@@ -46,6 +46,11 @@ type phase1Action struct {
 	Flag            bool     `json:"flag"`
 	Patterns        []string `json:"patterns"`
 	Values          []int64  `json:"values"`
+	// The generated String() cases only. One field serves all five enums, so a
+	// stringer row reads the same whichever enum it renders; the conversion to
+	// the enum's own underlying type is done at the call, because that width is
+	// part of what each case pins.
+	EnumValue int64 `json:"enum_value"`
 }
 
 type phase1Request struct {
@@ -152,6 +157,12 @@ func phase1Tristate(trace []phase1Action) []any {
 		case "bool_to_tristate":
 			row["flag"] = a.Flag
 			row["result"] = int64(BoolToTristate(a.Flag))
+		case "string":
+			// Tristate is a byte (tristate.go:8), so the generated guard
+			// `i < 0` at tristate_stringer_generated.go:22 can never fire and
+			// the numeric fallback is reached only through the index bound.
+			row["enum_value"] = a.EnumValue
+			row["text"] = Tristate(byte(a.EnumValue)).String()
 		default:
 			panic("phase1: unsupported action: " + a.Op)
 		}
@@ -276,6 +287,9 @@ func phase1ScriptKind(t *testing.T, trace []phase1Action) []any {
 		case "default_extension":
 			row["kind"] = a.Kind
 			row["extension"] = GetDefaultExtensionForScriptKind(ScriptKind(int32(a.Kind)))
+		case "string":
+			row["enum_value"] = a.EnumValue
+			row["text"] = ScriptKind(int32(a.EnumValue)).String()
 		default:
 			panic("phase1: unsupported action: " + a.Op)
 		}
@@ -342,6 +356,23 @@ func phase1Pattern(t *testing.T, trace []phase1Action) []any {
 	return ordered
 }
 
+// phase1Stringer replays a rendering trace. Each of the five generated String()
+// methods is reached through its own closure, so the enum's underlying type --
+// int32 for four of them, byte for Tristate -- is applied by the caller and
+// never widened here.
+func phase1Stringer(trace []phase1Action, render func(int64) string) []any {
+	ordered := []any{}
+	for _, a := range trace {
+		if a.Op != "string" {
+			panic("phase1: unsupported action: " + a.Op)
+		}
+		ordered = append(ordered, map[string]any{
+			"op": a.Op, "enum_value": a.EnumValue, "text": render(a.EnumValue),
+		})
+	}
+	return ordered
+}
+
 func TestPhase1LeavesCore(t *testing.T) {
 	input, err := os.ReadFile(os.Getenv("S08_REQUESTS"))
 	if err != nil {
@@ -371,6 +402,18 @@ func TestPhase1LeavesCore(t *testing.T) {
 			replayed = phase1ScriptKind(t, phase1Trace(t, request))
 		case "core.Pattern":
 			replayed = phase1Pattern(t, phase1Trace(t, request))
+		case "core.LanguageVariant":
+			replayed = phase1Stringer(phase1Trace(t, request), func(value int64) string {
+				return LanguageVariant(int32(value)).String()
+			})
+		case "core.ModuleKind":
+			replayed = phase1Stringer(phase1Trace(t, request), func(value int64) string {
+				return ModuleKind(int32(value)).String()
+			})
+		case "core.ScriptTarget":
+			replayed = phase1Stringer(phase1Trace(t, request), func(value int64) string {
+				return ScriptTarget(int32(value)).String()
+			})
 		default:
 			row["result"] = "native_unavailable"
 			row["reason"] = "subject is not served by the core probe"

@@ -411,6 +411,111 @@ def witness_problems() -> list[str]:
     return problems
 
 
+# ---------------------------------------------------------------------------
+# The F1a leaf roster.
+#
+# F1a's exit condition is that *every leaf operation* is linked to a runnable
+# prepared case or a verified existing witness. That makes the roster itself a
+# claim: an operation dropped from it silently is work hidden behind a green
+# gate. So membership is subtractive only through a reviewed ledger, where each
+# removal names a category, the owner that does have it, and the evidence read
+# at the pin.
+#
+# `unused_at_pin` is the one category with a mechanical check behind it: its
+# evidence records how many times the symbol occurs in the pinned tree, and one
+# occurrence is the definition itself. The plan's instruction for this file is
+# to read a generic helper's callers before choosing its Rust contract, so a
+# helper with no caller has no contract for this step to choose.
+#
+# An exemption is *not* a disposition. `later_step` in particular keeps the
+# operation inside Phase 1 -- F3a is a Phase 1 step -- and only says F1a is not
+# the step that prepares it. The one category that is also a disposition claim
+# is `equivalent_rust`, which the plan already defines, so that one updates the
+# scope row and is held to the same `basis_kind: "review"` bar.
+# ---------------------------------------------------------------------------
+LEAF_PACKAGES = frozenset(
+    "internal/" + name
+    for name in (
+        "core", "collections", "stringutil", "jsnum", "semver", "json",
+        "locale", "diagnostics", "bundled",
+    )
+)
+
+ROSTER_CATEGORIES = {
+    "build_tooling": "runs at build time and never in a compile; the port generates the same artifact elsewhere",
+    "go_runtime": "a Go language mechanism -- scheduling, sync, arenas, vet markers -- with no caller-visible contract to reproduce",
+    "generated_assertion": "not an operation: a compile-time assertion emitted by a generator",
+    "later_step": "a real operation that a different named step prepares",
+    "equivalent_rust": "the Go contract is reproduced exactly by a Rust language or standard library construct",
+    "unused_at_pin": "exported but called by nothing at the pin, tests included, so no caller fixes the contract",
+    "build_variant": "belongs to a build configuration this port does not produce, so no build reaches it",
+}
+
+ROSTER = ROOT / "data/phase1/leaf-roster.json"
+
+
+def leaf_roster() -> dict:
+    if not ROSTER.is_file():
+        return {"version": 1, "exemptions": []}
+    return json.loads(ROSTER.read_text())
+
+
+def roster_exemptions() -> dict[str, dict]:
+    return {entry["operation"]: entry for entry in leaf_roster().get("exemptions", [])}
+
+
+def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
+    """Validate the exemption ledger against the scope it claims to subtract from."""
+    document = leaf_roster()
+    problems: list[str] = []
+    if not ROSTER.is_file():
+        return ["data/phase1/leaf-roster.json is absent; the F1a roster has no reviewed ledger"]
+    pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+    if document.get("pin") != pin:
+        problems.append(
+            f"leaf-roster.json records pin {document.get('pin')!r}, not {pin!r}"
+        )
+    known = {row["id"]: row for row in scope.get("operations", [])}
+    prepared = cases_by_operation() if cases is None else {
+        operation: ids
+        for operation, ids in cases_by_operation().items()
+    }
+    seen: set[str] = set()
+    for entry in document.get("exemptions", []):
+        identity = entry.get("operation", "<unnamed>")
+        if identity in seen:
+            problems.append(f"leaf-roster: duplicate exemption for {identity}")
+        seen.add(identity)
+        row = known.get(identity)
+        if row is None:
+            problems.append(f"leaf-roster: {identity} is not an operation in the frozen scope")
+            continue
+        if row["go_package"] not in LEAF_PACKAGES:
+            problems.append(
+                f"leaf-roster: {identity} is not in a leaf package, so it was never on F1a's roster"
+            )
+        category = entry.get("category")
+        if category not in ROSTER_CATEGORIES:
+            problems.append(f"leaf-roster: {identity} has unknown category {category!r}")
+        for field in ("owner", "evidence"):
+            if not entry.get(field):
+                problems.append(f"leaf-roster: {identity} records no {field}")
+        # An exemption and a prepared case are contradictory claims about the
+        # same operation. Prefer the case and say so rather than silently
+        # letting the ledger suppress work that was actually done.
+        if identity in prepared:
+            problems.append(
+                f"leaf-roster: {identity} is exempted but also linked to prepared case(s) "
+                + ", ".join(prepared[identity][:3])
+            )
+        if category == "equivalent_rust" and row.get("disposition") != "equivalent_rust":
+            problems.append(
+                f"leaf-roster: {identity} claims equivalent_rust but the scope row says "
+                f"{row.get('disposition')!r}; rebuild the scope"
+            )
+    return problems
+
+
 def leaf_preparation(scope: dict, cases: dict) -> dict:
     """Preparation is not parity: a classified gap is runnable, an absent link isn't.
 
@@ -418,10 +523,6 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
     reviewed home elsewhere. In particular, do not hide unlinked core helpers
     or generated/runtime mechanisms merely because new traces did not use them.
     """
-    packages = {"internal/" + name for name in (
-        "core", "collections", "stringutil", "jsnum", "semver", "json",
-        "locale", "diagnostics", "bundled",
-    )}
     prepared: dict[str, list[str]] = {}
     for case in cases.get("cases", []):
         if case.get("family") != "leaves" or case.get("last_result") not in (
@@ -430,17 +531,44 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
+    witnessed: dict[str, list[str]] = {}
     for witness in cases.get("witnesses", []):
         if witness.get("kind") == "rust_gated":
             for operation in witness.get("operations", []):
-                prepared.setdefault(operation, []).append(witness["id"])
-    required = [r for r in scope["operations"] if r["go_package"] in packages]
-    pending = [{"operation": r["id"], "rust_home": r["rust_home"],
-                "disposition": r["disposition"]}
-               for r in required if r["id"] not in prepared]
-    return {"version": 1, "pin": scope["pin"], "complete": bool(required) and not pending,
-            "total_operations": len(required), "prepared_operations": len(required) - len(pending),
-            "pending": pending}
+                witnessed.setdefault(operation, []).append(witness["id"])
+    exempt = roster_exemptions()
+    required = [r for r in scope["operations"] if r["go_package"] in LEAF_PACKAGES]
+    pending = [
+        {"operation": r["id"], "rust_home": r["rust_home"], "disposition": r["disposition"]}
+        for r in required
+        if r["id"] not in prepared and r["id"] not in witnessed and r["id"] not in exempt
+    ]
+    accounted = [r for r in required if r["id"] not in {p["operation"] for p in pending}]
+    by_category: dict[str, int] = {}
+    for row in required:
+        entry = exempt.get(row["id"])
+        if entry and row["id"] not in prepared and row["id"] not in witnessed:
+            by_category[entry["category"]] = by_category.get(entry["category"], 0) + 1
+    problems = roster_problems(scope, cases)
+    return {
+        "version": 2,
+        "pin": scope["pin"],
+        # `complete` is the published `leaves_prepared` result. It is false
+        # while any leaf operation is neither prepared, witnessed nor exempted
+        # by a reviewed ledger entry, and false while that ledger itself does
+        # not validate -- an exemption nobody can defend is not an answer.
+        "complete": bool(required) and not pending and not problems,
+        "total_operations": len(required),
+        "accounted_operations": len(accounted),
+        "prepared_operations": sum(1 for r in required if r["id"] in prepared),
+        "witnessed_operations": sum(
+            1 for r in required if r["id"] not in prepared and r["id"] in witnessed
+        ),
+        "exempt_operations": sum(by_category.values()),
+        "exempt_by_category": dict(sorted(by_category.items())),
+        "pending": pending,
+        "roster_problems": problems,
+    }
 
 
 def build() -> dict:
@@ -451,6 +579,7 @@ def build() -> dict:
     entries = {e["go"]: e for e in ledger()}
     dependencies = package_dependencies()
     case_links = cases_by_operation()
+    exemptions = roster_exemptions()
     for function in inventory():
         package = function["package"]
         membership, reason = MEMBERSHIP[package]
@@ -473,6 +602,16 @@ def build() -> dict:
                 f"a prepared case runs and reports the Rust entry point absent: "
                 + ", ".join(witnessing[:3])
             )
+        basis_kind = "rule"
+        # A reviewed `equivalent_rust` exemption is the one roster category that
+        # is also a disposition claim, and the plan already defines that
+        # disposition. Recording it here rather than only in the ledger keeps a
+        # single answer per operation; verify() then holds it to the review bar.
+        exemption = exemptions.get(identity)
+        if exemption and exemption.get("category") == "equivalent_rust" and not linked:
+            disposition = "equivalent_rust"
+            basis = exemption["evidence"]
+            basis_kind = "review"
         linked = sorted(set(linked) | set(witnessing))
         if linked and disposition == "missing":
             # A case exists for it, so the gap is witnessed rather than merely
@@ -497,8 +636,19 @@ def build() -> dict:
                 "ledger_verification": list(entry.get("verify") or []),
                 "disposition": disposition,
                 "basis": basis,
-                "basis_kind": "rule",
+                "basis_kind": basis_kind,
                 "cases": linked,
+                # F1a roster membership, orthogonal to the disposition: whether
+                # this step owes a prepared case for the operation, and if not,
+                # which reviewed ledger entry says so.
+                "f1a_roster": (
+                    None
+                    if package not in LEAF_PACKAGES
+                    else "prepared" if linked
+                    else f"exempt:{exemption['category']}" if exemption
+                    else "pending"
+                ),
+                "f1a_roster_owner": exemption["owner"] if exemption else None,
                 "depends_on": dependencies.get(package, []),
                 "destination_phase": PHASE if disposition != "later_phase" else None,
             }

@@ -39,9 +39,14 @@ import (
 	"os"
 	"runtime"
 	"slices"
+	"strconv"
 	"testing"
 
 	"github.com/microsoft/TypeScript/tsc/internal/collections"
+	// The pinned MarshalJSONTo/UnmarshalJSONFrom take the repository's own
+	// encoder and decoder, not encoding/json's, so both packages are needed
+	// here and the pinned one is aliased.
+	tsjson "github.com/microsoft/TypeScript/tsc/internal/json"
 )
 
 type action struct {
@@ -63,6 +68,16 @@ type action struct {
 	// trace says what the key is: a rule that lived only in this file would
 	// leave a Rust port reading the request with no way to know it.
 	KeyOf string `json:"key_of"`
+	// Entries carries an ordered constructor's input pairs
+	// (NewOrderedMapFromList) and the second operand of a diff.
+	Entries [][]string `json:"entries"`
+	// Source is a raw JSON document an unmarshal action decodes. It is a
+	// string rather than a nested value so a malformed or duplicate-keyed
+	// document survives the request file unchanged.
+	Source string `json:"source"`
+	// Equality names DiffOrderedMapsFunc's comparison rule, for the same
+	// reason KeyOf travels: the rule is part of the request, not of a probe.
+	Equality string `json:"equality"`
 }
 
 // decodeAction unmarshals a request's actions once its subject has matched.
@@ -99,6 +114,32 @@ func entries(m *collections.OrderedMap[string, string]) []any {
 		out = append(out, []any{key, value})
 	}
 	return out
+}
+
+func valuesOf(m *collections.OrderedMap[string, string]) []any {
+	out := []any{}
+	for value := range m.Values() {
+		out = append(out, value)
+	}
+	return out
+}
+
+// mapFromEntries builds an operand for the diff actions. It goes through Set,
+// which is what NewOrderedMapFromList does, so a repeated key keeps its first
+// position and takes the last value.
+func mapFromEntries(pairs [][]string) *collections.OrderedMap[string, string] {
+	items := make([]collections.MapEntry[string, string], 0, len(pairs))
+	for _, pair := range pairs {
+		entry := collections.MapEntry[string, string]{}
+		if len(pair) > 0 {
+			entry.Key = pair[0]
+		}
+		if len(pair) > 1 {
+			entry.Value = pair[1]
+		}
+		items = append(items, entry)
+	}
+	return collections.NewOrderedMapFromList(items)
 }
 
 func keysOf(m *collections.OrderedMap[string, string]) []any {
@@ -217,6 +258,137 @@ func replayOrderedMap(request leafRequest) []any {
 		case "clone_set":
 			_, panicked := guarded(func() any { clone.Set(a.Key, a.Value); return nil })
 			row["panic"] = panicked
+		case "values":
+			value, panicked := guarded(func() any { return valuesOf(m) })
+			row["result"], row["panic"] = value, panicked
+		case "get_or_zero":
+			// GetOrZero cannot distinguish an absent key from a stored zero
+			// value. That indistinguishability is the contract, so the trace
+			// asks for both in the same case.
+			value, panicked := guarded(func() any { return m.GetOrZero(a.Key) })
+			row["result"], row["panic"] = value, panicked
+		case "entry_at":
+			value, panicked := guarded(func() any {
+				key, item, ok := m.EntryAt(a.Index)
+				return []any{key, item, ok}
+			})
+			row["index"] = int64(a.Index)
+			row["result"], row["panic"] = value, panicked
+		case "from_list":
+			value, panicked := guarded(func() any {
+				m = mapFromEntries(a.Entries)
+				return entries(m)
+			})
+			row["result"], row["panic"] = value, panicked
+		case "values_while_growing":
+			// The pinned iterators re-read len(m.keys) on every step, so a key
+			// appended by the body is enumerated by the same loop. A port that
+			// iterated a snapshot would stop one element earlier, which is the
+			// whole point of this action.
+			value, panicked := guarded(func() any {
+				seen := []any{}
+				grown := false
+				for item := range m.Values() {
+					seen = append(seen, item)
+					if !grown {
+						grown = true
+						m.Set(a.Key, a.Value)
+					}
+					// The pin appends once, so this loop terminates on its own.
+					// The cap only keeps a future pin from hanging the probe.
+					if len(seen) > 64 {
+						break
+					}
+				}
+				return seen
+			})
+			row["result"], row["panic"] = value, panicked
+		case "marshal":
+			// Through the pinned encoder, so MarshalJSONTo is what runs. The
+			// bytes are recorded verbatim: member order is the subject, and a
+			// decoded object would lose it.
+			value, panicked := guarded(func() any {
+				data, err := tsjson.Marshal(m)
+				if err != nil {
+					return []any{"error", err.Error()}
+				}
+				return []any{"bytes", string(data)}
+			})
+			row["result"], row["panic"] = value, panicked
+		case "unmarshal":
+			// Null is specified as a no-op rather than a clear, so a trace that
+			// unmarshals null into a populated map observes it unchanged.
+			value, panicked := guarded(func() any {
+				return []any{errorClass(tsjson.Unmarshal([]byte(a.Source), m)), entries(m)}
+			})
+			row["source"] = a.Source
+			row["result"], row["panic"] = value, panicked
+		case "diff":
+			// The callback sequence is the contract: additions are reported
+			// while iterating the second map, then modifications and removals
+			// while iterating the first. A single pass over the union of the
+			// keys would report the same three sets in a different order.
+			value, panicked := guarded(func() any {
+				other := mapFromEntries(a.Entries)
+				calls := []any{}
+				collections.DiffOrderedMaps(m, other,
+					func(key, item string) { calls = append(calls, []any{"added", key, item}) },
+					func(key, item string) { calls = append(calls, []any{"removed", key, item}) },
+					func(key, old, updated string) {
+						calls = append(calls, []any{"modified", key, old, updated})
+					})
+				return calls
+			})
+			row["result"], row["panic"] = value, panicked
+		case "diff_func":
+			value, panicked := guarded(func() any {
+				other := mapFromEntries(a.Entries)
+				equal, ok := equalities[a.Equality]
+				if !ok {
+					row["unsupported_action"] = "diff_func needs a known equality, got " + a.Equality
+					return nil
+				}
+				calls := []any{}
+				collections.DiffOrderedMapsFunc(m, other, equal,
+					func(key, item string) { calls = append(calls, []any{"added", key, item}) },
+					func(key, item string) { calls = append(calls, []any{"removed", key, item}) },
+					func(key, old, updated string) {
+						calls = append(calls, []any{"modified", key, old, updated})
+					})
+				return calls
+			})
+			row["equality"] = a.Equality
+			row["result"], row["panic"] = value, panicked
+		case "marshal_int_keys":
+			// resolveKeyName renders a string key as itself and an integer key
+			// through strconv. The pin instantiates OrderedMap[int, string],
+			// so the integer branch is reachable behavior rather than an
+			// invented one, and it is the branch a port is most likely to get
+			// wrong by rendering the key as a JSON number.
+			value, panicked := guarded(func() any {
+				numbered := &collections.OrderedMap[int, string]{}
+				for _, pair := range a.Entries {
+					if len(pair) < 2 {
+						continue
+					}
+					key, err := strconv.Atoi(pair[0])
+					if err != nil {
+						return []any{"error", err.Error()}
+					}
+					numbered.Set(key, pair[1])
+				}
+				data, err := tsjson.Marshal(numbered)
+				if err != nil {
+					return []any{"error", err.Error()}
+				}
+				return []any{"bytes", string(data)}
+			})
+			row["result"], row["panic"] = value, panicked
+		case "clone_is_nil":
+			// Clone is nil tolerant and returns nil; the unexported clone it
+			// wraps is not. Only the exported contract is observable.
+			value, panicked := guarded(func() any { return m.Clone() == nil })
+			row["result"], row["panic"] = value, panicked
 		case "early_stop_keys":
 			// Break out after `stop` keys: the pinned iterator is a range-over-func,
 			// so stopping early is an observable contract, not an implementation detail.
@@ -239,6 +411,42 @@ func replayOrderedMap(request leafRequest) []any {
 		ordered = append(ordered, row)
 	}
 	return ordered
+}
+
+// errorClass reduces a decode failure to what a Rust port could reproduce.
+//
+// The same rule this file already applies to panics applies to errors. The
+// pinned method returns errors.New("cannot unmarshal non-object JSON value
+// into Map"), and that sentence is the contract; but the json package wraps it
+// into "json: cannot unmarshal into Go collections.OrderedMap[string,string]:
+// ...", which names a Go type, and the decoder underneath reports byte offsets
+// in its own wording. Freezing either whole sentence as an expected value
+// would pin a row no port could ever match, so only the class and the pinned
+// sentence are recorded.
+func errorClass(err error) []any {
+	if err == nil {
+		return []any{"none", ""}
+	}
+	const pinned = "cannot unmarshal non-object JSON value into Map"
+	if contains(err.Error(), pinned) {
+		return []any{"non_object", pinned}
+	}
+	if contains(err.Error(), "unexpected EOF") {
+		return []any{"truncated", ""}
+	}
+	return []any{"decoder", ""}
+}
+
+// equalities are the value comparisons DiffOrderedMapsFunc may be asked for.
+// Naming them in the request keeps the rule visible to a Rust port reading the
+// request file; a rule that lived only here would be invisible to it.
+var equalities = map[string]func(a, b string) bool{
+	"exact": func(a, b string) bool { return a == b },
+	// Deliberately coarser than exact, so a case can show that the Func
+	// variant really does consult the callback rather than comparing directly.
+	"length": func(a, b string) bool { return len(a) == len(b) },
+	"always": func(a, b string) bool { return true },
+	"never":  func(a, b string) bool { return false },
 }
 
 // sortedStrings renders values whose source is a Go map. Map iteration order

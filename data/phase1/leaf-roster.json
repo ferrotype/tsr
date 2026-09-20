@@ -1,0 +1,668 @@
+{
+  "exemptions": [
+    {
+      "category": "later_step",
+      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Info",
+      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted. ModTime is in the same set; the only non-test reader of a vfs FileInfo's ModTime is the VFS layer itself. (A search for the bare member name also matches upstream/tsc/internal/diagnostics/generate.go:274, which sets a gzip.Writer's ModTime field and is unrelated.)",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
+      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Sys",
+      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These five exist to satisfy io/fs.FileInfo and fs.DirEntry, which upstream/tsc/internal/vfs/vfs.go:68 aliases as vfs.FileInfo. The only non-test readers of those members are the VFS layer itself -- upstream/tsc/internal/vfs/internal/internal.go:96 and :107 read Mode, upstream/tsc/internal/vfs/vfstest/vfstest.go:451 and :482 read Sys. crates/tsr_vfs/src/lib.rs:64-67 models FileInfo as { directory, size } only, so which of the remaining members the Rust trait must carry is a capability-matrix decision, which F2a's first task is to make. The two members the port does model, IsDir and Size, are covered here by leaves/bundled/wrapper-read-paths, and Name is reached by the walk case, so neither is exempted.",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Type",
+      "owner": "F2a, which owns the filesystem capability matrix these io/fs obligations belong to"
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/bundled/generate.go:44-82, in the \"//go:build ignore\" file (generate.go:1). It emits the //go:embed directives (line 58: 'code.WriteString(\"//go:embed libs/\" + lib + \"\\n\")'), the embeddedContents map (line 64) and libsEntries (line 70), then writeCode(\"embed_generated.go\", ...) at line 81. It runs only under `go generate`. || RUST: Rust needs no emitter: crates/tsr_bundled/src/lib.rs:8 embeds each asset directly with include_bytes!(\"../bundled/libs/lib.d.ts\"), and the map role of embeddedContents is taken by library() at lib.rs:438-442 (binary_search_by over LIBRARIES) while libsEntries' role is taken by BundledFs::entries at lib.rs:495-511. scripts/package_assets.py:74-77 re-derives the include list from lib.rs and raises \"bundled include inventory differs from pinned upstream\" if it is not exactly the pinned set.",
+      "operation": "tsc/internal/bundled/generate.go:generateEmbedded",
+      "owner": "scripts/package_assets.py:74-77 owns the embedded-inventory invariant; the Rust counterpart of the emitted embed_generated.go is the include_bytes! table plus lookup at crates/tsr_bundled/src/lib.rs:7-437 and :438-442."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/bundled/generate.go:28-42, inside the \"//go:build ignore\" file (generate.go:1). It emits source text: line 30 writes \"// Code generated by generate.go; DO NOT EDIT.\", line 34 writes \"var LibNames = []string{\", and line 41 calls writeCode(\"libs_generated.go\", code.Bytes()). Its product, not its execution, is what any port can observe. || RUST: crates/tsr_bundled/src/lib.rs:7 \"pub static LIBRARIES: &[(&str, &[u8])] = &[\" through :437 is the Rust stand-in for LibNames, hand-written rather than generated (no \"DO NOT EDIT\" header; I read the file head at :1-8). Its correspondence to the pin is enforced at check time by scripts/package_assets.py:78-80, which re-derives the pairs with the regex '\\(\\s*\"([^\"]+)\",\\s*include_bytes!\\(\\s*\"\\.\\./bundled/libs/([^\"]+)\"' and raises \"bundled exported names differ from embedded asset names\" on any mismatch of count or name.",
+      "operation": "tsc/internal/bundled/generate.go:generateLibList",
+      "owner": "scripts/package_assets.py:78-80 owns the exported-name invariant; the generated artifact's Rust counterpart is crates/tsr_bundled/src/lib.rs:7-437 (pub static LIBRARIES). PORTS.toml records the Go output libs_generated.go as kind=\"generated\" with rust=[\"crates/tsr_bundled/src/lib.rs\"]."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/bundled/generate.go:1 \"//go:build ignore\" with \"package main\" at :3 - the file is excluded from every package build and cannot be imported; upstream/tsc/internal/bundled/bundled.go:14 \"//go:generate go run generate.go\" is its only invocation. main is generate.go:20-26: \"libs := readLibs()\" / \"generateLibList(libs)\" / \"generateEmbedded(libs)\" - a generate-time driver with no runtime caller. || RUST: No Rust counterpart function exists and none is wanted. The equivalent driver is scripts/package_assets.py:95-112, which computes the expected asset set and either syncs or checks it; it is run by CI (.github/workflows/status.yml:48, :95). I checked for a Rust generator by grepping xtask/ and crates/ for tsr_bundled, bundled/libs, CopyrightNotice and LIBRARIES: the only hits are scripts/package_assets.py, tools/* consumers and the crate itself. Absence confirmed by reading, not by name match.",
+      "operation": "tsc/internal/bundled/generate.go:main",
+      "owner": "scripts/package_assets.py:95-112 (run()), gated in CI by .github/workflows/status.yml:48 and :95 (\"run: python3 scripts/package_assets.py --check\"). The Rust counterpart of what this generator produces is the hand-maintained table at crates/tsr_bundled/src/lib.rs:7-437. No xtask generator is involved: grep over xtask/ for tsr_bundled|bundled/libs|CopyrightNotice|LIBRARIES returns nothing, and xtask/src/gen/ holds only encoder.rs, diagnostics.rs, ast*.rs."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/bundled/generate.go:84-124, in the \"//go:build ignore\" file (generate.go:1). It reads the libs directory at generate time (:85 os.ReadDir(libsDir)) and validates each entry - name shape at :102 ('!strings.HasPrefix(name, \"lib.\") || !strings.HasSuffix(name, \".d.ts\")'), CR rejection at :111, copyright-header prefix at :114, trailing newline at :117 - aborting with log.Fatalf. Every failure path is a generator abort, never a runtime behavior. || RUST: No ported function; the job is owned by scripts/package_assets.py. Name validation is reproduced at :71 (re.fullmatch(r'libs/lib[\\w.\\-]*\\.d\\.ts', name) -> ValueError('unexpected bundled asset: ' + name)). The per-file content checks (LF, copyright prefix, trailing newline) are not re-run; instead :81-85 requires byte-identity with the pinned archive and records each file's sha256 in crates/tsr_bundled/bundled/manifest.json, so those properties are carried by the pin rather than re-validated. Both are build-time only; no runtime contract is involved either way.",
+      "operation": "tsc/internal/bundled/generate.go:readLibs",
+      "owner": "scripts/package_assets.py:55-85 (expected_assets) is the repo's input-validation step: it pins the gitlink (:56-59), extracts tsc/internal/bundled/CopyrightNotice.txt and libs from the pinned archive (:60-73), and rejects any unexpected name at :71-72."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/bundled/generate.go:126-135, in the \"//go:build ignore\" file (generate.go:1). It is a two-line helper of the generator: format.Source(code) at :127 then os.WriteFile(filename, formatted, 0o644) at :132, called only from generateLibList (:41) and generateEmbedded (:81). It writes Go source files to disk at generate time. || RUST: No Rust counterpart function and none is needed: crates/tsr_bundled/src/lib.rs is a hand-written, rustfmt-formatted source file, not an emitted one (read at :1-8, no generated header). The write-the-derived-artifact step in this repo is scripts/package_assets.py:98-105, which writes each expected asset (including crates/tsr_bundled/bundled/manifest.json, built at :82-85) or raises 'package asset drift: ' + relative under --check.",
+      "operation": "tsc/internal/bundled/generate.go:writeCode",
+      "owner": "scripts/package_assets.py:98-105 (run()) writes the derived artifacts, or fails with \"package asset drift\" under --check; Rust source formatting is separately gated by `python3 scripts/checks.py fmt` (cargo fmt --all --check)."
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/bundled/noembed.go:1 is `//go:build noembed` and upstream/tsc/internal/bundled/embed.go:1 is `//go:build !noembed`, so the two definitions are mutually exclusive within one binary and only one of them is ever compiled. Nothing in this repository asks for the noembed side: scripts/phase1_capture.py builds its probes with no `-tags` flag, and scripts/s04.py:105 sets GOFLAGS=\"\" explicitly, so no tag can arrive from the environment either. The Rust port has no unembedded build to mirror it: crates/tsr_bundled/src/lib.rs carries the library table as a const, so the assets are always present.",
+      "operation": "tsc/internal/bundled/noembed.go:IsBundled",
+      "owner": "no step: this port produces no unembedded build"
+    },
+    {
+      "category": "build_variant",
+      "evidence": "upstream/tsc/internal/bundled/noembed.go:1 is `//go:build noembed` and upstream/tsc/internal/bundled/embed.go:1 is `//go:build !noembed`, so the two definitions are mutually exclusive within one binary and only one of them is ever compiled. Nothing in this repository asks for the noembed side: scripts/phase1_capture.py builds its probes with no `-tags` flag, and scripts/s04.py:105 sets GOFLAGS=\"\" explicitly, so no tag can arrive from the environment either. The Rust port has no unembedded build to mirror it: crates/tsr_bundled/src/lib.rs carries the library table as a const, so the assets are always present.",
+      "operation": "tsc/internal/bundled/noembed.go:wrapFS",
+      "owner": "no step: this port produces no unembedded build"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/api, internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/collections/ordered_map.go:295-299 defines `func DiffOrderedMaps[K comparable, V comparable](m1 *OrderedMap[K, V], m2 *OrderedMap[K, V], onAdded func(key K, value V), onRemoved func(key K, value V), onModified func(key K, oldValue V, newValue V))` whose whole body is a delegation `DiffOrderedMapsFunc(m1, m2, func(a, b V) bool { return a == b }, onAdded, onRemoved, onModified)`. The observable shape is fixed by the callee: :302 `for k, v2 := range m2.Entries()` with :303 `if",
+      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
+      "owner": "phase 5, phase 6 (packages: internal/api, internal/project)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/collections/ordered_map.go:198-213. Clone: \"// Clone returns a shallow copy of the map.\" over `func (m *OrderedMap[K, V]) Clone() *OrderedMap[K, V] { if m == nil { return nil }; m2 := m.clone(); return &m2 }`. clone itself: `func (m *OrderedMap[K, V]) clone() OrderedMap[K, V] { return OrderedMap[K, V]{ keys: slices.Clone(m.keys), mp: maps.Clone(m.mp) } }`. It is unexported and has exactly one caller, Clone at :204; `grep -rn \"\\.clone()\" upstream/tsc/internal/collections/` f",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
+      "owner": "phase 5 (packages: internal/project)"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/collections/ordered_map.go defines `func (*noCopy) Lock() {}` with an empty body, above the comment \"Lock is a no-op used by -copylocks checker from `go vet`\". The methods exist so a vet analyser can see a lock-shaped field; they are never called and observe nothing.",
+      "operation": "tsc/internal/collections/ordered_map.go:noCopy.Lock",
+      "owner": "Rust ownership and the Copy trait, which make the mistake unrepresentable rather than detectable"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/collections/ordered_map.go defines `func (*noCopy) Unlock() {}` with an empty body, above the comment \"Lock is a no-op used by -copylocks checker from `go vet`\". The methods exist so a vet analyser can see a lock-shaped field; they are never called and observe nothing.",
+      "operation": "tsc/internal/collections/ordered_map.go:noCopy.Unlock",
+      "owner": "Rust ownership and the Copy trait, which make the mistake unrepresentable rather than detectable"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "docs/PHASE1-implementation-plan.md:437-438 instructs this step directly: \"Do not reproduce Go GC/arena internals where the existing Rust ownership system already supplies the contract.\" The operation's block-growth policy (upstream/tsc/internal/core/arena.go, nextArenaSize doubling to a 256 cap) is exactly such an internal. Its non-test consumers are internal/ast, internal/binder, internal/checker, internal/parser, internal/printer and internal/sourcemap -- no leaf package -- so whatever remains observable of it, the nil-versus-empty shape of an allocated slice, is observable through those ports' own output and belongs to the step that prepares them.",
+      "operation": "tsc/internal/core/arena.go:Arena.Clone",
+      "owner": "Rust ownership, plus crates/tsr_arena for the handle-based storage the AST port actually uses"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "docs/PHASE1-implementation-plan.md:437-438 instructs this step directly: \"Do not reproduce Go GC/arena internals where the existing Rust ownership system already supplies the contract.\" The operation's block-growth policy (upstream/tsc/internal/core/arena.go, nextArenaSize doubling to a 256 cap) is exactly such an internal. Its non-test consumers are internal/ast, internal/binder, internal/checker, internal/parser, internal/printer and internal/sourcemap -- no leaf package -- so whatever remains observable of it, the nil-versus-empty shape of an allocated slice, is observable through those ports' own output and belongs to the step that prepares them.",
+      "operation": "tsc/internal/core/arena.go:Arena.New",
+      "owner": "Rust ownership, plus crates/tsr_arena for the handle-based storage the AST port actually uses"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "docs/PHASE1-implementation-plan.md:437-438 instructs this step directly: \"Do not reproduce Go GC/arena internals where the existing Rust ownership system already supplies the contract.\" The operation's block-growth policy (upstream/tsc/internal/core/arena.go, nextArenaSize doubling to a 256 cap) is exactly such an internal. Its non-test consumers are internal/ast, internal/binder, internal/checker, internal/parser, internal/printer and internal/sourcemap -- no leaf package -- so whatever remains observable of it, the nil-versus-empty shape of an allocated slice, is observable through those ports' own output and belongs to the step that prepares them.",
+      "operation": "tsc/internal/core/arena.go:Arena.NewSlice",
+      "owner": "Rust ownership, plus crates/tsr_arena for the handle-based storage the AST port actually uses"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "docs/PHASE1-implementation-plan.md:437-438 instructs this step directly: \"Do not reproduce Go GC/arena internals where the existing Rust ownership system already supplies the contract.\" The operation's block-growth policy (upstream/tsc/internal/core/arena.go, nextArenaSize doubling to a 256 cap) is exactly such an internal. Its non-test consumers are internal/ast, internal/binder, internal/checker, internal/parser, internal/printer and internal/sourcemap -- no leaf package -- so whatever remains observable of it, the nil-versus-empty shape of an allocated slice, is observable through those ports' own output and belongs to the step that prepares them.",
+      "operation": "tsc/internal/core/arena.go:Arena.NewSlice1",
+      "owner": "Rust ownership, plus crates/tsr_arena for the handle-based storage the AST port actually uses"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "docs/PHASE1-implementation-plan.md:437-438 instructs this step directly: \"Do not reproduce Go GC/arena internals where the existing Rust ownership system already supplies the contract.\" The operation's block-growth policy (upstream/tsc/internal/core/arena.go, nextArenaSize doubling to a 256 cap) is exactly such an internal. Its non-test consumers are internal/ast, internal/binder, internal/checker, internal/parser, internal/printer and internal/sourcemap -- no leaf package -- so whatever remains observable of it, the nil-versus-empty shape of an allocated slice, is observable through those ports' own output and belongs to the step that prepares them.",
+      "operation": "tsc/internal/core/arena.go:nextArenaSize",
+      "owner": "Rust ownership, plus crates/tsr_arena for the handle-based storage the AST port actually uses"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BreadthFirstSearchLevel --include=*.go upstream/tsc` outside its own package matches only internal/project. The same holds for the parallel entry points: internal/project/projectcollection.go and projectcollectionbuilder.go are the only non-test callers. updateMin is the unexported minimum tracker those searches use and has no other caller. No leaf package and no Phase 1 package reaches any of them, so this step has no caller to read the contract from.",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Delete",
+      "owner": "phase 5 (internal/project), which MEMBERSHIP records as the project system step"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BreadthFirstSearchLevel --include=*.go upstream/tsc` outside its own package matches only internal/project. The same holds for the parallel entry points: internal/project/projectcollection.go and projectcollectionbuilder.go are the only non-test callers. updateMin is the unexported minimum tracker those searches use and has no other caller. No leaf package and no Phase 1 package reaches any of them, so this step has no caller to read the contract from.",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Has",
+      "owner": "phase 5 (internal/project), which MEMBERSHIP records as the project system step"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BreadthFirstSearchLevel --include=*.go upstream/tsc` outside its own package matches only internal/project. The same holds for the parallel entry points: internal/project/projectcollection.go and projectcollectionbuilder.go are the only non-test callers. updateMin is the unexported minimum tracker those searches use and has no other caller. No leaf package and no Phase 1 package reaches any of them, so this step has no caller to read the contract from.",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Range",
+      "owner": "phase 5 (internal/project), which MEMBERSHIP records as the project system step"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BreadthFirstSearchLevel --include=*.go upstream/tsc` outside its own package matches only internal/project. The same holds for the parallel entry points: internal/project/projectcollection.go and projectcollectionbuilder.go are the only non-test callers. updateMin is the unexported minimum tracker those searches use and has no other caller. No leaf package and no Phase 1 package reaches any of them, so this step has no caller to read the contract from.",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallel",
+      "owner": "phase 5 (internal/project), which MEMBERSHIP records as the project system step"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/bfs.go:64-193. The result is deterministic despite the goroutines, and that determinism is the contract. (a) Path order is child-first: `createPath` at bfs.go:169-176 does `path = append(path, job.node); job = job.parent`, so Path[0] is the found node and the last entry is the start \u2014 bfs_test.go:35 pins `[]string{\"D\", \"B\", \"A\"}`. (b) Lowest index in the level wins, not first to finish: bfs.go:119-121 `if stop { updateMin(&lowestGoal, int64(i)); return }` and bfs.go:14",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx",
+      "owner": "phase 5 (packages: internal/project)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BreadthFirstSearchLevel --include=*.go upstream/tsc` outside its own package matches only internal/project. The same holds for the parallel entry points: internal/project/projectcollection.go and projectcollectionbuilder.go are the only non-test callers. updateMin is the unexported minimum tracker those searches use and has no other caller. No leaf package and no Phase 1 package reaches any of them, so this step has no caller to read the contract from.",
+      "operation": "tsc/internal/core/bfs.go:updateMin",
+      "owner": "phase 5 (internal/project), which MEMBERSHIP records as the project system step"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn BinarySearchUniqueFunc` outside internal/core matches internal/astnav, internal/api/encoder and internal/ls/lsutil. internal/astnav is the only Phase 1 caller and F4a prepares it; the Rust port already has the search private to crates/tsr_astnav/src/lib.rs, which is where its contract is observable.",
+      "operation": "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc",
+      "owner": "F4a (internal/astnav); a private Rust counterpart already lives at crates/tsr_astnav/src/lib.rs"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn '\\bHasJsonModuleEmitEnabled\\b' --include=*.go upstream/tsc` returns 1 line(s), all in internal/core/compileroptions.go: the definition and nothing else. No caller anywhere in the pinned tree, tests included. crates/tsr_core/src/compiler_options.rs:345-351 `json_module_emit_enabled`: `!matches!(self.emit_module_kind(), ModuleKind::SYSTEM | ModuleKind::UMD)`. Faithful. No case, no witness.",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.HasJsonModuleEmitEnabled",
+      "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/core/compileroptions.go defines `func (*noCopy) Lock() {}` with an empty body, above the comment \"Lock is a no-op used by -copylocks checker from `go vet`\". The methods exist so a vet analyser can see a lock-shaped field; they are never called and observe nothing.",
+      "operation": "tsc/internal/core/compileroptions.go:noCopy.Lock",
+      "owner": "Rust ownership and the Copy trait, which make the mistake unrepresentable rather than detectable"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/core/compileroptions.go defines `func (*noCopy) Unlock() {}` with an empty body, above the comment \"Lock is a no-op used by -copylocks checker from `go vet`\". The methods exist so a vet analyser can see a lock-shaped field; they are never called and observe nothing.",
+      "operation": "tsc/internal/core/compileroptions.go:noCopy.Unlock",
+      "owner": "Rust ownership and the Copy trait, which make the mistake unrepresentable rather than detectable"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/context.go:37-42 `func GetCheckerLifetime(ctx context.Context) CheckerLifetime { if lifetime, ok := ctx.Value(checkerLifetimeKey).(CheckerLifetime); ok { return lifetime }; return CheckerLifetimeTemporary }` \u2014 type-asserted lookup defaulting to Temporary. Exercised only in phase-5 packages (upstream/tsc/internal/project/checkerpool_test.go:65,78,127). || RUST: Absent as a function; the equivalent decision is the `CheckerSlot` argument threaded to `CheckerPool::acquire` (crates/tsr_project/src/lib.rs:98) and mapped at lib.rs:88-94. No default-on-missing path exists because the value cannot be missing. || ADVERSARIAL RULING: \"The Go default is an artifact of context lookup, not an observable contract\" is refuted at upstream/tsc/internal/project/checkerpool.go:124 and 135-141: an unset lifetime deterministically routes the caller to `getQueryChecker` via the `default:` arm, so CheckerLifetimeTemporary (context.go:41) is the observable answer to \"which slot class does a caller who specifies nothing get\". crates/tsr_proj",
+      "operation": "tsc/internal/core/context.go:GetCheckerLifetime",
+      "owner": "Go context.Context value plumbing. Rust requires the caller to name the slot (crates/tsr_project/src/lib.rs:88-94 `fn index(&self, slot: CheckerSlot)`), so there is no absent-value case to default; the Go default is an artifact of context lookup, not an observable contract of the compiler."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/context.go:18-23 `func GetRequestID(ctx context.Context) string { if id, ok := ctx.Value(requestIDKey).(string); ok { return id }; return \"\" }` \u2014 a type-asserted context lookup with an empty-string default. || RUST: Absent: no context type, no ambient request id. The grep above over crates/, xtask/ and tools/ finds no `request_id` outside crates/tsr_compiler/examples/p3_comparators.rs:32. tsr_project models the pool (crates/tsr_project/src/lib.rs:47 `pub struct CheckerPool`) but stores no request identity and has no affinity map. || ADVERSARIAL RULING: The claim that the `\"\"` fallback \"only exists inside Go's context API\" is refuted at upstream/tsc/internal/project/checkerpool.go:116-121 and 131-133: the empty string is a live sentinel (holdTag maps it to checkerHeldAnonymous) and checkerpool.go:131-133 deliberately forces requestID=\"\" when ctx.Done()==nil to disable request affinity. That is a caller-visible default, so the go_runtime premise (",
+      "operation": "tsc/internal/core/context.go:GetRequestID",
+      "owner": "Go context.Context value plumbing; the fallback it defines (`\"\"`) only exists inside Go's context API. Rust has no ambient request identity at all and project-system affinity is deferred (crates/tsr_project/src/lib.rs:1); internal/lsp and internal/project are destination_phase 5 in scope.json."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/context.go:33-35 `func WithCheckerLifetime(ctx context.Context, lifetime CheckerLifetime) context.Context { return context.WithValue(ctx, checkerLifetimeKey, lifetime) }`, over the constants at context.go:27-31 (`CheckerLifetimeTemporary`, `CheckerLifetimeDiagnostics`, `CheckerLifetimeAPI`). Caller: upstream/tsc/internal/lsp/server.go:1852 `ctx = core.WithCheckerLifetime(ctx, core.CheckerLifetimeDiagnostics)`. || RUST: No context wrapper exists; the three lifetimes appear as slot kinds instead (crates/tsr_project/src/lib.rs:12-17), selected per call at the acquire site rather than carried ambiently, so nothing about the three-way choice is lost \u2014 only the carrier differs. || ADVERSARIAL RULING: The stated owner/artifact is an equivalence claim (\"the role it fills ... is an explicit enum argument in Rust\", crates/tsr_project/src/lib.rs:12-17) filed under go_runtime, which evades the equivalent_rust bar: scripts/phase1_scope.py:503-507 rejects an equivalent_rust entry while the scope row says `missing` (it does), and line 689-690 requires basis_kind \"review\". As an equivalence it also fail",
+      "operation": "tsc/internal/core/context.go:WithCheckerLifetime",
+      "owner": "Go context.Context value plumbing. The role it fills \u2014 telling the checker pool which slot class a caller wants \u2014 is an explicit enum argument in Rust: crates/tsr_project/src/lib.rs:12-17 `pub enum CheckerSlot { Diagnostics, Query(usize), Api }` consumed by `acquire(self: &Arc<Self>, slot: CheckerSlot)` at lib.rs:98."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/context.go:14-16 `func WithRequestID(ctx context.Context, id string) context.Context { return context.WithValue(ctx, requestIDKey, id) }`, keyed by the unexported `type key int` / `requestIDKey key = iota` (context.go:7-12). Callers: upstream/tsc/internal/lsp/server.go:981 `core.WithRequestID(requestCtx, req.ID.String())` and upstream/tsc/internal/project/checkerpool_test.go:64,93. || RUST: Absent. `grep -rn \"CheckerLifetime|checker_lifetime|request_id|RequestId\" crates xtask tools --include=*.rs` matches only crates/tsr_compiler/examples/p3_comparators.rs:32 (`let request_ids: ... = array(&requests)?`), which is that harness's own request identifiers and has no relation to a context value chain. No crate carries a context or ambient-value type; crates/tsr_project/src/lib.rs:1 states \"Scheduling/affinity and idle timers are later project-system work\". || ADVERSARIAL RULING: go_runtime is defined as \"no caller-visible contract to reproduce\" (scripts/phase1_scope.py:440); this operation's value is consumed: upstream/tsc/internal/project/checkerpool.go:125 reads it and checkerpool.go:116-121 (holdTag) gives the id a distinct meaning against checkerHeldAnonymous. The cited Rust replacement is wrong: crates/tsr_project/src/lib.rs:100 is `pub fn acquire(self: &Arc<Self>, s",
+      "operation": "tsc/internal/core/context.go:WithRequestID",
+      "owner": "Go context.Context value plumbing. Rust passes per-call state as an argument instead: tsr_project::CheckerPool::acquire(CheckerSlot) (crates/tsr_project/src/lib.rs:98). The only pinned callers live in internal/lsp and internal/project, both destination_phase 5 in data/phase1/scope.json excluded_packages."
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/core/core.go:24-34 \u2014 `func ApplyDebugStackLimit() {` / line 25 `v := os.Getenv(\"TS_GO_DEBUG_STACK_LIMIT\") //nolint:forbidigo` / line 33 `rtdebug.SetMaxStack(n)`, where `rtdebug` is the `runtime/debug` import at core.go:7. It returns early when the variable is unset or not a positive integer (lines 26-32). Callers: upstream/tsc/cmd/tsc/main.go:19 (cmd/tsc is excluded, destination_phase 4) and ten `TestMain` files (e.g. upstream/tsc/internal/testrunner/testmain_test.go:11); no library caller anywhere. || RUST: Absent from crates/ by design. `grep -rn \"stack_size|SetMaxStack\" crates/ xtask/ tools/ --include=*.rs` finds only thread-builder reservations (crates/tsr_parser/src/worker.rs:16, crates/tsr_astnav/src/tests.rs:133, crates/tsr_binder/src/recursion_tests.rs:47/88/141, crates/tsr_pseudochecker/tests/native.rs:251) and no env-driven limit; `grep -rn \"debug_stack_limit\" crates/` returns nothing. Rust has no SetMaxStack equivalent \u2014 a thread's stack size is immutable once spawned.",
+      "operation": "tsc/internal/core/core.go:ApplyDebugStackLimit",
+      "owner": "Go runtime goroutine-stack growth limit (runtime/debug.SetMaxStack). Rust's counterpart is a fixed reservation made at thread spawn: crates/tsr_parser/src/worker.rs:16 `.stack_size(256 * 1024 * 1024)` on the reserved parser worker, plus per-test `.stack_size(...)` builders (crates/tsr_binder/src/recursion_tests.rs:47,88,141). No observable contract is lost: the Go function only raises or lowers the point at which the process dies with a stack-overflow fatal error, it never changes any compiler output, and the only non-test caller is the excluded CLI entry point."
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/ls. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:708-715 \u2014 `func CheckEachDefined[S any](s []*S, msg string) []*S { for _, value := range s { if value == nil { panic(msg) } }; return s }`, with `panic(msg)` at line 711 and `return s` at 714. Native run of the verbatim body: `CheckEachDefined panic payload: \"should all be defined\"`. All five callers are in upstream/tsc/internal/ls/completions.go (lines 1164, 1628, 1711, 3396, 3398) and pass the result straight into another call; internal/ls is excluded with de",
+      "operation": "tsc/internal/core/core.go:CheckEachDefined",
+      "owner": "phase 5 (packages: internal/ls)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:418-426 \u2014 the doc comment `// Returns \\`a\\` if \\`a\\` is not \\`nil\\`; Otherwise, returns \\`b\\`. Coalesce is roughly analogous to \\`??\\` in JS, except that it non-shortcutting, so it is advised to only use a constant or precomputed value for \\`b\\`` and the body `func Coalesce[T *U, U any](a T, b T) T { if a == nil { return b } else { return a } }`. All twelve callers are in excluded packages (internal/transformers 3, internal/printer 3, internal/ls 3, internal/checker 3); no in-scope caller. || RUST: Absent from crates/: not among the 12 `internal/core/core.go` port annotations; `grep -rn \"fn coalesce\" crates/ --include=*.rs` returns nothing (the only `coalesce` hits are `is_nullish_coalesce`, the AST predicate for the `??` operator, e.g. crates/tsr_ast/src/utilities.rs:1198 \u2014 a different thing entirely).",
+      "operation": "tsc/internal/core/core.go:Coalesce",
+      "owner": "`Option::or`. Go constrains the parameters to pointer types (`T *U`), so nil maps onto None exactly, and the function returns `a` itself when non-nil and `b` otherwise \u2014 pointer identity preserved on both branches. `a.or(b)` is the same, including the non-shortcutting property the Go doc comment warns about: `b` is an already-evaluated argument in both languages (Rust's shortcutting form is the separate `or_else`). rustc check: `Some(&1).or(Some(&2))` is `Some(1)`, `None.or(Some(&2))` is `Some(2)`, `None.or(None)` is `None` \u2014 all three Go branches reproduced, with no empty-versus-nil ambiguity because Option has exactly two states."
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:868-876 \u2014 the comment `// CompareBooleans treats true as greater than false.` and the body `if a && !b { return 1 } else if !a && b { return -1 }; return 0`. All eight callers are in excluded packages: internal/modulespecifiers/util.go:31, internal/ls/codeactions_importfixes.go:450, internal/ls/lsutil/organizeimports.go:310/313/385/392, internal/ls/autoimport/fix.go:1039/1332 \u2014 every one of internal/modulespecifiers, internal/ls, internal/ls/lsutil and internal/ls/autoimport is in data/phase1/scope.json's excluded_packages (destination_phase 5). No in-scope caller. || RUST: Absent from crates/: not among the 12 `internal/core/core.go` port annotations; `grep -rn \"compare_booleans\" crates/ --include=*.rs` returns nothing. The comparator convention the port does use is `Ordering` \u2014 crates/tsr_core/src/go_sort.rs:15 and crates/tsr_scanner/src/spelling.rs:31 `compare: impl Fn(T, T) -> std::cmp::Ordering`.",
+      "operation": "tsc/internal/core/core.go:CompareBooleans",
+      "owner": "`bool::cmp` / `Ord`. Go's function is a three-valued sign with true greater than false, used only as a comparator (`if c := core.CompareBooleans(...); c != 0`). Rust's derived `Ord` on bool gives false < true, and this workspace's own comparator convention is already `std::cmp::Ordering`: crates/tsr_core/src/go_sort.rs:15 `pub fn sort<T>(data: &mut [T], compare: &mut impl FnMut(&T, &T) -> Ordering)`. rustc check: `false.cmp(&true)` is `Less`, `true.cmp(&false)` is `Greater`, `true.cmp(&true)` is `Equal` \u2014 the three Go results -1, 1, 0 with identical signs. There is no state left to observe, so a case could not discriminate anything."
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:803-811 \u2014 the doc comment `// CopyMapInto is maps.Copy, unless dst is nil, in which case it clones and returns src.`, `if dst == nil {` at 806, `return maps.Clone(src)` at 807, `maps.Copy(dst, src)` at 809 and `return dst` at 810. Native run of the verbatim body: `CopyMapInto(nil,nil) == nil: true`, `CopyMapInto(nil,empty) == nil: false len=0`, and the in-place mutation result quoted above. All four callers are in upstream/tsc/internal/project/configfileregistr",
+      "operation": "tsc/internal/core/core.go:CopyMapInto",
+      "owner": "phase 5 (packages: internal/project)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:337-345 \u2014 `func CountWhere[T any](slice []T, f func(T) bool) int { count := 0; for _, value := range slice { if f(value) { count++ } }; return count }`. All nine callers are in excluded packages: five in internal/checker (destination_phase 2), three in internal/testutil helpers, one in internal/pseudochecker (excluded); there is no in-scope caller. || RUST: Absent from crates/: not among the 12 `internal/core/core.go` port annotations; `grep -rn \"count_where\" crates/ --include=*.rs` returns nothing. || ADVERSARIAL RULING: The stated basis is false. `internal/testutil/tsbaseline` is not an excluded package: data/phase1/scope.json lists it under membership as `full` (\"baseline helpers used by syntactic comparisons\"), and it is absent from excluded_packages. So the three callers at upstream/tsc/internal/testutil/tsbaseline/error_baseline.go:243, 249 and 255 (numLibraryDiagnostics, numTsconfigDiagnostics, numContentMap",
+      "operation": "tsc/internal/core/core.go:CountWhere",
+      "owner": "`iter().filter(f).count()`. The Go body is a plain counting loop returning an int; there is no collection to be nil, no identity to preserve and no early exit. An empty or nil slice counts 0 in both languages (rustc check: `([] as [i32;0]).iter().filter(|_| true).count()` is `0`). The only representational difference is Go's `int` versus Rust's `usize`, which cannot be observed for any slice that exists."
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/api. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:769-775 \u2014 the doc comment `// onChanged is called for each key where the value in m1 differs from the value in m2.` and the body at 774 `DiffMapsFunc(m1, m2, comparableValuesEqual, onAdded, onRemoved, onChanged)`, with `func comparableValuesEqual[T comparable](a, b T) bool { return a == b }` at core.go:765-767. The signature at 773 constrains `V comparable`, which includes float64. One caller: upstream/tsc/internal/api/session.go:3845, and internal/api is exclu",
+      "operation": "tsc/internal/core/core.go:DiffMaps",
+      "owner": "phase 6 (packages: internal/api)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/execute/watchmanager, internal/ls/autoimport, internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:777-801. Guarded added pass at 782 `if onAdded != nil {`; early return at 789 `if onChanged == nil && onRemoved == nil {`; the unguarded call at 798 `onRemoved(k, v1)` inside the `} else {` at 797. Native run of the verbatim body with m1={\"gone\":1}, m2={}, onChanged non-nil, onRemoved nil: `PANIC runtime error: invalid memory address or nil pointer dereference`; with all callbacks nil: `no panic`. Four callers, all in excluded packages (internal/project/session",
+      "operation": "tsc/internal/core/core.go:DiffMapsFunc",
+      "owner": "phase 4, phase 5 (packages: internal/execute/watchmanager, internal/ls/autoimport, internal/project)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:271-276 \u2014 `func ElementOrNil[T any](slice []T, index int) T { if index < len(slice) { return slice[index] }; return *new(T) }`; line 275 is `return *new(T)`. There is no lower-bound guard. Native run of the verbatim body: `ElementOrNil past end:` (empty string, the zero value) and `ElementOrNil(-1) PANIC runtime error: index out of range [-1]`. Both callers are in the excluded internal/checker (checker.go:3071 and checker.go:9955, destination_phase 2), and chec",
+      "operation": "tsc/internal/core/core.go:ElementOrNil",
+      "owner": "phase 2 (packages: internal/checker)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:752-763 \u2014 the comment at 752 `// Enumerate returns a sequence of (index, value) pairs from the input sequence.` and the body `return func(yield func(int, T) bool) { i := 0; for v := range seq { if !yield(i, v) { return }; i++ } }`. Its only caller at the pin is upstream/tsc/internal/lsp/stack_sanitizer.go:34 (`for lineNum, line := range core.Enumerate(strings.Lines(stack))`), and internal/lsp is excluded with destination_phase 5, so there is no in-scope caller. || RUST: Absent from crates/: not among the 12 `internal/core/core.go` port annotations; `grep -rn \"fn enumerate\" crates/ --include=*.rs` returns nothing, because call sites use the stdlib adaptor.",
+      "operation": "tsc/internal/core/core.go:Enumerate",
+      "owner": "`Iterator::enumerate`. The Go body pairs each yielded value with a counter that starts at 0 and is incremented only after a successful yield, and it stops when the consumer stops; `enumerate` is the same 0-based pairing with the same early exit (rustc check: `vec![7i32, 8].into_iter().enumerate().collect::<Vec<_>>()` is `[(0, 7), (1, 8)]`). Nothing is allocated and nothing is returned but the sequence, so there is no nil/empty or identity contract to lose, and a case could only assert 0-based indices and ordering, which any plausible implementation satisfies."
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:199-206 \u2014 `func Every[T any](slice []T, f func(T) bool) bool { for _, value := range slice { if !f(value) { return false } } return true }`. The loop body is skipped for a nil or empty slice, so the result is true. Callers are dominated by excluded packages (59 in internal/checker, 7 in internal/ls) but in-scope ones do exist (internal/parser, internal/ast, internal/vfs, internal/tsoptions, one each); the contract they rely on is the same bool. || RUST: No ported function in crates/ (not among the 12 `internal/core/core.go` annotations; `grep -rn \"fn every\" crates/ --include=*.rs` returns nothing) because the call sites use the stdlib adaptor directly. Verified with rustc on this machine: `[] as [i32;0]).iter().all(|_| false)` evaluates to `true`, matching Go's vacuous case exactly.",
+      "operation": "tsc/internal/core/core.go:Every",
+      "owner": "`Iterator::all`. The Go body returns false on the first failing element and true otherwise, including vacuously for an empty or nil slice; `slice.iter().all(f)` is the same short-circuiting fold with the same vacuous-truth answer. The return is a bool, so there is no nil/empty or identity question at all, and a prepared case could only re-assert short-circuiting and the empty case, which `Iterator::all` satisfies by definition."
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn '\\bFilterIndex\\b' --include=*.go upstream/tsc` returns 1 line(s), all in internal/core/core.go: the definition and nothing else. No caller anywhere in the pinned tree, tests included. Absent from crates/: the 12 `internal/core/core.go` port annotations listed for Filter contain no FilterIndex, and `grep -rn \"filter_index\" crates/ --include=*.rs` returns nothing.",
+      "operation": "tsc/internal/core/core.go:FilterIndex",
+      "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:52-62 \u2014 `func FilterSeq[T any](slice []T, f func(T) bool) iter.Seq[T] { return func(yield func(T) bool) { for _, value := range slice { if f(value) { if !yield(value) { return } } } } }`. Nothing is allocated and nothing is returned but the closure. The single caller in the pin is upstream/tsc/internal/checker/checker.go:27603 (`core.FilterSeq(target.Types(), ...)`), and internal/checker is excluded in data/phase1/scope.json with destination_phase 2, so there is no in-scope caller either. || RUST: Deliberately absent from crates/: none of the 12 `internal/core/core.go` port annotations in crates/ is FilterSeq and `grep -rn \"filter_seq\" crates/ --include=*.rs` returns nothing. The port already passes lazy candidate sequences as `impl IntoIterator` rather than porting Go's seq helpers \u2014 crates/tsr_scanner/src/spelling.rs:18-22 `pub fn get_spelling_suggestion_for_strings<'candidate>(name: &[u8], candidates: impl IntoIterator<Item = &'candidate [u8]>)`.",
+      "operation": "tsc/internal/core/core.go:FilterSeq",
+      "owner": "`Iterator::filter` \u2014 the contract is a lazy sequence, so there is no collection-nil and no return-value identity to preserve. Go yields only values for which f is true, stops as soon as the consumer's `yield` returns false, and evaluates f only on demand; `slice.iter().filter(f)` does exactly that, and an empty or nil input slice produces an iterator that yields nothing in both languages. A prepared case could only assert lazy filtering, order and early exit, all of which any plausible implementation satisfies \u2014 the instructions call such a case worthless."
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/fourslash. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:247-255: the same backwards loop as FindLast but `return i`, with `return -1` on absence. The sentinel is load-bearing arithmetic at tsc/internal/fourslash/baselineutil.go:104, `return ss[:core.FindLastIndex(ss, func(s string) bool { return s != \"\" })+1]`, where -1 must become the empty prefix. Other callers: tsc/internal/checker/checker.go:18287 and :22513.",
+      "operation": "tsc/internal/core/core.go:FindLastIndex",
+      "owner": "phase 2, phase 5 (packages: internal/checker, internal/fourslash)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/fourslash, internal/ls. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:287-295. `for _, value := range slice {` / `mapped := f(value)` / `if mapped != *new(U) {` / `return mapped` / `}` / `}` / `return *new(U)`. Despite the name the test is against U's zero value (U is `comparable`, so for U=string it is \"\"), it is applied to the MAPPED value, and the mapper stops being called at the first non-zero. 10 call sites.",
+      "operation": "tsc/internal/core/core.go:FirstNonNil",
+      "owner": "phase 2, phase 5 (packages: internal/checker, internal/fourslash, internal/ls)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/ls/autoimport, internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:297-305. `var zero T` / `for _, value := range values {` / `if value != zero {` / `return value` / `}` / `}` / `return zero`, with `values ...T` variadic, so a call with no arguments is legal and returns the zero value. Callers pass exactly two arguments: tsc/internal/project/projectcollectionbuilder.go:340, tsc/internal/ls/autoimport/view.go:203 and tsc/internal/ls/autoimport/extract.go:379.",
+      "operation": "tsc/internal/core/core.go:FirstNonZero",
+      "owner": "phase 5 (packages: internal/ls/autoimport, internal/project)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/execute/build, internal/lsp. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:278-285. `if seq != nil {` / `for value := range seq {` / `return value` / `}` / `}` / `return *new(T)`. Two contracts: a nil iter.Seq is tolerated and answers T's zero instead of panicking, and the range-over-func returns on the first yield, so the producer is told to stop after one element. Callers: tsc/internal/lsp/progress.go:174 and :187 over `loading.Keys()`, and tsc/internal/execute/build/buildtask.go:295 over `t.resolved.GetOutputFileNames()`.",
+      "operation": "tsc/internal/core/core.go:FirstOrNilSeq",
+      "owner": "phase 4, phase 5 (packages: internal/execute/build, internal/lsp)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:517-520, comment included: `// Extracts the first value of a multi-value return.` / `func FirstResult[T1 any](t1 T1, _ ...any) T1 {` / `return t1` / `}`. The callee is evaluated exactly once by the caller and its extra results are discarded unnamed, so there is no nil/empty handling and the returned value is the argument itself. Call sites confirm the shape: tsc/internal/project/snapshotfs.go:284 `core.FirstResult(s.diskDirectories.Finalize())`, tsc/internal/transformers/moduletransforms/commonjsmodule.go:298 and esmodule.go:275, tsc/internal/transformers/tstransforms/runtimesyntax.go:817 and :838, all wrapping a single two-value call. 26 call sites, none of which passes explicit extra arguments. || RUST: No ported counterpart and none needed. No `port: tsc/internal/core/core.go:FirstResult` marker under crates/; crates/tsr_core/src/lib.rs:6-7,183-189 declares no such helper. In Rust the same call is `tx.visitor().visit_slice(custom).0` (or the named field, if the port returns a struct), which evaluates the callee once and yields the first result by value \u2014 identical, including for a nil/empty first result, because the value is passed through untouched.",
+      "operation": "tsc/internal/core/core.go:FirstResult",
+      "owner": "Rust tuple field access on a multi-value return (`f(..).0`); the Go helper exists only because Go cannot index a multi-value return in expression position"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:588-590 \u2014 `func GetSpellingSuggestionWithMaxCandidateCount[T any](name string, candidates iter.Seq[T], getName func(T) string, compare func(T, T) int, maxCandidates int) T {` / `\treturn getSpellingSuggestion(name, candidates, getName, compare, maxCandidates)`. The bound is enforced at core.go:602-606: `checkedCandidates++` BEFORE the test, then `if maxCandidates > 0 && checkedCandidates > maxCandidates {` / `\tvar zero T` / `\treturn zero` \u2014 i.e. the (maxCandidat",
+      "operation": "tsc/internal/core/core.go:GetSpellingSuggestionWithMaxCandidateCount",
+      "owner": "phase 2 (packages: internal/checker)"
+    },
+    {
+      "category": "equivalent_rust",
+      "evidence": "upstream/tsc/internal/core/core.go:704-706 is the whole function: `func Identity[T any](t T) T {` / `return t` / `}`. It takes one already-evaluated argument and returns it unchanged, so there is no nil/empty branch and no sentinel: a nil slice, a nil pointer and a zero struct all come back as themselves. It is never called with parentheses in the pinned tree \u2014 every use passes it as a function value (tsc/internal/astnav/tokens.go:714, tsc/internal/module/resolver.go:2044, tsc/internal/project/configfileregistry.go:96, project.go:201, projectcollection.go:272, tsc/internal/ls/autoimport/util.go:288, registry.go:529, tsc/internal/compiler/includeprocessor.go:102, and internally at core.go:638 and core/bfs.go:58). || RUST: No ported counterpart and none needed. No `port: tsc/internal/core/core.go:Identity` marker exists under crates/; crates/tsr_core/src/lib.rs:6-7,183-189 declares no such helper. The stdlib `core::convert::identity` has the identical signature and body. I deliberately do NOT claim the two `fn identity(_: &mut NodeVisitor<'_>, node: Option<NodeId>) -> Option<NodeId>` definitions at crates/tsr_ast/examples/support/factory.rs:53 and crates/tsr_ast/tests/visitor.rs:16 as the counterpart: I read both, they are a visitor callback in an example and a test, not the generic helper, and scope.json's own basis line for this operation already warns that the name match is no",
+      "operation": "tsc/internal/core/core.go:Identity",
+      "owner": "std::convert::identity (Rust core library); call sites take it as a function value, where a Rust port passes `core::convert::identity` or the closure `|x| x`"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/modulespecifiers. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:717-724: `matched := strings.Index(s[startIndex:], pattern)` / `if matched == -1 {` / `return -1` / `} else {` / `return matched + startIndex`. `s[startIndex:]` is a BYTE slice with no char-boundary constraint; it panics only when startIndex is out of [0,len(s)]. Callers: tsc/internal/modulespecifiers/util.go:295 and tsc/internal/modulespecifiers/specifiers.go:804, both advancing past a '/' with `previousIndex+1`.",
+      "operation": "tsc/internal/core/core.go:IndexAfter",
+      "owner": "phase 5 (packages: internal/modulespecifiers)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/ls, internal/ls/autoimport, internal/ls/change, internal/project, internal/transformers/declarations. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:117-126. `var result []U` (nil, never preallocated), then per element `mapped := f(value)` and `if mapped != *new(U) {` / `result = append(result, mapped)`. The discard test is on the MAPPED value against U's zero, not on the input, and U is constrained `comparable`, so for U=string the dropped value is \"\" and for U=*T it is nil. 26 call sites.",
+      "operation": "tsc/internal/core/core.go:MapNonNil",
+      "owner": "phase 2, phase 3, phase 5 (packages: internal/checker, internal/ls, internal/ls/autoimport, internal/ls/change, internal/project, internal/transformers/declarations)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/ls/autoimport. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:358-380. Line 360-362: `if len(xs) == 0 { return nil }` \u2014 empty input returns a nil slice, not an empty one. Lines 364-377 keep a running minimum `m` and a fresh `mins := []T{m}`; on `c < 0` it does `m = x; mins = mins[:0]; mins = append(mins, x)`, on `c == 0` it appends, and it never updates `m` on a tie. Duplicates are kept, in input order. One non-test caller: upstream/tsc/internal/ls/autoimport/view.go:250 `fixes = append(fixes, core.MinAllFunc(fixesForGrou",
+      "operation": "tsc/internal/core/core.go:MinAllFunc",
+      "owner": "phase 5 (packages: internal/ls/autoimport)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/ls. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:208-217 \u2014 `func Or[T any](funcs ...func(T) bool) func(T) bool { return func(input T) bool { for _, f := range funcs { if f(input) { return true } }; return false } }`. Short-circuiting disjunction; zero funcs yields a predicate that is always false, which is `any` over an empty sequence. Exactly one non-test caller, and it passes three concrete predicates: upstream/tsc/internal/ls/completions.go:5819 `ast.FindAncestor(node, core.Or(ast.IsImportDeclaration, ast.",
+      "operation": "tsc/internal/core/core.go:Or",
+      "owner": "phase 5 (packages: internal/ls)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:347-351 \u2014 `func ReplaceElement[T any](slice []T, i int, t T) []T { result := slices.Clone(slice); result[i] = t; return result }`. Two observable facts: the input slice is never written through (the caller's slice is unchanged and the result never aliases it), and an out-of-range i panics on the clone. Both non-test callers depend on the no-mutation half: upstream/tsc/internal/checker/checker.go:23662 `c.createNormalizedTupleTypeEx(target, core.ReplaceElement(e",
+      "operation": "tsc/internal/core/core.go:ReplaceElement",
+      "owner": "phase 2 (packages: internal/checker)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:167-181 \u2014 identical to SameMap except `f` takes `(value, index)`. Note that both loops pass the ABSOLUTE index: the scan passes `i` (line 168) and the tail loop passes `j` (line 176), not a tail-relative offset. `return slice` at line 180 preserves the caller's slice when nothing changes. One non-test caller: upstream/tsc/internal/checker/nodebuilderimpl.go:3081 `typeArguments = core.SameMapIndex(typeArguments, func(arg *Type, i int) *Type {`.",
+      "operation": "tsc/internal/core/core.go:SameMapIndex",
+      "owner": "phase 2 (packages: internal/checker)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/transformers/moduletransforms. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:726-728 \u2014 `func ShouldRewriteModuleSpecifier(specifier string, compilerOptions *CompilerOptions) bool {` / `\treturn compilerOptions.RewriteRelativeImportExtensions.IsTrue() && tspath.PathIsRelative(specifier) && !tspath.IsDeclarationFileName(specifier) && tspath.HasTSFileExtension(specifier)`. Four conjuncts. Supporting pinned definitions: upstream/tsc/internal/core/tristate.go:16-18 `func (t Tristate) IsTrue() bool { return t == TSTrue }` (so an unset option i",
+      "operation": "tsc/internal/core/core.go:ShouldRewriteModuleSpecifier",
+      "owner": "phase 2, phase 3 (packages: internal/checker, internal/transformers/moduletransforms)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/printer. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:317-336. Four clamps and an identity arm, all observable: `if start < 0 { start = len(s1) + start }` then `if start < 0 { start = 0 }` (a negative start counts from the end and then floors at 0, never panics), `if start > len(s1) { start = len(s1) }`, `if deleteCount < 0 { deleteCount = 0 }`, `end := min(start+max(deleteCount, 0), len(s1))`, and then line 333 `if start == end && len(items) == 0 { return s1 }` \u2014 a no-op splice returns the caller's own slice. Oth",
+      "operation": "tsc/internal/core/core.go:Splice",
+      "owner": "phase 3 (packages: internal/printer)"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn '\\bTryMap\\b' --include=*.go upstream/tsc` returns 1 line(s), all in internal/core/core.go: the definition and nothing else. No caller anywhere in the pinned tree, tests included. Absent. `grep -rniE \"fn try_map\" crates/ --include='*.rs'` returns nothing. The Rust idiom `iter().map(f).collect::<Result<Vec<_>, _>>()` matches the short-circuit and the discard-partials behavior bu",
+      "operation": "tsc/internal/core/core.go:TryMap",
+      "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/ls/autoimport. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/core.go:813-829 \u2014 the doc comment says it \"returns true if s1 and s2 contain the same elements, regardless of order\", and the body is a MULTISET test, not a set test: it builds `counts := make(map[T]int)`, increments for every element of s1, then decrements for every element of s2 and returns false the moment a count goes below zero. Equal lengths are required first (line 815), so nil versus allocated-empty both compare true. Two non-test callers: upstream/tsc/internal",
+      "operation": "tsc/internal/core/core.go:UnorderedEqual",
+      "owner": "phase 5 (packages: internal/ls/autoimport)"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/core/languagevariant_stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[LanguageVariant...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/core/languagevariant_stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.LinkStore` outside internal/core matches internal/checker and internal/printer; core.PagedLinkStore matches internal/checker alone. crates/tsr_checker/src/links.rs:1-8 names `core.PagedLinkStore` as the structure it ports, so a Rust home exists and it is in the checker crate, not tsr_core -- which is why scope.json's by-name rule recorded \"absent from every Rust crate by name\" for these four. Worth the checker step's attention: upstream/tsc/internal/core/linkstore.go:79-93 makes Has and TryGet PAGE-granular, returning a pointer into any allocated 256-entry page, so Has answers true for keys that were never set.",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Get",
+      "owner": "phase 2 (internal/checker); the Rust counterpart already exists at crates/tsr_checker/src/links.rs"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.LinkStore` outside internal/core matches internal/checker and internal/printer; core.PagedLinkStore matches internal/checker alone. crates/tsr_checker/src/links.rs:1-8 names `core.PagedLinkStore` as the structure it ports, so a Rust home exists and it is in the checker crate, not tsr_core -- which is why scope.json's by-name rule recorded \"absent from every Rust crate by name\" for these four. Worth the checker step's attention: upstream/tsc/internal/core/linkstore.go:79-93 makes Has and TryGet PAGE-granular, returning a pointer into any allocated 256-entry page, so Has answers true for keys that were never set.",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Has",
+      "owner": "phase 2 (internal/checker); the Rust counterpart already exists at crates/tsr_checker/src/links.rs"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/printer. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/linkstore.go:30-32 `func (s *LinkStore[K, V]) TryGet(key K) *V { return s.entries[key] }` \u2014 returns nil on a miss and never inserts, unlike Get (linkstore.go:12-23) and unlike PagedLinkStore.TryGet (linkstore.go:79-93) which returns a live pointer for any key on an allocated page.",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.TryGet",
+      "owner": "phase 2, phase 3 (packages: internal/checker, internal/printer)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.LinkStore` outside internal/core matches internal/checker and internal/printer; core.PagedLinkStore matches internal/checker alone. crates/tsr_checker/src/links.rs:1-8 names `core.PagedLinkStore` as the structure it ports, so a Rust home exists and it is in the checker crate, not tsr_core -- which is why scope.json's by-name rule recorded \"absent from every Rust crate by name\" for these four. Worth the checker step's attention: upstream/tsc/internal/core/linkstore.go:79-93 makes Has and TryGet PAGE-granular, returning a pointer into any allocated 256-entry page, so Has answers true for keys that were never set.",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Get",
+      "owner": "phase 2 (internal/checker); the Rust counterpart already exists at crates/tsr_checker/src/links.rs"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.LinkStore` outside internal/core matches internal/checker and internal/printer; core.PagedLinkStore matches internal/checker alone. crates/tsr_checker/src/links.rs:1-8 names `core.PagedLinkStore` as the structure it ports, so a Rust home exists and it is in the checker crate, not tsr_core -- which is why scope.json's by-name rule recorded \"absent from every Rust crate by name\" for these four. Worth the checker step's attention: upstream/tsc/internal/core/linkstore.go:79-93 makes Has and TryGet PAGE-granular, returning a pointer into any allocated 256-entry page, so Has answers true for keys that were never set.",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Has",
+      "owner": "phase 2 (internal/checker); the Rust counterpart already exists at crates/tsr_checker/src/links.rs"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/checker, internal/printer. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/linkstore.go:79-93: it resolves the page from the list branch only `if int(pageIndex) < len(s.pageList)` (linkstore.go:82-85) or from pageMap otherwise, then `if page != nil { return &page[key&pageMask] }; return nil`. So it never allocates, but it returns a live, writable pointer to a zeroed entry for any key on an allocated page \u2014 a strictly weaker miss contract than core.LinkStore.TryGet (linkstore.go:30-32), which returns nil for every key it was not given.",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.TryGet",
+      "owner": "phase 2, phase 3 (packages: internal/checker, internal/printer)"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/core/modulekind_stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[ModuleKind...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/core/modulekind_stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/project/ata. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/nodemodules.go:85-90 `func NonRelativeModuleNameForTypingCache(moduleName string) string { if NodeCoreModules()[moduleName] { return \"node\" } return moduleName }`, over the map built at :75-83 `nodeCoreModules[unprefixed] = true; nodeCoreModules[\"node:\"+unprefixed] = true` then `maps.Copy(nodeCoreModules, ExclusivelyPrefixedNodeCoreModules)`. The two source tables are :9-64 (52 unprefixed names, no \"test\", no \"quic\") and :67-73 `ExclusivelyPrefixedNodeCoreModules = map",
+      "operation": "tsc/internal/core/nodemodules.go:NonRelativeModuleNameForTypingCache",
+      "owner": "phase 5 (packages: internal/project/ata)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn ResolveConfigFileNameOfProjectReference` outside internal/core matches internal/tsoptions and internal/execute/build; ResolveProjectReferencePath is called only from internal/tsoptions/parsedcommandline.go. Both need a filesystem host to mean anything, which is F3a's surface and not a leaf's.",
+      "operation": "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference",
+      "owner": "F3a (internal/tsoptions), which prepares project-reference resolution"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn ResolveConfigFileNameOfProjectReference` outside internal/core matches internal/tsoptions and internal/execute/build; ResolveProjectReferencePath is called only from internal/tsoptions/parsedcommandline.go. Both need a filesystem host to mean anything, which is F3a's surface and not a leaf's.",
+      "operation": "tsc/internal/core/projectreference.go:ResolveProjectReferencePath",
+      "owner": "F3a (internal/tsoptions), which prepares project-reference resolution"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/core/scriptkind_stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[ScriptKind...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/core/scriptkind_stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/core/scripttarget_stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[ScriptTarget...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/core/scripttarget_stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
+      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
+      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewLimitedSemaphore --include=*.go upstream/tsc` outside internal/core matches internal/vfs/osvfs and nothing else. The filesystem step prepares that package and its concurrency limit, so it owns whatever of the semaphore is observable through it.",
+      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
+      "owner": "F2a (internal/vfs/osvfs), the only non-test caller"
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/core/semaphore.go:14-16 `func (s UnlimitedSemaphore) Acquire() (release func()) { return func() {} }`, with the interface assertion at semaphore.go:10 `var _ Semaphore = UnlimitedSemaphore{}` over the empty struct at semaphore.go:12. || RUST: Absent by design: there is no Semaphore trait or implementor in crates/. A function that allocates and returns an empty closure has no observable result to compare.",
+      "operation": "tsc/internal/core/semaphore.go:UnlimitedSemaphore.Acquire",
+      "owner": "Go sync primitive stub: the no-op arm of the Semaphore interface, used where a caller must satisfy the interface without limiting anything. Rust's equivalent is the absence of a gate (tsr_vfs has no concurrency construct)."
+    },
+    {
+      "category": "go_runtime",
+      "evidence": "upstream/tsc/internal/core/semaphore.go:18-20 `func (s UnlimitedSemaphore) TryAcquire(ctx context.Context) (release func(), acquired bool) { return func() {}, true }` \u2014 note it never consults ctx, so even an already-cancelled context acquires. || RUST: Absent: no Semaphore trait, implementor or caller in crates/. The only contract here (always acquired, no-op release) exists solely to satisfy Go's interface.",
+      "operation": "tsc/internal/core/semaphore.go:UnlimitedSemaphore.TryAcquire",
+      "owner": "Go sync primitive stub; it ignores the context entirely and always succeeds. No Rust counterpart is needed because no Rust code takes a Semaphore."
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.Stack --include=*.go upstream/tsc` outside internal/core matches internal/printer only.",
+      "operation": "tsc/internal/core/stack.go:Stack.Len",
+      "owner": "phase 3 (internal/printer), the only non-test caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/printer. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/stack.go:23-29 `l := len(s.data); if l == 0 { panic(\"stack is empty\") }; return s.data[l-1]` \u2014 returns the top item by value without removing it, and panics on an empty stack exactly as Pop does.",
+      "operation": "tsc/internal/core/stack.go:Stack.Peek",
+      "owner": "phase 3 (packages: internal/printer)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/printer. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/stack.go:11-21 `l := len(s.data); if l == 0 { panic(\"stack is empty\") }; item := s.data[l-1]; var zero T; s.data[l-1] = zero; s.data = s.data[:l-1]; return item` \u2014 it returns the last item BY VALUE and panics on an empty stack rather than returning a zero value; the slot zeroing is a GC hint.",
+      "operation": "tsc/internal/core/stack.go:Stack.Pop",
+      "owner": "phase 3 (packages: internal/printer)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.Stack --include=*.go upstream/tsc` outside internal/core matches internal/printer only.",
+      "operation": "tsc/internal/core/stack.go:Stack.Push",
+      "owner": "phase 3 (internal/printer), the only non-test caller"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/api, internal/execute, internal/ls, internal/ls/change. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/textchange.go:14-30 `func ApplyBulkEdits(text string, edits []TextChange) string { b := strings.Builder{}; b.Grow(len(text)); lastEnd := 0; for _, e := range edits { start := e.TextRange.Pos(); if start != lastEnd { b.WriteString(text[lastEnd:e.TextRange.Pos()]) }; b.WriteString(e.NewText); lastEnd = e.TextRange.End() }; b.WriteString(text[lastEnd:]); return b.String() }`. Callers include upstream/tsc/internal/api/session.go:3090 `return core.ApplyBulkEdits(text, chang",
+      "operation": "tsc/internal/core/textchange.go:ApplyBulkEdits",
+      "owner": "phase 4, phase 5, phase 6 (packages: internal/api, internal/execute, internal/ls, internal/ls/change)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/fourslash, internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/core/textchange.go:10-12 `func (t TextChange) ApplyTo(text string) string { return text[:t.Pos()] + t.NewText + text[t.End():] }`. The two slices are independent and unordered: nothing requires Pos <= End, so a reversed range duplicates the text between End and Pos rather than failing. The two expressions also panic with DIFFERENT Go runtime formats \u2014 `text[:pos]` is a high-only slice (\"slice bounds out of range [:11] with length 10\") while `text[end:]` is a low-bound slice",
+      "operation": "tsc/internal/core/textchange.go:TextChange.ApplyTo",
+      "owner": "phase 5 (packages: internal/fourslash, internal/project)"
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/core/tristate_stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[Tristate...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/core/tristate_stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn TypeAcquisition --include=*.go upstream/tsc` outside internal/core matches internal/api, internal/project, internal/project/ata and internal/tsoptions. The only Phase 1 caller is internal/tsoptions, whose config and command-line parsing F3a prepares.",
+      "operation": "tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals",
+      "owner": "F3a (internal/tsoptions), which parses the option this compares"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These are the compiler version constants. `grep -rn core.Version` outside internal/core matches internal/module, internal/packagejson, internal/execute/*, internal/lsp, internal/project and internal/testutil/harnessutil; core.VersionMajorMinor matches internal/packagejson, internal/project/ata and internal/vfs/osvfs. No leaf package reads either, and their observable effect is the version text a consumer embeds, which the consuming step compares.",
+      "operation": "tsc/internal/core/version.go:Version",
+      "owner": "F3a for internal/module and internal/packagejson; F2a for internal/vfs/osvfs; later phases otherwise"
+    },
+    {
+      "category": "later_step",
+      "evidence": "These are the compiler version constants. `grep -rn core.Version` outside internal/core matches internal/module, internal/packagejson, internal/execute/*, internal/lsp, internal/project and internal/testutil/harnessutil; core.VersionMajorMinor matches internal/packagejson, internal/project/ata and internal/vfs/osvfs. No leaf package reads either, and their observable effect is the version text a consumer embeds, which the consuming step compares.",
+      "operation": "tsc/internal/core/version.go:VersionMajorMinor",
+      "owner": "F3a for internal/module and internal/packagejson; F2a for internal/vfs/osvfs; later phases otherwise"
+    },
+    {
+      "category": "unused_at_pin",
+      "evidence": "`grep -rn '\\bWatchInterval\\b' --include=*.go upstream/tsc` returns 1 line(s), all in internal/core/watchoptions.go: the definition and nothing else. No caller anywhere in the pinned tree, tests included. Absent entirely. `grep -rn 'WatchOptions|watch_options|watch_interval|WatchInterval|WatchFileKind' --include=*.rs crates/ xtask/ tools/` returns nothing \u2014 there is no WatchOptions struct, no WatchFile",
+      "operation": "tsc/internal/core/watchoptions.go:WatchOptions.WatchInterval",
+      "owner": "nobody at this pin; the first caller a later pin adds fixes the contract"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/workgroup.go:98-104 `func NewThrottleGroup(ctx context.Context, semaphore chan struct{}) *ThrottleGroup { g, _ := errgroup.WithContext(ctx); return &ThrottleGroup{ semaphore: semaphore, group: g } }` \u2014 note the derived context is discarded. Caller: upstream/tsc/internal/project/ata/ata.go:286 `tg := core.NewThrottleGroup(ctx, concurrencySemaphore)`, whose channel is sized by ThrottleLimit at ata.go:71. || RUST: Absent: `grep -rn \"ThrottleGroup\" crates --include=*.rs` has no hits, and there is no automatic type acquisition implementation in crates/ (no tsr_ata crate; tsr_project holds only the checker pool, crates/tsr_project/src/lib.rs:47). || ADVERSARIAL RULING: It carries a caller-visible semantic beyond scheduling that the claim itself surfaces and then drops: upstream/tsc/internal/core/workgroup.go:99 discards the derived cancellable context (`g, _ := errgroup.WithContext(ctx)`), so a first error never cancels the siblings and every queued install runs to completion. That is a behavior a port must decide about, so \"no caller-visible contract to reprodu",
+      "operation": "tsc/internal/core/workgroup.go:NewThrottleGroup",
+      "owner": "golang.org/x/sync/errgroup plus a channel semaphore. Its sole pinned consumer is upstream/tsc/internal/project/ata/ata.go, which data/phase1/scope.json excludes at destination_phase 5 (\"internal/project/ata\": \"automatic type acquisition\"); no Rust crate ports ATA or any throttled task group."
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:NewWorkGroup",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/workgroup.go:108-118 `tg.group.Go(func() error { tg.semaphore <- struct{}{}; defer func() { <-tg.semaphore }(); return fn() })` \u2014 acquisition happens inside the goroutine, so spawning is unbounded while execution is bounded. || RUST: Absent: no ThrottleGroup, errgroup analogue or bounded task spawner in crates/. Nothing in the port issues concurrent external package installs (the only spawns are the parser stack worker, crates/tsr_parser/src/worker.rs:10, and the Node host worker, crates/tsr_node/src/lib.rs:109). || ADVERSARIAL RULING: The stated basis is \"no Rust counterpart ... its only consumer is a phase-5 package\", which is a deferral, not the go_runtime premise it is filed under (scripts/phase1_scope.py:440). The operation also fixes a caller-visible resource contract rather than a pure interleaving: upstream/tsc/internal/core/workgroup.go:109-117 acquires the slot INSIDE the goroutine, so spawning is unbounded while execu",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+      "owner": "Goroutine spawn gated by a channel semaphore (errgroup.Group.Go). No Rust counterpart: its only consumer, npm install throttling in internal/project/ata, is a phase-5 package with no port."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/core/workgroup.go:121-123 `func (tg *ThrottleGroup) Wait() error { return tg.group.Wait() }`, documented at workgroup.go:120 as returning \"the first error encountered, if any\". Consumer: upstream/tsc/internal/project/ata/ata.go:264,286. || RUST: Absent: no ThrottleGroup in crates/. First-error semantics in the ported code come from `Result` propagation in a single-threaded call chain (crates/tsr_compiler/src/loader.rs:286-292), which cannot race over which error is first. || ADVERSARIAL RULING: Error identity is explicitly a caller-visible contract, and this operation is defined by it: workgroup.go:120-123 returns the first non-nil error after all goroutines finish (and, because the derived context is discarded at workgroup.go:99, after all of them have run rather than being cancelled). go_runtime asserts there is no such contract (scripts/phase1_scope.py:440). The claim's own rationale ",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+      "owner": "errgroup join: returns the first non-nil error after all goroutines finish. No Rust counterpart; the phase-5 ATA consumer is unported, and Rust's sequential loader propagates the first error with `?` at crates/tsr_compiler/src/loader.rs:292 instead."
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "later_step",
+      "evidence": "`grep -rn core.NewWorkGroup --include=*.go upstream/tsc` outside internal/core matches internal/compiler, internal/execute/build, internal/execute/incremental, internal/execute/tsctests, internal/ls and internal/project. The only Phase 1 caller is internal/compiler, whose membership this scope records as \"partial\" with F4a naming the exact syntactic surface, so the work group's observable effect -- that every queued unit has completed when RunAndWait returns -- is observable through that step's own output and not through any leaf.",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop",
+      "owner": "F4a for the compiler runner's parse/bind path; phases 4-6 for internal/execute, internal/ls and internal/project"
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:1 `//go:build ignore` with `package main` at :3, so the file never links into any runtime binary; it is invoked only by the `//go:generate go run generate.go ...` directive at diagnostics.go:16. The function is at generate.go:409 `func convertPropertyName(origName string, code int) (varName string, key string)` and is called only from generator code: generate.go:102 (inside main), :141 and :160-161 (inside generateDiagnostics). || RUST: No Rust reimplementation exists: crates/tsr_diagnostics/src/ contains only lib.rs and generated.rs, and the generated header written by the Rust emitter says so outright \u2014 xtask/src/gen/diagnostics.rs:69 emits the line `// Names and localization keys come from convertPropertyName in generate.go.`. Instead the ts-rust build compiles and calls the pinned function directly: scripts/s03.py:262 runs `go test generate.go s03_export_test.go -run ^TestS03ExportDiagnostics$` inside the pinned package, and tools/s03/diagnostics-export_test.go:46 calls `name, key := convertPropertyName(message.key, code)`.",
+      "operation": "tsc/internal/diagnostics/generate.go:convertPropertyName",
+      "owner": "scripts/s03.py `prepare()` diagnostics-export step (scripts/s03.py:261-262) plus its access-only adapter tools/s03/diagnostics-export_test.go; the normalized export is consumed by xtask/src/gen/diagnostics.rs::emit (xtask/src/gen/diagnostics.rs:29). Note the runtime-observable product of this function \u2014 the 2,211 localization key strings \u2014 is separately witnessed byte-exactly by leaves/diagnostics/identity-roster-fingerprint and by `key_returned` in the identity cases; the function itself runs only at generation time."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:137 `func generateDiagnostics(diagnosticMessages []*diagnosticMessage) *bytes.Buffer`, whose first act is `buf.WriteString(\"// Code generated by generate.go; DO NOT EDIT.\\n\")` (:139) and which then emits one `var %s = &Message{code: %d, category: Category%s, key: %q, text: %q` line per message (:144) plus the `keyToMessage` switch (:161-167). Its output is written to disk by main at generate.go:116 `os.WriteFile(*diagnosticsOutput, formatted, 0o666)`. The file is `//go:build ignore` / `package main` (generate.go:1,3): build time only. || RUST: The Rust counterpart is xtask/src/gen/diagnostics.rs:29 `pub(super) fn emit(input: &Value, pin: &str) -> Result<BTreeMap<PathBuf, String>, String>`, which writes `crates/tsr_diagnostics/src/generated.rs` (named at xtask/src/gen/diagnostics.rs:95) as a `pub static MESSAGES: &[Message]` table (:71-81), per-message `pub const` aliases (:84-89) and `pub(crate) static KEY_INDEX` (:90-93). It is dispatched from xtask/src/gen/mod.rs:86 `\"diagnostics\" => diagnostics::emit(&value, pin)?`. The emitted shape differs from Go's (a slice plus a key index rather than package-level vars and a switch) but the per-message content contract \u2014 name, key, text, code, category and the three flags \u2014 is the same and is cross-checked field by field against the untouched pinned diagnostics_generated.go by `verifyPinnedD",
+      "operation": "tsc/internal/diagnostics/generate.go:generateDiagnostics",
+      "owner": "xtask/src/gen/diagnostics.rs::emit, driven by xtask/src/gen/mod.rs::outputs; the pinned-side input is produced by scripts/s03.py:261-262."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:176 `func generateLocalizations(knownKeys map[string]bool, locDir string) *bytes.Buffer`. It globs the pinned LCL tree (:201), writes one gzip file per locale (:280-283 `os.WriteFile(outputPath, compressed.Bytes(), 0o644)`), and emits loc_generated.go's `var matcher = language.NewMatcher(...)` (:299), `var localeFuncs = []func() map[Key]string{` (:308), `loadLocaleData` (:318) and the `//go:embed loc/%s` vars (:334-339). main writes the result at generate.go:129. Build time only: generate.go:1 `//go:build ignore`, :3 `package main`. || RUST: Absent, and recorded as absent. crates/tsr_diagnostics/src/ contains only lib.rs and generated.rs \u2014 there is no localize.rs, no matcher, no embedded locale data, and no gzip/locale table anywhere in the crate. data/phase1/locale-assets.json `generator_extension_status` states `\"state\": \"absent\"`, `\"lands_in\": \"F1b\"`, `\"today\": \"xtask/src/gen/diagnostics.rs generates the English message identities only (crates/tsr_diagnostics/src/generated.rs); it emits no locale tables, no matcher and no selection code.\"` \u2014 consistent with what I read in xtask/src/gen/diagnostics.rs, whose only output path is crates/tsr_diagnostics/src/generated.rs (:95). || ADVERSARIAL RULING: The category fails its own definition. scripts/phase1_scope.py:439 defines build_tooling as 'runs at build time and never in a compile; the port generates the same artifact elsewhere' \u2014 and the claim's own evidence proves the second half false: data/phase1/locale-assets.json `generator_extension_status` records `\"state\": \"absent\"`, `\"lands_in\": \"F1b\"`, and 'xtask/src/gen/diagnostics.rs ... emits n",
+      "operation": "tsc/internal/diagnostics/generate.go:generateLocalizations",
+      "owner": "xtask/src/gen/diagnostics.rs, whose localization extension is recorded as landing in F1b (data/phase1/locale-assets.json `generator_extension` / `generator_extension_status`). The runtime consequence of its absence is already frozen as F1a gaps rather than hidden: leaves/diagnostics/localize-table-coverage, localize-shipped-tables, localize-fallback-choice and localize-cache-repeat all carry `last_result: \"not_implemented\"` in data/phase1/cases.json, and tools/phase1/leaves/src/diagnostics.rs's `diagnostics.table` MISSING row names the missing table set explicitly."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:71 `func main()`, in a file headed `//go:build ignore` (:1) and `package main` (:3). Its whole body is generator plumbing: `flag.String(\"diagnostics\", ...)`/`flag.String(\"loc\", ...)`/`flag.String(\"locdir\", ...)` (:74-76), `readRawMessages` (:81,:88), `generateDiagnostics` (:106), `format.Source` (:108), `os.WriteFile(*diagnosticsOutput, ...)` (:116) and `os.WriteFile(*locOutput, ...)` (:129). It is reached only through the `//go:generate go run generate.go -diagnostics ./diagnostics_generated.go -loc ./loc_generated.go -locdir ./loc` directive at diagnostics.go:16. || RUST: No crates/ counterpart, and none should exist. The entry-point counterpart is the xtask generation driver: xtask/src/gen/mod.rs:80 `fn outputs(root: &Path, stage: &Path, pin: &str)`, which reads each staged export and dispatches at :86 `\"diagnostics\" => diagnostics::emit(&value, pin)?`, then rustfmts and writes the files. ts-rust never runs generate.go's `main`: the export adapter calls the two helper functions directly (tools/s03/diagnostics-export_test.go:36-38, :46) after scripts/s03.py:262 compiles generate.go beside it. || ADVERSARIAL RULING: The owner is overstated: it covers only half of what main produces. main writes two artifacts \u2014 diagnostics_generated.go at generate.go:117 and loc_generated.go at :131 (plus the loc/*.json.gz tree) \u2014 and neither named owner produces the second. xtask/src/gen/mod.rs:79-86 dispatches to diagnostics::emit whose only output path is crates/tsr_diagnostics/src/generated.rs (xtask/src/gen/diagnostics.rs",
+      "operation": "tsc/internal/diagnostics/generate.go:main",
+      "owner": "xtask/src/gen/mod.rs::outputs (the `cargo xtask gen` driver) on the Rust side; scripts/s03.py `prepare()` on the pinned side."
+    },
+    {
+      "category": "later_step",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:364 `func readLocalizedMessages(p string) (map[string]string, string)`. It opens an LCL file, `xml.NewDecoder(file).Decode(&lcx)` (:371), walks the nested `Item` structure and strips the leading semicolon from each ItemId (:383 `itemId := strings.TrimPrefix(item.ItemId, \";\")`), preferring `item.Str.Tgt.Val` over `item.Str.Val` (:387-391). Its only caller is generateLocalizations at generate.go:222 `localizedMessages, tgtCul := readLocalizedMessages(localeFile)`. Build time only (generate.go:1 `//go:build ignore`). || RUST: Absent. There is no XML or .lcl reader in the Rust port: crates/tsr_diagnostics/src/ holds only lib.rs and generated.rs, and a repo-wide grep for `quick-xml`/`roxmltree`/`lcl` over crates/ returns only incidental substring hits in generated AST tables, formatter rules and two bundled lib.d.ts files \u2014 no XML parser dependency and no localization input reader. data/phase1/locale-assets.json `generator_extension_status.state` is `\"absent\"` and `rust_status.planned_homes` lists `crates/tsr_diagnostics/src/localize.rs (absent)`. || ADVERSARIAL RULING: Same failure as generateLocalizations, and the claim concedes the disqualifying fact: 'Absent. There is no XML or .lcl reader in the Rust port.' build_tooling requires that 'the port generates the same artifact elsewhere' (scripts/phase1_scope.py:439); nothing does. The contract is real and must be reproduced by the named later step, not waived: generate.go:364-406 walks the nested LCX/RootItem/St",
+      "operation": "tsc/internal/diagnostics/generate.go:readLocalizedMessages",
+      "owner": "Same owner as generateLocalizations, whose only caller it is: xtask/src/gen/diagnostics.rs's localization extension, recorded as landing in F1b (data/phase1/locale-assets.json). The pinned LCL tree is inventoried instead at data/phase1/locale-assets.json (13 tables with source, hash and key count)."
+    },
+    {
+      "category": "build_tooling",
+      "evidence": "upstream/tsc/internal/diagnostics/generate.go:341 `func readRawMessages(p string) map[int]*diagnosticMessage`. It opens the file, `json.UnmarshalRead(file, &rawMessages)` into `map[string]*diagnosticMessage` (:349), then re-keys by code while stashing the original property name: :356-359 `for k, m := range rawMessages { m.key = k; codeToMessage[m.Code] = m }`. Called from main at generate.go:81 (`diagnosticMessages.json`) and :88 (`extraDiagnosticMessages.json`). Build time only (generate.go:1 `//go:build ignore`, :3 `package main`). || RUST: No Rust reimplementation: the Rust emitter never sees diagnosticMessages.json. xtask/src/gen/diagnostics.rs:29-36 deserializes an already-normalized `Export { version: u32, messages: Vec<Message> }` with `deny_unknown_fields`, whose rows already carry `name`, `key`, `text`, `code`, `category` and the three flags (xtask/src/gen/diagnostics.rs:16-27). The pinned function is instead compiled and called as-is by the ts-rust export step: tools/s03/diagnostics-export_test.go:36-38 `messages := readRawMessages(\"diagnosticMessages.json\"); for code, message := range readRawMessages(\"extraDiagnosticMessages.json\") { messages[code] = message }`, run by scripts/s03.py:262.",
+      "operation": "tsc/internal/diagnostics/generate.go:readRawMessages",
+      "owner": "scripts/s03.py `prepare()` diagnostics-export step (scripts/s03.py:261-262) with tools/s03/diagnostics-export_test.go; downstream consumer xtask/src/gen/diagnostics.rs::emit."
+    },
+    {
+      "category": "generated_assertion",
+      "evidence": "upstream/tsc/internal/diagnostics/stringer_generated.go declares `func _()` whose whole body is `var x [1]struct{}` followed by `_ = x[Category...-N]` index expressions. Its own comment says an \"invalid array index\" compiler error signifies that the constant values have changed. It is never called and has no runtime behavior, so there is nothing for a port to reproduce; the equivalent guarantee in this repository is that the generator is re-run against the pin.",
+      "operation": "tsc/internal/diagnostics/stringer_generated.go:_",
+      "owner": "xtask/src/gen (the Rust tables are regenerated from the pin, which is the same guarantee)"
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "purpose": "Operations removed from F1a's leaf roster, each with the category, the owner that does have it, and the evidence read at the pin. An entry here is a claim that this step owes no prepared case for the operation, so it is validated like any other claim: see roster_problems in scripts/phase1_scope.py.",
+  "rule": "An operation leaves the F1a roster only through an entry here. `later_step` is decided by the pinned callers: when every non-test caller is outside this step, the step that ports those callers owns the operation, because the plan requires a generic helper's callers to be read before its Rust contract is chosen. `unused_at_pin` records that there is no caller at all, with the occurrence count that says so. The caller rule governs generic helpers and Go machinery. It does NOT override an operation the plan names as this step's own work: docs/PHASE1-implementation-plan.md:432-434 puts \"tri-state/default option semantics\" in F1 explicitly, so the compiler-option getters stay on this roster whoever calls them, and their contract is self-contained rather than caller-derived.",
+  "version": 1
+}

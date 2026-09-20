@@ -1208,15 +1208,268 @@ class LeafReviewRegressions(unittest.TestCase):
             for actions in case.get("operation_actions", {}).values():
                 self.assertTrue(set(actions) <= set(case["operations"]), case["id"])
 
-    def test_preparation_cannot_be_complete_with_unlinked_leaf_operations(self):
+    def test_the_preparation_inventory_accounts_for_every_leaf_operation(self):
+        """Every leaf operation lands in exactly one bucket, and the arithmetic says so.
+
+        This is the published `leaves_prepared` result's own audit: if the
+        buckets did not add up to the roster, a shrinking denominator could
+        report completion without anything being prepared.
+        """
         current = json.loads((ROOT / "data/phase1/scope.json").read_text())
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
         report = scope.leaf_preparation(current, cases)
         committed = json.loads((ROOT / "data/phase1/leaves-preparation.json").read_text())
-        self.assertEqual(report, committed, "regenerate the pending preparation inventory")
+        self.assertEqual(report, committed,
+                         "run `python3 scripts/phase1.py inventory --write`")
+        self.assertEqual(
+            report["total_operations"],
+            report["accounted_operations"] + len(report["pending"]),
+        )
+        self.assertEqual(
+            report["accounted_operations"],
+            report["prepared_operations"]
+            + report["witnessed_operations"]
+            + report["exempt_operations"],
+        )
+        self.assertEqual(report["exempt_operations"], sum(report["exempt_by_category"].values()))
+        # The roster is the whole leaf surface, counted from the scope itself,
+        # so a denominator that quietly shrank would fail here.
+        expected = sum(
+            1 for row in current["operations"] if row["go_package"] in scope.LEAF_PACKAGES
+        )
+        self.assertEqual(report["total_operations"], expected)
+        self.assertEqual(report["complete"], not report["pending"] and not report["roster_problems"])
+
+
+class FrozenObservationTests(unittest.TestCase):
+    """A declared case and a frozen native observation must be the same set.
+
+    `last_result` decides coverage, and it is written into the manifest rather
+    than derived at read time. The cheapest way for that to become fiction is a
+    case that no probe ever ran, or a frozen row for a case nobody declared, so
+    both directions are checked against the committed capture.
+    """
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.root = ROOT / "data/phase1/native"
+
+    def frozen(self, family):
+        provenance = json.loads((self.root / family / "capture-provenance.json").read_text())
+        seen = {}
+        for probe in provenance["native_probes"].values():
+            directory = probe["directory"].removeprefix("native/")
+            document = json.loads((self.root / family / directory / "observations.json").read_text())
+            for row in document["observations"]:
+                # A probe declines the subjects it does not serve; the case is
+                # answered by whichever probe actually observed it.
+                if row["result"] == "native_unavailable" and row["case"] in seen:
+                    continue
+                if row["result"] != "native_unavailable" or row["case"] not in seen:
+                    seen[row["case"]] = row["result"]
+        return seen
+
+    def test_every_declared_case_has_a_frozen_native_observation(self):
+        for family in sorted(capture.FAMILIES):
+            if not (self.root / family / "capture-provenance.json").is_file():
+                continue
+            frozen = self.frozen(family)
+            declared = {c["id"] for c in self.cases["cases"] if c.get("family") == family}
+            self.assertEqual(declared - set(frozen), set(),
+                             f"{family}: declared cases with no frozen observation")
+            self.assertEqual(set(frozen) - declared, set(),
+                             f"{family}: frozen observations for undeclared cases")
+
+    def test_no_case_claims_a_result_its_probe_could_not_produce(self):
+        """A match needs a native observation, not a declined one."""
+        for family in sorted(capture.FAMILIES):
+            if not (self.root / family / "capture-provenance.json").is_file():
+                continue
+            frozen = self.frozen(family)
+            for case in self.cases["cases"]:
+                if case.get("family") != family:
+                    continue
+                if case.get("last_result") in ("match", "different"):
+                    self.assertEqual(
+                        frozen[case["id"]], "observed",
+                        f"{case['id']} claims {case['last_result']} but the frozen native row is "
+                        f"{frozen[case['id']]}",
+                    )
+
+    def test_every_case_id_is_declared_by_a_request(self):
+        for family in sorted(capture.FAMILIES):
+            document = capture.load_requests(capture.FAMILIES[family])
+            requested = {r["case"] for r in document["requests"]}
+            declared = {c["id"] for c in self.cases["cases"] if c.get("family") == family}
+            self.assertEqual(declared - requested, set(),
+                             f"{family}: cases with no request")
+            self.assertEqual(requested - declared, set(),
+                             f"{family}: requests with no case record")
+
+
+class RecordedResultTests(unittest.TestCase):
+    """`last_result` is derived from a capture, never asserted by hand."""
+
+    def test_record_refuses_a_capture_that_does_not_match_the_manifest(self):
+        """A capture missing a declared case, or carrying an undeclared one, is a defect."""
+        calls = {}
+
+        def fake_compare(directory, require):
+            calls["directory"] = directory
+            return {"family": "leaves", "rows": [{"case": "leaves/not-declared", "result": "match"}]}
+
+        original = phase1.capture_module.compare
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), False)
+        finally:
+            phase1.capture_module.compare = original
+        message = str(caught.exception)
+        self.assertIn("declared but", message)
+        self.assertIn("run but not declared", message)
+
+    def test_record_reports_what_it_would_change_without_writing(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        leaves = [c for c in cases["cases"] if c.get("family") == "leaves"]
+        self.assertTrue(leaves)
+        flipped = "different" if leaves[0]["last_result"] != "different" else "match"
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[0] = {"case": leaves[0]["id"], "result": flipped}
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            result = phase1.record_results(Path("/nowhere"), False)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before,
+                         "a dry run must not write")
+        self.assertEqual(result["changed"], [
+            {"case": leaves[0]["id"], "was": leaves[0]["last_result"], "now": flipped}
+        ])
+        self.assertEqual(result["cases"], len(leaves))
+
+
+class RosterLedgerTests(unittest.TestCase):
+    """The F1a roster shrinks only through a ledger that itself has to validate.
+
+    Dropping an operation from the roster is a claim, not a bookkeeping step:
+    it says this step does not owe a prepared case for it. Every way of making
+    that claim without evidence is rejected here, because a roster that can be
+    trimmed silently turns a green gate into an unfalsifiable one.
+    """
+
+    def setUp(self):
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.path = ROOT / "data/phase1/leaf-roster.json"
+        self.original = self.path.read_bytes() if self.path.is_file() else None
+
+    def tearDown(self):
+        if self.original is None:
+            self.path.unlink(missing_ok=True)
+        else:
+            self.path.write_bytes(self.original)
+
+    def forge(self, exemptions):
+        document = json.loads(self.original) if self.original else {"version": 1}
+        document["exemptions"] = exemptions
+        self.path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+        return scope.roster_problems(self.scope, self.cases)
+
+    def a_leaf_operation(self, disposition="missing"):
+        for row in self.scope["operations"]:
+            if row["go_package"] in scope.LEAF_PACKAGES and not row["cases"] \
+                    and row["disposition"] == disposition:
+                return row["id"]
+        self.fail(f"no unlinked leaf operation with disposition {disposition}")
+
+    def test_the_committed_ledger_validates(self):
+        self.assertEqual(scope.roster_problems(self.scope, self.cases), [])
+
+    def test_an_exemption_naming_an_unknown_operation_is_rejected(self):
+        problems = self.forge([{
+            "operation": "tsc/internal/core/core.go:NoSuchFunction",
+            "category": "go_runtime", "owner": "nothing", "evidence": "invented",
+        }])
+        self.assertTrue(any("not an operation in the frozen scope" in p for p in problems))
+
+    def test_an_exemption_outside_the_leaf_packages_is_rejected(self):
+        outside = next(
+            row["id"] for row in self.scope["operations"]
+            if row["go_package"] not in scope.LEAF_PACKAGES
+        )
+        problems = self.forge([{
+            "operation": outside, "category": "later_step",
+            "owner": "F2a", "evidence": "read at the pin",
+        }])
+        self.assertTrue(any("never on F1a's roster" in p for p in problems))
+
+    def test_an_unknown_category_is_rejected(self):
+        problems = self.forge([{
+            "operation": self.a_leaf_operation(), "category": "because_i_say_so",
+            "owner": "nobody", "evidence": "none",
+        }])
+        self.assertTrue(any("unknown category" in p for p in problems))
+
+    def test_an_exemption_without_owner_or_evidence_is_rejected(self):
+        operation = self.a_leaf_operation()
+        for field in ("owner", "evidence"):
+            entry = {"operation": operation, "category": "go_runtime",
+                     "owner": "Rust ownership", "evidence": "upstream/... :1"}
+            entry[field] = ""
+            problems = self.forge([entry])
+            self.assertTrue(any(f"records no {field}" in p for p in problems), field)
+
+    def test_a_duplicate_exemption_is_rejected(self):
+        operation = self.a_leaf_operation()
+        entry = {"operation": operation, "category": "go_runtime",
+                 "owner": "Rust ownership", "evidence": "upstream/... :1"}
+        problems = self.forge([entry, dict(entry)])
+        self.assertTrue(any("duplicate exemption" in p for p in problems))
+
+    def test_exempting_an_operation_that_has_a_prepared_case_is_rejected(self):
+        """Two contradictory answers about the same operation is a defect, not a choice."""
+        covered = next(iter(scope.cases_by_operation()))
+        problems = self.forge([{
+            "operation": covered, "category": "equivalent_rust",
+            "owner": "Iterator::filter", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("but also linked to prepared case" in p for p in problems))
+
+    def test_an_equivalent_rust_exemption_must_agree_with_the_scope_row(self):
+        problems = self.forge([{
+            "operation": self.a_leaf_operation("missing"),
+            "category": "equivalent_rust",
+            "owner": "Iterator::find", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("rebuild the scope" in p for p in problems))
+
+    def test_a_ledger_problem_keeps_the_published_result_false(self):
+        """Even with nothing pending, an indefensible ledger cannot publish green."""
+        self.forge([{
+            "operation": self.a_leaf_operation(), "category": "nonsense",
+            "owner": "", "evidence": "",
+        }])
+        report = scope.leaf_preparation(self.scope, self.cases)
+        self.assertTrue(report["roster_problems"])
         self.assertFalse(report["complete"])
-        self.assertTrue(report["pending"])
-        self.assertEqual(report["total_operations"], report["prepared_operations"] + len(report["pending"]))
+
+    def test_an_absent_ledger_is_itself_a_problem(self):
+        self.path.unlink(missing_ok=True)
+        self.assertTrue(any("has no reviewed ledger" in p
+                            for p in scope.roster_problems(self.scope, self.cases)))
+
+    def test_every_exempt_category_is_documented(self):
+        document = json.loads(self.original) if self.original else {"exemptions": []}
+        for entry in document.get("exemptions", []):
+            self.assertIn(entry["category"], scope.ROSTER_CATEGORIES)
+            self.assertTrue(scope.ROSTER_CATEGORIES[entry["category"]])
 
 
 if __name__ == "__main__":

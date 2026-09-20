@@ -201,6 +201,95 @@
       "operation": "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
       "order_sensitive": true,
       "subject": "BundledReads"
+    },
+    {
+      "actions": [
+        {
+          "op": "delegate_path",
+          "path": "/inner/known.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/sub/deep.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/missing.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/KNOWN.TXT"
+        },
+        {
+          "op": "delegate_path",
+          "path": "bundled:///libs/lib.d.ts"
+        }
+      ],
+      "case": "leaves/bundled/inner-filesystem-delegation",
+      "discriminates": "the half of the wrapper no other case in this group can reach: the else branch of every method, which forwards to the filesystem WrapFS was handed. The other bundled cases install an inner filesystem that panics on any delegated call, which is what makes their non-delegation claim meaningful but also what makes a delegated path unobservable there; this case installs one that answers. It would catch a wrapper that served every path from the embedded table -- reporting /inner/known.txt missing because it is not an asset -- and equally one that case-folded the path before forwarding, because /inner/KNOWN.TXT must stay missing under a case-sensitive inner filesystem while /inner/known.txt is found. The five delegated paths cover the read, the stat, the two existence predicates, the directory listing and the realpath together, because embed.go:49-99 and :148-153 each carry their own copy of the splitPath test rather than sharing one. The last action closes the loop from the other side: with an inner filesystem that could have answered, a bundled path is still served from the embedded assets, so delegation is not merely a fallback for whatever the embedded table lacks.",
+      "operation": "tsc/internal/bundled/bundled.go:WrapFS",
+      "order_sensitive": true,
+      "subject": "BundledDelegation"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "case_sensitive": false,
+          "op": "use_case_sensitive_file_names"
+        }
+      ],
+      "case": "leaves/bundled/case-sensitivity-forwarding",
+      "discriminates": "whether the wrapper answers this question for itself or forwards it. embed.go:45-47 has no bundled branch at all -- it is the one method of the wrapper that never calls splitPath -- so the answer is the inner filesystem's, whatever it is. A port that hardcoded true, or that derived the answer from the embedded table's own exact-match lookup, would return the same value for both actions; the pinned wrapper returns a different value for each. The three existence probes in every row keep the two halves apart: the embedded lookup is exact under both settings, so LIB.D.TS is missing and lib.d.ts is found either way, while the delegated lookup of /inner/KNOWN.TXT follows the setting. That combination would also catch the inverse error, a port that let the inner filesystem's case-insensitivity reach the asset table.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "BundledCaseSensitivity"
+    },
+    {
+      "actions": [
+        {
+          "op": "walk",
+          "root": "/inner",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "/inner/missing",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///libs/lib.d.ts",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///libs/",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///",
+          "stop": "skip_all_at_2"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///",
+          "stop": "error_at_2"
+        }
+      ],
+      "case": "leaves/bundled/walk-delegation-and-recursion",
+      "discriminates": "the four walk branches the dispatch case cannot reach, recorded as the callback sequence because the order is the contract. (1) A non-bundled root never enters walkDir: WalkDir forwards it at embed.go:112, so the inner filesystem's own traversal runs, and that traversal reports the root itself first -- the bundled walk never does, because walkDir only ever calls back on the entries of a directory (embed.go:126-137). A port that routed every walk through one implementation would make the two roots agree. (2) A missing delegated root reaches the inner filesystem's error, not a bundled answer. (3) A bundled root that is an asset, and (4) a bundled root with a trailing slash, both fall into walkDir's default branch (embed.go:122) and walk zero entries WITHOUT an error, which is the branch a port would most plausibly turn into a not-found error or, for the trailing slash, into the libs directory. (5) and (6) stop the callback inside the nested libs walk rather than at the top level, where the dispatch case stops it: fs.SkipAll returned there is propagated out of the recursion by embed.go:139-141 and only then turned into a nil result by :105-107, while any other error travels the same path and is returned to the caller unchanged. A port that handled SkipAll only in the outer loop would end the walk but return the signal as an error.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
+      "order_sensitive": true,
+      "subject": "BundledWalk"
     }
   ],
   "version": 1

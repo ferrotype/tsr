@@ -399,7 +399,9 @@ dependencies = [
  "tsr_diagnostics",
  "tsr_jsnum",
  "tsr_jsstring",
+ "tsr_module",
  "tsr_semver",
+ "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
 ]

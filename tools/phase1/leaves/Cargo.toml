@@ -17,7 +17,16 @@ tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
 tsr_diagnostics = { version = "0.1.0", path = "../../../crates/tsr_diagnostics" }
 tsr_jsnum = { version = "0.1.0", path = "../../../crates/tsr_jsnum" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+# GetEffectiveTypeRoots is a compileroptions.go operation whose only port lives
+# in tsr_module (src/type_references.rs:32), so the options group needs it to
+# compare the real entry point rather than record a gap that does not exist.
+tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
 tsr_semver = { version = "0.1.0", path = "../../../crates/tsr_semver" }
+# StringifyJson is a core.go operation whose only port lives in tsr_tsoptions
+# (src/config_json.rs:23, specialised to ConfigValue and to the compact arm),
+# so the helpers group needs it to compare the real entry point over the domain
+# it covers rather than record a gap that does not exist.
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }

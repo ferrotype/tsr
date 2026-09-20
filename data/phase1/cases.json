@@ -36,6 +36,134 @@
       ]
     },
     {
+      "expected_contract": "Pins that the wrapper holds no opinion about case sensitivity. embed.go:45-47 is the one wrapper method with no bundled branch at all -- it never calls splitPath -- so it returns the inner filesystem's answer whatever that is. A fresh wrapper is built over a fresh inner filesystem for each action, one case-sensitive and one not, so a port that hardcoded true, or that derived the answer from the embedded table's own exact-match lookup, returns the same value twice where the pin returns a different value for each. The three existence probes in every row keep the two halves apart: the embedded lookup stays exact under both settings, so LIB.D.TS is missing and lib.d.ts is found either way, while the delegated lookup of /inner/KNOWN.TXT follows the setting -- which also catches the inverse error, a port that let the inner filesystem's case-insensitivity reach the asset table. The asset paths are built by joining onto bundled.LibPath(), so the case reaches LibPath and libPath as well.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/case-sensitivity-forwarding",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "use_case_sensitive_file_names case_sensitive=false": [
+          "tsc/internal/bundled/bundled.go:LibPath",
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:libPath",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames"
+        ],
+        "use_case_sensitive_file_names case_sensitive=true": [
+          "tsc/internal/bundled/bundled.go:LibPath",
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:libPath",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames"
+        ]
+      },
+      "operations": [
+        "tsc/internal/bundled/bundled.go:LibPath",
+        "tsc/internal/bundled/bundled.go:WrapFS",
+        "tsc/internal/bundled/embed.go:libPath",
+        "tsc/internal/bundled/embed.go:splitPath",
+        "tsc/internal/bundled/embed.go:wrapFS",
+        "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+        "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames"
+      ]
+    },
+    {
+      "expected_contract": "Pins the else branch of the wrapper WrapFS installs: for a path that splitPath does not match, each of ReadFile, FileExists, DirectoryExists, GetAccessibleEntries, Stat and Realpath forwards the path unchanged to the filesystem WrapFS was handed and returns that filesystem's answer unchanged, and for a path it does match none of them consults the inner filesystem at all. Every other case in this group installs an inner filesystem that panics on any delegated call, which is what makes their non-delegation claim load-bearing but also what leaves this half unwitnessed; this case installs one that answers, built from the same two files on both sides -- vfstest.FromMap in Go, tsr_vfs::MemoryBuilder in Rust, the pairing the F0 pilot already uses. The five delegated paths cover a file, a directory, a nested file, a miss and a case-varied miss, so a port that answered from the embedded table alone, or that normalized or case-folded a path before forwarding it, differs. The sixth action is the converse: with an inner filesystem that could have answered, a bundled path is still served from the embedded assets, so delegation is not a fallback for whatever the embedded table lacks. WrapFS and wrapFS are entered once per case, before the trace; every action's answer comes from the wrapper they returned. fileInfo.IsDir and fileInfo.Size are reached only by the bundled action, where Stat returns the package's own fileInfo; the delegated actions get the inner filesystem's FileInfo instead. Two qualifications the rows themselves do not carry: the pin reaches each of these six methods through its own independent splitPath test, and that independence is witnessed on the Go side only, because in the port file_exists and directory_exists are FileSystem trait defaults derived from BundledFs::stat rather than separate dispatch sites -- so this case pins five forwarding sites in Rust against six in Go. And the delegated path is forwarded unchanged only as far as case is concerned: vfstest.FromMap and MemoryBuilder both require rooted normalized posix input, so a wrapper that normalized a non-normalized delegated path would not be caught here.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/inner-filesystem-delegation",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "delegate_path /inner": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "delegate_path /inner/KNOWN.TXT": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "delegate_path /inner/known.txt": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "delegate_path /inner/missing.txt": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "delegate_path /inner/sub/deep.txt": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ],
+        "delegate_path bundled:///libs/lib.d.ts": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.Size",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ]
+      },
+      "operations": [
+        "tsc/internal/bundled/bundled.go:WrapFS",
+        "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+        "tsc/internal/bundled/embed.go:fileInfo.Size",
+        "tsc/internal/bundled/embed.go:splitPath",
+        "tsc/internal/bundled/embed.go:wrapFS",
+        "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+        "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+        "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+        "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+        "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+        "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+      ]
+    },
+    {
       "expected_contract": "the root every consumer joins asset names onto. An embedded build answers with the scheme path bundled:///libs, not a directory on disk, and that path is itself bundled. A Rust constant that carried a trailing slash, a different scheme or a filesystem path would break every consumer that concatenates a lib name onto it.",
       "family": "leaves",
       "host_applicability": "any",
@@ -43,7 +171,8 @@
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
-        "tsc/internal/bundled/bundled.go:LibPath"
+        "tsc/internal/bundled/bundled.go:LibPath",
+        "tsc/internal/bundled/embed.go:libPath"
       ]
     },
     {
@@ -55,6 +184,69 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/bundled/bundled.go:TestingLibPath"
+      ]
+    },
+    {
+      "expected_contract": "Pins the four walk branches the dispatch case cannot reach, as the ordered callback sequence. A non-bundled root never enters walkDir: WalkDir forwards it at embed.go:112, the inner filesystem's own traversal runs, and that traversal reports the root itself first, which the bundled walk never does because walkDir only calls back on the entries of a directory. A missing delegated root reaches the inner filesystem's error rather than a bundled answer. A bundled root that is an asset, and a bundled root with a trailing slash, both fall into walkDir's default branch at embed.go:122 and walk zero entries WITHOUT an error -- the branch a port would most plausibly turn into a not-found error or, for the trailing slash, into the libs directory. The last two actions stop the callback inside the nested libs walk rather than at the top level, where the dispatch case stops it: fs.SkipAll returned there is propagated out of the recursion by embed.go:139-141 and only then turned into a nil result by :105-107, while any other error travels the same path and reaches the caller unchanged. Only the two bundled roots that produce callbacks reach fileInfo.Name and fileInfo.IsDir, through rootEntries and libsEntries; the two empty walks reach neither. The Rust side records a gap rather than an observation: tsr_vfs::FileSystem declares no walk method, so neither root can be walked from the port, and only the Go observation is frozen.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/walk-delegation-and-recursion",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "walk /inner": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
+        ],
+        "walk /inner/missing": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
+        ],
+        "walk bundled:/// stop=error_at_2": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.Name",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+          "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+        ],
+        "walk bundled:/// stop=skip_all_at_2": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.Name",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+          "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+        ],
+        "walk bundled:///libs/": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+          "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+        ],
+        "walk bundled:///libs/lib.d.ts": [
+          "tsc/internal/bundled/bundled.go:WrapFS",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrapFS",
+          "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+          "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
+        ]
+      },
+      "operations": [
+        "tsc/internal/bundled/bundled.go:WrapFS",
+        "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+        "tsc/internal/bundled/embed.go:fileInfo.Name",
+        "tsc/internal/bundled/embed.go:splitPath",
+        "tsc/internal/bundled/embed.go:wrapFS",
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+        "tsc/internal/bundled/embed.go:wrappedFS.walkDir"
       ]
     },
     {
@@ -87,12 +279,27 @@
       "id": "leaves/bundled/wrapper-read-paths",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves/bundled_probe_test.go::phase1Reads",
+      "operation_actions": {
+        "read_path": [
+          "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+          "tsc/internal/bundled/embed.go:fileInfo.Size",
+          "tsc/internal/bundled/embed.go:splitPath",
+          "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+          "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+          "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+          "tsc/internal/bundled/embed.go:wrappedFS.Stat"
+        ]
+      },
       "operations": [
-        "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+        "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+        "tsc/internal/bundled/embed.go:fileInfo.Size",
+        "tsc/internal/bundled/embed.go:splitPath",
         "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
         "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
-        "tsc/internal/bundled/embed.go:wrappedFS.Stat",
-        "tsc/internal/bundled/embed.go:wrappedFS.Realpath"
+        "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+        "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
+        "tsc/internal/bundled/embed.go:wrappedFS.Stat"
       ]
     },
     {
@@ -425,6 +632,18 @@
       ]
     },
     {
+      "expected_contract": "Clone answers nil for a nil receiver instead of an empty map or a panic, and the unexported clone it delegates to is reached only on the non-nil path, where it copies both the key slice and the map",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-clone-tolerates-nil",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.clone"
+      ]
+    },
+    {
       "expected_contract": "writing through the clone must not alias back into the original",
       "family": "leaves",
       "host_applicability": "any",
@@ -484,6 +703,33 @@
         "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+      ]
+    },
+    {
+      "expected_contract": "the diff makes two passes: additions while iterating the second map, then modifications and removals while iterating the first, so the callbacks arrive as added d, removed a, modified c rather than in the key order a, c, d that a single pass over the union of the keys would produce; onModified receives the old value before the new one",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-diff-callback-sequence",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
+        "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Get"
+      ]
+    },
+    {
+      "expected_contract": "the Func variant consults the supplied comparison for every shared key: under a length comparison a:1 against a:9 is equal while b:22 against b:7 is modified, an always-equal comparison reports no modification at all, and a never-equal comparison reports every shared key modified even where the values are byte identical; a port that compared the values directly would answer the same in all three",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Get"
       ]
     },
     {
@@ -591,6 +837,42 @@
       ]
     },
     {
+      "expected_contract": "EntryAt guards both ends before it indexes the key slice, so -1 and any index at or past the size answer (zero key, zero value, false) rather than wrapping round to the last entry or panicking on the slice; deleting the middle key shifts c down to index 1 in the same step that makes index 2 out of range",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-entry-at-bounds",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt"
+      ]
+    },
+    {
+      "expected_contract": "the constructor replays Set over the list, so a repeated key keeps the position of its first appearance and takes the value of its last, and the resulting size is smaller than the input; a port that appended every entry would report five keys in input order",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-from-list-repeated-keys",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+      ]
+    },
+    {
+      "expected_contract": "GetOrZero indexes the map directly and yields the value type's zero for an absent key, so a stored empty string and an absent key are indistinguishable through it while Get still separates them by its second result; a port that returned an option and rendered absence as a sentinel would separate them",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-get-or-zero-hides-absence",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Get",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero"
+      ]
+    },
+    {
       "expected_contract": "overwriting an existing key must keep its original position, not move it to the end",
       "family": "leaves",
       "host_applicability": "any",
@@ -615,6 +897,30 @@
       ]
     },
     {
+      "expected_contract": "resolveKeyName renders a non-string key through strconv, so an integer-keyed map produces quoted decimal member names in insertion order, not JSON numbers and not sorted names; the pin instantiates OrderedMap[int, string], so this branch is reachable behavior rather than an invented one",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-marshal-integer-keys",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+        "tsc/internal/collections/ordered_map.go:resolveKeyName"
+      ]
+    },
+    {
+      "expected_contract": "MarshalJSONTo writes members by walking the key slice, so the bytes carry insertion order rather than sorted or hash order, and a delete followed by a set moves that member to the end of the object; the observation keeps the raw bytes because a decoded object would lose exactly the property under test",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-marshal-member-order",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+        "tsc/internal/collections/ordered_map.go:resolveKeyName"
+      ]
+    },
+    {
       "expected_contract": "a size hint changes allocation only, never iteration order",
       "family": "leaves",
       "host_applicability": "any",
@@ -625,24 +931,73 @@
       ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
-        "entries": [
-          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
-        ],
         "new_size_hint": [
-          "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint"
-        ],
-        "set": [
-          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
-        ],
-        "size": [
-          "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+          "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
+          "tsc/internal/collections/ordered_map.go:newMapWithSizeHint"
         ]
       },
       "operations": [
         "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
-        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
+        "tsc/internal/collections/ordered_map.go:newMapWithSizeHint"
+      ]
+    },
+    {
+      "expected_contract": "members are Set in the order the decoder yields them, so a round trip through marshal reproduces the document's own member order rather than a sorted or hashed one",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-unmarshal-keeps-document-order",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom"
+      ]
+    },
+    {
+      "expected_contract": "a null document returns immediately without touching the receiver, following the Unmarshaler convention the source cites, so members set beforehand survive it; a port that treated null as an empty object would clear them. The object that follows merges into the survivors rather than replacing them",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-unmarshal-null-is-not-a-clear",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom"
+      ]
+    },
+    {
+      "expected_contract": "every token that is neither null nor an object start is refused and the receiver is left exactly as it was; the array, number and string documents are refused by this method's own sentence while the truncated document fails earlier, in the decoder, which separates a refusal the pinned source raises from one it never reaches. Only the class and the pinned sentence are recorded: the surrounding wording names a Go type and a byte offset, which no port could reproduce",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-unmarshal-rejects-non-objects",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom"
+      ]
+    },
+    {
+      "expected_contract": "Values walks the key slice rather than the map, so it answers in insertion order, and a key that is deleted and set again moves to the end instead of returning to its original place; a port iterating the hash map would answer in an unspecified order",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-values-follow-insertion",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
+      ]
+    },
+    {
+      "expected_contract": "the pinned iterator re-reads the key slice length on every step, which the source calls out deliberately, so a key appended by the loop body is enumerated by the same loop and three values are seen where the map held two; a port that iterated a snapshot, or that borrowed the container for the loop and so could not append at all, would answer two",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-values-see-appended-key",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Values"
       ]
     },
     {
@@ -831,6 +1186,7 @@
         ]
       },
       "operations": [
+        "tsc/internal/collections/ordered_map.go:newMapWithSizeHint",
         "tsc/internal/collections/ordered_set.go:NewOrderedSetWithSizeHint",
         "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
         "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
@@ -1229,6 +1585,116 @@
       ]
     },
     {
+      "expected_contract": "Pins the two-value enum whose signed guard is live. LanguageVariant is an int32 (languagevariant.go:6), so unlike Tristate -- which shares this index-table shape -- the `i < 0` test at languagevariant_stringer_generated.go:21 can actually fire, and a negative value takes the numeric fallback instead of indexing the table backwards. The names keep the type prefix, so they are LanguageVariantStandard and LanguageVariantJSX rather than Standard and JSX. A port that rendered a bare JSX, or that clamped an out-of-domain value to Standard instead of reporting the number, differs on five of the seven values. The Rust side records a gap: tsr_core::LanguageVariant declares two constants and nothing else.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/language-variant-stringer-domain",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "string[0]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[1]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[2]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[3]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[4]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[5]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ],
+        "string[6]": [
+          "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String"
+      ]
+    },
+    {
+      "expected_contract": "Pins the two numeric gaps between ModuleKind's three runs. The declared values are 0..7, 99..102 and 199..200 (modulekind_stringer_generated.go:11-24), so the generated method is a three-arm switch over three separate name strings at :39-51, each arm subtracting its own base before indexing; 8, 98, 103, 198 and 201 therefore render as ModuleKind(n). That is exactly where a hand-written Rust match differs, and the port already demonstrates it: it has two private renderings of this operation and they disagree -- crates/tsr_checker/src/emit_checks.rs:514 module_kind_text names all fourteen values and carries a source comment naming this generated file, while crates/tsr_compiler/src/verify_options.rs:584 module_name names only Node16..NodeNext and renders ModuleKind(1) where the pin renders CommonJS. Neither is reachable outside its crate and tsr_core::ModuleKind has no renderer, so the Rust side records the gap. The names are trimmed of the ModuleKind prefix, because this stringer is generated with -trimprefix and ScriptKind's is not.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/module-kind-stringer-gaps",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "string[0]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[10]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[11]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[12]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[13]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[14]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[15]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[16]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[17]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[18]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[19]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[1]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[20]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[2]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[3]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[4]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[5]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[6]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[7]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[8]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ],
+        "string[9]": [
+          "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String"
+      ]
+    },
+    {
       "expected_contract": "the star index, the prefix and suffix tests and the capture are all byte offsets, so a pattern and a candidate that are not valid UTF-8 are compared and captured verbatim; a decode-then-match implementation would collapse each invalid byte to U+FFFD and match candidates this one rejects",
       "family": "leaves",
       "host_applicability": "any",
@@ -1391,6 +1857,128 @@
       },
       "operations": [
         "tsc/internal/core/core.go:GetScriptKindFromFileName"
+      ]
+    },
+    {
+      "expected_contract": "Pins the hole at 5. ScriptKind's declared values run 0..4 and then jump to 6 (scriptkind_stringer_generated.go:11-16), so the generated method is a switch over two runs at :27-34 rather than one index lookup: 5 renders as the numeric fallback while 6 renders as a name. A hand-written match that walked a table of the six declared values in order would give 5 the name that belongs to 6 and shift every later value. This stringer is generated without -trimprefix, unlike ModuleKind's and ScriptTarget's, so its names keep the type prefix -- ScriptKindTS, not TS -- which a port sharing one naming helper across the enums would get wrong. The i32 extremes fix the fallback's text at both ends. The Rust side records a gap: tsr_core::ScriptKind carries from_file_name, ensure_from_file_name and default_extension only, and no rendering of it exists in crates/.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/script-kind-stringer-gap",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "string[0]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[10]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[11]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[1]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[2]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[3]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[4]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[5]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[6]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[7]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[8]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ],
+        "string[9]": [
+          "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String"
+      ]
+    },
+    {
+      "expected_contract": "Pins the gap between ES2025 and ESNext and the two aliases that share a number. ScriptTarget declares 0..12 and 99..100, so the generated method is a two-arm switch (scripttarget_stringer_generated.go:40-49) and 13..98 render as ScriptTarget(n) -- the range a port that treated the enum as contiguous would fill with invented names. ScriptTargetLatest is 99 and ScriptTargetLatestStandard is 12 (:26-27), so those numbers must render as ESNext and ES2025; a port that gave an alias its own name would differ there without being wrong about any declared value. The names are trimmed of the ScriptTarget prefix, and 100 is JSON rather than ScriptTargetJSON. The Rust side records a gap: tsr_core::ScriptTarget declares the constants only, and the port's one rendering is the private fn script_target_text at crates/tsr_compiler/src/include_reason.rs:684, written for a single diagnostic argument and unreachable from outside that crate.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/script-target-stringer-gaps",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "string[0]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[10]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[11]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[12]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[13]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[14]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[15]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[16]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[17]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[18]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[19]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[1]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[2]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[3]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[4]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[5]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[6]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[7]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[8]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ],
+        "string[9]": [
+          "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String"
       ]
     },
     {
@@ -1580,6 +2168,40 @@
       ]
     },
     {
+      "expected_contract": "Pins the whole domain of a byte-valued enum's rendering. The generated method guards with `i < 0 || idx >= len(_Tristate_index)-1` at tristate_stringer_generated.go:22, but Tristate is a Go byte (tristate.go:8), so the signed half of that guard is dead and the numeric fallback is reached only past the index table. The trace renders the three named values and four unnamed ones up to 255, the largest the byte can hold, so a port that modelled Tristate as a three-variant enum cannot answer at all and one that modelled it as a signed integer reports a different domain boundary. The Rust side records a gap: tsr_core::Tristate has no Display, no as_str and no name table, and no rendering of it exists anywhere in crates/.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-stringer-domain",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "string[0]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[1]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[2]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[3]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[4]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[5]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ],
+        "string[6]": [
+          "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/tristate_stringer_generated.go:Tristate.String"
+      ]
+    },
+    {
       "expected_contract": "UnmarshalJSON switches on the exact bytes it is handed and never reports an error, so a quoted, padded or malformed literal silently becomes TSUnknown; reaching it through encoding/json changes the answer, because the decoder strips the surrounding whitespace and rejects a syntax error before the method is ever called",
       "family": "leaves",
       "host_applicability": "any",
@@ -1740,7 +2362,22 @@
       "id": "leaves/diagnostics/identity-flags",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "lookup": [
+          "tsc/internal/diagnostics/diagnostics.go:Message.Category",
+          "tsc/internal/diagnostics/diagnostics.go:Message.Code",
+          "tsc/internal/diagnostics/diagnostics.go:Message.ElidedInCompatibilityPyramid",
+          "tsc/internal/diagnostics/diagnostics.go:Message.Key",
+          "tsc/internal/diagnostics/diagnostics.go:Message.ReportsDeprecated",
+          "tsc/internal/diagnostics/diagnostics.go:Message.ReportsUnnecessary"
+        ]
+      },
       "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Category",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Code",
+        "tsc/internal/diagnostics/diagnostics.go:Message.ElidedInCompatibilityPyramid",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Key",
+        "tsc/internal/diagnostics/diagnostics.go:Message.ReportsDeprecated",
         "tsc/internal/diagnostics/diagnostics.go:Message.ReportsUnnecessary"
       ]
     },
@@ -1763,6 +2400,13 @@
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Category",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Code",
+        "tsc/internal/diagnostics/diagnostics.go:Message.ElidedInCompatibilityPyramid",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Key",
+        "tsc/internal/diagnostics/diagnostics.go:Message.ReportsDeprecated",
+        "tsc/internal/diagnostics/diagnostics.go:Message.ReportsUnnecessary",
+        "tsc/internal/diagnostics/diagnostics.go:Message.String",
         "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage"
       ]
     },
@@ -1896,6 +2540,393 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
         "tsc/internal/diagnostics/diagnostics.go:StringifyArgs"
+      ]
+    },
+    {
+      "expected_contract": "Pins that AppendIfUnique returns the input unchanged on a hit, and that on a miss Go's append writes into the input's spare capacity: appending to a re-sliced prefix overwrites the element past that prefix in the caller's backing array, which the base register reads back. Witnesses no Rust operation; the Rust row states which of the two behaviours a Vec-based port owes.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/append-if-unique-writes-into-spare-capacity",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "append_if_unique": [
+          "tsc/internal/core/core.go:AppendIfUnique"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:AppendIfUnique",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins that comparableValuesEqual is Go's ==, which on a pointer and on a struct that merely carries one is address equality: two distinct values with identical contents compare unequal. That is the equality DiffMaps diffs source-file maps with. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/comparable-values-equal-is-address-equality",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "pairs": [
+          "tsc/internal/core/core.go:comparableValuesEqual"
+        ],
+        "pointers": [
+          "tsc/internal/core/core.go:comparableValuesEqual"
+        ],
+        "strings": [
+          "tsc/internal/core/core.go:comparableValuesEqual"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:comparableValuesEqual"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Concatenate returns an operand itself whenever the other side is empty -- witnessed by Same and by writing through the result into each operand in turn -- and that its guards are ordered, so concatenate(nil, empty) is nil while concatenate(empty, nil) is a non-nil empty slice. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/concatenate-returns-an-operand",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "concatenate": [
+          "tsc/internal/core/core.go:Concatenate"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Concatenate",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins that ConcatenateSeq skips an absent (nil) operand instead of calling it, and that an absent operand is skipped rather than called. The visited counts under each limit do NOT witness that an early stop ends the chain rather than advancing to the next operand: the counter is on the consumer side, so both behaviours produce the same total. Witnessing that would need a per-operand pull counter on the producer, which this trace does not have. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/concatenate-seq-skips-a-nil-operand",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "collect": [
+          "tsc/internal/core/core.go:ConcatenateSeq"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:ConcatenateSeq"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Deduplicate removes non-consecutive duplicates across the whole slice keeping the first occurrence, and that it returns the input itself whenever nothing is removed, including for nil, empty and single-element inputs. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/deduplicate-keeps-the-first-occurrence",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "deduplicate": [
+          "tsc/internal/core/core.go:Deduplicate"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Deduplicate",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins Filter's result identity and its three empty answers: the input slice itself when every element passes (witnessed twice, by Same and by writing through the result and reading the input back), a non-nil EMPTY slice when the first element is rejected, a non-nil empty result for a non-nil empty input -- whose identity this trace does NOT pin, because Same answers true from its length-zero arm for any two empty slices and so cannot separate the input from a fresh allocation, and nil when the input is nil. Also pins the predicate call count across the rejecting branch. Witnesses no Rust operation: tsr_core has no Filter, so the Rust row is a gap record.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/filter-identity-and-empty-clone",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "filter": [
+          "tsc/internal/core/core.go:Filter"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Filter",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins the sentinel contract of the three searches: Find and FindLast answer with the element type's zero value on a miss, so a matched empty string is indistinguishable from a failed search and only FindIndex's -1 separates them; Find takes the first match and FindLast the last; the call counts pin the scan direction wherever the two ends differ; on an input whose first and last match are the same element the pair is direction-blind, which the asymmetric input separates. Witnesses no Rust operation. The a/bb/cc row is where the counts alone carry the direction: two calls answering bb for Find against one answering cc for FindLast",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/find-zero-value-is-not-absence",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "find": [
+          "tsc/internal/core/core.go:Find"
+        ],
+        "find_index": [
+          "tsc/internal/core/core.go:FindIndex"
+        ],
+        "find_last": [
+          "tsc/internal/core/core.go:FindLast"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Find",
+        "tsc/internal/core/core.go:FindIndex",
+        "tsc/internal/core/core.go:FindLast"
+      ]
+    },
+    {
+      "expected_contract": "Pins that FirstOrNil and LastOrNil answer with the element type's zero value for an empty or nil slice rather than panicking or reporting absence, so an empty input and an input of empty strings answer identically. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/first-and-last-or-nil",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "first_or_nil": [
+          "tsc/internal/core/core.go:FirstOrNil"
+        ],
+        "last_or_nil": [
+          "tsc/internal/core/core.go:LastOrNil"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:FirstOrNil",
+        "tsc/internal/core/core.go:LastOrNil"
+      ]
+    },
+    {
+      "expected_contract": "Pins that FlatMap and Flatten accumulate into nil, so an input that contributes nothing yields nil rather than an empty slice; that a nil inner slice is skipped; and that Flatten of a single non-empty subarray COPIES, unlike Concatenate, which returns an operand. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/flatmap-and-flatten-nil-accumulator",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "flat_map": [
+          "tsc/internal/core/core.go:FlatMap"
+        ],
+        "flatten": [
+          "tsc/internal/core/core.go:Flatten"
+        ],
+        "flatten_register": [
+          "tsc/internal/core/core.go:Flatten"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:FlatMap",
+        "tsc/internal/core/core.go:Flatten",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins that MapFiltered returns nil -- not an empty slice -- for a nil input, for a non-nil empty input and for an input whose every element is dropped, which is the opposite of Map on the same non-nil empty input, which leaves/helpers/map-preserves-nil records; the contrast is across the two cases rather than inside this trace, and that the callback runs once per element either way. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/map-filtered-nil-accumulator",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "map_filtered": [
+          "tsc/internal/core/core.go:MapFiltered"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:MapFiltered"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Map and MapIndex carry their input's nil / non-nil-empty distinction through to the result, that both always allocate (an identity mapping is not Same as its input), and that MapIndex's callback takes the element then the index. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/map-preserves-nil",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "map": [
+          "tsc/internal/core/core.go:Map"
+        ],
+        "map_index": [
+          "tsc/internal/core/core.go:MapIndex"
+        ],
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Map",
+        "tsc/internal/core/core.go:MapIndex",
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Memoize runs its producer exactly once even when the answer is the zero value, and that a producer which panics is NOT cleared, so the next call runs it again and can then succeed and latch. The recorded producer call count, not the returned value, is the observation. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/memoize-runs-create-once",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "call": [
+          "tsc/internal/core/core.go:Memoize"
+        ],
+        "memoize": [
+          "tsc/internal/core/core.go:Memoize"
+        ],
+        "memoize_panicking": [
+          "tsc/internal/core/core.go:Memoize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Memoize"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Must panics if and only if the error is present -- an error with an empty message still panics -- that it panics with the error VALUE rather than a rendering of it (the recorded payload kind), and that it returns the value unchanged when the error is absent, including when the value is the zero value. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/must-panics-with-the-error-value",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "must": [
+          "tsc/internal/core/core.go:Must"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Must"
+      ]
+    },
+    {
+      "expected_contract": "Pins OrElse as a zero-value test on the value itself -- \"0\" and \"false\" are kept, only \"\" is replaced -- and IfElse as a selection on the boolean alone, so IfElse(true, zero, other) is the zero value and the two cannot be fused. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/or-else-tests-the-value-not-a-flag",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "if_else": [
+          "tsc/internal/core/core.go:IfElse"
+        ],
+        "or_else": [
+          "tsc/internal/core/core.go:OrElse"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:IfElse",
+        "tsc/internal/core/core.go:OrElse"
+      ]
+    },
+    {
+      "expected_contract": "Pins Same as equal lengths AND (length zero OR the same first-element address): true for a nil slice against a non-nil empty one, false for two distinct slices with equal contents, and true for two views of one array only while their lengths agree. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/same-is-length-then-first-element",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Same"
+      ]
+    },
+    {
+      "expected_contract": "Pins that SameMap returns the input itself when the mapping changes nothing, and that it calls f exactly len(slice) times wherever the first change falls -- once per element during the scan up to and including the one that first differs, then once per element after it, and never a second time for any element -- the already-equal prefix is copied unmapped from the results the scan already produced. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/same-map-identity-and-call-count",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "same": [
+          "tsc/internal/core/core.go:Same"
+        ],
+        "same_map": [
+          "tsc/internal/core/core.go:SameMap"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Same",
+        "tsc/internal/core/core.go:SameMap"
+      ]
+    },
+    {
+      "expected_contract": "Pins that SingleElementSlice answers nil -- not an empty slice, not a slice holding nil -- for a nil element, and that the one-element result holds the caller's own pointer, so a write through the element is visible in the caller's value. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/single-element-slice-nil-and-pointer-identity",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "single": [
+          "tsc/internal/core/core.go:SingleElementSlice"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:SingleElementSlice"
+      ]
+    },
+    {
+      "expected_contract": "Pins that Some stops calling the predicate at the first true: the recorded call count, not the boolean, is the observation, and an empty or nil input calls it zero times. Witnesses no Rust operation.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/some-stops-at-the-first-true",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "some": [
+          "tsc/internal/core/core.go:Some"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:Some"
+      ]
+    },
+    {
+      "expected_contract": "Pins the exact bytes StringifyJson produces on the compact arm the quoting callers use: no HTML escaping, no line-separator escaping, DEL unescaped, lowercase \\u00xx for control bytes, one U+FFFD per invalid UTF-8 byte, [] for a typed nil slice and null for an absent value. This is the one case in the group that witnesses a Rust operation: crates/tsr_tsoptions/src/config_json.rs:23 stringify_json(&ConfigValue) is the only annotated port of any core.go helper and covers exactly this arm, so the case is a real two-sided comparison over the ConfigValue domain (a string, a populated array, an empty array, a typed nil array and an absent value). It does not witness the prefix/indent arm, which has no Rust entry point.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/stringify-json-compact-escapes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "stringify": [
+          "tsc/internal/core/core.go:StringifyJson"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:StringifyJson"
+      ]
+    },
+    {
+      "expected_contract": "Pins that the indent options are installed when indent is non-empty. Every action here carries an empty prefix, so this trace does not separate the pinned guard (prefix empty AND indent empty) from a guard on indent alone, so the same input has a compact and a multiline shape in one trace, that an empty array stays on one line even when indented, and that a scalar is unaffected. Witnesses no Rust operation: no Rust entry point takes a prefix or an indent.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/helpers/stringify-json-indent-arm",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "stringify": [
+          "tsc/internal/core/core.go:StringifyJson"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:StringifyJson"
       ]
     },
     {
@@ -2520,6 +3551,1056 @@
       ]
     },
     {
+      "expected_contract": "Pins that the file-name arm is the declaration-file predicate and not a .ts suffix test: with the option off, the three declaration extensions answer true and every other spelling answers false, including the upper-case one. The option arm is the same disjunction the sibling case pins, so either field short-circuits the predicate.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/allow-importing-ts-extensions-from-declaration-file",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "allow_importing_ts_extensions_from": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.AllowImportingTsExtensionsFrom",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.AllowImportingTsExtensionsFrom",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions"
+      ]
+    },
+    {
+      "expected_contract": "Pins that the getter is a disjunction over allowImportingTsExtensions and rewriteRelativeImportExtensions, each tested by equality with TSTrue rather than by a range, so the second field alone enables the behavior and an out-of-domain byte in either field answers false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/allow-importing-ts-extensions-second-disjunct",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "get_allow_importing_ts_extensions": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions"
+      ]
+    },
+    {
+      "expected_contract": "GetAllowJS consults checkJs only when allowJs is exactly TSUnknown, and both halves are equality tests against TSTrue rather than range or negation tests. The pair (allowJs=TSFalse, checkJs=TSTrue) must answer false and the out-of-domain byte must behave as set-but-not-true.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/allow-js-falls-back-to-check-js",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "1:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "2:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "3:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "4:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "5:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ],
+        "6:get_allow_js": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS"
+      ]
+    },
+    {
+      "expected_contract": "Every exported field the pinned CompilerOptions declares survives Clone with its value, and the row names each one, so the comparison pins the roster itself, not a digest: a port whose copy omits a deprecated field, an internal field or configFilePath is named by the field that changed. It also pins the zero value's rendering -- an absent string list, pointer and path map stay absent rather than becoming empty -- and that the shallow copy of the path map preserves entry order and a nil value list.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/clone-field-roster",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:clone": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+        ],
+        "1:clone": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+        ],
+        "2:clone": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+      ]
+    },
+    {
+      "expected_contract": "Declaration maps need both declarationMap == TSTrue and declaration emit, in that order: the second conjunct is reached only when the first holds, and either failing answers false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/declaration-maps-need-declarations",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "1:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "2:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "3:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled"
+        ],
+        "4:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled"
+        ],
+        "5:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled"
+        ],
+        "6:get_are_declaration_maps_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+      ]
+    },
+    {
+      "expected_contract": "With no typeRoots, configFilePath's directory is the base and the current directory is ignored entirely. The walk yields one root per ancestor, each the ancestor combined with node_modules and @types, and stops where a directory is its own parent, so an absolute config file at the root yields exactly one root.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/effective-type-roots-config-base",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "1:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "2:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "3:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+      ]
+    },
+    {
+      "expected_contract": "A non-nil typeRoots is returned verbatim with fromConfig true, without normalisation and without the ancestor walk, and the empty non-nil list takes that branch too -- absence, not emptiness, is what selects the walk. An explicit list also wins over configFilePath.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/effective-type-roots-explicit",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "1:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "2:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "3:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "4:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+      ]
+    },
+    {
+      "expected_contract": "The ancestor walk stops only when a directory is its own parent, so a relative base ends with the empty-string ancestor and contributes a final bare node_modules/@types entry. A configFilePath with no directory part gives an empty base and still walks, because the empty-base panic guards only the current-directory branch; with neither a configFilePath nor a current directory the pinned panic text is the contract.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/effective-type-roots-relative-and-empty-base",
+      "last_result": "different",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "1:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "2:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "3:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ],
+        "4:get_effective_type_roots": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots"
+      ]
+    },
+    {
+      "expected_contract": "Declaration emit is the disjunction of declaration.IsTrue and composite.IsTrue, so either alone is enough, an explicit false on one does not veto the other, and an out-of-domain byte is not true.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/emit-declarations-or-composite",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "1:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "2:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "3:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "4:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ],
+        "5:get_emit_declarations": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations"
+      ]
+    },
+    {
+      "expected_contract": "Any non-zero moduleDetection is returned unchanged, including Auto and a value outside the declared domain; otherwise the effective module kind selects Force exactly on the closed run Node16..NodeNext, so ESNext below it and Preserve above it both answer Auto.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/emit-module-detection-kind-range",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "10:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "1:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind"
+        ],
+        "2:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind"
+        ],
+        "3:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind"
+        ],
+        "4:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind"
+        ],
+        "5:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "6:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "7:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "8:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "9:get_emit_module_detection_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+      ]
+    },
+    {
+      "expected_contract": "An explicitly set module wins outright; otherwise the effective target selects a module kind through an equality test against ESNext followed by three descending >= arms. ScriptTargetJSON (100) must take the ES2022 arm, not the ESNext arm, which pins the equality test; each >= boundary is pinned at the boundary and one below it.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/emit-module-kind-target-cascade",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "10:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "1:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind"
+        ],
+        "2:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "3:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "4:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "5:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "6:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "7:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "8:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "9:get_emit_module_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+      ]
+    },
+    {
+      "expected_contract": "The unset target defaults to ScriptTargetLatestStandard (ES2025 = 12), not ScriptTargetLatest, and only the zero value is treated as unset: ES5, ESNext, JSON and a negative target are all returned unchanged.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/emit-script-target-default",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "1:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "2:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "3:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "4:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ],
+        "5:get_emit_script_target": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget"
+      ]
+    },
+    {
+      "expected_contract": "The first conjunct is `useDefineForClassFields != TSFalse`, so unset and out-of-domain both pass it, and the second is `effective target >= ES2022`. With nothing set at all the answer is true, through the ES2025 default; the target conjunct is reached only when the first holds.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/emit-standard-class-fields-target",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "1:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "2:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "3:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "4:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "5:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "6:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "7:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "8:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ],
+        "9:get_emit_standard_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields"
+      ]
+    },
+    {
+      "expected_contract": "Pins that composite alone makes the build incremental and that both tests are equality against TSTrue, so an out-of-domain byte answers false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/is-incremental-or-composite",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "is_incremental": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.IsIncremental"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.IsIncremental"
+      ]
+    },
+    {
+      "expected_contract": "The getter is a plain disjunction of two equality tests against TSTrue, not a fallback: verbatimModuleSyntax is consulted even when isolatedModules is explicitly false, and neither half treats an out-of-domain byte as true.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/isolated-modules-or-verbatim",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ],
+        "1:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ],
+        "2:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ],
+        "3:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ],
+        "4:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ],
+        "5:get_isolated_modules": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules"
+      ]
+    },
+    {
+      "expected_contract": "The renderer names the five non-zero declared kinds exactly, and closes its domain with two panics instead of a numeric fallback: the zero value and any undeclared value must panic with the pinned wording. The Rust side has no such entry point, so this records the gap.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/jsx-emit-text-domain",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "1:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "2:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "3:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "4:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "5:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "6:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ],
+        "7:jsx_emit_text": [
+          "tsc/internal/core/compileroptions.go:JsxEmit.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:JsxEmit.String"
+      ]
+    },
+    {
+      "expected_contract": "The transform is enabled for exactly the three React emit kinds. Membership is by equality, so Preserve, ReactNative, the zero value, an undeclared value above the domain and a negative one all answer false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/jsx-transform-enabled-membership",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "1:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "2:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "3:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "4:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "5:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "6:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ],
+        "7:get_jsx_transform_enabled": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled"
+      ]
+    },
+    {
+      "expected_contract": "The predicate is the closed range ES2015..ESNext, not membership of the declared ES kinds, so undeclared values inside the run answer true and everything above ESNext -- Node16 onwards and Preserve -- answers false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/module-kind-is-non-node-esm",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "10:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "11:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "12:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "13:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "14:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "15:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "16:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "1:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "2:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "3:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "4:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "5:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "6:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "7:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "8:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ],
+        "9:is_non_node_esm": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM"
+      ]
+    },
+    {
+      "expected_contract": "Pins that the first test is a range over Node18 to NodeNext, so the unnamed values inside it answer true, and that Preserve and ESNext are separate equalities outside that range. Named-constant enumeration and a bare range check each fail a different row.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/module-kind-supports-import-attributes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "supports_import_attributes": [
+          "tsc/internal/core/compileroptions.go:ModuleKind.SupportsImportAttributes"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:ModuleKind.SupportsImportAttributes"
+      ]
+    },
+    {
+      "expected_contract": "Unknown, Classic and Node10 are all re-derived from the effective module kind, while every other value -- including one outside the declared domain -- is returned unchanged. The derivation answers Node16 for the Node16/Node18/Node20 run, NodeNext for NodeNext, and Bundler for everything else including ModuleKindPreserve.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/module-resolution-kind-arms",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "10:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "11:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "1:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "2:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "3:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "4:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "5:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "6:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "7:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "8:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ],
+        "9:get_module_resolution_kind": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind"
+      ]
+    },
+    {
+      "expected_contract": "The renderer names all five non-zero declared kinds, including the two deprecated ones, and panics with two distinct pinned messages on the zero value and on an undeclared one. The Rust side has no such entry point, so this records the gap.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/module-resolution-text-domain",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "1:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "2:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "3:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "4:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "5:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "6:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ],
+        "7:module_resolution_text": [
+          "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String"
+      ]
+    },
+    {
+      "expected_contract": "Only NewLineKindCRLF answers the carriage-return pair; the single named case and its default mean None, LF and every out-of-domain value answer the lone linefeed, and nothing panics. The Rust side has no such entry point, so this records the gap.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/new-line-character-default",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:new_line_character": [
+          "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+        ],
+        "1:new_line_character": [
+          "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+        ],
+        "2:new_line_character": [
+          "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+        ],
+        "3:new_line_character": [
+          "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+        ],
+        "4:new_line_character": [
+          "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter"
+      ]
+    },
+    {
+      "expected_contract": "Pins that only the two exact literals classify and everything else falls to the default, with no trimming and no prefix or suffix matching. The port has no counterpart at any name, so the Rust side records the gap and the Go row is native authority.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/new-line-kind-from-text",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "new_line_kind_from_text": [
+          "tsc/internal/core/compileroptions.go:GetNewLineKind"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:GetNewLineKind"
+      ]
+    },
+    {
+      "expected_contract": "An absent or empty paths map answers the empty string before pathsBasePath is even considered, with nil and empty behaving alike; with a non-empty map an explicit pathsBasePath wins over the current directory, and an empty current directory is answered as the empty string.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/paths-base-path-precedence",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "1:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "2:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "3:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "4:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "5:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "6:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ],
+        "7:get_paths_base_path": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath"
+      ]
+    },
+    {
+      "expected_contract": "A set resolveJsonModule answers its own equality against TSTrue without consulting anything else. When it is unset, only Node20 and NodeNext answer true directly -- Node16 and Node18 are deliberately not in that switch -- and everything else answers whether the derived resolution kind is Bundler, which is why Classic answers true and an explicit Node16 resolution answers false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/resolve-json-module-cascade",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "1:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "2:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "3:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "4:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "5:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "6:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "7:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "8:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ],
+        "9:get_resolve_json_module": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule"
+      ]
+    },
+    {
+      "expected_contract": "The getter is IsTrueOrUnknown on its own field: unset and TSTrue answer true, TSFalse and any out-of-domain byte answer false, and the neighbouring imports field does not affect it.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/resolve-package-json-exports-domain",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_resolve_package_json_exports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+        ],
+        "1:get_resolve_package_json_exports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+        ],
+        "2:get_resolve_package_json_exports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+        ],
+        "3:get_resolve_package_json_exports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+        ],
+        "4:get_resolve_package_json_exports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports"
+      ]
+    },
+    {
+      "expected_contract": "The imports getter is IsTrueOrUnknown on the imports field alone, with the same out-of-domain behaviour, and is unaffected by resolvePackageJsonExports.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/resolve-package-json-imports-domain",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_resolve_package_json_imports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+        ],
+        "1:get_resolve_package_json_imports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+        ],
+        "2:get_resolve_package_json_imports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+        ],
+        "3:get_resolve_package_json_imports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+        ],
+        "4:get_resolve_package_json_imports": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports"
+      ]
+    },
+    {
+      "expected_contract": "Pins the nested disjunction: verbatimModuleSyntax reaches the answer through GetIsolatedModules without isolatedModules being set at all, and preserveConstEnums explicitly false does not suppress it.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/should-preserve-const-enums-through-isolated-modules",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "should_preserve_const_enums": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.ShouldPreserveConstEnums"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.ShouldPreserveConstEnums"
+      ]
+    },
+    {
+      "expected_contract": "A set sub-option answers its own equality against TSTrue; an unset one falls back to `strict != TSFalse`, which answers true when strict is itself unset. The fallback is a negation, not IsTrue, and the getter reads only the sub-option it was handed.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/strict-option-value-fallback",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "1:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "2:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "3:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "4:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "5:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "6:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "7:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ],
+        "8:get_strict_option_value": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue"
+      ]
+    },
+    {
+      "expected_contract": "Pins that the ES2022 target default applies only where useDefineForClassFields is unset, and that the target it compares against is the resolved one from GetEmitScriptTarget rather than the raw field, so an unset target does not read as zero.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/use-define-for-class-fields-target-default",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "get_use_define_for_class_fields": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+          "tsc/internal/core/compileroptions.go:CompilerOptions.GetUseDefineForClassFields"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+        "tsc/internal/core/compileroptions.go:CompilerOptions.GetUseDefineForClassFields"
+      ]
+    },
+    {
+      "expected_contract": "The wildcard test is exact string equality against \"*\" anywhere in types, so `**`, `*.js` and the empty string are not wildcards, and the absent and empty type lists both answer false.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/uses-wildcard-types-exact",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "0:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "1:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "2:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "3:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "4:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "5:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "6:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "7:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ],
+        "8:uses_wildcard_types": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes"
+      ]
+    },
+    {
       "expected_contract": "The length probe recognises UTF-16 BOMs the rest of the compiler cannot decode, so RemoveByteOrderMark strips two bytes from FE FF and leaves invalid UTF-8 behind, and AddUTF8ByteOrderMark refuses to prepend one whenever any BOM is already present - including a UTF-16 one it is not converting. A bare FE or FF, or an incomplete EF BB, is not a BOM, so the UTF-8 mark is prepended in front of it.",
       "family": "leaves",
       "host_applicability": "any",
@@ -2531,15 +4612,18 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "add_bom": [
-          "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark"
+          "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark",
+          "tsc/internal/stringutil/util.go:getByteOrderMarkLength"
         ],
         "remove_bom": [
-          "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
+          "tsc/internal/stringutil/util.go:RemoveByteOrderMark",
+          "tsc/internal/stringutil/util.go:getByteOrderMarkLength"
         ]
       },
       "operations": [
         "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark",
-        "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
+        "tsc/internal/stringutil/util.go:RemoveByteOrderMark",
+        "tsc/internal/stringutil/util.go:getByteOrderMarkLength"
       ]
     },
     {
@@ -2613,11 +4697,13 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "encode_uri": [
-          "tsc/internal/stringutil/util.go:EncodeURI"
+          "tsc/internal/stringutil/util.go:EncodeURI",
+          "tsc/internal/stringutil/util.go:shouldEscapeForEncodeURI"
         ]
       },
       "operations": [
-        "tsc/internal/stringutil/util.go:EncodeURI"
+        "tsc/internal/stringutil/util.go:EncodeURI",
+        "tsc/internal/stringutil/util.go:shouldEscapeForEncodeURI"
       ]
     },
     {
@@ -2795,7 +4881,7 @@
       ]
     },
     {
-      "expected_contract": "StringToNumber, not strconv: an empty or all-whitespace string is 0 and only the ECMAScript whitespace set is trimmed (so U+FEFF and U+000B are, U+0085 is not), 'Infinity' is accepted but 'infinity' is not, radix prefixes are accepted only unsigned so '-0x10' is NaN, leading zeros never mean octal, a separator is never allowed, and overflow saturates to Infinity while underflow returns +0 because ",
+      "expected_contract": "FromString is the only entry point into this file's conversion, and the corpus drives every branch underneath it: the four whitespace forms reach the trimmer, a non-number rune and a non-ASCII digit reach the rune test, the three radix prefixes reach their digit classifiers with both a valid and an invalid body and a bare prefix, and the fraction and exponent forms reach the float path including its documented out-of-range result, where an overflowing literal yields an infinity rather than a failure. Two helpers are reached but not separately discriminated: trimming the fractional trailing zeros and the exponent's leading zeros cannot change the value the parse produces, so no input here separates them from doing nothing. They are linked because the corpus calls them, not because it pins them.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/text/jsnum-from-string",
@@ -2804,12 +4890,35 @@
       "operation_actions": {
         "from_text": [
           "tsc/internal/jsnum/string.go:FromString",
-          "tsc/internal/jsnum/string.go:Number.String"
+          "tsc/internal/jsnum/string.go:cutAny",
+          "tsc/internal/jsnum/string.go:isAllBinaryDigits",
+          "tsc/internal/jsnum/string.go:isAllDigits",
+          "tsc/internal/jsnum/string.go:isAllHexDigits",
+          "tsc/internal/jsnum/string.go:isAllOctalDigits",
+          "tsc/internal/jsnum/string.go:isNumberRune",
+          "tsc/internal/jsnum/string.go:isStrWhiteSpace",
+          "tsc/internal/jsnum/string.go:parseFloatString",
+          "tsc/internal/jsnum/string.go:stringToFloat64",
+          "tsc/internal/jsnum/string.go:trimLeadingZeros",
+          "tsc/internal/jsnum/string.go:trimTrailingZeros",
+          "tsc/internal/jsnum/string.go:tryParseInt"
         ]
       },
       "operations": [
         "tsc/internal/jsnum/string.go:FromString",
-        "tsc/internal/jsnum/string.go:Number.String"
+        "tsc/internal/jsnum/string.go:Number.String",
+        "tsc/internal/jsnum/string.go:cutAny",
+        "tsc/internal/jsnum/string.go:isAllBinaryDigits",
+        "tsc/internal/jsnum/string.go:isAllDigits",
+        "tsc/internal/jsnum/string.go:isAllHexDigits",
+        "tsc/internal/jsnum/string.go:isAllOctalDigits",
+        "tsc/internal/jsnum/string.go:isNumberRune",
+        "tsc/internal/jsnum/string.go:isStrWhiteSpace",
+        "tsc/internal/jsnum/string.go:parseFloatString",
+        "tsc/internal/jsnum/string.go:stringToFloat64",
+        "tsc/internal/jsnum/string.go:trimLeadingZeros",
+        "tsc/internal/jsnum/string.go:trimTrailingZeros",
+        "tsc/internal/jsnum/string.go:tryParseInt"
       ]
     },
     {
@@ -2982,7 +5091,7 @@
       ]
     },
     {
-      "expected_contract": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a r",
+      "expected_contract": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a r A working byte-level reference for the eventual tsr_jsstring implementation already exists in the tree: crates/tsr_checker/src/node_builder_names.rs:1069-1084 is annotated `port: tsc/internal/stringutil/util.go:UnquoteString` and reproduces the backslash-newline exception, but it is private to tsr_checker, is not a leaf dependency and nothing tests it, so it is recorded here as a pointer for F1b and not claimed as coverage.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/text/quote-stripping",
@@ -2996,12 +5105,15 @@
           "tsc/internal/stringutil/util.go:StripQuotes"
         ],
         "unquote_string": [
-          "tsc/internal/stringutil/util.go:UnquoteString"
+          "tsc/internal/stringutil/util.go:StripQuotes",
+          "tsc/internal/stringutil/util.go:UnquoteString",
+          "tsc/internal/stringutil/util.go:matchSlashReplacer"
         ]
       },
       "operations": [
         "tsc/internal/stringutil/util.go:StripQuotes",
-        "tsc/internal/stringutil/util.go:UnquoteString"
+        "tsc/internal/stringutil/util.go:UnquoteString",
+        "tsc/internal/stringutil/util.go:matchSlashReplacer"
       ]
     },
     {
@@ -3011,8 +5123,25 @@
       "id": "leaves/text/semver-compare-precedence",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "compare": [
+          "tsc/internal/semver/version.go:Version.Compare",
+          "tsc/internal/semver/version.go:comparePreReleaseIdentifier",
+          "tsc/internal/semver/version.go:comparePreReleaseIdentifiers",
+          "tsc/internal/semver/version.go:getUintComponent"
+        ],
+        "compare_nil_both": [
+          "tsc/internal/semver/version.go:Version.Compare"
+        ],
+        "compare_nil_left": [
+          "tsc/internal/semver/version.go:Version.Compare"
+        ]
+      },
       "operations": [
-        "tsc/internal/semver/version.go:Version.Compare"
+        "tsc/internal/semver/version.go:Version.Compare",
+        "tsc/internal/semver/version.go:comparePreReleaseIdentifier",
+        "tsc/internal/semver/version.go:comparePreReleaseIdentifiers",
+        "tsc/internal/semver/version.go:getUintComponent"
       ]
     },
     {
@@ -3022,8 +5151,24 @@
       "id": "leaves/text/semver-parse-boundaries",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "must_parse_round_trip": [
+          "tsc/internal/semver/version.go:MustParse",
+          "tsc/internal/semver/version.go:Version.String"
+        ],
+        "parse": [
+          "tsc/internal/semver/version.go:SemverParseError.Error",
+          "tsc/internal/semver/version.go:TryParseVersion",
+          "tsc/internal/semver/version.go:Version.String",
+          "tsc/internal/semver/version.go:getUintComponent"
+        ]
+      },
       "operations": [
-        "tsc/internal/semver/version.go:TryParseVersion"
+        "tsc/internal/semver/version.go:MustParse",
+        "tsc/internal/semver/version.go:SemverParseError.Error",
+        "tsc/internal/semver/version.go:TryParseVersion",
+        "tsc/internal/semver/version.go:Version.String",
+        "tsc/internal/semver/version.go:getUintComponent"
       ]
     },
     {
@@ -3033,8 +5178,93 @@
       "id": "leaves/text/semver-range-caret-and-tilde",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "range": [
+          "tsc/internal/semver/version.go:Version.String",
+          "tsc/internal/semver/version.go:Version.incrementMajor",
+          "tsc/internal/semver/version.go:Version.incrementMinor",
+          "tsc/internal/semver/version.go:Version.incrementPatch",
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:isWildcard",
+          "tsc/internal/semver/version_range.go:parseAlternatives",
+          "tsc/internal/semver/version_range.go:parseComparator",
+          "tsc/internal/semver/version_range.go:parsePartial",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ]
+      },
       "operations": [
-        "tsc/internal/semver/version_range.go:parseComparator"
+        "tsc/internal/semver/version.go:Version.String",
+        "tsc/internal/semver/version.go:Version.incrementMajor",
+        "tsc/internal/semver/version.go:Version.incrementMinor",
+        "tsc/internal/semver/version.go:Version.incrementPatch",
+        "tsc/internal/semver/version_range.go:TryParseVersionRange",
+        "tsc/internal/semver/version_range.go:VersionRange.String",
+        "tsc/internal/semver/version_range.go:VersionRange.Test",
+        "tsc/internal/semver/version_range.go:formatAlternative",
+        "tsc/internal/semver/version_range.go:formatComparator",
+        "tsc/internal/semver/version_range.go:formatDisjunction",
+        "tsc/internal/semver/version_range.go:isWildcard",
+        "tsc/internal/semver/version_range.go:parseAlternatives",
+        "tsc/internal/semver/version_range.go:parseComparator",
+        "tsc/internal/semver/version_range.go:parsePartial",
+        "tsc/internal/semver/version_range.go:testAlternative",
+        "tsc/internal/semver/version_range.go:testComparator",
+        "tsc/internal/semver/version_range.go:testDisjunction"
+      ]
+    },
+    {
+      "expected_contract": "A caret or tilde range renders as an explicit pair of comparators, and the upper bound is a bare release: the increment helpers construct a fresh version from the incremented component alone, so the operand's prerelease and build survive only in the lower bound.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-range-increment-drops-prerelease",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "range": [
+          "tsc/internal/semver/version.go:Version.String",
+          "tsc/internal/semver/version.go:Version.incrementMajor",
+          "tsc/internal/semver/version.go:Version.incrementMinor",
+          "tsc/internal/semver/version.go:Version.incrementPatch",
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:isWildcard",
+          "tsc/internal/semver/version_range.go:parseAlternatives",
+          "tsc/internal/semver/version_range.go:parseComparator",
+          "tsc/internal/semver/version_range.go:parsePartial",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ]
+      },
+      "operations": [
+        "tsc/internal/semver/version.go:Version.String",
+        "tsc/internal/semver/version.go:Version.incrementMajor",
+        "tsc/internal/semver/version.go:Version.incrementMinor",
+        "tsc/internal/semver/version.go:Version.incrementPatch",
+        "tsc/internal/semver/version_range.go:TryParseVersionRange",
+        "tsc/internal/semver/version_range.go:VersionRange.String",
+        "tsc/internal/semver/version_range.go:VersionRange.Test",
+        "tsc/internal/semver/version_range.go:formatAlternative",
+        "tsc/internal/semver/version_range.go:formatComparator",
+        "tsc/internal/semver/version_range.go:formatDisjunction",
+        "tsc/internal/semver/version_range.go:isWildcard",
+        "tsc/internal/semver/version_range.go:parseAlternatives",
+        "tsc/internal/semver/version_range.go:parseComparator",
+        "tsc/internal/semver/version_range.go:parsePartial",
+        "tsc/internal/semver/version_range.go:testAlternative",
+        "tsc/internal/semver/version_range.go:testComparator",
+        "tsc/internal/semver/version_range.go:testDisjunction"
       ]
     },
     {
@@ -3044,8 +5274,90 @@
       "id": "leaves/text/semver-range-prerelease-membership",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "range": [
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:isWildcard",
+          "tsc/internal/semver/version_range.go:parseAlternatives",
+          "tsc/internal/semver/version_range.go:parseComparator",
+          "tsc/internal/semver/version_range.go:parseHyphen",
+          "tsc/internal/semver/version_range.go:parsePartial",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ],
+        "range_nil_version": [
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ]
+      },
       "operations": [
-        "tsc/internal/semver/version_range.go:VersionRange.Test"
+        "tsc/internal/semver/version_range.go:TryParseVersionRange",
+        "tsc/internal/semver/version_range.go:VersionRange.String",
+        "tsc/internal/semver/version_range.go:VersionRange.Test",
+        "tsc/internal/semver/version_range.go:formatAlternative",
+        "tsc/internal/semver/version_range.go:formatComparator",
+        "tsc/internal/semver/version_range.go:formatDisjunction",
+        "tsc/internal/semver/version_range.go:isWildcard",
+        "tsc/internal/semver/version_range.go:parseAlternatives",
+        "tsc/internal/semver/version_range.go:parseComparator",
+        "tsc/internal/semver/version_range.go:parseHyphen",
+        "tsc/internal/semver/version_range.go:parsePartial",
+        "tsc/internal/semver/version_range.go:testAlternative",
+        "tsc/internal/semver/version_range.go:testComparator",
+        "tsc/internal/semver/version_range.go:testDisjunction"
+      ]
+    },
+    {
+      "expected_contract": "A range that fails to parse is returned with no alternatives, renders as the wildcard, and admits every version, because an empty disjunction is specified to match everything.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-range-unparsed-matches-everything",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "range": [
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:isWildcard",
+          "tsc/internal/semver/version_range.go:parseAlternatives",
+          "tsc/internal/semver/version_range.go:parseComparator",
+          "tsc/internal/semver/version_range.go:parsePartial",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ]
+      },
+      "operations": [
+        "tsc/internal/semver/version_range.go:TryParseVersionRange",
+        "tsc/internal/semver/version_range.go:VersionRange.String",
+        "tsc/internal/semver/version_range.go:VersionRange.Test",
+        "tsc/internal/semver/version_range.go:formatAlternative",
+        "tsc/internal/semver/version_range.go:formatComparator",
+        "tsc/internal/semver/version_range.go:formatDisjunction",
+        "tsc/internal/semver/version_range.go:isWildcard",
+        "tsc/internal/semver/version_range.go:parseAlternatives",
+        "tsc/internal/semver/version_range.go:parseComparator",
+        "tsc/internal/semver/version_range.go:parsePartial",
+        "tsc/internal/semver/version_range.go:testAlternative",
+        "tsc/internal/semver/version_range.go:testComparator",
+        "tsc/internal/semver/version_range.go:testDisjunction"
       ]
     },
     {
@@ -3055,8 +5367,41 @@
       "id": "leaves/text/semver-range-wildcards-and-primitives",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "range": [
+          "tsc/internal/semver/version.go:Version.String",
+          "tsc/internal/semver/version_range.go:TryParseVersionRange",
+          "tsc/internal/semver/version_range.go:VersionRange.String",
+          "tsc/internal/semver/version_range.go:VersionRange.Test",
+          "tsc/internal/semver/version_range.go:formatAlternative",
+          "tsc/internal/semver/version_range.go:formatComparator",
+          "tsc/internal/semver/version_range.go:formatDisjunction",
+          "tsc/internal/semver/version_range.go:isWildcard",
+          "tsc/internal/semver/version_range.go:parseAlternatives",
+          "tsc/internal/semver/version_range.go:parseComparator",
+          "tsc/internal/semver/version_range.go:parseHyphen",
+          "tsc/internal/semver/version_range.go:parsePartial",
+          "tsc/internal/semver/version_range.go:testAlternative",
+          "tsc/internal/semver/version_range.go:testComparator",
+          "tsc/internal/semver/version_range.go:testDisjunction"
+        ]
+      },
       "operations": [
-        "tsc/internal/semver/version_range.go:TryParseVersionRange"
+        "tsc/internal/semver/version.go:Version.String",
+        "tsc/internal/semver/version_range.go:TryParseVersionRange",
+        "tsc/internal/semver/version_range.go:VersionRange.String",
+        "tsc/internal/semver/version_range.go:VersionRange.Test",
+        "tsc/internal/semver/version_range.go:formatAlternative",
+        "tsc/internal/semver/version_range.go:formatComparator",
+        "tsc/internal/semver/version_range.go:formatDisjunction",
+        "tsc/internal/semver/version_range.go:isWildcard",
+        "tsc/internal/semver/version_range.go:parseAlternatives",
+        "tsc/internal/semver/version_range.go:parseComparator",
+        "tsc/internal/semver/version_range.go:parseHyphen",
+        "tsc/internal/semver/version_range.go:parsePartial",
+        "tsc/internal/semver/version_range.go:testAlternative",
+        "tsc/internal/semver/version_range.go:testComparator",
+        "tsc/internal/semver/version_range.go:testDisjunction"
       ]
     },
     {
@@ -3110,7 +5455,7 @@
       ]
     },
     {
-      "expected_contract": "ToLowerJS is String.prototype.toLowerCase, not Go simple lowering: Final_Sigma context turns the trailing sigma of \u0391\u03a3 into \u03c2 while \u0391\u03a3\u0392 keeps \u03c3, a following Case_Ignorable code point ('.' or U+0301) is skipped rather than counted as a following cased letter, so \u0391\u03a3. and \u0391\u03a3\u0301 still end in \u03c2, and \u0130 expands to i plus U+0307. A lone-surrogate sentinel survives byte for byte while a malformed byte is repa",
+      "expected_contract": "Lowercasing takes the ASCII fast path only when every byte is ASCII, so the empty, all-lower, all-upper and mixed ASCII inputs separate the fast path's two answers from the general one. The Greek inputs drive the final-sigma condition through each of its states: a capital sigma after a cased letter and before a period is final, the same sigma before another cased letter is not, a combining mark between them is ignored when looking ahead, and a sigma with nothing cased before it is not final regardless of what follows. Lone surrogates and an invalid byte pin that the scan is over the raw bytes.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/text/to-lower-js",
@@ -3118,11 +5463,21 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "to_lower_js": [
-          "tsc/internal/stringutil/js_case.go:ToLowerJS"
+          "tsc/internal/stringutil/js_case.go:ToLowerJS",
+          "tsc/internal/stringutil/js_case.go:hasSigmaCasedAfter",
+          "tsc/internal/stringutil/js_case.go:isFinalSigmaContext",
+          "tsc/internal/stringutil/js_case.go:isSigmaCased",
+          "tsc/internal/stringutil/js_case.go:isUnicodeCaseIgnorable",
+          "tsc/internal/stringutil/js_case.go:toLowerASCII"
         ]
       },
       "operations": [
-        "tsc/internal/stringutil/js_case.go:ToLowerJS"
+        "tsc/internal/stringutil/js_case.go:ToLowerJS",
+        "tsc/internal/stringutil/js_case.go:hasSigmaCasedAfter",
+        "tsc/internal/stringutil/js_case.go:isFinalSigmaContext",
+        "tsc/internal/stringutil/js_case.go:isSigmaCased",
+        "tsc/internal/stringutil/js_case.go:isUnicodeCaseIgnorable",
+        "tsc/internal/stringutil/js_case.go:toLowerASCII"
       ]
     },
     {
@@ -3134,11 +5489,13 @@
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operation_actions": {
         "to_upper_js": [
-          "tsc/internal/stringutil/js_case.go:ToUpperJS"
+          "tsc/internal/stringutil/js_case.go:ToUpperJS",
+          "tsc/internal/stringutil/js_case.go:toUpperASCII"
         ]
       },
       "operations": [
-        "tsc/internal/stringutil/js_case.go:ToUpperJS"
+        "tsc/internal/stringutil/js_case.go:ToUpperJS",
+        "tsc/internal/stringutil/js_case.go:toUpperASCII"
       ]
     },
     {
@@ -3251,6 +5608,91 @@
   "version": 2,
   "witnesses": [
     {
+      "artifact": "data/s04/e4-probes.json",
+      "freshness": "gated on every `cargo xtask run e4`",
+      "id": "witness/s04-e4-probes",
+      "kind": "rust_gated",
+      "operation_actions": {
+        "byte_from_position": [
+          "tsc/internal/core/core.go:PositionToLineAndByteOffset",
+          "tsc/internal/core/core.go:ComputeECMALineStarts",
+          "tsc/internal/core/core.go:ComputeECMALineStartsSeq"
+        ],
+        "combine": [
+          "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
+        ],
+        "decode_js": [
+          "tsc/internal/stringutil/util.go:DecodeJSStringRune"
+        ],
+        "ecma_lines": [
+          "tsc/internal/core/core.go:ComputeECMALineStarts",
+          "tsc/internal/core/core.go:ComputeECMALineStartsSeq"
+        ],
+        "encode": [
+          "tsc/internal/stringutil/util.go:EncodeJSStringRune"
+        ],
+        "lower": [
+          "tsc/internal/stringutil/js_case.go:ToLowerJS"
+        ],
+        "lower_first": [
+          "tsc/internal/stringutil/util.go:LowerFirstChar"
+        ],
+        "truncate": [
+          "tsc/internal/stringutil/util.go:TruncateByRunes"
+        ],
+        "upper": [
+          "tsc/internal/stringutil/js_case.go:ToUpperJS"
+        ],
+        "utf16_len": [
+          "tsc/internal/core/core.go:UTF16Len"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/core.go:ComputeECMALineStarts",
+        "tsc/internal/core/core.go:ComputeECMALineStartsSeq",
+        "tsc/internal/core/core.go:PositionToLineAndByteOffset",
+        "tsc/internal/core/core.go:UTF16Len",
+        "tsc/internal/stringutil/js_case.go:ToLowerJS",
+        "tsc/internal/stringutil/js_case.go:ToUpperJS",
+        "tsc/internal/stringutil/util.go:CombineSurrogatePairs",
+        "tsc/internal/stringutil/util.go:DecodeJSStringRune",
+        "tsc/internal/stringutil/util.go:EncodeJSStringRune",
+        "tsc/internal/stringutil/util.go:LowerFirstChar",
+        "tsc/internal/stringutil/util.go:TruncateByRunes"
+      ],
+      "producer": "e4",
+      "rust_gate": "scripts/s04.py e4 runs `cargo run --package tsr_jsstring --example e4 --release` and compares its bytes to the pinned Go oracle",
+      "witnesses": "The listed E4 action names call these exact stringutil functions in scripts/s04_oracle/main.go and their Rust counterparts in crates/tsr_jsstring/examples/e4.rs. scripts/s04.py verifies the frozen request inventory before its differential comparison; scenario groups are not attributed wholesale. The same comparison also drives three core position helpers: scripts/s04_oracle/main.go:170 answers `ecma_lines` with core.ComputeECMALineStarts, :192 answers `byte_from_position` with core.PositionToLineAndByteOffset and :194 answers `utf16_len` with core.UTF16Len, against crates/tsr_jsstring/examples/e4.rs:202, :258 and the ByteFromPosition arm. ComputeECMALineStarts is a two-line wrapper that appends ComputeECMALineStartsSeq, so every ecma_lines probe drives both."
+    },
+    {
+      "artifact": "data/s05/cases.json",
+      "freshness": "gated on every `cargo xtask run scanner`",
+      "id": "witness/s05-scanner-cases",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/core/core.go:GetSpellingSuggestion",
+        "tsc/internal/core/core.go:GetSpellingSuggestionForStrings",
+        "tsc/internal/core/core.go:getSpellingSuggestion",
+        "tsc/internal/core/core.go:levenshteinWithMax"
+      ],
+      "producer": "scanner",
+      "rust_gate": "scripts/s05.py:39 builds `cargo build --package tsr_scanner --example s05 --release --locked` and compares its output to the pinned Go oracle",
+      "witnesses": "The pinned regular-expression scanner is the only in-scope caller of the spelling suggestions: upstream/tsc/internal/scanner/regexp.go:985, :993, :997 and :1086 all call core.GetSpellingSuggestionForStrings, which delegates to the unexported getSpellingSuggestion and through it to levenshteinWithMax. The Rust counterparts are crates/tsr_scanner/src/spelling.rs:18, :28 and its levenshtein_with_max, so the differential comparison over the frozen regexp cases exercises the same chain on both sides. The suggestion text is part of the compared diagnostic, not a separate assertion, so a wrong edit-distance weight changes the bytes. NOTE: the Rust home is tsr_scanner::spelling, not tsr_core, which is why a by-name search of tsr_core missed it."
+    },
+    {
+      "artifact": "data/s07/helper-tests.json",
+      "freshness": "gated on every `cargo xtask run program`",
+      "id": "witness/s07-helper-tests-go-sort",
+      "kind": "rust_gated",
+      "operations": [
+        "tsc/internal/core/core.go:DeduplicateSorted",
+        "tsc/internal/core/core.go:InsertSorted"
+      ],
+      "producer": "program",
+      "rust_gate": "scripts/s07_helpers.py runs `cargo test --package tsr_core --lib go_sort::tests::`",
+      "witnesses": "A frozen inventory of tsr_core go_sort unit tests, enforced by the same producer."
+    },
+    {
       "artifact": "data/s07/helper-tests.json",
       "freshness": "gated on every `cargo xtask run program`",
       "id": "witness/s07-helper-tests-pattern",
@@ -3265,19 +5707,6 @@
       "producer": "program",
       "rust_gate": "scripts/s07_helpers.py runs `cargo test --package tsr_core --lib pattern::tests::`",
       "witnesses": "A frozen inventory of tsr_core pattern unit tests, enforced by a producer. It gates the Rust implementation directly. It is not a Go-versus-Rust comparison: the group's `checker` is null, so its expectations were derived from the pinned source rather than regenerated."
-    },
-    {
-      "artifact": "data/s07/helper-tests.json",
-      "freshness": "gated on every `cargo xtask run program`",
-      "id": "witness/s07-helper-tests-go-sort",
-      "kind": "rust_gated",
-      "operations": [
-        "tsc/internal/core/core.go:DeduplicateSorted",
-        "tsc/internal/core/core.go:InsertSorted"
-      ],
-      "producer": "program",
-      "rust_gate": "scripts/s07_helpers.py runs `cargo test --package tsr_core --lib go_sort::tests::`",
-      "witnesses": "A frozen inventory of tsr_core go_sort unit tests, enforced by the same producer."
     },
     {
       "artifact": "data/s07/path-observations.json",
@@ -3411,47 +5840,6 @@
       ],
       "producer": "program",
       "witnesses": "Frozen native semver observations. NOT Rust coverage: scripts/s07_semver.py runs `go test ./internal/semver` against a copied adapter and never executes Rust."
-    },
-    {
-      "artifact": "data/s04/e4-probes.json",
-      "freshness": "gated on every `cargo xtask run e4`",
-      "id": "witness/s04-e4-probes",
-      "kind": "rust_gated",
-      "operation_actions": {
-        "combine": [
-          "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
-        ],
-        "decode_js": [
-          "tsc/internal/stringutil/util.go:DecodeJSStringRune"
-        ],
-        "encode": [
-          "tsc/internal/stringutil/util.go:EncodeJSStringRune"
-        ],
-        "lower": [
-          "tsc/internal/stringutil/js_case.go:ToLowerJS"
-        ],
-        "lower_first": [
-          "tsc/internal/stringutil/util.go:LowerFirstChar"
-        ],
-        "truncate": [
-          "tsc/internal/stringutil/util.go:TruncateByRunes"
-        ],
-        "upper": [
-          "tsc/internal/stringutil/js_case.go:ToUpperJS"
-        ]
-      },
-      "operations": [
-        "tsc/internal/stringutil/js_case.go:ToLowerJS",
-        "tsc/internal/stringutil/js_case.go:ToUpperJS",
-        "tsc/internal/stringutil/util.go:CombineSurrogatePairs",
-        "tsc/internal/stringutil/util.go:DecodeJSStringRune",
-        "tsc/internal/stringutil/util.go:EncodeJSStringRune",
-        "tsc/internal/stringutil/util.go:LowerFirstChar",
-        "tsc/internal/stringutil/util.go:TruncateByRunes"
-      ],
-      "producer": "e4",
-      "rust_gate": "scripts/s04.py e4 runs `cargo run --package tsr_jsstring --example e4 --release` and compares its bytes to the pinned Go oracle",
-      "witnesses": "The listed E4 action names call these exact stringutil functions in scripts/s04_oracle/main.go and their Rust counterparts in crates/tsr_jsstring/examples/e4.rs. scripts/s04.py verifies the frozen request inventory before its differential comparison; scenario groups are not attributed wholesale."
     }
   ]
 }

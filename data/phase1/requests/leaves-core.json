@@ -868,6 +868,319 @@
       "operation": "tsc/internal/core/pattern.go:FindBestPatternMatch",
       "order_sensitive": true,
       "subject": "core.Pattern"
+    },
+    {
+      "actions": [
+        {
+          "enum_value": 0,
+          "op": "string"
+        },
+        {
+          "enum_value": 1,
+          "op": "string"
+        },
+        {
+          "enum_value": 2,
+          "op": "string"
+        },
+        {
+          "enum_value": 3,
+          "op": "string"
+        },
+        {
+          "enum_value": 4,
+          "op": "string"
+        },
+        {
+          "enum_value": 127,
+          "op": "string"
+        },
+        {
+          "enum_value": 255,
+          "op": "string"
+        }
+      ],
+      "case": "leaves/core/tristate-stringer-domain",
+      "discriminates": "the rendering of a Tristate outside its three named values. The generated method guards with `i < 0 || idx >= len(_Tristate_index)-1` (tristate_stringer_generated.go:22), but Tristate is a byte (tristate.go:8), so the signed half of that guard is dead and the numeric fallback is reached only past the index table. A port that modelled Tristate as a three-variant enum could not render 3, 4 or 255 at all, and a port that modelled Tristate as a signed i8 renders 255 as Tristate(-1) where the pin renders Tristate(255). 255 is the largest value the byte can hold, so this trace also fixes where the fallback's numeric text ends.",
+      "operation": "tsc/internal/core/tristate_stringer_generated.go:Tristate.String",
+      "order_sensitive": true,
+      "subject": "core.Tristate"
+    },
+    {
+      "actions": [
+        {
+          "enum_value": -2147483648,
+          "op": "string"
+        },
+        {
+          "enum_value": -1,
+          "op": "string"
+        },
+        {
+          "enum_value": 0,
+          "op": "string"
+        },
+        {
+          "enum_value": 1,
+          "op": "string"
+        },
+        {
+          "enum_value": 2,
+          "op": "string"
+        },
+        {
+          "enum_value": 3,
+          "op": "string"
+        },
+        {
+          "enum_value": 4,
+          "op": "string"
+        },
+        {
+          "enum_value": 5,
+          "op": "string"
+        },
+        {
+          "enum_value": 6,
+          "op": "string"
+        },
+        {
+          "enum_value": 7,
+          "op": "string"
+        },
+        {
+          "enum_value": 99,
+          "op": "string"
+        },
+        {
+          "enum_value": 2147483647,
+          "op": "string"
+        }
+      ],
+      "case": "leaves/core/script-kind-stringer-gap",
+      "discriminates": "the hole at 5. ScriptKind is not densely numbered: the declared values run 0..4 and then jump to 6 (scriptkind_stringer_generated.go:11-16), so the generated method is a switch over two runs (:27-34) rather than one index lookup, and 5 renders as the numeric fallback while 6 renders as a name. A hand-written match that walked a table of the six declared values in order would hand 5 the name that belongs to 6 and shift every later value. This stringer also keeps the type prefix -- it is generated without -trimprefix, unlike ModuleKind and ScriptTarget -- so the names are ScriptKindTS rather than TS, which a port sharing one naming helper across the enums would get wrong. The i32 extremes fix the fallback's text at both ends of the domain.",
+      "operation": "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String",
+      "order_sensitive": true,
+      "subject": "core.ScriptKind"
+    },
+    {
+      "actions": [
+        {
+          "enum_value": -2147483648,
+          "op": "string"
+        },
+        {
+          "enum_value": -1,
+          "op": "string"
+        },
+        {
+          "enum_value": 0,
+          "op": "string"
+        },
+        {
+          "enum_value": 1,
+          "op": "string"
+        },
+        {
+          "enum_value": 2,
+          "op": "string"
+        },
+        {
+          "enum_value": 3,
+          "op": "string"
+        },
+        {
+          "enum_value": 2147483647,
+          "op": "string"
+        }
+      ],
+      "case": "leaves/core/language-variant-stringer-domain",
+      "discriminates": "the two-value enum whose guard is live. LanguageVariant is an int32 (languagevariant.go:6), so unlike Tristate -- which shares this index-table shape -- the generated `i < 0` test at languagevariant_stringer_generated.go:21 can actually fire, and a negative value takes the numeric fallback rather than indexing the table backwards. The names keep the type prefix, so they are LanguageVariantStandard and LanguageVariantJSX rather than Standard and JSX. A port that rendered a bare JSX differs on the two named values; a port that clamped an out-of-domain value to Standard instead of reporting the number differs on the unnamed ones on five of these seven values.",
+      "operation": "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String",
+      "order_sensitive": true,
+      "subject": "core.LanguageVariant"
+    },
+    {
+      "actions": [
+        {
+          "enum_value": -1,
+          "op": "string"
+        },
+        {
+          "enum_value": 0,
+          "op": "string"
+        },
+        {
+          "enum_value": 1,
+          "op": "string"
+        },
+        {
+          "enum_value": 2,
+          "op": "string"
+        },
+        {
+          "enum_value": 3,
+          "op": "string"
+        },
+        {
+          "enum_value": 4,
+          "op": "string"
+        },
+        {
+          "enum_value": 5,
+          "op": "string"
+        },
+        {
+          "enum_value": 6,
+          "op": "string"
+        },
+        {
+          "enum_value": 7,
+          "op": "string"
+        },
+        {
+          "enum_value": 8,
+          "op": "string"
+        },
+        {
+          "enum_value": 98,
+          "op": "string"
+        },
+        {
+          "enum_value": 99,
+          "op": "string"
+        },
+        {
+          "enum_value": 100,
+          "op": "string"
+        },
+        {
+          "enum_value": 101,
+          "op": "string"
+        },
+        {
+          "enum_value": 102,
+          "op": "string"
+        },
+        {
+          "enum_value": 103,
+          "op": "string"
+        },
+        {
+          "enum_value": 198,
+          "op": "string"
+        },
+        {
+          "enum_value": 199,
+          "op": "string"
+        },
+        {
+          "enum_value": 200,
+          "op": "string"
+        },
+        {
+          "enum_value": 201,
+          "op": "string"
+        },
+        {
+          "enum_value": 2147483647,
+          "op": "string"
+        }
+      ],
+      "case": "leaves/core/module-kind-stringer-gaps",
+      "discriminates": "the two numeric gaps between ModuleKind's three runs. The declared values are 0..7, 99..102 and 199..200 (modulekind_stringer_generated.go:11-24), so the generated method is a three-arm switch over three separate name strings (:39-51), each arm subtracting its own base before indexing. 8, 98, 103, 198 and 201 therefore render as ModuleKind(n), and this is exactly where a hand-written Rust match would differ: the port has two private renderings of this operation and they already disagree with each other -- crates/tsr_checker/src/emit_checks.rs:514 names all fourteen values, while crates/tsr_compiler/src/verify_options.rs:584 names only Node16..NodeNext and renders ModuleKind(1) where the pin renders CommonJS. The names are trimmed of the ModuleKind prefix, because this stringer is generated with -trimprefix and ScriptKind's is not.",
+      "operation": "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String",
+      "order_sensitive": true,
+      "subject": "core.ModuleKind"
+    },
+    {
+      "actions": [
+        {
+          "enum_value": -1,
+          "op": "string"
+        },
+        {
+          "enum_value": 0,
+          "op": "string"
+        },
+        {
+          "enum_value": 1,
+          "op": "string"
+        },
+        {
+          "enum_value": 2,
+          "op": "string"
+        },
+        {
+          "enum_value": 3,
+          "op": "string"
+        },
+        {
+          "enum_value": 4,
+          "op": "string"
+        },
+        {
+          "enum_value": 5,
+          "op": "string"
+        },
+        {
+          "enum_value": 6,
+          "op": "string"
+        },
+        {
+          "enum_value": 7,
+          "op": "string"
+        },
+        {
+          "enum_value": 8,
+          "op": "string"
+        },
+        {
+          "enum_value": 9,
+          "op": "string"
+        },
+        {
+          "enum_value": 10,
+          "op": "string"
+        },
+        {
+          "enum_value": 11,
+          "op": "string"
+        },
+        {
+          "enum_value": 12,
+          "op": "string"
+        },
+        {
+          "enum_value": 13,
+          "op": "string"
+        },
+        {
+          "enum_value": 98,
+          "op": "string"
+        },
+        {
+          "enum_value": 99,
+          "op": "string"
+        },
+        {
+          "enum_value": 100,
+          "op": "string"
+        },
+        {
+          "enum_value": 101,
+          "op": "string"
+        },
+        {
+          "enum_value": 2147483647,
+          "op": "string"
+        }
+      ],
+      "case": "leaves/core/script-target-stringer-gaps",
+      "discriminates": "the gap between ES2025 and ESNext, and the two aliases that share a number. ScriptTarget declares 0..12 and 99..100, so the generated method is a two-arm switch (scripttarget_stringer_generated.go:40-49) and 13..98 render as ScriptTarget(n) -- the range a port that treated the enum as contiguous would fill with invented names. ScriptTargetLatest is 99 and ScriptTargetLatestStandard is 12 (scripttarget_stringer_generated.go:26-27), so those two numbers must render as ESNext and ES2025: a port that gave an alias its own name would differ there without being wrong about any declared value. The names are trimmed of the ScriptTarget prefix, and 100 is JSON rather than ScriptTargetJSON.",
+      "operation": "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String",
+      "order_sensitive": true,
+      "subject": "core.ScriptTarget"
     }
   ],
   "version": 1
