@@ -2,6 +2,11 @@
 
 Phase 0 is the spike in [PLAN.md](../PLAN.md), section 9: the three contracts, the AST, scanner, parser and encoder, the dependency slices, and the eight experiments E1 to E8 with explicit thresholds. This directory holds it as sprint files that `cargo xtask check <id>` evaluates against current evidence under the [tracking contract](../docs/TRACKING.md). A sprint is done only when every exit check and every required item passes; a check that names a metric no producer emits yet cannot pass, so an unimplemented sprint stays open by construction.
 
+S12 is the owner-approved exception: it records the **2026-09-20 historical
+Phase 0 acceptance** in ADR 0020 and the [evidence index](../docs/S12-historical-evidence.md).
+Its completion persists independently of live evidence freshness. Other sprint
+and experiment checks retain their current-source requirements.
+
 ## Sequence
 
 Phases are ordered by dependency, not by time, and so are sprints. Each sprint's `exit` names its direct prerequisites. Sprints can run in parallel once their prerequisites are complete.
@@ -19,7 +24,7 @@ Phases are ordered by dependency, not by time, and so are sprints. Each sprint's
 | S09 | Ownership and registry harness | S08 | E3 complete, including Miri and AddressSanitizer |
 | S10 | WebAssembly and Rust embedding | S08 | E7, E8 |
 | S11 | Test-host transport prototype | S06 | none; not a gate input |
-| S12 | Phase 0 gate | S02 to S10 | E1 to E8 pass; ADR 0020 records the decision |
+| S12 | Phase 0 gate | Historical S02 to S10 milestones | ADR 0020 accepts the indexed E1 to E8 evidence and records go (2026-09-20) |
 
 S03 and S04 run in parallel after S02. S09 and S10 run in parallel after S08. S11 runs in parallel with S08 to S10 and does not gate S12.
 
@@ -61,5 +66,5 @@ The relater fixture manifest fixes the supported operations and expected observa
 - **Traceability.** Ported Rust items carry `port:` markers (docs/TRACKING.md). Sprints S05 to S07 require a mapping ratio for their packages; the ratio measures traceability, never parity. Parity comes from the behavioral evidence the ledger's `verify` checks name.
 - **Ledger.** The 36 Phase 0 files in `PORTS.toml` already carry the `verify` checks they must pass; `status` moves from `planned` to `in-progress` and `ported` as the sprints land, and `verified` is computed.
 - **Divergences.** A difference from a Corsa baseline passes E2 only with an owner-approved entry in `data/divergences.toml` (ADR 0004).
-- **Decisions.** ADR 0019 (test-host protocol) and ADR 0020 (gate decision) exist as Proposed so their sprints can name them; they are accepted only after the owner's review, like ADRs 0006, 0007 and 0013.
+- **Decisions.** ADR 0019 (test-host protocol) and ADR 0020 (gate decision) were accepted after the owner's review, on 2026-09-19 and 2026-09-20 respectively. ADR 0020 explicitly accepts historical evidence for the S12 milestone; it does not mark that evidence current.
 - **Not in Phase 0.** The release matrix, the glibc 2.28 symbol check on shipped binaries, code signing and the full WebAssembly and embedding acceptance are Phase 7 gates (ADRs 0002 and 0003).

@@ -1,43 +1,29 @@
-# Phase 0 gate (PLAN.md, section 9): E1 to E4 pass; E5 to E8 meet their thresholds for the parts
-# they measure, with the extrapolations written down as extrapolations; otherwise stop.
-# The owner records the decision in ADR 0020.
+# Dated Phase 0 acceptance, approved by the owner on 2026-09-20 (ADR 0020).
+# docs/S12-historical-evidence.md identifies the accepted E1–E8 and S02–S10 evidence.
+# S12 records that milestone; it does not certify current-source measurements.
+# Producer freshness, experiment checks and other sprint checks remain unchanged.
 id = "S12"
 title = "Phase 0 gate"
-goal = "Every experiment passes on current evidence, the extrapolations, workload limits, full checking/emit acceptance matrix and Phase 7 performance budgets are written down, and the owner records the go/no-go decision."
+goal = "Record the owner's 2026-09-20 acceptance of the preserved Phase 0 evidence under the approved thresholds, with extrapolations, workload limits, the full checking/emit acceptance matrix and Phase 7 budgets in ADR 0020. This dated milestone does not assert current-source evidence freshness."
 exit = [
-  "sprint.S02.done == 1",
-  "sprint.S03.done == 1",
-  "sprint.S04.done == 1",
-  "sprint.S05.done == 1",
-  "sprint.S06.done == 1",
-  "sprint.S07.done == 1",
-  "sprint.S08.done == 1",
-  "sprint.S09.done == 1",
-  "sprint.S10.done == 1",
-  "exp.E1.pass == 1",
-  "exp.E2.pass == 1",
-  "exp.E3.pass == 1",
-  "exp.E4.pass == 1",
-  "exp.E5.pass == 1",
-  "exp.E6.pass == 1",
-  "exp.E7.pass == 1",
-  "exp.E8.pass == 1",
   "adr.0020.status == Accepted",
 ]
 
 [[item]]
 id = "S12-1"
-title = "Every gate experiment passes on current evidence"
-kind = "task"
+title = "Owner accepts the indexed historical E1–E8 evidence under the approved thresholds (2026-09-20)"
+kind = "adr"
+ref = "0020"
 required = true
-done_when = ["exp.E1.pass == 1", "exp.E2.pass == 1", "exp.E3.pass == 1", "exp.E4.pass == 1", "exp.E5.pass == 1", "exp.E6.pass == 1", "exp.E7.pass == 1", "exp.E8.pass == 1"]
+done_when = ["adr.0020.status == Accepted"]
 
 [[item]]
 id = "S12-2"
-title = "Every Phase 0 implementation sprint is done"
-kind = "task"
+title = "Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed historical evidence (2026-09-20)"
+kind = "adr"
+ref = "0020"
 required = true
-done_when = ["sprint.S02.done == 1", "sprint.S03.done == 1", "sprint.S04.done == 1", "sprint.S05.done == 1", "sprint.S06.done == 1", "sprint.S07.done == 1", "sprint.S08.done == 1", "sprint.S09.done == 1", "sprint.S10.done == 1"]
+done_when = ["adr.0020.status == Accepted"]
 
 [[item]]
 id = "S12-3"

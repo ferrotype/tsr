@@ -3,10 +3,11 @@
 This is the historical result under the original limits. The owner amended
 those limits on 2026-09-20 in [ADR 0020](adr/0020-phase-0-gate-decision.md).
 The values, failure results and raw captures below are unchanged; they are
-not reissued as current acceptance evidence.
+not reissued as current acceptance evidence. The owner accepted them under the
+amended limits for the dated [S12 closure](S12-closure-plan.md).
 
 The embedding interfaces and correctness captures are complete on the source
-tree committed as `09e6016`. S10 remains open: all three performance criteria
+tree committed as `09e6016`. At that capture, S10 remained open: all three performance criteria
 miss their unchanged thresholds. The plan and API contracts are in
 [S10-implementation-plan.md](S10-implementation-plan.md) and [S10.md](S10.md).
 

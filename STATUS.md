@@ -543,35 +543,18 @@ Items:
 - [ ] S11-2 Callback filesystem operations (readFile, fileExists, directoryExists, getAccessibleEntries, realpath) over the connection, with cancellation and callback progress
 - [ ] S11-3 Test-only initialization, options and plugin controls
 
-### S12 Phase 0 gate (open)
+### S12 Phase 0 gate (done)
 
-Every experiment passes on current evidence, the extrapolations, workload limits, full checking/emit acceptance matrix and Phase 7 performance budgets are written down, and the owner records the go/no-go decision.
+Record the owner's 2026-09-20 acceptance of the preserved Phase 0 evidence under the approved thresholds, with extrapolations, workload limits, the full checking/emit acceptance matrix and Phase 7 budgets in ADR 0020. This dated milestone does not assert current-source evidence freshness.
 
 Exit checks:
 
-- [ ] `sprint.S02.done == 1`
-- [ ] `sprint.S03.done == 1`
-- [ ] `sprint.S04.done == 1`
-- [ ] `sprint.S05.done == 1`
-- [ ] `sprint.S06.done == 1`
-- [ ] `sprint.S07.done == 1`
-- [ ] `sprint.S08.done == 1`
-- [ ] `sprint.S09.done == 1`
-- [ ] `sprint.S10.done == 1`
-- [ ] `exp.E1.pass == 1`
-- [ ] `exp.E2.pass == 1`
-- [ ] `exp.E3.pass == 1`
-- [ ] `exp.E4.pass == 1`
-- [ ] `exp.E5.pass == 1`
-- [ ] `exp.E6.pass == 1`
-- [ ] `exp.E7.pass == 1`
-- [ ] `exp.E8.pass == 1`
 - [x] `adr.0020.status == Accepted`
 
 Items:
 
-- [ ] S12-1 Every gate experiment passes on current evidence
-- [ ] S12-2 Every Phase 0 implementation sprint is done
+- [x] S12-1 Owner accepts the indexed historical E1–E8 evidence under the approved thresholds (2026-09-20) (adr 0020)
+- [x] S12-2 Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed historical evidence (2026-09-20) (adr 0020)
 - [x] S12-3 Gate decision as ADR 0020: extrapolations and workload limits for E5 to E8, the full checking/emit acceptance matrix, the Phase 7 performance budgets, and go or no-go (adr 0020)
 
 ## Decisions
