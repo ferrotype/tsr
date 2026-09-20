@@ -1,0 +1,73 @@
+# Phase 1, stage A: preparation. No production parity is claimed here.
+#
+# These items consume preparation metrics only:
+#   run.foundations.harness_pass, run.foundations.inventory_complete,
+#   run.foundations.leaves_prepared, run.foundations.filesystem_prepared,
+#   run.foundations.utilities_prepared, run.foundations.integration_prepared,
+#   run.config.prepared, run.syntax.prepared
+#
+# A `prepared` metric checks complete case/authority/dispatch coverage, the
+# required smoke and the comparator controls. It may be true while the matching
+# production-completion metric is false; neither is a manually entered
+# acknowledgement. The `foundations`, `config` and `syntax` producers are NOT
+# registered in status/runs.toml at F0: the plan registers a producer only once
+# it can validate its complete declared inventory and report honest failures.
+# F1a-F5a register them as their family adapters land.
+#
+# This sprint does not alter S01-S12 completion or E1's threshold.
+id = "P1A"
+title = "Phase 1 stage A: prepared tests and coverage"
+goal = "Every Phase 1 operation, the 309 config/options reference outputs and each family's comparisons are frozen, runnable and honestly classified, with missing Rust operations named rather than emulated."
+exit = [
+  "sprint.S12.done == 1",
+  "run.foundations.inventory_complete == true",
+  "run.foundations.harness_pass == true",
+  "run.foundations.leaves_prepared == true",
+  "run.foundations.filesystem_prepared == true",
+  "run.foundations.utilities_prepared == true",
+  "run.foundations.integration_prepared == true",
+  "run.config.prepared == true",
+  "run.syntax.prepared == true",
+]
+
+[[item]]
+id = "P1A-F0"
+title = "Inventory, manifests, baseline index and an executable pilot"
+kind = "task"
+required = true
+done_when = ["run.foundations.inventory_complete == true", "run.foundations.harness_pass == true"]
+
+[[item]]
+id = "P1A-F1a"
+title = "Foundation leaf tests: core/collections, text/number, JSON, locale, diagnostics and library access"
+kind = "task"
+required = true
+done_when = ["run.foundations.leaves_prepared == true"]
+
+[[item]]
+id = "P1A-F2a"
+title = "Filesystem, path and both matching dialects, including the 142 matching baseline outputs"
+kind = "task"
+required = true
+done_when = ["run.foundations.filesystem_prepared == true"]
+
+[[item]]
+id = "P1A-F3a"
+title = "Config, command-line and resolution tests over all 309 reference outputs"
+kind = "task"
+required = true
+done_when = ["run.config.prepared == true"]
+
+[[item]]
+id = "P1A-F4a"
+title = "Syntax, binder, navigation and evaluator coverage"
+kind = "task"
+required = true
+done_when = ["run.syntax.prepared == true"]
+
+[[item]]
+id = "P1A-F5a"
+title = "Integration witnesses, producer wiring and the stage A coverage report"
+kind = "task"
+required = true
+done_when = ["run.foundations.integration_prepared == true"]

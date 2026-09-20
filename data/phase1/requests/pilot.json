@@ -1,0 +1,94 @@
+{
+  "family": "pilot",
+  "requests": [
+    {
+      "case": "pilot/matching/include-star-ts",
+      "currentDirectory": "/dev",
+      "depth": null,
+      "dialect": "vfsmatch",
+      "excludes": [],
+      "extensions": [
+        ".ts",
+        ".d.ts"
+      ],
+      "files": [
+        "/dev/a.ts",
+        "/dev/b.ts",
+        "/dev/c.d.ts",
+        "/dev/x/a.ts",
+        "/dev/js/a.js"
+      ],
+      "includes": [
+        "*.ts"
+      ],
+      "operation": "vfsmatch.readDirectory",
+      "path": "/dev",
+      "useCaseSensitiveFileNames": true
+    },
+    {
+      "case": "pilot/matching/recursive-exclude",
+      "currentDirectory": "/dev",
+      "depth": null,
+      "dialect": "vfsmatch",
+      "excludes": [
+        "x/**"
+      ],
+      "extensions": [
+        ".ts"
+      ],
+      "files": [
+        "/dev/a.ts",
+        "/dev/x/a.ts",
+        "/dev/x/b.ts",
+        "/dev/y/c.ts"
+      ],
+      "includes": [
+        "**/*.ts"
+      ],
+      "operation": "vfsmatch.readDirectory",
+      "path": "/dev",
+      "useCaseSensitiveFileNames": true
+    },
+    {
+      "args": [
+        "--composite",
+        "false",
+        "0.ts"
+      ],
+      "case": "pilot/commandline/parse-composite-false",
+      "currentDirectory": "/dev",
+      "operation": "tsoptions.parseCommandLine"
+    },
+    {
+      "args": [
+        "--verbose",
+        "--force",
+        "tests"
+      ],
+      "case": "pilot/commandline/parse-build-verbose",
+      "currentDirectory": "/dev",
+      "operation": "tsoptions.parseBuildCommandLine"
+    },
+    {
+      "case": "pilot/json/marshal-ordered",
+      "operation": "json.marshalOrdered",
+      "ordered": [
+        [
+          "b",
+          1
+        ],
+        [
+          "a",
+          2
+        ]
+      ]
+    },
+    {
+      "case": "pilot/locale/select-ja",
+      "operation": "locale.selectTranslation",
+      "requested": "ja"
+    }
+  ],
+  "requests_sha256": "5fe4f24d9ae49ae4333e9c83fea6ba4ba3196798adf718f86b12f6ed4588dffe",
+  "version": 1
+}

@@ -254,7 +254,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | checkerbench | stale: source, pin, command or inputs changed | [result](status/evidence/5c877c889f3630fa74103cc142b2b07234e3bb68d28fbc875789b74e9d507c97.json) |
 | checkertext | stale: source, pin, command or inputs changed | [result](status/evidence/e19d93b1b2e77cd0a2bda635f9e50aecd53ca78e5e4a4c27d45adc3e2ed2dc70.json) |
 | clippy | stale: source, pin, command or inputs changed | [result](status/evidence/2d09f23327466d969f3802fe696309740929a8d87f3cb4d2186d88f87cb1ba70.json) |
-| deny | current | [result](status/evidence/252fadf205f09448300c7aadc8187d41934e19bc7d9ba1bc618b302dfcb77140.json) |
+| deny | stale: source, pin, command or inputs changed | [result](status/evidence/252fadf205f09448300c7aadc8187d41934e19bc7d9ba1bc618b302dfcb77140.json) |
 | e1 | stale: source, pin, command or inputs changed | [result](status/evidence/79c4514b84217208c97c6f02053dd215f7c941dd1a139d25c362bdf4334b2ea2.json) |
 | e2 | stale: source, pin, command or inputs changed | [result](status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json) |
 | e3 | stale: source, pin, command or inputs changed | [result](status/evidence/e360fcedd982cc66cf6b3e9bbd5eefc299699b4fe1cc50d064741d4f1ead151d.json) |
@@ -274,6 +274,31 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | workspace | stale: source, pin, command or inputs changed | [result](status/evidence/0cf9cc95174085613ffed90cbfee4b7240359ce12fa3c6c9d7971ce66f92dd33.json) |
 
 ## Sprints
+
+### P1A Phase 1 stage A: prepared tests and coverage (open)
+
+Every Phase 1 operation, the 309 config/options reference outputs and each family's comparisons are frozen, runnable and honestly classified, with missing Rust operations named rather than emulated.
+
+Exit checks:
+
+- [ ] `sprint.S12.done == 1` (unknown metric)
+- [ ] `run.foundations.inventory_complete == true` (unknown metric)
+- [ ] `run.foundations.harness_pass == true` (unknown metric)
+- [ ] `run.foundations.leaves_prepared == true` (unknown metric)
+- [ ] `run.foundations.filesystem_prepared == true` (unknown metric)
+- [ ] `run.foundations.utilities_prepared == true` (unknown metric)
+- [ ] `run.foundations.integration_prepared == true` (unknown metric)
+- [ ] `run.config.prepared == true` (unknown metric)
+- [ ] `run.syntax.prepared == true` (unknown metric)
+
+Items:
+
+- [ ] P1A-F0 Inventory, manifests, baseline index and an executable pilot
+- [ ] P1A-F1a Foundation leaf tests: core/collections, text/number, JSON, locale, diagnostics and library access
+- [ ] P1A-F2a Filesystem, path and both matching dialects, including the 142 matching baseline outputs
+- [ ] P1A-F3a Config, command-line and resolution tests over all 309 reference outputs
+- [ ] P1A-F4a Syntax, binder, navigation and evaluator coverage
+- [ ] P1A-F5a Integration witnesses, producer wiring and the stage A coverage report
 
 ### S01 Contracts, workspace, oracle (open)
 
@@ -309,13 +334,13 @@ Exit checks:
 - [ ] `run.workspace.build == true` (unknown metric)
 - [ ] `run.fmt.clean == true` (unknown metric)
 - [ ] `run.clippy.clean == true` (unknown metric)
-- [x] `run.deny.clean == true`
+- [ ] `run.deny.clean == true` (unknown metric)
 - [ ] `run.selftest.pass == true` (unknown metric)
 
 Items:
 
 - [ ] S02-1 Pinned stable toolchain, workspace lint configuration and release profile per ADR 0016
-- [x] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
+- [ ] S02-2 cargo-deny policy per ADR 0017: license allow-list, no duplicate versions, no advisories, crates.io only
 - [ ] S02-3 Tracker self-tests (xtask and scripts) registered as a producer
 - [-] S02-4 Status workflow on macOS and Linux: validate provenance, check archived views including the worklist, enforce live producer metrics and S01, build with the minimum Rust version, publish views and evidence as artifacts (verified on GitHub, not in the ledger) [optional]
 

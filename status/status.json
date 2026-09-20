@@ -16,8 +16,8 @@
       "S04_RUSTUP_HOME": ""
     },
     "host": "macos-aarch64",
-    "revision": "03a55ac0c8e98ff36b752ebca57c2bf42f5b5de5",
-    "source_sha256": "a62284df2d59adbcce5bf4c518629d5a0e049b9b1c98d8075229e3b0748fe5f7",
+    "revision": "0a9198f4ef36d2c225ec2735219f457e3c67a91f",
+    "source_sha256": "2e784f6878e2355921eb030b15ce8e984a42c89ca630e00221097fde1812fac4",
     "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
     "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1"
   },
@@ -53,7 +53,7 @@
     "checkerbench": "stale: source, pin, command or inputs changed",
     "checkertext": "stale: source, pin, command or inputs changed",
     "clippy": "stale: source, pin, command or inputs changed",
-    "deny": "current",
+    "deny": "stale: source, pin, command or inputs changed",
     "e1": "stale: source, pin, command or inputs changed",
     "e2": "stale: source, pin, command or inputs changed",
     "e3": "stale: source, pin, command or inputs changed",
@@ -1125,7 +1125,7 @@
     "ledger.phase[6].loc_total": 7909.0,
     "ledger.phase[6].loc_verified_ratio": 0.0,
     "provenance.valid": 1.0,
-    "run.deny.clean": true,
+    "sprint.P1A.done": 0.0,
     "sprint.S01.done": 0.0,
     "sprint.S02.done": 0.0,
     "sprint.S03.done": 0.0,
