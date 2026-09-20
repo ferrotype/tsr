@@ -1,0 +1,24 @@
+[package]
+name = "phase1_leaves"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 1 F1a: answers the foundation-leaf request schedule with the production Rust implementations, row for row"
+
+# A private harness, following tools/s09/format-harness. It needs direct
+# dependencies on every leaf crate it drives, and no published crate has that
+# set, so it lives here rather than as an example on a shipped crate.
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+tsr_bundled = { version = "0.1.0", path = "../../../crates/tsr_bundled" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_diagnostics = { version = "0.1.0", path = "../../../crates/tsr_diagnostics" }
+tsr_jsnum = { version = "0.1.0", path = "../../../crates/tsr_jsnum" }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_semver = { version = "0.1.0", path = "../../../crates/tsr_semver" }
+tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
+
+[lints]
+workspace = true

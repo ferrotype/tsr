@@ -5,12 +5,22 @@
     "python": "3.11.12"
   },
   "native_probes": {
+    "commandline": {
+      "directory": "native/commandline",
+      "go": "go1.27.1",
+      "goarch": "arm64",
+      "goos": "darwin",
+      "observations_sha256": "cb015d1f5bf13a3590b76b33d85dadb741679965e0e33c6495af710f19fed50a",
+      "package": "tsoptions",
+      "trimpath": false
+    },
     "json": {
       "directory": "native/json",
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
       "observations_sha256": "f2c93614f17acbe46ac2092a69cb3f5f477709b820f75b4b60f061284a1749d0",
+      "package": "json",
       "trimpath": true
     },
     "locale": {
@@ -19,29 +29,23 @@
       "goarch": "arm64",
       "goos": "darwin",
       "observations_sha256": "3638090dc67fa77fad2ed144b2485f36004af2de87594212d7173956ac088489",
+      "package": "locale",
       "trimpath": true
     },
-    "tsoptions": {
-      "directory": "native/tsoptions",
-      "go": "go1.27.1",
-      "goarch": "arm64",
-      "goos": "darwin",
-      "observations_sha256": "cb015d1f5bf13a3590b76b33d85dadb741679965e0e33c6495af710f19fed50a",
-      "trimpath": false
-    },
-    "vfs/vfsmatch": {
-      "directory": "native/vfs-vfsmatch",
+    "vfsmatch": {
+      "directory": "native/vfsmatch",
       "go": "go1.27.1",
       "goarch": "arm64",
       "goos": "darwin",
       "observations_sha256": "df4751685ab9fa28b39b833aa3919f757986ce413768adc0034c4b40c7eaf0b1",
+      "package": "vfs/vfsmatch",
       "trimpath": true
     }
   },
   "partial": false,
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "requests_sha256": "f69d61200bac4dde13a2fc0165188be9f17d861582047700c5f4daeb0c90486a",
-  "rust_binary_sha256": "89833bc548ef1cdefb9947e34dbb8206a73d5b785434daf5cf780ba61cd4d547",
+  "rust_binary_sha256": "0174202c5c4b85bdcbc6374be74d89e8d7b5e306c6d9dd2e7826019f80b799a3",
   "rust_observations_sha256": "8bd04cfe5c492d6a7442b583aecc502bf52406d6dbade92b0cbf23654ba8d149",
   "selected_cases": [
     "pilot/commandline/parse-build-verbose",
@@ -53,8 +57,8 @@
   ],
   "source_closure": {
     ".cargo/config.toml": "716b49c90c25aeeebc4b0359b111a62927d166a1d7f02c4fe83b89d55fb74887",
-    "Cargo.lock": "c8e8046512583bcd40a008dfac96305031103e33729fd8e35393850eb31ab6a4",
-    "Cargo.toml": "3ef45c160fc356b93bcc101e44c27ddf93e46b187a2695701b1f20d205f3b886",
+    "Cargo.lock": "e567d627664ead82b8d837c3fca52ad499d69e93be4a71e9f57655a68d69256d",
+    "Cargo.toml": "85df18867b35da1fa6b1cc46128cbf0d8703b6b07294a3243610c12abd4f96a0",
     "crates/tsr_arena/Cargo.toml": "8cd7ae2a89f36e001d7614393ffc16b080686adbefa2879c4ae14e07973615d8",
     "crates/tsr_arena/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "crates/tsr_arena/NOTICE": "c920c6e51ee08f6cb2c76d168b65a8916c3557ffafad5ee103894427daa80ec0",
@@ -367,7 +371,7 @@
     "data/upstream.json": "d241c9d2b55d96bdff6b732efc646d57eeb61e4c04106a893daf667121ac15ac",
     "rust-toolchain.toml": "cdc04b5e11c4baaf96bac0569ea6680c4a598a5f4025338d7216d57187a60e7e",
     "scripts/phase1.py": "61782053fa0a27af0f0e4f6c3fd737c73bd8ff8ee7999eafca1a4a671afa983c",
-    "scripts/phase1_capture.py": "bfbc307319f2215f05d15704fbcb487d5a3e2613839978dcc90b00d568c46447",
+    "scripts/phase1_capture.py": "790bd25f10d27ed05a62df3e24f4c7ef570f66e2b187d9d874e3a6e62b526366",
     "scripts/phase1_invocations.py": "4ed33ccba902292bae6f93a0ae4c108eb3cd44f8c038e43a59e65e360b391bdb",
     "scripts/s04.py": "552e676a31ef745c77b1c06304e2ef0153c83c3752a045347bc1a0f7c58e554a",
     "scripts/s04_common.py": "0c9ff31e34d83cbd9c500bb9462631b862a221acfb6f85e4816d1aedbb6a68d7",
@@ -382,7 +386,7 @@
   },
   "source_closure_size": 327,
   "upstream_gitlink": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "version": 2,
+  "version": 3,
   "workspace_packages": [
     "crates/tsr_arena",
     "crates/tsr_ast",

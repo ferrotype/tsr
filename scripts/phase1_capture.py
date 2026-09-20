@@ -38,6 +38,19 @@ from s08_oracle import ROOT, canonical, digest  # noqa: E402
 
 RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run")
 
+# `s08_oracle.canonical` serialises with sort_keys=True, so two observations
+# whose JSON objects differ only in member order compare equal. That is fatal
+# for any case whose subject *is* order -- ordered maps and sets, JSON member
+# order, iteration order. Such a request declares `order_sensitive: true`, and
+# then two extra rules apply:
+#
+#   * the observation may not carry a multi-key JSON object anywhere, because
+#     that object's order is exactly what canonicalisation destroys. Ordered
+#     data travels as entry arrays ([["a",1],["b",2]]) or raw bytes, which is
+#     the representation the plan prescribes.
+#   * both sides are additionally compared as emitted, not canonicalised.
+ORDER_SENSITIVE_KEY = "order_sensitive"
+
 # Each side may only report the statuses it can legitimately produce. A Rust
 # driver cannot declare the native authority unavailable, and the native probe
 # cannot declare a Rust entry point missing.
@@ -75,11 +88,13 @@ FAMILIES = {
         "requests": "data/phase1/requests/pilot.json",
         "native_probes": [
             {
+                "name": "vfsmatch",
                 "package": "vfs/vfsmatch",
                 "probe": "tools/phase1/pilot/vfsmatch_probe_test.go",
                 "test": "TestPhase1PilotReadDirectory",
             },
             {
+                "name": "commandline",
                 "package": "tsoptions",
                 "probe": "tools/phase1/pilot/commandline_probe_test.go",
                 "test": "TestPhase1PilotCommandLine",
@@ -88,17 +103,20 @@ FAMILIES = {
                 "trimpath": False,
             },
             {
+                "name": "json",
                 "package": "json",
                 "probe": "tools/phase1/pilot/json_probe_test.go",
                 "test": "TestPhase1PilotJson",
             },
             {
+                "name": "locale",
                 "package": "locale",
                 "probe": "tools/phase1/pilot/locale_probe_test.go",
                 "test": "TestPhase1PilotLocale",
             },
         ],
         "rust_package": "tsr_tsoptions",
+        "rust_target_kind": "example",
         "rust_example": "phase1_pilot",
         "rust_target": "crates/tsr_tsoptions/examples/phase1_pilot.rs",
         "rust_driver": "tools/phase1/pilot/rust_observation.rs",
@@ -238,10 +256,17 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
 
 def build_rust(family: str) -> Path:
     spec = FAMILIES[family]
+    # A family's driver is either an example on an existing crate or a private
+    # harness binary under tools/phase1/. Both are supported so a family whose
+    # leaf crates no published crate depends on directly can own its host.
+    kind = spec.get("rust_target_kind", "example")
+    if kind not in ("example", "bin"):
+        raise ValueError(f"unknown rust_target_kind {kind!r} for {family}")
+    selector = ["--example", spec["rust_example"]] if kind == "example" else ["--bin", spec["rust_example"]]
     messages = command(
         [
             "cargo", "build", "--locked", "--offline", "-p", spec["rust_package"],
-            "--example", spec["rust_example"], "--message-format=json",
+            *selector, "--message-format=json",
         ],
         cwd=ROOT,
     )
@@ -311,6 +336,23 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     return report
 
 
+def order_safe_problems(value: object, path: str = "observation") -> list[str]:
+    """Locate JSON objects whose member order canonicalisation would erase."""
+    problems: list[str] = []
+    if isinstance(value, dict):
+        if len(value) > 1:
+            problems.append(
+                f"{path} is a {len(value)}-key JSON object; an order-sensitive observation must "
+                "use an entry array or raw bytes, because canonicalisation sorts object keys"
+            )
+        for key, item in value.items():
+            problems.extend(order_safe_problems(item, f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            problems.extend(order_safe_problems(item, f"{path}[{index}]"))
+    return problems
+
+
 def validate_response(document: object, requests: list[dict], side: str) -> list[dict]:
     """Validate an observation document as an ordered sequence.
 
@@ -357,6 +399,13 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
             )
         if result == "observed" and "observation" not in row:
             raise ValueError(f"{where} is observed but carries no observation payload")
+        if result == "observed" and request.get(ORDER_SENSITIVE_KEY):
+            problems = order_safe_problems(row["observation"])
+            if problems:
+                raise ValueError(
+                    f"{where} answers order-sensitive case {case!r} with an order-erasing "
+                    f"representation: {problems[0]}"
+                )
         if result == "not_implemented":
             missing = row.get("missing_operation")
             required = ("operation", "go_authority", "intended_signature", "production_home")
@@ -407,8 +456,15 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     # One native probe per Go package. Each sees the whole schedule and declines
     # the operations it does not serve, so every case has a native row.
     native_reports = {}
+    seen_probe_names = set()
     for probe in spec["native_probes"]:
-        name = probe["package"].replace("/", "-")
+        # Keyed by the probe's own name, not its package: a family may need two
+        # probes in one Go package, for instance to give a process-global
+        # default a fresh process per case.
+        name = probe["name"]
+        if name in seen_probe_names:
+            raise ValueError(f"duplicate native probe name {name!r} in family {family}")
+        seen_probe_names.add(name)
         report = run_probe(
             output / "native" / name,
             probe["package"],
@@ -418,7 +474,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             probe.get("trimpath", True),
         )
         validate_response(report, selected, "native")
-        native_reports[probe["package"]] = {
+        native_reports[name] = {
+            "package": probe["package"],
             "directory": f"native/{name}",
             "observations_sha256": sha_file(output / "native" / name / "observations.json"),
             "go": report.get("go"),
@@ -444,7 +501,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         )
 
     provenance = {
-        "version": 2,
+        "version": 3,
         "family": family,
         "pin": recorded_pin,
         "upstream_gitlink": recorded_gitlink,
@@ -470,7 +527,7 @@ def authenticate(directory: Path) -> dict:
 
 def _authenticate(directory: Path) -> dict:
     provenance = strict_json_loads((directory / "provenance.json").read_bytes())
-    if provenance.get("version") != 2:
+    if provenance.get("version") != 3:
         raise ValueError(
             f"capture provenance version {provenance.get('version')!r} is not readable by this "
             "comparator; recapture the family"
@@ -534,14 +591,14 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
     """
     documents = {}
     failures: list[str] = []
-    for package, probe in sorted(provenance["native_probes"].items()):
+    for probe_name, probe in sorted(provenance["native_probes"].items()):
         document = strict_json_loads((directory / probe["directory"] / "observations.json").read_bytes())
         rows = validate_response(document, requests, "native")
-        documents[package] = rows
+        documents[probe_name] = rows
         for row in rows:
             if row["result"] == "harness_failed":
                 cause = row.get("error") or row.get("reason") or "no cause recorded"
-                failures.append(f"{package} failed on {row['case']}: {cause}")
+                failures.append(f"{probe_name} failed on {row['case']}: {cause}")
     if failures:
         raise ValueError(
             f"{len(failures)} native harness failure(s) invalidate this capture: "
@@ -549,7 +606,7 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
         )
 
     merged: dict[str, dict] = {}
-    for package, rows in documents.items():
+    for probe_name, rows in documents.items():
         for row in rows:
             case = row["case"]
             if row["result"] != "observed":
@@ -560,7 +617,7 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
                 raise ValueError(
                     f"two native probes both observed case {case}; the authority is ambiguous"
                 )
-            merged[case] = dict(row, native_package=package)
+            merged[case] = dict(row, native_probe=probe_name)
     return merged
 
 
@@ -646,7 +703,16 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         if native["result"] == "native_unavailable":
             rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
             continue
-        same = canonical(native.get("observation")) == canonical(rust.get("observation"))
+        request = next(r for r in requests if r["case"] == case)
+        if request.get(ORDER_SENSITIVE_KEY):
+            # Compare as emitted as well, so a pure member-order difference is
+            # still a difference rather than being canonicalised away.
+            same = (
+                json.dumps(native.get("observation"), separators=(",", ":"))
+                == json.dumps(rust.get("observation"), separators=(",", ":"))
+            )
+        else:
+            same = canonical(native.get("observation")) == canonical(rust.get("observation"))
         rows.append({
             "case": case,
             "result": "match" if same else "different",

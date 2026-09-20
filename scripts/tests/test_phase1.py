@@ -119,7 +119,7 @@ class SyntheticCapture:
     def __init__(self, directory: Path, rows, native_rows=None, partial=False, selected=None,
                  closure=None):
         self.directory = directory
-        probe_directory = directory / "native" / "vfs-vfsmatch"
+        probe_directory = directory / "native" / "vfsmatch"
         probe_directory.mkdir(parents=True)
         requests = {"version": 1, "family": "pilot",
                     "requests": [{"case": r["case"], "operation": "vfsmatch.readDirectory"} for r in rows]}
@@ -147,13 +147,14 @@ class SyntheticCapture:
 
         recorded = capture.source_closure("pilot") if closure is None else closure
         provenance = {
-            "version": 2, "family": "pilot", "pin": capture.pin(),
+            "version": 3, "family": "pilot", "pin": capture.pin(),
             "upstream_gitlink": capture.gitlink(), "partial": partial,
             "selected_cases": selected if selected is not None else [r["case"] for r in rows],
             "requests_sha256": sha(request_bytes),
             "native_probes": {
-                "vfs/vfsmatch": {
-                    "directory": "native/vfs-vfsmatch",
+                "vfsmatch": {
+                    "package": "vfs/vfsmatch",
+                    "directory": "native/vfsmatch",
                     "observations_sha256": sha(native_bytes),
                     "go": "go1.27.1", "goos": "darwin", "goarch": "arm64", "trimpath": True,
                 }
@@ -613,12 +614,13 @@ class NativeMergeTests(unittest.TestCase):
         requests = [{"case": "a", "operation": "vfsmatch.readDirectory"}]
         provenance = {"native_probes": {}}
         for package, row in probe_rows.items():
-            probe_directory = directory / "native" / package.replace("/", "-")
+            probe_directory = directory / "native" / package
             probe_directory.mkdir(parents=True)
             body = canonical({"version": 1, "observations": [row]}) + b"\n"
             (probe_directory / "observations.json").write_bytes(body)
             provenance["native_probes"][package] = {
-                "directory": f"native/{package.replace('/', '-')}",
+                "package": "vfs/vfsmatch",
+                "directory": f"native/{package}",
                 "observations_sha256": sha(body),
             }
         return directory, provenance, requests
@@ -849,6 +851,102 @@ class FreezeTests(unittest.TestCase):
             directory = installed / probe["directory"].removeprefix("native/")
             self.assertTrue((directory / "observations.json").is_file(), str(directory))
             self.assertTrue((directory / "provenance.json").is_file(), str(directory))
+
+
+class OrderSensitiveTests(unittest.TestCase):
+    """Order-sensitive cases must not be compared through a sorting canonicaliser."""
+
+    def test_canonical_alone_is_order_blind(self):
+        # The premise: this is why the extra rules exist.
+        self.assertEqual(canonical({"b": 1, "a": 2}), canonical({"a": 2, "b": 1}))
+
+    def test_entry_arrays_survive_canonicalisation(self):
+        self.assertNotEqual(canonical([["b", 1], ["a", 2]]), canonical([["a", 2], ["b", 1]]))
+
+    def test_order_safe_problems_flags_multi_key_objects(self):
+        self.assertTrue(capture.order_safe_problems({"a": 1, "b": 2}))
+        self.assertTrue(capture.order_safe_problems({"wrap": {"a": 1, "b": 2}}))
+        self.assertTrue(capture.order_safe_problems({"rows": [{"a": 1, "b": 2}]}))
+
+    def test_order_safe_problems_accepts_entry_arrays_and_single_keys(self):
+        self.assertEqual(capture.order_safe_problems({"entries": [["a", 1], ["b", 2]]}), [])
+        self.assertEqual(capture.order_safe_problems({"bytes": "{\"b\":1,\"a\":2}"}), [])
+
+    def test_an_order_sensitive_case_rejects_an_order_erasing_observation(self):
+        requests = [{"case": "m", "operation": "collections.orderedMap",
+                     "order_sensitive": True}]
+        document = {"version": 1, "observations": [
+            {"case": "m", "operation": "collections.orderedMap", "result": "observed",
+             "observation": {"a": 1, "b": 2}}]}
+        with self.assertRaisesRegex(ValueError, "order-erasing representation"):
+            capture.validate_response(document, requests, "rust")
+
+    def test_an_order_sensitive_case_accepts_an_entry_array(self):
+        requests = [{"case": "m", "operation": "collections.orderedMap",
+                     "order_sensitive": True}]
+        document = {"version": 1, "observations": [
+            {"case": "m", "operation": "collections.orderedMap", "result": "observed",
+             "observation": {"entries": [["a", 1], ["b", 2]]}}]}
+        self.assertEqual(len(capture.validate_response(document, requests, "rust")), 1)
+
+    def test_a_pure_member_order_difference_is_reported_as_different(self):
+        temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temporary, ignore_errors=True)
+        # Override the family inventory *before* building the capture, so the
+        # recorded closure covers the same inputs the replay recomputes.
+        real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", real)
+        inventory = Path(temporary) / "inv.json"
+        inventory.write_text(json.dumps({"version": 1, "family": "pilot", "requests": [
+            {"case": "a", "operation": "vfsmatch.readDirectory", "order_sensitive": True}]}))
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"])
+        capture.FAMILIES["pilot"]["requests"] = str(inventory)
+
+        rows = [{"case": "a",
+                 "native": {"entries": [["b", 1], ["a", 2]]},
+                 "rust": {"result": "observed",
+                          "observation": {"entries": [["a", 2], ["b", 1]]}}}]
+        directory = Path(temporary) / "ordered"
+        SyntheticCapture(directory, rows)
+        report = capture.compare(directory)
+        self.assertEqual(report["counts"]["different"], 1,
+                         "a member-order difference must not canonicalise away")
+
+
+class ProbeRegistryTests(unittest.TestCase):
+    """A Go package may host more than one probe."""
+
+    def test_every_declared_probe_has_a_unique_name(self):
+        for family, spec in capture.FAMILIES.items():
+            names = [p["name"] for p in spec["native_probes"]]
+            self.assertEqual(len(names), len(set(names)), family)
+            for probe in spec["native_probes"]:
+                self.assertIn("package", probe, family)
+
+    def test_probe_directories_are_named_per_probe_not_per_package(self):
+        # Two probes in one package must not collide; the pilot's four probes
+        # already exercise the keying.
+        spec = capture.FAMILIES["pilot"]
+        directories = [p["name"] for p in spec["native_probes"]]
+        self.assertEqual(len(directories), len(set(directories)))
+
+    def test_the_committed_capture_is_keyed_by_probe_name(self):
+        installed = ROOT / "data/phase1/native/pilot"
+        if not installed.is_dir():
+            self.skipTest("no frozen pilot observations are committed")
+        provenance = json.loads((installed / "capture-provenance.json").read_text())
+        for name, probe in provenance["native_probes"].items():
+            self.assertEqual(probe["directory"], f"native/{name}")
+            self.assertIn("package", probe)
+
+    def test_unknown_rust_target_kind_is_refused(self):
+        real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", real)
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"], rust_target_kind="lib")
+        with self.assertRaisesRegex(ValueError, "unknown rust_target_kind"):
+            capture.build_rust("pilot")
 
 
 if __name__ == "__main__":
