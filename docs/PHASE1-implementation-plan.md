@@ -233,6 +233,10 @@ missing-operation results make that separation possible.
 | F4 | Close syntax, AST, binder, navigation and evaluator gaps | F0; required F1–F3 operations | Exact complete parse/bind inventory, syntax-only diagnostics, utility and ownership counterexamples |
 | F5 | Confirm transport/generation integration and close Phase 1 | F1–F4 | Complete Phase 1 gate report and scoped regression checks, preserving S11 boundaries |
 
+F1–F5 completion evidence in this table belongs to the `b` steps. Preparation
+follows F0 → F1a → F2a → F3a → F4a → F5a; each `a` step's inputs and separate
+readiness criteria are specified below.
+
 Phase 2 work can start once the AST/binder/resolution/options contracts it uses
 are ready; locale and unrelated utility work should not serialize that critical
 path. That readiness is recorded per contract and does not mark Phase 1 done.
@@ -260,7 +264,7 @@ build all family adapters or empty placeholder files in F0:
 | `data/phase1/native/<family>/` | Small new native observations and their provenance when they cannot be referenced in existing data. No second copy of the compiler corpus. |
 | `tools/phase1/<family>/` | Access-only Go bridges and Rust observation drivers not already supplied by an existing adapter. Test instrumentation patches are separate from the oracle's production algorithm. |
 | `scripts/phase1.py`, `scripts/phase1_*.py` | Thin dispatcher, manifest validation and family comparisons, delegating to existing scripts wherever they already own the contract. |
-| `scripts/test_phase1*.py` | Runner, comparison, provenance and failure-path tests; no expensive corpus capture in the script tests. |
+| `scripts/tests/test_phase1*.py` | Runner, comparison, provenance and failure-path tests; no expensive corpus capture in the script tests. |
 | `docs/PHASE1-progress.md` | Per-step completion record, coverage counts, named gaps, exact reproduction commands and implementation queue. This is a results record, not a second plan. |
 | `target/phase1/<capture-name>/` | Immutable raw requests/responses, stderr, build/source identities and comparison report for one capture. Never overwrite a capture while comparing it. |
 
@@ -268,6 +272,13 @@ New filenames in this table are planned deliverables, not claims that tools
 already exist. Keep existing adapters in their existing homes. The new layer
 joins their outputs; it must not become a second implementation of the parser,
 resolver, generator or evidence engine.
+
+New Python suites belong in `scripts/tests/`, following that directory's import
+setup. `python3 scripts/run_tests.py` is the existing full script-test gate;
+`scripts/checks.py::selftest` calls it. It already discovers both `scripts/tests`
+and legacy root suites with duplicate identities removed. The focused command
+below is for iteration, not a replacement for CI discovery. Extend the discovery
+regression to verify the new Phase 1 suites are in the real gate.
 
 **Commands to provide in F0.** Implement this small interface and document its
 actual usage in the progress record. Family names are `leaves`, `filesystem`,
@@ -280,7 +291,7 @@ python3 scripts/phase1.py freeze --from DIRECTORY
 python3 scripts/phase1.py capture --family FAMILY --output DIRECTORY [--case ID ...]
 python3 scripts/phase1.py compare --capture DIRECTORY [--require-parity]
 python3 scripts/phase1.py report --captures DIRECTORY ... --output FILE
-python3 -m unittest discover -s scripts -p 'test_phase1*.py'
+python3 -m unittest discover -s scripts/tests -p 'test_phase1*.py'
 ```
 
 - `inventory --check` validates committed scope, case coverage, baseline mapping
@@ -376,9 +387,12 @@ absent. Check current Rust consumers and test drivers before assigning work.
 4. Obtain requests from native tests or an access-only instrumentation patch to
    their test machinery. Do not parse Go tables with ad hoc regular expressions
    or reconstruct native expectations from Rust. Retain and hash any extraction
-   patch, and prove it changes observation only. Validate the original native
-   renderer against the frozen baseline bytes before using an exported request
-   to judge Rust.
+   patch, and prove it changes observation only. Record the renderer authority
+   per baseline group and implement the shared test-envelope seam described in
+   F3. Verify native observation → rendering against the frozen baseline bytes
+   before judging Rust. Do not assume all 309 files have a callable Go renderer;
+   a missing renderer or request authority is a named F0 blocker, not permission
+   to reconstruct expected results from Rust or silently reduce the inventory.
 5. Create the manifests and dispatcher above. Freeze the entire inventory now;
    missing observations stay named pending work for F1a–F5a. F0's pilot must
    actually execute representative config, command-line, matching, JSON and
@@ -492,8 +506,9 @@ library project.
 4. Connect production Rust APIs already available. For missing JSON, locale or
    formatting operations, emit named `not_implemented` rows and specify the
    intended signature/production home in the queue. An adapter may serialize
-   results or expose private test-only state; it may not implement the missing
-   formatter, matcher or locale algorithm.
+   results, render a declared test envelope or expose private test-only state;
+   it may not substitute for missing production diagnostic formatting, matching
+   or locale behavior. The shared Go baseline renderer below owns the envelope.
 5. Prepare a locale-asset manifest mapping the 13 source tables to message keys,
    hashes, fallback obligations and the planned `xtask/src/gen/diagnostics.rs`
    extension. The localization generator itself lands in F1b; F1a tests must
@@ -603,9 +618,10 @@ in a separately marked host-specific group.
    real OS timestamp cases record filesystem precision rather than sleep.
 5. Add all 142 matching baseline outputs through the shared config index. Call
    the original `vfsmatch` test setup, retain directory/include/exclude inputs,
-   and compare the exact rendered baseline. Also enumerate its direct unit
-   tests not represented by baseline files; 142 is not the count of all path
-   and matching behavior.
+   and compare the exact rendered baseline through the authority established
+   at F0. Do not equate the Go list-assertion tests with a renderer for all 142
+   files. Also enumerate direct unit tests not represented by baseline files;
+   142 is not the count of all path and matching behavior.
 6. Prepare `internal/glob` cases independently: braces, ranges, separators,
    malformed patterns, casing, Unicode and root matching. Tag each request
    with its dialect so neither adapter can dispatch to the other silently.
@@ -691,6 +707,65 @@ option diagnostics outside the E2 acceptance subset where the native operation
 supports them. Owner-approved E2 selection decisions stay unchanged and do not
 silently shrink this phase's foundation tests.
 
+#### Baseline rendering decision — prepare the seam in F0
+
+Use **structured Rust observations plus a shared Go test-envelope renderer**.
+Do not port the Go test's option-struct JSON layout into the Rust compiler or
+invent a second Rust implementation of its headings and section assembly.
+This choice concerns the test format; Rust's production JSON and diagnostic
+formatting contracts still have their own required comparisons.
+
+The native command-line test makes this separation explicit:
+`commandlineparser_test.go::formatNewBaseline` / `formatNewBaselineBuild`
+assemble sections from argument lists, marshaled option bytes, joined filenames/
+projects and an already-formatted errors string. Config tests also assemble
+sections in `tsconfigparsing_test.go::baselineParseConfigWith`. Their option
+bytes depend on the pinned Go structs, tags and marshaling behavior, not a Rust
+product serialization API.
+
+Implement the seam as follows:
+
+1. Rust calls its actual parser/matcher/config APIs and emits a typed observation:
+   all compared option values and presence states, ordered maps and file/project
+   lists, raw config, source bytes, and structured diagnostics. Freeze explicit
+   conversions for tristates, enums, nil/empty and omitted fields. The bridge
+   rejects unknown/missing protocol fields; it cannot silently zero-fill them.
+2. A test-only Go bridge maps that observation to the native data types required
+   by the renderer. It only converts representations and renders the test
+   envelope. It must not call native parsing, matching or resolution to complete
+   a Rust result, recompute missing fields, or read expected results to fill it.
+   Compare typed observations before rendering, so an omitted JSON field cannot
+   conceal a semantic difference.
+3. Use the original envelope functions and marshaling calls. Where assembly is
+   inline, carry a minimal reviewed test-source patch exposing the same assembly
+   over supplied observations. Hash it with the adapter. Native results through
+   this seam must reproduce the untouched native test's bytes; mutating an option,
+   file order or presence state must either alter the comparison or be rejected.
+4. **Keep diagnostic formatting independent.** The Rust observation also carries
+   error text produced by Rust's production diagnostic writer, with the native
+   newline/color/context settings. Supply those bytes to the shared envelope;
+   compare them against Go's production writer and also compare the diagnostic
+   structure. For inline config renderers, expose an errors-text injection seam
+   without changing assembly. Go-rendered Rust diagnostic structures are useful
+   for triage only: they cannot certify Rust formatting. In Phase A, an absent
+   Rust writer keeps that case `not_implemented` even if structural parity holds.
+5. Keep input-derived headings/FS dumps separate from observed results. Both
+   renderings may consume the same frozen input metadata, but Rust-derived
+   result sections must come entirely from the Rust observation. Retain raw
+   observations, formatted diagnostics and final baseline bytes so a difference
+   can be attributed to semantics, production formatting or the test bridge.
+
+**Do not extrapolate a Go renderer to all 309 files.** The pinned `vfsmatch`
+tests assert ordered file lists and reference a TypeScript `matchFiles.ts`
+fixture that is absent at the referenced path in this pin. That is not proof
+of an executable renderer for every `config/matchFiles` baseline. F0 must trace
+those 142 files' request and rendering authority separately. If a group only
+has a carried test-format implementation, identify it explicitly, keep native
+matching as the semantic authority, and verify its native-result rendering
+against the frozen files. If authority cannot be established, stop under the
+existing baseline-authority rule; do not promise a nonexistent Go renderer or
+write an envelope that copies the expected result sections.
+
 #### F3a — prepare config, command-line and resolution tests
 
 **Start from:** the F0 baseline index, F2a's matching cases,
@@ -710,11 +785,12 @@ silently shrink this phase's foundation tests.
    filesystem entries, option mode, environment and rendering/color/newline
    settings. Keep file arrays, raw config and `paths` in source order. Hash the
    exact serialized request the children read, not an earlier object.
-3. Connect existing config parsing APIs. For missing command-line/build-option
-   APIs, record separate `not_implemented` operations with their full native
-   output rather than emulating parsing in the driver. If structured config
-   agrees but production diagnostic rendering is absent, report that component
-   separately while the byte-baseline result remains non-passing.
+3. Connect existing config parsing APIs to the typed observation and shared
+   renderer defined above. For missing command-line/build-option APIs, record
+   separate `not_implemented` operations with their full native output rather
+   than emulating parsing in the driver. If structured config agrees but Rust
+   production diagnostic rendering is absent, report that component separately
+   while the byte-baseline result remains non-passing.
 4. Cover the original tests beyond the baseline outputs: response-file read and
    tokenization errors, explicit null/boolean overrides, repeated options,
    aliases, mode-specific unknown/deprecated options, inheritance/cache errors,
@@ -1056,6 +1132,31 @@ inventory honestly. The names below are proposed additions, not commands that
 work before F0–F5a implements them. Keep the existing `e1`, `binder`, `gen` and
 `testhost` producers and their contracts; do not duplicate their capture logic.
 
+Families select adapter/capture work; producers are ledger records. Their mapping
+is explicit and many-to-one:
+
+| Command family | Ledger producer | Production result |
+| --- | --- | --- |
+| `leaves` | `foundations` | `run.foundations.leaves_complete` |
+| `filesystem` | `foundations`; `config` consumes the shared 142 baseline rows | `run.foundations.filesystem_complete`; the 142 outputs also contribute once to `run.config.parity` |
+| `config` | `config` | All 309 output rows and `run.config.direct_complete` for supplementary option/package/resolution cases |
+| `syntax` | `syntax`; reuse `e1` and `binder` for their existing corpora | Syntax-only observations; existing full parser/binder parity remains separately required |
+| `utilities` | `foundations` | `run.foundations.utilities_complete` |
+| `integration` | `foundations`; reuse `gen` and `testhost` for their contracts | `run.foundations.integration_complete` for the F5a cross-family witnesses, plus the existing generator/transport requirements |
+
+**Freshness tradeoff:** retain these three new grouped producers. The ledger
+uses one source fingerprint per producer, not per metric: a relevant leaf edit
+therefore stales the entire `foundations` record, including its filesystem,
+utility and integration booleans. Do not claim these remain independently
+current. Keep family captures independently authenticated against their actual
+request, adapter, binary and transitive source inputs. Re-recording a grouped
+producer can replay still-valid family captures and rerun the invalid ones,
+then emit a newly validated aggregate. If families share a changed binary or
+dependency, all affected captures must be rerun; a family label is not a waiver.
+The ledger's source set remains the union of all contributing closures. This
+limits unnecessary captures without changing the tracker or introducing a
+producer per helper. F5a tests must demonstrate this behavior.
+
 | Producer | Required observations / proposed metrics | Completion rule |
 | --- | --- | --- |
 | `foundations` | Full frozen leaves, filesystem/path/glob and utility inventories; `inventory_complete`, `leaves_complete`, `filesystem_complete`, `utilities_complete`, `integration_complete` | Each family boolean is computed from its exact required IDs and every comparison; no empty/vacuous true and no unknown operation. Snapshot/ownership assertions and the F5a cross-family witnesses are part of the relevant case results. |
@@ -1128,12 +1229,13 @@ mutation leaking into an old snapshot; malformed bytes repaired too early;
 duplicate diagnostics; build options accepted with the wrong mode; lazy token
 identity changing after retention; an Unsupported result counted as unresolved.
 
-Stop for owner input only when a real decision is needed: a new baseline
-behavior divergence, a change to an accepted transport/ownership contract, a
-new required platform/dependency policy decision, or an upstream baseline whose
-authority cannot be established. Routine porting, helper placement and fixing a
-measured mismatch do not need repeated approval. Report such conflicts with a
-minimal reproducer and pinned Go output.
+Stop for the scheduled Phase A coverage review after F5a, before starting F1b.
+Outside that planned review, stop for owner input only when a real decision is
+needed: a new baseline behavior divergence, a change to an accepted transport/
+ownership contract, a new required platform/dependency policy decision, or an
+upstream baseline whose authority cannot be established. Routine porting, helper
+placement and fixing a measured mismatch do not need repeated approval. Report
+such conflicts with a minimal reproducer and pinned Go output.
 
 ### Plan review performed before implementation
 
