@@ -8,7 +8,8 @@ Upstream authority: `1f70213d4922b434345f639b441681e470c7cfc1`.
 
 **`a` = prepare tests and checks. `b` = implement production code.**
 F0 is preparation only, so it has no `b` step. The detailed F0–F5 sections below
-supply the scope for this list.
+contain separate `a` and `b` checklists with inputs, tasks and completion rules.
+Read the shared execution contract before starting F0.
 
 ### Phase A — prepare the tests and checks
 
@@ -194,8 +195,8 @@ depend on an intentionally incomplete feature gate during preparation.
 ### What belongs in a `b` step
 
 This contains the actual Rust ports and fixes: command-line parsing,
-locale/localized diagnostics, missing JSON/collection operations, writable and cached filesystem
-adapters, and whichever resolver/syntax utility gaps the tests establish.
+locale/localized diagnostics, missing JSON/collection operations, writable and
+cached filesystem adapters, and whichever resolver/syntax utility gaps the tests establish.
 
 - Implement one coherent family in its production home; add no test-only
   substitute for code that real consumers need.
@@ -219,6 +220,10 @@ Checkpoints describe reviewable implementation batches, not calendar estimates.
 Each can take several focused PRs. Finish and review the behavior before
 starting an expensive final capture.
 
+The dependencies in this table describe production behavior. Preparing F2a or
+F3a does not require F1b/F2b to be implemented: native observations and explicit
+missing-operation results make that separation possible.
+
 | Checkpoint | Work | Depends on | Completion evidence |
 | --- | --- | --- | --- |
 | F0 | Freeze remaining scope and connect existing evidence to Phase 1 | S12 | Complete operation/test inventory; runnable baseline adapters for a small representative set; missing outcomes stay visible |
@@ -232,39 +237,179 @@ Phase 2 work can start once the AST/binder/resolution/options contracts it uses
 are ready; locale and unrelated utility work should not serialize that critical
 path. That readiness is recorded per contract and does not mark Phase 1 done.
 
-### F0 — make the remaining work concrete
+### Execution contract for every step
 
-Create `data/phase1/scope.json` with one identity per pinned Go operation or
-explicit operation family. Each entry records its source, Rust home, disposition
-(already covered, implemented but untested, missing, equivalent Rust mechanism,
-or owned by a later phase), direct dependencies, test identities and acceptance
-output. Generated methods, Go runtime machinery and observable source behavior
-are separate categories. Later-phase entries need a named destination and
-reason; behavioral differences use the existing divergence policy.
+The numbered list is the order of work. Each step below has required outputs
+and a completion checklist. Finish that checklist before reporting the step
+complete; a pilot or a proposal to add the remaining fixtures is not completion.
+A step may span several PRs. Record progress by completed case/operation IDs,
+remaining IDs and concrete blockers, rather than by a percentage guessed from
+files edited. Phase A ends at F5a with a coverage review; do not start F1b as an
+unannounced extension of a preparation PR.
 
-Freeze `data/phase1/cases.json` and the config baseline index with pin, exact
-file hashes, case/variant identities, host settings and ordered requests. Reuse
-`data/s06`, `data/s07` and `data/s11` inventories rather than copying the entire
-corpus into another archive. Record the association between the 309 output
-files and their native test invocations, including tests with several outputs.
+**Artifacts and ownership.** F0 establishes these conventions and the shared
+manifests/dispatcher. Create each family artifact in its own `a` step; do not
+build all family adapters or empty placeholder files in F0:
 
-Use a small `scripts/phase1.py` dispatcher with separate family modules and
-access-only native overlays under `tools/phase1/`. Reuse existing subprocess,
-strict-JSON, build-artifact and provenance helpers; do not build another general
-benchmark or schema framework. Default comparison is read-only; an explicit
-prepare/freeze operation changes expected inputs. Native setup and adapters
-must be validated before their output can be accepted as a language result.
+| Path | Content and rule |
+| --- | --- |
+| `data/phase1/scope.json` | Pinned operation identities, disposition, dependencies, Rust home, evidence/test links and destination phase. Grouping retains the complete member list. |
+| `data/phase1/cases.json` | Stable family/case/action IDs, ordered request references, native authority, expected observation contract, host applicability and operation IDs covered. |
+| `data/phase1/config-baselines.json` | Exact 309 reference paths/hashes and their native invocation/output mapping. F2a and F3a share this index. |
+| `data/phase1/requests/<family>.json` | Only new direct requests; point to existing manifests for reused requests. Represent source bytes and ordered objects without loss. |
+| `data/phase1/native/<family>/` | Small new native observations and their provenance when they cannot be referenced in existing data. No second copy of the compiler corpus. |
+| `tools/phase1/<family>/` | Access-only Go bridges and Rust observation drivers not already supplied by an existing adapter. Test instrumentation patches are separate from the oracle's production algorithm. |
+| `scripts/phase1.py`, `scripts/phase1_*.py` | Thin dispatcher, manifest validation and family comparisons, delegating to existing scripts wherever they already own the contract. |
+| `scripts/test_phase1*.py` | Runner, comparison, provenance and failure-path tests; no expensive corpus capture in the script tests. |
+| `docs/PHASE1-progress.md` | Per-step completion record, coverage counts, named gaps, exact reproduction commands and implementation queue. This is a results record, not a second plan. |
+| `target/phase1/<capture-name>/` | Immutable raw requests/responses, stderr, build/source identities and comparison report for one capture. Never overwrite a capture while comparing it. |
 
-Start the executable adapter with representative native config parsing,
-command-line, file-matching and JSON/locale requests. Include one known absent
-Rust operation so the report demonstrates an honest pending/failure outcome.
-Then enumerate the remaining native test tables without relying on a fragile
-regular-expression transcription of Go source.
+New filenames in this table are planned deliverables, not claims that tools
+already exist. Keep existing adapters in their existing homes. The new layer
+joins their outputs; it must not become a second implementation of the parser,
+resolver, generator or evidence engine.
 
-**Exit:** every in-scope operation has a disposition and test owner; all 309
-baseline files have mapped producers; the pilot compares real Go/Rust output;
-missing/duplicate/reordered requests and harness failures are rejected. F0
-should end with a ranked implementation queue, not weeks of instrumentation.
+**Commands to provide in F0.** Implement this small interface and document its
+actual usage in the progress record. Family names are `leaves`, `filesystem`,
+`config`, `syntax`, `utilities` and `integration`.
+
+```text
+python3 scripts/phase1.py inventory --check
+python3 scripts/phase1.py prepare --family FAMILY --output DIRECTORY
+python3 scripts/phase1.py freeze --from DIRECTORY
+python3 scripts/phase1.py capture --family FAMILY --output DIRECTORY [--case ID ...]
+python3 scripts/phase1.py compare --capture DIRECTORY [--require-parity]
+python3 scripts/phase1.py report --captures DIRECTORY ... --output FILE
+python3 -m unittest discover -s scripts -p 'test_phase1*.py'
+```
+
+- `inventory --check` validates committed scope, case coverage, baseline mapping
+  and hashes without editing them or building binaries.
+- `prepare` exports native inputs and executes observations into a staging
+  directory. `freeze` explicitly installs reviewed manifests/observations; it
+  never blesses Rust output as expected truth. Preparation may expand the
+  reviewed inventory, but capture and comparison cannot change it.
+- `capture` preflights before building, writes the exact bytes the children
+  consume, and runs selected comparisons through the existing adapters or the
+  new narrow drivers. A selection is marked partial and cannot supply a full
+  family gate. Reuse authenticated Go observations when their inputs are
+  unchanged; changing Rust alone does not require capturing Go again.
+- `compare` authenticates and compares saved outputs without running children.
+  A valid report with semantic gaps can exit successfully in development mode;
+  `--require-parity` fails on any required non-match. Harness/provenance errors
+  fail in both modes. Diagnostics and logs stay off producer JSON stdout.
+- `report` joins verified reports by case ID and rejects duplicates, incompatible
+  contracts and missing rows within a declared selection. In a development
+  report, cases outside that selection remain `not_run`; full-family acceptance
+  rejects such an incomplete result. It neither runs tests nor manufactures
+  passing rows from a prior summary. Separate historical coverage from current
+  executable evidence when freshness differs.
+
+Use `scripts/s04_common.py` for strict envelope decoding and existing source/
+process helpers where compatible. `scripts/s06_build.py` already exports the
+pin; `scripts/s07_config.py` and `tools/s07/config/` already observe config;
+`scripts/s07_program_compare.py` already compares program outputs. Reuse their
+contracts rather than importing a helper whose serializer or source closure
+changes the meaning of a request. In particular,
+`scripts/s07_subset.py::json_bytes` preserves `paths`/`config_raw` order but is
+not a general ordered-JSON codec: other ordered objects use ordered entry arrays
+or raw bytes. Strict JSON applies to the observation envelope; deliberately
+invalid/duplicate-key JSON under test travels inside it as bytes.
+
+**Result contract.** Keep execution and semantic agreement separate:
+
+| Result | Meaning | Counts as feature parity? |
+| --- | --- | --- |
+| `match` | Both sides executed the same scheduled observation and agree, including an expected domain error | Yes |
+| `different` | Both executed; values, bytes, identities or ordering differ | No |
+| `not_implemented` | The Rust entry point is missing or returns an explicit unsupported boundary | No |
+| `native_unavailable` | The native authority did not execute this request; record its guard/reason | No; requires classification, never automatic denominator removal |
+| `harness_failed` | Build/protocol/assertion/timeout/unexpected panic/serialization failure prevents comparison | No; no passing aggregate may be emitted |
+| `not_run` | The case is outside a bounded selection or has a named prerequisite still missing | No |
+
+Expected native panics/errors are only domain observations when explicitly
+specified, isolated and matched by class/payload according to that operation's
+contract. A blanket panic-versus-panic match is not sufficient. A missing API
+must still have a frozen native request/result, a Rust dispatch entry reporting
+`not_implemented`, and a Phase B task; a prose TODO alone is not a prepared test.
+At the xtask boundary, required non-matches map to `fail`, not a passing/omitted
+case. Infrastructure failures invalidate the capture. Never change the existing
+xtask `pass`/`fail`/`skip` protocol to fit this richer development report.
+
+**Validation and run budget.** Every preparation step runs its script tests, a
+bounded real native/Rust smoke and a read-only comparison replay. Compile only
+its drivers/affected test targets. Use complete native test-table inventories,
+but do not repeat already-authenticated full corpus work to prove a dispatcher.
+Every Phase B step runs its prepared family suite and affected production
+regressions; F5b owns the final complete Phase 1 correctness run. Do not run
+benchmarks, checkerbench, relater timings or a new release-platform matrix as
+part of these steps. Inspect actual failures before repeating a command.
+
+### F0 — inventory, manifests and executable setup
+
+**Inputs:** `PLAN.md` Phase 1 scope, `PORTS.toml`,
+`status/unmapped-functions.json`, `docs/S12-evidence.md`, the S04–S11 case
+manifests and the pinned native packages. The worklist is not proof that code is
+absent. Check current Rust consumers and test drivers before assigning work.
+
+**Do these in order:**
+
+1. Confirm the initialized submodule matches the stated pin; record the exact
+   toolchain requirements from existing manifests. An absent Go/Node runtime
+   must give an actionable preflight error, not silently download a different
+   toolchain. Reuse the established Go environment, including
+   `GOTOOLCHAIN=local`. Do not edit the canonical submodule.
+2. Enumerate the Phase 1 source operations and native test tables. For every
+   operation, record source path plus symbol identity, current Rust home,
+   disposition, callable consumers and dependencies. Use these dispositions:
+   `covered`, `implemented_untested`, `missing`, `equivalent_rust`, `later_phase`.
+   `covered` needs exact existing case/artifact links; `equivalent_rust` needs
+   the replacement mechanism and a behavioral witness. `later_phase` needs the
+   destination and reason. Generated/runtime-only mechanisms retain an explicit
+   classification and cannot erase an observable operation.
+3. Enumerate all baseline files recursively. Freeze 142 matching + 87 config +
+   53 command-line + 27 build-option outputs. The matching directory contains
+   nested paths; a top-level-only glob misses two outputs. Associate each with
+   native test/subtest identity, ordered inputs, host setup, rendering mode and
+   expected path/hash. Distinguish one invocation producing several outputs
+   from several invocations contributing to a baseline.
+4. Obtain requests from native tests or an access-only instrumentation patch to
+   their test machinery. Do not parse Go tables with ad hoc regular expressions
+   or reconstruct native expectations from Rust. Retain and hash any extraction
+   patch, and prove it changes observation only. Validate the original native
+   renderer against the frozen baseline bytes before using an exported request
+   to judge Rust.
+5. Create the manifests and dispatcher above. Freeze the entire inventory now;
+   missing observations stay named pending work for F1a–F5a. F0's pilot must
+   actually execute representative config, command-line, matching, JSON and
+   locale requests, including a known implemented match and an absent Rust API.
+   F0 does not need to implement all those APIs or finish every adapter.
+6. Define capture provenance: pin; request bytes and ordering; baseline hashes;
+   native/Rust adapter sources and transitive build inputs; binary digests;
+   toolchain, host/settings; exact case schedule; output/stderr hashes; source
+   stability before and after execution. Test recursive source collection,
+   including a file under a nested oracle directory and `.cargo/config.toml`.
+   Fail early on missing inputs, mismatched inventories or stale native data.
+7. Add focused runner tests: duplicate/missing/extra IDs, reordered actions,
+   ordered-map serialization, malformed/truncated responses, native harness
+   failure versus expected diagnostic, timeout, absent Rust API, tampered raw
+   output and a source change during capture. A partial capture must not pass
+   the full-inventory check; an empty inventory must not yield parity 1.
+8. Add Phase 1 sprint definitions without altering S01–S12 completion or E1's
+   threshold. Preparation completion means its exact checklist is met;
+   production completion consumes the family metrics specified in section 4.
+   Reserve absent metrics as pending. Register a producer only after it can
+   validate its complete declared inventory and report honest failures.
+9. Publish the initial progress/queue record. For each gap list operation IDs,
+   case IDs, native result, Rust result, smallest reproducer, production home,
+   dependency and exact command. F1a–F5a fill observations and coverage; they
+   must not silently delete difficult entries discovered here.
+
+**Completion checklist:** scope has zero unclassified operations; all 309
+outputs have verified invocation mappings; manifests and failure tests pass;
+the real pilot has both an observed match and a named missing operation; replay
+is read-only; the pending implementation queue is generated from concrete rows.
+A pilot alone is insufficient if inventory/mapping work remains incomplete.
 
 ### F1 — complete foundation leaves
 
@@ -310,10 +455,88 @@ crate map and provenance to actual homes; avoid extracting package JSON or
 string utilities solely to satisfy the original directory sketch. Any new
 published crate follows the existing packaged-asset/dependency checks.
 
-**Exit:** the frozen leaf groups pass against Go, including errors and cache
-behavior; generated locale/default messages and libraries have independent
-source authority; imports remain acyclic; affected consumers still compile and
-retain their prior behavior.
+#### F1a — prepare the foundation tests
+
+**Start from:** F0's leaf roster; existing S04/S05 text/number probes; S07 path,
+semver and package helpers; native `internal/core`, `collections`, `stringutil`,
+`jsstring`, `jsnum`, `json`, `locale`, `diagnostics`, `bundled` and their tests.
+Read the callers of generic Go helpers before choosing their observable Rust
+contract. This is coverage preparation, not a new general-purpose standard
+library project.
+
+**Required coverage matrix:**
+
+| Group | Requests to freeze | Compare |
+| --- | --- | --- |
+| Core/collections | Empty/nil; insert, overwrite, delete and reinsert; scope copy/fork and mutation; early-stop iteration; consumer-used concurrent operations | Values, presence, ordered iteration and alias/isolation behavior. For concurrency, assert the specified outcomes, not a scheduler-dependent interleaving. |
+| Text/number/semver | Existing byte/casing/number corpus plus uncovered callable operations; malformed UTF-8, lone surrogates, empty/end positions, overflow, NaN/infinities/negative zero; semver parse/range boundaries | Raw result bytes, numeric bit/category distinctions, positions and expected failure classes; never replacement-decoded strings alone. |
+| JSON | Ordered members, duplicate names, missing/null/empty, large number tokens, negative zero, malformed bytes/escapes, truncation, streaming boundaries and formatting/options | Raw output and consumed/error positions, tokens/order and domain errors. Marshal and unmarshal get separate cases; no generic JSON normalization of the tested payload. |
+| Locale | Every shipped locale plus aliases, case/script/region variants, malformed/unsupported tags, absent versus explicit locale, fallback, repeated and changed requests | Native canonical tag, selected translation/fallback and observable cache behavior under a declared process environment. |
+| Diagnostics | Every generated identity; translated coverage/fallback for all 13 tables; zero/multiple/repeated/missing arguments; unknown message; invalid-byte arguments; multiline text | Exact formatted bytes, category/code/flags, fallback choice and expected failure. Formatting work is shared with F3a, not reimplemented in its driver. |
+| Bundled libraries | Complete asset index, valid/missing names, wrapper paths and access outside the repository | Asset names/content hashes, errors and checkout-independent access. |
+
+**Tasks:**
+
+1. Map every existing probe to the leaf operation IDs it actually exercises.
+   Keep tested S04/S05/S07 requests by reference; add requests only for uncovered
+   behavior and the boundary matrix above. Do not relabel a raw-string probe as
+   a scanner or locale witness.
+2. Export native unit-table inputs through test-only accessors. For operations
+   with no native test, add a direct Go probe calling the actual pinned function.
+   Retain its declaration/caller reference with the observation. For JSON and
+   locale, obtain discriminating native results before proposing a dependency.
+3. Add ordered action traces where state matters: collection fork/mutate/read,
+   locale selection changed in one process, and repeated formatting. Use fresh
+   processes for environment-global defaults when needed. Don't let one case's
+   locale or cache leak into the next case accidentally.
+4. Connect production Rust APIs already available. For missing JSON, locale or
+   formatting operations, emit named `not_implemented` rows and specify the
+   intended signature/production home in the queue. An adapter may serialize
+   results or expose private test-only state; it may not implement the missing
+   formatter, matcher or locale algorithm.
+5. Prepare a locale-asset manifest mapping the 13 source tables to message keys,
+   hashes, fallback obligations and the planned `xtask/src/gen/diagnostics.rs`
+   extension. The localization generator itself lands in F1b; F1a tests must
+   report its absence rather than accepting hand-maintained translations.
+6. Run the leaf comparison over all new small direct requests. Verify negative
+   controls for reordered collection/JSON output, wrong fallback locale,
+   byte replacement and a missing translation key. Retain one reproduction per
+   missing operation, grouping duplicate symptoms by the same production fix.
+
+**Deliver:** leaf cases/requests/native observations, tested Rust dispatch,
+locale-asset manifest, per-group results and F1b tasks. Existing coverage links
+must resolve to real cases, not just a document claiming the family was done.
+
+**F1a complete when:** every leaf operation is linked to a runnable prepared
+case or verified existing witness; all native outputs are available and
+attributed; harness checks pass; every Rust non-match is classified. Rust leaf
+parity may still fail. Do not port production code to make this step look green.
+
+#### F1b — implement the foundation leaves
+
+1. Work from F1a's queue, beginning with shared collection/text/JSON operations
+   required by later leaves. Use existing homes unless F0 established a real
+   dependency boundary. Record representation choices for Go nil/order/sharing
+   semantics; avoid per-call conversions between two equivalent containers.
+2. Complete numeric/text/semver gaps without replacing already-proven byte and
+   number code. Run each changed operation's old probes as well as new cases.
+3. Implement the caller-visible JSON and locale contracts. Choose a dependency
+   only after its behavior passes F1a's native cases; where it differs, provide
+   the narrow required adapter rather than weakening the expected results.
+4. Extend the generator for localized messages and wire production formatting,
+   fallback and errors. Check all 13 tables and English behavior, and keep the
+   diagnostic-rendering helper usable by F3 without pulling in CLI execution.
+5. Finish library access and package checks where F1a found gaps. Regenerate
+   provenance/outputs through the generator; don't manually patch generated
+   files. Run changed crates' tests, targeted clippy, formatting, and dependency/
+   MSRV checks if manifests or language/library features changed.
+6. Run the complete prepared leaf family, plus relevant existing text/number/
+   asset regressions. Update scope dispositions and metrics only for passing
+   operations; leave any remaining required non-match visible.
+
+**F1b complete when:** all required leaf observations match Go, including error,
+ordering and cache behavior; locale/library assets reproduce; dependencies are
+acyclic and affected real consumers use the tested implementation.
 
 ### F2 — filesystems, paths and the two kinds of matching
 
@@ -349,11 +572,83 @@ roots, `./` and `.\\`, casing/canonicalization, extensions, ignored/untitled
 paths and symlink caches. Test callable operations directly even if the compiler
 corpus happens never to take them.
 
-**Exit:** all 142 matching reference outputs pass; VFS traces preserve return
-values, errors, state and callback order; snapshot isolation and affected owner
-lifetimes pass. Known Go nontermination (such as a demonstrated symlink cycle)
-uses an isolated watchdog and a named policy, not a hanging test or invented
-successful result. A newly proposed behavioral divergence needs owner review.
+#### F2a — prepare filesystem, path and matching tests
+
+**Start from:** `data/s07/path-requests.json`, the direct path/resolver adapters,
+S11 filesystem fixtures, `crates/tsr_vfs/src/{lib,os}.rs`,
+`crates/tsr_tsoptions/src/glob.rs`, and native `internal/vfs/*`, `tspath` and
+`glob`. Reuse `vfstest` for deterministic traces; keep native OS observations
+in a separately marked host-specific group.
+
+**Tasks:**
+
+1. Create an operation-by-adapter capability matrix: snapshot, live OS,
+   I/O-backed, cached, tracking, wrapping and test filesystem. For each required
+   operation, name either its native-supported behavior or its deliberate
+   capability error. Absence in today's Rust trait is an implementation gap,
+   not a reason to omit the operation.
+2. Freeze stateful traces with observations after each action: create/read/
+   overwrite/append/remove; stat/entries; both access and modification times;
+   wrapper forwarding; cache enabled/disabled/cleared; cached miss followed by
+   creation; cached hit followed by replacement/deletion. Preserve the actual
+   native cache contract even where it deliberately retains stale results.
+3. Add paired snapshot cases: keep snapshot A alive, mutate the live builder,
+   publish B, then read both. A must retain its original bytes, identities and
+   program owners. Record these as Rust ownership assertions alongside the
+   paired filesystem trace rather than inventing a Go snapshot operation.
+4. Freeze path and traversal boundaries: relative/drive/UNC/URL roots, `./` and
+   `.\\`, case modes, missing/denied paths, file versus directory versus link,
+   dangling links and realpath caches. Walk traces record callback path, entry,
+   error, skip decision and ordering. Use a controlled clock where appropriate;
+   real OS timestamp cases record filesystem precision rather than sleep.
+5. Add all 142 matching baseline outputs through the shared config index. Call
+   the original `vfsmatch` test setup, retain directory/include/exclude inputs,
+   and compare the exact rendered baseline. Also enumerate its direct unit
+   tests not represented by baseline files; 142 is not the count of all path
+   and matching behavior.
+6. Prepare `internal/glob` cases independently: braces, ranges, separators,
+   malformed patterns, casing, Unicode and root matching. Tag each request
+   with its dialect so neither adapter can dispatch to the other silently.
+7. Keep OS mutation inside per-case temporary roots. Cases requiring unavailable
+   privileges/platform support remain named unavailable; don't substitute an
+   in-memory passing result. A demonstrated native nontermination gets an
+   isolated watchdog and an explicit pending policy decision, never a hang or
+   an invented successful oracle response.
+8. Run complete small trace/dialect groups and the matching comparisons through
+   existing Rust operations; report missing live adapters explicitly. Add
+   comparator controls for stale-cache output, swapped walk callbacks, lost
+   timestamp arguments and mutation leaking into an old snapshot.
+
+**Deliver:** capability matrix, filesystem/path/glob requests, 142-output
+comparison, host applicability and snapshot assertions, plus F2b's ordered gap
+queue. Store case IDs for failures, not just a count or combined stderr log.
+
+**F2a complete when:** all native trace results and 142 baselines are mapped and
+replayable; every required adapter/operation has a case; order/state/error
+comparators reject the controls; missing Rust capabilities are explicit. One
+host's OS results do not certify the other host.
+
+#### F2b — implement filesystem, path and matching behavior
+
+1. Introduce only the capability/API changes required by F2a, including both
+   timestamps and the real walk callback contract. Preserve immutable
+   `MemorySnapshot` publication; mutate through live hosts/builders instead.
+2. Implement live OS and I/O-backed behavior, then wrappers/tracking and caches
+   on top of those contracts. Preserve error distinctions and avoid bypassing a
+   wrapper or cache in real compiler call paths.
+3. Fix path and configuration matching gaps, then the separate test/LSP glob
+   grammar. Retain dialect-specific APIs even if low-level helpers are shared.
+4. Execute each stateful trace after its corresponding fix; add owner/drop,
+   retained-source and snapshot regressions when mutation or caching changes.
+   Run host-specific OS cases on the two active native targets without
+   re-enabling paused CI runners.
+5. Run the full F2a suite and all 142 matching outputs. Check the existing S11
+   filesystem cases when changing code used by the endpoint; do not expand the
+   endpoint's Unicode or callback contract in this step.
+
+**F2b complete when:** required traces match values, errors, state and callback
+order; all 142 outputs match; snapshot isolation holds; host-specific evidence
+is accurately labeled. Newly proposed divergences still need owner review.
 
 ### F3 — config/options, package JSON and module resolution
 
@@ -396,9 +691,93 @@ option diagnostics outside the E2 acceptance subset where the native operation
 supports them. Owner-approved E2 selection decisions stay unchanged and do not
 silently shrink this phase's foundation tests.
 
-**Exit:** all 309 outputs match, direct package/resolution/cache tests pass, and
-supported program-loading operations preserve ordered closure and diagnostics.
-No pending Phase 1 branch is represented by a successful empty result.
+#### F3a — prepare config, command-line and resolution tests
+
+**Start from:** the F0 baseline index, F2a's matching cases,
+`tools/s07/config/`, `tools/s07/config-resolver/`, `tools/s07/packagejson/`,
+`tools/s07/program/`, the corresponding `scripts/s07_*.py` adapters and
+`data/s07/*requests.json`. Native authority is the original `tsoptions` tests,
+`tsoptionstest` rendering, `diagnosticwriter`, package JSON and resolver code.
+
+**Tasks:**
+
+1. Extend the baseline adapter to all four groups. F2a's 142 matching outputs
+   retain the same IDs; don't count them again as new cases. Execute/export the
+   original native invocations for the other 167 outputs. Verify each native
+   result against the committed pin's baseline before comparing Rust.
+2. Freeze every input needed to reproduce an invocation: argument vector,
+   current directory, case sensitivity, response-file and config bytes,
+   filesystem entries, option mode, environment and rendering/color/newline
+   settings. Keep file arrays, raw config and `paths` in source order. Hash the
+   exact serialized request the children read, not an earlier object.
+3. Connect existing config parsing APIs. For missing command-line/build-option
+   APIs, record separate `not_implemented` operations with their full native
+   output rather than emulating parsing in the driver. If structured config
+   agrees but production diagnostic rendering is absent, report that component
+   separately while the byte-baseline result remains non-passing.
+4. Cover the original tests beyond the baseline outputs: response-file read and
+   tokenization errors, explicit null/boolean overrides, repeated options,
+   aliases, mode-specific unknown/deprecated options, inheritance/cache errors,
+   `${configDir}` substitution, raw JSONC/source locations and mapper manifests.
+   Enumerate these from native tables; the list here is a minimum, not a filter.
+5. Extend package/resolver probes for uncaptured scope entries: ordered exports/
+   imports conditions, invalid/null/missing fields, `typesVersions`, self-name
+   imports, type references, usage-site ESM/CJS mode, extension/root/symlink/case
+   behavior and redirection. Compare resolved identity, failed lookup locations,
+   affecting locations, diagnostics and native traces where the API supplies
+   them. A trace-only discrepancy is still visible, even if the path agrees.
+6. Add paired cold/repeat/invalidate action traces. Exercise cache separation
+   by mode, options, importer and snapshot; include negative lookup followed by
+   changed host state according to the native invalidation contract. Preserve
+   error emission and include reasons on hits as well as misses.
+7. Prepare program-loading checks using the real loader and host. Compare
+   ordered loaded-file/include-reason graphs, option diagnostics, duplicate
+   input/auxiliary ordering and unresolved results. Keep E2's owner-approved
+   selection policy intact; direct foundation tests can cover a case outside
+   that subset without changing the E2 denominator.
+8. Validate the adapter with deliberate controls: reorder two `paths` entries,
+   drop one output from a multi-output test, change a diagnostic argument/color
+   escape, merge missing with null, return a cached result in the wrong mode,
+   and report Unsupported as ordinary unresolved. Each must be rejected by the
+   relevant comparator or completeness check.
+9. Compare all 309 outputs once with the available Rust APIs; report the 142/
+   87/53/27 counts individually. Run the new small direct resolution/loader
+   cases and replay all reports without rebuilding. Produce F3b tasks grouped
+   by production cause, retaining every affected case ID.
+
+**Deliver:** one complete 309-output report, direct unit/resolver/cache/program
+requests and observations, byte and structured comparators, formatting gaps
+linked to F1b, and a production queue with exact reproduction commands.
+
+**F3a complete when:** all 309 native outputs are verified and individually
+accounted for; every comparison is runnable or names its missing Rust operation;
+request order is tested; supplementary direct/native unit inventory is complete.
+A structured-only match does not complete a byte-baseline case. No build/watch
+executor or mapper process is implemented to finish this preparation step.
+
+#### F3b — implement config/options and resolution gaps
+
+1. Complete ordinary command-line parsing and response-file handling in
+   `tsr_tsoptions`, followed by build-option parsing as a distinct mode. Preserve
+   option provenance/order, diagnostic distinctions and callback reads. Do not
+   add command execution or build scheduling.
+2. Close config interpretation, inheritance, raw-value, JSONC diagnostic and
+   cache gaps. Wire F1b's formatter or port only the missing native diagnostic
+   writer slice; exact output remains the authority.
+3. Close package JSON and module-resolution gaps in the existing `tsr_module`
+   homes. Apply invalidation and mode separation at the real cache owner, not
+   only in a test host. Recheck the full action trace, not just its final path.
+4. Integrate changed options/host behavior into program loading and rerun the
+   corresponding ordered graph/diagnostic cases. Preserve informational E2
+   selections and later-phase content-mapper execution boundaries.
+5. Run all 309 baselines, direct option/package/resolver suites and applicable
+   program regressions. If a shared change affects checker requests, use an E2
+   bounded recheck selected by that surface and previously matching controls;
+   escalate only when its scope or observed regressions justify a full run.
+
+**F3b complete when:** all 309 outputs match exactly, supplementary direct and
+cache tests pass, and loader closure/diagnostics agree. No unsupported required
+operation is disguised as an empty successful parse or an unresolved module.
 
 ### F4 — complete syntax, binding and reusable syntax services
 
@@ -438,10 +817,98 @@ it: values, string-ness, cross-file/external-reference flags, short-circuit and
 unknown results must match Go. Keep checker symbol resolution in the checker;
 a standalone evaluator must not depend on or duplicate a second checker.
 
-**Exit:** every parse/bind primary request matches; complete declared syntax-only
-requests match; public utility, navigation and evaluation families pass; no
-unclassified operation is left in the Phase 1 inventory. Run affected ownership,
-release/stack and malformed-byte witnesses where these changes touch them.
+#### F4a — prepare syntax, binder and utility coverage
+
+**Start from:** `scripts/s07_inventory.py`, the existing E1/binder drivers,
+`data/s06/`, `data/s07/binder-*.json`, `data/s07/*helper*`, native
+`internal/astnav/tokens_test.go`, `internal/evaluator/evaluator.go`, and
+`crates/tsr_compiler/src/syntactic_diagnostics.rs`. Preserve the existing corpus
+expander and identity-aware AST/binder comparators.
+
+**Tasks:**
+
+1. Validate membership and request expansion for all 12,721 physical sources and
+   108 libraries. Record virtual units, configurations and options per primary
+   ID, plus the separate supplemental IDs. Link current valid observations or
+   the accepted Phase 0 record with its actual freshness; do not label the
+   historical record a new current run. No E2 eligibility filter may remove a
+   parser request.
+2. Build the syntax-only program schedule from the complete declared compiler
+   input/variant inventory using native preprocessing. Per row, retain load
+   outcome, test-selection/option guard and whether the syntactic operation can
+   run. Rejected loads retain their native diagnostics and explicit phase status;
+   they cannot silently become an empty successful syntactic result. Resolve
+   unsupported native authority as a named boundary, not a dropped variant.
+3. Observe pinned `Program.GetSyntacticDiagnostics` and its diagnostic rendering
+   without invoking semantic/declaration phases for comparison. Call Rust's
+   production syntactic API. Reuse matching authenticated native observations;
+   otherwise capture this native syntax schedule once. Freeze structured
+   diagnostics, order/deduplication, codes/arguments/ranges and rendered bytes.
+4. Add discriminating syntax requests: JS-only diagnostics, parameter decorators
+   with `checkJs`/`experimentalDecorators`, `@ts-check` and `@ts-nocheck`
+   precedence, malformed sources, empty/missing nodes and cross-file owner
+   rejection. Mark content-mapped filtering as the named Phase 5 boundary; don't
+   make an unmapped source stand in for a mapped case.
+5. Audit AST/scanner/parser/binder callable utilities against production callers
+   and existing probes. Construct only the missing graph witnesses: list order,
+   trailing commas and ranges; clone/update/original identity; foreign owners;
+   lazy JSDoc/token repeated access; source text; bundle/member retention;
+   independent binding/publication and helper caches. Preserve byte and owner
+   observations separately from node pretty-printing.
+6. Export all native astnav test tables/baseline requests, with source bytes,
+   cursor positions and expected token identity/range/kind. Include first/last
+   positions, trivia/comments, zero-width nodes, preceding/next/touching-token
+   operations and repeated lazy token identity. Compare to real `Navigator`
+   operations, not a second scanner in the driver.
+7. Freeze evaluator requests with controlled callback observations: literal and
+   operator values, string-ness, cross-file/external-reference flags, unknown
+   results and callback/short-circuit order. Connect the existing evaluator
+   behavior where available; otherwise name the missing reusable callback API.
+   Don't duplicate checker name resolution to manufacture a standalone result.
+8. Test the comparators with a missing expanded unit, reordered diagnostics,
+   changed parent/flow edge, wrong owner/identity, lost trailing comma, and a
+   syntactic adapter accidentally appending semantic diagnostics. All must fail.
+9. Run a bounded real smoke covering each new utility group and syntax boundary,
+   then replay its outputs. Validate full corpus scheduling without rerunning
+   full parse/bind just to show the adapter works. Record unexecuted prepared
+   cases separately; F5b performs the final full correctness capture.
+
+**Deliver:** complete parse/bind coverage links and syntax schedule, native
+syntax observations, utilities/navigation/evaluator requests, tested drivers and
+comparators, plus F4b's gaps ranked by actual behavior. Mapping percentages are
+not substitutes for this report.
+
+**F4a complete when:** every primary/expanded request is accounted for; the
+syntax phase cannot be confused with whole `.errors.txt`; all required utility
+operations have executable witnesses; bounded controls pass and pending Rust
+behavior is named. Full Rust corpus parity is F4b/F5b's production obligation,
+not something to fake or repeatedly capture during preparation.
+
+#### F4b — close syntax/binder and reusable utility gaps
+
+1. Fix the smallest production cause from F4a's queue and add its focused
+   regression. Keep explicit bind-before-publication, compact storage and local
+   readers; no broad representation rewrite is needed to close utility gaps.
+2. Complete syntactic diagnostic aggregation/formatting and option behavior
+   through `Program::syntactic_diagnostics`. Keep semantic/declaration checking
+   outside this path and retain mapped-source limitations explicitly.
+3. Complete AST/lazy/binder utility operations with the prepared identity,
+   retention and graph witnesses. Changes to ranges must preserve load-bearing
+   list/trailing-comma behavior; changes to caches must preserve the correct
+   owner and publication boundary.
+4. Finish navigation, then the reusable evaluator API where required. Share the
+   existing callback-based implementation with consumers instead of retaining
+   a test-only algorithm and a separate checker implementation.
+5. Run each affected utility group and selected primary cases during fixes.
+   Use release/deep-stack, malformed-byte and ownership instrumentation when
+   their corresponding surfaces change. Once fixes settle, capture or validate
+   the complete parser/binder and syntax families; F5b reuses these captures if
+   the relevant sources and observation contracts are unchanged.
+
+**F4b complete when:** full required parse/bind requests and syntax observations
+match; utilities, navigation and evaluator groups pass; there are no
+unclassified Phase 1 operations. Phase 1 parse parity must be exactly 1.0 without
+changing E1's historical threshold or narrowing its primary corpus.
 
 ### F5 — integration, generation and closure
 
@@ -467,9 +934,106 @@ Publish the Phase 1 operation/coverage report and accepted boundaries, make the
 new sprint checks reproducible, and update `PORTS.toml` based on actual behavior
 and implementation homes. Preserve existing measurements and failures.
 
-**Exit:** every Phase 1 criterion below passes or has its already-approved,
-explicitly scoped qualification. New semantic deviations cannot be waived by
-editing a count or silently broadening the S12 reuse decision.
+#### F5a — prepare integration checks and the Phase A review
+
+**Start from:** all F0/F1a–F4a outputs, `status/runs.toml`,
+`docs/TRACKING.md`, the current generation/package checks, `scripts/s11.py`,
+`data/s11/` and the S11 Session/subprocess tests. This step proves that the
+prepared pieces form one enforceable contract; it does not implement the
+remaining product behavior.
+
+**Tasks:**
+
+1. Join scope → operation → case/action → native authority → Rust driver →
+   comparison → producer metric → sprint item. Reject orphaned operations,
+   duplicate case ownership, missing outputs and a metric with no contributing
+   observations. Reused cases may support several claims but retain one
+   identity; the config denominator stays 309, not 309 plus matching again.
+2. Prepare integration witnesses for the actual shared boundaries: localized
+   diagnostics in config baselines; package/config ordered values through
+   resolution; live filesystem changes versus retained program snapshots;
+   generated messages/library assets as consumed outside the checkout; syntax
+   diagnostic output through the real compiler path. These compose production
+   APIs where present; missing dependencies yield named pending rows.
+3. Map all 89 existing S11 cases to their continued obligations. Run the existing
+   transport smoke when changing an adapter; reuse valid full observations
+   otherwise. Add a fixture only if a newly tested foundation operation exposes
+   an uncovered transport contract. Don't claim blocked workers, a production
+   mapper host or semantic fourslash coverage from these tests.
+4. Prepare generator/asset checks for the F1b locale extension and retain current
+   AST/diagnostic/API generation and untouched-client equality. Missing locale
+   output stays pending; don't count the existing generator's success as proof
+   that the new locale tables exist. Identify the actual pinned Node/npm setup
+   and reuse its bootstrap path instead of substituting the system version.
+5. Implement/finish the three grouped producer adapters and their source/input
+   closures described below. Fingerprint every consumed native bridge, request,
+   baseline, comparator, transitive Rust dependency and build setting. Verify
+   capture and ledger closure agreement with mutation tests, including nested
+   files, rather than trusting two similar-looking glob lists.
+6. Test aggregate failures by deleting one required case, duplicating a row,
+   using an earlier request schedule, tampering with an artifact, substituting
+   a partial report and changing a relevant source after capture. Also prove an
+   unrelated documentation edit does not invalidate a code-only observation.
+   Do not exclude a real dependency merely to avoid evidence becoming stale.
+7. Add harness-health checks to existing CI and keep unfinished feature parity
+   separately reported. Test that an unmet feature keeps its sprint pending,
+   while it does not break unrelated build/quality jobs merely because Phase A
+   was merged. No silent skipping and no new performance jobs or target matrix.
+8. Generate the Phase A report with totals by family and status; list exact
+   required IDs still unobserved, different or missing. Include one concrete
+   native/Rust example per root cause, F1b–F5b ownership/dependencies and commands
+   for reproduction. Check that every F0 operation has a reviewed disposition
+   and that no gap disappeared solely because an adapter omitted it.
+9. Review all preparation exits and the report. State which future production
+   PRs close each gap, which contracts already pass and which genuine decisions
+   need the owner. Stop here for the agreed coverage review, with committed
+   runnable tests and reports; don't start production fixes before that review.
+
+**Deliver:** integration fixtures, complete producer/consumer mapping, tested
+fingerprints and failure aggregation, CI harness checks, and the finished Phase
+A coverage/gap report. The progress record must distinguish test preparation
+complete from Phase 1 implementation complete.
+
+**F5a complete when:** every `a` checklist passes; all required behavior is
+accounted for by runnable checks; native truth and missing Rust work are clear;
+a broken/partial/stale report cannot pass any gate. A set of skeleton test
+files, example-only baselines or a TODO list without runnable adapters does not
+satisfy this exit.
+
+#### F5b — integrate, validate and close Phase 1
+
+1. Confirm F1b–F4b completion and review the final source/contract changes. Resolve
+   integration failures through the owning production path, then rerun the
+   affected family. Recheck source fingerprints before planning captures so a
+   cheap manifest failure is found before a full run.
+2. Run the final complete Phase 1 correctness suite once: all required leaf/VFS/
+   utility traces, all 309 baseline outputs, the full parser/binder request
+   inventory and the complete syntax schedule. Reuse captures already made at
+   F1b–F4b if their normal validators still accept the relevant sources, pin,
+   requests and observation contract. Never refresh a measurement merely to
+   obtain a newer timestamp.
+3. Run final generator drift and untouched-client checks for changed generated
+   surfaces; verify locale/library assets and installed consumers when affected.
+   Validate all S11 transport/Session cases against the final relevant inputs.
+   Keep the documented wire/later-phase boundaries unchanged.
+4. Run affected debug/release tests, formatting, clippy, dependency policy,
+   declared MSRV and applicable ownership instrumentation on the two active
+   native CI targets. Preserve existing quality gates. CI failure diagnosis
+   remains scoped; do not respond by scheduling unrelated benchmarks.
+5. Record the real producer outputs, regenerate tracker views, validate the
+   ledger and run each Phase 1 sprint check. Update `PORTS.toml` only for actual
+   implementation homes and verified behavior. The new closure check must not
+   depend on stale S07/S08 timing metrics or silently reopen S12.
+6. Publish the final operation/coverage report: exact totals, current artifacts,
+   scoped accepted qualifications and later-phase obligations. Confirm that
+   every required Phase 1 row passes. A newly discovered unsupported case means
+   work remains; fix it or obtain an explicit scoped owner decision, without
+   changing counts or thresholds to manufacture completion.
+
+**F5b complete when:** the section 4 claims have passing reproducible evidence,
+all Phase 1 sprint exits pass, reports match the evidence and no required case
+is missing. Historical Phase 0 closure and later-phase work remain accurately
+recorded. No timing rerun is a Phase 1 closure prerequisite.
 
 ## 4. Acceptance and evidence design
 
@@ -485,17 +1049,52 @@ editing a count or silently broadening the S12 reuse decision.
 | Transport | All existing 89 S11 cases plus explicitly added contract cases; no missing/ignored rows | `testhost` producer and ADR 0019 |
 | Safety and quality | Targeted debug/release tests, appropriate ownership instrumentation, MSRV, formatting/lints/dependency policy | Existing CI and scoped E3 suites |
 
-Register new producers only when their adapters exist. Proposed names are
-`foundations` (family groups), `config` (309 outputs), and `syntax` (program
-syntactic observations); extend the existing `e1`, `binder`, `gen`, `testhost`
-contracts where appropriate. Avoid a new producer for every helper file. These
-names are a plan, not commands currently promised to work.
+### Producer and sprint wiring to implement during preparation
 
-At F0, add sprint definitions for this sequence with exact metric consumers.
-Do not make another experiment pass accidentally through a bare reused boolean.
-In particular, Phase 1 parse parity 1.0 is its own check and must not silently
-change the accepted Phase 0 E1 threshold. A slice boolean never certifies the
-entire foundation package. Complete the per-case report before aggregating it.
+Register new producers only when their adapters exist and can report the whole
+inventory honestly. The names below are proposed additions, not commands that
+work before F0–F5a implements them. Keep the existing `e1`, `binder`, `gen` and
+`testhost` producers and their contracts; do not duplicate their capture logic.
+
+| Producer | Required observations / proposed metrics | Completion rule |
+| --- | --- | --- |
+| `foundations` | Full frozen leaves, filesystem/path/glob and utility inventories; `inventory_complete`, `leaves_complete`, `filesystem_complete`, `utilities_complete`, `integration_complete` | Each family boolean is computed from its exact required IDs and every comparison; no empty/vacuous true and no unknown operation. Snapshot/ownership assertions and the F5a cross-family witnesses are part of the relevant case results. |
+| `config` | Case IDs are the 309 output paths; runner-derived `tests_total`, `parity`; `inventory_complete` also verifies invocation/output mapping | Exactly 309 expected results, parity 1 and complete mapping. Supplementary direct config/package/resolution cases also feed a required `direct_complete` metric; matching 309 alone does not close them. |
+| `syntax` | Frozen program syntactic case/phase IDs; runner-derived parity; `inventory_complete` | Every required load/syntactic observation is accounted for and matches. An unexecuted native phase cannot be recorded as an empty successful diagnostic list. |
+| Existing `e1`, `binder` | Existing primary/supplemental results and frozen inventories | Phase 1 consumes parity 1 and full membership; E1's historical threshold remains unchanged. Missing helper coverage is supplied by `foundations.utilities_complete`. |
+| Existing `gen`, `testhost` | Actual generator/drift/client results, new localization inventory result, S11 parity/controls | Existing success is insufficient for a newly added locale requirement; give that requirement its own computed metric, `run.gen.locale_complete`. |
+
+The new sprint definitions must enumerate the metrics they consume and identify
+which family/case inventory establishes each requirement. F0 can register
+pending names before producers exist; it cannot populate passing constants.
+F5a's tracker tests must demonstrate that each missing/false family metric
+prevents its production sprint and Phase 1 closure from passing. Preparation
+sprints are separate and consume manifest/harness/coverage readiness, never
+production parity. Do not make another experiment pass accidentally through a
+bare reused boolean or a slice result masquerading as full coverage.
+
+Use separately computed preparation metrics: `run.foundations.harness_pass`,
+`inventory_complete`, `leaves_prepared`, `filesystem_prepared`,
+`utilities_prepared`, `integration_prepared`, `run.config.prepared` and
+`run.syntax.prepared`. Unqualified names in that list belong to `foundations`.
+A `prepared` metric checks complete case/authority/dispatch coverage, the
+required smoke and comparator controls, and classified gaps. It may be true
+while its corresponding production-completion metric is false. Neither is a
+manually entered acknowledgement. F0 readiness uses inventory and harness
+checks; later preparation exits add their family checks. Keep the detailed
+per-step checklists as review requirements beyond what these metrics can prove.
+
+For producers with `cases`, emit the exact xtask test-result protocol and let
+xtask derive parity. For grouped booleans, retain the full authenticated per-case
+report and artifact identity behind every aggregate. Structured development
+outcomes may be richer than xtask's protocol, but their adapter cannot turn
+`not_implemented`, `native_unavailable`, `harness_failed` or `not_run` into pass.
+
+At F5a, document the exact new sprint IDs and runnable `cargo xtask run <id>` /
+`cargo xtask check <sprint-id>` sequence in the progress record. At F5b, record
+those results and use the existing `cargo xtask validate`, `cargo xtask status`
+and `cargo xtask status --check-committed` commands. Do not claim a new command
+or gate exists until its implementation has landed.
 
 Reuse valid native observations when their pin, request schedule and observation
 contract are unchanged. Compile executable adapters once per coherent batch.
@@ -555,6 +1154,14 @@ minimal reproducer and pinned Go output.
 - **Could this repeat the S12 rerun cycle?** No. S12 stays closed, the recent
   pre-rename captures remain accepted, and new runs follow actual behavior and
   coverage changes. No benchmark refresh is scheduled by this plan.
+- **Can preparation finish while production is missing?** Yes. Each missing
+  operation has native truth, a runnable explicit missing-result path and a
+  production task. Preparation readiness and feature parity use separate
+  metrics; neither empty output nor a prose TODO can pass as implementation.
+- **Can a bounded smoke certify a whole family?** No. Its selected IDs are
+  recorded, unselected cases remain `not_run`, and the full-family gate rejects
+  incomplete results. Native/reference inventories remain independent of what
+  Rust currently supports.
 
 The first preparation PR delivers F0 and a small command-line baseline adapter
 that records a genuinely missing Rust operation. Continue through F1a–F5a and
