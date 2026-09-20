@@ -1,6 +1,6 @@
 # tsr_embed
 
-The Rust embedding entry point for [tsr](https://github.com/iantocristian/ts-rust),
+The Rust embedding entry point for [tsr](https://github.com/ferrotype/tsr),
 a Rust port of the TypeScript compiler. It provides parsing, owned program
 sessions, diagnostics and scoped type queries without requiring a compiler process.
 
@@ -65,7 +65,7 @@ fn main() {
 A query borrows its operation scope. Use `retain_type`, `retain_symbol` or
 `retain_signature` for a result that must survive that scope; it then keeps its
 program alive. `retire()` prevents subsequent queries, including through retained
-results. See the [embedding guide](https://github.com/iantocristian/ts-rust/blob/main/docs/S10.md)
+results. See the [embedding guide](https://github.com/ferrotype/tsr/blob/main/docs/S10.md)
 for lifetime and host details.
 
 ## Parser only

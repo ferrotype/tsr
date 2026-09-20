@@ -74,20 +74,17 @@ and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
 ## Before the first release
 
-The project branding is **tsr**; the unrelated `ts-rust` crate on crates.io is
-not this project. `tsr_embed` is the application entry point. A `tsr` facade that
-re-exports the public embedding surface remains a separate follow-up; neither
+The project branding is **tsr**; `tsr_embed` is the application entry point.
+A `tsr` facade that re-exports the public embedding surface remains a separate follow-up; neither
 `tsr` nor `tsrust` is added to this 28-package release set. All package READMEs
 state the Rust 1.96 minimum, and package metadata includes search keywords and
 the compiler category.
 
-The current repository URL is still `https://github.com/iantocristian/ts-rust`.
-On 2026-09-20, `ferrotype/tsr` did not resolve through GitHub. Decide the final
-repository home before publication; if transferring/renaming, complete that move
-and update the workspace repository field and README links before generating
-release archives. Keeping a working URL now does not authorize a transfer.
-Published archives retain their original manifest bytes; a later GitHub redirect
-does not rewrite those bytes.
+The repository has moved to [`ferrotype/tsr`](https://github.com/ferrotype/tsr).
+The inherited repository metadata and crate README links use that address.
+Generate release archives after this update so their immutable manifests contain
+the final URL. Historical pull-request and Actions links in `docs/` retain their
+original addresses and resolve through GitHub redirects.
 
 Do not schedule the first release as 28 immediate uploads. crates.io's current
 [default limiter](https://github.com/rust-lang/crates.io/blob/5723cfaf552efd5e870d25c71f2bb5193b21a958/src/rate_limiter.rs)
