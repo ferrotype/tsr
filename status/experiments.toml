@@ -365,20 +365,20 @@ unit = "Rust / Go wall time at eight threads"
 
 [E7]
 title = "WebAssembly"
-nature = "Parser performance and checker-slice feasibility measured separately; full checking/emit parity and speed are not established"
+nature = "Parser performance and checker-slice feasibility measured separately; full checking/emit parity and speed are not established. Parser size and throughput limits re-based by owner-approved ADR 0020 (2026-09-20) from 0.25 and 2.0"
 
 [[E7.criteria]]
 id = "parser_artifact_size"
 metric = "run.e7.parser_artifact_size_ratio"
 op = "<="
-threshold = 0.25
+threshold = 0.30
 unit = "Rust wasm32 / Go GOOS=js parser artifact bytes"
 
 [[E7.criteria]]
 id = "parse_throughput"
 metric = "run.e7.parse_throughput_ratio"
 op = ">="
-threshold = 2
+threshold = 1.5
 unit = "Rust / Go parse throughput"
 
 [[E7.criteria]]
@@ -397,13 +397,13 @@ unit = "checker subset runs using an in-memory host without native process/files
 
 [E8]
 title = "Embedding"
-nature = "Separate Rust consumer feasibility and Node parse latency measured separately; full crate surface and workload budgets remain Phase 7 gates"
+nature = "Separate Rust consumer feasibility and Node parse latency measured separately; full crate surface and workload budgets remain Phase 7 gates. Node parse latency limit re-based by owner-approved ADR 0020 (2026-09-20) from 0.10"
 
 [[E8.criteria]]
 id = "node_parse_latency"
 metric = "run.e8.node_parse_latency_ratio"
 op = "<="
-threshold = 0.1
+threshold = 0.40
 unit = "Node in-process / --api socket parse-and-encode latency for a 10 KB file"
 
 [[E8.criteria]]

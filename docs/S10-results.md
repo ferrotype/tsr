@@ -1,5 +1,10 @@
 # S10 initial acceptance results
 
+This is the historical result under the original limits. The owner amended
+those limits on 2026-09-20 in [ADR 0020](adr/0020-phase-0-gate-decision.md).
+The values, failure results and raw captures below are unchanged; they are
+not reissued as current acceptance evidence.
+
 The embedding interfaces and correctness captures are complete on the source
 tree committed as `09e6016`. S10 remains open: all three performance criteria
 miss their unchanged thresholds. The plan and API contracts are in

@@ -36,7 +36,7 @@
     <div class="tile"><b>0 / 457</b><span>files verified</span></div>
     <div class="tile"><b>35.7%</b><span>functions with a Rust counterpart, of 11506</span></div>
     <div class="tile"><b>0 / 8</b><span>experiments passed</span></div>
-    <div class="tile"><b>21 / 22</b><span>decisions accepted</span></div>
+    <div class="tile"><b>22 / 22</b><span>decisions accepted</span></div>
   </div>
   <h2>Over time</h2>
   <div class="chart"><svg viewBox="0 0 720 220" width="100%" role="img" aria-label="Verified lines and mapped functions over time">
@@ -65,8 +65,8 @@
 <tr><td>E4</td><td>Strings</td><td>run.e4.source_decoding == true<br>run.scanner.diagnostics == true<br>run.checkertext.token_literal_bytes == true<br>run.checkertext.helper_printer_semantics == true<br>run.e4.slice_validity == true<br>run.e4.utf8_positions == true<br>run.e4.utf16_positions == true<br>run.e1.encoder_success_error == true<br>run.e1.encoder_output_bytes == true<br>run.e4.helper_semantics == true<br>run.scanner.token_value_bytes == true</td><td>source_decoding: missing<br>diagnostics: missing<br>token_literal_bytes: missing<br>helper_printer_semantics: missing<br>slice_validity: missing<br>utf8_positions: missing<br>utf16_positions: missing<br>encoder_success_error: missing<br>encoder_output_bytes: missing<br>helper_semantics: missing<br>token_value_bytes: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E5</td><td>Memory</td><td>run.e5.peak_rss_ratio &lt;= 0.85<br>run.e5.allocated_bytes_ratio &lt;= 0.85<br>run.e5.type_footprint_ratio &lt;= 0.85</td><td>peak_rss: missing<br>allocated_bytes: missing<br>type_footprint: missing</td><td><span class="chip warn">pending</span></td></tr>
 <tr><td>E6</td><td>CPU</td><td>run.e6.one_thread_wall_time_ratio &lt;= 1.25<br>run.e6.eight_threads_wall_time_ratio &lt;= 1.45</td><td>one_thread: missing<br>eight_threads: missing</td><td><span class="chip warn">pending</span></td></tr>
-<tr><td>E7</td><td>WebAssembly</td><td>run.e7.parser_artifact_size_ratio &lt;= 0.25<br>run.e7.parse_throughput_ratio &gt;= 2<br>run.e7.checker_parity == 1<br>run.e7.portable_host == true</td><td>parser_artifact_size: missing<br>parse_throughput: missing<br>checker_parity: missing<br>portable_host: missing</td><td><span class="chip warn">pending</span></td></tr>
-<tr><td>E8</td><td>Embedding</td><td>run.e8.node_parse_latency_ratio &lt;= 0.1<br>run.e8.rust_consumer_parity == 1<br>run.e8.lifetime_checks == true</td><td>node_parse_latency: missing<br>rust_consumer_parity: missing<br>lifetime_checks: missing</td><td><span class="chip warn">pending</span></td></tr>
+<tr><td>E7</td><td>WebAssembly</td><td>run.e7.parser_artifact_size_ratio &lt;= 0.3<br>run.e7.parse_throughput_ratio &gt;= 1.5<br>run.e7.checker_parity == 1<br>run.e7.portable_host == true</td><td>parser_artifact_size: missing<br>parse_throughput: missing<br>checker_parity: missing<br>portable_host: missing</td><td><span class="chip warn">pending</span></td></tr>
+<tr><td>E8</td><td>Embedding</td><td>run.e8.node_parse_latency_ratio &lt;= 0.4<br>run.e8.rust_consumer_parity == 1<br>run.e8.lifetime_checks == true</td><td>node_parse_latency: missing<br>rust_consumer_parity: missing<br>lifetime_checks: missing</td><td><span class="chip warn">pending</span></td></tr>
 </tbody></table>
   <h2>Evidence</h2>
   <table><thead><tr><th>Run</th><th>State</th><th>Artifact</th></tr></thead><tbody><tr><td>binder</td><td>stale: source, pin, command or inputs changed</td><td><a href="../status/evidence/14b49da69e6c1cc5b0a9a9778ffd14dbf7c6c606d33371c6a91267b74f4aa38f.json">result</a></td></tr>
@@ -105,6 +105,6 @@
 <tr><td>S09</td><td>Ownership and registry harness</td><td class="num">0 / 3</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S10</td><td>WebAssembly and Rust embedding</td><td class="num">0 / 3</td><td><span class="chip warn">open</span></td></tr>
 <tr><td>S11</td><td>Test-host transport prototype</td><td class="num">1 / 4</td><td><span class="chip warn">open</span></td></tr>
-<tr><td>S12</td><td>Phase 0 gate</td><td class="num">0 / 18</td><td><span class="chip warn">open</span></td></tr>
+<tr><td>S12</td><td>Phase 0 gate</td><td class="num">1 / 18</td><td><span class="chip warn">open</span></td></tr>
 </tbody></table>
 </div>
