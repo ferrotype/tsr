@@ -41,14 +41,21 @@ RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harne
 # `s08_oracle.canonical` serialises with sort_keys=True, so two observations
 # whose JSON objects differ only in member order compare equal. That is fatal
 # for any case whose subject *is* order -- ordered maps and sets, JSON member
-# order, iteration order. Such a request declares `order_sensitive: true`, and
-# then two extra rules apply:
+# order, iteration order.
 #
-#   * the observation may not carry a multi-key JSON object anywhere, because
-#     that object's order is exactly what canonicalisation destroys. Ordered
-#     data travels as entry arrays ([["a",1],["b",2]]) or raw bytes, which is
-#     the representation the plan prescribes.
-#   * both sides are additionally compared as emitted, not canonicalised.
+# The fix is representational, not a different comparison. Canonicalisation
+# preserves *array* order, so ordered data travels as an array and compares
+# correctly through the existing canonical path. Comparing the raw emitted
+# bytes instead would be actively wrong: Go's encoding/json sorts map keys
+# while Rust's serde_json preserve_order does not, so two agreeing sides would
+# differ on named fields alone.
+#
+# A request declares `order_sensitive: true`. Its observation must then carry
+# the ordered payload under `ordered` as a list, and no value nested inside
+# those elements may be a multi-key object, because such an object is an
+# ordered map whose order canonicalisation would erase. An element may itself
+# be a multi-key object: those are named result fields, and their order carries
+# no information.
 ORDER_SENSITIVE_KEY = "order_sensitive"
 
 # Each side may only report the statuses it can legitimately produce. A Rust
@@ -120,6 +127,21 @@ FAMILIES = {
         "rust_example": "phase1_pilot",
         "rust_target": "crates/tsr_tsoptions/examples/phase1_pilot.rs",
         "rust_driver": "tools/phase1/pilot/rust_observation.rs",
+    },
+    "leaves": {
+        "requests": "data/phase1/requests/leaves.json",
+        "native_probes": [
+            {
+                "name": "collections",
+                "package": "collections",
+                "probe": "tools/phase1/leaves/collections_probe_test.go",
+                "test": "TestPhase1LeavesCollections",
+            },
+        ],
+        "rust_package": "phase1_leaves",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_leaves",
+        "rust_target": "tools/phase1/leaves/src/main.rs",
     },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
@@ -210,7 +232,10 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
     paths: set[Path] = set()
 
     paths.add(Path(spec["requests"]))
-    paths.add(Path(spec["rust_driver"]))
+    # The pilot's driver and Cargo target are different files (a thin example
+    # includes the driver); a harness binary is its own target.
+    if spec.get("rust_driver"):
+        paths.add(Path(spec["rust_driver"]))
     paths.add(Path(spec["rust_target"]))
     for probe in spec["native_probes"]:
         paths.add(Path(probe["probe"]))
@@ -336,20 +361,39 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     return report
 
 
-def order_safe_problems(value: object, path: str = "observation") -> list[str]:
-    """Locate JSON objects whose member order canonicalisation would erase."""
+def order_safe_problems(observation: object) -> list[str]:
+    """Check an order-sensitive observation uses an order-preserving shape."""
+    if not isinstance(observation, dict) or "ordered" not in observation:
+        return [
+            "an order-sensitive observation must carry its ordered payload under `ordered`"
+        ]
+    payload = observation["ordered"]
+    if not isinstance(payload, list):
+        return [
+            "`ordered` must be a list; a JSON object's member order is lost to canonicalisation"
+        ]
+
+    def nested(value: object, path: str) -> list[str]:
+        if isinstance(value, dict):
+            if len(value) > 1:
+                return [
+                    f"{path} is a {len(value)}-key object nested inside the ordered payload; "
+                    "ordered data must be an entry array, because canonicalisation sorts keys"
+                ]
+            return [p for k, v in value.items() for p in nested(v, f"{path}.{k}")]
+        if isinstance(value, list):
+            return [p for i, v in enumerate(value) for p in nested(v, f"{path}[{i}]")]
+        return []
+
     problems: list[str] = []
-    if isinstance(value, dict):
-        if len(value) > 1:
-            problems.append(
-                f"{path} is a {len(value)}-key JSON object; an order-sensitive observation must "
-                "use an entry array or raw bytes, because canonicalisation sorts object keys"
-            )
-        for key, item in value.items():
-            problems.extend(order_safe_problems(item, f"{path}.{key}"))
-    elif isinstance(value, list):
-        for index, item in enumerate(value):
-            problems.extend(order_safe_problems(item, f"{path}[{index}]"))
+    for index, element in enumerate(payload):
+        where = f"ordered[{index}]"
+        if isinstance(element, dict):
+            # The element's own named fields are fine; their values are not.
+            for key, value in element.items():
+                problems.extend(nested(value, f"{where}.{key}"))
+        else:
+            problems.extend(nested(element, where))
     return problems
 
 
@@ -703,16 +747,10 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         if native["result"] == "native_unavailable":
             rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
             continue
-        request = next(r for r in requests if r["case"] == case)
-        if request.get(ORDER_SENSITIVE_KEY):
-            # Compare as emitted as well, so a pure member-order difference is
-            # still a difference rather than being canonicalised away.
-            same = (
-                json.dumps(native.get("observation"), separators=(",", ":"))
-                == json.dumps(rust.get("observation"), separators=(",", ":"))
-            )
-        else:
-            same = canonical(native.get("observation")) == canonical(rust.get("observation"))
+        # Canonicalisation preserves array order, and order-sensitive cases are
+        # required to put their ordered payload in an array, so this comparison
+        # sees order differences without being confused by named-field order.
+        same = canonical(native.get("observation")) == canonical(rust.get("observation"))
         rows.append({
             "case": case,
             "result": "match" if same else "different",

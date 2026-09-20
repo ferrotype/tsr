@@ -863,21 +863,33 @@ class OrderSensitiveTests(unittest.TestCase):
     def test_entry_arrays_survive_canonicalisation(self):
         self.assertNotEqual(canonical([["b", 1], ["a", 2]]), canonical([["a", 2], ["b", 1]]))
 
-    def test_order_safe_problems_flags_multi_key_objects(self):
-        self.assertTrue(capture.order_safe_problems({"a": 1, "b": 2}))
-        self.assertTrue(capture.order_safe_problems({"wrap": {"a": 1, "b": 2}}))
-        self.assertTrue(capture.order_safe_problems({"rows": [{"a": 1, "b": 2}]}))
+    def test_order_safe_problems_flags_a_nested_ordered_map(self):
+        # A multi-key object *inside* an element is an ordered map whose order
+        # canonicalisation would erase.
+        self.assertTrue(capture.order_safe_problems(
+            {"ordered": [{"op": "entries", "result": {"a": 1, "b": 2}}]}))
+        self.assertTrue(capture.order_safe_problems(
+            {"ordered": [{"op": "entries", "result": [{"a": 1, "b": 2}]}]}))
 
-    def test_order_safe_problems_accepts_entry_arrays_and_single_keys(self):
-        self.assertEqual(capture.order_safe_problems({"entries": [["a", 1], ["b", 2]]}), [])
-        self.assertEqual(capture.order_safe_problems({"bytes": "{\"b\":1,\"a\":2}"}), [])
+    def test_order_safe_problems_accepts_entry_arrays_and_named_fields(self):
+        # An element's own named fields are fine: their order carries no
+        # information and canonicalisation sorts them the same on both sides.
+        self.assertEqual(capture.order_safe_problems(
+            {"ordered": [{"op": "set", "panic": ""}, {"op": "entries",
+                                                      "result": [["a", 1], ["b", 2]]}]}), [])
+        self.assertEqual(capture.order_safe_problems(
+            {"ordered": [{"bytes": "{\"b\":1,\"a\":2}"}]}), [])
+
+    def test_an_order_sensitive_observation_must_declare_its_ordered_payload(self):
+        self.assertTrue(capture.order_safe_problems({"entries": [["a", 1]]}))
+        self.assertTrue(capture.order_safe_problems({"ordered": {"a": 1}}))
 
     def test_an_order_sensitive_case_rejects_an_order_erasing_observation(self):
         requests = [{"case": "m", "operation": "collections.orderedMap",
                      "order_sensitive": True}]
         document = {"version": 1, "observations": [
             {"case": "m", "operation": "collections.orderedMap", "result": "observed",
-             "observation": {"a": 1, "b": 2}}]}
+             "observation": {"ordered": [{"op": "entries", "result": {"a": 1, "b": 2}}]}}]}
         with self.assertRaisesRegex(ValueError, "order-erasing representation"):
             capture.validate_response(document, requests, "rust")
 
@@ -886,7 +898,7 @@ class OrderSensitiveTests(unittest.TestCase):
                      "order_sensitive": True}]
         document = {"version": 1, "observations": [
             {"case": "m", "operation": "collections.orderedMap", "result": "observed",
-             "observation": {"entries": [["a", 1], ["b", 2]]}}]}
+             "observation": {"ordered": [{"op": "entries", "result": [["a", 1], ["b", 2]]}]}}]}
         self.assertEqual(len(capture.validate_response(document, requests, "rust")), 1)
 
     def test_a_pure_member_order_difference_is_reported_as_different(self):
@@ -904,9 +916,9 @@ class OrderSensitiveTests(unittest.TestCase):
         capture.FAMILIES["pilot"]["requests"] = str(inventory)
 
         rows = [{"case": "a",
-                 "native": {"entries": [["b", 1], ["a", 2]]},
+                 "native": {"ordered": [{"result": [["b", 1], ["a", 2]]}]},
                  "rust": {"result": "observed",
-                          "observation": {"entries": [["a", 2], ["b", 1]]}}}]
+                          "observation": {"ordered": [{"result": [["a", 2], ["b", 1]]}]}}}]
         directory = Path(temporary) / "ordered"
         SyntheticCapture(directory, rows)
         report = capture.compare(directory)

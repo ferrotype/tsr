@@ -1,0 +1,314 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "new_nil"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "op": "clear"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-empty-nil",
+      "discriminates": "a nil *OrderedMap tolerates Size/Keys/Entries/Get/Has/Clone but Clear has no nil guard",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-insert-overwrite",
+      "discriminates": "overwriting an existing key must keep its original position, not move it to the end",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "key": "b",
+          "op": "delete"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-delete-reinsert",
+      "discriminates": "a reinserted key goes to the end, not back to its original slot",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-double-delete",
+      "discriminates": "the second Delete returns the zero value and false without disturbing the map",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "early_stop_keys",
+          "stop": 2
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-early-stop",
+      "discriminates": "breaking out of the range-over-func iterator is observable and leaves the map intact",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "clone_entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clone-isolation",
+      "discriminates": "a clone keeps its own order and contents after the original is mutated",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "z",
+          "op": "clone_set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "clone_entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clone-write-back",
+      "discriminates": "writing through the clone must not alias back into the original",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clear-reuse",
+      "discriminates": "Clear empties the order as well as the map, so later inserts start a fresh sequence",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_size_hint",
+          "size": 4
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-size-hint",
+      "discriminates": "a size hint changes allocation only, never iteration order",
+      "operation": "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    }
+  ],
+  "version": 1
+}
