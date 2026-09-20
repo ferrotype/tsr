@@ -59,7 +59,7 @@ class ArchiveTests(unittest.TestCase):
                                         "cases": [prefix + f"case_{index:02d}" for index in range(count)]}
         for name in replay.GROUPS:
             case = "ownership_tests::" + name
-            inventory["groups"][name] = {"package": "tsr_compiler", "filter": case, "exact": True, "cases": [case]}
+            inventory["groups"][name] = {"package": "ts_compiler", "filter": case, "exact": True, "cases": [case]}
         text = ""
         suites = {**inventory["common"], **inventory["groups"]}
         for mode in sorted(replay.MODES):

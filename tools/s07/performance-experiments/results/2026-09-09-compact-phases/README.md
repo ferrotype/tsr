@@ -2,7 +2,7 @@
 
 The same existing phase adapter, compiled against each frozen production source,
 ran the consuming path at one worker with normal mimalloc, Rust 1.97.1 and
-`tsr_ast/layout-profile`. One warmup and three alternating measured runs per
+`ts_ast/layout-profile`. One warmup and three alternating measured runs per
 revision completed; all eight children match the full workload/digest and bind
 all 13,094 files in place with zero fallbacks.
 

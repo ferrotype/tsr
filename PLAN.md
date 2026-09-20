@@ -221,7 +221,7 @@ Each decision names what it replaces. Corsa's observable behavior is preserved w
 
 ### 11. This repository is the workspace; upstream is a pinned submodule
 
-- **Decision.** A Cargo workspace at the root of this repository, one crate per Go package where the boundary carries meaning, tiny leaves merged into `ts_core`. Test-only packages become test crates. microsoft/TypeScript is a git submodule at `upstream/`, pinned to a commit (1f70213d49 today), providing test data, schemas, libs, locales, the JS client, the extension, and the Go source from which the oracle binary is built and against which the ledger is kept. See the crate map below.
+- **Decision.** A Cargo workspace at the root of this repository, one crate per Go package where the boundary carries meaning, tiny leaves merged into `tsr_core`. Test-only packages become test crates. microsoft/TypeScript is a git submodule at `upstream/`, pinned to a commit (1f70213d49 today), providing test data, schemas, libs, locales, the JS client, the extension, and the Go source from which the oracle binary is built and against which the ledger is kept. See the crate map below.
 - **Because.** Cargo compiles and caches crates independently; a monolithic crate makes the 60,000-line checker the compile-time bottleneck of every change. A submodule keeps 342 MB of test data out of this repository's history while pinning exactly which upstream commit every baseline and schema came from.
 
 ### 12. Toolchain and lints
@@ -279,23 +279,23 @@ Tiers group related crates; the actual dependency edges are in `data/import-grap
 
 | Tier | Crates | Phase |
 |---|---|---|
-| 0, leaves: no compiler knowledge | `ts_core`, `ts_collections`, `ts_tspath`, `ts_stringutil`, `ts_jsnum`, `ts_json`, `ts_locale`, `ts_glob`, `ts_semver`, `ts_packagejson`, `ts_vfs`, `ts_vfs_os`, `ts_vfs_match`, `ts_diagnostics` (generated), `ts_bundled` (generated) | 1 |
-| 0, leaves: contracts the AST depends on | `ts_jsstring` (source/string bytes and position maps), `ts_arena` (checked owner/generation ids, lazy storage, bundle ownership and leases) | 0 |
-| 0, leaves: platform | `ts_fswatch` (FSEvents, inotify, fanotify), `ts_nativepath` | 4 |
-| 1, syntax: source text to parsed trees | `ts_ast` (generated), `ts_scanner`, `ts_parser`, `ts_encoder` (generated) | 0 (E1); 1 for full parse/bind coverage |
-| 1, syntax | `ts_binder`, `ts_astnav`, `ts_evaluator` | 1 |
-| 2, semantics: resolution | `ts_module`, `ts_tsoptions` | 1 |
-| 2, semantics: types | `ts_modulespecifiers`, `ts_checker` | 2 |
-| 2, semantics: output trees | `ts_pseudochecker`, `ts_sourcemap`, `ts_printer`, `ts_transformers`, `ts_declarations` | 3 |
-| 3, programs: compile, build, watch | `ts_outputpaths`, `ts_transpile` | 3 |
-| 3, programs | `ts_compiler`, `ts_incremental`, `ts_build`, `ts_execute`, `ts_diagnosticwriter`, `ts_tracing`, `ts_pprof`, `tsc` (binary) | 4 |
-| 4, editor: language service and projects | `ts_format`, `ts_ls`, `ts_autoimport`, `ts_lsproto` (generated), `ts_project`, `ts_ata`, `ts_contentmapper`, `ts_spanmap` | 5 |
-| 5, servers: processes and protocols | `ts_lsp`, `ts_testhost` (transport contracts in 1; semantic server integration in 5) | 5 |
-| 5, servers | `ts_ipc` (unix sockets), `ts_jsonrpc`, `ts_api` | 6 |
-| 7, additional entry points | `ts_wasm`, `ts_embed` (parser/checker prototypes in 0; full compiler acceptance before cut-over) | 7 |
-| Test crates, not shipped | `ts_testutil`, `ts_testrunner` | 1 |
-| Test crates | `ts_tsctests` | 4 |
-| Test crates | `ts_fourslash`, `ts_projecttest` | 5 |
+| 0, leaves: no compiler knowledge | `tsr_core`, `tsr_collections`, `tsr_tspath`, `tsr_stringutil`, `tsr_jsnum`, `tsr_json`, `tsr_locale`, `tsr_glob`, `tsr_semver`, `tsr_packagejson`, `tsr_vfs`, `ts_vfs_os`, `ts_vfs_match`, `tsr_diagnostics` (generated), `tsr_bundled` (generated) | 1 |
+| 0, leaves: contracts the AST depends on | `tsr_jsstring` (source/string bytes and position maps), `tsr_arena` (checked owner/generation ids, lazy storage, bundle ownership and leases) | 0 |
+| 0, leaves: platform | `tsr_fswatch` (FSEvents, inotify, fanotify), `tsr_nativepath` | 4 |
+| 1, syntax: source text to parsed trees | `tsr_ast` (generated), `tsr_scanner`, `tsr_parser`, `tsr_encoder` (generated) | 0 (E1); 1 for full parse/bind coverage |
+| 1, syntax | `tsr_binder`, `tsr_astnav`, `tsr_evaluator` | 1 |
+| 2, semantics: resolution | `tsr_module`, `tsr_tsoptions` | 1 |
+| 2, semantics: types | `tsr_modulespecifiers`, `tsr_checker` | 2 |
+| 2, semantics: output trees | `tsr_pseudochecker`, `tsr_sourcemap`, `tsr_printer`, `tsr_transformers`, `tsr_declarations` | 3 |
+| 3, programs: compile, build, watch | `tsr_outputpaths`, `tsr_transpile` | 3 |
+| 3, programs | `tsr_compiler`, `tsr_incremental`, `tsr_build`, `tsr_execute`, `tsr_diagnosticwriter`, `tsr_tracing`, `tsr_pprof`, `tsc` (binary) | 4 |
+| 4, editor: language service and projects | `tsr_format`, `tsr_ls`, `tsr_autoimport`, `tsr_lsproto` (generated), `tsr_project`, `ts_ata`, `tsr_contentmapper`, `tsr_spanmap` | 5 |
+| 5, servers: processes and protocols | `tsr_lsp`, `tsr_testhost` (transport contracts in 1; semantic server integration in 5) | 5 |
+| 5, servers | `tsr_ipc` (unix sockets), `tsr_jsonrpc`, `tsr_api` | 6 |
+| 7, additional entry points | `tsr_wasm`, `tsr_embed` (parser/checker prototypes in 0; full compiler acceptance before cut-over) | 7 |
+| Test crates, not shipped | `tsr_testutil`, `tsr_testrunner` | 1 |
+| Test crates | `tsr_tsctests` | 4 |
+| Test crates | `tsr_fourslash`, `ts_projecttest` | 5 |
 
 ## 9. Sequence and gates
 

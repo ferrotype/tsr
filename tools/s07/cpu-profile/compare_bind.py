@@ -26,6 +26,7 @@ def rank(counter, denominator):
 
 
 def phase_for_rust(names, worker):
+    names = [rust.selector_name(name) for name in names]
     parse = any(n.startswith('tsr_parser::orchestration::parse_source_file_with_counters') for n in names)
     bind = any(n.startswith('tsr_binder::bind_parsed_file') for n in names)
     if parse and bind:
@@ -74,9 +75,9 @@ def suspect_groups(samples):
     own, inclusive, leafs = Counter(), Counter(), defaultdict(Counter)
     for weight, displayed, names in samples:
         for group, predicate in SUSPECTS.items():
-            if displayed and predicate(displayed[0]):
+            if displayed and predicate(rust.selector_name(displayed[0])):
                 own[group] += weight
-            if any(predicate(n) for n in names):
+            if any(predicate(rust.selector_name(n)) for n in names):
                 inclusive[group] += weight
                 leafs[group][displayed[0] if displayed else '<missing stack>'] += weight
     return {name: {'displayed_self_ns': own[name], 'inclusive_ns': inclusive[name],

@@ -246,13 +246,13 @@
   },
   "post_capture_attribution_corrections": [
     {
-      "path": "crates/tsr_checker/src/indexes.rs",
+      "path": "crates/ts_checker/src/indexes.rs",
       "captured_sha256": "8bdb6a9f5877b0cb47efc8316b3b64ddc8f96029aa728efc4309a3e0107e4f36",
       "delivery_sha256": "f6092068f26c4ec89f4b0593713e076952d71240b72f8b6227fdd9bca57cb3c1",
       "reason": "Go source attribution comments only; executable lines unchanged"
     },
     {
-      "path": "crates/tsr_checker/src/signature_parameters.rs",
+      "path": "crates/ts_checker/src/signature_parameters.rs",
       "captured_sha256": "3877e9bc184ce988559458e15646e0c91d1ed1b325e108204087bbd77f3eedbf",
       "delivery_sha256": "2cde83a12280e9ecbc1a6e23d25144f9ddec9ae9d3276f764b39e2b2a8db1e1b",
       "reason": "Go source attribution comments only; executable lines unchanged"

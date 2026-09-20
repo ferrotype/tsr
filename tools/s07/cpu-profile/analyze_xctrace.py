@@ -109,11 +109,20 @@ def demangle(names, executable=None):
                     "changed_symbols": sum(result[name] != name for name in names)}
 
 
+# Only selector inputs are normalized. Captured frame names, stack keys and
+# report labels retain the spelling of the binary that produced the archive.
+LEGACY_CRATE = re.compile(r"(?<![\w:])ts_(arena|ast|binder|parser|cpu_profile)(?=::)")
+
+
+def selector_name(name):
+    return LEGACY_CRATE.sub(r"tsr_\1", name)
+
+
 def marker(name, function):
     # Match an actual driver function or its closure; never a generic parameter
     # mentioning another function. Symbol metadata itself remains unmodified.
     return re.match(r"^tsr_cpu_profile(?:::[A-Za-z_][A-Za-z_0-9]*)*::" + function
-                    + r"(?=$|::|[<(])", name) is not None
+                    + r"(?=$|::|[<(])", selector_name(name)) is not None
 
 
 def frame_names(frame):
@@ -133,7 +142,7 @@ def phase_for(stack, worker=False):
         return "worker_unassigned"
     if not names:
         return "unknown"
-    if any(name.startswith("tsr_cpu_profile::") for name in names):
+    if any(selector_name(name).startswith("tsr_cpu_profile::") for name in names):
         return "driver"
     if names[0].startswith(("std::", "core::", "alloc::", "runtime.", "mi_", "_mi_", "pthread_", "_pthread_")):
         return "runtime"
@@ -211,7 +220,7 @@ def member(name, owner, method):
 
 
 def query_flags(stack):
-    names = [name for frame in stack for name in frame_names(frame)]
+    names = [selector_name(name) for frame in stack for name in frame_names(frame)]
     def has(owner, method):
         return any(member(name, owner, method) for name in names)
     lookup = has('tsr_ast::storage::AstView', 'node') or any(

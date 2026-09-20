@@ -36843,7 +36843,7 @@
         },
         {
           "file": "crates/tsr_checker/src/node_builder_names.rs",
-          "line": 1452
+          "line": 1453
         },
         {
           "file": "crates/tsr_tspath/src/comparison.rs",

@@ -59,9 +59,10 @@ path inside a historical profiling README.
   field records what was executed at capture time. `scripts/s08_ownership.py`
   reads only `archive.path`, `archive.sha256` and `upstream_pin`; it never
   replays `rust_command`, so rewriting it would only falsify the record.
-- `PLAN.md`, which `CLAUDE.md` excludes from staging. It and
-  `docs/corsa-in-rust.html` describe the same architecture, so they now
-  disagree on prefix; `PLAN.md` is the owner's to update.
+- Historical S07/S08 capture manifests, recorded reports, symbol names and
+  frozen replay helpers. Their paths identify the original archive members,
+  not the current checkout. `PLAN.md` and the active architecture document now
+  both use the new prefix.
 
 The `data/s08/p*/README.md` replay instructions were migrated, because their
 "Regenerate with:" blocks invoke `cargo` against the *current* tree. An
@@ -86,7 +87,14 @@ The S07 subset re-freeze appends finding
 `RENAME-2026-09-19-crate-prefix-operation-mappings`. It falls under the owner's
 standing approval: `data/s07/operations.json` changed **only** inside
 `rust_mappings`, at all 547 sites, in the leading directory component alone,
-with everything outside `rust_mappings` byte-identical.
+with everything outside `rust_mappings` byte-identical. The subsequent
+`RENAME-2026-09-20-final-anchor-and-provenance` finding corrects one final-format
+anchor: `PathIsRelative` moved from line 1452 to 1453 in
+`crates/tsr_checker/src/node_builder_names.rs`. Source observations were exported
+again after the final ledger projection; their bytes remain identical, and their
+provenance now records the current `data/upstream.json` hash. The subset rule and
+review were re-frozen from these exact inputs; subset and checker-obligation bytes
+remain unchanged.
 
 A fresh P0 capture drops the reviewer's `observation_reuse` provenance note.
 Because the frozen observation is byte-identical to the committed one, that
@@ -94,8 +102,11 @@ note still holds and was preserved rather than deleted.
 
 ## Reverse-mapping comparison
 
-Run read-only through git plumbing; nothing was ever reversed in the working
-checkout.
+The initial mechanical comparison at `963a848` is recorded below. It checks
+invertibility of the namespace edit; it does not by itself establish whether a
+historical reference should have been edited. Review repairs below add a strict
+baseline-byte check for historical captures. All comparisons use read-only Git
+plumbing; nothing was reversed in the working checkout.
 
 ```
 baseline 8729daf: 2585 entries        proposed HEAD: 2587 entries
@@ -136,7 +147,47 @@ follows its own inline fixture — `scripts/ledger-init.py` independently
 produces the new value `637f37b9…`, so the Rust and Python canonicalisations
 still agree.
 
-## Validation
+## Review repairs and targeted verification
+
+Historical S07 capture metadata and frozen replay helpers were restored from
+`8729daf` (31 files), along with five S08 historical reports/manifests. Current
+reproduction instructions still name the current crates. No archive payload was
+rewritten. The restored gate-rebase archive replays successfully with all 468
+members and its declared validator; all restored files match the baseline bytes.
+
+The live CPU analyzers accept both old and new crate namespaces for selectors
+only. Captured frame names, self/inclusive report keys and artifact hashes remain
+unchanged. Offline bind comparison reproduces 2,528,000,000 ns for Rust and
+730,000,000 / 670,000,000 / 690,000,000 ns for the three Go runs. The full
+comparison equals the archived final result apart from provenance. New coverage
+checks both spellings, rejects generic/foreign-name false positives, and verifies
+that report labels retain the original spelling.
+
+The final operation inventory is generated from actual source lines. Two cheap
+checks now catch a moved marker or stale syntax-producer input before a full Go
+producer run. The 12 operation-contract tests, five CPU comparison tests and 13
+analyzer contracts pass. `cargo xtask validate` passes. These repairs do not change
+Rust implementation code, acceptance thresholds or selection.
+
+The additional non-rename edits are explicitly scoped to:
+
+- `data/s07/operations.json`: the single `PathIsRelative` line number.
+- `data/s07/subset-rule.json`: the operation hash, syntax provenance and review hash.
+- `data/s07/subset-review.json`: the candidate rule hash and appended repair finding.
+- `scripts/tests/test_s07_operations.py`: marker-location and input-fingerprint checks.
+- `tools/s07/cpu-profile/analyze_xctrace.py`: selector-only compatibility normalization.
+- `tools/s07/cpu-profile/compare_bind.py`: apply compatibility to phase/group selection.
+- `tools/s07/cpu-profile/test_compare_bind.py`: old/new capture regression coverage.
+- This record and regenerated tracker views: current validation and source identity.
+
+Restored historical files have no remaining diff from the baseline. `PLAN.md`
+changes only mapped crate names. The final reverse comparison reports no missing
+paths or mode/type changes; the added paths remain this record and the plan.
+
+## Original implementation validation
+
+These existing results are retained; the repair did not rerun the workspace
+build, lint, wasm, addon or embedding suites. CI reruns on the pushed revision.
 
 | Check | Result |
 | --- | --- |

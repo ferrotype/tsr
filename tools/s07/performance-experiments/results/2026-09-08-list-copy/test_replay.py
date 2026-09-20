@@ -34,7 +34,7 @@ def e3_fixture():
                                     "cases": [prefix + f"case_{index:02d}" for index in range(count)]}
     for name in replay.base.GROUPS:
         case = "ownership_tests::" + name
-        inventory["groups"][name] = {"package": "tsr_compiler", "filter": case,
+        inventory["groups"][name] = {"package": "ts_compiler", "filter": case,
                                     "exact": True, "cases": [case]}
     text = ""
     suites = {**inventory["common"], **inventory["groups"]}
@@ -247,7 +247,7 @@ class ListCopyArchiveTests(unittest.TestCase):
             receipt["binaries"][role] = binary
             builds[role] = {"artifacts": {"normal": {"path": "normal", "sha256": binary_sha}},
                             "inventory": {"normal": {"bytes": 123}}, "source_fingerprint": {
-                                "files": {"crates/tsr_binder/src/containers.rs": source_sha}}}
+                                "files": {"crates/ts_binder/src/containers.rs": source_sha}}}
             name = role + "-containers.rs"
             members["generated-code/" + name] = source
             receipt["review_artifacts"][name] = source_sha
