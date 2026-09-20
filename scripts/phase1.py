@@ -111,6 +111,20 @@ def inventory_check() -> dict:
         outstanding.append(
             f"group {group} is blocked on {index['groups'][group]['authority'].get('blocker')}"
         )
+    # Operations whose source file carries file-level producer metrics but which
+    # have no operation-level witness. F0 requires exact case/artifact links for
+    # anything it calls `covered`, so connecting the existing S04-S11 evidence to
+    # operation ids is named here rather than assumed from the ledger.
+    unlinked = sum(
+        1
+        for row in scope["operations"]
+        if row["disposition"] == "implemented_untested" and row.get("ledger_verification")
+    )
+    if unlinked:
+        outstanding.append(
+            f"{unlinked} operations carry file-level producer metrics but no exact "
+            "operation-level coverage link"
+        )
     return {
         "pin": pin,
         "operations": scope["total_operations"],
@@ -141,18 +155,37 @@ def freeze(source: Path) -> dict:
     its provenance are installed.
     """
     source = Path(source).resolve()
-    provenance = json.loads((source / "provenance.json").read_text())
+    # Authenticate before installing anything: freezing an unverified capture
+    # would put unchecked bytes into the reviewed inventory.
+    provenance = capture_module.authenticate(source)
     if provenance["partial"]:
         raise ValueError("a partial capture cannot be frozen as a family inventory")
     family = provenance["family"]
     destination = ROOT / "data/phase1/native" / family
-    destination.mkdir(parents=True, exist_ok=True)
-    for name in ("observations.json", "provenance.json"):
-        shutil.copyfile(source / "native" / name, destination / name)
+    if destination.exists():
+        shutil.rmtree(destination)
+    destination.mkdir(parents=True)
+
+    # One directory per native probe, mirroring the capture layout. A family
+    # may be served by several probes, so a single observations.json is not the
+    # shape on disk.
+    installed = {}
+    for package, probe in sorted(provenance["native_probes"].items()):
+        probe_source = source / probe["directory"]
+        probe_destination = destination / probe["directory"].removeprefix("native/")
+        probe_destination.mkdir(parents=True, exist_ok=True)
+        for name in ("observations.json", "provenance.json"):
+            shutil.copyfile(probe_source / name, probe_destination / name)
+        installed[package] = str(probe_destination.relative_to(destination))
+
     (destination / "capture-provenance.json").write_text(
         json.dumps(provenance, indent=2, sort_keys=True) + "\n"
     )
-    return {"frozen": family, "destination": str(destination.relative_to(ROOT))}
+    return {
+        "frozen": family,
+        "destination": str(destination.relative_to(ROOT)),
+        "probes": installed,
+    }
 
 
 def main() -> int:

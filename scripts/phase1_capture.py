@@ -45,15 +45,30 @@ RUST_STATUSES = ("observed", "not_implemented", "harness_failed")
 NATIVE_STATUSES = ("observed", "native_unavailable", "harness_failed")
 
 # Shared helpers whose behavior changes an observation even though they are not
-# family specific.
+# family specific. The s04 group is load-bearing rather than incidental:
+# `s04.py::verified_upstream` loads `tracking-bootstrap.py` to authenticate the
+# submodule, and `s04.py::go_environment` reads the required Go version out of
+# `data/s04/toolchains.toml`. Omitting them let a changed Go pin leave existing
+# captures looking current.
 SHARED_SCRIPTS = (
     "scripts/phase1_capture.py",
     "scripts/phase1.py",
+    "scripts/phase1_invocations.py",
+    "scripts/s04.py",
     "scripts/s04_common.py",
+    "scripts/s04_runtime.py",
     "scripts/s08_oracle.py",
+    "scripts/tracking-bootstrap.py",
 )
-# Build inputs that select the toolchain, dependency versions and codegen.
-BUILD_INPUTS = ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "data/upstream.json")
+# Build and toolchain inputs that select dependency versions, codegen and the
+# Go toolchain the native probes run under.
+BUILD_INPUTS = (
+    "Cargo.toml",
+    "Cargo.lock",
+    "rust-toolchain.toml",
+    "data/upstream.json",
+    "data/s04/toolchains.toml",
+)
 
 FAMILIES = {
     "pilot": {
@@ -448,6 +463,11 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     return provenance
 
 
+def authenticate(directory: Path) -> dict:
+    """Public entry point: validate a stored capture without reading its rows."""
+    return _authenticate(Path(directory).resolve())
+
+
 def _authenticate(directory: Path) -> dict:
     provenance = strict_json_loads((directory / "provenance.json").read_bytes())
     if provenance.get("version") != 2:
@@ -506,11 +526,30 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
     Every probe reports every case; the one that owns an operation returns
     `observed` and the rest return `native_unavailable`. Two probes claiming the
     same case is a contradiction, not a merge.
+
+    A harness failure is collected across *all* probes and raised before any
+    merging happens. Merging first hid it two ways: an earlier
+    `native_unavailable` won the `setdefault`, and an `observed` row from the
+    owning probe overwrote a failure reported by another.
     """
-    merged: dict[str, dict] = {}
+    documents = {}
+    failures: list[str] = []
     for package, probe in sorted(provenance["native_probes"].items()):
         document = strict_json_loads((directory / probe["directory"] / "observations.json").read_bytes())
         rows = validate_response(document, requests, "native")
+        documents[package] = rows
+        for row in rows:
+            if row["result"] == "harness_failed":
+                cause = row.get("error") or row.get("reason") or "no cause recorded"
+                failures.append(f"{package} failed on {row['case']}: {cause}")
+    if failures:
+        raise ValueError(
+            f"{len(failures)} native harness failure(s) invalidate this capture: "
+            + "; ".join(failures[:5])
+        )
+
+    merged: dict[str, dict] = {}
+    for package, rows in documents.items():
         for row in rows:
             case = row["case"]
             if row["result"] != "observed":

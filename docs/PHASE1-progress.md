@@ -10,7 +10,7 @@ moved pin invalidates it.
 
 | Step | State |
 | --- | --- |
-| F0 — inventory, manifests and executable setup | **incomplete**: blocked on the `config/matchFiles` authority decision |
+| F0 — inventory, manifests and executable setup | **incomplete**: the matchFiles authority decision, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | not started |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
@@ -27,8 +27,9 @@ implementation; no production behavior has been added or changed.
 | Requirement | Result |
 | --- | --- |
 | Scope has zero unclassified operations | 4,795 operations, each with a disposition, basis, case links and dependencies |
+| `covered` carries exact case/artifact links | **1 of 4,795.** 2,720 mapped operations have only file-level producer metrics; see Scope |
 | All 309 outputs have verified invocation mappings | **167 of 309.** 142 blocked; see below |
-| Manifests and failure tests pass | 61 Phase 1 tests, plus the extended discovery regression |
+| Manifests and failure tests pass | 75 Phase 1 tests, plus the extended discovery regression |
 | The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations, each with a native expectation |
 | Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
 | The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
@@ -123,11 +124,26 @@ operations are Phase 1 obligations, and F4a enumerates that exact surface.
 
 | Disposition | Count |
 | --- | ---: |
-| `covered` | 2,703 |
-| `implemented_untested` | 747 |
+| `covered` | 1 |
+| `implemented_untested` | 3,449 |
 | `missing` | 1,327 |
 | `equivalent_rust` | 0 |
 | `later_phase` | 18 |
+
+`covered` requires an **exact operation-level link**, which is what F0 asks for.
+The ledger's `verify` field cannot supply one: its entries are file-level
+producer metric expressions such as `run.e1.parity >= 0.999`. They say a source
+file's port is exercised by a producer; they do not say which operation any
+single metric witnesses. Treating their presence as coverage marked 2,703
+operations `covered` with no artifact behind any of them. Those metrics are now
+retained per row as `ledger_verification` for context, and a mapped operation
+without an exact link is `implemented_untested`.
+
+Connecting the existing S04–S11 evidence to operation ids is therefore
+outstanding F0 work in its own right, reported by `inventory --check`, and it is
+what F1a's "map every existing probe to the leaf operation IDs it actually
+exercises" will discharge. `verify()` rejects a `covered` row with no links and
+an `implemented_untested` row that has them.
 
 Every row carries a `basis`, a `basis_kind`, the cases that witness it and its
 package's internal dependencies read from the pinned Go imports. All F0 rows
@@ -173,10 +189,14 @@ end to end:
 
 **A production change stales the capture.** The source closure is derived from
 `cargo metadata`, not hand-listed, so it contains the driver package's whole
-workspace dependency closure — 322 inputs, including
+workspace dependency closure — 327 inputs, including
 `crates/tsr_tsoptions/src/glob.rs`, all of `tsr_vfs`, the example target,
-`Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `.cargo/**` and the shared
-oracle helpers. Appending a comment to `glob.rs` makes `compare` fail with
+`Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` and `.cargo/**`. It also
+covers what the *native* side executes: `data/s04/toolchains.toml` (which
+selects the required Go version), `scripts/s04.py`, `scripts/s04_runtime.py`
+and `scripts/tracking-bootstrap.py`, which `verified_upstream` loads to
+authenticate the submodule. Each of those has been verified to invalidate a
+capture. Appending a comment to `glob.rs` makes `compare` fail with
 `capture input crates/tsr_tsoptions/src/glob.rs changed after the capture`.
 Replay recomputes the expected key set rather than trusting the recorded one,
 so a capture that recorded too few inputs cannot authenticate; the workspace
@@ -198,6 +218,17 @@ statuses. Against a real capture:
 
 A side may only report its own statuses: a Rust driver cannot claim
 `native_unavailable`, and a native probe cannot claim `not_implemented`.
+
+**A native harness failure cannot be merged away.** Failures are collected
+across every probe and raised before any merging happens. Merging first hid
+them two ways: an earlier `native_unavailable` won the `setdefault`, and an
+`observed` row from the owning probe overwrote a failure reported by another.
+Injecting a failure into a probe that sorts before the observing one, and into
+one that sorts after, now both fail with the probe, case and cause named.
+
+**Freezing installs the multi-probe layout.** `freeze` authenticates the
+capture before installing anything, then writes one directory per probe. It
+previously copied a single `native/observations.json`, which no longer exists.
 
 ## Commands
 

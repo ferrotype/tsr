@@ -241,16 +241,41 @@ def workspace_symbol_index() -> dict[str, list[str]]:
     return index
 
 
-def classify(entry: dict, symbol: str, mapped: bool, index: dict[str, list[str]]) -> tuple[str, str]:
-    """Return (disposition, basis). Basis records how the disposition was reached."""
+def classify(
+    entry: dict,
+    symbol: str,
+    mapped: bool,
+    index: dict[str, list[str]],
+    coverage: list[str],
+) -> tuple[str, str]:
+    """Return (disposition, basis). Basis records how the disposition was reached.
+
+    `covered` requires an *exact* operation-level link, which is what F0 asks
+    for. The ledger's `verify` field cannot supply one: its entries are
+    file-level producer metric expressions such as `run.e1.parity >= 0.999`.
+    They say a source file's port is exercised by a producer; they do not say
+    which operation any single metric witnesses. Treating their presence as
+    coverage marked 2,703 operations `covered` with no artifact behind any of
+    them. They are retained per row as `ledger_verification` for context, and
+    a mapped operation without an exact link is `implemented_untested`.
+    """
     status = entry.get("status")
     verify = entry.get("verify") or []
 
     if status == "out-of-scope":
         return "later_phase", "ledger marks the source file out of scope for the port"
     if mapped:
+        if coverage:
+            return (
+                "covered",
+                f"witnessed by {len(coverage)} exact case link(s): " + ", ".join(coverage[:3]),
+            )
         if verify:
-            return "covered", f"ledger maps the symbol and records {len(verify)} verification link(s)"
+            return (
+                "implemented_untested",
+                f"ledger maps the symbol and its source file carries {len(verify)} file-level "
+                "producer metric(s), which do not witness this operation individually",
+            )
         return "implemented_untested", "ledger maps the symbol but records no verification link"
 
     candidate = snake(symbol)
@@ -328,8 +353,8 @@ def build() -> dict:
             f'{function["receiver"]}.{function["name"]}' if function.get("receiver") else function["name"]
         )
         mapped = identity not in missing_ids
-        disposition, basis = classify(entry, symbol, mapped, index)
         linked = case_links.get(identity, [])
+        disposition, basis = classify(entry, symbol, mapped, index, linked)
         if linked and disposition == "missing":
             # A case exists for it, so the gap is witnessed rather than merely
             # inferred from the audit input.
@@ -348,6 +373,9 @@ def build() -> dict:
                 "ledger_crate": entry.get("crate"),
                 "rust_home": list(entry.get("rust") or []),
                 "actual_home": KNOWN_HOMES.get(package),
+                # File-level producer metrics from the ledger. Context, not an
+                # operation-level coverage claim; see classify().
+                "ledger_verification": list(entry.get("verify") or []),
                 "disposition": disposition,
                 "basis": basis,
                 "basis_kind": "rule",
@@ -399,6 +427,14 @@ def verify(scope: dict) -> list[str]:
             problems.append(f"{row.get('id')}: later_phase row must name a destination outside phase 1")
         if row.get("disposition") == "equivalent_rust" and row.get("basis_kind") != "review":
             problems.append(f"{row.get('id')}: equivalent_rust requires a reviewed behavioral witness")
+        if row.get("disposition") == "covered" and not row.get("cases"):
+            problems.append(
+                f"{row.get('id')}: covered requires exact case links, but none are recorded"
+            )
+        if row.get("cases") and row.get("disposition") == "implemented_untested":
+            problems.append(
+                f"{row.get('id')}: an operation with exact case links cannot be implemented_untested"
+            )
     counts: dict[str, int] = {d: 0 for d in DISPOSITIONS}
     for row in rows:
         if row.get("disposition") in counts:

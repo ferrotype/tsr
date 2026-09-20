@@ -591,5 +591,181 @@ class InvocationMappingTests(unittest.TestCase):
         self.assertIn("writeComparison(t, actual, localPath, referencePath)", text)
 
 
+class NativeMergeTests(unittest.TestCase):
+    """A native harness failure must never be merged away."""
+
+    def setUp(self):
+        self.temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temporary, ignore_errors=True)
+
+    def capture_with(self, name, probe_rows):
+        """Build a capture whose probes report the given rows for one case."""
+        directory = Path(self.temporary) / name
+        requests = [{"case": "a", "operation": "vfsmatch.readDirectory"}]
+        provenance = {"native_probes": {}}
+        for package, row in probe_rows.items():
+            probe_directory = directory / "native" / package.replace("/", "-")
+            probe_directory.mkdir(parents=True)
+            body = canonical({"version": 1, "observations": [row]}) + b"\n"
+            (probe_directory / "observations.json").write_bytes(body)
+            provenance["native_probes"][package] = {
+                "directory": f"native/{package.replace('/', '-')}",
+                "observations_sha256": sha(body),
+            }
+        return directory, provenance, requests
+
+    def test_an_earlier_unavailable_cannot_hide_a_later_failure(self):
+        # "aaa" sorts before "zzz", so the unavailable row is merged first and
+        # previously won the setdefault.
+        directory, provenance, requests = self.capture_with("hidden-by-unavailable", {
+            "aaa": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "native_unavailable", "reason": "not mine"},
+            "zzz": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "harness_failed", "error": "probe crashed"},
+        })
+        with self.assertRaisesRegex(ValueError, "native harness failure"):
+            capture._merge_native(directory, provenance, requests)
+
+    def test_an_observed_row_cannot_hide_a_failure(self):
+        directory, provenance, requests = self.capture_with("hidden-by-observed", {
+            "aaa": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "harness_failed", "error": "probe crashed"},
+            "zzz": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "observed", "observation": {"files": []}},
+        })
+        with self.assertRaisesRegex(ValueError, "native harness failure"):
+            capture._merge_native(directory, provenance, requests)
+
+    def test_the_failure_cause_is_reported(self):
+        directory, provenance, requests = self.capture_with("cause", {
+            "aaa": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "harness_failed", "error": "probe crashed"},
+        })
+        with self.assertRaisesRegex(ValueError, "probe crashed"):
+            capture._merge_native(directory, provenance, requests)
+
+    def test_two_observing_probes_are_still_ambiguous(self):
+        directory, provenance, requests = self.capture_with("ambiguous", {
+            "aaa": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "observed", "observation": {"files": []}},
+            "zzz": {"case": "a", "operation": "vfsmatch.readDirectory",
+                    "result": "observed", "observation": {"files": []}},
+        })
+        with self.assertRaisesRegex(ValueError, "authority is ambiguous"):
+            capture._merge_native(directory, provenance, requests)
+
+
+class NativeDependencyTests(unittest.TestCase):
+    """The closure must cover what the native side actually executes."""
+
+    def test_go_toolchain_and_upstream_helpers_are_in_the_closure(self):
+        closure = capture.source_closure("pilot")
+        for required in (
+            "data/s04/toolchains.toml",      # selects the required Go version
+            "scripts/s04.py",                # go_environment and verified_upstream
+            "scripts/s04_runtime.py",        # toolchain pin validation
+            "scripts/tracking-bootstrap.py", # loaded by verified_upstream
+            "scripts/phase1_invocations.py", # the baseline instrumentation
+        ):
+            self.assertIn(required, closure, required)
+
+    def test_changing_the_required_go_version_invalidates_a_capture(self):
+        temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temporary, ignore_errors=True)
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "observed", "observation": {"files": []}}}]
+        directory = Path(temporary) / "toolchain"
+        SyntheticCapture(directory, rows)
+        provenance = json.loads((directory / "provenance.json").read_text())
+        target = "data/s04/toolchains.toml"
+        self.assertIn(target, provenance["source_closure"])
+        provenance["source_closure"][target] = "0" * 64
+        (directory / "provenance.json").write_bytes(canonical(provenance) + b"\n")
+        with self.assertRaisesRegex(ValueError, f"{target} changed after the capture"):
+            capture.compare(directory)
+
+
+class CoverageLinkTests(unittest.TestCase):
+    """`covered` requires exact operation-level links, not file-level metrics."""
+
+    def setUp(self):
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_every_covered_row_has_exact_case_links(self):
+        for row in self.scope["operations"]:
+            if row["disposition"] == "covered":
+                self.assertTrue(row["cases"], f"{row['id']} is covered with no case links")
+
+    def test_file_level_metrics_alone_do_not_make_an_operation_covered(self):
+        # A mapped operation whose file carries producer metrics but which has
+        # no case link is untested, not covered. (An *unmapped* operation in
+        # such a file stays `missing`; the metrics say nothing about it either.)
+        rows = [
+            r for r in self.scope["operations"]
+            if r.get("ledger_verification") and not r["cases"] and r["mapped_in_ledger"]
+        ]
+        self.assertTrue(rows, "expected mapped operations carrying only file-level metrics")
+        for row in rows:
+            self.assertEqual(row["disposition"], "implemented_untested", row["id"])
+        self.assertGreater(len(rows), 1000, "the overclaim affected thousands of rows")
+
+    def test_file_level_metrics_are_retained_for_context(self):
+        rows = [r for r in self.scope["operations"] if r.get("ledger_verification")]
+        self.assertTrue(rows)
+        self.assertTrue(any("run." in v for r in rows for v in r["ledger_verification"]))
+
+    def test_a_covered_row_without_links_is_rejected(self):
+        forged = json.loads(json.dumps(self.scope))
+        row = next(r for r in forged["operations"] if r["disposition"] == "implemented_untested")
+        row["disposition"] = "covered"
+        forged["counts"]["covered"] += 1
+        forged["counts"]["implemented_untested"] -= 1
+        problems = scope.verify(forged)
+        self.assertTrue(any("covered requires exact case links" in p for p in problems))
+
+    def test_unlinked_coverage_is_named_as_outstanding_f0_work(self):
+        result = phase1.inventory_check()
+        self.assertTrue(
+            any("operation-level coverage link" in item for item in result["f0_outstanding"]),
+            "connecting existing evidence to operation ids must be named, not assumed",
+        )
+
+
+class FreezeTests(unittest.TestCase):
+    """Freezing must handle the multi-probe layout and authenticate first."""
+
+    def setUp(self):
+        self.temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temporary, ignore_errors=True)
+
+    def test_freeze_authenticates_before_installing(self):
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "observed", "observation": {"files": []}}}]
+        directory = Path(self.temporary) / "unauthentic"
+        SyntheticCapture(directory, rows)
+        (directory / "rust-observations.json").write_bytes(b'{"version":1,"observations":[]}\n')
+        with self.assertRaisesRegex(ValueError, "does not match its recorded hash"):
+            phase1.freeze(directory)
+
+    def test_freeze_refuses_a_partial_capture(self):
+        rows = [{"case": "a", "native": {"files": []},
+                 "rust": {"result": "observed", "observation": {"files": []}}}]
+        directory = Path(self.temporary) / "partial"
+        SyntheticCapture(directory, rows, partial=True)
+        with self.assertRaisesRegex(ValueError, "partial capture cannot be frozen"):
+            phase1.freeze(directory)
+
+    def test_the_committed_frozen_layout_is_per_probe(self):
+        installed = ROOT / "data/phase1/native/pilot"
+        if not installed.is_dir():
+            self.skipTest("no frozen pilot observations are committed")
+        self.assertTrue((installed / "capture-provenance.json").is_file())
+        provenance = json.loads((installed / "capture-provenance.json").read_text())
+        for probe in provenance["native_probes"].values():
+            directory = installed / probe["directory"].removeprefix("native/")
+            self.assertTrue((directory / "observations.json").is_file(), str(directory))
+            self.assertTrue((directory / "provenance.json").is_file(), str(directory))
+
+
 if __name__ == "__main__":
     unittest.main()
