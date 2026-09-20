@@ -9,7 +9,7 @@ edition = "2021"
 # ADR 0016: one release behind the stable toolchain pinned in rust-toolchain.toml.
 rust-version = "1.96"
 license = "Apache-2.0"
-repository = "https://github.com/iantocristian/ts-rust"
+repository = "https://github.com/ferrotype/tsr"
 keywords = ["typescript", "javascript", "compiler", "tsr"]
 categories = ["compilers"]
 publish = false
