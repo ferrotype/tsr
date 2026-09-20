@@ -1,11 +1,16 @@
 # tsr_api
 
-Snapshot-scoped compiler API handles, printing and formatting for ts-rust.
+Snapshot-scoped compiler API handles, printing and formatting for tsr.
 
-Part of [ts-rust](https://github.com/iantocristian/ts-rust), a Rust port of
+Part of [tsr](https://github.com/iantocristian/ts-rust), a Rust port of
 the TypeScript compiler. This project is under development; the API and supported
 compiler behavior are not stable. See the repository status and sprint records
 for current coverage.
 
+Requires **Rust 1.96 or newer**.
+
 Licensed under Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE) for
 license and attribution information.
+
+For application integration, start with
+[`tsr_embed`](https://github.com/iantocristian/ts-rust/tree/main/crates/tsr_embed).

@@ -63,3 +63,27 @@ honestly; package checks do not make those captures current.
 Actual publication, registry-only dry runs as sibling `0.1.0` releases become
 available, and any API stability commitment remain outside this PR. The package
 archive checks and isolated builds above are complete without those releases.
+
+## Package-page review amendments
+
+Package descriptions and README branding now use `tsr`; repository links still
+resolve to the actual repository. Every public package states Rust 1.96 and
+inherits compiler search keywords/categories. The embedding README has a complete
+in-memory diagnostic example with its dependency list and explicit host setup.
+The stale S10 guide reference to a public `corpus` feature now names the private
+wasm harness.
+
+The `ferrotype/tsr` move, optional facade crate, dependency-ordered registry dry
+runs and first-publication rate-limit planning are recorded in the packaging
+README. No repository transfer or additional public package is part of this
+amendment. The rate estimate is conditional on the server defaults and a full
+new-crate bucket, not a release-time guarantee.
+
+Validation for this documentation/metadata amendment: all 28 Cargo archives were
+regenerated and compared with the original verified package contents. Rust
+source, assets, license/notice text, dependencies, features, compiler settings and
+external lock entries are unchanged. Differences are limited to READMEs,
+description/keywords/categories, VCS provenance and internal archive checksums.
+The original build/runtime results remain the basis for those unchanged sources;
+this amendment does not claim another full build. The embedding README's Rust
+block was extracted unchanged, compiled and run, including its TS2322 assertion.

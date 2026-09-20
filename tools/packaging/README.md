@@ -72,6 +72,38 @@ same. It no longer exports unrelated parser/checker classes and therefore no
 longer imports the class throw shim. Public `tsr_wasm` parser/checker features
 and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
+## Before the first release
+
+The project branding is **tsr**; the unrelated `ts-rust` crate on crates.io is
+not this project. `tsr_embed` is the application entry point. A `tsr` facade that
+re-exports the public embedding surface remains a separate follow-up; neither
+`tsr` nor `tsrust` is added to this 28-package release set. All package READMEs
+state the Rust 1.96 minimum, and package metadata includes search keywords and
+the compiler category.
+
+The current repository URL is still `https://github.com/iantocristian/ts-rust`.
+On 2026-09-20, `ferrotype/tsr` did not resolve through GitHub. Decide the final
+repository home before publication; if transferring/renaming, complete that move
+and update the workspace repository field and README links before generating
+release archives. Keeping a working URL now does not authorize a transfer.
+Published archives retain their original manifest bytes; a later GitHub redirect
+does not rewrite those bytes.
+
+Do not schedule the first release as 28 immediate uploads. crates.io's current
+[default limiter](https://github.com/rust-lang/crates.io/blob/5723cfaf552efd5e870d25c71f2bb5193b21a958/src/rate_limiter.rs)
+allows five new crates in a burst and replenishes one slot per ten minutes.
+Updates have a separate default allowance. If 24 of these names are still new
+and the new-crate bucket starts full, the theoretical refill wait is 190 minutes
+(3 h 10 min), plus publication, index visibility and validation time. Server
+configuration and account overrides can change that allowance; check the actual
+response rather than treating this estimate as a guaranteed schedule. Recheck
+name ownership and availability before release.
+
+Registry-only dry runs must follow dependency availability, using the order
+below; the local extracted-package verification is already possible before any
+publication. Do not remove dependency versions or publish placeholders merely
+to make a registry dry run pass.
+
 ## Dependency-first release order
 
 This order includes retained internal development dependencies as well as normal,

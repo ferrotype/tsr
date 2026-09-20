@@ -271,5 +271,157 @@
   "pending": [
     "final step-7 producer and quiet-host performance evidence refresh",
     "registry-only publish dry-runs after dependency versions exist"
-  ]
+  ],
+  "metadata_amendment": {
+    "base_commit": "011d0c3b066a9517217e4b4eb639fe88a56779e0",
+    "date": "2026-09-20",
+    "verification": "All archived files equal the previously built archives except README, package description/keywords/categories, VCS metadata, and internal archive checksums in lockfiles. Dependency/feature/compiler configuration and external lock entries are equal. Prior isolated build and runtime results are reused; no new full build claimed.",
+    "archives": {
+      "tsr_api": {
+        "archive_sha256": "a661469f9935ab7435a7c0da9892edcdf5b9a5944a59aa2af65b33bc42b44dc6",
+        "bytes": 21751,
+        "normalized_manifest_sha256": "f6c68593f9224cbf1f184fb8b6b752ec9072fd6d09ffc6cd0832e2c200b5a250"
+      },
+      "tsr_arena": {
+        "archive_sha256": "d7b21c78ebafa0141dfa86e7c1821d728918b8de0fb3d7b65ebd2148e93e63b6",
+        "bytes": 53146,
+        "normalized_manifest_sha256": "8efe32784c6b1b14c8f76c566a6d24f0610f7183c8d1f466d369814d82b34695"
+      },
+      "tsr_ast": {
+        "archive_sha256": "43333a610725aa32e56e9fecb093481f0f29b17fc01262919e17b66a94531162",
+        "bytes": 463538,
+        "normalized_manifest_sha256": "57fe0a17ae5482641f77ea43e17264113163ac3fc295eb83416f5399f88a996b"
+      },
+      "tsr_astnav": {
+        "archive_sha256": "38891699344e9b6ebadc83fe1ffeacbbd811037789bfaec41d689ecfc0683771",
+        "bytes": 19161,
+        "normalized_manifest_sha256": "5edca3b0a00e75b65cc39f85961860864238b5b65939723954a4b05658843622"
+      },
+      "tsr_binder": {
+        "archive_sha256": "6be39e7d4a7526c920df5a1daadc848fc1e4c49c2b46c95f9e6bf4bcf54ad50b",
+        "bytes": 86894,
+        "normalized_manifest_sha256": "84e9fe3af0fa61df16fb0ebb99c7051b62a2eed0e766639e14e532e6aa07db1b"
+      },
+      "tsr_bundled": {
+        "archive_sha256": "4f620ed2dce9a662dbe950b18cd706f7546998bd9edcdea6e865beacc94b9151",
+        "bytes": 572127,
+        "normalized_manifest_sha256": "430ffb71858fbc61f60d274d52a5ea454662de169b6d89e3200ef418def16397"
+      },
+      "tsr_checker": {
+        "archive_sha256": "e938a9a6f532550edecf113c0eec70b1c86e0729f432f4cfc7d45252ba0aa8a5",
+        "bytes": 734266,
+        "normalized_manifest_sha256": "6c0ebe58d6c1b155c86ed6729cb6951cef47a7cc8a2dfde9fe4442a2a577ead4"
+      },
+      "tsr_compiler": {
+        "archive_sha256": "42d7e7df3d5be829b70ec64f46792b4a612111caf2e27b4a107364f8f97c081f",
+        "bytes": 68253,
+        "normalized_manifest_sha256": "94fdfc2d275ca39fa0ab5f94d13f6312409c8380de4ba23aa0c563c1be6e49bd"
+      },
+      "tsr_core": {
+        "archive_sha256": "c46f53a867a5ca20689a01cf846f48544c7a00c38503fd98aec061272e1e4b4a",
+        "bytes": 107872,
+        "normalized_manifest_sha256": "1529e103d6049530f6e2a45ef3d0a86e2d61ea079ba3c5f6eaf30e77bd648f76"
+      },
+      "tsr_diagnostics": {
+        "archive_sha256": "a3ad5be7af20360eb93b7fa4b9912f08b59e8a880636198c7337b65e21a5c7b1",
+        "bytes": 182543,
+        "normalized_manifest_sha256": "fb5fd5a277e0a082b37d2cff892cf0ccfc467424978bb2530d4f144bd4a13f8d"
+      },
+      "tsr_embed": {
+        "archive_sha256": "f6367a0b22d35bbd513d89f18f144ad7e97cd2cf072a8850bab8ea623756485c",
+        "bytes": 12677,
+        "normalized_manifest_sha256": "df109fb70be101f6f12fcb8e4961b42829fe7e1e0c61bfa01a98a5e5fae6dda5"
+      },
+      "tsr_encoder": {
+        "archive_sha256": "380087c37f0d8b80cbc17ef5b97c50c9be12d012876ab38f6c86dd067aea047f",
+        "bytes": 45585,
+        "normalized_manifest_sha256": "d9dd8a40ddbfeca1b68c8ba13c888e53a75df42e836a71e83825de8082326cc4"
+      },
+      "tsr_format": {
+        "archive_sha256": "385ec7e360c50386969707b560feddb0661b02146e2cf93e459b10b2b9ef69c5",
+        "bytes": 64222,
+        "normalized_manifest_sha256": "55ab4beece8a38c093342477d5c44cd39724f802c19a58592fb99b75ae7aa9c6"
+      },
+      "tsr_jsnum": {
+        "archive_sha256": "d0e7b4180f7b9120712a302e95ffb8431e718cbb4bdce926c626a089fd93e899",
+        "bytes": 12526,
+        "normalized_manifest_sha256": "8e3a81ff20a018bead04623b007646637b988c60b921727a7acb15110c028026"
+      },
+      "tsr_jsstring": {
+        "archive_sha256": "10e5d0423cd31c0ac8074bfafcd322714a95602b4a70b9ec9a65dfa5dc8b8108",
+        "bytes": 72929,
+        "normalized_manifest_sha256": "aca565fb85d044632856180a5217b4fb9b779cdbc8b6814c86682a0836be5f54"
+      },
+      "tsr_module": {
+        "archive_sha256": "9d49b342916ee2459050ce9e9139f84d04e4adbed6c312f624ee8cd188c163ec",
+        "bytes": 36911,
+        "normalized_manifest_sha256": "4420c81dfaacb2f2d1d517f604f23e5197424975a9c0c2ec841177c507bdaacd"
+      },
+      "tsr_nodebuilder": {
+        "archive_sha256": "8b9601249b91466d8439b4fbd7f8b23f89868aeb8e263eb3dc8c88a54e40dbc7",
+        "bytes": 10950,
+        "normalized_manifest_sha256": "7e11e4de5db658e591d4d643956c018d291b9dc3676022e535cdc1452a146b94"
+      },
+      "tsr_parser": {
+        "archive_sha256": "aaa26a501a35aa6494508d88d762a67278405369115617847b53f31ed5e0ad93",
+        "bytes": 109935,
+        "normalized_manifest_sha256": "a055b44d45fda6c81348e29e75877984a65835764aaf906b77a681bd39f397c2"
+      },
+      "tsr_printer": {
+        "archive_sha256": "a513bd140ebfd9258f5df79a20a95399b95b2dddabe470b86c09ce82052e78df",
+        "bytes": 75757,
+        "normalized_manifest_sha256": "45a98f867f05d6f2b6927d96d90db95ef58922a29987f14b430bfc4df5a8ed2f"
+      },
+      "tsr_project": {
+        "archive_sha256": "c9a6b90e14d6fb38b28098bca6033603d8d80694bc4f1e8fdd2d54b3732ffa2f",
+        "bytes": 18374,
+        "normalized_manifest_sha256": "410effccd429fe8958c05e966165c75149f681ade8fb93e6d1f8279106d4b153"
+      },
+      "tsr_pseudochecker": {
+        "archive_sha256": "6448686271991322cdadaaeb9da8cd305668fbf23c41d2edf28168aee9fa4616",
+        "bytes": 18353,
+        "normalized_manifest_sha256": "53f879da11b02c45736f5b420ee7792dd800d80df07aef98d9e1066deb5c8612"
+      },
+      "tsr_scanner": {
+        "archive_sha256": "6aa58ea2090263f6c8aba0c2ef93b1cd7049f5b71f645d6f3b84c918d936adca",
+        "bytes": 60367,
+        "normalized_manifest_sha256": "689959f3774583e8825c428cf91e96c9d6595db05ac8568ad2edfde9652babb7"
+      },
+      "tsr_semver": {
+        "archive_sha256": "c9166978431bb1712bcb582feb58ae37f5d951ec0a1aa875e47556e9c7535d30",
+        "bytes": 11592,
+        "normalized_manifest_sha256": "462d5adc79d8497d38ca143d02d466fcf2481885459f8e4aa7bab6f852abd963"
+      },
+      "tsr_transformers": {
+        "archive_sha256": "b45682ccf226f88fc118e598e4bce9582406956fc5e742d988101a52325e88bc",
+        "bytes": 46322,
+        "normalized_manifest_sha256": "56816d1863a24e322ef44afb3f2882950dd1f1ef726382791e53744c441b402c"
+      },
+      "tsr_tsoptions": {
+        "archive_sha256": "ead0a4a7a3a5bbe4630d0ff74107bd52ec519bd15d639b03d7ba92a2e3ccaa61",
+        "bytes": 52220,
+        "normalized_manifest_sha256": "c33ef9bbdcec5172a848df26345371313ebeb0dee16a289e00e706a3d853437d"
+      },
+      "tsr_tspath": {
+        "archive_sha256": "7833c9d513cea3d7ffc1081a0fa8d413efc775d3d95065f6bc328e2de875355a",
+        "bytes": 10149,
+        "normalized_manifest_sha256": "9704b698f5208cda50d771707d438ecaea7ddb75a046aa6acee84e1cd0719f6f"
+      },
+      "tsr_vfs": {
+        "archive_sha256": "44ebf14a98f1a87686656f696332c0b499c3d33ebfcc9f4017632ad4c2df041d",
+        "bytes": 9488,
+        "normalized_manifest_sha256": "55a38f58971c0e78055ff93a8bd1475d453cd827594547b81ddac20737ed8f70"
+      },
+      "tsr_wasm": {
+        "archive_sha256": "cf2f5bccf4525d723cb568d531bb9485eb4c03cfcc5ccff413c7a5eca36f6cdb",
+        "bytes": 13825,
+        "normalized_manifest_sha256": "c909134ed28334220496220bc2a7ad6cc266487224a3c2f62e2922818197c96a"
+      }
+    },
+    "readme_example": {
+      "state": "pass",
+      "method": "Extracted the README Rust block unchanged; compiled and executed with its declared dependencies resolved to local 0.1.0 packages. TS2322 assertion passed.",
+      "readme_sha256": "df573349c7621d0ef85a2651aea32176e572144bff7280254a2f68b7407a44a6"
+    }
+  }
 }

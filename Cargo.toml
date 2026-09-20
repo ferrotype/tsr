@@ -10,6 +10,8 @@ edition = "2021"
 rust-version = "1.96"
 license = "Apache-2.0"
 repository = "https://github.com/iantocristian/ts-rust"
+keywords = ["typescript", "javascript", "compiler", "tsr"]
+categories = ["compilers"]
 publish = false
 
 # ADR 0016: forbid unsafe code; the leaf crates that need platform FFI (file watching,

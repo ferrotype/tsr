@@ -5,8 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = ["crates-io"]
-description = "Checker ownership and project slot lifetimes for ts-rust"
+description = "Checker ownership and project slot lifetimes for tsr"
 repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
