@@ -545,7 +545,7 @@ Items:
 
 ### S12 Phase 0 gate (done)
 
-Record the owner's 2026-09-20 acceptance of the preserved Phase 0 evidence under the approved thresholds, with extrapolations, workload limits, the full checking/emit acceptance matrix and Phase 7 budgets in ADR 0020. This dated milestone does not assert current-source evidence freshness.
+Close Phase 0 using the recent 2026-09-19 evidence, confirmed applicable across the crate rename on 2026-09-20, under the approved thresholds and the workload limits, acceptance matrix and Phase 7 budgets in ADR 0020.
 
 Exit checks:
 
@@ -553,8 +553,8 @@ Exit checks:
 
 Items:
 
-- [x] S12-1 Owner accepts the indexed historical E1–E8 evidence under the approved thresholds (2026-09-20) (adr 0020)
-- [x] S12-2 Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed historical evidence (2026-09-20) (adr 0020)
+- [x] S12-1 Owner accepts the indexed recent E1–E8 evidence under the approved thresholds (2026-09-20) (adr 0020)
+- [x] S12-2 Owner accepts the Phase 0 implementation milestones S02–S10 on the indexed recent evidence (2026-09-20) (adr 0020)
 - [x] S12-3 Gate decision as ADR 0020: extrapolations and workload limits for E5 to E8, the full checking/emit acceptance matrix, the Phase 7 performance budgets, and go or no-go (adr 0020)
 
 ## Decisions

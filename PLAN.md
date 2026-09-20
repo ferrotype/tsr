@@ -344,7 +344,7 @@ E4 progresses through leaf helpers in S04, scanner values in S05 and encoder beh
 - **Gate.** E1 to E4 pass; E5 to E8 meet their thresholds for the parts they measure, with the extrapolations written down as extrapolations. Otherwise stop.
 
 Phase 0 was accepted on **2026-09-20** through [ADR 0020](docs/adr/0020-phase-0-gate-decision.md).
-At the owner's direction, S12 closes on the [indexed historical evidence](docs/S12-historical-evidence.md)
+At the owner's direction, S12 closes on the [indexed recent evidence](docs/S12-evidence.md)
 under the approved limits, without repeating the captures after the crate rename
 and publishing work. S12 records that dated milestone; current-source experiment
 and other sprint freshness checks remain unchanged.

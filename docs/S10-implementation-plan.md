@@ -3,8 +3,8 @@
 Policy update, 2026-09-20: [ADR 0020](adr/0020-phase-0-gate-decision.md)
 changes the parser-size, throughput and Node-latency limits to 0.30, 1.5 and
 0.40 respectively. This original implementation plan and its initial results
-retain the former limits as history. The owner accepted these historical
-results for the dated [S12 closure](S12-closure-plan.md); normal current-source
+retain the former limits as history. The owner confirmed these recent
+results remain applicable across the crate rename for the [S12 closure](S12-closure-plan.md); normal current-source
 evidence checks remain unchanged.
 
 Original status: interfaces and full correctness/ownership captures implemented; three

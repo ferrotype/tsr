@@ -1,8 +1,10 @@
-# S12 accepted historical evidence
+# S12 evidence
 
 Owner acceptance: **2026-09-20**, [ADR 0020](adr/0020-phase-0-gate-decision.md).
-This index freezes the collection accepted for the Phase 0 milestone. It does
-not change any producer's freshness state or claim a single current-source run.
+These captures were recorded on **2026-09-19**, the day before closure. The owner
+confirmed they remain applicable after the crate rename. Their age is not a
+problem: the tracker fingerprint changed with the crate names. S12 reuses the
+measurements and retains their original provenance.
 
 ## Immutable records
 
@@ -45,7 +47,7 @@ head `20a4348`. The full E2 capture is used here, rather than the S11 CI E2
 record that reports only the frozen denominator. The benchmark and S10 records
 retain their own source revisions and execution contexts.
 
-## Historical evaluation
+## Closure evaluation
 
 The collection satisfies all **55** experiment criteria in the approved
 `status/experiments.toml`: E1 2/2, E2 12/12, E3 18/18, E4 11/11, E5 3/3,
@@ -53,10 +55,10 @@ E6 2/2, E7 4/4 and E8 3/3. The numerical results and workload limits are in
 [ADR 0020](adr/0020-phase-0-gate-decision.md#evidence-available-for-the-decision).
 
 The S01–S10 exit predicates and required items also evaluate true against this
-collection. Cases-based parity was derived from the exact historical manifests,
+collection. Cases-based parity was derived from the exact recorded manifests,
 with no missing, failed or skipped cases. Static provenance, mapping counts and
 accepted contract states came from the committed S11 report at `8729daff`.
-This is an evaluation of the declared historical collection, not a replacement
+This is an evaluation of the declared evidence collection, not a replacement
 for the live report's single-context freshness evaluation. S11 is independent
 of the S12 gate and its closure is recorded separately.
 
