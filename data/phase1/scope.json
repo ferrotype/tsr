@@ -1,10 +1,10 @@
 {
   "counts": {
-    "covered": 43,
+    "covered": 69,
     "equivalent_rust": 0,
-    "implemented_untested": 3418,
+    "implemented_untested": 3400,
     "later_phase": 18,
-    "missing": 1316
+    "missing": 1308
   },
   "dispositions": [
     "covered",
@@ -120208,11 +120208,9 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input and absent from every Rust crate by name",
       "basis_kind": "rule",
-      "cases": [
-        "leaves/bundled/wrapper-dispatch-surface"
-      ],
+      "cases": [],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120238,9 +120236,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120266,9 +120266,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120294,9 +120296,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-read-paths"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120304,7 +120308,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
@@ -120322,9 +120326,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-read-paths"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120332,7 +120338,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
@@ -120350,9 +120356,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-read-paths"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120360,7 +120368,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
@@ -120408,9 +120416,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-read-paths"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120418,7 +120428,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.Realpath",
@@ -120436,9 +120446,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120464,9 +120476,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/bundled/wrapper-read-paths",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-read-paths"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -120474,7 +120488,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.Stat",
@@ -120520,10 +120534,10 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 1 exact link(s): leaves/bundled/asset-index-complete",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
       "cases": [
-        "leaves/bundled/asset-index-complete"
+        "leaves/bundled/wrapper-dispatch-surface"
       ],
       "depends_on": [
         "internal/osutil",
@@ -120532,7 +120546,7 @@
         "internal/vfs/osvfs"
       ],
       "destination_phase": 1,
-      "disposition": "covered",
+      "disposition": "missing",
       "go_package": "internal/bundled",
       "go_source": "tsc/internal/bundled/embed.go",
       "id": "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
@@ -120550,9 +120564,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "a prepared case runs and reports the Rust entry point absent: leaves/bundled/wrapper-dispatch-surface; witnessed by 1 prepared case(s)",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/bundled/wrapper-dispatch-surface"
+      ],
       "depends_on": [
         "internal/osutil",
         "internal/tspath",
@@ -147538,9 +147554,12 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 2 exact link(s): leaves/core/pattern-zero-value-panic, witness/s07-helper-tests-pattern",
+      "basis": "witnessed by 5 exact link(s): leaves/core/pattern-byte-domain, leaves/core/pattern-overlapping-match, leaves/core/pattern-parse-validity",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core/pattern-byte-domain",
+        "leaves/core/pattern-overlapping-match",
+        "leaves/core/pattern-parse-validity",
         "leaves/core/pattern-zero-value-panic",
         "witness/s07-helper-tests-pattern"
       ],
@@ -147568,10 +147587,12 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 2 exact link(s): leaves/core/pattern-overlapping-match, witness/s07-helper-tests-pattern",
+      "basis": "witnessed by 4 exact link(s): leaves/core/pattern-byte-domain, leaves/core/pattern-overlapping-match, leaves/core/pattern-zero-value-panic",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core/pattern-byte-domain",
         "leaves/core/pattern-overlapping-match",
+        "leaves/core/pattern-zero-value-panic",
         "witness/s07-helper-tests-pattern"
       ],
       "depends_on": [
@@ -147598,10 +147619,12 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 2 exact link(s): leaves/core/pattern-byte-domain, witness/s07-helper-tests-pattern",
+      "basis": "witnessed by 4 exact link(s): leaves/core/pattern-byte-domain, leaves/core/pattern-overlapping-match, leaves/core/pattern-zero-value-panic",
       "basis_kind": "rule",
       "cases": [
         "leaves/core/pattern-byte-domain",
+        "leaves/core/pattern-overlapping-match",
+        "leaves/core/pattern-zero-value-panic",
         "witness/s07-helper-tests-pattern"
       ],
       "depends_on": [
@@ -147628,10 +147651,14 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 2 exact link(s): leaves/core/pattern-parse-validity, witness/s07-helper-tests-pattern",
+      "basis": "witnessed by 6 exact link(s): leaves/core/pattern-byte-domain, leaves/core/pattern-find-best-match, leaves/core/pattern-overlapping-match",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core/pattern-byte-domain",
+        "leaves/core/pattern-find-best-match",
+        "leaves/core/pattern-overlapping-match",
         "leaves/core/pattern-parse-validity",
+        "leaves/core/pattern-zero-value-panic",
         "witness/s07-helper-tests-pattern"
       ],
       "depends_on": [
@@ -148094,10 +148121,11 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-int32-narrowing",
+      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
       "basis_kind": "rule",
       "cases": [
-        "leaves/core/text-range-int32-narrowing"
+        "leaves/core/text-range-int32-narrowing",
+        "leaves/core/text-range-len-wraparound"
       ],
       "depends_on": [
         "internal/collections",
@@ -148251,9 +148279,12 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-int32-narrowing",
+        "leaves/core/text-range-len-wraparound"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148262,7 +148293,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.End",
@@ -148346,9 +148377,10 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 1 exact link(s): leaves/core/text-range-len-wraparound",
+      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
       "basis_kind": "rule",
       "cases": [
+        "leaves/core/text-range-int32-narrowing",
         "leaves/core/text-range-len-wraparound"
       ],
       "depends_on": [
@@ -148410,9 +148442,12 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 2 exact link(s): leaves/core/text-range-int32-narrowing, leaves/core/text-range-len-wraparound",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/text-range-int32-narrowing",
+        "leaves/core/text-range-len-wraparound"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148421,7 +148456,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/text.go",
       "id": "tsc/internal/core/text.go:TextRange.Pos",
@@ -148654,9 +148689,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-predicate-domain",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/tristate-predicate-domain"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148665,7 +148702,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.IsFalse",
@@ -148683,9 +148720,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-predicate-domain",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/tristate-predicate-domain"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148694,7 +148733,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.IsFalseOrUnknown",
@@ -148743,9 +148782,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-predicate-domain",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/tristate-predicate-domain"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148754,7 +148795,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.IsTrueOrUnknown",
@@ -148772,9 +148813,11 @@
     },
     {
       "actual_home": null,
-      "basis": "unmapped in the audit input and absent from every Rust crate by name",
+      "basis": "witnessed by 1 exact link(s): leaves/core/tristate-predicate-domain",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/core/tristate-predicate-domain"
+      ],
       "depends_on": [
         "internal/collections",
         "internal/debug",
@@ -148783,7 +148826,7 @@
         "internal/tspath"
       ],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "covered",
       "go_package": "internal/core",
       "go_source": "tsc/internal/core/tristate.go",
       "id": "tsc/internal/core/tristate.go:Tristate.IsUnknown",
@@ -151767,16 +151810,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.BitwiseAND",
@@ -151792,16 +151837,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.BitwiseNOT",
@@ -151817,16 +151864,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.BitwiseOR",
@@ -151842,16 +151891,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.BitwiseXOR",
@@ -151867,16 +151918,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-remainder-and-exponentiate",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-remainder-and-exponentiate"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.Exponentiate",
@@ -151969,16 +152022,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.LeftShift",
@@ -152048,16 +152103,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-bitwise-and-shift",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-bitwise-and-shift"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.UnsignedRightShift",
@@ -152125,16 +152182,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol but records no verification link",
+      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-int32-conversions",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/jsnum-int32-conversions"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/jsnum.go",
       "id": "tsc/internal/jsnum/jsnum.go:Number.toUint32",
@@ -152200,16 +152259,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/pseudo-bigint-parse",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/pseudo-bigint-parse"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/pseudobigint.go",
       "id": "tsc/internal/jsnum/pseudobigint.go:NewPseudoBigInt",
@@ -152324,16 +152385,18 @@
     },
     {
       "actual_home": null,
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/pseudo-bigint-parse",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/pseudo-bigint-parse"
+      ],
       "depends_on": [
         "internal/json",
         "internal/stringutil",
         "internal/testutil/jstest"
       ],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/jsnum",
       "go_source": "tsc/internal/jsnum/pseudobigint.go",
       "id": "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String",
@@ -152386,9 +152449,10 @@
     },
     {
       "actual_home": null,
-      "basis": "witnessed by 1 exact link(s): leaves/text/jsnum-number-to-string",
+      "basis": "witnessed by 2 exact link(s): leaves/text/jsnum-from-string, leaves/text/jsnum-number-to-string",
       "basis_kind": "rule",
       "cases": [
+        "leaves/text/jsnum-from-string",
         "leaves/text/jsnum-number-to-string"
       ],
       "depends_on": [
@@ -197506,10 +197570,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/to-lower-js",
+      "basis": "witnessed by 2 exact link(s): leaves/text/to-lower-js, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/to-lower-js"
+        "leaves/text/to-lower-js",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -197533,10 +197598,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/to-upper-js",
+      "basis": "witnessed by 2 exact link(s): leaves/text/to-upper-js, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/to-upper-js"
+        "leaves/text/to-upper-js",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -197736,12 +197802,14 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:CodePointToSurrogatePair",
@@ -197762,10 +197830,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/combine-surrogate-pairs",
+      "basis": "witnessed by 2 exact link(s): leaves/text/combine-surrogate-pairs, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/combine-surrogate-pairs"
+        "leaves/text/combine-surrogate-pairs",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -197790,10 +197859,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
+      "basis": "witnessed by 2 exact link(s): leaves/text/js-string-rune-codec, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/js-string-rune-codec"
+        "leaves/text/js-string-rune-codec",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -197818,12 +197888,15 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 2 exact link(s): leaves/text/js-string-rune-codec, witness/s04-e4-probes",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec",
+        "witness/s04-e4-probes"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:EncodeJSStringRune",
@@ -197976,12 +198049,14 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsHighSurrogate",
@@ -198028,12 +198103,14 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsLowSurrogate",
@@ -198080,12 +198157,14 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:IsSurrogate",
@@ -198160,10 +198239,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/lower-first-char",
+      "basis": "witnessed by 2 exact link(s): leaves/text/lower-first-char, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/lower-first-char"
+        "leaves/text/lower-first-char",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,
@@ -198272,12 +198352,14 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "ledger maps the symbol and its source file carries 1 file-level producer metric(s), which do not witness this operation individually",
+      "basis": "witnessed by 1 exact link(s): leaves/text/js-string-rune-codec",
       "basis_kind": "rule",
-      "cases": [],
+      "cases": [
+        "leaves/text/js-string-rune-codec"
+      ],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "implemented_untested",
+      "disposition": "covered",
       "go_package": "internal/stringutil",
       "go_source": "tsc/internal/stringutil/util.go",
       "id": "tsc/internal/stringutil/util.go:SurrogatePairToCodePoint",
@@ -198298,10 +198380,11 @@
     },
     {
       "actual_home": "tsr_jsstring",
-      "basis": "witnessed by 1 exact link(s): leaves/text/truncate-by-runes",
+      "basis": "witnessed by 2 exact link(s): leaves/text/truncate-by-runes, witness/s04-e4-probes",
       "basis_kind": "rule",
       "cases": [
-        "leaves/text/truncate-by-runes"
+        "leaves/text/truncate-by-runes",
+        "witness/s04-e4-probes"
       ],
       "depends_on": [],
       "destination_phase": 1,

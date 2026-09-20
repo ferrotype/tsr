@@ -1,18 +1,20 @@
 {
   "cases": [
     {
-      "expected_contract": "the complete packaged asset index: all 108 names in their frozen byte-sorted order, each with its length and an FNV-1a/64 digest of its bytes. It catches a missing, extra, renamed, reordered or altered asset. It is also the checkout-independence witness for Rust: Go reads these bytes from its embedded copy of upstream/tsc/internal/bundled/libs, while crates/tsr_bundled compiles in its own crate-lo",
+      "coverage_operations": [],
+      "expected_contract": "Ordered asset names, lengths and bytes only; does not witness the Rust filesystem WalkDir operation.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/bundled/asset-index-complete",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "native_operations": [
         "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
-      ]
+      ],
+      "operations": []
     },
     {
-      "expected_contract": "valid and missing asset names against the same index. Both sides are asked for the same fifteen names in the same order, and every one of them must resolve by exact case-sensitive match or not at all: no extension completion, no whitespace trimming, no re-application of the libs/ segment and no `.` or `..` resolution. lib.ES5.d.ts and LIB.ES5.D.TS catch case folding; lib.es2015 catches extension c",
+      "expected_contract": "Actual production wrapper reads on both sides for the same full bundled paths, including invalid names.",
       "family": "leaves",
       "host_applicability": "any",
       "id": "leaves/bundled/asset-name-resolution",
@@ -61,9 +63,36 @@
       "host_applicability": "any",
       "id": "leaves/bundled/wrapper-dispatch-surface",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/bundled/embed.go:wrappedFS.AppendFile",
+        "tsc/internal/bundled/embed.go:wrappedFS.Chtimes",
+        "tsc/internal/bundled/embed.go:wrappedFS.Remove",
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+        "tsc/internal/bundled/embed.go:wrappedFS.WriteFile"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
-        "tsc/internal/bundled/embed.go:wrapFS"
+        "tsc/internal/bundled/embed.go:wrapFS",
+        "tsc/internal/bundled/embed.go:wrappedFS.AppendFile",
+        "tsc/internal/bundled/embed.go:wrappedFS.Chtimes",
+        "tsc/internal/bundled/embed.go:wrappedFS.Remove",
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+        "tsc/internal/bundled/embed.go:wrappedFS.WriteFile"
+      ]
+    },
+    {
+      "expected_contract": "Production wrapper directory/file predicates, listing, stat and realpath for bundled roots, files, and malformed paths. Walk and mutation behavior are separate pending operations.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/wrapper-read-paths",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves/bundled_probe_test.go::phase1Reads",
+      "operations": [
+        "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+        "tsc/internal/bundled/embed.go:wrappedFS.DirectoryExists",
+        "tsc/internal/bundled/embed.go:wrappedFS.FileExists",
+        "tsc/internal/bundled/embed.go:wrappedFS.Stat",
+        "tsc/internal/bundled/embed.go:wrappedFS.Realpath"
       ]
     },
     {
@@ -72,9 +101,33 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-empty-scope-write-discarded",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "enter_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "exit_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "get": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Get"
+        ],
+        "has": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Has"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Get",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Has",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
       ]
     },
     {
@@ -83,8 +136,29 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "enter_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "exit_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "get": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Get"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Get",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set",
         "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned"
       ]
     },
@@ -94,8 +168,28 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "enter_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "exit_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+        ],
+        "get": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Get"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Get",
         "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
       ]
     },
@@ -105,9 +199,29 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/cow-set-scope-fork",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/cow.go:CopyOnWriteSet.Add"
+        ],
+        "enter_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope"
+        ],
+        "exit_scope": [
+          "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope"
+        ],
+        "has": [
+          "tsc/internal/collections/cow.go:CopyOnWriteSet.Has"
+        ],
+        "new": []
+      },
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteSet.Add",
+        "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope",
+        "tsc/internal/collections/cow.go:CopyOnWriteSet.Has"
       ]
     },
     {
@@ -116,9 +230,42 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/multimap-empty-and-size-hint",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/multimap.go:MultiMap.Add"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/multimap.go:MultiMap.Add"
+        ],
+        "get": [
+          "tsc/internal/collections/multimap.go:MultiMap.Get"
+        ],
+        "has": [
+          "tsc/internal/collections/multimap.go:MultiMap.Has"
+        ],
+        "keys": [
+          "tsc/internal/collections/multimap.go:MultiMap.Keys"
+        ],
+        "len": [
+          "tsc/internal/collections/multimap.go:MultiMap.Len"
+        ],
+        "new": [],
+        "new_size_hint": [
+          "tsc/internal/collections/multimap.go:NewMultiMapWithSizeHint"
+        ],
+        "values": [
+          "tsc/internal/collections/multimap.go:MultiMap.Values"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/multimap.go:MultiMap.Add",
+        "tsc/internal/collections/multimap.go:MultiMap.Get",
+        "tsc/internal/collections/multimap.go:MultiMap.Has",
+        "tsc/internal/collections/multimap.go:MultiMap.Keys",
+        "tsc/internal/collections/multimap.go:MultiMap.Len",
+        "tsc/internal/collections/multimap.go:MultiMap.Values",
+        "tsc/internal/collections/multimap.go:NewMultiMapWithSizeHint"
       ]
     },
     {
@@ -127,9 +274,45 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/multimap-group-by-remove-all-clear",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/multimap.go:GroupBy"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/multimap.go:MultiMap.Add"
+        ],
+        "clear": [
+          "tsc/internal/collections/multimap.go:MultiMap.Clear"
+        ],
+        "get": [
+          "tsc/internal/collections/multimap.go:MultiMap.Get"
+        ],
+        "group_by": [
+          "tsc/internal/collections/multimap.go:GroupBy"
+        ],
+        "has": [
+          "tsc/internal/collections/multimap.go:MultiMap.Has"
+        ],
+        "keys": [
+          "tsc/internal/collections/multimap.go:MultiMap.Keys"
+        ],
+        "len": [
+          "tsc/internal/collections/multimap.go:MultiMap.Len"
+        ],
+        "remove_all": [
+          "tsc/internal/collections/multimap.go:MultiMap.RemoveAll"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/multimap.go:GroupBy",
+        "tsc/internal/collections/multimap.go:MultiMap.Add",
+        "tsc/internal/collections/multimap.go:MultiMap.Clear",
+        "tsc/internal/collections/multimap.go:MultiMap.Get",
+        "tsc/internal/collections/multimap.go:MultiMap.Has",
+        "tsc/internal/collections/multimap.go:MultiMap.Keys",
+        "tsc/internal/collections/multimap.go:MultiMap.Len",
+        "tsc/internal/collections/multimap.go:MultiMap.RemoveAll"
       ]
     },
     {
@@ -138,8 +321,39 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/multimap-remove-aliases-the-slice",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/multimap.go:MultiMap.Remove"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/multimap.go:MultiMap.Add"
+        ],
+        "get": [
+          "tsc/internal/collections/multimap.go:MultiMap.Get"
+        ],
+        "get_capture": [
+          "tsc/internal/collections/multimap.go:MultiMap.Get"
+        ],
+        "get_replay": [
+          "tsc/internal/collections/multimap.go:MultiMap.Get"
+        ],
+        "has": [
+          "tsc/internal/collections/multimap.go:MultiMap.Has"
+        ],
+        "len": [
+          "tsc/internal/collections/multimap.go:MultiMap.Len"
+        ],
+        "new": [],
+        "remove": [
+          "tsc/internal/collections/multimap.go:MultiMap.Remove"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/multimap.go:MultiMap.Add",
+        "tsc/internal/collections/multimap.go:MultiMap.Get",
+        "tsc/internal/collections/multimap.go:MultiMap.Has",
+        "tsc/internal/collections/multimap.go:MultiMap.Len",
         "tsc/internal/collections/multimap.go:MultiMap.Remove"
       ]
     },
@@ -149,9 +363,30 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clear-reuse",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Clear"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clear": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Clear"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ],
+        "size": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
       ]
     },
     {
@@ -160,9 +395,33 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clone-isolation",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clone": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+        ],
+        "clone_entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "delete": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
       ]
     },
     {
@@ -171,9 +430,32 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-clone-write-back",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clone": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+        ],
+        "clone_entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "clone_set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
       ]
     },
     {
@@ -182,9 +464,26 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-delete-reinsert",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "delete": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
       ]
     },
     {
@@ -193,9 +492,30 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-double-delete",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "delete": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ],
+        "size": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
       ]
     },
     {
@@ -204,9 +524,26 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-early-stop",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:OrderedMap.Keys"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "early_stop_keys": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Keys"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
       ]
     },
     {
@@ -215,8 +552,41 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-empty-nil",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clear": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Clear"
+        ],
+        "clone": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+        ],
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "get": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Get"
+        ],
+        "has": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Has"
+        ],
+        "keys": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Keys"
+        ],
+        "new_nil": [],
+        "size": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Get",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Has",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
       ]
     },
@@ -226,8 +596,21 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-insert-overwrite",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new": [],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
         "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
       ]
     },
@@ -237,9 +620,29 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-map-size-hint",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "entries": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Entries"
+        ],
+        "new_size_hint": [
+          "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint"
+        ],
+        "set": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+        ],
+        "size": [
+          "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Entries",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
       ]
     },
     {
@@ -248,9 +651,47 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-clone-clear-isolation",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_set.go:OrderedSet.Clone"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "clear": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Clear"
+        ],
+        "clone": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Clone"
+        ],
+        "clone_add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "clone_size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "clone_values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ],
+        "delete": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
+        ],
+        "new": [],
+        "size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clear",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
       ]
     },
     {
@@ -259,9 +700,30 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-delete-reinsert",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "delete": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
+        ],
+        "new": [],
+        "size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
       ]
     },
     {
@@ -270,9 +732,43 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-empty-nil",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "clear": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Clear"
+        ],
+        "clone": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Clone"
+        ],
+        "delete": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
+        ],
+        "has": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Has"
+        ],
+        "new": [],
+        "new_nil": [],
+        "size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clear",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Has",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
       ]
     },
     {
@@ -281,9 +777,30 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-insertion-order",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "has": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Has"
+        ],
+        "new": [],
+        "size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Has",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
       ]
     },
     {
@@ -292,8 +809,31 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/ordered-set-size-hint-early-stop",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+        ],
+        "early_stop_values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ],
+        "new_size_hint": [
+          "tsc/internal/collections/ordered_set.go:NewOrderedSetWithSizeHint"
+        ],
+        "size": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+        ],
+        "values": [
+          "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+        ]
+      },
       "operations": [
+        "tsc/internal/collections/ordered_set.go:NewOrderedSetWithSizeHint",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
         "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
       ]
     },
@@ -303,9 +843,37 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/set-constructors",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/set.go:NewSetFromItems"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/set.go:Set.Add"
+        ],
+        "equals": [
+          "tsc/internal/collections/set.go:Set.Equals"
+        ],
+        "keys": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "len": [
+          "tsc/internal/collections/set.go:Set.Len"
+        ],
+        "new_from_items": [
+          "tsc/internal/collections/set.go:NewSetFromItems"
+        ],
+        "new_size_hint": [
+          "tsc/internal/collections/set.go:NewSetWithSizeHint"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/set.go:NewSetFromItems",
+        "tsc/internal/collections/set.go:NewSetWithSizeHint",
+        "tsc/internal/collections/set.go:Set.Add",
+        "tsc/internal/collections/set.go:Set.Equals",
+        "tsc/internal/collections/set.go:Set.Keys",
+        "tsc/internal/collections/set.go:Set.Len"
       ]
     },
     {
@@ -314,9 +882,59 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/set-nil-receiver-guards",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/set.go:Set.Union"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/set.go:Set.Add"
+        ],
+        "clear": [
+          "tsc/internal/collections/set.go:Set.Clear"
+        ],
+        "clone": [
+          "tsc/internal/collections/set.go:Set.Clone"
+        ],
+        "equals": [
+          "tsc/internal/collections/set.go:Set.Equals"
+        ],
+        "has": [
+          "tsc/internal/collections/set.go:Set.Has"
+        ],
+        "intersects": [
+          "tsc/internal/collections/set.go:Set.Intersects"
+        ],
+        "is_subset_of": [
+          "tsc/internal/collections/set.go:Set.IsSubsetOf"
+        ],
+        "keys": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "len": [
+          "tsc/internal/collections/set.go:Set.Len"
+        ],
+        "new": [],
+        "new_nil": [],
+        "union": [
+          "tsc/internal/collections/set.go:Set.Union"
+        ],
+        "unioned_with": [
+          "tsc/internal/collections/set.go:Set.UnionedWith"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Add",
+        "tsc/internal/collections/set.go:Set.Clear",
+        "tsc/internal/collections/set.go:Set.Clone",
+        "tsc/internal/collections/set.go:Set.Equals",
+        "tsc/internal/collections/set.go:Set.Has",
+        "tsc/internal/collections/set.go:Set.Intersects",
+        "tsc/internal/collections/set.go:Set.IsSubsetOf",
+        "tsc/internal/collections/set.go:Set.Keys",
+        "tsc/internal/collections/set.go:Set.Len",
+        "tsc/internal/collections/set.go:Set.Union",
+        "tsc/internal/collections/set.go:Set.UnionedWith"
       ]
     },
     {
@@ -325,9 +943,50 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/set-union-clone-isolation",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/set.go:Set.Clone"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/set.go:Set.Add"
+        ],
+        "clone": [
+          "tsc/internal/collections/set.go:Set.Clone"
+        ],
+        "delete": [
+          "tsc/internal/collections/set.go:Set.Delete"
+        ],
+        "equals": [
+          "tsc/internal/collections/set.go:Set.Equals"
+        ],
+        "intersects": [
+          "tsc/internal/collections/set.go:Set.Intersects"
+        ],
+        "is_subset_of": [
+          "tsc/internal/collections/set.go:Set.IsSubsetOf"
+        ],
+        "keys": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "new": [],
+        "union": [
+          "tsc/internal/collections/set.go:Set.Union"
+        ],
+        "unioned_with": [
+          "tsc/internal/collections/set.go:Set.UnionedWith"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Add",
+        "tsc/internal/collections/set.go:Set.Clone",
+        "tsc/internal/collections/set.go:Set.Delete",
+        "tsc/internal/collections/set.go:Set.Equals",
+        "tsc/internal/collections/set.go:Set.Intersects",
+        "tsc/internal/collections/set.go:Set.IsSubsetOf",
+        "tsc/internal/collections/set.go:Set.Keys",
+        "tsc/internal/collections/set.go:Set.Union",
+        "tsc/internal/collections/set.go:Set.UnionedWith"
       ]
     },
     {
@@ -336,9 +995,48 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/set-zero-value-keys-alias",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/set.go:Set.Keys"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/set.go:Set.Add"
+        ],
+        "add_if_absent": [
+          "tsc/internal/collections/set.go:Set.AddIfAbsent"
+        ],
+        "clear": [
+          "tsc/internal/collections/set.go:Set.Clear"
+        ],
+        "delete": [
+          "tsc/internal/collections/set.go:Set.Delete"
+        ],
+        "has": [
+          "tsc/internal/collections/set.go:Set.Has"
+        ],
+        "keys": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "keys_capture": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "keys_replay": [
+          "tsc/internal/collections/set.go:Set.Keys"
+        ],
+        "len": [
+          "tsc/internal/collections/set.go:Set.Len"
+        ],
+        "new": []
+      },
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Add",
+        "tsc/internal/collections/set.go:Set.AddIfAbsent",
+        "tsc/internal/collections/set.go:Set.Clear",
+        "tsc/internal/collections/set.go:Set.Delete",
+        "tsc/internal/collections/set.go:Set.Has",
+        "tsc/internal/collections/set.go:Set.Keys",
+        "tsc/internal/collections/set.go:Set.Len"
       ]
     },
     {
@@ -347,9 +1045,45 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/syncmap-nil-value-contract",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/syncmap.go:SyncMap.Load"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "keys": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Keys"
+        ],
+        "load": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Load"
+        ],
+        "load_or_store": [
+          "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore"
+        ],
+        "load_or_store_nil": [
+          "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore"
+        ],
+        "new": [],
+        "range": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Range"
+        ],
+        "size": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Size"
+        ],
+        "store_nil": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Store"
+        ],
+        "to_map": [
+          "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Keys",
+        "tsc/internal/collections/syncmap.go:SyncMap.Load",
+        "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore",
+        "tsc/internal/collections/syncmap.go:SyncMap.Range",
+        "tsc/internal/collections/syncmap.go:SyncMap.Size",
+        "tsc/internal/collections/syncmap.go:SyncMap.Store",
+        "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
       ]
     },
     {
@@ -358,9 +1092,30 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/syncmap-range-early-stop",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/syncmap.go:SyncMap.Range"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "new": [],
+        "range_stop": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Range"
+        ],
+        "size": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Size"
+        ],
+        "store": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Store"
+        ],
+        "to_map": [
+          "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Range",
+        "tsc/internal/collections/syncmap.go:SyncMap.Size",
+        "tsc/internal/collections/syncmap.go:SyncMap.Store",
+        "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
       ]
     },
     {
@@ -369,9 +1124,56 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/syncmap-store-clone-clear",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/syncmap.go:SyncMap.Clone"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clear": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Clear"
+        ],
+        "clone": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Clone"
+        ],
+        "clone_keys": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Keys"
+        ],
+        "clone_size": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Size"
+        ],
+        "delete": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Delete"
+        ],
+        "keys": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Keys"
+        ],
+        "load": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Load"
+        ],
+        "load_or_store": [
+          "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore"
+        ],
+        "new": [],
+        "size": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Size"
+        ],
+        "store": [
+          "tsc/internal/collections/syncmap.go:SyncMap.Store"
+        ],
+        "to_map": [
+          "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Clear",
+        "tsc/internal/collections/syncmap.go:SyncMap.Clone",
+        "tsc/internal/collections/syncmap.go:SyncMap.Delete",
+        "tsc/internal/collections/syncmap.go:SyncMap.Keys",
+        "tsc/internal/collections/syncmap.go:SyncMap.Load",
+        "tsc/internal/collections/syncmap.go:SyncMap.LoadOrStore",
+        "tsc/internal/collections/syncmap.go:SyncMap.Size",
+        "tsc/internal/collections/syncmap.go:SyncMap.Store",
+        "tsc/internal/collections/syncmap.go:SyncMap.ToMap"
       ]
     },
     {
@@ -380,9 +1182,50 @@
       "host_applicability": "any",
       "id": "leaves/core-collections/syncset-add-if-absent-and-early-stop",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add": [
+          "tsc/internal/collections/syncset.go:SyncSet.Add"
+        ],
+        "add_if_absent": [
+          "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent"
+        ],
+        "delete": [
+          "tsc/internal/collections/syncset.go:SyncSet.Delete"
+        ],
+        "has": [
+          "tsc/internal/collections/syncset.go:SyncSet.Has"
+        ],
+        "is_empty": [
+          "tsc/internal/collections/syncset.go:SyncSet.IsEmpty"
+        ],
+        "keys": [
+          "tsc/internal/collections/syncset.go:SyncSet.Keys"
+        ],
+        "new": [],
+        "range_stop": [
+          "tsc/internal/collections/syncset.go:SyncSet.Range"
+        ],
+        "size": [
+          "tsc/internal/collections/syncset.go:SyncSet.Size"
+        ],
+        "to_slice": [
+          "tsc/internal/collections/syncset.go:SyncSet.ToSlice"
+        ]
+      },
+      "operations": [
+        "tsc/internal/collections/syncset.go:SyncSet.Add",
+        "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent",
+        "tsc/internal/collections/syncset.go:SyncSet.Delete",
+        "tsc/internal/collections/syncset.go:SyncSet.Has",
+        "tsc/internal/collections/syncset.go:SyncSet.IsEmpty",
+        "tsc/internal/collections/syncset.go:SyncSet.Keys",
+        "tsc/internal/collections/syncset.go:SyncSet.Range",
+        "tsc/internal/collections/syncset.go:SyncSet.Size",
+        "tsc/internal/collections/syncset.go:SyncSet.ToSlice"
       ]
     },
     {
@@ -392,8 +1235,23 @@
       "id": "leaves/core/pattern-byte-domain",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "matched_text": [
+          "tsc/internal/core/pattern.go:Pattern.MatchedText"
+        ],
+        "matches": [
+          "tsc/internal/core/pattern.go:Pattern.Matches"
+        ],
+        "parse": [
+          "tsc/internal/core/pattern.go:TryParsePattern",
+          "tsc/internal/core/pattern.go:Pattern.IsValid"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/pattern.go:Pattern.Matches"
+        "tsc/internal/core/pattern.go:Pattern.IsValid",
+        "tsc/internal/core/pattern.go:Pattern.MatchedText",
+        "tsc/internal/core/pattern.go:Pattern.Matches",
+        "tsc/internal/core/pattern.go:TryParsePattern"
       ]
     },
     {
@@ -403,8 +1261,15 @@
       "id": "leaves/core/pattern-find-best-match",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "find_best": [
+          "tsc/internal/core/pattern.go:FindBestPatternMatch",
+          "tsc/internal/core/pattern.go:TryParsePattern"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/pattern.go:FindBestPatternMatch"
+        "tsc/internal/core/pattern.go:FindBestPatternMatch",
+        "tsc/internal/core/pattern.go:TryParsePattern"
       ]
     },
     {
@@ -414,8 +1279,23 @@
       "id": "leaves/core/pattern-overlapping-match",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "matched_text": [
+          "tsc/internal/core/pattern.go:Pattern.MatchedText"
+        ],
+        "matches": [
+          "tsc/internal/core/pattern.go:Pattern.Matches"
+        ],
+        "parse": [
+          "tsc/internal/core/pattern.go:TryParsePattern",
+          "tsc/internal/core/pattern.go:Pattern.IsValid"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/pattern.go:Pattern.MatchedText"
+        "tsc/internal/core/pattern.go:Pattern.IsValid",
+        "tsc/internal/core/pattern.go:Pattern.MatchedText",
+        "tsc/internal/core/pattern.go:Pattern.Matches",
+        "tsc/internal/core/pattern.go:TryParsePattern"
       ]
     },
     {
@@ -425,7 +1305,14 @@
       "id": "leaves/core/pattern-parse-validity",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/core/pattern.go:TryParsePattern",
+          "tsc/internal/core/pattern.go:Pattern.IsValid"
+        ]
+      },
       "operations": [
+        "tsc/internal/core/pattern.go:Pattern.IsValid",
         "tsc/internal/core/pattern.go:TryParsePattern"
       ]
     },
@@ -436,8 +1323,26 @@
       "id": "leaves/core/pattern-zero-value-panic",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "is_valid": [
+          "tsc/internal/core/pattern.go:Pattern.IsValid"
+        ],
+        "matched_text": [
+          "tsc/internal/core/pattern.go:Pattern.MatchedText"
+        ],
+        "matches": [
+          "tsc/internal/core/pattern.go:Pattern.Matches"
+        ],
+        "parse": [
+          "tsc/internal/core/pattern.go:TryParsePattern",
+          "tsc/internal/core/pattern.go:Pattern.IsValid"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/pattern.go:Pattern.IsValid"
+        "tsc/internal/core/pattern.go:Pattern.IsValid",
+        "tsc/internal/core/pattern.go:Pattern.MatchedText",
+        "tsc/internal/core/pattern.go:Pattern.Matches",
+        "tsc/internal/core/pattern.go:TryParsePattern"
       ]
     },
     {
@@ -447,6 +1352,11 @@
       "id": "leaves/core/script-kind-default-extension",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "default_extension": [
+          "tsc/internal/core/core.go:GetDefaultExtensionForScriptKind"
+        ]
+      },
       "operations": [
         "tsc/internal/core/core.go:GetDefaultExtensionForScriptKind"
       ]
@@ -458,6 +1368,11 @@
       "id": "leaves/core/script-kind-ensure-default",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "ensure_from_file_name": [
+          "tsc/internal/core/core.go:EnsureScriptKindFromFileName"
+        ]
+      },
       "operations": [
         "tsc/internal/core/core.go:EnsureScriptKindFromFileName"
       ]
@@ -469,6 +1384,11 @@
       "id": "leaves/core/script-kind-from-file-name",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "from_file_name": [
+          "tsc/internal/core/core.go:GetScriptKindFromFileName"
+        ]
+      },
       "operations": [
         "tsc/internal/core/core.go:GetScriptKindFromFileName"
       ]
@@ -480,8 +1400,19 @@
       "id": "leaves/core/text-range-int32-narrowing",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "new": [
+          "tsc/internal/core/text.go:NewTextRange",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End",
+          "tsc/internal/core/text.go:TextRange.Len"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/text.go:NewTextRange"
+        "tsc/internal/core/text.go:NewTextRange",
+        "tsc/internal/core/text.go:TextRange.End",
+        "tsc/internal/core/text.go:TextRange.Len",
+        "tsc/internal/core/text.go:TextRange.Pos"
       ]
     },
     {
@@ -491,8 +1422,19 @@
       "id": "leaves/core/text-range-len-wraparound",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "new": [
+          "tsc/internal/core/text.go:NewTextRange",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End",
+          "tsc/internal/core/text.go:TextRange.Len"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/text.go:TextRange.Len"
+        "tsc/internal/core/text.go:NewTextRange",
+        "tsc/internal/core/text.go:TextRange.End",
+        "tsc/internal/core/text.go:TextRange.Len",
+        "tsc/internal/core/text.go:TextRange.Pos"
       ]
     },
     {
@@ -501,9 +1443,65 @@
       "host_applicability": "any",
       "id": "leaves/core/text-range-predicate-family-missing",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/core/text.go:TextRange.IsValid"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "contains": [
+          "tsc/internal/core/text.go:TextRange.Contains",
+          "tsc/internal/core/text.go:TextRange.ContainsInclusive",
+          "tsc/internal/core/text.go:TextRange.ContainsExclusive"
+        ],
+        "make": [
+          "tsc/internal/core/text.go:NewTextRange",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End",
+          "tsc/internal/core/text.go:TextRange.IsValid"
+        ],
+        "make2": [
+          "tsc/internal/core/text.go:NewTextRange",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End"
+        ],
+        "relate": [
+          "tsc/internal/core/text.go:TextRange.ContainedBy",
+          "tsc/internal/core/text.go:TextRange.Overlaps",
+          "tsc/internal/core/text.go:TextRange.Intersects",
+          "tsc/internal/core/text.go:CompareTextRanges"
+        ],
+        "undefined": [
+          "tsc/internal/core/text.go:UndefinedTextRange",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End",
+          "tsc/internal/core/text.go:TextRange.IsValid"
+        ],
+        "with_end": [
+          "tsc/internal/core/text.go:TextRange.WithEnd",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End"
+        ],
+        "with_pos": [
+          "tsc/internal/core/text.go:TextRange.WithPos",
+          "tsc/internal/core/text.go:TextRange.Pos",
+          "tsc/internal/core/text.go:TextRange.End"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/text.go:CompareTextRanges",
+        "tsc/internal/core/text.go:NewTextRange",
+        "tsc/internal/core/text.go:TextRange.ContainedBy",
+        "tsc/internal/core/text.go:TextRange.Contains",
+        "tsc/internal/core/text.go:TextRange.ContainsExclusive",
+        "tsc/internal/core/text.go:TextRange.ContainsInclusive",
+        "tsc/internal/core/text.go:TextRange.End",
+        "tsc/internal/core/text.go:TextRange.Intersects",
+        "tsc/internal/core/text.go:TextRange.IsValid",
+        "tsc/internal/core/text.go:TextRange.Overlaps",
+        "tsc/internal/core/text.go:TextRange.Pos",
+        "tsc/internal/core/text.go:TextRange.WithEnd",
+        "tsc/internal/core/text.go:TextRange.WithPos",
+        "tsc/internal/core/text.go:UndefinedTextRange"
       ]
     },
     {
@@ -513,6 +1511,11 @@
       "id": "leaves/core/tristate-default-if-unknown",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "default_if_unknown": [
+          "tsc/internal/core/tristate.go:Tristate.DefaultIfUnknown"
+        ]
+      },
       "operations": [
         "tsc/internal/core/tristate.go:Tristate.DefaultIfUnknown"
       ]
@@ -524,6 +1527,11 @@
       "id": "leaves/core/tristate-from-bool",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "bool_to_tristate": [
+          "tsc/internal/core/tristate.go:BoolToTristate"
+        ]
+      },
       "operations": [
         "tsc/internal/core/tristate.go:BoolToTristate"
       ]
@@ -534,7 +1542,15 @@
       "host_applicability": "any",
       "id": "leaves/core/tristate-marshal-json",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/core/tristate.go:Tristate.MarshalJSON"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "marshal": [
+          "tsc/internal/core/tristate.go:Tristate.MarshalJSON"
+        ]
+      },
       "operations": [
         "tsc/internal/core/tristate.go:Tristate.MarshalJSON"
       ]
@@ -546,8 +1562,21 @@
       "id": "leaves/core/tristate-predicate-domain",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "predicates": [
+          "tsc/internal/core/tristate.go:Tristate.IsTrue",
+          "tsc/internal/core/tristate.go:Tristate.IsFalse",
+          "tsc/internal/core/tristate.go:Tristate.IsUnknown",
+          "tsc/internal/core/tristate.go:Tristate.IsTrueOrUnknown",
+          "tsc/internal/core/tristate.go:Tristate.IsFalseOrUnknown"
+        ]
+      },
       "operations": [
-        "tsc/internal/core/tristate.go:Tristate.IsTrue"
+        "tsc/internal/core/tristate.go:Tristate.IsFalse",
+        "tsc/internal/core/tristate.go:Tristate.IsFalseOrUnknown",
+        "tsc/internal/core/tristate.go:Tristate.IsTrue",
+        "tsc/internal/core/tristate.go:Tristate.IsTrueOrUnknown",
+        "tsc/internal/core/tristate.go:Tristate.IsUnknown"
       ]
     },
     {
@@ -556,7 +1585,18 @@
       "host_applicability": "any",
       "id": "leaves/core/tristate-unmarshal-json",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "unmarshal": [
+          "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON"
+        ],
+        "unmarshal_via_json": [
+          "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON"
+        ]
+      },
       "operations": [
         "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON"
       ]
@@ -1194,8 +2234,31 @@
       "host_applicability": "any",
       "id": "leaves/locale/context-absent-explicit-and-default",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/locale/locale.go:WithLocale"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "ctx_read": [
+          "tsc/internal/locale/locale.go:FromContext",
+          "tsc/internal/locale/locale.go:HasLocale",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ],
+        "ctx_root": [],
+        "ctx_with": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:WithLocale",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ],
+        "ctx_with_default": [
+          "tsc/internal/locale/locale.go:WithLocale"
+        ]
+      },
       "operations": [
+        "tsc/internal/locale/locale.go:FromContext",
+        "tsc/internal/locale/locale.go:HasLocale",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse",
         "tsc/internal/locale/locale.go:WithLocale"
       ]
     },
@@ -1205,9 +2268,31 @@
       "host_applicability": "any",
       "id": "leaves/locale/default-cold-process",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/locale/locale.go:Locale.String"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "ctx_read": [
+          "tsc/internal/locale/locale.go:FromContext",
+          "tsc/internal/locale/locale.go:HasLocale",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ],
+        "default_read": [
+          "tsc/internal/locale/locale.go:Locale.String"
+        ],
+        "localize": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Localize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+        "tsc/internal/locale/locale.go:FromContext",
+        "tsc/internal/locale/locale.go:HasLocale",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1216,8 +2301,18 @@
       "host_applicability": "any",
       "id": "leaves/locale/parse-aliases-and-legacy-tags",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ]
+      },
       "operations": [
+        "tsc/internal/locale/locale.go:Locale.String",
         "tsc/internal/locale/locale.go:Parse"
       ]
     },
@@ -1227,8 +2322,18 @@
       "host_applicability": "any",
       "id": "leaves/locale/parse-case-script-region-variants",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ]
+      },
       "operations": [
+        "tsc/internal/locale/locale.go:Locale.String",
         "tsc/internal/locale/locale.go:Parse"
       ]
     },
@@ -1238,8 +2343,18 @@
       "host_applicability": "any",
       "id": "leaves/locale/parse-malformed-and-unsupported",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ]
+      },
       "operations": [
+        "tsc/internal/locale/locale.go:Locale.String",
         "tsc/internal/locale/locale.go:Parse"
       ]
     },
@@ -1249,8 +2364,18 @@
       "host_applicability": "any",
       "id": "leaves/locale/parse-shipped-tags",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ]
+      },
       "operations": [
+        "tsc/internal/locale/locale.go:Locale.String",
         "tsc/internal/locale/locale.go:Parse"
       ]
     },
@@ -1260,9 +2385,19 @@
       "host_applicability": "any",
       "id": "leaves/locale/string-default-sentinel",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/locale/locale.go:Locale.String"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String"
+        ]
+      },
+      "operations": [
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1271,9 +2406,22 @@
       "host_applicability": "any",
       "id": "leaves/locale/translation-fallback-matching",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "localize": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Localize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1282,9 +2430,21 @@
       "host_applicability": "any",
       "id": "leaves/locale/translation-missing-key-english-fallback",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "localize": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Localize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1293,9 +2453,23 @@
       "host_applicability": "any",
       "id": "leaves/locale/translation-placeholder-order",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/diagnostics/diagnostics.go:Message.Localize"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "localize_message": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
+          "tsc/internal/diagnostics/diagnostics.go:Message.Code"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Code",
+        "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1304,9 +2478,22 @@
       "host_applicability": "any",
       "id": "leaves/locale/translation-repeated-and-changed",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "localize": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Localize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1315,9 +2502,21 @@
       "host_applicability": "any",
       "id": "leaves/locale/translation-shipped-locales",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "localize": [
+          "tsc/internal/locale/locale.go:Parse",
+          "tsc/internal/locale/locale.go:Locale.String",
+          "tsc/internal/diagnostics/diagnostics.go:Localize"
+        ]
+      },
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize",
+        "tsc/internal/locale/locale.go:Locale.String",
+        "tsc/internal/locale/locale.go:Parse"
       ]
     },
     {
@@ -1326,8 +2525,20 @@
       "host_applicability": "any",
       "id": "leaves/text/byte-order-marks",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "add_bom": [
+          "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark"
+        ],
+        "remove_bom": [
+          "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
+        ]
+      },
       "operations": [
+        "tsc/internal/stringutil/util.go:AddUTF8ByteOrderMark",
         "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
       ]
     },
@@ -1337,9 +2548,41 @@
       "host_applicability": "any",
       "id": "leaves/text/character-classes",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/stringutil/util.go:IsWhiteSpaceLike"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "ascii_letter": [
+          "tsc/internal/stringutil/util.go:IsASCIILetter"
+        ],
+        "digit": [
+          "tsc/internal/stringutil/util.go:IsDigit"
+        ],
+        "hex_digit": [
+          "tsc/internal/stringutil/util.go:IsHexDigit"
+        ],
+        "line_break": [
+          "tsc/internal/stringutil/util.go:IsLineBreak"
+        ],
+        "octal_digit": [
+          "tsc/internal/stringutil/util.go:IsOctalDigit"
+        ],
+        "white_space_like": [
+          "tsc/internal/stringutil/util.go:IsWhiteSpaceLike"
+        ],
+        "white_space_single_line": [
+          "tsc/internal/stringutil/util.go:IsWhiteSpaceSingleLine"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/util.go:IsASCIILetter",
+        "tsc/internal/stringutil/util.go:IsDigit",
+        "tsc/internal/stringutil/util.go:IsHexDigit",
+        "tsc/internal/stringutil/util.go:IsLineBreak",
+        "tsc/internal/stringutil/util.go:IsOctalDigit",
+        "tsc/internal/stringutil/util.go:IsWhiteSpaceLike",
+        "tsc/internal/stringutil/util.go:IsWhiteSpaceSingleLine"
       ]
     },
     {
@@ -1349,6 +2592,11 @@
       "id": "leaves/text/combine-surrogate-pairs",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "combine_surrogate_pairs": [
+          "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
       ]
@@ -1359,7 +2607,15 @@
       "host_applicability": "any",
       "id": "leaves/text/encode-uri",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/stringutil/util.go:EncodeURI"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "encode_uri": [
+          "tsc/internal/stringutil/util.go:EncodeURI"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/util.go:EncodeURI"
       ]
@@ -1371,6 +2627,11 @@
       "id": "leaves/text/equate-case-insensitive-fold",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "equate_ci": [
+          "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive"
       ]
@@ -1381,9 +2642,25 @@
       "host_applicability": "any",
       "id": "leaves/text/eslint-comparer-lowercases",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "compare_ci": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive"
+        ],
+        "compare_cs": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive"
+        ],
+        "compare_eslint": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible",
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive"
       ]
     },
     {
@@ -1393,8 +2670,37 @@
       "id": "leaves/text/js-string-rune-codec",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "code_point_to_surrogate_pair": [
+          "tsc/internal/stringutil/util.go:CodePointToSurrogatePair"
+        ],
+        "decode_js_rune": [
+          "tsc/internal/stringutil/util.go:DecodeJSStringRune"
+        ],
+        "encode_js_rune": [
+          "tsc/internal/stringutil/util.go:EncodeJSStringRune"
+        ],
+        "is_high_surrogate": [
+          "tsc/internal/stringutil/util.go:IsHighSurrogate"
+        ],
+        "is_low_surrogate": [
+          "tsc/internal/stringutil/util.go:IsLowSurrogate"
+        ],
+        "is_surrogate": [
+          "tsc/internal/stringutil/util.go:IsSurrogate"
+        ],
+        "surrogate_pair_to_code_point": [
+          "tsc/internal/stringutil/util.go:SurrogatePairToCodePoint"
+        ]
+      },
       "operations": [
-        "tsc/internal/stringutil/util.go:DecodeJSStringRune"
+        "tsc/internal/stringutil/util.go:CodePointToSurrogatePair",
+        "tsc/internal/stringutil/util.go:DecodeJSStringRune",
+        "tsc/internal/stringutil/util.go:EncodeJSStringRune",
+        "tsc/internal/stringutil/util.go:IsHighSurrogate",
+        "tsc/internal/stringutil/util.go:IsLowSurrogate",
+        "tsc/internal/stringutil/util.go:IsSurrogate",
+        "tsc/internal/stringutil/util.go:SurrogatePairToCodePoint"
       ]
     },
     {
@@ -1404,8 +2710,37 @@
       "id": "leaves/text/jsnum-bitwise-and-shift",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "bitwise_and": [
+          "tsc/internal/jsnum/jsnum.go:Number.BitwiseAND"
+        ],
+        "bitwise_not": [
+          "tsc/internal/jsnum/jsnum.go:Number.BitwiseNOT"
+        ],
+        "bitwise_or": [
+          "tsc/internal/jsnum/jsnum.go:Number.BitwiseOR"
+        ],
+        "bitwise_xor": [
+          "tsc/internal/jsnum/jsnum.go:Number.BitwiseXOR"
+        ],
+        "left_shift": [
+          "tsc/internal/jsnum/jsnum.go:Number.LeftShift"
+        ],
+        "signed_right_shift": [
+          "tsc/internal/jsnum/jsnum.go:Number.SignedRightShift"
+        ],
+        "unsigned_right_shift": [
+          "tsc/internal/jsnum/jsnum.go:Number.UnsignedRightShift"
+        ]
+      },
       "operations": [
-        "tsc/internal/jsnum/jsnum.go:Number.SignedRightShift"
+        "tsc/internal/jsnum/jsnum.go:Number.BitwiseAND",
+        "tsc/internal/jsnum/jsnum.go:Number.BitwiseNOT",
+        "tsc/internal/jsnum/jsnum.go:Number.BitwiseOR",
+        "tsc/internal/jsnum/jsnum.go:Number.BitwiseXOR",
+        "tsc/internal/jsnum/jsnum.go:Number.LeftShift",
+        "tsc/internal/jsnum/jsnum.go:Number.SignedRightShift",
+        "tsc/internal/jsnum/jsnum.go:Number.UnsignedRightShift"
       ]
     },
     {
@@ -1414,9 +2749,49 @@
       "host_applicability": "any",
       "id": "leaves/text/jsnum-classifiers-and-rounding",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/jsnum/jsnum.go:Number.Floor"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "abs": [
+          "tsc/internal/jsnum/jsnum.go:Number.Abs"
+        ],
+        "floor": [
+          "tsc/internal/jsnum/jsnum.go:Number.Floor"
+        ],
+        "inf_constructor": [
+          "tsc/internal/jsnum/jsnum.go:Inf"
+        ],
+        "is_inf": [
+          "tsc/internal/jsnum/jsnum.go:Number.IsInf"
+        ],
+        "is_nan": [
+          "tsc/internal/jsnum/jsnum.go:Number.IsNaN"
+        ],
+        "is_non_finite": [
+          "tsc/internal/jsnum/jsnum.go:isNonFinite"
+        ],
+        "nan_constructor": [
+          "tsc/internal/jsnum/jsnum.go:NaN"
+        ],
+        "to_shift_count": [
+          "tsc/internal/jsnum/jsnum.go:Number.toShiftCount"
+        ],
+        "trunc": [
+          "tsc/internal/jsnum/jsnum.go:Number.trunc"
+        ]
+      },
+      "operations": [
+        "tsc/internal/jsnum/jsnum.go:Inf",
+        "tsc/internal/jsnum/jsnum.go:NaN",
+        "tsc/internal/jsnum/jsnum.go:Number.Abs",
+        "tsc/internal/jsnum/jsnum.go:Number.Floor",
+        "tsc/internal/jsnum/jsnum.go:Number.IsInf",
+        "tsc/internal/jsnum/jsnum.go:Number.IsNaN",
+        "tsc/internal/jsnum/jsnum.go:Number.toShiftCount",
+        "tsc/internal/jsnum/jsnum.go:Number.trunc",
+        "tsc/internal/jsnum/jsnum.go:isNonFinite"
       ]
     },
     {
@@ -1426,8 +2801,15 @@
       "id": "leaves/text/jsnum-from-string",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "from_text": [
+          "tsc/internal/jsnum/string.go:FromString",
+          "tsc/internal/jsnum/string.go:Number.String"
+        ]
+      },
       "operations": [
-        "tsc/internal/jsnum/string.go:FromString"
+        "tsc/internal/jsnum/string.go:FromString",
+        "tsc/internal/jsnum/string.go:Number.String"
       ]
     },
     {
@@ -1437,8 +2819,17 @@
       "id": "leaves/text/jsnum-int32-conversions",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "to_int32": [
+          "tsc/internal/jsnum/jsnum.go:Number.toInt32"
+        ],
+        "to_uint32": [
+          "tsc/internal/jsnum/jsnum.go:Number.toUint32"
+        ]
+      },
       "operations": [
-        "tsc/internal/jsnum/jsnum.go:Number.toInt32"
+        "tsc/internal/jsnum/jsnum.go:Number.toInt32",
+        "tsc/internal/jsnum/jsnum.go:Number.toUint32"
       ]
     },
     {
@@ -1448,6 +2839,11 @@
       "id": "leaves/text/jsnum-number-to-string",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "to_text": [
+          "tsc/internal/jsnum/string.go:Number.String"
+        ]
+      },
       "operations": [
         "tsc/internal/jsnum/string.go:Number.String"
       ]
@@ -1459,7 +2855,16 @@
       "id": "leaves/text/jsnum-remainder-and-exponentiate",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "exponentiate": [
+          "tsc/internal/jsnum/jsnum.go:Number.Exponentiate"
+        ],
+        "remainder": [
+          "tsc/internal/jsnum/jsnum.go:Number.Remainder"
+        ]
+      },
       "operations": [
+        "tsc/internal/jsnum/jsnum.go:Number.Exponentiate",
         "tsc/internal/jsnum/jsnum.go:Number.Remainder"
       ]
     },
@@ -1469,8 +2874,20 @@
       "host_applicability": "any",
       "id": "leaves/text/line-splitting-and-indentation",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/stringutil/util.go:SplitLines"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "guess_indentation": [
+          "tsc/internal/stringutil/util.go:GuessIndentation"
+        ],
+        "split_lines": [
+          "tsc/internal/stringutil/util.go:SplitLines"
+        ]
+      },
       "operations": [
+        "tsc/internal/stringutil/util.go:GuessIndentation",
         "tsc/internal/stringutil/util.go:SplitLines"
       ]
     },
@@ -1481,6 +2898,11 @@
       "id": "leaves/text/lower-first-char",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "lower_first_char": [
+          "tsc/internal/stringutil/util.go:LowerFirstChar"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/util.go:LowerFirstChar"
       ]
@@ -1491,9 +2913,25 @@
       "host_applicability": "any",
       "id": "leaves/text/prefix-suffix-byte-window",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/stringutil/compare.go:HasPrefix"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "has_prefix": [
+          "tsc/internal/stringutil/compare.go:HasPrefix"
+        ],
+        "has_prefix_and_suffix": [
+          "tsc/internal/stringutil/compare.go:HasPrefixAndSuffixWithoutOverlap"
+        ],
+        "has_suffix": [
+          "tsc/internal/stringutil/compare.go:HasSuffix"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/compare.go:HasPrefix",
+        "tsc/internal/stringutil/compare.go:HasPrefixAndSuffixWithoutOverlap",
+        "tsc/internal/stringutil/compare.go:HasSuffix"
       ]
     },
     {
@@ -1503,8 +2941,19 @@
       "id": "leaves/text/pseudo-bigint-parse",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "new_pseudo_big_int": [
+          "tsc/internal/jsnum/pseudobigint.go:NewPseudoBigInt",
+          "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String"
+        ],
+        "parse_pseudo_big_int": [
+          "tsc/internal/jsnum/pseudobigint.go:ParsePseudoBigInt"
+        ]
+      },
       "operations": [
-        "tsc/internal/jsnum/pseudobigint.go:ParsePseudoBigInt"
+        "tsc/internal/jsnum/pseudobigint.go:NewPseudoBigInt",
+        "tsc/internal/jsnum/pseudobigint.go:ParsePseudoBigInt",
+        "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String"
       ]
     },
     {
@@ -1513,9 +2962,23 @@
       "host_applicability": "any",
       "id": "leaves/text/pseudo-bigint-sign-and-valid",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "parse_valid_big_int": [
+          "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
+          "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String"
+        ],
+        "pseudo_big_int_sign": [
+          "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.Sign"
+        ]
+      },
+      "operations": [
+        "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
+        "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.Sign",
+        "tsc/internal/jsnum/pseudobigint.go:PseudoBigInt.String"
       ]
     },
     {
@@ -1524,9 +2987,21 @@
       "host_applicability": "any",
       "id": "leaves/text/quote-stripping",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/stringutil/util.go:StripQuotes"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "strip_quotes": [
+          "tsc/internal/stringutil/util.go:StripQuotes"
+        ],
+        "unquote_string": [
+          "tsc/internal/stringutil/util.go:UnquoteString"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/util.go:StripQuotes",
+        "tsc/internal/stringutil/util.go:UnquoteString"
       ]
     },
     {
@@ -1590,9 +3065,48 @@
       "host_applicability": "any",
       "id": "leaves/text/string-comparers",
       "last_result": "not_implemented",
-      "native_authority": "tools/phase1/leaves probes against the pinned packages",
-      "operations": [
+      "missing_operations": [
         "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive"
+      ],
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "compare_ci": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive"
+        ],
+        "compare_ci_then_cs": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveThenSensitive"
+        ],
+        "compare_cs": [
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive"
+        ],
+        "comparer_ci": [
+          "tsc/internal/stringutil/compare.go:GetStringComparer",
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive"
+        ],
+        "comparer_cs": [
+          "tsc/internal/stringutil/compare.go:GetStringComparer",
+          "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive"
+        ],
+        "equality_comparer_ci": [
+          "tsc/internal/stringutil/compare.go:GetStringEqualityComparer",
+          "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive"
+        ],
+        "equality_comparer_cs": [
+          "tsc/internal/stringutil/compare.go:GetStringEqualityComparer",
+          "tsc/internal/stringutil/compare.go:EquateStringCaseSensitive"
+        ],
+        "equate_cs": [
+          "tsc/internal/stringutil/compare.go:EquateStringCaseSensitive"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveThenSensitive",
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseSensitive",
+        "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive",
+        "tsc/internal/stringutil/compare.go:EquateStringCaseSensitive",
+        "tsc/internal/stringutil/compare.go:GetStringComparer",
+        "tsc/internal/stringutil/compare.go:GetStringEqualityComparer"
       ]
     },
     {
@@ -1602,6 +3116,11 @@
       "id": "leaves/text/to-lower-js",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "to_lower_js": [
+          "tsc/internal/stringutil/js_case.go:ToLowerJS"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/js_case.go:ToLowerJS"
       ]
@@ -1613,6 +3132,11 @@
       "id": "leaves/text/to-upper-js",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "to_upper_js": [
+          "tsc/internal/stringutil/js_case.go:ToUpperJS"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/js_case.go:ToUpperJS"
       ]
@@ -1624,6 +3148,11 @@
       "id": "leaves/text/truncate-by-runes",
       "last_result": "match",
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "truncate_by_runes": [
+          "tsc/internal/stringutil/util.go:TruncateByRunes"
+        ]
+      },
       "operations": [
         "tsc/internal/stringutil/util.go:TruncateByRunes"
       ]
@@ -1634,8 +3163,20 @@
       "host_applicability": "any",
       "id": "leaves/text/unicode-identifier-predicates",
       "last_result": "not_implemented",
+      "missing_operations": [
+        "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart"
+      ],
       "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "identifier_part": [
+          "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierPart"
+        ],
+        "identifier_start": [
+          "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart"
+        ]
+      },
       "operations": [
+        "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierPart",
         "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart"
       ]
     },
@@ -1875,11 +3416,42 @@
       "artifact": "data/s04/e4-probes.json",
       "freshness": "gated on every `cargo xtask run e4`",
       "id": "witness/s04-e4-probes",
-      "kind": "rust_ungated",
-      "operations": [],
+      "kind": "rust_gated",
+      "operation_actions": {
+        "combine": [
+          "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
+        ],
+        "decode_js": [
+          "tsc/internal/stringutil/util.go:DecodeJSStringRune"
+        ],
+        "encode": [
+          "tsc/internal/stringutil/util.go:EncodeJSStringRune"
+        ],
+        "lower": [
+          "tsc/internal/stringutil/js_case.go:ToLowerJS"
+        ],
+        "lower_first": [
+          "tsc/internal/stringutil/util.go:LowerFirstChar"
+        ],
+        "truncate": [
+          "tsc/internal/stringutil/util.go:TruncateByRunes"
+        ],
+        "upper": [
+          "tsc/internal/stringutil/js_case.go:ToUpperJS"
+        ]
+      },
+      "operations": [
+        "tsc/internal/stringutil/js_case.go:ToLowerJS",
+        "tsc/internal/stringutil/js_case.go:ToUpperJS",
+        "tsc/internal/stringutil/util.go:CombineSurrogatePairs",
+        "tsc/internal/stringutil/util.go:DecodeJSStringRune",
+        "tsc/internal/stringutil/util.go:EncodeJSStringRune",
+        "tsc/internal/stringutil/util.go:LowerFirstChar",
+        "tsc/internal/stringutil/util.go:TruncateByRunes"
+      ],
       "producer": "e4",
       "rust_gate": "scripts/s04.py e4 runs `cargo run --package tsr_jsstring --example e4 --release` and compares its bytes to the pinned Go oracle",
-      "witnesses": "Text probes executed on both sides and compared byte for byte. The manifest records per-scenario counts (helpers/case-table, helpers/ascii, ...) rather than Go symbols, so it cannot yet be attributed to exact operation ids. Mapping its scenarios to operations is open F1a task 1 work; claiming the whole internal/stringutil package would over-report coverage."
+      "witnesses": "The listed E4 action names call these exact stringutil functions in scripts/s04_oracle/main.go and their Rust counterparts in crates/tsr_jsstring/examples/e4.rs. scripts/s04.py verifies the frozen request inventory before its differential comparison; scenario groups are not attributed wholesale."
     }
   ]
 }

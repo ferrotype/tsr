@@ -1154,5 +1154,70 @@ class NegativeControlTests(unittest.TestCase):
         self.assertEqual(report["counts"]["match"], 1)
 
 
+class LeafReviewRegressions(unittest.TestCase):
+    def test_embedded_assets_are_capture_inputs(self):
+        import unittest.mock
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            asset = root / "crates/leaf/data/value.d.ts"
+            asset.parent.mkdir(parents=True)
+            asset.write_bytes(b"interface Before {}")
+            with unittest.mock.patch.object(capture, "ROOT", root):
+                before = capture.source_closure("leaves", ["crates/leaf"])
+                asset.write_bytes(b"interface After {}")
+                after = capture.source_closure("leaves", ["crates/leaf"])
+            name = "crates/leaf/data/value.d.ts"
+            self.assertIn(name, before)
+            self.assertNotEqual(before[name], after[name])
+        real = capture.source_closure("leaves")
+        self.assertIn("crates/tsr_bundled/bundled/libs/lib.d.ts", real)
+        self.assertIn("crates/tsr_bundled/bundled/CopyrightNotice.txt", real)
+
+    def test_unknown_actions_cannot_agree_as_observations(self):
+        requests = [{"case": "x", "operation": "NewTextRange", "actions": [{"op": "typo"}]}]
+        rows = [{"case": "x", "operation": "NewTextRange", "result": "observed",
+                 "observation": {"ordered": [{"op": "typo", "unsupported_action": "typo"}]}}]
+        for side in ("native", "rust"):
+            with self.subTest(side=side), self.assertRaisesRegex(ValueError, "unsupported action"):
+                capture.validate_response({"observations": rows}, requests, side)
+
+    def test_decoding_cannot_erase_a_requested_trace(self):
+        request = {"case": "x", "operation": "trace", "actions": [{"op": "get"}]}
+        result = {"case": "x", "operation": "trace", "result": "observed",
+                  "observation": {"ordered": []}}
+        for side in ("native", "rust"):
+            with self.subTest(side=side), self.assertRaisesRegex(ValueError, "action result"):
+                capture.validate_response({"observations": [result]}, [request], side)
+        request["actions"] = {"op": "get"}
+        with self.assertRaisesRegex(ValueError, "nonempty array"):
+            capture.validate_response({"observations": [result]}, [request], "native")
+
+    def test_asset_content_does_not_cover_a_filesystem_walk(self):
+        linked = scope.cases_by_operation()
+        self.assertNotIn("leaves/bundled/asset-index-complete",
+                         linked.get("tsc/internal/bundled/embed.go:wrappedFS.WalkDir", []))
+
+    def test_prepared_links_include_all_named_actions(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        operations = {op for c in cases if c["family"] == "leaves" for op in c["operations"]}
+        for operation in ("tsc/internal/locale/locale.go:FromContext",
+                          "tsc/internal/locale/locale.go:HasLocale",
+                          "tsc/internal/collections/multimap.go:MultiMap.Clear"):
+            self.assertIn(operation, operations)
+        for case in cases:
+            for actions in case.get("operation_actions", {}).values():
+                self.assertTrue(set(actions) <= set(case["operations"]), case["id"])
+
+    def test_preparation_cannot_be_complete_with_unlinked_leaf_operations(self):
+        current = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        report = scope.leaf_preparation(current, cases)
+        committed = json.loads((ROOT / "data/phase1/leaves-preparation.json").read_text())
+        self.assertEqual(report, committed, "regenerate the pending preparation inventory")
+        self.assertFalse(report["complete"])
+        self.assertTrue(report["pending"])
+        self.assertEqual(report["total_operations"], report["prepared_operations"] + len(report["pending"]))
+
+
 if __name__ == "__main__":
     unittest.main()

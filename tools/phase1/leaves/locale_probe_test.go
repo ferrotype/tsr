@@ -57,11 +57,16 @@ type action struct {
 // decodeAction unmarshals a request's actions once its subject has matched.
 func decodeAction(raw json.RawMessage) []action {
 	if len(raw) == 0 {
-		return nil
+		panic("phase1: missing actions")
 	}
 	var out []action
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil
+		// Decoding happens before guarded production calls. A malformed
+		// request must fail the probe, never turn into an empty observation.
+		panic("phase1: invalid action payload: " + err.Error())
+	}
+	if len(out) == 0 {
+		panic("phase1: empty action trace")
 	}
 	return out
 }
@@ -192,7 +197,7 @@ func replay(request leafRequest) ([]any, string) {
 			row["text"] = text
 			row["panic"] = panicked
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}

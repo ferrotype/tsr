@@ -153,7 +153,7 @@ func phase1Tristate(trace []phase1Action) []any {
 			row["flag"] = a.Flag
 			row["result"] = int64(BoolToTristate(a.Flag))
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -186,7 +186,7 @@ func phase1TristateJSON(trace []phase1Action) []any {
 			row["result"] = int64(t)
 			row["error"] = err != nil
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -206,7 +206,7 @@ func phase1TextRange(trace []phase1Action) []any {
 			row["end"] = int64(r.End())
 			row["len"] = int64(r.Len())
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -253,7 +253,7 @@ func phase1TextRangePredicates(trace []phase1Action) []any {
 			row["pos"] = int64(moved.Pos())
 			row["end"] = int64(moved.End())
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -277,7 +277,7 @@ func phase1ScriptKind(t *testing.T, trace []phase1Action) []any {
 			row["kind"] = a.Kind
 			row["extension"] = GetDefaultExtensionForScriptKind(ScriptKind(int32(a.Kind)))
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -335,7 +335,7 @@ func phase1Pattern(t *testing.T, trace []phase1Action) []any {
 			})
 			row["result"], row["panic"] = value, panicked
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}

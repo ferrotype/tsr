@@ -188,6 +188,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "phase1_leaves",
+      "manifest": "tools/phase1/leaves/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 1 foundation test harness"
+    },
+    {
       "name": "tsr_cpu_profile",
       "manifest": "tools/s07/cpu-profile/rust/Cargo.toml",
       "publish": false,

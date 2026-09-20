@@ -68,11 +68,16 @@ type action struct {
 // decodeAction unmarshals a request's actions once its subject has matched.
 func decodeAction(raw json.RawMessage) []action {
 	if len(raw) == 0 {
-		return nil
+		panic("phase1: missing actions")
 	}
 	var out []action
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil
+		// Decoding happens before guarded production calls. A malformed
+		// request must fail the probe, never turn into an empty observation.
+		panic("phase1: invalid action payload: " + err.Error())
+	}
+	if len(out) == 0 {
+		panic("phase1: empty action trace")
 	}
 	return out
 }
@@ -229,7 +234,7 @@ func replayOrderedMap(request leafRequest) []any {
 			})
 			row["result"], row["panic"] = value, panicked
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -318,7 +323,7 @@ func replayOrderedSet(request leafRequest) []any {
 				return seen
 			})
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -453,7 +458,7 @@ func replaySet(request leafRequest) []any {
 				return slots.get(a.Target).Intersects(slots.operand(a.Target, a.Other))
 			})
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -542,7 +547,7 @@ func replayMultiMap(request leafRequest) []any {
 			_, panicked := guarded(func() any { m.Clear(); return nil })
 			row["panic"] = panicked
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -578,8 +583,7 @@ func replayCopyOnWriteMap(request leafRequest) []any {
 			row["depth"] = len(scopes)
 		case "exit_scope":
 			if len(scopes) == 0 {
-				row["unsupported_action"] = "exit_scope without a matching enter_scope"
-				break
+				panic("phase1: exit_scope without a matching enter_scope")
 			}
 			restore := scopes[len(scopes)-1]
 			scopes = scopes[:len(scopes)-1]
@@ -587,7 +591,7 @@ func replayCopyOnWriteMap(request leafRequest) []any {
 			row["panic"] = panicked
 			row["depth"] = len(scopes)
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -618,8 +622,7 @@ func replayCopyOnWriteSet(request leafRequest) []any {
 			row["depth"] = len(scopes)
 		case "exit_scope":
 			if len(scopes) == 0 {
-				row["unsupported_action"] = "exit_scope without a matching enter_scope"
-				break
+				panic("phase1: exit_scope without a matching enter_scope")
 			}
 			restore := scopes[len(scopes)-1]
 			scopes = scopes[:len(scopes)-1]
@@ -627,7 +630,7 @@ func replayCopyOnWriteSet(request leafRequest) []any {
 			row["panic"] = panicked
 			row["depth"] = len(scopes)
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -737,7 +740,7 @@ func replaySyncMap(request leafRequest) []any {
 				return sortedStrings(names)
 			})
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}
@@ -786,7 +789,7 @@ func replaySyncSet(request leafRequest) []any {
 				return count
 			})
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}

@@ -401,6 +401,7 @@ dependencies = [
  "tsr_jsstring",
  "tsr_semver",
  "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]

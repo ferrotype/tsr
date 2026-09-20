@@ -11,7 +11,7 @@ moved pin invalidates it.
 | Step | State |
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
-| F1a — foundation leaf tests | **prepared**: 149 leaf cases frozen, 41 matching, 108 naming a missing Rust entry point |
+| F1a — foundation leaf tests | **incomplete**: 150 leaf cases frozen; 222 of 460 inventoried leaf operations have preparation links |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
@@ -24,7 +24,7 @@ implementation; no production behavior has been added or changed.
 
 ## F1a — foundation leaf preparation
 
-149 leaf cases are frozen across the plan's six coverage groups, every one with
+150 leaf cases are frozen across the plan's six coverage groups, every one with
 a native observation from the pinned packages and a classified Rust result.
 
 | Group | Cases | match | not_implemented |
@@ -35,8 +35,8 @@ a native observation from the pinned packages and a classified Rust result.
 | text/number/semver | 29 | 18 | 11 |
 | locale | 12 | 0 | 12 |
 | diagnostics | 27 | 6 | 21 |
-| bundled | 6 | 4 | 2 |
-| **total** | **149** | **41** | **108** |
+| bundled | 7 | 5 | 2 |
+| **total** | **150** | **42** | **108** |
 
 Zero `different`, zero `native_unavailable`, zero `harness_failed`: every case
 runs on both sides. The 108 `not_implemented` rows are the honest
@@ -86,8 +86,10 @@ wrong. The corrections that mattered most:
 
 `covered` requires an exact link **and** evidence the comparison passes. A
 prepared case that reports `not_implemented` witnesses a gap; it does not close
-one. Recording each case's comparison result moved the count from an
-inflated 112 to 43.
+one. Expanding the direct action links and checking the production bundled
+wrapper gives 69 covered operations. The asset-content index does not cover
+`wrappedFS.WalkDir`; it remains a named missing API. ReadFile coverage now
+comes from calling `BundledFs::read_file`, not its backing asset table.
 
 The same rule applies to existing artifacts. `data/s07/path-observations.json`
 and `semver-observations.json` look like Rust witnesses and are not: their
@@ -97,14 +99,36 @@ operations covered on the strength of a Go-only run.
 
 | Disposition | Count |
 | --- | ---: |
-| `covered` | 43 |
-| `implemented_untested` | 3,418 |
-| `missing` | 1,316 |
+| `covered` | 69 |
+| `implemented_untested` | 3,400 |
+| `missing` | 1,308 |
 | `equivalent_rust` | 0 |
 | `later_phase` | 18 |
 
-65 operations now carry a case that runs and reports the Rust entry point
+74 operations now carry a case that runs and reports the Rust entry point
 absent, which is a witnessed gap rather than an inferred one.
+
+### Remaining F1a preparation
+
+The runnable case count is not the completion criterion. `inventory --check`
+now reports `f1a_preparation.complete: false`: **222 of 460** operations in the
+leaf package roster have a classified leaf case or an exact gated witness;
+**238 remain unlinked**. The complete queue, including each intended Rust home,
+is committed in `data/phase1/leaves-preparation.json` and checked against the
+live inventory by the Phase 1 tests.
+
+This is a conservative package roster. Runtime helpers, generators and core
+operations that belong to a later preparation step still need explicit
+operation ownership; they have not been silently dropped to mark F1a complete.
+Pending entries need either a native case, an exact link to existing gated
+observations, or a reviewed assignment to another preparation step. Several
+operations can share one trace. F1b can use the existing cases, but they do not
+close the remaining F1a work.
+
+The added action maps include locale context reads, collection mutations and
+constructors, range predicates, string operations and numeric operations. Seven
+E4 action names are now linked to their exact Go and Rust entry points; this
+does not attribute the entire E4 scenario inventory to every string helper.
 
 ### F1b queue
 
@@ -123,8 +147,8 @@ lands in F1b.
 
 ### Known limitations
 
-- The e4 and s05 probe scenarios are still not attributed to exact operation
-  ids: `data/s04/e4-probes.json` records per-scenario counts, not Go symbols.
+- Remaining E4 and S05 action attribution is in the preparation queue. Only
+  the seven explicitly mapped E4 actions confer coverage.
 - Some cases record a boolean where the pinned implementation's short-circuit is
   genuinely unobservable through the API (`SyncSet.IsEmpty`,
   `CopyOnWriteMap`'s ownership restore). Those claims were narrowed to what the
@@ -135,9 +159,9 @@ lands in F1b.
 | Requirement | Result |
 | --- | --- |
 | Scope has zero unclassified operations | 4,795 operations, each with a disposition, basis, case links and dependencies |
-| `covered` carries exact case/artifact links | **1 of 4,795.** 2,720 mapped operations have only file-level producer metrics; see Scope |
+| `covered` carries exact case/artifact links | **69 of 4,795.** 2,694 mapped operations have only file-level producer metrics; see Scope |
 | All 309 outputs have verified invocation mappings | **167 of 309.** 142 blocked; see below |
-| Manifests and failure tests pass | 79 Phase 1 tests, plus the extended discovery regression |
+| Manifests and failure tests pass | 115 Phase 1 tests, plus the extended discovery regression |
 | The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations, each with a native expectation |
 | Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
 | The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
@@ -234,9 +258,9 @@ operations are Phase 1 obligations, and F4a enumerates that exact surface.
 
 | Disposition | Count |
 | --- | ---: |
-| `covered` | 1 |
-| `implemented_untested` | 3,449 |
-| `missing` | 1,327 |
+| `covered` | 69 |
+| `implemented_untested` | 3,400 |
+| `missing` | 1,308 |
 | `equivalent_rust` | 0 |
 | `later_phase` | 18 |
 
@@ -299,7 +323,7 @@ end to end:
 
 **A production change stales the capture.** The source closure is derived from
 `cargo metadata`, not hand-listed, so it contains the driver package's whole
-workspace dependency closure — 327 inputs, including
+workspace dependency closure — 444 pilot inputs and 238 leaf inputs, including
 `crates/tsr_tsoptions/src/glob.rs`, all of `tsr_vfs`, the example target,
 `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` and `.cargo/**`. It also
 covers what the *native* side executes: `data/s04/toolchains.toml` (which
@@ -311,7 +335,9 @@ capture. Appending a comment to `glob.rs` makes `compare` fail with
 Replay recomputes the expected key set rather than trusting the recorded one,
 so a capture that recorded too few inputs cannot authenticate; the workspace
 package list is itself authenticated, and a dependency added since the capture
-is caught through the `Cargo.toml`/`Cargo.lock` hashes.
+is caught through the `Cargo.toml`/`Cargo.lock` hashes. All regular package
+files are included, including embedded `.d.ts` libraries and their notice;
+production asset edits now stale the leaf capture as source edits do.
 
 **A malformed response cannot reach parity.** Each response is validated as an
 ordered sequence before anything is indexed by case id, checking count, order,
@@ -325,6 +351,11 @@ statuses. Against a real capture:
 | extra failing row | `rust response has 7 rows for 6 requests` |
 | reordered rows | `row 0 reports case '...' where the request schedule has '...'` |
 | unknown status | `unknown rust status 'looks_fine'; allowed statuses are ...` |
+
+Unknown action markers are harness failures, not comparable observations.
+Malformed action arrays are rejected, and an observed trace must retain one
+result per requested action. Native action decoding no longer turns malformed
+JSON into an empty successful trace.
 
 A side may only report its own statuses: a Rust driver cannot claim
 `native_unavailable`, and a native probe cannot claim `not_implemented`.
@@ -389,8 +420,9 @@ metrics. Every item is open and no metric is populated.
 
 The `foundations`, `config` and `syntax` producers are **not** registered in
 `status/runs.toml`. The plan registers a producer only once it can validate its
-complete declared inventory and report honest failures; only the `pilot` family
-has an adapter. F1a–F5a register them as their family adapters land.
+complete declared inventory and report honest failures. The `pilot` and
+`leaves` families have adapters; the leaf preparation inventory is still
+incomplete. F1a–F5a register producers when their declared inventory is ready.
 
 `cargo xtask validate` and `cargo xtask status --check-committed` both pass with
 P1A registered, and S01–S12 are unchanged.

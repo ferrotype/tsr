@@ -3,7 +3,7 @@
   "requests": [
     {
       "case": "leaves/bundled/asset-index-complete",
-      "discriminates": "the complete packaged asset index: all 108 names in their frozen byte-sorted order, each with its length and an FNV-1a/64 digest of its bytes. It catches a missing, extra, renamed, reordered or altered asset. It is also the checkout-independence witness for Rust: Go reads these bytes from its embedded copy of upstream/tsc/internal/bundled/libs, while crates/tsr_bundled compiles in its own crate-local bundled/libs copy, so a match proves the packaged crate reproduces the pinned assets without reading the upstream checkout. Order is load-bearing for Rust: tsr_bundled::library resolves names with a binary search over LIBRARIES, which silently misses if that list is not byte-sorted. What it does not witness is the walk. The operation recorded here is the native entry point the probe calls, wrappedFS.WalkDir; the Rust half answers from the tsr_bundled::LIBRARIES slice, and tsr_vfs::FileSystem declares no walk method at all, so the wrapper's root-entry dispatch, its fs.SkipAll/fs.SkipDir contract and the scheme paths it hands each callback are observed on the Go side only, by leaves/bundled/wrapper-dispatch-surface.",
+      "discriminates": "Complete ordered asset names, sizes and bytes. Go observes these through WalkDir/ReadFile; Rust enumerates the embedded asset table. This is content evidence, not Rust WalkDir coverage.",
       "operation": "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
       "order_sensitive": true,
       "subject": "BundledIndex"
@@ -72,7 +72,7 @@
         }
       ],
       "case": "leaves/bundled/asset-name-resolution",
-      "discriminates": "valid and missing asset names against the same index. Both sides are asked for the same fifteen names in the same order, and every one of them must resolve by exact case-sensitive match or not at all: no extension completion, no whitespace trimming, no re-application of the libs/ segment and no `.` or `..` resolution. lib.ES5.d.ts and LIB.ES5.D.TS catch case folding; lib.es2015 catches extension completion; the trailing-space 'lib.es5.d.ts ' catches trimming; libs/lib.es5.d.ts catches a lookup that strips a leading libs/ segment, which is exactly what tsr_bundled::BundledFs::read_file does before it calls library; ./lib.es5.d.ts catches normalization on both sides, because the pin declines bundled:///libs/./lib.es5.d.ts while bundled:///libs/lib.es5.d.ts reads, and tsr_bundled::library declines './lib.es5.d.ts' while 'lib.es5.d.ts' resolves, so a normalizing implementation on either side flips its row; ../libs/lib.es5.d.ts is the same witness for `..`, where a normalizing Go would reduce libs/../libs/lib.es5.d.ts to an embedded key. Two rows are boundaries rather than discriminators and are kept as such. The empty name only records that neither side answers for it. ../CopyrightNotice.txt records that a traversal out of libs/ resolves to nothing, but it does not witness normalization: CopyrightNotice.txt is never embedded, because generate.go reads it only to check that every lib begins with it as a header and emits //go:embed directives for libs/<name> alone, so bundled:///CopyrightNotice.txt is already false at the pin and an implementation that did normalize would still return false. Finally, the two sides are not asked the same question about paths: Go runs wrappedFS.ReadFile on LibPath() + \"/\" + name, while Rust runs tsr_bundled::library(name) on the bare name, so a name carrying path syntax constrains the Go side as a path and the Rust side only as a name that happens to contain slashes or dots. The wrapper path layer Rust would need, BundledFs::read_file, is unreachable from this harness and is recorded as a gap by leaves/bundled/wrapper-dispatch-surface.",
+      "discriminates": "Both sides call their production filesystem wrapper on LibPath()+\"/\"+name. Exact case, no extension completion, trimming or dot-segment normalization; missing and malformed asset names remain missing.",
       "operation": "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
       "order_sensitive": true,
       "subject": "BundledLookup"
@@ -160,6 +160,47 @@
       "discriminates": "access outside the checkout, from the Go side. TestingLibPath locates the libs directory through runtime.Caller(0), so it resolves only where the pinned source tree is present; under -trimpath the same call returns the module-relative github.com/microsoft/TypeScript/tsc/internal/bundled/libs and does not panic, so the accessor fails silently. The payload records base names, absoluteness, existence and entry count rather than a machine path, so it distinguishes both worlds without freezing anyone's directory layout. crates/tsr_bundled has no counterpart by construction and reports the gap.",
       "operation": "tsc/internal/bundled/bundled.go:TestingLibPath",
       "subject": "BundledSourceDir"
+    },
+    {
+      "actions": [
+        {
+          "op": "read_path",
+          "path": "bundled:///"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///LIBS"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/../libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:////libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/lib.d.ts"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/nope.d.ts"
+        }
+      ],
+      "case": "leaves/bundled/wrapper-read-paths",
+      "discriminates": "Production wrapper directory/file predicates, listing, stat and realpath for bundled roots, files, and malformed paths. Walk and mutation behavior are separate pending operations.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "BundledReads"
     }
   ],
   "version": 1

@@ -359,7 +359,7 @@ def cases_by_operation() -> dict[str, list[str]]:
         # match covers.
         if case.get("last_result") != "match":
             continue
-        for operation in case.get("operations", []):
+        for operation in case.get("coverage_operations", case.get("operations", [])):
             inverted.setdefault(operation, []).append(case["id"])
     for witness in document.get("witnesses", []):
         if witness.get("kind") not in COVERING_WITNESS_KINDS:
@@ -379,7 +379,7 @@ def witnessed_gaps() -> dict[str, list[str]]:
     for case in document.get("cases", []):
         if case.get("last_result") != "not_implemented":
             continue
-        for operation in case.get("operations", []):
+        for operation in case.get("missing_operations", case.get("operations", [])):
             gaps.setdefault(operation, []).append(case["id"])
     return {k: sorted(v) for k, v in gaps.items()}
 
@@ -409,6 +409,38 @@ def witness_problems() -> list[str]:
         if not witness.get("witnesses"):
             problems.append(f"{identity}: no description of what it actually witnesses")
     return problems
+
+
+def leaf_preparation(scope: dict, cases: dict) -> dict:
+    """Preparation is not parity: a classified gap is runnable, an absent link isn't.
+
+    Keep the conservative package roster until an operation has an explicit
+    reviewed home elsewhere. In particular, do not hide unlinked core helpers
+    or generated/runtime mechanisms merely because new traces did not use them.
+    """
+    packages = {"internal/" + name for name in (
+        "core", "collections", "stringutil", "jsnum", "semver", "json",
+        "locale", "diagnostics", "bundled",
+    )}
+    prepared: dict[str, list[str]] = {}
+    for case in cases.get("cases", []):
+        if case.get("family") != "leaves" or case.get("last_result") not in (
+            "match", "different", "not_implemented"
+        ):
+            continue
+        for operation in case.get("operations", []):
+            prepared.setdefault(operation, []).append(case["id"])
+    for witness in cases.get("witnesses", []):
+        if witness.get("kind") == "rust_gated":
+            for operation in witness.get("operations", []):
+                prepared.setdefault(operation, []).append(witness["id"])
+    required = [r for r in scope["operations"] if r["go_package"] in packages]
+    pending = [{"operation": r["id"], "rust_home": r["rust_home"],
+                "disposition": r["disposition"]}
+               for r in required if r["id"] not in prepared]
+    return {"version": 1, "pin": scope["pin"], "complete": bool(required) and not pending,
+            "total_operations": len(required), "prepared_operations": len(required) - len(pending),
+            "pending": pending}
 
 
 def build() -> dict:

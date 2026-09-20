@@ -335,7 +335,10 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
             relative = path.relative_to(ROOT)
             if relative.parts[0] == "target" or "target" in relative.parts[:2]:
                 continue
-            if path.suffix in (".rs", ".toml") or path.name in ("README.md", "NOTICE", "LICENSE"):
+            # Embedded assets and build-script inputs are compiler inputs too.
+            # Restricting this to Rust/TOML misses e.g. bundled/libs/*.d.ts,
+            # whose bytes are exactly what the leaf asset probes measure.
+            if not any(part in (".git", "target", "__pycache__") for part in path.relative_to(directory).parts):
                 paths.add(relative)
 
     closure: dict[str, str] = {}
@@ -510,6 +513,24 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
             )
         if result == "observed" and "observation" not in row:
             raise ValueError(f"{where} is observed but carries no observation payload")
+        if "actions" in request:
+            actions = request["actions"]
+            if not isinstance(actions, list) or not actions or any(
+                not isinstance(action, dict) or not isinstance(action.get("op"), str)
+                or not action["op"] for action in actions
+            ):
+                raise ValueError(f"{where}: actions must be a nonempty array of named operations")
+            if result == "observed":
+                observed = row["observation"]
+                trace = observed.get("ordered") if isinstance(observed, dict) else None
+                if not isinstance(trace, list) or len(trace) != len(actions):
+                    raise ValueError(f"{where}: observation omitted or added an action result")
+        if result == "observed" and isinstance(row["observation"], dict):
+            for action in row["observation"].get("ordered", []):
+                if (isinstance(action, dict) and "unsupported_action" in action) or (
+                    isinstance(action, list) and action and action[0] == "unsupported_action"
+                ):
+                    raise ValueError(f"{where}: unsupported action is a harness failure: {action}")
         if result == "observed" and request.get(ORDER_SENSITIVE_KEY):
             problems = order_safe_problems(row["observation"])
             if problems:

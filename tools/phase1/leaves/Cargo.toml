@@ -20,5 +20,7 @@ tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
 tsr_semver = { version = "0.1.0", path = "../../../crates/tsr_semver" }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 
+tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+
 [lints]
 workspace = true

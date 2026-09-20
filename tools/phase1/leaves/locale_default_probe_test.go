@@ -47,11 +47,16 @@ type defaultAction struct {
 // decodeDefaultAction unmarshals a request's actions once its subject has matched.
 func decodeDefaultAction(raw json.RawMessage) []defaultAction {
 	if len(raw) == 0 {
-		return nil
+		panic("phase1: missing actions")
 	}
 	var out []defaultAction
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil
+		// Decoding happens before guarded production calls. A malformed
+		// request must fail the probe, never turn into an empty observation.
+		panic("phase1: invalid action payload: " + err.Error())
+	}
+	if len(out) == 0 {
+		panic("phase1: empty action trace")
 	}
 	return out
 }
@@ -113,7 +118,7 @@ func replayDefault(request defaultRequest) []any {
 			row["text"] = text
 			row["panic"] = panicked
 		default:
-			row["unsupported_action"] = a.Op
+			panic("phase1: unsupported action: " + a.Op)
 		}
 		ordered = append(ordered, row)
 	}

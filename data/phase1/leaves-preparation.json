@@ -1,0 +1,1611 @@
+{
+  "complete": false,
+  "pending": [
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/bundled.go:WrapFS",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Info",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.IsDir",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.ModTime",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Mode",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Name",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Size",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Sys",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:fileInfo.Type",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:libPath",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:splitPath",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
+      "rust_home": [
+        "crates/tsr_bundled/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/generate.go:generateEmbedded",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/generate.go:generateLibList",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/generate.go:main",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/generate.go:readLibs",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/generate.go:writeCode",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/noembed.go:IsBundled",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/bundled/noembed.go:wrapFS",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Values",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:newMapWithSizeHint",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:noCopy.Lock",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:noCopy.Unlock",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/collections/ordered_map.go:resolveKeyName",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/arena.go:Arena.Clone",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/arena.go:Arena.New",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/arena.go:Arena.NewSlice",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/arena.go:Arena.NewSlice1",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/arena.go:nextArenaSize",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Delete",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Has",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchLevel.Range",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallel",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:BreadthFirstSearchParallelEx",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/bfs.go:updateMin",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/binarysearch.go:BinarySearchUniqueFunc",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.AllowImportingTsExtensionsFrom",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.Clone",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetUseDefineForClassFields",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.HasJsonModuleEmitEnabled",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.IsIncremental",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.ShouldPreserveConstEnums",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:GetNewLineKind",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:JsxEmit.String",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleKind.SupportsImportAttributes",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:noCopy.Lock",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/compileroptions.go:noCopy.Unlock",
+      "rust_home": [
+        "crates/tsr_core/src/compiler_options.rs",
+        "crates/tsr_core/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:GetCheckerLifetime",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:GetRequestID",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:WithCheckerLifetime",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/context.go:WithRequestID",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:AppendIfUnique",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ApplyDebugStackLimit",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CheckEachDefined",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Coalesce",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CompareBooleans",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:ComputeECMALineStarts",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:ComputeECMALineStartsSeq",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Concatenate",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ConcatenateSeq",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CopyMapInto",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:CountWhere",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Deduplicate",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:DiffMaps",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:DiffMapsFunc",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ElementOrNil",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Enumerate",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Every",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Filter",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FilterIndex",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FilterSeq",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Find",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FindIndex",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FindLast",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FindLastIndex",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstNonNil",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstNonZero",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstOrNil",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstOrNilSeq",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FirstResult",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:FlatMap",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Flatten",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:GetSpellingSuggestion",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:GetSpellingSuggestionForStrings",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:GetSpellingSuggestionWithMaxCandidateCount",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Identity",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:IfElse",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:IndexAfter",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:LastOrNil",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Map",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MapFiltered",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MapIndex",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MapNonNil",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Memoize",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:MinAllFunc",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Must",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Or",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:OrElse",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:PositionToLineAndByteOffset",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:ReplaceElement",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Same",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:SameMap",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:SameMapIndex",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:ShouldRewriteModuleSpecifier",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:SingleElementSlice",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Some",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:Splice",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:StringifyJson",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:TryMap",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:UTF16Len",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:UnorderedEqual",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/core.go:comparableValuesEqual",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:getSpellingSuggestion",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/core.go:levenshteinWithMax",
+      "rust_home": [
+        "crates/tsr_jsstring/src/line_map.rs",
+        "crates/tsr_scanner/src/spelling.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/languagevariant_stringer_generated.go:LanguageVariant.String",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/languagevariant_stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Get",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.Has",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:LinkStore.TryGet",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Get",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.Has",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/linkstore.go:PagedLinkStore.TryGet",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/modulekind_stringer_generated.go:ModuleKind.String",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/modulekind_stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/nodemodules.go:NonRelativeModuleNameForTypingCache",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/projectreference.go:ResolveConfigFileNameOfProjectReference",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/projectreference.go:ResolveProjectReferencePath",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/scriptkind_stringer_generated.go:ScriptKind.String",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/scriptkind_stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/scripttarget_stringer_generated.go:ScriptTarget.String",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/scripttarget_stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.Acquire",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:LimitedSemaphore.TryAcquire",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:NewLimitedSemaphore",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:UnlimitedSemaphore.Acquire",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/semaphore.go:UnlimitedSemaphore.TryAcquire",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Len",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Peek",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Pop",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/stack.go:Stack.Push",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/textchange.go:ApplyBulkEdits",
+      "rust_home": [
+        "crates/tsr_core/src/text_change.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/textchange.go:TextChange.ApplyTo",
+      "rust_home": [
+        "crates/tsr_core/src/text_change.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/tristate_stringer_generated.go:Tristate.String",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/core/tristate_stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/version.go:Version",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/version.go:VersionMajorMinor",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/watchoptions.go:WatchOptions.WatchInterval",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:NewThrottleGroup",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:NewWorkGroup",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Message.ElidedInCompatibilityPyramid",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Message.Key",
+      "rust_home": []
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Message.ReportsDeprecated",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:convertPropertyName",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:generateDiagnostics",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:generateLocalizations",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:main",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:readLocalizedMessages",
+      "rust_home": []
+    },
+    {
+      "disposition": "later_phase",
+      "operation": "tsc/internal/diagnostics/generate.go:readRawMessages",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/diagnostics/stringer_generated.go:_",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:cutAny",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isAllBinaryDigits",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isAllDigits",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isAllHexDigits",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isAllOctalDigits",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isNumberRune",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:isStrWhiteSpace",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:parseFloatString",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:stringToFloat64",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:trimLeadingZeros",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:trimTrailingZeros",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/jsnum/string.go:tryParseInt",
+      "rust_home": [
+        "crates/tsr_jsnum/src/lib.rs",
+        "crates/tsr_jsnum/src/string.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/semver/version.go:MustParse",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:SemverParseError.Error",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:Version.String",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:Version.incrementMajor",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:Version.incrementMinor",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:Version.incrementPatch",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:comparePreReleaseIdentifier",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:comparePreReleaseIdentifiers",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version.go:getUintComponent",
+      "rust_home": [
+        "crates/tsr_semver/src/version.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:VersionRange.String",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:formatAlternative",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:formatComparator",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:formatDisjunction",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:isWildcard",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:parseAlternatives",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/semver/version_range.go:parseHyphen",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/semver/version_range.go:parsePartial",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:testAlternative",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:testComparator",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/semver/version_range.go:testDisjunction",
+      "rust_home": [
+        "crates/tsr_semver/src/version_range.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:hasSigmaCasedAfter",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:isFinalSigmaContext",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:isSigmaCased",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:isUnicodeCaseIgnorable",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:toLowerASCII",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/stringutil/js_case.go:toUpperASCII",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/stringutil/util.go:getByteOrderMarkLength",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs",
+        "crates/tsr_jsstring/src/wtf8.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/stringutil/util.go:matchSlashReplacer",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs",
+        "crates/tsr_jsstring/src/wtf8.rs"
+      ]
+    },
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/stringutil/util.go:shouldEscapeForEncodeURI",
+      "rust_home": [
+        "crates/tsr_jsstring/src/helpers.rs",
+        "crates/tsr_jsstring/src/wtf8.rs"
+      ]
+    }
+  ],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "prepared_operations": 222,
+  "total_operations": 460,
+  "version": 1
+}

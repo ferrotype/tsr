@@ -203,14 +203,7 @@ func phase1Index(t *testing.T) map[string]any {
 	return map[string]any{"count": len(rows), "ordered": rows}
 }
 
-// phase1Lookup resolves one asset name per action. FileExists and Stat are
-// cross-checked against ReadFile rather than reported, so the row stays a shape
-// the Rust side can produce from its own production lookup.
-//
-// The path this builds -- LibPath() + "/" + name -- is the Go-side question.
-// The Rust half of this case answers with tsr_bundled::library(name), a bare
-// name lookup, so a name that carries path syntax constrains this side only;
-// leaves-bundled.json says so in the case's own `discriminates`.
+// phase1Lookup asks the same LibPath()+"/"+name wrapper path as Rust.
 func phase1Lookup(t *testing.T, request phase1Request) map[string]any {
 	t.Helper()
 	wrapped := bundled.WrapFS(&phase1StubFS{})
@@ -237,6 +230,31 @@ func phase1Lookup(t *testing.T, request phase1Request) map[string]any {
 			t.Fatalf("phase1: Stat(%q) disagrees with ReadFile", path)
 		}
 		rows = append(rows, []any{action.Name, true, len(contents), phase1Digest(contents)})
+	}
+	return map[string]any{"ordered": rows}
+}
+
+// phase1Reads keeps wrapper behavior separate from the asset-content census.
+func phase1Reads(t *testing.T, request phase1Request) map[string]any {
+	wrapped := bundled.WrapFS(&phase1StubFS{})
+	rows := []any{}
+	for _, action := range decodePhase1Action(t, request.Actions) {
+		if action.Op != "read_path" {
+			t.Fatalf("unsupported bundled path action: %q", action.Op)
+		}
+		path := action.Path
+		entries := wrapped.GetAccessibleEntries(path)
+		var stat any
+		if info := wrapped.Stat(path); info != nil {
+			stat = []any{info.IsDir(), info.Size()}
+		}
+		rows = append(rows, map[string]any{
+			"op": action.Op, "path": path,
+			"directory_exists": wrapped.DirectoryExists(path),
+			"file_exists":      wrapped.FileExists(path),
+			"files":            phase1Strings(entries.Files), "directories": phase1Strings(entries.Directories),
+			"stat": stat, "realpath": wrapped.Realpath(path),
+		})
 	}
 	return map[string]any{"ordered": rows}
 }
@@ -433,6 +451,9 @@ func TestPhase1LeavesBundled(t *testing.T) {
 		case "BundledLookup":
 			row["result"] = "observed"
 			row["observation"] = phase1Lookup(t, request)
+		case "BundledReads":
+			row["result"] = "observed"
+			row["observation"] = phase1Reads(t, request)
 		case "BundledPath":
 			row["result"] = "observed"
 			row["observation"] = phase1Paths(t, request)

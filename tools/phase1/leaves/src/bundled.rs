@@ -1,29 +1,16 @@
 //! The bundled leaf group: packaged library access.
 //!
 //! Every observed row comes from a production `tsr_bundled` item --
-//! `LIBRARIES`, `library`, `is_bundled` and `LIB_PATH`. This module renders
+//! `LIBRARIES`, `BundledFs`, `is_bundled` and `LIB_PATH`. This module renders
 //! what they return; it never reimplements a lookup, a path predicate or an
 //! index.
 //!
-//! Two parts of the group's Go authority have no answer here. Both say so
-//! through a recorded gap, which is what the capture reads; this comment only
-//! explains the gaps, it does not stand in for them.
-//!
-//! `TestingLibPath` has no Rust counterpart by construction.
-//!
-//! `wrappedFS`, the dispatch `WrapFS` installs, is exercised on the Go side
-//! only. `tsr_bundled::BundledFs` is its counterpart, and a close one for the
-//! methods it implements, but `tsr_bundled` imports `tsr_vfs::FileSystem`
-//! privately, so its methods cannot be named without a direct `tsr_vfs`
-//! dependency that this harness does not declare. Two frozen cases still carry
-//! a `wrappedFS` operation id -- `asset-index-complete` records
-//! `wrappedFS.WalkDir` and `asset-name-resolution` records
-//! `wrappedFS.ReadFile` -- because that is the pinned entry point the native
-//! probe calls. What the Rust half of those two cases witnesses is the asset
-//! index and the bare-name lookup underneath the wrapper, not the wrapper
-//! itself, and each case's `discriminates` says so. The wrapper's own surface
-//! is `leaves/bundled/wrapper-dispatch-surface`, whose Rust row is this
-//! module's second named gap.
+//! Asset-index evidence is distinct from wrapper evidence: enumerating
+//! `LIBRARIES` cannot certify a filesystem walk. Read/path cases call
+//! `BundledFs` through its production `FileSystem` interface.
+
+use std::sync::Arc;
+use tsr_vfs::{FileSystem, MemoryBuilder};
 
 use serde_json::{json, Value};
 
@@ -61,22 +48,64 @@ fn index() -> Outcome {
     Outcome::Observed(json!({ "count": rows.len(), "ordered": rows }))
 }
 
-/// One production lookup per requested name, answered by `tsr_bundled::library`.
+fn filesystem() -> tsr_bundled::BundledFs {
+    tsr_bundled::BundledFs::new(Arc::new(MemoryBuilder::new(b"/", true).finish()))
+}
+
+/// Ask the same wrapper path on both sides, including malformed asset names.
 fn lookup(request: &Value) -> Outcome {
-    let rows: Vec<Value> = api::actions(request)
-        .iter()
-        .map(|action| match api::action_op(action) {
-            "lookup" => {
-                let name = api::action_str(action, "name");
-                match tsr_bundled::library(name.as_bytes()) {
-                    Some(bytes) => json!([name, true, bytes.len(), digest(bytes)]),
-                    None => json!([name, false, -1, ""]),
-                }
-            }
-            other => json!(["unsupported_action", other]),
-        })
-        .collect();
+    let fs = filesystem();
+    let mut rows = Vec::new();
+    for action in api::actions(request) {
+        if api::action_op(action) != "lookup" {
+            return Outcome::Failed(format!("unsupported bundled lookup action: {action}"));
+        }
+        let name = api::action_str(action, "name");
+        let path = [tsr_bundled::LIB_PATH, b"/", name.as_bytes()].concat();
+        let content = match fs.read_file(&path) {
+            Ok(content) => content,
+            Err(error) => return Outcome::Failed(error.to_string()),
+        };
+        rows.push(match content {
+            Some(content) => json!([name, true, content.raw.len(), digest(&content.raw)]),
+            None => json!([name, false, -1, ""]),
+        });
+    }
     Outcome::Observed(api::ordered(rows))
+}
+
+fn reads(request: &Value) -> Outcome {
+    fn run(request: &Value) -> Result<Value, tsr_vfs::Error> {
+        let fs = filesystem();
+        let mut rows = Vec::new();
+        for action in api::actions(request) {
+            let path = api::action_str(action, "path");
+            let entries = fs.entries(path.as_bytes())?;
+            let stat = fs
+                .stat(path.as_bytes())?
+                .map(|info| json!([info.directory, info.size]));
+            rows.push(json!({
+                "op": "read_path", "path": path,
+                "directory_exists": fs.directory_exists(path.as_bytes())?,
+                "file_exists": fs.file_exists(path.as_bytes())?,
+                "files": entries.files.iter().map(|name| std::str::from_utf8(name.as_bytes()).expect("embedded library names are UTF-8")).collect::<Vec<_>>(),
+                "directories": entries.directories.iter().map(|name| std::str::from_utf8(name.as_bytes()).expect("embedded library names are UTF-8")).collect::<Vec<_>>(),
+                "stat": stat,
+                "realpath": std::str::from_utf8(fs.realpath(path.as_bytes())?.as_bytes()).expect("request paths are UTF-8"),
+            }));
+        }
+        Ok(api::ordered(rows))
+    }
+    if api::actions(request)
+        .iter()
+        .any(|action| api::action_op(action) != "read_path")
+    {
+        return Outcome::Failed("unsupported bundled path action".into());
+    }
+    match run(request) {
+        Ok(value) => Outcome::Observed(value),
+        Err(error) => Outcome::Failed(error.to_string()),
+    }
 }
 
 /// The `bundled:///` prefix predicate, answered by `tsr_bundled::is_bundled`.
@@ -109,27 +138,15 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     match api::subject(request) {
         "BundledIndex" => Some(index()),
         "BundledLookup" => Some(lookup(request)),
+        "BundledReads" => Some(reads(request)),
         "BundledPath" => Some(paths(request)),
         "BundledLibPath" => Some(lib_path()),
-        // Reported as a gap rather than answered. `tsr_bundled::BundledFs` is
-        // the counterpart of the pinned wrapper, but its methods are
-        // `tsr_vfs::FileSystem` trait methods and `tsr_bundled` imports that
-        // trait privately, so nothing can name them without a direct `tsr_vfs`
-        // dependency. Two parts of this case would stay gaps even with that
-        // dependency added, which is why the record names them.
+        // Reads are exercised separately. This mixed trace also needs the
+        // absent walk API and Go-compatible mutation refusal/delegation.
         "BundledWrapper" => Some(Outcome::missing(
-            "tsc/internal/bundled/embed.go:wrapFS",
-            "a reachable tsr_bundled::BundledFs: the type exists and implements read_file, \
-             stat, directory_exists, entries and realpath over the bundled:/// prefix, but \
-             tsr_vfs::FileSystem is a private import of crates/tsr_bundled/src/lib.rs, so a \
-             caller needs a direct tsr_vfs dependency to invoke any of them. Beyond reach, \
-             two observations in this case have no counterpart to compare even then: \
-             tsr_vfs::FileSystem declares no walk method, and BundledFs overrides none of \
-             the trait's mutating methods, so it inherits defaults that answer \
-             Error::Unsupported for every path instead of refusing a bundled path and \
-             delegating the rest",
-            "crates/tsr_bundled/src/lib.rs (BundledFs; reachable from this harness once \
-             tools/phase1/leaves declares tsr_vfs, which is not this group's file to change)",
+            "tsc/internal/bundled/embed.go:wrappedFS.WalkDir and mutating methods",
+            "a FileSystem walk operation and bundled mutation refusal/delegation; reads are already exercised by BundledReads and BundledLookup",
+            "crates/tsr_bundled/src/lib.rs (FileSystem has no walk method; bundled mutations currently inherit Unsupported defaults)",
         )),
         // Reported as a gap rather than answered. The Go accessor resolves the
         // package's own source directory through runtime.Caller(0); the Rust

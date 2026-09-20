@@ -69,6 +69,7 @@ def inventory_check() -> dict:
     index = load(BASELINES)
 
     problems += scope_module.verify(scope)
+    problems += scope_module.witness_problems()
     problems += baselines.verify(index)
     problems += baselines.verify_written_subfolders()
 
@@ -141,6 +142,7 @@ def inventory_check() -> dict:
         "ok": not problems,
         "f0_complete": not outstanding,
         "f0_outstanding": outstanding,
+        "f1a_preparation": scope_module.leaf_preparation(scope, cases),
     }
 
 

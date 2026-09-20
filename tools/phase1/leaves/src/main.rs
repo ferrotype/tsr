@@ -49,7 +49,54 @@ fn observe(request: &Value) -> Map<String, Value> {
     row.insert("case".into(), Value::String(case.to_owned()));
     row.insert("operation".into(), Value::String(operation.to_owned()));
 
-    let claimed = GROUPS.iter().find_map(|(_, handler)| handler(request));
+    let needs_actions = !matches!(
+        api::subject(request),
+        "BundledIndex"
+            | "BundledLibPath"
+            | "BundledWrapper"
+            | "BundledSourceDir"
+            | "diagnostics.roster"
+    );
+    let claimed = if (needs_actions && request.get("actions").is_none())
+        || request.get("actions").is_some_and(|actions| {
+            actions.as_array().is_none_or(|actions| {
+                actions.is_empty()
+                    || actions.iter().any(|action| {
+                        !action.is_object()
+                            || action
+                                .get("op")
+                                .and_then(Value::as_str)
+                                .is_none_or(str::is_empty)
+                    })
+            })
+        }) {
+        Some(Outcome::Failed(
+            "actions must be a nonempty array of named operations".into(),
+        ))
+    } else {
+        GROUPS.iter().find_map(|(_, handler)| handler(request))
+    };
+    let claimed = match claimed {
+        Some(Outcome::Observed(value)) => {
+            let unsupported = value
+                .get("ordered")
+                .and_then(Value::as_array)
+                .and_then(|rows| {
+                    rows.iter().find(|row| {
+                        row.get("unsupported_action").is_some()
+                            || row.as_array().is_some_and(|items| {
+                                items.first().and_then(Value::as_str) == Some("unsupported_action")
+                            })
+                    })
+                });
+            if let Some(action) = unsupported {
+                Some(Outcome::Failed(format!("unsupported action: {action}")))
+            } else {
+                Some(Outcome::Observed(value))
+            }
+        }
+        other => other,
+    };
     match claimed {
         Some(Outcome::Observed(value)) => {
             row.insert("result".into(), Value::String("observed".into()));
@@ -122,4 +169,27 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Err("usage: phase1_leaves requests.json observations.json".into());
     }
     run(&args[0], &args[1])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn unknown_and_malformed_actions_are_harness_failures() {
+        for actions in [
+            json!([{"op": "typo_new"}]),
+            json!({"op": "new"}),
+            json!([]),
+            json!([null]),
+            json!([{}]),
+        ] {
+            let result = observe(&json!({"case": "bad", "operation": "NewTextRange",
+                "subject": "core.TextRange", "actions": actions}));
+            assert_eq!(result["result"], "harness_failed");
+        }
+        let result = observe(&json!({"case": "missing", "operation": "NewTextRange",
+            "subject": "core.TextRange"}));
+        assert_eq!(result["result"], "harness_failed");
+    }
 }
