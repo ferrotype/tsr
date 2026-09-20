@@ -10,7 +10,7 @@ moved pin invalidates it.
 
 | Step | State |
 | --- | --- |
-| F0 — inventory, manifests and executable setup | **incomplete**: the matchFiles authority decision, and connecting existing evidence to operation ids |
+| F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | not started |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
@@ -34,7 +34,7 @@ implementation; no production behavior has been added or changed.
 | Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
 | The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
 
-## Blocker: `config/matchFiles` baseline authority
+## Approved: carry the `config/matchFiles` test renderer
 
 **The 142 `config/matchFiles` reference outputs have no Go invocation and no Go
 renderer at this pin.** The plan anticipated this and required it be named
@@ -64,18 +64,20 @@ The **semantic** authority does exist: `vfsmatch_test.go`'s `TestReadDirectory`
 and `TestReadDirectoryMatchesTypeScriptBaselines` assert ordered `matchFiles()`
 results, and the pilot already matches Rust against it.
 
-This is an owner decision under the plan's stop conditions. The options:
+**Owner-approved on 2026-09-20: keep all 309 byte-for-byte baselines.** Carry a
+test-only implementation of the matchFiles envelope, retaining pinned Go
+matching/configuration behavior as the semantic authority. First prove that
+native observations rendered through it reproduce all 142 frozen files; then
+render Rust observations through the same test-envelope seam. Expected result
+sections must never be copied from the baseline or completed using native
+semantics on Rust's behalf.
 
-- **A.** Keep 309 as the byte-baseline denominator and carry a reviewed
-  test-format implementation for the matchFiles envelope, verifying it
-  reproduces the frozen bytes from native results before any Rust comparison.
-- **B.** Hold the 142 as ordered-list semantic comparisons against the native
-  `vfsmatch` authority, and reduce the byte-baseline denominator to 167 with
-  that reduction recorded explicitly.
-- **C.** Treat the 142 as unreachable at this pin and record them as a standing
-  qualification.
-
-F0 does not choose, and F0 is not complete until one is chosen.
+The authority decision is settled. The remaining work is request/invocation
+mapping, renderer implementation and native-byte verification, owned by F2a's
+matching preparation and reused by F3a. Keep the manifest's authority blocked
+until that proof exists; approval alone is not a successful observation. This
+does not block F1a's leaf preparation and does not require another approval to
+implement the agreed renderer.
 
 ## The 309 index and its per-output mapping
 
@@ -91,7 +93,7 @@ bytes — not an assumption about a generic renderer.
 
 | Group | Outputs | Verified | Authority |
 | --- | ---: | ---: | --- |
-| `config/matchFiles` | 142 | **0** | blocked |
+| `config/matchFiles` | 142 | **0** | carried test renderer approved; implementation and verification pending |
 | `config/tsconfigParsing` | 87 | 87 | `baselineParseConfigWith`, plus inline assembly in `TestParseConfigFileTextToJson` |
 | `.../parseCommandLine` | 53 | 53 | `formatNewBaseline` |
 | `.../parseBuildOptions` | 27 | 27 | `formatNewBaselineBuild` |
