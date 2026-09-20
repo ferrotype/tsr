@@ -8,15 +8,15 @@ publish = false
 description = "S08 feasibility prototype: a relater over stable reference-counted type cells with interior mutability, measured against the ID-based production checker in P7"
 
 [dependencies]
-ts_arena = { version = "0.1.0", path = "../../../crates/ts_arena" }
-ts_ast = { version = "0.1.0", path = "../../../crates/ts_ast" }
-ts_binder = { version = "0.1.0", path = "../../../crates/ts_binder" }
-ts_core = { version = "0.1.0", path = "../../../crates/ts_core" }
-ts_diagnostics = { version = "0.1.0", path = "../../../crates/ts_diagnostics" }
-ts_jsnum = { version = "0.1.0", path = "../../../crates/ts_jsnum" }
-ts_jsstring = { version = "0.1.0", path = "../../../crates/ts_jsstring" }
-ts_scanner = { version = "0.1.0", path = "../../../crates/ts_scanner" }
-ts_parser = { version = "0.1.0", path = "../../../crates/ts_parser" }
+tsr_arena = { version = "0.1.0", path = "../../../crates/tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../../../crates/tsr_ast" }
+tsr_binder = { version = "0.1.0", path = "../../../crates/tsr_binder" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_diagnostics = { version = "0.1.0", path = "../../../crates/tsr_diagnostics" }
+tsr_jsnum = { version = "0.1.0", path = "../../../crates/tsr_jsnum" }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_scanner = { version = "0.1.0", path = "../../../crates/tsr_scanner" }
+tsr_parser = { version = "0.1.0", path = "../../../crates/tsr_parser" }
 
 [lints]
 workspace = true

@@ -139,8 +139,8 @@ class CheckerMergeOwnership(unittest.TestCase):
         spec = tomllib.loads((ROOT / 'status/runs.toml').read_text())['e3']
         self.assertEqual(spec['command'], ['python3', 'scripts/s08_ownership.py'])
         for name in ('scripts/s08_ownership.py', 'scripts/s08_p2.py', 'scripts/s08_oracle.py',
-                     'crates/ts_checker/**', 'crates/ts_printer/**', 'crates/ts_nodebuilder/**',
-                     'crates/ts_transformers/**', ownership.ARCHIVE, ownership.RECORD, 'data/upstream.json'):
+                     'crates/tsr_checker/**', 'crates/tsr_printer/**', 'crates/tsr_nodebuilder/**',
+                     'crates/tsr_transformers/**', ownership.ARCHIVE, ownership.RECORD, 'data/upstream.json'):
             self.assertIn(name, spec['sources'])
         self.assertIn("'run.e3.independent_checker_merges == true'",
                       (ROOT / '.github/workflows/status.yml').read_text())

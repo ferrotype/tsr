@@ -13,8 +13,8 @@ use sha2::{Digest, Sha256};
 use std::io::Write as _;
 use std::sync::Arc;
 use std::time::Instant;
-use ts_checker::{Operation, TypeRef};
-use ts_compiler::{FileCache, Program, ProgramFile};
+use tsr_checker::{Operation, TypeRef};
+use tsr_compiler::{FileCache, Program, ProgramFile};
 
 // S07's allocator wrapper: requested bytes (layout sizes) and live requested
 // bytes at the allocator boundary; allocator size-class slack excluded.

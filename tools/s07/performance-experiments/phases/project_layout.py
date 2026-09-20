@@ -484,7 +484,7 @@ def main():
     rows = [strict_json_loads(line) for line in data.splitlines()]
     model_path = HERE.parent / "layout/baseline-model.json"
     model = strict_json_loads(model_path.read_bytes())
-    if (build["source_fingerprint"]["files"]["crates/ts_ast/src/data_generated.rs"]
+    if (build["source_fingerprint"]["files"]["crates/tsr_ast/src/data_generated.rs"]
             != model["provenance"]["generated_ast_sha256"]):
         raise ValueError("compiled payload layouts belong to a different generated schema")
     sizes, compilation = compile_directory_sketch(args.scratch.resolve())

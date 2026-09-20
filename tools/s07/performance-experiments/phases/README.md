@@ -20,7 +20,7 @@ RSS claims. All completed roots survive the pipeline endpoint and reporting.
 Preload, worker setup, bounded queue and retained-root boundaries follow the
 existing CPU attribution driver. Both modes retain the same enum wrapper.
 
-The executable always enables `ts_ast/layout-profile`; that diagnostic feature
+The executable always enables `tsr_ast/layout-profile`; that diagnostic feature
 is recorded in its manifest and applies to both backends. Its shape traversal
 is run only when requested, after all measured endpoints. Do not compare this
 driver's timings with a differently built normal or allocation executable.

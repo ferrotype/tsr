@@ -1,7 +1,7 @@
 //! Eager parser buffers retain/drop/transfer their original requested Vec layout.
 use crate::list_buffer::ListBuffer;
-use ts_arena::allocation_traffic as traffic;
-use ts_ast::NodeId;
+use tsr_arena::allocation_traffic as traffic;
+use tsr_ast::NodeId;
 
 fn assert_accounting(snapshot: &impl Fn() -> [usize; 2], before: [usize; 2]) {
     let after = snapshot();
@@ -16,7 +16,7 @@ pub fn calibrate_parser_list_traffic(snapshot: impl Fn() -> [usize; 2]) {
     // frozen 64-bit ListBuffer's 48-byte representation or its Vec capacity policy.
     assert_eq!(size_of::<ListBuffer>(), 48);
     assert_eq!(align_of::<ListBuffer>(), 8);
-    let owner = ts_ast::AstBuilder::new(ts_jsstring::SourceText::default(), &ts_arena::Counters::new()).id().arena();
+    let owner = tsr_ast::AstBuilder::new(tsr_jsstring::SourceText::default(), &tsr_arena::Counters::new()).id().arena();
     let node = NodeId::from_parts(owner, 1).unwrap();
     traffic::set_phase(1);
     for count in [0, 4, 5, 65, 2051] {

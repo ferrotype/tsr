@@ -11,7 +11,7 @@ Phases are ordered by dependency, not by time, and so are sprints. Each sprint's
 | S01 | Contracts, workspace, oracle | | done: ADRs 0006, 0007, 0013 accepted; oracle builds |
 | S02 | Toolchain, lints, dependency policy, CI | S01 | fmt, clippy, deny, selftest producers |
 | S03 | Generators from the pinned schemas | S02 | `gen` producer: no drift, client byte-identical |
-| S04 | Contract leaves: `ts_jsstring` and `ts_arena` | S02 | E4 decoding, helpers, slices, positions; E3 ids, lazy storage, bundles, counters |
+| S04 | Contract leaves: `tsr_jsstring` and `tsr_arena` | S02 | E4 decoding, helpers, slices, positions; E3 ids, lazy storage, bundles, counters |
 | S05 | Scanner | S03, S04 | `scanner` producer; E4 scanner diagnostics, token bytes and literal values |
 | S06 | Parser, JSDoc, AST runtime and encoder | S03, S05 | E1; E4 encoder success/error and output bytes |
 | S07 | Binder, resolution slice, program host, parse-and-bind benchmark | S06 | `binder`, `program` producers; frozen subset; E5 parse/bind; E6; E3 programs and snapshots |

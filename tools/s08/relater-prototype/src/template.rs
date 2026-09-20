@@ -100,7 +100,7 @@ impl Graph {
         if normalized_types.is_empty() {
             return Ok(self.string_literal(&text));
         }
-        normalized_texts.push(ts_jsstring::wtf8::combine_surrogate_pairs(&text).into_owned());
+        normalized_texts.push(tsr_jsstring::wtf8::combine_surrogate_pairs(&text).into_owned());
         if normalized_texts.iter().all(Vec::is_empty)
             && normalized_types
                 .iter()
@@ -123,9 +123,9 @@ impl Graph {
         let mut name = String::from("`");
         for (index, part) in normalized_texts.iter().enumerate() {
             name.push_str(
-                &String::from_utf8(ts_jsstring::escape::escape_string(
+                &String::from_utf8(tsr_jsstring::escape::escape_string(
                     part,
-                    ts_jsstring::QuoteChar::Backtick,
+                    tsr_jsstring::QuoteChar::Backtick,
                 ))
                 .expect("EscapeString escapes invalid UTF-8 and lone surrogates"),
             );
@@ -191,7 +191,7 @@ fn add_spans(
             != 0
         {
             normalized_types.push(ty.clone());
-            normalized_texts.push(ts_jsstring::wtf8::combine_surrogate_pairs(text).into_owned());
+            normalized_texts.push(tsr_jsstring::wtf8::combine_surrogate_pairs(text).into_owned());
             text.clear();
         } else {
             return Ok(false);
@@ -204,7 +204,7 @@ fn add_spans(
 fn template_string(ty: &TypeCell) -> Option<Vec<u8>> {
     Some(match &ty.literal {
         Some(LiteralValue::String(value)) => value.clone(),
-        Some(LiteralValue::Number(bits)) => ts_jsnum::Number::new(f64::from_bits(*bits))
+        Some(LiteralValue::Number(bits)) => tsr_jsnum::Number::new(f64::from_bits(*bits))
             .to_string()
             .into_bytes(),
         Some(LiteralValue::Boolean(value)) => value.to_string().into_bytes(),
@@ -371,7 +371,7 @@ impl Relater<'_> {
             } else if position < source_text(segment).len() {
                 (
                     segment,
-                    position + ts_jsstring::wtf8::decode_rune(&source_text(segment)[position..]).1,
+                    position + tsr_jsstring::wtf8::decode_rune(&source_text(segment)[position..]).1,
                 )
             } else if segment < last {
                 (segment + 1, 0)
@@ -453,7 +453,7 @@ impl Relater<'_> {
         if let Some(LiteralValue::String(bytes)) = &source.literal {
             if target.flags & flags::NUMBER != 0
                 && !bytes.is_empty()
-                && ts_jsnum::from_string(bytes).value().is_finite()
+                && tsr_jsnum::from_string(bytes).value().is_finite()
             {
                 return Ok(true);
             }
@@ -489,19 +489,19 @@ fn valid_bigint_string(bytes: &[u8]) -> bool {
     }
     let mut text = bytes.to_vec();
     text.push(b'n');
-    let mut scanner = ts_scanner::Scanner::new();
+    let mut scanner = tsr_scanner::Scanner::new();
     scanner.set_skip_trivia(false);
     scanner.buffer_diagnostics();
     scanner.set_text(&text);
     let mut kind = scanner.scan();
-    if kind == ts_ast::SyntaxKind::MinusToken {
+    if kind == tsr_ast::SyntaxKind::MinusToken {
         kind = scanner.scan();
     }
     let success = scanner.drain_diagnostics().next().is_none();
     success
-        && kind == ts_ast::SyntaxKind::BigIntLiteral
+        && kind == tsr_ast::SyntaxKind::BigIntLiteral
         && scanner.token_end() == text.len() as i64
-        && scanner.token_flags() & ts_ast::token_flags::CONTAINS_SEPARATOR == 0
+        && scanner.token_flags() & tsr_ast::token_flags::CONTAINS_SEPARATOR == 0
 }
 
 #[cfg(test)]

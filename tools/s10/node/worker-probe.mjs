@@ -1,4 +1,4 @@
-// Development attribution only. Build ts_node with --features worker-probe,
+// Development attribution only. Build tsr_node with --features worker-probe,
 // copy its library to a separate .node path, then pass that path here.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";

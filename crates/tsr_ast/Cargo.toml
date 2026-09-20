@@ -1,0 +1,21 @@
+[package]
+name = "tsr_ast"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+layout-profile = []
+
+[dependencies]
+hashbrown = { version = "=0.17.1", default-features = false }
+stacker = "=0.1.25"
+tsr_core = { path = "../tsr_core", version = "0.1.0" }
+tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.1.0" }
+tsr_arena = { path = "../tsr_arena", version = "0.1.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+
+[lints]
+workspace = true

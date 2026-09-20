@@ -47,7 +47,7 @@ def main():
     for name,rows in sorted(groups.items()):
         rust+='#[rustfmt::skip]\npub static '+name.upper()+'_OPTIONS: &[OptionDeclaration] = &[\n'+',\n'.join(map(declaration,rows))+'\n];\n'
     manifest={'pin':pin,'source_sha256':hashes,'adapter_sha256':hashlib.sha256(adapter.read_bytes()).hexdigest(),'generator_sha256':hashlib.sha256(__import__('pathlib').Path(__file__).read_bytes()).hexdigest(),'observations_sha256':hashlib.sha256(data).hexdigest(),'counts':{k:len(v) for k,v in groups.items()}}
-    artifacts=[(ROOT/'data/s07/option-declarations.json',data),(ROOT/'data/s07/option-declarations-manifest.json',(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()),(ROOT/'crates/ts_tsoptions/src/option_declarations_generated.rs',rust.encode())]
+    artifacts=[(ROOT/'data/s07/option-declarations.json',data),(ROOT/'data/s07/option-declarations-manifest.json',(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()),(ROOT/'crates/tsr_tsoptions/src/option_declarations_generated.rs',rust.encode())]
     for path,raw in artifacts:
         if args.write:path.write_bytes(raw)
         elif not path.exists() or path.read_bytes()!=raw:raise ValueError('option metadata changed: '+str(path))

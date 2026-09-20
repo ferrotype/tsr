@@ -582,7 +582,7 @@ pub(super) fn emit(schema: &Value, pin: &str) -> Result<BTreeMap<PathBuf, String
         ("visitors_generated.rs", visitors),
     ]
     .into_iter()
-    .map(|(name, code)| (PathBuf::from("crates/ts_ast/src").join(name), code))
+    .map(|(name, code)| (PathBuf::from("crates/tsr_ast/src").join(name), code))
     .collect())
 }
 

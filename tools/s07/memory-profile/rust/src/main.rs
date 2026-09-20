@@ -10,11 +10,11 @@ use std::{
     thread,
     time::Instant,
 };
-use ts_ast::{
+use tsr_ast::{
     AstFile, BoundFile, ExternalModuleIndicatorOptions, JsString, NodeId, ParsedFile,
     SourceFileParseOptions,
 };
-use ts_jsstring::SourceText;
+use tsr_jsstring::SourceText;
 
 #[cfg(not(feature = "sites"))]
 #[global_allocator]
@@ -26,7 +26,7 @@ static ALLOCATOR: cap::Cap<alloc_tracker::Allocator<mimalloc::MiMalloc>> = cap::
     usize::MAX,
 );
 #[cfg(feature = "sites")]
-use ts_jsstring::memory_sites::{self, Phase};
+use tsr_jsstring::memory_sites::{self, Phase};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -41,7 +41,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 #[derive(Default, Serialize)]
 struct WorkerTimes {
@@ -130,7 +130,7 @@ fn profile_preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect()
@@ -165,7 +165,7 @@ fn loaded_digest(inputs: &[Loaded]) -> String {
 fn profile_parse(input: &Loaded) -> ParsedFile {
     #[cfg(feature = "sites")]
     let _phase = memory_sites::phase(Phase::Parse);
-    black_box(ts_parser::parse_source_file(
+    black_box(tsr_parser::parse_source_file(
         input.source.clone(),
         input.script_kind,
         input.options.clone(),
@@ -184,7 +184,7 @@ fn profile_publish(parsed: ParsedFile) -> (AstFile, NodeId) {
 fn profile_bind(file: AstFile, source: NodeId) -> BoundFile {
     #[cfg(feature = "sites")]
     let _phase = memory_sites::phase(Phase::Bind);
-    let bound = ts_binder::bind_source_file(&file, source).expect("workload binding must complete");
+    let bound = tsr_binder::bind_source_file(&file, source).expect("workload binding must complete");
     drop(file);
     black_box(bound)
 }
@@ -216,7 +216,7 @@ fn profile_retirement(files: Vec<Vec<BoundFile>>) {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 4 {
-        return Err("usage: ts_memory_profile INPUTS.json WORKERS OUTPUT_PREFIX".into());
+        return Err("usage: tsr_memory_profile INPUTS.json WORKERS OUTPUT_PREFIX".into());
     }
     let workers: usize = args[2].to_str().ok_or("invalid workers")?.parse()?;
     if !matches!(workers, 1 | 8) || thread::available_parallelism()?.get() < workers {
@@ -240,7 +240,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             senders.push(send);
             let inputs = &inputs;
             let (ready, finished, release) = (&ready, &finished, &release);
-            handles.push(ts_parser::spawn_parser_worker(scope, move || {
+            handles.push(tsr_parser::spawn_parser_worker(scope, move || {
                 let mut roots = Vec::with_capacity(file_count.div_ceil(workers));
                 let mut times = WorkerTimes::default();
                 let mut failure = None;
@@ -366,11 +366,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         let census_before = memory();
         let census_start = Instant::now();
-        let mut census = ts_jsstring::census::Collector::default();
+        let mut census = tsr_jsstring::census::Collector::default();
         for file in files.iter().flatten() {
-            ts_ast::add_retained_file(file, &mut census);
+            tsr_ast::add_retained_file(file, &mut census);
         }
-        use ts_jsstring::census::Walk;
+        use tsr_jsstring::census::Walk;
         for input in &inputs {
             input.source.walk(&mut census, "preload.source");
             input

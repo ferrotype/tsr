@@ -2,8 +2,8 @@
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{fs, hint::black_box, num::NonZeroU64, time::Instant};
-use ts_s07_storage_pilot::chunks;
-use ts_s07_storage_pilot::lists::{Builder, NodeRef, Published};
+use tsr_s07_storage_pilot::chunks;
+use tsr_s07_storage_pilot::lists::{Builder, NodeRef, Published};
 
 #[cfg(feature = "allocation")]
 #[global_allocator]

@@ -25,7 +25,7 @@ def capture(directory):
     ) for p in ROOT.glob(pattern) if p.is_file()}
     go = run_overlay(directory / "go", "checker", source_path.read_text(), requests, "TestS08StoragePilot")
     rust_version = command(["rustc", "--version", "--verbose"], cwd=ROOT).decode()
-    build = command(["cargo", "build", "--release", "--locked", "-p", "ts_checker", "--features", "storage-pilot",
+    build = command(["cargo", "build", "--release", "--locked", "-p", "tsr_checker", "--features", "storage-pilot",
                      "--example", "storage_pilot", "--message-format=json"], cwd=ROOT)
     (directory / "cargo-build.ndjson").write_bytes(build)
     artifacts = [row for line in build.splitlines() if (row := strict_json_loads(line)).get("reason") == "compiler-artifact"

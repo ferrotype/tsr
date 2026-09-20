@@ -204,21 +204,21 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "sha2",
- "ts_arena",
- "ts_ast",
- "ts_bundled",
- "ts_checker",
- "ts_compiler",
- "ts_core",
- "ts_embed",
- "ts_jsstring",
- "ts_module",
- "ts_nodebuilder",
- "ts_printer",
- "ts_scanner",
- "ts_tsoptions",
- "ts_tspath",
- "ts_vfs",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_bundled",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_embed",
+ "tsr_jsstring",
+ "tsr_module",
+ "tsr_nodebuilder",
+ "tsr_printer",
+ "tsr_scanner",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]
@@ -227,13 +227,13 @@ version = "0.1.0"
 dependencies = [
  "s10_corpus",
  "serde_json",
- "ts_arena",
- "ts_checker",
- "ts_core",
- "ts_embed",
- "ts_jsstring",
- "ts_tsoptions",
- "ts_vfs",
+ "tsr_arena",
+ "tsr_checker",
+ "tsr_core",
+ "tsr_embed",
+ "tsr_jsstring",
+ "tsr_tsoptions",
+ "tsr_vfs",
 ]
 
 [[package]]
@@ -321,271 +321,271 @@ dependencies = [
 ]
 
 [[package]]
-name = "ts_arena"
+name = "tsr_arena"
 version = "0.1.0"
 dependencies = [
  "hashbrown",
- "ts_jsstring",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_ast"
-version = "0.1.0"
-dependencies = [
- "hashbrown",
- "stacker",
- "ts_arena",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
-]
-
-[[package]]
-name = "ts_binder"
-version = "0.1.0"
-dependencies = [
- "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
- "ts_parser",
- "ts_scanner",
-]
-
-[[package]]
-name = "ts_bundled"
-version = "0.1.0"
-dependencies = [
- "ts_jsstring",
- "ts_vfs",
-]
-
-[[package]]
-name = "ts_checker"
+name = "tsr_ast"
 version = "0.1.0"
 dependencies = [
  "hashbrown",
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_binder",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
- "ts_module",
- "ts_nodebuilder",
- "ts_printer",
- "ts_pseudochecker",
- "ts_scanner",
- "ts_tsoptions",
- "ts_tspath",
- "ts_vfs",
+ "tsr_arena",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_compiler"
+name = "tsr_binder"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_binder",
- "ts_bundled",
- "ts_checker",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
- "ts_module",
- "ts_parser",
- "ts_printer",
- "ts_scanner",
- "ts_transformers",
- "ts_tsoptions",
- "ts_tspath",
- "ts_vfs",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
+ "tsr_parser",
+ "tsr_scanner",
 ]
 
 [[package]]
-name = "ts_core"
+name = "tsr_bundled"
 version = "0.1.0"
 dependencies = [
- "ts_jsstring",
+ "tsr_jsstring",
+ "tsr_vfs",
 ]
 
 [[package]]
-name = "ts_diagnostics"
+name = "tsr_checker"
+version = "0.1.0"
+dependencies = [
+ "hashbrown",
+ "stacker",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_binder",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
+ "tsr_module",
+ "tsr_nodebuilder",
+ "tsr_printer",
+ "tsr_pseudochecker",
+ "tsr_scanner",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
+name = "tsr_compiler"
+version = "0.1.0"
+dependencies = [
+ "stacker",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_binder",
+ "tsr_bundled",
+ "tsr_checker",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
+ "tsr_module",
+ "tsr_parser",
+ "tsr_printer",
+ "tsr_scanner",
+ "tsr_transformers",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
+name = "tsr_core"
+version = "0.1.0"
+dependencies = [
+ "tsr_jsstring",
+]
+
+[[package]]
+name = "tsr_diagnostics"
 version = "0.1.0"
 
 [[package]]
-name = "ts_embed"
+name = "tsr_embed"
 version = "0.1.0"
 dependencies = [
- "ts_arena",
- "ts_ast",
- "ts_checker",
- "ts_compiler",
- "ts_core",
- "ts_encoder",
- "ts_jsstring",
- "ts_parser",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_encoder",
+ "tsr_jsstring",
+ "tsr_parser",
  "xxhash-rust",
 ]
 
 [[package]]
-name = "ts_encoder"
+name = "tsr_encoder"
 version = "0.1.0"
 dependencies = [
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_jsstring",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_jsnum"
+name = "tsr_jsnum"
 version = "0.1.0"
 dependencies = [
  "num-bigint",
  "num-traits",
  "ryu-js",
- "ts_jsstring",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_jsstring"
+name = "tsr_jsstring"
 version = "0.1.0"
 
 [[package]]
-name = "ts_module"
+name = "tsr_module"
 version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
- "ts_semver",
- "ts_tsoptions",
- "ts_tspath",
- "ts_vfs",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
+ "tsr_semver",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]
-name = "ts_nodebuilder"
+name = "tsr_nodebuilder"
 version = "0.1.0"
 dependencies = [
- "ts_ast",
+ "tsr_ast",
 ]
 
 [[package]]
-name = "ts_parser"
+name = "tsr_parser"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
- "ts_scanner",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
+ "tsr_scanner",
 ]
 
 [[package]]
-name = "ts_printer"
+name = "tsr_printer"
 version = "0.1.0"
 dependencies = [
  "hashbrown",
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_jsnum",
- "ts_jsstring",
- "ts_nodebuilder",
- "ts_scanner",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_jsnum",
+ "tsr_jsstring",
+ "tsr_nodebuilder",
+ "tsr_scanner",
 ]
 
 [[package]]
-name = "ts_pseudochecker"
+name = "tsr_pseudochecker"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
+ "tsr_arena",
+ "tsr_ast",
 ]
 
 [[package]]
-name = "ts_scanner"
+name = "tsr_scanner"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_semver"
+name = "tsr_semver"
 version = "0.1.0"
 dependencies = [
- "ts_jsstring",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_transformers"
+name = "tsr_transformers"
 version = "0.1.0"
 dependencies = [
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_nodebuilder",
- "ts_printer",
- "ts_scanner",
- "ts_tspath",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_nodebuilder",
+ "tsr_printer",
+ "tsr_scanner",
+ "tsr_tspath",
 ]
 
 [[package]]
-name = "ts_tsoptions"
+name = "tsr_tsoptions"
 version = "0.1.0"
 dependencies = [
  "serde_json",
  "stacker",
- "ts_ast",
- "ts_bundled",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
- "ts_parser",
- "ts_scanner",
- "ts_tspath",
- "ts_vfs",
+ "tsr_ast",
+ "tsr_bundled",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
+ "tsr_parser",
+ "tsr_scanner",
+ "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]
-name = "ts_tspath"
+name = "tsr_tspath"
 version = "0.1.0"
 dependencies = [
- "ts_core",
- "ts_jsstring",
+ "tsr_core",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_vfs"
+name = "tsr_vfs"
 version = "0.1.0"
 dependencies = [
- "ts_jsstring",
- "ts_tspath",
+ "tsr_jsstring",
+ "tsr_tspath",
 ]
 
 [[package]]

@@ -36,7 +36,7 @@ run_overlay(
     'TestS08P6SemanticDiagnostics',
 )
 PY
-cargo test --locked -p ts_compiler --test checker_semantics js_open_object_access
+cargo test --locked -p tsr_compiler --test checker_semantics js_open_object_access
 ```
 
 The frozen 209-variant selection contains every acceptance variant under

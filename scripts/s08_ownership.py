@@ -74,7 +74,7 @@ def measure(root, invoke, prefix, options, env, spec, native, directory, mode):
     # silent child. The request and output paths belong to this invocation only.
     if output.exists():
         raise ValueError("checker merge output already exists")
-    args = [*prefix, "run", "--package", "ts_compiler", "--example", "p2_checker",
+    args = [*prefix, "run", "--package", "tsr_compiler", "--example", "p2_checker",
             "--locked", *options, "--", str(directory / "requests.json"), str(output)]
     try:
         stdout = invoke(root, args, env)

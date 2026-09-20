@@ -54,7 +54,7 @@ class OwnershipScope(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_manifest(legacy)
         retargeted = copy.deepcopy(self.manifest)
-        retargeted["common"]["exclusive_binding"]["package"] = "ts_ast"
+        retargeted["common"]["exclusive_binding"]["package"] = "tsr_ast"
         with self.assertRaisesRegex(ValueError, "changed scope"):
             validate_manifest(retargeted)
 
@@ -106,7 +106,7 @@ class OwnershipScope(unittest.TestCase):
         self.assertTrue(all(result.values()))
         self.assertEqual(calls["bind_tests::"], self.manifest["common"]["binding_publication"]["cases"])
         self.assertEqual(calls["local_bind_tests::"], self.manifest["common"]["local_ast"]["cases"])
-        inventories["ts_ast"].append("unreviewed_bind_tests::unexpected")
+        inventories["tsr_ast"].append("unreviewed_bind_tests::unexpected")
         with redirect_stderr(io.StringIO()):
             result = measure(Path("."), invoke, ["cargo"], [], {}, self.manifest, "debug")
         self.assertFalse(result["binding_publication"])

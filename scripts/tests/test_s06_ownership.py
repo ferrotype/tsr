@@ -71,7 +71,7 @@ class AstOwnershipProducerTests(unittest.TestCase):
                 report = s04_ownership.run(root)
             self.assertEqual(report["metrics"]["ast_runtime_tests"], len(s06_ownership.load_cases(root)))
         runs = [(args, env) for args, env in calls
-                if "ts_ast" in args and "storage_tests::" in args]
+                if "tsr_ast" in args and "storage_tests::" in args]
         self.assertEqual(len(runs), 4)
         for args, _ in runs:
             self.assertIn("storage_tests::", args)
@@ -91,7 +91,7 @@ class AstOwnershipProducerTests(unittest.TestCase):
             for failure in ("missing", "failed", "ignored", "command"):
                 calls = []
                 def invoke(root, args, env=None):
-                    if "ts_ast" not in args or "storage_tests::" not in args:
+                    if "tsr_ast" not in args or "storage_tests::" not in args:
                         return successful_invoke(root, args, env)
                     mode = ("miri" if "miri" in args else "address_sanitizer" if "-Zbuild-std" in args
                             else "release" if "--release" in args else "debug")

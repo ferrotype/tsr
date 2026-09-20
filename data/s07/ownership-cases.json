@@ -23,7 +23,7 @@
       ],
       "exact": false,
       "filter": "bind_tests::",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "skip": [
         "local_bind_tests::"
       ]
@@ -42,7 +42,7 @@
       ],
       "exact": false,
       "filter": "storage::validation_proof_tests::",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "skip": []
     },
     "exclusive_binding": {
@@ -60,7 +60,7 @@
       ],
       "exact": false,
       "filter": "exclusive_tests::",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "skip": []
     },
     "local_ast": {
@@ -78,7 +78,7 @@
       ],
       "exact": false,
       "filter": "local_bind_tests::",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "skip": []
     },
     "local_ast_core": {
@@ -107,7 +107,7 @@
       ],
       "exact": false,
       "filter": "bind_result::local_bind::",
-      "package": "ts_ast",
+      "package": "tsr_ast",
       "skip": []
     },
     "local_binder": {
@@ -124,7 +124,7 @@
       ],
       "exact": false,
       "filter": "local_tests::",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "skip": []
     },
     "local_flow_ids": {
@@ -134,7 +134,7 @@
       ],
       "exact": false,
       "filter": "flow_access::tests::",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "skip": []
     },
     "local_symbol_ids": {
@@ -145,7 +145,7 @@
       ],
       "exact": false,
       "filter": "symbol_access::tests::",
-      "package": "ts_binder",
+      "package": "tsr_binder",
       "skip": []
     }
   },
@@ -156,7 +156,7 @@
       ],
       "exact": true,
       "filter": "ownership_tests::retained_snapshot_edit_answers_concurrently_and_rejects_old_new_id_crossing",
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "skip": []
     },
     "shared_bound_file": {
@@ -165,7 +165,7 @@
       ],
       "exact": true,
       "filter": "ownership_tests::shared_bound_file_retains_identity_until_the_final_response_drops",
-      "package": "ts_compiler",
+      "package": "tsr_compiler",
       "skip": []
     }
   },

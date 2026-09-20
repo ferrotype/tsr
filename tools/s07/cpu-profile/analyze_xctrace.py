@@ -109,11 +109,20 @@ def demangle(names, executable=None):
                     "changed_symbols": sum(result[name] != name for name in names)}
 
 
+# Only selector inputs are normalized. Captured frame names, stack keys and
+# report labels retain the spelling of the binary that produced the archive.
+LEGACY_CRATE = re.compile(r"(?<![\w:])ts_(arena|ast|binder|parser|cpu_profile)(?=::)")
+
+
+def selector_name(name):
+    return LEGACY_CRATE.sub(r"tsr_\1", name)
+
+
 def marker(name, function):
     # Match an actual driver function or its closure; never a generic parameter
     # mentioning another function. Symbol metadata itself remains unmodified.
-    return re.match(r"^ts_cpu_profile(?:::[A-Za-z_][A-Za-z_0-9]*)*::" + function
-                    + r"(?=$|::|[<(])", name) is not None
+    return re.match(r"^tsr_cpu_profile(?:::[A-Za-z_][A-Za-z_0-9]*)*::" + function
+                    + r"(?=$|::|[<(])", selector_name(name)) is not None
 
 
 def frame_names(frame):
@@ -133,7 +142,7 @@ def phase_for(stack, worker=False):
         return "worker_unassigned"
     if not names:
         return "unknown"
-    if any(name.startswith("ts_cpu_profile::") for name in names):
+    if any(selector_name(name).startswith("tsr_cpu_profile::") for name in names):
         return "driver"
     if names[0].startswith(("std::", "core::", "alloc::", "runtime.", "mi_", "_mi_", "pthread_", "_pthread_")):
         return "runtime"
@@ -211,15 +220,15 @@ def member(name, owner, method):
 
 
 def query_flags(stack):
-    names = [name for frame in stack for name in frame_names(frame)]
+    names = [selector_name(name) for frame in stack for name in frame_names(frame)]
     def has(owner, method):
         return any(member(name, owner, method) for name in names)
-    lookup = has('ts_ast::storage::AstView', 'node') or any(
-        has('ts_arena::file::StorageView<ts_ast::Node>', method) for method in ('node', 'node_here'))
-    core = has('ts_ast::storage::AstView', 'validate_core')
-    binding = has('ts_ast::bind_result::BindBuilder', 'validate')
-    new_node = has('ts_ast::storage::AstBuilder', 'new_node_before_hook')
-    edges = has('ts_ast::storage::AstView', 'validate_data') or has('ts_ast::data_generated::NodeData', 'validate_references')
+    lookup = has('tsr_ast::storage::AstView', 'node') or any(
+        has('tsr_arena::file::StorageView<tsr_ast::Node>', method) for method in ('node', 'node_here'))
+    core = has('tsr_ast::storage::AstView', 'validate_core')
+    binding = has('tsr_ast::bind_result::BindBuilder', 'validate')
+    new_node = has('tsr_ast::storage::AstBuilder', 'new_node_before_hook')
+    edges = has('tsr_ast::storage::AstView', 'validate_data') or has('tsr_ast::data_generated::NodeData', 'validate_references')
     return {'ast_lookup_union': lookup, 'validate_core': core, 'bind_builder_validate': binding,
             'new_node_before_hook': new_node, 'new_node_edge_validation': new_node and edges,
             'edge_validation_any': edges,
@@ -509,8 +518,8 @@ def contract_checks():
              '<tagged-backtrace><backtrace><frame id="3" name="leaf" addr="0xa">'
              '<binary id="4" UUID="uuid" name="app"/><source-location file="fixture.rs" line="7"/>'
              '</frame><frame id="5" name="leaf" addr="0xb"><binary ref="4"/></frame>'
-             '<frame id="6" name="ts_cpu_profile::profile_parse"><binary ref="4"/></frame>'
-             '<frame id="7" name="ts_cpu_profile::measure_pipeline"><binary ref="4"/></frame>'
+             '<frame id="6" name="tsr_cpu_profile::profile_parse"><binary ref="4"/></frame>'
+             '<frame id="7" name="tsr_cpu_profile::measure_pipeline"><binary ref="4"/></frame>'
              '</backtrace></tagged-backtrace></row>')
 
     def row(time, weight, body, state='Running', pid=42):
@@ -519,10 +528,10 @@ def contract_checks():
                 f'<weight>{weight}</weight>{body}</row>')
 
     binding = ('<tagged-backtrace><backtrace><frame ref="3"/>'
-               '<frame id="8" name="ts_cpu_profile::profile_bind"><binary ref="4"/></frame>'
+               '<frame id="8" name="tsr_cpu_profile::profile_bind"><binary ref="4"/></frame>'
                '<frame ref="6"/></backtrace></tagged-backtrace>')
     retirement = ('<tagged-backtrace><backtrace><frame ref="3"/>'
-                  '<frame id="9" name="ts_cpu_profile::profile_retirement"><binary ref="4"/></frame>'
+                  '<frame id="9" name="tsr_cpu_profile::profile_retirement"><binary ref="4"/></frame>'
                   '</backtrace></tagged-backtrace>')
     body = (first + row(2, 7, binding) + row(3, 11, '<sentinel/>')
             + row(4, 13, '<sentinel/>', state='Waiting')
@@ -551,14 +560,14 @@ def contract_checks():
         physical = {'UUID': 'uuid', 'arch': 'arm64', 'load-addr': '0x2000'}
         symbols = {'uuid': 'uuid', 'architecture': 'arm64', 'linked_base': 0x1000,
                    'starts': [0x1100], 'ranges': [{'start': 0x1100, 'end': 0x1200,
-                                                'names': ['ts_cpu_profile::profile_bind']}]}
-        frame = {'name': 'ts_parser::worker::on_parser_worker', 'address': '0x2110', 'binary': physical}
+                                                'names': ['tsr_cpu_profile::profile_bind']}]}
+        frame = {'name': 'tsr_parser::worker::on_parser_worker', 'address': '0x2110', 'binary': physical}
         frame['physical_symbol'] = physical_for(frame, symbols)
         assert frame['physical_symbol']['linked_address'] == 0x1110 and phase_for([frame]) == 'bind'
         passed.append('ASLR-relative physical wrapper beats displayed inline-callee name')
         assert physical_for({**frame, 'binary': {**physical, 'UUID': 'other'}}, symbols) is None
-        assert phase_for([{'name': 'ts_cpu_profile::main::{closure#0}'}], worker=True) == 'worker_unassigned'
-        assert not member('alloc::Vec<ts_ast::storage::AstView>::node', 'ts_ast::storage::AstView', 'node')
+        assert phase_for([{'name': 'tsr_cpu_profile::main::{closure#0}'}], worker=True) == 'worker_unassigned'
+        assert not member('alloc::Vec<tsr_ast::storage::AstView>::node', 'tsr_ast::storage::AstView', 'node')
         passed.append('wrong UUID and generic mentions cannot qualify phases or queries')
         for name, changed in (
             ('unknown reference', document.replace('<frame ref="3"/>', '<frame ref="999"/>', 1)),

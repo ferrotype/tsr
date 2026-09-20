@@ -111,7 +111,7 @@ def run(root):
     base = os.environ.copy()
     base["CARGO_TERM_COLOR"] = "never"
     report = validate_measurements(strict_json_loads(invoke(root, [
-        "cargo", "run", "--quiet", "--package", "ts_arena", "--example", "e3",
+        "cargo", "run", "--quiet", "--package", "tsr_arena", "--example", "e3",
         "--features", "harness", "--release", "--locked",
     ], base)))
     # Publish named native failures even when later tools would fail too. There
@@ -119,7 +119,7 @@ def run(root):
     if any(test["result"] == "fail" for test in report["tests"]):
         report["tests"] = {test["id"]: test["result"] for test in report["tests"]}
         return report
-    tests = ["test", "--package", "ts_arena", "--lib", "--locked"]
+    tests = ["test", "--package", "tsr_arena", "--lib", "--locked"]
     tail = ["--", "--test-threads=1"]
     arena_modes = {
         "debug": validate_test_output(invoke(root, ["cargo", *tests, *tail], base)),
@@ -134,7 +134,7 @@ def run(root):
         program_modes[mode] = s07_ownership.measure(root, invoke, ["cargo"], options, base, program_cases, mode)
         checker_modes[mode] = s09_ownership.measure(root, invoke, ["cargo"], options, base, checker_cases, mode)
     report["metrics"]["ast_runtime_tests"] = len(ast_cases)
-    sys.stderr.buffer.write(invoke(root, ["cargo", "test", "--package", "ts_arena", "--doc", "--locked"], base))
+    sys.stderr.buffer.write(invoke(root, ["cargo", "test", "--package", "tsr_arena", "--doc", "--locked"], base))
     nightly = load_toolchains(root)["nightly"]
     native = invoke(root, ["rustc", "-Vv"], base).decode()
     print(native, file=sys.stderr)

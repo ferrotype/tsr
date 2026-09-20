@@ -14,21 +14,21 @@ s08-phase-timer = []
 [dependencies]
 serde_json = { version = "1", features = ["preserve_order"] }
 sha2 = "0.10"
-ts_embed = { version = "0.1.0", path = "../../../crates/ts_embed" }
-ts_arena = { version = "0.1.0", path = "../../../crates/ts_arena" }
-ts_ast = { version = "0.1.0", path = "../../../crates/ts_ast" }
-ts_checker = { version = "0.1.0", path = "../../../crates/ts_checker" }
-ts_compiler = { version = "0.1.0", path = "../../../crates/ts_compiler" }
-ts_core = { version = "0.1.0", path = "../../../crates/ts_core" }
-ts_vfs = { version = "0.1.0", path = "../../../crates/ts_vfs" }
-ts_bundled = { version = "0.1.0", path = "../../../crates/ts_bundled" }
-ts_tsoptions = { version = "0.1.0", path = "../../../crates/ts_tsoptions" }
-ts_tspath = { version = "0.1.0", path = "../../../crates/ts_tspath" }
-ts_jsstring = { version = "0.1.0", path = "../../../crates/ts_jsstring" }
-ts_printer = { version = "0.1.0", path = "../../../crates/ts_printer" }
-ts_nodebuilder = { version = "0.1.0", path = "../../../crates/ts_nodebuilder" }
-ts_module = { version = "0.1.0", path = "../../../crates/ts_module" }
-ts_scanner = { version = "0.1.0", path = "../../../crates/ts_scanner" }
+tsr_embed = { version = "0.1.0", path = "../../../crates/tsr_embed" }
+tsr_arena = { version = "0.1.0", path = "../../../crates/tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../../../crates/tsr_ast" }
+tsr_checker = { version = "0.1.0", path = "../../../crates/tsr_checker" }
+tsr_compiler = { version = "0.1.0", path = "../../../crates/tsr_compiler" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
+tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }
+tsr_bundled = { version = "0.1.0", path = "../../../crates/tsr_bundled" }
+tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
+tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_printer = { version = "0.1.0", path = "../../../crates/tsr_printer" }
+tsr_nodebuilder = { version = "0.1.0", path = "../../../crates/tsr_nodebuilder" }
+tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
+tsr_scanner = { version = "0.1.0", path = "../../../crates/tsr_scanner" }
 
 [lints]
 workspace = true

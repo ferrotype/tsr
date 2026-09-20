@@ -12,7 +12,7 @@ diagnostics are measured Go output, not Rust snapshots. The test compares
 codes, ranges, arguments, chains, related information and tags exactly.
 
 ```sh
-cargo test -p ts_compiler --test checker_error_tail
+cargo test -p tsr_compiler --test checker_error_tail
 ```
 
 Before the fixes, all 26 witnesses differed. After the fixes, all match. The

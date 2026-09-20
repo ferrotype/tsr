@@ -45,7 +45,7 @@ def patches(stage):
         source = read(relative)
         pattern = r"\bfn " + re.escape(function_name) + r"\s*(?:<[^{};]*?>)?\s*\([^{};]*?\)[^{};]*?\{"
         matches = list(re.finditer(pattern, source, re.S))
-        expected = 2 if relative == "crates/ts_ast/src/storage.rs" and function_name in {"node_slice", "text_slice"} else 1
+        expected = 2 if relative == "crates/tsr_ast/src/storage.rs" and function_name in {"node_slice", "text_slice"} else 1
         if expected == 2:
             matches = [match for match in matches if "&mut self" in match.group()]
         if len(matches) != expected:
@@ -58,7 +58,7 @@ def patches(stage):
             raise ValueError(f"ambiguous original anchor: {relative}:{function_name}")
         register(relative, anchor[0].start(), variant, name, "function body, inclusive callees")
         sites[-1]["source_occurrences"] = [base.count("\n", 0, match.start()) + 1 for match in anchor]
-        qualifier = "crate" if relative.startswith("crates/ts_jsstring/") else "ts_jsstring"
+        qualifier = "crate" if relative.startswith("crates/tsr_jsstring/") else "tsr_jsstring"
         statement = f"\n        let _memory_site = {qualifier}::memory_sites::site({qualifier}::memory_sites::Site::{variant});"
         for match in reversed(matches):
             source = source[:match.end()] + statement + source[match.end():]
@@ -73,40 +73,40 @@ def patches(stage):
                  f"exact expression ({expected} source occurrence(s))")
         sites[-1]["source_occurrences"] = [base.count("\n", 0, match.start()) + 1
                                            for match in re.finditer(re.escape(expression), base)]
-        replacement = ("{ let _memory_site = ts_jsstring::memory_sites::site("
-                       f"ts_jsstring::memory_sites::Site::{variant}); {expression} }}")
+        replacement = ("{ let _memory_site = tsr_jsstring::memory_sites::site("
+                       f"tsr_jsstring::memory_sites::Site::{variant}); {expression} }}")
         changes[relative] = source.replace(expression, replacement)
 
     for relative, name, variant, label in [
-        ("ts_arena/src/arena.rs", "push", "ArenaPush", "arena.page_and_directory_growth"),
-        ("ts_arena/src/file.rs", "push", "CoreNodeSlots", "arena.core_node_slots"),
-        ("ts_arena/src/file.rs", "push_aux", "CoreAuxSlots", "arena.core_aux_slots"),
-        ("ts_arena/src/node_slots.rs", "insert", "FlowBindingSlots", "binding.flow_slots_and_foreign_map"),
-        ("ts_ast/src/bind_result.rs", "node_mut", "BoundNodeOverlay", "binding.node_overlay_copy_and_map"),
-        ("ts_ast/src/bind_result.rs", "binding_mut", "FullBindings", "binding.full_record_map"),
-        ("ts_ast/src/symbols.rs", "append", "DeclarationAppend", "symbol.declaration_append"),
-        ("ts_ast/src/symbols.rs", "alloc_with_capacity", "DeclarationBacking", "symbol.declaration_backing"),
-        ("ts_binder/src/declarations.rs", "new_symbol", "SymbolSlots", "symbol.arena_slots"),
-        ("ts_binder/src/flow.rs", "new_flow_node_ex", "FlowNodeSlots", "flow.node_slots"),
-        ("ts_binder/src/flow.rs", "new_flow_list", "FlowListSlots", "flow.list_slots"),
-        ("ts_jsstring/src/jsstring.rs", "from_bytes", "StringBacking", "string.from_bytes_arc_backing"),
-        ("ts_jsstring/src/source_text.rs", "from_bytes", "SourceTextDecode", "source_text.decode_and_backing"),
-        ("ts_scanner/src/identifier.rs", "append_token_value", "ScannerAppend", "scanner.append_cooked_token"),
-        ("ts_scanner/src/identifier.rs", "scan_identifier_parts", "ScannerIdentifier", "scanner.identifier_parts"),
-        ("ts_scanner/src/literal.rs", "scan_string", "ScannerString", "scanner.string_literal"),
-        ("ts_scanner/src/literal.rs", "scan_template_and_set_token_value", "ScannerTemplate", "scanner.template_literal"),
-        ("ts_scanner/src/number.rs", "scan_number", "ScannerNumber", "scanner.number_and_cache"),
-        ("ts_ast/src/storage.rs", "node_slice", "NodeSliceBacking", "syntax.node_slice_compaction_and_aux"),
-        ("ts_ast/src/storage.rs", "text_slice", "TextSliceBacking", "syntax.text_slice_compaction_and_aux"),
+        ("tsr_arena/src/arena.rs", "push", "ArenaPush", "arena.page_and_directory_growth"),
+        ("tsr_arena/src/file.rs", "push", "CoreNodeSlots", "arena.core_node_slots"),
+        ("tsr_arena/src/file.rs", "push_aux", "CoreAuxSlots", "arena.core_aux_slots"),
+        ("tsr_arena/src/node_slots.rs", "insert", "FlowBindingSlots", "binding.flow_slots_and_foreign_map"),
+        ("tsr_ast/src/bind_result.rs", "node_mut", "BoundNodeOverlay", "binding.node_overlay_copy_and_map"),
+        ("tsr_ast/src/bind_result.rs", "binding_mut", "FullBindings", "binding.full_record_map"),
+        ("tsr_ast/src/symbols.rs", "append", "DeclarationAppend", "symbol.declaration_append"),
+        ("tsr_ast/src/symbols.rs", "alloc_with_capacity", "DeclarationBacking", "symbol.declaration_backing"),
+        ("tsr_binder/src/declarations.rs", "new_symbol", "SymbolSlots", "symbol.arena_slots"),
+        ("tsr_binder/src/flow.rs", "new_flow_node_ex", "FlowNodeSlots", "flow.node_slots"),
+        ("tsr_binder/src/flow.rs", "new_flow_list", "FlowListSlots", "flow.list_slots"),
+        ("tsr_jsstring/src/jsstring.rs", "from_bytes", "StringBacking", "string.from_bytes_arc_backing"),
+        ("tsr_jsstring/src/source_text.rs", "from_bytes", "SourceTextDecode", "source_text.decode_and_backing"),
+        ("tsr_scanner/src/identifier.rs", "append_token_value", "ScannerAppend", "scanner.append_cooked_token"),
+        ("tsr_scanner/src/identifier.rs", "scan_identifier_parts", "ScannerIdentifier", "scanner.identifier_parts"),
+        ("tsr_scanner/src/literal.rs", "scan_string", "ScannerString", "scanner.string_literal"),
+        ("tsr_scanner/src/literal.rs", "scan_template_and_set_token_value", "ScannerTemplate", "scanner.template_literal"),
+        ("tsr_scanner/src/number.rs", "scan_number", "ScannerNumber", "scanner.number_and_cache"),
+        ("tsr_ast/src/storage.rs", "node_slice", "NodeSliceBacking", "syntax.node_slice_compaction_and_aux"),
+        ("tsr_ast/src/storage.rs", "text_slice", "TextSliceBacking", "syntax.text_slice_compaction_and_aux"),
     ]:
         function("crates/" + relative, name, variant, label)
 
-    expression("crates/ts_binder/src/declarations.rs",
+    expression("crates/tsr_binder/src/declarations.rs",
                "self.table_mut(table).insert(name, Some(symbol))",
                "SymbolMapInsert", "symbol.table_insert", expected=2)
     # Concrete payload allocations occur before Factory::new_node, so a
     # factory-wide scope alone would miss every one of these Box allocations.
-    relative = "crates/ts_ast/src/data_generated.rs"
+    relative = "crates/tsr_ast/src/data_generated.rs"
     payloads = re.findall(r"Self::(\w+)\(Box::new\(data\)\)", read(relative))
     if len(payloads) != 37 or len(set(payloads)) != len(payloads):
         raise ValueError("boxed payload inventory changed; independently classify it")
@@ -121,10 +121,10 @@ def patches(stage):
         for site in sites)
     collector = (HERE / "collector.rs").read_text().replace("/* SITE_VARIANTS */", variants)
     collector = collector.replace("/* SITE_METADATA */", metadata)
-    changes["crates/ts_jsstring/src/memory_sites.rs"] = collector
-    lib = "crates/ts_jsstring/src/lib.rs"
+    changes["crates/tsr_jsstring/src/memory_sites.rs"] = collector
+    lib = "crates/tsr_jsstring/src/lib.rs"
     changes[lib] = read(lib) + "\n" + MARKER + "\npub mod memory_sites;\n"
-    manifest = "crates/ts_jsstring/Cargo.toml"
+    manifest = "crates/tsr_jsstring/Cargo.toml"
     original = read(manifest)
     if "alloc_tracker" in original:
         raise ValueError("allocation dependency already present")
@@ -133,7 +133,7 @@ def patches(stage):
         changes[manifest] = original.replace("[dependencies]\n", "[dependencies]\n" + dependency, 1)
     else:
         changes[manifest] = original + "\n[dependencies]\n" + dependency
-    changes["crates/ts_jsstring/examples/memory_sites_probe.rs"] = (HERE / "probe.rs").read_text()
+    changes["crates/tsr_jsstring/examples/memory_sites_probe.rs"] = (HERE / "probe.rs").read_text()
     return changes, sites
 
 

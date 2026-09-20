@@ -1,0 +1,26 @@
+[package]
+name = "tsr_transformers"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
+tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }
+tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
+tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
+tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+
+[dev-dependencies]
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+serde_json = "1"
+
+[lints]
+workspace = true

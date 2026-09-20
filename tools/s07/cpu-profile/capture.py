@@ -41,7 +41,7 @@ def validate_work(report, expected, workers):
 def run(argv, env, prefix):
     reject_concurrent_builds()
     processes = subprocess.check_output(["ps", "-axo", "comm="], text=True).splitlines()
-    active = {Path(name.strip()).name for name in processes} & {"ts_cpu_profile", "go-cpu-profile", "xctrace"}
+    active = {Path(name.strip()).name for name in processes} & {"tsr_cpu_profile", "go-cpu-profile", "xctrace"}
     if active:
         raise ValueError("another diagnostic capture is running: " + ", ".join(sorted(active)))
     started = time.monotonic_ns()

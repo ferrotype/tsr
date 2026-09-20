@@ -37,11 +37,11 @@ checker-local merge, recursion, text integration and measurement obligations.
 This is a substantial semantic port, not a type-annotation evaluator.
 
 The workspace holds the S08 scaffold and nothing more of the checker:
-`ts_checker` (owner and operation scope, the resolution-cycle guard, checker-local
+`tsr_checker` (owner and operation scope, the resolution-cycle guard, checker-local
 link stores, the type record and alias store, flags checked against the pinned Go
-package, and the program-host contract), `ts_printer` (the two text writers) and
-`ts_nodebuilder` (flags and the symbol-tracker contract). None contains a type
-construction, relation or checking algorithm. `ts_compiler` loads programs and
+package, and the program-host contract), `tsr_printer` (the two text writers) and
+`tsr_nodebuilder` (flags and the symbol-tracker contract). None contains a type
+construction, relation or checking algorithm. `tsr_compiler` loads programs and
 verifies their options; its public module explicitly excludes checker/emitter
 construction. `run.e2` currently verifies only the source-selected
 denominator. `CheckerIdentity`/`CheckerLease` are generic identity and permit
@@ -165,23 +165,23 @@ obligation artifact merely to mark implementation progress.
 
 | Home | Responsibility and dependency boundary |
 | --- | --- |
-| `crates/ts_checker` | Checker state/host contract, owner operations, types/signatures, links, merges, resolution, relations, inference, narrowing, diagnostics and checker-dependent node building |
-| `ts_checker::{owner,identity,storage,links}` | One ownership/mutation contract; checked external imports and private local access |
-| `ts_checker::{symbols,resolve,types,signatures,instantiate,inference,relater,flow,check,grammar}` | Cohesive algorithm families; split large families further without opaque forwarding layers |
-| `ts_checker::{node_builder,type_display,accessibility}` | Checker-dependent type-to-node traversal, caches, name accessibility and display flags |
-| `crates/ts_printer` | Checker-independent AST printing, text writer, parenthesization, emit metadata and original-source text reuse |
-| `crates/ts_nodebuilder` | Node-builder flags and the `SymbolTracker` contract, kept as its own crate exactly as upstream keeps `internal/nodebuilder`, so the Phase 3 declarations transformer never depends on `ts_checker` |
-| `crates/ts_evaluator` | Constant evaluation (`internal/evaluator`, 168 lines): enum members, computed names and template-literal folding; the checker constructs it in initialization with its own `evaluateEntity` |
-| `ts_binder::name_resolver` | `resolveName` is already ported as the hook-driven resolver; the checker implements `NameResolverHooks` and `ResolverHost` over its state instead of porting `resolveName` a second time |
-| Collections (`ts_core` or a `ts_collections` crate, decided at P1) | The checker uses `collections.Set` at 24 sites plus `OrderedSet`, `OrderedMap`, `MultiMap` and the copy-on-write set and map; the ordered ones are output-order structures (deferred nodes, for one) and must keep insertion order |
-| `ts_compiler` | Implements the checker host/program interface over the existing loader; convenience entry points retain complete bound-file dependencies |
-| `ts_ast` / `ts_arena` | Only the concrete symbol/AST access and ownership primitives needed by both consumers; no dependency on `ts_checker` |
-| `ts_diagnostics` plus `ts_compiler` diagnostic formatting module | Structured diagnostics and pinned diagnostic-writer behavior; baseline decoration stays in the harness |
+| `crates/tsr_checker` | Checker state/host contract, owner operations, types/signatures, links, merges, resolution, relations, inference, narrowing, diagnostics and checker-dependent node building |
+| `tsr_checker::{owner,identity,storage,links}` | One ownership/mutation contract; checked external imports and private local access |
+| `tsr_checker::{symbols,resolve,types,signatures,instantiate,inference,relater,flow,check,grammar}` | Cohesive algorithm families; split large families further without opaque forwarding layers |
+| `tsr_checker::{node_builder,type_display,accessibility}` | Checker-dependent type-to-node traversal, caches, name accessibility and display flags |
+| `crates/tsr_printer` | Checker-independent AST printing, text writer, parenthesization, emit metadata and original-source text reuse |
+| `crates/tsr_nodebuilder` | Node-builder flags and the `SymbolTracker` contract, kept as its own crate exactly as upstream keeps `internal/nodebuilder`, so the Phase 3 declarations transformer never depends on `tsr_checker` |
+| `crates/tsr_evaluator` | Constant evaluation (`internal/evaluator`, 168 lines): enum members, computed names and template-literal folding; the checker constructs it in initialization with its own `evaluateEntity` |
+| `tsr_binder::name_resolver` | `resolveName` is already ported as the hook-driven resolver; the checker implements `NameResolverHooks` and `ResolverHost` over its state instead of porting `resolveName` a second time |
+| Collections (`tsr_core` or a `tsr_collections` crate, decided at P1) | The checker uses `collections.Set` at 24 sites plus `OrderedSet`, `OrderedMap`, `MultiMap` and the copy-on-write set and map; the ordered ones are output-order structures (deferred nodes, for one) and must keep insertion order |
+| `tsr_compiler` | Implements the checker host/program interface over the existing loader; convenience entry points retain complete bound-file dependencies |
+| `tsr_ast` / `tsr_arena` | Only the concrete symbol/AST access and ownership primitives needed by both consumers; no dependency on `tsr_checker` |
+| `tsr_diagnostics` plus `tsr_compiler` diagnostic formatting module | Structured diagnostics and pinned diagnostic-writer behavior; baseline decoration stays in the harness |
 | `scripts/s08_*.py`, `tools/s08/oracle/`, Rust examples/binaries | Strict requests, pinned Go access bridges, baseline comparison, ownership and measurements |
 
 The dependency direction is compiler → checker → printer → AST, with
-`ts_nodebuilder` beside `ts_printer` below the checker and the checker host trait
-(`ts_checker::CheckerHost`) defined below the compiler. If shared flags/data need a lower home,
+`tsr_nodebuilder` beside `tsr_printer` below the checker and the checker host trait
+(`tsr_checker::CheckerHost`) defined below the compiler. If shared flags/data need a lower home,
 put only that common contract there. Upstream `internal/nodebuilder` contains
 flags; the actual checker-dependent builder is in `internal/checker/nodebuilder*`.
 Do not create a circular checker/node-builder crate dependency.
@@ -218,8 +218,8 @@ operation` takes the identity's permit and then the state lock, refuses same-thr
 reentry through a thread-local set of active owners before waiting, lets ordinary
 contention wait, and a panic inside an operation retires the generation before the
 permit is released. Two lock acquisitions per operation is the known cost of
-reusing the `ts_arena` permit unchanged; operations are per query, not per node,
-and P1 measures whether folding the state into the permit is worth a `ts_arena`
+reusing the `tsr_arena` permit unchanged; operations are per query, not per node,
+and P1 measures whether folding the state into the permit is worth a `tsr_arena`
 change.
 
 Checker-local type/signature slots are private. Owner-internal lists and cache
@@ -260,9 +260,9 @@ Port `pushTypeResolution`, `findResolutionCycleStartIndex`,
 keys on entity **and property**, invalidates an affected stack suffix on cycles,
 and stops its search when an intermediate resolution has produced a value.
 A generic `HashSet<TypeId>` or a one-bit "busy" flag is not equivalent. The
-guard is ported in `ts_checker::ResolutionStack`, with the produced-property
+guard is ported in `tsr_checker::ResolutionStack`, with the produced-property
 predicate supplied by the checker because it reads the links; the link stores are
-`ts_checker::LinkStore`, keyed by arena and slot, paged per arena on first use,
+`tsr_checker::LinkStore`, keyed by arena and slot, paged per arena on first use,
 with a page count for the census.
 
 Distinguish algorithmic recursion, which continues under the current `&mut self`,
@@ -376,10 +376,10 @@ executes the required path, those outcomes remain named failures even if an
 existing reference baseline happens to contain no declaration error.
 
 Add the required `internal/transformers/declarations` slice under
-`crates/ts_transformers/src/declarations/`, below compiler and separate from the
+`crates/tsr_transformers/src/declarations/`, below compiler and separate from the
 checker. Its emit host/resolver contracts must remain cycle-free through the
 existing AST, node-builder and printer layers; implement their checker-specific
-callbacks in `ts_checker::{emit_resolver,accessibility}`. P0 traces
+callbacks in `tsr_checker::{emit_resolver,accessibility}`. P0 traces
 `Program.getDeclarationDiagnosticsForFile`, `declarations.GetDeclarationDiagnostics`
 and the callbacks they execute, including isolated declarations. P4/P5 complete
 this path before E2 semantic acceptance. Emitted JavaScript/declaration file
@@ -426,7 +426,7 @@ slice; do not wait until the whole checker exists to run production queries.
    formatting flags, truncation and error chains. Bring up a minimal real
    printer in the first vertical slice and extend it with each new type family.
 
-Use S04/S05's `JsString`, scanner bytes and `ts_jsnum` for names/literals. Keep
+Use S04/S05's `JsString`, scanner bytes and `tsr_jsnum` for names/literals. Keep
 signed node positions and deliberate Go numeric semantics. Do not coerce a
 JavaScript string to Rust `str`, normalize numeric spellings by Rust formatting,
 or copy source-backed strings unnecessarily.

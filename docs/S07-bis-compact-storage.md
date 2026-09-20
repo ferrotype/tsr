@@ -482,7 +482,7 @@ constitute a new performance result for CP5.
 The [phase archive](../tools/s07/performance-experiments/results/2026-09-09-compact-phases/README.md)
 contains separately built frozen CP1 and CP4 production sources with the same
 existing phase adapter. Both use the consuming binding path, Rust 1.97.1,
-normal mimalloc, the same release configuration and `ts_ast/layout-profile`.
+normal mimalloc, the same release configuration and `tsr_ast/layout-profile`.
 The adapter source is unchanged and identical between builds. One warmup and
 three alternating measured children per revision ran on one worker; all eight
 children preserve the complete input digest, work counts, 13,094 in-place files

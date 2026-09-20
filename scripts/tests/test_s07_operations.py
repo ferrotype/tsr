@@ -3,6 +3,7 @@ import copy
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -23,6 +24,21 @@ class OperationMatrixTests(unittest.TestCase):
         self.assertEqual(len(result), 6)
         self.assertEqual(sum(row['required_generated_functions'] for row in result), 2)
 
+    def test_committed_rust_mapping_lines_still_name_the_source_marker(self):
+        files = {}
+        for identifier, function in self.document['functions'].items():
+            for mapping in function['rust_mappings']:
+                path = mapping['file']
+                if path not in files:
+                    files[path] = (ROOT / path).read_text().splitlines()
+                with self.subTest(identifier=identifier, path=path):
+                    line = mapping['line']
+                    self.assertGreaterEqual(line, 1)
+                    self.assertLessEqual(line, len(files[path]))
+                    markers = re.findall(r'\bport:\s+(tsc/\S+)', files[path][line - 1])
+                    self.assertIn(identifier, markers,
+                                  'source formatting moved an anchor: regenerate the operation inventory')
+
     def test_committed_subset_review_covers_current_operation_inventory(self):
         # A valid regenerated inventory can still invalidate the accepted subset
         # through its fingerprint. Catch that before either producer runs Go.
@@ -34,6 +50,9 @@ class OperationMatrixTests(unittest.TestCase):
                          'operation anchors changed: review and refreeze the dependent subset rule')
         self.assertEqual(rule.pop('review_sha256'), sha256(json_bytes(review)))
         self.assertEqual(rule['state'], 'frozen')
+        for name, expected in rule['provenance']['syntax']['producer_inputs'].items():
+            self.assertEqual(expected, sha256((ROOT / name).read_bytes()),
+                             'syntax observation input changed: ' + name)
         rule['state'] = 'candidate_pending_dependency_closure_and_review'
         self.assertEqual(review['candidate_sha256']['subset-rule.json'], sha256(json_bytes(rule)))
         for name in ('subset.json', 'checker-obligations.json'):

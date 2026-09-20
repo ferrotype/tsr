@@ -22,19 +22,19 @@ disabled test. S10 does not implement the later full-compiler/emit wasm phase.
 
 Existing components to reuse:
 
-* `ts_vfs::MemorySnapshot` and `ts_bundled::BundledFs`: all files, libraries,
+* `tsr_vfs::MemorySnapshot` and `tsr_bundled::BundledFs`: all files, libraries,
   symlinks, directory enumeration, and package metadata supplied in memory.
-* `ts_compiler::Program` / `FileCache`: loading and exclusive parse/bind.
-* `ts_checker::CheckerOwner` / `Operation`: generation validation, exclusive
+* `tsr_compiler::Program` / `FileCache`: loading and exclusive parse/bind.
+* `tsr_checker::CheckerOwner` / `Operation`: generation validation, exclusive
   operation scope, retained results, reentry rejection, panic retirement.
-* `ts_encoder`: protocol-8 output, source indexing, lazy JSDoc materialization.
+* `tsr_encoder`: protocol-8 output, source indexing, lazy JSDoc materialization.
 * S08's pure Rust corpus executor, native baseline walker, and comparators:
   reuse these with an explicit embedding construction policy; do not copy the
   checker or build a second test-only type-query API.
 
 ## 2. Public boundaries and ownership
 
-`ts_embed` supplies a Rust session around an immutable program and its checker.
+`tsr_embed` supplies a Rust session around an immutable program and its checker.
 Loading takes explicit program options and host inputs. Checker initialization
 is lazy and fallible; query scopes borrow the session's checker owner. Retained
 type/symbol/signature results use the existing owner-carrying handles. A handle
@@ -44,7 +44,7 @@ generation must reject all subsequent operations. No per-node `Arc`, callback
 under a publication lock, unchecked identity conversion, or copied type graph.
 
 Parser-only use must not depend on the checker, bundled libraries, or the project
-service. `ts_wasm` therefore has a parser build and an explicit checker feature;
+service. `tsr_wasm` therefore has a parser build and an explicit checker feature;
 the artifact-size numerator is the actual shipped parser build. Both artifacts
 and their feature lists are recorded. The JS boundary accepts byte buffers for
 source text, preserving WTF-8/invalid-byte behavior. Results are owned bytes or
@@ -58,7 +58,7 @@ if the in-process gate requires it, not a premise of the size comparison.
 
 Keep JSON request adaptation and baseline decoration in `tools/s10`, outside
 the production embedding API. The external Rust consumer owns its own Cargo
-workspace and lockfile and depends on `ts_embed` by path. It must load and query
+workspace and lockfile and depends on `tsr_embed` by path. It must load and query
 through that API. Sharing the existing baseline visitor is allowed; secretly
 using the old native executable as the consumer is not.
 
@@ -91,7 +91,7 @@ errors before changing architecture. In particular:
 
 1. Record the plan and review below. Install the pinned wasm standard library.
 2. Build the parser/compiler closure for wasm32; resolve concrete target issues.
-3. Add parser-only `ts_wasm`, JS loader, and native `ts_embed` session API.
+3. Add parser-only `tsr_wasm`, JS loader, and native `tsr_embed` session API.
 4. Run a tiny TS and JS parse/encode comparison against native protocol output,
    including non-ASCII text and lazy JSDoc. Establish actual import inventory,
    byte ownership, explicit disposal, repeated calls, and terminal trap behavior.
@@ -122,7 +122,7 @@ not booleans derived from successful compilation.
 
 ### P2: portable checker corpus
 
-1. Add the checker feature and memory-backed request adapter to `ts_wasm`.
+1. Add the checker feature and memory-backed request adapter to `tsr_wasm`.
 2. Use the same construction policy and walker as P1; compile no native runner
    or allocation/profiling instrumentation into the wasm instance.
 3. Run representative requests, then all frozen acceptance variants. Preserve
@@ -215,8 +215,8 @@ at P4. None authorizes a smaller acceptance corpus or a changed threshold.
 
 ## 6. Implementation decisions and reproducible commands
 
-The implementation uses `ts_embed` with a parser-only base and a default
-`checker` feature. `ts_wasm` builds three closures: shipped parser, shipped
+The implementation uses `tsr_embed` with a parser-only base and a default
+`checker` feature. `tsr_wasm` builds three closures: shipped parser, shipped
 checker, and a capture-only `corpus` feature that adds the existing S08 walker.
 The corpus executable and the shipped checker are both exercised; a successful
 walker run does not stand in for testing the public `MemoryHost` API.
@@ -259,7 +259,7 @@ python3 scripts/s10_build.py --corpus --wasm-bindgen /path/to/wasm-bindgen
 python3 scripts/s10_build.py --consumer
 python3 scripts/s10_build.py --node
 python3 scripts/s10_go.py
-cargo build --locked --release -p ts_wasm --example parser
+cargo build --locked --release -p tsr_wasm --example parser
 python3 scripts/s10_measure.py capture --kind portable --output target/s10/portable
 python3 scripts/s10_corpus.py capture --runtime wasm --output target/s10/wasm-corpus
 python3 scripts/s10_corpus.py capture --runtime rust --output target/s10/rust-corpus

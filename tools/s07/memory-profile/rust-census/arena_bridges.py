@@ -1,12 +1,12 @@
 """Stage-only implementations appended in the modules owning private fields."""
 
-BOUNDS = 'N: NodeRecord + ts_jsstring::census::Walk, N::Aux: ts_jsstring::census::Walk, S: ts_jsstring::census::Walk'
+BOUNDS = 'N: NodeRecord + tsr_jsstring::census::Walk, N::Aux: tsr_jsstring::census::Walk, S: tsr_jsstring::census::Walk'
 
 BRIDGES = {
-'ts_arena/src/arena.rs': r'''
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for Arena<T> {
-    fn walk(&self, c: &mut ts_jsstring::census::Collector, category: &str) {
-        use ts_jsstring::census::Walk;
+'tsr_arena/src/arena.rs': r'''
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for Arena<T> {
+    fn walk(&self, c: &mut tsr_jsstring::census::Collector, category: &str) {
+        use tsr_jsstring::census::Walk;
         c.vector(&self.pages, &format!("{category}.page_directory"));
         for page in &self.pages {
             page.values.walk(c, &format!("{category}.page_payload"));
@@ -16,29 +16,29 @@ impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for Arena<T> {
     }
 }
 ''',
-'ts_arena/src/owned.rs': r'''
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for OwnedArena<T> {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
+'tsr_arena/src/owned.rs': r'''
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for OwnedArena<T> {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
 }
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for SymbolArena<T> {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
-}
-''',
-'ts_arena/src/counters.rs': r'''
-impl ts_jsstring::census::Walk for State {
-    fn walk(&self,_:&mut ts_jsstring::census::Collector,_:&str) {}
-}
-impl ts_jsstring::census::Walk for Counters {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
-}
-impl ts_jsstring::census::Walk for Track {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) { self.counters.walk(c,k); }
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for SymbolArena<T> {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
 }
 ''',
-'ts_arena/src/node_slots.rs': r'''
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for NodeSlots<T> {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) {
-        use ts_jsstring::census::Walk;
+'tsr_arena/src/counters.rs': r'''
+impl tsr_jsstring::census::Walk for State {
+    fn walk(&self,_:&mut tsr_jsstring::census::Collector,_:&str) {}
+}
+impl tsr_jsstring::census::Walk for Counters {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) { self.0.walk(c,k); }
+}
+impl tsr_jsstring::census::Walk for Track {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) { self.counters.walk(c,k); }
+}
+''',
+'tsr_arena/src/node_slots.rs': r'''
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for NodeSlots<T> {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) {
+        use tsr_jsstring::census::Walk;
         c.vector(&self.pages,&format!("{k}.page_directory"));
         for page in self.pages.iter().flatten() {
             let used=page.iter().filter(|v|v.is_some()).count();
@@ -50,10 +50,10 @@ impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for NodeSlots<T> {
     }
 }
 ''',
-'ts_arena/src/lazy.rs': r'''
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for Page<T> {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) {
-        use ts_jsstring::census::Walk;
+'tsr_arena/src/lazy.rs': r'''
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for Page<T> {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) {
+        use tsr_jsstring::census::Walk;
         // Allocation payload includes every OnceLock, initialized or not.
         // The Arc walker has already charged that payload. Counts here expose
         // reserved/initialized slot mass without adding its bytes a second time.
@@ -63,32 +63,32 @@ impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for Page<T> {
         self._allocation.walk(c,"arena.tracking");
     }
 }
-impl<T: ts_jsstring::census::Walk> ts_jsstring::census::Walk for Pages<T> {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,k:&str) {
-        use ts_jsstring::census::Walk;
+impl<T: tsr_jsstring::census::Walk> tsr_jsstring::census::Walk for Pages<T> {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,k:&str) {
+        use tsr_jsstring::census::Walk;
         c.vector(&self.directory,&format!("{k}.page_directory"));
         c.record(&format!("{k}.reserved_slots"),0,0,self.reserved,self.directory.len()*PAGE_SIZE,0);
         for page in &self.directory { page.walk(c,&format!("{k}.page_payload")); }
         self.counters.walk(c,"arena.tracking");
     }
 }
-impl ts_jsstring::census::Walk for TokenKey { fn walk(&self,_:&mut ts_jsstring::census::Collector,_:&str) {} }
-impl ts_jsstring::census::Walk for CachedToken { fn walk(&self,_:&mut ts_jsstring::census::Collector,_:&str) {} }
-impl<N> ts_jsstring::census::Walk for LazyArena<N>
-where N:NodeRecord+ts_jsstring::census::Walk,N::Aux:ts_jsstring::census::Walk {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,_:&str) {
-        use ts_jsstring::census::Walk;
+impl tsr_jsstring::census::Walk for TokenKey { fn walk(&self,_:&mut tsr_jsstring::census::Collector,_:&str) {} }
+impl tsr_jsstring::census::Walk for CachedToken { fn walk(&self,_:&mut tsr_jsstring::census::Collector,_:&str) {} }
+impl<N> tsr_jsstring::census::Walk for LazyArena<N>
+where N:NodeRecord+tsr_jsstring::census::Walk,N::Aux:tsr_jsstring::census::Walk {
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,_:&str) {
+        use tsr_jsstring::census::Walk;
         let state=self.read();
         state.pages.walk(c,"lazy.nodes"); state.auxiliary.walk(c,"lazy.auxiliary");
         state.jsdoc.walk(c,"lazy.jsdoc_cache"); state.tokens.walk(c,"lazy.token_cache");
     }
 }
 ''',
-'ts_arena/src/file.rs': '''
-impl<N,S> ts_jsstring::census::Walk for StorageOwner<N,S>
+'tsr_arena/src/file.rs': '''
+impl<N,S> tsr_jsstring::census::Walk for StorageOwner<N,S>
 where ''' + BOUNDS + r''' {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,_:&str) {
-        use ts_jsstring::census::Walk;
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,_:&str) {
+        use tsr_jsstring::census::Walk;
         self.core.walk(c,"core.nodes"); self.auxiliary.walk(c,"core.auxiliary");
         self.symbols.walk(c,"core.symbols"); self.lazy.walk(c,"lazy");
         self.source.walk(c,"source.bytes"); self.position_map.walk(c,"source.position_map");
@@ -103,18 +103,18 @@ where ''' + BOUNDS + r''' {
     }
 }
 ''',
-'ts_arena/src/bundle.rs': '''
-impl<N,S> ts_jsstring::census::Walk for StorageBundle<N,S>
+'tsr_arena/src/bundle.rs': '''
+impl<N,S> tsr_jsstring::census::Walk for StorageBundle<N,S>
 where ''' + BOUNDS + r''' {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,_:&str) {
-        use ts_jsstring::census::Walk;
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,_:&str) {
+        use tsr_jsstring::census::Walk;
         self.files.walk(c,"owner.bundle_directory"); self._owner.walk(c,"arena.tracking");
     }
 }
-impl<N,S> ts_jsstring::census::Walk for StorageHandle<N,S>
+impl<N,S> tsr_jsstring::census::Walk for StorageHandle<N,S>
 where ''' + BOUNDS + r''' {
-    fn walk(&self,c:&mut ts_jsstring::census::Collector,_:&str) {
-        use ts_jsstring::census::Walk;
+    fn walk(&self,c:&mut tsr_jsstring::census::Collector,_:&str) {
+        use tsr_jsstring::census::Walk;
         match &self.root {
             Root::File(file)=>file.walk(c,"owner.file"),
             Root::Bundle(bundle,_)=>bundle.walk(c,"owner.bundle"),

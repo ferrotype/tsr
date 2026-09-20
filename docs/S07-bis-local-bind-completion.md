@@ -37,9 +37,9 @@ algorithms:
 
 | Inventory | Source and adapters |
 | --- | --- |
-| Node getters, kind-driven failure rules, shape-driven modifiers/body/function fields, locals-container shapes | `ts_ast::node_semantics`, expanded by `NodeAccess` and `BindRead`; storage adapters select borrowed checked or local typed rows. |
+| Node getters, kind-driven failure rules, shape-driven modifiers/body/function fields, locals-container shapes | `tsr_ast::node_semantics`, expanded by `NodeAccess` and `BindRead`; storage adapters select borrowed checked or local typed rows. |
 | Concrete shape names, tags, declaration-name capability and payload/child access | The existing AST schema and `xtask::gen::ast_local_read`; generated local reads include the shape metadata needed by the shared rules. |
-| Parentheses/partially-emitted wrappers, entity/dotted names, left-hand-side classification, optional-chain and logical/coalescing predicates | `ts_ast::syntax_helpers`, used by checked `AstView` and scoped `LocalBind`; only storage reads and error types differ. |
+| Parentheses/partially-emitted wrappers, entity/dotted names, left-hand-side classification, optional-chain and logical/coalescing predicates | `tsr_ast::syntax_helpers`, used by checked `AstView` and scoped `LocalBind`; only storage reads and error types differ. |
 | Fixed kind predicates and container classification | Shared utility predicates and the existing container-rule inventory; dynamic reads occur only for rules that need them. |
 
 Mixed checked/local identities compare their canonical public identities;

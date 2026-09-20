@@ -13,7 +13,7 @@ The spike must pass bounded experiments for all three (E5 to E8) before the rest
 
 ## Consequences
 
-Phase 7 includes full checking and emit through both entry points. `ts_wasm` and `ts_embed` exist as crates from the spike onward, with parser and checker-slice entry points first.
+Phase 7 includes full checking and emit through both entry points. `tsr_wasm` and `tsr_embed` exist as crates from the spike onward, with parser and checker-slice entry points first.
 
 ## Evidence
 

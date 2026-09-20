@@ -39,14 +39,14 @@ exit = [
 
 [[item]]
 id = "S07-1"
-title = "ts_binder with file-owned symbols and flow nodes (ADR 0007); bind parity over the corpus against the oracle's symbol dump"
+title = "tsr_binder with file-owned symbols and flow nodes (ADR 0007); bind parity over the corpus against the oracle's symbol dump"
 kind = "task"
 required = true
 done_when = ["run.binder.parity == 1", "run.binder.reached_bind == true", "run.binder.supplemental_parity == 1", "run.binder.protocol == true", "run.binder.helpers == true", "run.binder.resolvers == true", "run.binder.graph_contracts == true", "run.binder.depth == true"]
 
 [[item]]
 id = "S07-2"
-title = "ts_core, ts_tsoptions, ts_module and ts_vfs slices; the in-memory program host; pinned lib loading through ts_bundled; unsupported operations fail explicitly and are listed in the slice manifest"
+title = "tsr_core, tsr_tsoptions, tsr_module and tsr_vfs slices; the in-memory program host; pinned lib loading through tsr_bundled; unsupported operations fail explicitly and are listed in the slice manifest"
 kind = "task"
 required = true
 done_when = ["run.program.subset_loads == true"]

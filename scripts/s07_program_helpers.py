@@ -59,7 +59,7 @@ def preflight(directory):
         if identity in identities:
             raise ValueError('duplicate program helper group')
         identities.add(identity)
-        if (group['package'] not in {'ts_compiler','ts_module','ts_semver','ts_tspath'}
+        if (group['package'] not in {'tsr_compiler','tsr_module','tsr_semver','tsr_tspath'}
                 or any(type(group[field]) is not str for field in ('target','prefix'))
                 or type(group['tests']) is not list or not group['tests']
                 or group['tests'] != sorted(set(group['tests']))

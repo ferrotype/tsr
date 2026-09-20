@@ -139,7 +139,7 @@ outputs over four lifecycles, plus JSX and forced-module byte comparisons with
 the native parser. A one-input socket benchmark smoke matched the encoded
 bytes and verified removal of its temporary directory.
 
-The optional `ts_node/worker-probe` feature timestamps the existing request
+The optional `tsr_node/worker-probe` feature timestamps the existing request
 path without changing the worker's reserved stack. The outer owner thread only
 joins the parser worker; it does not forward each request through another queue.
 Twenty-one alternating normal/instrumented batches used 100 fresh 10 KiB inputs
@@ -165,7 +165,7 @@ and cache behavior. Next CPU work should inspect parsing/encoding on the worker.
 [The compact probe record](s10-node-worker-probe.json) retains every batch's
 timing and load, hashes and boundary definitions. Full input/output hashes,
 source hashes and the instrumented binary remain in
-`target/s10/review-worker-probe`. Reproduce by building `ts_node` in release
+`target/s10/review-worker-probe`. Reproduce by building `tsr_node` in release
 with `--features worker-probe`, copying the library to a separate `.node` file,
 and running `node tools/s10/node/worker-probe.mjs <binary.node> 21 100`.
 The feature is absent from the shipped default Node build.

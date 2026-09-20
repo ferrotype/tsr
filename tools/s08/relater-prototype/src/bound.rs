@@ -12,8 +12,8 @@ use crate::{
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
-use ts_arena::{NodeId, SymbolId};
-use ts_ast::{modifier_flags as mf, NodeListId, SyntaxKind as K};
+use tsr_arena::{NodeId, SymbolId};
+use tsr_ast::{modifier_flags as mf, NodeListId, SyntaxKind as K};
 
 mod compound_source;
 mod conditional_source;
@@ -32,8 +32,8 @@ impl From<InputError> for Error {
     }
 }
 
-impl From<ts_arena::Error> for Error {
-    fn from(error: ts_arena::Error) -> Self {
+impl From<tsr_arena::Error> for Error {
+    fn from(error: tsr_arena::Error) -> Self {
         Self::Unsupported(format!("bound AST: {error:?}").into())
     }
 }
@@ -275,7 +275,7 @@ impl Construction {
         };
         for (_, symbol) in self.input.table(locals)? {
             let Some(symbol) = symbol else { continue };
-            if self.input.symbol(symbol)?.flags() & ts_ast::symbol_flags::TYPE_PARAMETER == 0 {
+            if self.input.symbol(symbol)?.flags() & tsr_ast::symbol_flags::TYPE_PARAMETER == 0 {
                 continue;
             }
             result.push(
@@ -415,7 +415,7 @@ impl Construction {
             .push(crate::Diagnostic {
                 location,
                 message:
-                    ts_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
+                    tsr_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,
                 args: Vec::new(),
                 chain: Vec::new(),
                 related: Vec::new(),
@@ -446,7 +446,7 @@ impl Construction {
         let source = self.input.source_file(node)?;
         let file = String::from_utf8(source.file_name().to_vec())
             .map_err(|_| Error::Unsupported("non-UTF8 diagnostic file name".into()))?;
-        let pos = ts_scanner::skip_trivia(source.text().as_bytes(), i64::from(read.pos()));
+        let pos = tsr_scanner::skip_trivia(source.text().as_bytes(), i64::from(read.pos()));
         Ok(DiagnosticLocation {
             file: Some(file),
             pos: pos as isize,
@@ -653,7 +653,7 @@ impl Construction {
         let mut current = node;
         while let Some(parent) = self.input.node(current)?.parent() {
             let read = self.input.node(parent)?;
-            if ts_ast::utilities::is_statement(self.input.ast(parent)?, parent)? {
+            if tsr_ast::utilities::is_statement(self.input.ast(parent)?, parent)? {
                 break;
             }
             let conditional = read
@@ -1038,7 +1038,7 @@ impl Construction {
                 return Ok(regular);
             }
             Some(K::NumericLiteral) => {
-                let number = ts_jsnum::from_string(&self.text(node)?);
+                let number = tsr_jsnum::from_string(&self.text(node)?);
                 (
                     tf::NUMBER_LITERAL,
                     LiteralValue::Number(number.value().to_bits()),
@@ -1046,8 +1046,8 @@ impl Construction {
                 )
             }
             Some(K::BigIntLiteral) => {
-                let value = ts_jsnum::PseudoBigInt::new(
-                    &ts_jsnum::parse_pseudo_big_int(&self.text(node)?),
+                let value = tsr_jsnum::PseudoBigInt::new(
+                    &tsr_jsnum::parse_pseudo_big_int(&self.text(node)?),
                     false,
                 );
                 let name =
@@ -1074,7 +1074,7 @@ impl Construction {
                 let inner = self.literal(operand)?;
                 match inner.literal.as_ref() {
                     Some(LiteralValue::Number(bits)) => {
-                        let number = ts_jsnum::Number::new(if negative {
+                        let number = tsr_jsnum::Number::new(if negative {
                             -f64::from_bits(*bits)
                         } else {
                             f64::from_bits(*bits)
@@ -1089,7 +1089,7 @@ impl Construction {
                         negative: sign,
                         digits,
                     }) => {
-                        let value = ts_jsnum::PseudoBigInt::new(digits, negative != *sign);
+                        let value = tsr_jsnum::PseudoBigInt::new(digits, negative != *sign);
                         let name = String::from_utf8(value.to_text())
                             .map_err(|_| Error::ResolutionFailed)?
                             + "n";

@@ -1,0 +1,39 @@
+[package]
+name = "tsr_wasm"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+checker = ["tsr_embed/checker", "dep:tsr_compiler", "dep:tsr_checker", "dep:tsr_vfs", "dep:tsr_bundled", "dep:tsr_tsoptions", "dep:tsr_astnav", "dep:serde_json"]
+# Capture-only native walker, separate from the shipped checker interface.
+corpus = ["checker", "dep:s10_corpus"]
+
+[dependencies]
+wasm-bindgen = "=0.2.126"
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_encoder = { version = "0.1.0", path = "../tsr_encoder" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_embed = { version = "0.1.0", path = "../tsr_embed", default-features = false }
+tsr_compiler = { version = "0.1.0", path = "../tsr_compiler", optional = true }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker", optional = true }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs", optional = true }
+tsr_bundled = { version = "0.1.0", path = "../tsr_bundled", optional = true }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions", optional = true }
+tsr_astnav = { version = "0.1.0", path = "../tsr_astnav", optional = true }
+serde_json = { version = "1", features = ["preserve_order"], optional = true }
+s10_corpus = { version = "0.1.0", path = "../../tools/s10/corpus-adapter", optional = true }
+
+[dev-dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+
+[lints]
+workspace = true

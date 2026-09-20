@@ -279,102 +279,102 @@ dependencies = [
 ]
 
 [[package]]
-name = "ts_arena"
+name = "tsr_arena"
 version = "0.1.0"
 dependencies = [
- "ts_jsstring",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_ast"
-version = "0.1.0"
-dependencies = [
- "stacker",
- "ts_arena",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
-]
-
-[[package]]
-name = "ts_binder"
+name = "tsr_ast"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsstring",
- "ts_parser",
- "ts_scanner",
+ "tsr_arena",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_core"
+name = "tsr_binder"
 version = "0.1.0"
 dependencies = [
- "ts_jsstring",
+ "stacker",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
+ "tsr_parser",
+ "tsr_scanner",
 ]
 
 [[package]]
-name = "ts_cpu_profile"
+name = "tsr_core"
+version = "0.1.0"
+dependencies = [
+ "tsr_jsstring",
+]
+
+[[package]]
+name = "tsr_cpu_profile"
 version = "0.1.0"
 dependencies = [
  "mimalloc",
  "serde",
  "serde_json",
  "sha2",
- "ts_ast",
- "ts_binder",
- "ts_core",
- "ts_jsstring",
- "ts_parser",
+ "tsr_ast",
+ "tsr_binder",
+ "tsr_core",
+ "tsr_jsstring",
+ "tsr_parser",
 ]
 
 [[package]]
-name = "ts_diagnostics"
+name = "tsr_diagnostics"
 version = "0.1.0"
 
 [[package]]
-name = "ts_jsnum"
+name = "tsr_jsnum"
 version = "0.1.0"
 dependencies = [
  "num-bigint",
  "num-traits",
  "ryu-js",
- "ts_jsstring",
+ "tsr_jsstring",
 ]
 
 [[package]]
-name = "ts_jsstring"
+name = "tsr_jsstring"
 version = "0.1.0"
 
 [[package]]
-name = "ts_parser"
+name = "tsr_parser"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
- "ts_scanner",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
+ "tsr_scanner",
 ]
 
 [[package]]
-name = "ts_scanner"
+name = "tsr_scanner"
 version = "0.1.0"
 dependencies = [
  "stacker",
- "ts_arena",
- "ts_ast",
- "ts_core",
- "ts_diagnostics",
- "ts_jsnum",
- "ts_jsstring",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_jsstring",
 ]
 
 [[package]]

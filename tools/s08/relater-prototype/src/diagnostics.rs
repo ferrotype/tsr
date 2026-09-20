@@ -2,7 +2,7 @@
 //! builds these records directly from pinned messages, never by parsing text.
 
 use std::rc::Rc;
-use ts_diagnostics::{self as d, Message};
+use tsr_diagnostics::{self as d, Message};
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DiagnosticLocation {

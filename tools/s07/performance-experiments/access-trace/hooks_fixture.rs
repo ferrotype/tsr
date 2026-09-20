@@ -31,7 +31,7 @@ thread_local! {
 fn observe(name: &'static str, a: u64, b: u64) {
     LOG.with(|log| log.borrow_mut().push(Observation::Operation(name, a, b)));
 }
-mod ts_ast {
+mod tsr_ast {
     pub type NodeSliceRead<'a> = super::SliceRead<'a>;
     pub mod access_trace {
         pub fn event(op: u16, site: u16, a: u64, b: u64, c: u64, d: u64) {

@@ -7,7 +7,7 @@ workspace build.
 
 ## Compiled sizes
 
-The probe imports the existing production `ts_ast` rlib's public payload types.
+The probe imports the existing production `tsr_ast` rlib's public payload types.
 Its copied enum preserves every variant's order and current boxing choice; its
 copied Node frame preserves the actual fields, types and order. Assertions check
 the unchanged copies' size/alignment against real `NodeData` and `Node` before
@@ -79,7 +79,7 @@ group but directly declares `FallthroughFlowNode` in
 The binder writes it when a nonfinal clause can fall through in
 [binder.go:2143](../../../../upstream/tsc/internal/binder/binder.go#L2143); the current
 Rust binder has the corresponding write in
-[statements.rs:385](../../../../crates/ts_binder/src/statements.rs#L385).
+[statements.rs:385](../../../../crates/tsr_binder/src/statements.rs#L385).
 The base fields plus direct fields cover **84 shapes**, leaving **108** without
 these binding fields. This is a schema capacity inventory, not evidence that
 every field is written on the frozen workload.

@@ -1,0 +1,23 @@
+[package]
+name = "tsr_project"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
+
+[dev-dependencies]
+tsr_arena = { version = "0.1.0", path = "../tsr_arena", features = ["harness"] }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_compiler = { version = "0.1.0", path = "../tsr_compiler" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+
+[lints]
+workspace = true

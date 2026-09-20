@@ -1,0 +1,47 @@
+[package]
+name = "tsr_checker"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+storage-pilot = ["dep:serde_json"]
+relation-probe = ["dep:serde_json"]
+
+[dependencies]
+stacker = "=0.1.25"
+hashbrown = { version = "=0.17.1", default-features = false }
+serde_json = { version = "1", optional = true }
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_binder = { version = "0.1.0", path = "../tsr_binder" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
+tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_module = { version = "0.1.0", path = "../tsr_module" }
+tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
+tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
+tsr_pseudochecker = { version = "0.1.0", path = "../tsr_pseudochecker" }
+tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+
+[dev-dependencies]
+serde_json = "1"
+cap = { version = "=0.1.2", features = ["stats"] }
+mimalloc = "=0.1.48"
+
+[lints]
+workspace = true
+
+[[example]]
+name = "storage_pilot"
+required-features = ["storage-pilot"]
+
+[[example]]
+name = "storage_families"
+required-features = ["storage-pilot"]

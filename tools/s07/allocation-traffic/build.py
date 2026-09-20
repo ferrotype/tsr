@@ -87,12 +87,12 @@ with (CACHE / 's07-benchmark/measurement.lock').open('a+') as lock:
     before_config = config()
     artifacts = {}; builds = {}
     for allocation, role in ((True, 'allocation'),):
-        argv = ['cargo', '+'+stable, 'build', '--release', '--offline', '--locked', '--package', 'ts_bench', '--bin', 'ts-bench', '--target', host, '--message-format=json-render-diagnostics', *release_configuration(env, source)]
+        argv = ['cargo', '+'+stable, 'build', '--release', '--offline', '--locked', '--package', 'tsr_bench', '--bin', 'ts-bench', '--target', host, '--message-format=json-render-diagnostics', *release_configuration(env, source)]
         if allocation: argv += ['--features', 'allocation']
         with tempfile.TemporaryDirectory(prefix='allocation-traffic-build-', dir=ROOT/'target') as temporary:
             argv += ['--target-dir', temporary, '--config', 'build.build-dir='+json.dumps(temporary)]
             messages = run(argv, role+'-cargo', source, env)
-            executable = rust_executable(messages, source/'crates/ts_bench/Cargo.toml', allocation)
+            executable = rust_executable(messages, source/'crates/tsr_bench/Cargo.toml', allocation)
             assert executable.resolve().is_relative_to(Path(temporary).resolve())
             destination = OUT/'artifacts'/'rust-allocation-traffic'
             shutil.copyfile(executable, destination); destination.chmod(0o755)
@@ -102,19 +102,19 @@ with (CACHE / 's07-benchmark/measurement.lock').open('a+') as lock:
             probe_argv = [arg for arg in argv]
             at = probe_argv.index('--bin'); probe_argv[at:at+2] = ['--example', 'allocation_traffic_probe']
             probe_messages = run(probe_argv, 'calibration-cargo', source, env)
-            probe = cargo_executable(probe_messages, source/'crates/ts_bench/Cargo.toml', 'allocation_traffic_probe', 'example', ['allocation'])
+            probe = cargo_executable(probe_messages, source/'crates/tsr_bench/Cargo.toml', 'allocation_traffic_probe', 'example', ['allocation'])
             assert probe.resolve().is_relative_to(Path(temporary).resolve())
             probe_destination = OUT/'artifacts'/'allocation-traffic-probe'
             shutil.copyfile(probe, probe_destination); probe_destination.chmod(0o755)
             run([str(probe_destination)], 'calibration', source, env, timeout=30)
-            tests = ['cargo', '+'+stable, 'test', '--offline', '--locked', '--package', 'ts_ast', '--lib', '--target', host, '--target-dir', temporary, '--config', 'build.build-dir='+json.dumps(temporary), 'symbol_tables::tests']
+            tests = ['cargo', '+'+stable, 'test', '--offline', '--locked', '--package', 'tsr_ast', '--lib', '--target', host, '--target-dir', temporary, '--config', 'build.build-dir='+json.dumps(temporary), 'symbol_tables::tests']
             run(tests, 'symbol-table-tests', source, env)
             parser_tests = tests.copy()
-            parser_tests[parser_tests.index('ts_ast')] = 'ts_parser'
+            parser_tests[parser_tests.index('tsr_ast')] = 'tsr_parser'
             for test_filter in ['list_buffer::', 'factory::tests', 'lists::tests']:
                 parser_tests[-1] = test_filter
                 run([*parser_tests, '--', '--test-threads=1'], test_filter.replace('::', '-')+'-tests', source, env)
-            clippy = ['cargo', '+'+stable, 'clippy', '--offline', '--locked', '--package', 'ts_bench', '--bin', 'ts-bench', '--example', 'allocation_traffic_probe', '--features', 'allocation', '--target', host, '--target-dir', temporary, '--config', 'build.build-dir='+json.dumps(temporary), '--', '-D', 'warnings']
+            clippy = ['cargo', '+'+stable, 'clippy', '--offline', '--locked', '--package', 'tsr_bench', '--bin', 'ts-bench', '--example', 'allocation_traffic_probe', '--features', 'allocation', '--target', host, '--target-dir', temporary, '--config', 'build.build-dir='+json.dumps(temporary), '--', '-D', 'warnings']
             run(clippy, 'clippy', source, env)
         runner.runtime_libraries(destination, OUT/(role+'-runtime-libraries.txt'))
         rows = [strict_json_loads(line) for line in messages.splitlines() if line]

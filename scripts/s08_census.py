@@ -40,7 +40,7 @@ def requests_from_fixtures():
 
 def build_rust(directory):
     env = s08_checkerbench.native_environment()
-    manifest = ROOT / "crates/ts_compiler/Cargo.toml"
+    manifest = ROOT / "crates/tsr_compiler/Cargo.toml"
     messages = command(["cargo", "build", "--release", "--locked", "--example", "p7_census", "--features", "s08-allocation",
                         "--message-format=json", "--manifest-path", str(manifest)], cwd=ROOT, env=env).decode()
     binary = s08_checkerbench.cargo_executable(messages, manifest, "p7_census", "example", ["s08-allocation"])

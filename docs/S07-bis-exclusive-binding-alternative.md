@@ -36,7 +36,7 @@ independent coverage; retaining code does not remove that integration obligation
 
 | Question | Code finding and plan decision |
 | --- | --- |
-| Does production expose a parsed view between parsing and binding? | No such exposure in `ts_compiler::FileCache::acquire`; use that consuming entry point first, also in the benchmark |
+| Does production expose a parsed view between parsing and binding? | No such exposure in `tsr_compiler::FileCache::acquire`; use that consuming entry point first, also in the benchmark |
 | Is there a shared parse-cache once cell to replace? | No: `acquire` takes `&mut self`, stores weak completed entries and installs nothing on failure. Do not introduce negative caching or a new pending-cell protocol |
 | Do published readers prevent A0? | They remain on the existing path. Exclusive input cannot have an escaping borrowed node across consumption; preserve this through compile-fail checks |
 | What about post-bind parsed access? | `BoundFile::parsed_file()` currently exposes original parsed state. The new path needs a bound-only result or another explicit API; it must not falsely expose mutated storage as that old parsed snapshot |
@@ -47,11 +47,11 @@ independent coverage; retaining code does not remove that integration obligation
 | Do all owner checks disappear? | Repeated routing may disappear under a proved local scope; arbitrary raw, foreign/lazy and wrong-source IDs still require validation and safe bounds access |
 | Does A0 remove the large field-map allocation? | Initially no: it removes full-node overlay/routing while keeping symbol/flow field maps. Removing those maps belongs to compact inline fields at CP3 |
 
-Source anchors: [cache](../crates/ts_compiler/src/cache.rs),
-[loader](../crates/ts_compiler/src/loader.rs),
-[binder storage and result APIs](../crates/ts_ast/src/bind_result.rs),
-[binder traversal](../crates/ts_binder/src/containers.rs),
-[lazy storage](../crates/ts_arena/src/lazy.rs).
+Source anchors: [cache](../crates/tsr_compiler/src/cache.rs),
+[loader](../crates/tsr_compiler/src/loader.rs),
+[binder storage and result APIs](../crates/tsr_ast/src/bind_result.rs),
+[binder traversal](../crates/tsr_binder/src/containers.rs),
+[lazy storage](../crates/tsr_arena/src/lazy.rs).
 
 ## 3. Activated A0 prototype
 

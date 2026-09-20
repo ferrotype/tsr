@@ -9,8 +9,8 @@ use std::{
     path::Path,
     thread,
 };
-use ts_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
-use ts_jsstring::SourceText;
+use tsr_ast::{ExternalModuleIndicatorOptions, JsString, SourceFileParseOptions};
+use tsr_jsstring::SourceText;
 #[global_allocator]
 static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
 #[derive(Deserialize)]
@@ -26,7 +26,7 @@ struct Input {
 struct Loaded {
     source: SourceText,
     options: SourceFileParseOptions,
-    script_kind: ts_core::ScriptKind,
+    script_kind: tsr_core::ScriptKind,
 }
 fn preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error>> {
     let inputs: Vec<Input> = serde_json::from_slice(&fs::read(path)?)?;
@@ -46,7 +46,7 @@ fn preload(path: &Path) -> Result<Vec<Loaded>, Box<dyn std::error::Error>> {
                         force: input.force,
                     },
                 },
-                script_kind: ts_core::ScriptKind(input.script_kind),
+                script_kind: tsr_core::ScriptKind(input.script_kind),
             })
         })
         .collect()
@@ -78,22 +78,22 @@ fn loaded_digest(inputs: &[Loaded]) -> String {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 3 {
-        return Err("usage: ts_s07_bis_owner_census INPUTS.json OUTPUT.ndjson".into());
+        return Err("usage: tsr_s07_bis_owner_census INPUTS.json OUTPUT.ndjson".into());
     }
     let inputs = preload(Path::new(&args[1]))?;
     let loaded_input_sha256 = loaded_digest(&inputs);
     let loaded_bytes: usize = inputs.iter().map(|input| input.source.len()).sum();
     let files = thread::scope(|scope| {
-        ts_parser::spawn_parser_worker(scope, || {
+        tsr_parser::spawn_parser_worker(scope, || {
             inputs
                 .iter()
                 .map(|input| {
-                    let parsed = ts_parser::parse_source_file(
+                    let parsed = tsr_parser::parse_source_file(
                         input.source.clone(),
                         input.script_kind,
                         input.options.clone(),
                     );
-                    ts_binder::bind_parsed_file(parsed)
+                    tsr_binder::bind_parsed_file(parsed)
                         .expect("frozen workload binding must complete")
                 })
                 .collect::<Vec<_>>()

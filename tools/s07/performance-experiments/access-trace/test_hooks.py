@@ -64,7 +64,7 @@ class HookTests(unittest.TestCase):
         for name in changed:
             text = (self.stage / name).read_text()
             emitted.extend((int(op), int(site)) for op, site in re.findall(
-                r"ts_ast::access_trace::event\(\s*(\d+),\s*(\d+),", text))
+                r"tsr_ast::access_trace::event\(\s*(\d+),\s*(\d+),", text))
         registry = json.loads((HERE / "hooks-registry.json").read_text())
         declared = [(event["id"], site["id"]) for event in registry["events"]
                     for site in event["sites"]]
@@ -140,7 +140,7 @@ class HookTests(unittest.TestCase):
         for variant, directory in [("original", FROZEN), ("traced", self.stage)]:
             methods = []
             for file, selected in names.items():
-                source = (directory / "crates/ts_binder/src" / file).read_text()
+                source = (directory / "crates/tsr_binder/src" / file).read_text()
                 methods += [function(source, name) for name in selected]
             fixture = fixture.replace(f"// {variant.upper()}_METHODS", "\n".join(methods))
         rustc = shutil.which("rustc")

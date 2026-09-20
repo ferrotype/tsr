@@ -13,7 +13,7 @@ IgnoreErrors` builder flags and `AllowUnresolvedNames` internal flag.
 
 ```sh
 python3 scripts/s08_p5_display.py capture --output target/s08/p5-display-new
-cargo run -p ts_compiler --example p5_display -- \
+cargo run -p tsr_compiler --example p5_display -- \
   data/s08/p5/display/requests.json target/s08/p5-display-rust.json
 python3 scripts/s08_p5_display.py compare --native data/s08/p5/display \
   --actual target/s08/p5-display-rust.json

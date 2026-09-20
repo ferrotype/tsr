@@ -105,9 +105,9 @@ def config_provenance_inputs():
             'scripts/s07_program_compare.py', 'tools/s07/config/rust_observation.rs',
             'scripts/s04_ownership.py',
             'data/upstream.json', 'data/s04/toolchains.toml'}
-    crates = ('ts_compiler', 'ts_module', 'ts_semver', 'ts_tsoptions', 'ts_vfs',
-              'ts_bundled', 'ts_tspath', 'ts_core', 'ts_parser', 'ts_scanner',
-              'ts_ast', 'ts_arena', 'ts_binder', 'ts_jsstring', 'ts_jsnum', 'ts_diagnostics')
+    crates = ('tsr_compiler', 'tsr_module', 'tsr_semver', 'tsr_tsoptions', 'tsr_vfs',
+              'tsr_bundled', 'tsr_tspath', 'tsr_core', 'tsr_parser', 'tsr_scanner',
+              'tsr_ast', 'tsr_arena', 'tsr_binder', 'tsr_jsstring', 'tsr_jsnum', 'tsr_diagnostics')
     for crate in crates:
         directory = ROOT / 'crates' / crate
         rust.add(str((directory / 'Cargo.toml').relative_to(ROOT)))
@@ -183,7 +183,7 @@ def rust_binary():
     for key in list(env):
         if key.startswith('CARGO_PROFILE_') or key == 'CARGO_BUILD_TARGET':
             env.pop(key, None)
-    output = command(['cargo', 'build', '--locked', '--release', '-p', 'ts_compiler',
+    output = command(['cargo', 'build', '--locked', '--release', '-p', 'tsr_compiler',
                       '--example', 'program_probe', '--message-format=json'], cwd=ROOT, env=env)
     records = [strict_json_loads(line) for line in output.splitlines() if line.strip()]
     binaries = [row['executable'] for row in records
@@ -195,9 +195,9 @@ def rust_binary():
 
 
 def input_fingerprints():
-    crates = ('ts_arena', 'ts_ast', 'ts_core', 'ts_diagnostics', 'ts_jsstring',
-              'ts_jsnum', 'ts_scanner', 'ts_parser', 'ts_binder', 'ts_tspath',
-              'ts_vfs', 'ts_bundled', 'ts_tsoptions', 'ts_semver', 'ts_module', 'ts_compiler')
+    crates = ('tsr_arena', 'tsr_ast', 'tsr_core', 'tsr_diagnostics', 'tsr_jsstring',
+              'tsr_jsnum', 'tsr_scanner', 'tsr_parser', 'tsr_binder', 'tsr_tspath',
+              'tsr_vfs', 'tsr_bundled', 'tsr_tsoptions', 'tsr_semver', 'tsr_module', 'tsr_compiler')
     paths=[ROOT/'Cargo.lock',ROOT/'Cargo.toml',ROOT/'rust-toolchain.toml',
            ROOT/'tools/s07/program/rust_observation.rs',Path(__file__).resolve(),
            ROOT/'scripts/s07_program.py']

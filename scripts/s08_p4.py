@@ -158,7 +158,7 @@ def build(directory, *, example='p4_inventory', source_fn=None, optimize=False, 
         target = snapshot / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
-    command = ['cargo', 'build', '--locked', '-p', 'ts_compiler', '--example', example, '--message-format=json']
+    command = ['cargo', 'build', '--locked', '-p', 'tsr_compiler', '--example', example, '--message-format=json']
     if features:
         command += ['--features', ','.join(features)]
     if optimize:

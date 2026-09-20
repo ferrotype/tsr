@@ -1,0 +1,24 @@
+[package]
+name = "tsr_printer"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+hashbrown = { version = "=0.17.1", default-features = false }
+stacker = "=0.1.25"
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }
+tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
+tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
+
+[dev-dependencies]
+serde_json = "1"
+
+[lints]
+workspace = true

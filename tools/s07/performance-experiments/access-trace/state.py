@@ -9,7 +9,7 @@ import re
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 BASE = ROOT / "target/s07-bis/cp1-node-read-candidate/source"
-SCHEMA = "crates/ts_ast/src/data_generated.rs"
+SCHEMA = "crates/tsr_ast/src/data_generated.rs"
 SCHEMA_SHA256 = "8563c53e83fe66ea8d7a353102858dabdb5d570556150be53f96ec57f5879428"
 MARKER = "// S07-bis access trace: staged physical state observer."
 FIELD_OPS = {"Option<NodeId>": 17, "Option<NodeListId>": 18, "bool": 19,
@@ -152,7 +152,7 @@ def registry(shapes):
 
 
 ADDITIONS = {
-    "crates/ts_arena/src/arena.rs": '''
+    "crates/tsr_arena/src/arena.rs": '''
 impl<T> Arena<T> {
     pub(crate) fn access_trace_layout(&self) -> [u64; 8] {
         let n = |value: usize| u64::try_from(value).expect("trace count fits u64");
@@ -165,7 +165,7 @@ impl<T> Arena<T> {
     }
 }
 ''',
-    "crates/ts_arena/src/file.rs": '''
+    "crates/tsr_arena/src/file.rs": '''
 impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
     pub fn access_trace_core_nodes(self) -> impl Iterator<Item = (NodeId, &'a N)> {
         let arena = self.owner.core.id;
@@ -191,7 +191,7 @@ impl<'a, N: NodeRecord, S> StorageView<'a, N, S> {
     pub fn access_trace_lazy_counts(self) -> [usize; 4] { self.owner.lazy.access_trace_counts() }
 }
 ''',
-    "crates/ts_arena/src/lazy.rs": '''
+    "crates/tsr_arena/src/lazy.rs": '''
 impl<N: NodeRecord> LazyArena<N> {
     pub(crate) fn access_trace_counts(&self) -> [usize; 4] {
         let state = self.read();
@@ -201,14 +201,14 @@ impl<N: NodeRecord> LazyArena<N> {
     }
 }
 ''',
-    "crates/ts_ast/src/metadata.rs": "\n".join('''
+    "crates/tsr_ast/src/metadata.rs": "\n".join('''
 impl NAME {
     pub(crate) fn access_trace_descriptor(self) -> (u64, u32, u32) {
         (self.backing.map_or(0, |id| id.bits()), self.start, self.len)
     }
 }
 '''.replace("NAME", name) for name in ("SourceNodeSlice", "SourceTextSlice", "CommentSlice", "PragmaSlice", "ReferenceSlice")),
-    "crates/ts_ast/src/lib.rs": "\npub mod access_trace_state;\n",
+    "crates/tsr_ast/src/lib.rs": "\npub mod access_trace_state;\n",
 }
 
 
@@ -228,8 +228,8 @@ def apply(stage):
         require(MARKER not in original, "state observer already applied")
         originals[name] = original
         changes[name] = original + "\n" + MARKER + "\n" + addition
-    for name, body in (("crates/ts_ast/src/access_trace_state.rs", (HERE / "src/state.rs").read_text()),
-                       ("crates/ts_ast/src/access_trace_state_generated.rs", generated(shapes))):
+    for name, body in (("crates/tsr_ast/src/access_trace_state.rs", (HERE / "src/state.rs").read_text()),
+                       ("crates/tsr_ast/src/access_trace_state_generated.rs", generated(shapes))):
         require(not (stage / name).exists(), "state observer target already exists")
         originals[name] = ""
         changes[name] = body

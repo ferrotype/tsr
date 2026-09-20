@@ -77,17 +77,17 @@ def build(output,baseline,base_sha):
     config=lambda:{str(p):runner.digest(p) if p.is_file() else None for p in cargo_configuration_paths(env,crate)}
     before_config=config(); before_source=runner.inventory(source)
     # Semantic tests run in the same additive source copy, before the full capture.
-    test_args=['cargo','+'+stable,'test','--offline','--locked','--manifest-path',str(crate/'Cargo.toml'),'--bin','ts_s07_bis_owner_census','--','--nocapture']
+    test_args=['cargo','+'+stable,'test','--offline','--locked','--manifest-path',str(crate/'Cargo.toml'),'--bin','tsr_s07_bis_owner_census','--','--nocapture']
     tested=subprocess.run(test_args,cwd=crate,env=env,capture_output=True)
     (output/'test.stdout').write_bytes(tested.stdout); (output/'test.stderr').write_bytes(tested.stderr)
     if tested.returncode: raise ValueError('owner census contract tests failed; inspect build test.stderr')
-    argv=['cargo','+'+stable,'build','--release','--offline','--locked','--manifest-path',str(crate/'Cargo.toml'),'--bin','ts_s07_bis_owner_census','--target',host,'--message-format=json-render-diagnostics',*release_configuration(env,crate)]
+    argv=['cargo','+'+stable,'build','--release','--offline','--locked','--manifest-path',str(crate/'Cargo.toml'),'--bin','tsr_s07_bis_owner_census','--target',host,'--message-format=json-render-diagnostics',*release_configuration(env,crate)]
     built=subprocess.run(argv,cwd=crate,env=env,capture_output=True)
     (output/'cargo-messages.ndjson').write_bytes(built.stdout); (output/'cargo.stderr').write_bytes(built.stderr)
     if built.returncode: raise ValueError('owner census build failed; inspect cargo.stderr')
-    binary=cargo_executable(built.stdout,crate/'Cargo.toml','ts_s07_bis_owner_census','bin',[])
+    binary=cargo_executable(built.stdout,crate/'Cargo.toml','tsr_s07_bis_owner_census','bin',[])
     ast_artifacts=[strict_json_loads(line) for line in built.stdout.splitlines() if line]
-    if not any(r.get('reason')=='compiler-artifact' and r.get('target',{}).get('name')=='ts_ast' and r.get('features')==['owner-census'] for r in ast_artifacts):
+    if not any(r.get('reason')=='compiler-artifact' and r.get('target',{}).get('name')=='tsr_ast' and r.get('features')==['owner-census'] for r in ast_artifacts):
         raise ValueError('observer feature not active on actual AST artifact')
     shutil.copyfile(binary,output/'artifacts/owner-census')
     runner.runtime_libraries(output/'artifacts/owner-census',output/'runtime-libraries.txt')

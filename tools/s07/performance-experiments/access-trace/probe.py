@@ -123,7 +123,7 @@ def build(output):
     # Release tests avoid an additional debug dependency build on this disk-bound
     # diagnostic host. The artifact still uses the exact native release settings.
     test_args = ['cargo', '+' + stable, 'test', '--release', '--offline', '--locked',
-                 '--manifest-path', str(crate / 'Cargo.toml'), '-p', 'ts_ast',
+                 '--manifest-path', str(crate / 'Cargo.toml'), '-p', 'tsr_ast',
                  '--lib', 'access_trace', '--', '--nocapture']
     runner.write_json(output / 'build-declaration.json', {
         'baseline_manifest_sha256': BASE_SHA, 'rustc': rustc, 'test_command': test_args,
@@ -137,7 +137,7 @@ def build(output):
     if tested.returncode:
         raise ValueError('trace recorder/state tests failed; inspect test.stderr')
     argv = ['cargo', '+' + stable, 'build', '--release', '--offline', '--locked',
-            '--manifest-path', str(crate / 'Cargo.toml'), '--bin', 'ts_s07_bis_access_trace',
+            '--manifest-path', str(crate / 'Cargo.toml'), '--bin', 'tsr_s07_bis_access_trace',
             '--target', host, '--message-format=json-render-diagnostics', *release_configuration(env, crate)]
     built = subprocess.run(argv, cwd=crate, env=env, capture_output=True)
     (output / 'cargo-messages.ndjson').write_bytes(built.stdout)
@@ -146,7 +146,7 @@ def build(output):
         'stdout_sha256': digest(output / 'cargo-messages.ndjson'), 'stderr_sha256': digest(output / 'cargo.stderr')})
     if built.returncode:
         raise ValueError('trace build failed; inspect cargo.stderr')
-    binary = cargo_executable(built.stdout, crate / 'Cargo.toml', 'ts_s07_bis_access_trace', 'bin', [])
+    binary = cargo_executable(built.stdout, crate / 'Cargo.toml', 'tsr_s07_bis_access_trace', 'bin', [])
     runner.copy_file(binary, output / 'artifacts/access-trace')
     runner.copy_file(BASE / reference['artifacts']['normal']['path'], output / 'artifacts/control')
     for artifact in ('access-trace', 'control'):

@@ -920,7 +920,7 @@ values and narrow writes, and reconstruct the full retained working set. Small
 fixtures remain semantic counterexamples. Report operation coverage separately
 from node population and CPU coverage, and confirm replay results in production.
 
-1. Introduce the borrowed facade in `ts_ast::storage`/`node_accessors`; change
+1. Introduce the borrowed facade in `tsr_ast::storage`/`node_accessors`; change
    generated accessors and factory mutations at their emitter in
    `xtask/src/gen/ast.rs` and related generator modules. Use `cargo xtask gen`;
    do not hand-edit generated outputs or alter upstream schema semantics.

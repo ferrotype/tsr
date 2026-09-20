@@ -36,7 +36,7 @@ def scanner(executable, env, upstream, tables, prefix=None):
     update_tables(tables)
     corpus, supplemental, probes = freeze(upstream, tables)
     # Cargo identifies its freshly built executable even with configured target directories.
-    build = command(["cargo", "build", "--package", "ts_scanner", "--example", "s05", "--release", "--locked", "--message-format=json"], cwd=ROOT)
+    build = command(["cargo", "build", "--package", "tsr_scanner", "--example", "s05", "--release", "--locked", "--message-format=json"], cwd=ROOT)
     artifacts = [strict_json_loads(line) for line in build.splitlines() if line.strip()]
     binaries = [item["executable"] for item in artifacts if item.get("reason") == "compiler-artifact" and item.get("target", {}).get("name") == "s05" and item.get("executable")]
     if len(binaries) != 1:

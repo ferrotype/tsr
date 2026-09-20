@@ -40,6 +40,6 @@ failures):
 | Informational public display | 9 match | 9 match |
 
 All 344 selected comparisons match in every domain; 44 variants improved and
-none regressed. Compiler tests in `crates/ts_compiler/tests/checker_semantics.rs`
+none regressed. Compiler tests in `crates/tsr_compiler/tests/checker_semantics.rs`
 pin the abstract-union, `in`-narrowing and negative-name displays to their Go
 baselines; no native oracle programs were captured for this pass.

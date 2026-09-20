@@ -1,5 +1,5 @@
 [package]
-name = "ts_s07_bis_access_trace"
+name = "tsr_s07_bis_access_trace"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.96"
@@ -14,12 +14,12 @@ mimalloc = "=0.1.48"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
-ts_arena = { path = "../../../../crates/ts_arena", version = "0.1.0" }
-ts_ast = { path = "../../../../crates/ts_ast", version = "0.1.0" }
-ts_core = { path = "../../../../crates/ts_core", version = "0.1.0" }
-ts_jsstring = { path = "../../../../crates/ts_jsstring", version = "0.1.0" }
-ts_parser = { path = "../../../../crates/ts_parser", version = "0.1.0" }
-ts_binder = { path = "../../../../crates/ts_binder", version = "0.1.0" }
+tsr_arena = { path = "../../../../crates/tsr_arena", version = "0.1.0" }
+tsr_ast = { path = "../../../../crates/tsr_ast", version = "0.1.0" }
+tsr_core = { path = "../../../../crates/tsr_core", version = "0.1.0" }
+tsr_jsstring = { path = "../../../../crates/tsr_jsstring", version = "0.1.0" }
+tsr_parser = { path = "../../../../crates/tsr_parser", version = "0.1.0" }
+tsr_binder = { path = "../../../../crates/tsr_binder", version = "0.1.0" }
 
 [profile.release]
 opt-level = 3

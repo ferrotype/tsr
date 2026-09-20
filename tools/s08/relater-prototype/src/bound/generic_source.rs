@@ -26,7 +26,7 @@ impl Construction {
             if read.kind() != K::InterfaceDeclaration {
                 continue;
             }
-            if read.flags() & ts_ast::node_flags::CONTAINS_THIS != 0
+            if read.flags() & tsr_ast::node_flags::CONTAINS_THIS != 0
                 || !self
                     .list(declaration, read.type_parameter_list())?
                     .is_empty()
@@ -60,7 +60,7 @@ impl Construction {
                 if !group.symbols.iter().any(|&symbol| {
                     self.input
                         .symbol(symbol)
-                        .is_ok_and(|symbol| symbol.flags() & ts_ast::symbol_flags::INTERFACE != 0)
+                        .is_ok_and(|symbol| symbol.flags() & tsr_ast::symbol_flags::INTERFACE != 0)
                 }) {
                     return Ok(true);
                 }
@@ -812,7 +812,7 @@ impl Construction {
                 return Ok(group.symbols.iter().any(|&symbol| {
                     self.input
                         .symbol(symbol)
-                        .is_ok_and(|symbol| symbol.flags() & ts_ast::symbol_flags::TYPE_ALIAS != 0)
+                        .is_ok_and(|symbol| symbol.flags() & tsr_ast::symbol_flags::TYPE_ALIAS != 0)
                 }));
             }
             Some(K::TypeQuery) => return Ok(true),
@@ -1168,11 +1168,11 @@ mod tests {
     use crate::LiteralValue;
 
     fn fixture(text: &[u8]) -> (BoundChecker, NodeId) {
-        let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(
-            ts_jsstring::SourceText::from_loaded_bytes(text),
-            ts_core::ScriptKind::TS,
-            ts_ast::SourceFileParseOptions {
-                file_name: ts_ast::JsString::from_bytes(b"/generic.ts".as_slice()),
+        let file = tsr_binder::bind_parsed_file(tsr_parser::parse_source_file(
+            tsr_jsstring::SourceText::from_loaded_bytes(text),
+            tsr_core::ScriptKind::TS,
+            tsr_ast::SourceFileParseOptions {
+                file_name: tsr_ast::JsString::from_bytes(b"/generic.ts".as_slice()),
                 ..Default::default()
             },
         ))

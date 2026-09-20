@@ -1,0 +1,22 @@
+[package]
+name = "tsr_format"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+stacker = "=0.1.25"
+tsr_arena = { path = "../tsr_arena", version = "0.1.0" }
+tsr_ast = { path = "../tsr_ast", version = "0.1.0" }
+tsr_astnav = { path = "../tsr_astnav", version = "0.1.0" }
+tsr_core = { path = "../tsr_core", version = "0.1.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+tsr_scanner = { path = "../tsr_scanner", version = "0.1.0" }
+
+[dev-dependencies]
+tsr_parser = { path = "../tsr_parser", version = "0.1.0" }
+
+[lints]
+workspace = true

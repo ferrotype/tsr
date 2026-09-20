@@ -56,8 +56,8 @@ field key and dispatches to its setter. The concrete implementation steps are:
    unused flow. Published, lazy, imported and mapped-source paths retain their
    current owner checks and behavior.
 
-Expected handwritten files are `crates/ts_binder/src/containers.rs`,
-`crates/ts_ast/src/node_read.rs` (or the existing generated data-source facade),
+Expected handwritten files are `crates/tsr_binder/src/containers.rs`,
+`crates/tsr_ast/src/node_read.rs` (or the existing generated data-source facade),
 `bind_result.rs`, `storage.rs` and `compact/binding.rs`. Regenerate through
 `cargo xtask gen`; do not edit generated output or add a second shape inventory.
 No extra per-node state or unbounded cache is part of this change.
@@ -87,7 +87,7 @@ CommonJS detection or a physical owner's first source. Mapped siblings and
 sequential files must each get their own immutable facts. This adds two booleans
 per binder, not retained metadata for every node.
 
-Expected files are `crates/ts_binder/src/state.rs`, `diagnostics.rs` and existing
+Expected files are `crates/tsr_binder/src/state.rs`, `diagnostics.rs` and existing
 exclusive/published binding tests. Compare full diagnostic output for ordinary
 and escaped reserved names, ambient and JSDoc nodes, parse-error suppression,
 script/external-module/CommonJS contexts and private `#constructor`. Include

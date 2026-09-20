@@ -1,0 +1,24 @@
+[package]
+name = "tsr_binder"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+stacker = "=0.1.25"
+tsr_arena = { path = "../tsr_arena", version = "0.1.0" }
+tsr_ast = { path = "../tsr_ast", version = "0.1.0" }
+tsr_core = { path = "../tsr_core", version = "0.1.0" }
+tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.1.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+tsr_parser = { path = "../tsr_parser", version = "0.1.0" }
+tsr_scanner = { path = "../tsr_scanner", version = "0.1.0" }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

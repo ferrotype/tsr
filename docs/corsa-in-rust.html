@@ -450,7 +450,7 @@
           <div class="decision">
             <h3>11. This repository is the workspace; upstream is a pinned submodule</h3>
         <dl>
-          <dt>Decision</dt><dd>A Cargo workspace at the root of this repository, one crate per Go package where the boundary carries meaning, tiny leaves merged into <code>ts_core</code>. Test-only packages become test crates. microsoft/TypeScript is a git submodule at <code>upstream/</code>, pinned to a commit (1f70213d49 today), providing test data, schemas, libs, locales, the JS client, the extension, and the Go source from which the oracle binary is built and against which the ledger is kept. See the crate map below.</dd>
+          <dt>Decision</dt><dd>A Cargo workspace at the root of this repository, one crate per Go package where the boundary carries meaning, tiny leaves merged into <code>tsr_core</code>. Test-only packages become test crates. microsoft/TypeScript is a git submodule at <code>upstream/</code>, pinned to a commit (1f70213d49 today), providing test data, schemas, libs, locales, the JS client, the extension, and the Go source from which the oracle binary is built and against which the ledger is kept. See the crate map below.</dd>
           <dt>Because</dt><dd>Cargo compiles and caches crates independently; a monolithic crate makes the 60,000-line checker the compile-time bottleneck of every change. A submodule keeps 342 MB of test data out of this repository's history while pinning exactly which upstream commit every baseline and schema came from.</dd>
         </dl>
           </div>
@@ -519,109 +519,109 @@
           <div class="tier">
             <div class="tname"><b>Tier 0, leaves: no compiler knowledge</b>Phase 1</div>
             <div>
-              <div class="crates"><span class="crate p1">ts_core</span> <span class="crate p1">ts_collections</span> <span class="crate p1">ts_tspath</span> <span class="crate p1">ts_stringutil</span> <span class="crate p1">ts_jsnum</span> <span class="crate p1">ts_json</span> <span class="crate p1">ts_locale</span> <span class="crate p1">ts_glob</span> <span class="crate p1">ts_semver</span> <span class="crate p1">ts_packagejson</span> <span class="crate p1">ts_vfs</span> <span class="crate p1">ts_vfs_os</span> <span class="crate p1">ts_vfs_match</span> <span class="crate p1 gen">ts_diagnostics</span> <span class="crate p1 gen">ts_bundled</span></div>
+              <div class="crates"><span class="crate p1">tsr_core</span> <span class="crate p1">tsr_collections</span> <span class="crate p1">tsr_tspath</span> <span class="crate p1">tsr_stringutil</span> <span class="crate p1">tsr_jsnum</span> <span class="crate p1">tsr_json</span> <span class="crate p1">tsr_locale</span> <span class="crate p1">tsr_glob</span> <span class="crate p1">tsr_semver</span> <span class="crate p1">tsr_packagejson</span> <span class="crate p1">tsr_vfs</span> <span class="crate p1">tsr_vfs_os</span> <span class="crate p1">tsr_vfs_match</span> <span class="crate p1 gen">tsr_diagnostics</span> <span class="crate p1 gen">tsr_bundled</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 0, leaves: contracts the AST depends on</b>Phase 0</div>
             <div>
-              <div class="crates"><span class="crate p0">ts_jsstring</span> <span class="crate p0">ts_arena</span></div>
-              <p class="small"><code>ts_jsstring</code> (source/string bytes and position maps); <code>ts_arena</code> (checked owner/generation ids, lazy storage, bundle ownership and leases).</p>
+              <div class="crates"><span class="crate p0">tsr_jsstring</span> <span class="crate p0">tsr_arena</span></div>
+              <p class="small"><code>tsr_jsstring</code> (source/string bytes and position maps); <code>tsr_arena</code> (checked owner/generation ids, lazy storage, bundle ownership and leases).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 0, leaves: platform</b>Phase 4</div>
             <div>
-              <div class="crates"><span class="crate p4">ts_fswatch</span> <span class="crate p4">ts_nativepath</span></div>
-              <p class="small"><code>ts_fswatch</code> (FSEvents, inotify, fanotify).</p>
+              <div class="crates"><span class="crate p4">tsr_fswatch</span> <span class="crate p4">tsr_nativepath</span></div>
+              <p class="small"><code>tsr_fswatch</code> (FSEvents, inotify, fanotify).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 1, syntax: source text to parsed trees</b>Phase 0 (E1); 1 for full parse/bind coverage</div>
             <div>
-              <div class="crates"><span class="crate p0 gen">ts_ast</span> <span class="crate p0">ts_scanner</span> <span class="crate p0">ts_parser</span> <span class="crate p0 gen">ts_encoder</span></div>
+              <div class="crates"><span class="crate p0 gen">tsr_ast</span> <span class="crate p0">tsr_scanner</span> <span class="crate p0">tsr_parser</span> <span class="crate p0 gen">tsr_encoder</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 1, syntax</b>Phase 1</div>
             <div>
-              <div class="crates"><span class="crate p1">ts_binder</span> <span class="crate p1">ts_astnav</span> <span class="crate p1">ts_evaluator</span></div>
+              <div class="crates"><span class="crate p1">tsr_binder</span> <span class="crate p1">tsr_astnav</span> <span class="crate p1">tsr_evaluator</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 2, semantics: resolution</b>Phase 1</div>
             <div>
-              <div class="crates"><span class="crate p1">ts_module</span> <span class="crate p1">ts_tsoptions</span></div>
+              <div class="crates"><span class="crate p1">tsr_module</span> <span class="crate p1">tsr_tsoptions</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 2, semantics: types</b>Phase 2</div>
             <div>
-              <div class="crates"><span class="crate p2">ts_modulespecifiers</span> <span class="crate p2">ts_checker</span></div>
+              <div class="crates"><span class="crate p2">tsr_modulespecifiers</span> <span class="crate p2">tsr_checker</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 2, semantics: output trees</b>Phase 3</div>
             <div>
-              <div class="crates"><span class="crate p3">ts_pseudochecker</span> <span class="crate p3">ts_sourcemap</span> <span class="crate p3">ts_printer</span> <span class="crate p3">ts_transformers</span> <span class="crate p3">ts_declarations</span></div>
+              <div class="crates"><span class="crate p3">tsr_pseudochecker</span> <span class="crate p3">tsr_sourcemap</span> <span class="crate p3">tsr_printer</span> <span class="crate p3">tsr_transformers</span> <span class="crate p3">tsr_declarations</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 3, programs: compile, build, watch</b>Phase 3</div>
             <div>
-              <div class="crates"><span class="crate p3">ts_outputpaths</span> <span class="crate p3">ts_transpile</span></div>
+              <div class="crates"><span class="crate p3">tsr_outputpaths</span> <span class="crate p3">tsr_transpile</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 3, programs</b>Phase 4</div>
             <div>
-              <div class="crates"><span class="crate p4">ts_compiler</span> <span class="crate p4">ts_incremental</span> <span class="crate p4">ts_build</span> <span class="crate p4">ts_execute</span> <span class="crate p4">ts_diagnosticwriter</span> <span class="crate p4">ts_tracing</span> <span class="crate p4">ts_pprof</span> <span class="crate p4">tsc</span></div>
+              <div class="crates"><span class="crate p4">tsr_compiler</span> <span class="crate p4">tsr_incremental</span> <span class="crate p4">tsr_build</span> <span class="crate p4">tsr_execute</span> <span class="crate p4">tsr_diagnosticwriter</span> <span class="crate p4">tsr_tracing</span> <span class="crate p4">tsr_pprof</span> <span class="crate p4">tsc</span></div>
               <p class="small"><code>tsc</code> (binary).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 4, editor: language service and projects</b>Phase 5</div>
             <div>
-              <div class="crates"><span class="crate p5">ts_format</span> <span class="crate p5">ts_ls</span> <span class="crate p5">ts_autoimport</span> <span class="crate p5 gen">ts_lsproto</span> <span class="crate p5">ts_project</span> <span class="crate p5">ts_ata</span> <span class="crate p5">ts_contentmapper</span> <span class="crate p5">ts_spanmap</span></div>
+              <div class="crates"><span class="crate p5">tsr_format</span> <span class="crate p5">tsr_ls</span> <span class="crate p5">tsr_autoimport</span> <span class="crate p5 gen">tsr_lsproto</span> <span class="crate p5">tsr_project</span> <span class="crate p5">tsr_ata</span> <span class="crate p5">tsr_contentmapper</span> <span class="crate p5">tsr_spanmap</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 5, servers: processes and protocols</b>Phase 5</div>
             <div>
-              <div class="crates"><span class="crate p5">ts_lsp</span> <span class="crate p5">ts_testhost</span></div>
-              <p class="small"><code>ts_testhost</code> (transport contracts in 1; semantic server integration in 5).</p>
+              <div class="crates"><span class="crate p5">tsr_lsp</span> <span class="crate p5">tsr_testhost</span></div>
+              <p class="small"><code>tsr_testhost</code> (transport contracts in 1; semantic server integration in 5).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 5, servers</b>Phase 6</div>
             <div>
-              <div class="crates"><span class="crate p6">ts_ipc</span> <span class="crate p6">ts_jsonrpc</span> <span class="crate p6">ts_api</span></div>
-              <p class="small"><code>ts_ipc</code> (unix sockets).</p>
+              <div class="crates"><span class="crate p6">tsr_ipc</span> <span class="crate p6">tsr_jsonrpc</span> <span class="crate p6">tsr_api</span></div>
+              <p class="small"><code>tsr_ipc</code> (unix sockets).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Tier 7, additional entry points</b>Phase 7</div>
             <div>
-              <div class="crates"><span class="crate p7">ts_wasm</span> <span class="crate p7">ts_embed</span></div>
-              <p class="small"><code>ts_embed</code> (parser/checker prototypes in 0; full compiler acceptance before cut-over).</p>
+              <div class="crates"><span class="crate p7">tsr_wasm</span> <span class="crate p7">tsr_embed</span></div>
+              <p class="small"><code>tsr_embed</code> (parser/checker prototypes in 0; full compiler acceptance before cut-over).</p>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Test crates, not shipped</b>Phase 1</div>
             <div>
-              <div class="crates"><span class="crate p1">ts_testutil</span> <span class="crate p1">ts_testrunner</span></div>
+              <div class="crates"><span class="crate p1">tsr_testutil</span> <span class="crate p1">tsr_testrunner</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Test crates</b>Phase 4</div>
             <div>
-              <div class="crates"><span class="crate p4">ts_tsctests</span></div>
+              <div class="crates"><span class="crate p4">tsr_tsctests</span></div>
             </div>
           </div>
           <div class="tier">
             <div class="tname"><b>Test crates</b>Phase 5</div>
             <div>
-              <div class="crates"><span class="crate p5">ts_fourslash</span> <span class="crate p5">ts_projecttest</span></div>
+              <div class="crates"><span class="crate p5">tsr_fourslash</span> <span class="crate p5">tsr_projecttest</span></div>
             </div>
           </div>
         </div>

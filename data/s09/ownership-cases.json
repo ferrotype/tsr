@@ -13,7 +13,7 @@
         "lease::tests::identity_adopts_its_symbol_arena_exactly_once"
       ],
       "filter": "lease::",
-      "package": "ts_arena"
+      "package": "tsr_arena"
     },
     "pool": {
       "cases": [
@@ -28,7 +28,7 @@
         "tests::snapshots_share_the_pool_until_the_last_root_is_dropped"
       ],
       "filter": "tests::",
-      "package": "ts_project"
+      "package": "tsr_project"
     },
     "registry": {
       "cases": [
@@ -43,7 +43,7 @@
         "tests::serialization_panic_without_a_lease_retires_all_snapshots"
       ],
       "filter": "tests::",
-      "package": "ts_api"
+      "package": "tsr_api"
     },
     "scratch": {
       "cases": [
@@ -54,7 +54,7 @@
         "printing::scratch_checks::printing_does_not_grow_snapshot_roots_and_text_survives_scratch"
       ],
       "filter": "printing::scratch_checks::",
-      "package": "ts_api"
+      "package": "tsr_api"
     },
     "insertion": {
       "cases": [
@@ -66,10 +66,10 @@
         "formatting::scratch_checks::printer_and_decoder_errors_drop_scratch_without_retiring_snapshot"
       ],
       "filter": "formatting::scratch_checks::",
-      "package": "ts_api"
+      "package": "tsr_api"
     },
     "results": {
-      "package": "ts_project",
+      "package": "tsr_project",
       "filter": "retention::results::",
       "cases": [
         "retention::results::final_result_drop_releases_checker_and_program_storage",
@@ -80,7 +80,7 @@
       ]
     },
     "ast": {
-      "package": "ts_project",
+      "package": "tsr_project",
       "filter": "retention::ast::",
       "cases": [
         "retention::ast::another_checker_rejects_typed_ast_links",
@@ -90,7 +90,7 @@
       ]
     },
     "builder": {
-      "package": "ts_checker",
+      "package": "tsr_checker",
       "filter": "node_builder::cache::retention::",
       "cases": [
         "node_builder::cache::retention::a_clone_resolves_its_original_after_that_cache_entry_is_removed_and_allocation_rotates",

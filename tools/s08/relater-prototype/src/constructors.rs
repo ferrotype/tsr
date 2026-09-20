@@ -68,8 +68,8 @@ impl Graph {
     }
 
     pub fn string_literal(&self, bytes: &[u8]) -> Rc<TypeCell> {
-        let bytes = ts_jsstring::wtf8::combine_surrogate_pairs(bytes).into_owned();
-        let escaped = ts_jsstring::escape::escape_string(&bytes, ts_jsstring::QuoteChar::Double);
+        let bytes = tsr_jsstring::wtf8::combine_surrogate_pairs(bytes).into_owned();
+        let escaped = tsr_jsstring::escape::escape_string(&bytes, tsr_jsstring::QuoteChar::Double);
         let mut name = String::from("\"");
         name.push_str(
             &String::from_utf8(escaped)

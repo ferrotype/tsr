@@ -33,7 +33,7 @@ def sha(data):
 def source_fingerprint():
     """Bind captures to source bytes, including uncommitted implementation files."""
     sources = set()
-    for crate in ("ts_arena", "ts_ast", "ts_bench", "ts_binder", "ts_core", "ts_diagnostics", "ts_jsnum", "ts_jsstring", "ts_parser", "ts_scanner"):
+    for crate in ("tsr_arena", "tsr_ast", "tsr_bench", "tsr_binder", "tsr_core", "tsr_diagnostics", "tsr_jsnum", "tsr_jsstring", "tsr_parser", "tsr_scanner"):
         sources.update(p for p in (ROOT / "crates" / crate).rglob("*") if p.is_file() and p.suffix in {".rs", ".toml"})
     for directory in ("scripts/s07_oracle", "tools/s07/benchmark", ".cargo"):
         sources.update(p for p in (ROOT / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)
@@ -176,7 +176,7 @@ def build_rust(instrumented=False):
         raise ValueError("benchmark instrumentation mode must be boolean")
     env = native_environment()
     stable, host = rust_native_toolchain(env)
-    args = ["cargo", "+"+stable, "build", "--release", "--locked", "--package", "ts_bench", "--bin", "ts-bench", "--target", host, "--message-format=json-render-diagnostics", *release_configuration(env)]
+    args = ["cargo", "+"+stable, "build", "--release", "--locked", "--package", "tsr_bench", "--bin", "ts-bench", "--target", host, "--message-format=json-render-diagnostics", *release_configuration(env)]
     if instrumented:
         args.extend(["--features", "allocation"])
     destination = CACHE / "s07-benchmark" / ("rust-benchmark-allocation" if instrumented else "rust-benchmark")
@@ -191,7 +191,7 @@ def build_rust(instrumented=False):
         build_directory = Path(temporary).resolve()
         args.extend(["--target-dir", str(build_directory),
                      "--config", "build.build-dir=" + json.dumps(str(build_directory))])
-        executable = rust_executable(command(args, cwd=ROOT, env=env), ROOT / "crates/ts_bench/Cargo.toml", instrumented)
+        executable = rust_executable(command(args, cwd=ROOT, env=env), ROOT / "crates/tsr_bench/Cargo.toml", instrumented)
         if not executable.resolve().is_relative_to(build_directory):
             raise ValueError("Cargo benchmark artifact escaped its isolated build directory")
         shutil.copyfile(executable, destination)
@@ -204,13 +204,13 @@ def build_allocation_probe(mode, toolchain):
         raise ValueError("unknown allocator preflight profile")
     env = native_environment()
     selected, host = rust_native_toolchain(env, toolchain=toolchain)
-    args = ["cargo", "+"+selected, "build", "--locked", "--package", "ts_bench",
+    args = ["cargo", "+"+selected, "build", "--locked", "--package", "tsr_bench",
             "--example", "allocation_probe", "--features", "allocation", "--target", host,
             "--message-format=json-render-diagnostics",
             *profile_configuration(env, "release" if mode == "release" else "dev")]
     if mode == "release":
         args.append("--release")
-    binary = cargo_executable(command(args, cwd=ROOT, env=env), ROOT / "crates/ts_bench/Cargo.toml",
+    binary = cargo_executable(command(args, cwd=ROOT, env=env), ROOT / "crates/tsr_bench/Cargo.toml",
                               "allocation_probe", "example", ["allocation"], mode == "release")
     return binary, env
 

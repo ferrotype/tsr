@@ -1,6 +1,6 @@
 //! Lossless diagnostic records for failure attribution, without baseline rendering.
 use serde_json::{json, Value};
-use ts_compiler::Program;
+use tsr_compiler::Program;
 pub fn hex(raw: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut result = String::with_capacity(raw.len() * 2);
@@ -10,7 +10,7 @@ pub fn hex(raw: &[u8]) -> String {
     }
     result
 }
-fn payload(program: &Program, d: &ts_ast::Diagnostic) -> Value {
+fn payload(program: &Program, d: &tsr_ast::Diagnostic) -> Value {
     let file = d.file.map(|id| {
         if let Some(config) = program
             .config()
@@ -48,15 +48,15 @@ fn payload(program: &Program, d: &ts_ast::Diagnostic) -> Value {
         "related":d.related_information.iter().map(|d|payload(program,d)).collect::<Vec<_>>(),
         "unnecessary":d.reports_unnecessary,"deprecated":d.reports_deprecated,"skipped_on_no_emit":d.skipped_on_no_emit})
 }
-pub fn phase(program: &Program, values: &[ts_ast::Diagnostic]) -> Value {
+pub fn phase(program: &Program, values: &[tsr_ast::Diagnostic]) -> Value {
     json!({"state":"executed","diagnostics":values.iter().map(|d|payload(program,d)).collect::<Vec<_>>()})
 }
 
 /// Collect only when P5 requests aggregation; P4 keeps its diagnostic-only cost.
 pub fn captured_phase(
     program: &Program,
-    values: &[ts_ast::Diagnostic],
-    captured: &mut Option<Vec<ts_ast::Diagnostic>>,
+    values: &[tsr_ast::Diagnostic],
+    captured: &mut Option<Vec<tsr_ast::Diagnostic>>,
 ) -> Value {
     if let Some(captured) = captured {
         captured.extend_from_slice(values);

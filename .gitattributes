@@ -2,7 +2,7 @@
 tools/s03/patches/*.patch -text -whitespace
 
 # Review generators and normalized contracts before expanding their large outputs.
-crates/ts_ast/src/*_generated.rs linguist-generated=true
-crates/ts_diagnostics/src/generated.rs linguist-generated=true
-crates/ts_encoder/src/generated.rs linguist-generated=true
+crates/tsr_ast/src/*_generated.rs linguist-generated=true
+crates/tsr_diagnostics/src/generated.rs linguist-generated=true
+crates/tsr_encoder/src/generated.rs linguist-generated=true
 data/s03/schema/*.json linguist-generated=true

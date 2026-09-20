@@ -4,9 +4,9 @@
 //! executables pass `NoHooks`.
 use serde_json::{json, Value};
 use std::sync::Arc;
-use ts_checker::{CheckerOwner, Error};
-use ts_compiler as ts_compiler_error;
-use ts_compiler::{FileCache, Program, ProgramOptions};
+use tsr_checker::{CheckerOwner, Error};
+use tsr_compiler as ts_compiler_error;
+use tsr_compiler::{FileCache, Program, ProgramOptions};
 mod config;
 pub mod diagnostics;
 #[path = "../../s07/program/rust_observation.rs"]
@@ -24,19 +24,19 @@ pub trait Hooks {
         &mut self,
         options: ProgramOptions,
         cache: &mut FileCache,
-        counters: &ts_arena::Counters,
+        counters: &tsr_arena::Counters,
     ) -> Result<Arc<Program>, ts_compiler_error::Error> {
         Program::load(options, cache, counters).map(Arc::new)
     }
     fn create_checker(
         &mut self,
         program: Arc<Program>,
-        counters: &ts_arena::Counters,
+        counters: &tsr_arena::Counters,
     ) -> Result<Arc<CheckerOwner>, Error> {
         CheckerOwner::for_program(
-            ts_arena::CheckerIdentity::new(ts_arena::Generation::new(counters), counters),
+            tsr_arena::CheckerIdentity::new(tsr_arena::Generation::new(counters), counters),
             counters,
-            Arc::new(ts_compiler::ProgramCheckerHost::new(program)),
+            Arc::new(tsr_compiler::ProgramCheckerHost::new(program)),
         )
         .map(Arc::new)
     }
@@ -48,8 +48,8 @@ pub trait Hooks {
     fn pause(&mut self) {}
     fn resume(&mut self) {}
     /// Query results the walker retains as roots of the retained checkpoint.
-    fn roots(&mut self, _types: &[ts_checker::TypeRef]) {}
-    fn checkpoint(&mut self, _op: &mut ts_checker::Operation<'_>) {}
+    fn roots(&mut self, _types: &[tsr_checker::TypeRef]) {}
+    fn checkpoint(&mut self, _op: &mut tsr_checker::Operation<'_>) {}
     /// Whether the row needs the loaded graph's observation (file digests,
     /// metadata, imports). A driver that compares only checker output skips
     /// it: hashing every file text per variant is most of the child's time
@@ -92,13 +92,13 @@ pub fn observe(
     hooks: &mut dyn Hooks,
     baseline: impl FnOnce(
         &Program,
-        &mut ts_checker::Operation<'_>,
+        &mut tsr_checker::Operation<'_>,
         &Value,
-        Option<&[ts_ast::Diagnostic]>,
+        Option<&[tsr_ast::Diagnostic]>,
         &mut dyn Hooks,
     ) -> BaselineResults,
 ) -> Value {
-    let counters = ts_arena::Counters::new();
+    let counters = tsr_arena::Counters::new();
     let capture_errors = request["error_baseline_requested"] == true;
     let mut diagnostic_values = capture_errors.then(Vec::new);
     let mut phases = json!({});

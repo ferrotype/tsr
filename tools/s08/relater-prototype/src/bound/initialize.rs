@@ -6,7 +6,7 @@ use super::{
     Rc, RefCell, Signature, Structure, TypeCell, K,
 };
 use crate::bound_input::BoundInputOptions;
-use ts_ast::symbol_flags as sf;
+use tsr_ast::symbol_flags as sf;
 
 const CONTAINS_WIDENING_TYPE: u32 = 1 << 16;
 

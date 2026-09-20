@@ -289,7 +289,7 @@ def main() -> None:
     parser.add_argument("--rustc", default="rustc", help="compiler command; effective version is recorded")
     args = parser.parse_args()
     output = args.output_dir.resolve()
-    source_path, schema_path = ROOT / "crates/ts_ast/src/data_generated.rs", ROOT / "upstream/tools/scripts/tsc/ast.json"
+    source_path, schema_path = ROOT / "crates/tsr_ast/src/data_generated.rs", ROOT / "upstream/tools/scripts/tsc/ast.json"
     source, schema_data = source_path.read_bytes(), schema_path.read_bytes()
     shapes = schema_shapes(source.decode(), strict_json(schema_data))
     layouts, build = compile_layouts(shapes, output, args.rustc)

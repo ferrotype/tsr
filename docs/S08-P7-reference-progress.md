@@ -346,7 +346,7 @@ that unions a type parameter with its own declaring type could expose this.
 - `src/{type_link,generics,tuples,template,signatures,relation_keys}.rs`: graph
   lifetime rules, relation algorithms and actual key-type construction.
 - `src/{diagnostics,display}.rs`: structured chains and lazy type display.
-- `crates/ts_compiler/examples/p7_relater/reference.rs`: independent adapter.
+- `crates/tsr_compiler/examples/p7_relater/reference.rs`: independent adapter.
 - `scripts/s08_relater.py`: strict comparison, source fingerprint and capture
   precondition; associated Python tests reject false equivalence.
 

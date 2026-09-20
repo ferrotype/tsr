@@ -11,10 +11,10 @@ mod query;
 
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
-use ts_arena::{Error as ArenaError, NodeId};
-use ts_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SyntaxKind as K};
-use ts_checker::{Operation, TypeRef};
-use ts_compiler::Program;
+use tsr_arena::{Error as ArenaError, NodeId};
+use tsr_ast::{AstView, ChildVisitor, NodeListId, NodeSlice, SyntaxKind as K};
+use tsr_checker::{Operation, TypeRef};
+use tsr_compiler::Program;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -106,7 +106,7 @@ fn nodes(program: &Program, root: NodeId) -> Result<Vec<NodeId>> {
     while let Some(id) = work.pop() {
         let view = ast(program, id)?;
         let node = view.node(id)?;
-        let reparsed = node.flags() & ts_ast::node_flags::REPARSED != 0;
+        let reparsed = node.flags() & tsr_ast::node_flags::REPARSED != 0;
         let assertion = matches!(
             node.kind().known(),
             Some(K::AsExpression | K::SatisfiesExpression)
@@ -195,7 +195,7 @@ impl Walker<'_, '_> {
     fn baseline(&mut self, files: &[InputFile<'_>], header: &[u8], symbols: bool) -> Result<Value> {
         let mut output = Vec::new();
         for input in files {
-            let path = ts_tspath::to_path(
+            let path = tsr_tspath::to_path(
                 input.name,
                 self.program.current_directory(),
                 self.program.host().use_case_sensitive_file_names(),
@@ -307,8 +307,8 @@ pub fn generate_with_timing(
                             #[cfg(feature = "s08-phase-timer")]
                             let _display = instrument::Display::begin();
                             walker.op.type_to_string(typ,
-                                ts_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
-                                    | ts_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE)
+                                tsr_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
+                                    | tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE)
                         };
                         walker.timing.pause();
                         row["text_hex"] = json!(hex(text?.as_bytes()));

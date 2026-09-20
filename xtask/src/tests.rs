@@ -581,7 +581,7 @@ fn generated_projection_has_the_same_canonical_hash_as_python() {
 [[file]]
 go = "tsc/internal/é.go"
 package = "internal"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 0
 kind = "source"
 pin = "{PIN}"
@@ -596,7 +596,7 @@ verify = []
     );
     assert_eq!(
         evidence::ledger_generated_hash(&f.0).unwrap(),
-        "e6b84925e58249fe2524f0db7428309a0bb5433d123d5549ab1b302f67ea39ee"
+        "637f37b9dba865420809290bc99927d2ab80f1b50231c1ed8a3445a24ab9b528"
     );
 }
 

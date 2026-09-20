@@ -233,7 +233,7 @@ def run_go(directory, request):
 
 
 def build_rust(directory):
-    build = command(["cargo", "build", "--release", "--locked", "-p", "ts_checker", "--features", "storage-pilot",
+    build = command(["cargo", "build", "--release", "--locked", "-p", "tsr_checker", "--features", "storage-pilot",
                      "--example", "storage_families", "--message-format=json"], cwd=ROOT)
     (directory / "cargo-build.ndjson").write_bytes(build)
     artifacts = [row for line in build.splitlines() if (row := strict_json_loads(line)).get("reason") == "compiler-artifact"

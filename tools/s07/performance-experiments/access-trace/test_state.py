@@ -64,7 +64,7 @@ class StateExportTests(unittest.TestCase):
             for name, original in originals.items():
                 self.assertTrue((stage / name).read_text().startswith(original))
             self.assertEqual((stage / state.SCHEMA).read_bytes(), self.raw)
-            generated = stage / "crates/ts_ast/src/access_trace_state_generated.rs"
+            generated = stage / "crates/tsr_ast/src/access_trace_state_generated.rs"
             self.assertEqual(generated.read_text(), state.generated(self.shapes))
             with self.assertRaisesRegex(ValueError, "already applied"):
                 state.apply(stage)

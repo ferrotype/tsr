@@ -20,7 +20,7 @@ run_overlay(
     request, 'TestS08P6SemanticDiagnostics',
 )
 PYTHON
-cargo test --locked -p ts_compiler --test checker_semantics --test checker_config_diagnostics
+cargo test --locked -p tsr_compiler --test checker_semantics --test checker_config_diagnostics
 ```
 
 The combined development selection includes all 128 frozen variants with

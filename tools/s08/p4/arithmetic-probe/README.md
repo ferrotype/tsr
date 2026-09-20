@@ -5,7 +5,7 @@ run against the pinned source on darwin/arm64. Every entry compares exact output
 bits with the Rust companion, except NaN payload/sign. These files are a native
 ARM observation, not an x86 observation.
 
-Run `cargo build -p ts_jsnum --example p4_arithmetic --locked`, then
+Run `cargo build -p tsr_jsnum --example p4_arithmetic --locked`, then
 `python3 scripts/s08_p4_jsnum.py --actual target/debug/examples/p4_arithmetic
 --output target/s08/p4-arithmetic-native-<fresh-id>` on each native CI runner.
 The test executes Go's actual `Number.Exponentiate` and compares Rust on that

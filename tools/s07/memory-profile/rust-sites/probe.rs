@@ -2,7 +2,7 @@
 #![forbid(unsafe_code)]
 use std::alloc::System;
 use std::hint::black_box;
-use ts_jsstring::memory_sites::{self as sites, Phase, Site};
+use tsr_jsstring::memory_sites::{self as sites, Phase, Site};
 
 #[global_allocator]
 static ALLOCATOR: alloc_tracker::Allocator<System> = alloc_tracker::Allocator::new(System);

@@ -65,16 +65,16 @@ Fable correctly identifies an asymmetric traversal baseline. The legacy arm in
 [`list_main.rs`](../tools/s07/performance-experiments/storage-pilot/list_main.rs)
 walks raw boxed slices. Production first routes an auxiliary record, checks its
 variant and validates its range in
-[`node_slice_read`](../crates/ts_ast/src/storage.rs). `NodeSliceRead` retains the
+[`node_slice_read`](../crates/tsr_ast/src/storage.rs). `NodeSliceRead` retains the
 resulting record and range; its
-[`Deref`](../crates/ts_ast/src/lists.rs) still matches the variant and slices the
+[`Deref`](../crates/tsr_ast/src/lists.rs) still matches the variant and slices the
 backing with safe bounds checks. Extra work on the control makes the isolated
 comparison an unsuitable direct production estimate. It does not establish a
 mathematical upper bound: replacement routing, page boundaries, compact-ID
 decoding, cache behavior and optimization can change as well.
 
 The claim that binding walks each list once is not the implemented access count.
-[`syntax_node` and `bind_each`](../crates/ts_binder/src/containers.rs) re-resolve
+[`syntax_node` and `bind_each`](../crates/tsr_binder/src/containers.rs) re-resolve
 the complete slice for each element. Functions-first statement binding walks
 the list twice to select functions and non-functions; binding a statement once
 does not mean reading its list entry once. Construction and final

@@ -34,22 +34,22 @@ Go, at pin `1f70213d`, from the port ledger:
 
 | file | crate in ledger | loc | functions |
 | --- | --- | --- | --- |
-| `format/span.go` | `ts_format` | 1,262 | 44 |
-| `format/indent.go` | `ts_format` | 821 | 32 |
-| `format/rulecontext.go` | `ts_format` | 629 | 88 |
-| `format/rules.go` | `ts_format` | 450 | 4 (one rule table) |
-| `format/scanner.go` | `ts_format` | 374 | 23 |
-| `format/api.go` | `ts_format` | 189 | 12 |
-| `format/rulesmap.go` | `ts_format` | 156 | 7 |
-| `format/util.go` | `ts_format` | 148 | 8 |
-| `format/context.go` | `ts_format` | 121 | 11 |
-| `format/rule.go` | `ts_format` | 109 | 6 |
-| `astnav/tokens.go` | `ts_astnav` | 793 | 18 |
-| `printer/changetrackerwriter.go` | `ts_printer` | 250 | 36 |
-| `printer/syntheticfile.go` | `ts_printer` | 53 | 2 |
-| `core/textchange.go` | `ts_core` | 30 | 2 |
-| `ls/lsutil/formatcodeoptions.go` | `ts_ls` | 141 | 5 |
-| `ls/lsutil/{utilities,children,completednode}.go` | `ts_ls` | 486 | partly used |
+| `format/span.go` | `tsr_format` | 1,262 | 44 |
+| `format/indent.go` | `tsr_format` | 821 | 32 |
+| `format/rulecontext.go` | `tsr_format` | 629 | 88 |
+| `format/rules.go` | `tsr_format` | 450 | 4 (one rule table) |
+| `format/scanner.go` | `tsr_format` | 374 | 23 |
+| `format/api.go` | `tsr_format` | 189 | 12 |
+| `format/rulesmap.go` | `tsr_format` | 156 | 7 |
+| `format/util.go` | `tsr_format` | 148 | 8 |
+| `format/context.go` | `tsr_format` | 121 | 11 |
+| `format/rule.go` | `tsr_format` | 109 | 6 |
+| `astnav/tokens.go` | `tsr_astnav` | 793 | 18 |
+| `printer/changetrackerwriter.go` | `tsr_printer` | 250 | 36 |
+| `printer/syntheticfile.go` | `tsr_printer` | 53 | 2 |
+| `core/textchange.go` | `tsr_core` | 30 | 2 |
+| `ls/lsutil/formatcodeoptions.go` | `tsr_ls` | 141 | 5 |
+| `ls/lsutil/{utilities,children,completednode}.go` | `tsr_ls` | 486 | partly used |
 
 About 6,000 Go lines, all `planned` today. Printer work inside `printer.go` comes
 on top: 20 references to `PreserveSourceNewlines`, the six emit hooks
@@ -92,8 +92,8 @@ Rust today:
 
 | have | missing |
 | --- | --- |
-| scanner with every rescan the formatting scanner uses, `skip_trivia`, comment ranges | `ts_astnav`, entirely |
-| ECMA line map on the source file, UTF-16 to UTF-8 position map | `ts_format`, entirely |
+| scanner with every rescan the formatting scanner uses, `skip_trivia`, comment ranges | `tsr_astnav`, entirely |
+| ECMA line map on the source file, UTF-16 to UTF-8 position map | `tsr_format`, entirely |
 | printer at about 4,200 lines against Go's 6,345, with `get_lines_between_nodes` and `get_leading_line_terminator_count` | emit hooks; `PreserveSourceNewlines` is a named `Unsupported`; the separating, closing and effective line helpers |
 | protocol-8 decoder into a request-owned `AstBuilder` | `ChangeTrackerWriter`, position assignment, synthetic source file |
 | | `TextChange`, `ApplyBulkEdits`, format settings |
@@ -103,12 +103,12 @@ source file, so the `comment emission` boundary is not on this path.
 
 ## 3. Placement
 
-Crates follow `PLAN.md` section 8 and the ledger: a new `ts_astnav`, a new
-`ts_format`, positioned printing in `ts_printer`, text changes in `ts_core`. The
-`lsutil` pieces are ledgered to `ts_ls`, which does not exist and should not be
-created for four small files. They go in `ts_format::settings` and
-`ts_format::lsutil` with `// port:` markers naming the `lsutil` functions.
-`ts_ls` re-exports them when it arrives. Their ledger rows keep `crate = "ts_ls"`,
+Crates follow `PLAN.md` section 8 and the ledger: a new `tsr_astnav`, a new
+`tsr_format`, positioned printing in `tsr_printer`, text changes in `tsr_core`. The
+`lsutil` pieces are ledgered to `tsr_ls`, which does not exist and should not be
+created for four small files. They go in `tsr_format::settings` and
+`tsr_format::lsutil` with `// port:` markers naming the `lsutil` functions.
+`tsr_ls` re-exports them when it arrives. Their ledger rows keep `crate = "tsr_ls"`,
 because that column is generated from the package map and validation rejects a
 hand edit; the row's `rust` field records where the code actually lives.
 
@@ -161,7 +161,7 @@ The corpus is the S07 subset source inventory, which is already frozen and
 already parses identically (E1). Manifests carry request and source hashes, as
 the printing fixture does, so stale observations cannot certify new code.
 
-**F1. `ts_astnav`.** The five entry points and what they need. Exit: every
+**F1. `tsr_astnav`.** The five entry points and what they need. Exit: every
 navigation probe matches.
 
 Done. `compare --ops nav` reports 16,120 of 16,120 inputs, 35.1 million rows,
@@ -307,10 +307,10 @@ indentation, so that choice follows the source and is not observable.
 
 Upstream shares dynamic indenters by pointer and mutates them when a rule adds
 or removes a line; here they live in a vector owned by the worker and are named
-by index. The visit order is `VisitEachChild`'s, exposed from `ts_astnav`. The
+by index. The visit order is `VisitEachChild`'s, exposed from `tsr_astnav`. The
 temporary `allow(dead_code)` is gone.
 
-**F7. API and ownership.** `ts_api` gains insertion formatting beside printing.
+**F7. API and ownership.** `tsr_api` gains insertion formatting beside printing.
 The request owns the decoded tree, the positioned clone, the synthetic source
 file, the formatting scanner and the edit list; the target file is borrowed
 from the snapshot and never copied into scratch. Disposal tests mirror the
@@ -320,7 +320,7 @@ no arena growth and no registered handle. `scripts/s09_ownership.py` then
 publishes `api_scratch_disposal` as printing and formatting together, in all
 four modes, and the informational printing metric stays as its component.
 
-Done. `ts_api::format_node_for_insertion` is the pinned handler after transport:
+Done. `tsr_api::format_node_for_insertion` is the pinned handler after transport:
 decode, print and position, wrap the tree in a synthetic source file over the
 printed text, take the indentation at the target position, format the node with
 it, apply the edits. `compare --ops insert` reports 16,120 of 16,120 under both
@@ -337,7 +337,7 @@ a builder with an empty source can now adopt one (`adopt_source`); nothing built
 so far can refer into an empty text. And a tree that has been given positions is
 not printed a second time, so the request consumes its decoded tree.
 
-Six tests in `crates/ts_api/src/formatting/scratch_checks.rs` hold the ownership
+Six tests in `crates/tsr_api/src/formatting/scratch_checks.rs` hold the ownership
 contract against frozen native rows (`data/s09/insertion-*.json`, four sources,
 64 answers, from `scripts/s09_format.py fixtures`): native outputs and failures,
 live scratch until the text returns, sixteen repeated requests beside a live
@@ -396,7 +396,7 @@ true and the E3 evidence is refreshed.
 
 ## 9. Decisions this plan assumes
 
-1. The `lsutil` pieces live in `ts_format` until `ts_ls` exists.
+1. The `lsutil` pieces live in `tsr_format` until `tsr_ls` exists.
 2. No new gate; formatter parity is reported, not enforced, until the owner adds
    a criterion.
 3. The corpus is the S07 subset plus the recorded fourslash formatting calls.

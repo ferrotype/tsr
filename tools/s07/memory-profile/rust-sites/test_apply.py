@@ -18,8 +18,8 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(sum(s["variant"].startswith("Payload") for s in sites), 37)
         nodes = next(s for s in sites if s["variant"] == "NodeSliceBacking")
         self.assertEqual(len(nodes["source_occurrences"]), 2)
-        self.assertNotIn("/* SITE_VARIANTS */", changes["crates/ts_jsstring/src/memory_sites.rs"])
-        self.assertNotIn("unsafe ", changes["crates/ts_jsstring/src/memory_sites.rs"])
+        self.assertNotIn("/* SITE_VARIANTS */", changes["crates/tsr_jsstring/src/memory_sites.rs"])
+        self.assertNotIn("unsafe ", changes["crates/tsr_jsstring/src/memory_sites.rs"])
         for site in sites:
             self.assertGreater(site["source_line"], 0)
             self.assertEqual(len(site["source_sha256"]), 64)
@@ -49,7 +49,7 @@ class ApplyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="s07-sites-test-") as temp:
             root = Path(temp)
             self.make_stage(root)
-            target = root / "crates/ts_arena/src/arena.rs"
+            target = root / "crates/tsr_arena/src/arena.rs"
             target.write_text(target.read_text().replace("fn push", "fn changed_push"))
             before = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
             with self.assertRaisesRegex(ValueError, "source prefix"):

@@ -1,7 +1,7 @@
 //! Physical owned storage only. No traversal of lazy edges or assigning getters.
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use ts_ast::{AstStorageData, BoundView, FlowData, NodeData, SourceMetadataData};
+use tsr_ast::{AstStorageData, BoundView, FlowData, NodeData, SourceMetadataData};
 
 fn count(map: &mut BTreeMap<String, usize>, key: impl ToString) {
     *map.entry(key.to_string()).or_default() += 1;
@@ -42,7 +42,7 @@ pub fn observe(index: usize, view: BoundView<'_>, bound_in_place: bool) -> Value
     let (mut identifier_bytes, mut suffix_bytes, mut fallback_bytes) = (0, 0, 0);
     for node in ast.owner_census_nodes() {
         count(&mut core_shapes, node.data().name());
-        if ts_ast::existing_runtime_node_id(node) != 0 {
+        if tsr_ast::existing_runtime_node_id(node) != 0 {
             count(&mut node_runtime_ids_by_shape, node.data().name());
         }
         let text = match node.data() {
@@ -126,7 +126,7 @@ pub fn observe(index: usize, view: BoundView<'_>, bound_in_place: bool) -> Value
     let mut referenced_declaration_backings = BTreeSet::new();
     let mut declaration_slice_lengths_capacities = BTreeMap::new();
     for (_, symbol) in result.symbols().iter() {
-        symbol_runtime_ids += usize::from(ts_ast::existing_runtime_symbol_id(symbol) != 0);
+        symbol_runtime_ids += usize::from(tsr_ast::existing_runtime_symbol_id(symbol) != 0);
         let slice = symbol.declarations;
         declaration_descriptors.insert((
             slice.backing_id().map(|id| id.bits()),
@@ -221,25 +221,25 @@ mod tests {
     }
     #[test]
     fn census_observes_allocated_core_and_does_not_assign_ids_or_lazy_nodes() {
-        let mut parsed=ts_parser::parse_source_file(ts_jsstring::SourceText::from_bytes(br"/** deferred */ namespace N { export const \u0061 = 1; } function f(x:number){ return x; }".as_slice()),ts_core::ScriptKind::TS,ts_ast::SourceFileParseOptions { file_name: ts_ast::JsString::from_bytes(b"/owner-census.ts".as_slice()), path: ts_ast::JsString::from_bytes(b"/owner-census.ts".as_slice()), ..Default::default() });
+        let mut parsed=tsr_parser::parse_source_file(tsr_jsstring::SourceText::from_bytes(br"/** deferred */ namespace N { export const \u0061 = 1; } function f(x:number){ return x; }".as_slice()),tsr_core::ScriptKind::TS,tsr_ast::SourceFileParseOptions { file_name: tsr_ast::JsString::from_bytes(b"/owner-census.ts".as_slice()), path: tsr_ast::JsString::from_bytes(b"/owner-census.ts".as_slice()), ..Default::default() });
         let unattached = parsed.builder_mut().node_slice(vec![None; 3]).unwrap();
         parsed
             .builder_mut()
-            .new_list(ts_core::TextRange::new(-1, -1), unattached)
+            .new_list(tsr_core::TextRange::new(-1, -1), unattached)
             .unwrap();
-        let file = ts_binder::bind_parsed_file(parsed).unwrap();
+        let file = tsr_binder::bind_parsed_file(parsed).unwrap();
         let original_ids: Vec<_> = file
             .view()
             .ast()
             .owner_census_nodes()
-            .map(ts_ast::existing_runtime_node_id)
+            .map(tsr_ast::existing_runtime_node_id)
             .collect();
         let original_symbol_ids: Vec<_> = file
             .view()
             .result()
             .symbols()
             .iter()
-            .map(|(_, symbol)| ts_ast::existing_runtime_symbol_id(symbol))
+            .map(|(_, symbol)| tsr_ast::existing_runtime_symbol_id(symbol))
             .collect();
         let first = observe(0, file.view(), file.bound_in_place());
         let second = observe(0, file.view(), file.bound_in_place());
@@ -249,7 +249,7 @@ mod tests {
             file.view()
                 .ast()
                 .owner_census_nodes()
-                .map(ts_ast::existing_runtime_node_id)
+                .map(tsr_ast::existing_runtime_node_id)
                 .collect::<Vec<_>>()
         );
         assert_eq!(
@@ -258,7 +258,7 @@ mod tests {
                 .result()
                 .symbols()
                 .iter()
-                .map(|(_, symbol)| ts_ast::existing_runtime_symbol_id(symbol))
+                .map(|(_, symbol)| tsr_ast::existing_runtime_symbol_id(symbol))
                 .collect::<Vec<_>>()
         );
         assert_eq!(

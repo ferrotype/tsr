@@ -25,11 +25,11 @@ The ledger has one entry per non-test upstream Go file. Files are inventory unit
 [[file]]
 go = "tsc/internal/scanner/scanner.go"
 package = "internal/scanner"
-crate = "ts_scanner"
+crate = "tsr_scanner"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_scanner/src/lib.rs", "crates/ts_scanner/src/literals.rs"]
+rust = ["crates/tsr_scanner/src/lib.rs", "crates/tsr_scanner/src/literals.rs"]
 verify = ["run.scanner.parity == 1", "run.scanner.tests_skipped == 0"]
 pin = "<full upstream SHA>"
 source_hash = "<SHA-256 of current upstream file bytes>"

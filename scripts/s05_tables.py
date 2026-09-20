@@ -144,7 +144,7 @@ def update(tables, write=False):
     pin = strict_json_loads((ROOT / "data/upstream.json").read_bytes())["pin"]
     raw = (json.dumps(tables, sort_keys=True, indent=2)+"\n").encode()
     generated = render(tables, pin)
-    outputs = {"data/s05/tables.json": raw, "crates/ts_scanner/src/tables_generated.rs": generated, "crates/ts_jsstring/src/go_fold_generated.rs": render_fold(tables, pin)}
+    outputs = {"data/s05/tables.json": raw, "crates/tsr_scanner/src/tables_generated.rs": generated, "crates/tsr_jsstring/src/go_fold_generated.rs": render_fold(tables, pin)}
     manifest = {"version": 1, "upstream_pin": pin,
                 "go_unicode_version": tables["go_unicode_version"], "identifier_unicode_version": "15.1.0",
                 "inputs": {path: hashlib.sha256((ROOT / "upstream" / path).read_bytes()).hexdigest() for path in INPUTS},

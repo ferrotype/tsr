@@ -16,7 +16,7 @@ comments and protocol diagrams must be checked against executable code.
 | S06 requirement | Deliverable and acceptance |
 | --- | --- |
 | S06-1 frozen denominator | 12,721 compiler/conformance physical cases plus 108 lib files; freeze virtual units, effective parse options, auxiliary assets and every eligibility reason before Rust results exist |
-| S06-2 parser/JSDoc/reparser | Real `ts_parser` over the current scanner and owning AST; grouped case results compare protocol-8 output against the clean Go pin |
+| S06-2 parser/JSDoc/reparser | Real `tsr_parser` over the current scanner and owning AST; grouped case results compare protocol-8 output against the clean Go pin |
 | S06-3 AST runtime | Construction, list identity, parents, visitors, updates/clones, precedence, subtree facts and SourceFile services; independent runtime observations beyond encoded bytes |
 | S06-4 encoder | SourceFile and fragment encoding, string/structured data, position conversion and node-index tables; exact Go success/error outcomes and successful bytes |
 | S06-5 traceability | At least 463/514 parser, 61/67 encoder-package and 420/839 AST source functions mapped to real implementations. Generated functions have separate provenance and earn no source-function coverage. |
@@ -59,8 +59,8 @@ explicit mapper-metadata fixtures do not mark those later packages complete.
 
 ## 2. Public boundaries and module structure
 
-Create `ts_parser`; extend `ts_ast`, `ts_encoder`, `ts_arena`, the narrow core/path
-slice and the authoritative S03 Rust emitters. Add `ts_spanmap` only for the
+Create `tsr_parser`; extend `tsr_ast`, `tsr_encoder`, `tsr_arena`, the narrow core/path
+slice and the authoritative S03 Rust emitters. Add `tsr_spanmap` only for the
 protocol-8 data/serialization operations and explicit metadata fixtures needed
 here. Do not build the later compiler host or general API server to run E1.
 PR #9 remains the stacked dependency at `6491399`. The buffered-diagnostic,
@@ -105,11 +105,11 @@ or return a dangling bare ID to make the API convenient.
 
 Resolve these seams before porting grammar bodies.
 
-**One node header.** Do not wrap the current `ts_ast::Node` unchanged inside
-`ts_arena::Node<N>`: kind and reparsed flags would have two authorities. Define a
-small metadata interface in `ts_arena` so its storage can hold the AST's concrete
+**One node header.** Do not wrap the current `tsr_ast::Node` unchanged inside
+`tsr_arena::Node<N>`: kind and reparsed flags would have two authorities. Define a
+small metadata interface in `tsr_arena` so its storage can hold the AST's concrete
 record with typed kind, flags, range and parent ID. Keep the current generic
-arena node as the S04 adapter. The storage crate must not depend on `ts_ast`.
+arena node as the S04 adapter. The storage crate must not depend on `tsr_ast`.
 The runtime header uses an open signed `NodeKind(i16)`: Go factories accept
 unknown kinds and even known kind/payload mismatches. Keep the scanner's closed
 `SyntaxKind` separately. Node.ForEachChild dispatches by kind, whereas Clone,
@@ -201,7 +201,7 @@ A transaction-local resolver may inspect staged and already published lazy data
 without reacquiring its lock; core reads remain borrowed. Preserve the existing
 reentry detector, contention behavior, unlock/rethrow policy and bundle retention.
 
-AST defines the typed JSDoc-provider boundary and `ts_parser` implements it.
+AST defines the typed JSDoc-provider boundary and `tsr_parser` implements it.
 Use an explicit provider/function entry point with no owning closure capturing
 its own file; do not create an AST→parser crate dependency or global mutable hook.
 Reparsed clones are core allocations made before publication, not lazy nodes.
@@ -259,7 +259,7 @@ S03's JsString payload choice entails source Arc clones and slice classification
 for stored strings; document that cost rather than claiming zero per-node
 atomics/scans. Share cooked allocations where possible instead of forcing a copy.
 
-Reuse the pinned spelling helper currently private in `ts_scanner`; expose or
+Reuse the pinned spelling helper currently private in `tsr_scanner`; expose or
 relocate it through a dependency-safe seam, without a core↔scanner cycle.
 Complete node-aware scanner helpers needed by parser diagnostics through the
 AST view interface, including missing nodes, trivia/JSDoc handling and reparsed

@@ -1201,10 +1201,10 @@ impl Construction {
 struct SyntaxChildren {
     nodes: Vec<NodeId>,
     lists: Vec<NodeListId>,
-    slices: Vec<ts_ast::NodeSlice>,
+    slices: Vec<tsr_ast::NodeSlice>,
 }
 
-impl ts_ast::ChildVisitor for SyntaxChildren {
+impl tsr_ast::ChildVisitor for SyntaxChildren {
     fn visit_node(&mut self, node: NodeId) -> std::ops::ControlFlow<()> {
         self.nodes.push(node);
         std::ops::ControlFlow::Continue(())
@@ -1213,7 +1213,7 @@ impl ts_ast::ChildVisitor for SyntaxChildren {
         self.lists.push(list);
         std::ops::ControlFlow::Continue(())
     }
-    fn visit_node_slice(&mut self, slice: ts_ast::NodeSlice) -> std::ops::ControlFlow<()> {
+    fn visit_node_slice(&mut self, slice: tsr_ast::NodeSlice) -> std::ops::ControlFlow<()> {
         self.slices.push(slice);
         std::ops::ControlFlow::Continue(())
     }
@@ -1243,11 +1243,11 @@ mod tests {
     use crate::bound_input::BoundInput;
 
     fn owner(source: &str) -> (BoundChecker, NodeId) {
-        let file = ts_binder::bind_parsed_file(ts_parser::parse_source_file(
-            ts_jsstring::SourceText::from_loaded_bytes(source.as_bytes()),
-            ts_core::ScriptKind::TS,
-            ts_ast::SourceFileParseOptions {
-                file_name: ts_jsstring::JsString::from_bytes(b"/fixture.ts".as_slice()),
+        let file = tsr_binder::bind_parsed_file(tsr_parser::parse_source_file(
+            tsr_jsstring::SourceText::from_loaded_bytes(source.as_bytes()),
+            tsr_core::ScriptKind::TS,
+            tsr_ast::SourceFileParseOptions {
+                file_name: tsr_jsstring::JsString::from_bytes(b"/fixture.ts".as_slice()),
                 ..Default::default()
             },
         ))

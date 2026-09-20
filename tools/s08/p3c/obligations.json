@@ -11,8 +11,8 @@
       "obligations": 5,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/conditional.rs",
-        "crates/ts_checker/src/relater_conditional.rs"
+        "crates/tsr_checker/src/conditional.rs",
+        "crates/tsr_checker/src/relater_conditional.rs"
       ],
       "native_suites": [
         "conditionals",
@@ -35,10 +35,10 @@
       "obligations": 81,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/object_members.rs",
-        "crates/ts_checker/src/source_signatures.rs",
-        "crates/ts_checker/src/compound_signatures.rs",
-        "crates/ts_checker/src/late_members.rs"
+        "crates/tsr_checker/src/object_members.rs",
+        "crates/tsr_checker/src/source_signatures.rs",
+        "crates/tsr_checker/src/compound_signatures.rs",
+        "crates/tsr_checker/src/late_members.rs"
       ],
       "native_suites": [
         "compound",
@@ -53,9 +53,9 @@
       "obligations": 81,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/merge.rs",
-        "crates/ts_checker/src/references.rs",
-        "crates/ts_checker/src/apparent.rs"
+        "crates/tsr_checker/src/merge.rs",
+        "crates/tsr_checker/src/references.rs",
+        "crates/tsr_checker/src/apparent.rs"
       ],
       "native_suites": [
         "generics",
@@ -69,9 +69,9 @@
       "obligations": 41,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/type_parameters.rs",
-        "crates/ts_checker/src/check_generics.rs",
-        "crates/ts_checker/src/variance.rs"
+        "crates/tsr_checker/src/type_parameters.rs",
+        "crates/tsr_checker/src/check_generics.rs",
+        "crates/tsr_checker/src/variance.rs"
       ],
       "native_suites": [
         "generics",
@@ -104,8 +104,8 @@
       "obligations": 10,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/indexes.rs",
-        "crates/ts_checker/src/relater_structure.rs"
+        "crates/tsr_checker/src/indexes.rs",
+        "crates/tsr_checker/src/relater_structure.rs"
       ],
       "native_suites": [
         "indexes",
@@ -119,10 +119,10 @@
       "obligations": 2,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/infer_types.rs",
-        "crates/ts_checker/src/infer_tuples.rs",
-        "crates/ts_checker/src/infer_templates.rs",
-        "crates/ts_checker/src/infer_reverse.rs"
+        "crates/tsr_checker/src/infer_types.rs",
+        "crates/tsr_checker/src/infer_tuples.rs",
+        "crates/tsr_checker/src/infer_templates.rs",
+        "crates/tsr_checker/src/infer_reverse.rs"
       ],
       "native_suites": [
         "inference",
@@ -145,8 +145,8 @@
       "obligations": 6,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/mapped.rs",
-        "crates/ts_checker/src/relater_mapped.rs"
+        "crates/tsr_checker/src/mapped.rs",
+        "crates/tsr_checker/src/relater_mapped.rs"
       ],
       "native_suites": [
         "mapped",
@@ -160,10 +160,10 @@
       "obligations": 70,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/union.rs",
-        "crates/ts_checker/src/intersection.rs",
-        "crates/ts_checker/src/indexes.rs",
-        "crates/ts_checker/src/normalize.rs"
+        "crates/tsr_checker/src/union.rs",
+        "crates/tsr_checker/src/intersection.rs",
+        "crates/tsr_checker/src/indexes.rs",
+        "crates/tsr_checker/src/normalize.rs"
       ],
       "native_suites": [
         "indexes",
@@ -178,9 +178,9 @@
       "obligations": 47,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/mapper.rs",
-        "crates/ts_checker/src/instantiate.rs",
-        "crates/ts_checker/src/references.rs"
+        "crates/tsr_checker/src/mapper.rs",
+        "crates/tsr_checker/src/instantiate.rs",
+        "crates/tsr_checker/src/references.rs"
       ],
       "native_suites": [
         "generics",
@@ -195,7 +195,7 @@
       "obligations": 111,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/check_type_syntax.rs"
+        "crates/tsr_checker/src/check_type_syntax.rs"
       ],
       "native_suites": [
         "boundaries"
@@ -208,9 +208,9 @@
       "obligations": 3,
       "status": "capability_executed_acceptance_pending",
       "production_modules": [
-        "crates/ts_checker/src/template.rs",
-        "crates/ts_checker/src/template_relation.rs",
-        "crates/ts_checker/src/string_mapping.rs"
+        "crates/tsr_checker/src/template.rs",
+        "crates/tsr_checker/src/template_relation.rs",
+        "crates/tsr_checker/src/string_mapping.rs"
       ],
       "native_suites": [
         "mapped",

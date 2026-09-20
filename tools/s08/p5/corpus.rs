@@ -50,7 +50,7 @@ fn input_files(request: &Value, key: &str) -> Result<Vec<InputBytes>, &'static s
 pub fn observe(request: &Value) -> Value {
     observe_with(
         request,
-        &mut ts_compiler::FileCache::new(),
+        &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
         false,
     )
@@ -60,7 +60,7 @@ pub fn observe(request: &Value) -> Value {
 /// walker's type results as checkpoint roots (checkerbench child).
 pub fn observe_with(
     request: &Value,
-    cache: &mut ts_compiler::FileCache,
+    cache: &mut tsr_compiler::FileCache,
     hooks: &mut dyn executor::Hooks,
     count_only: bool,
 ) -> Value {

@@ -1,9 +1,9 @@
 //! Current Rust config outputs; no pass flags or reference output are consumed.
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, sync::Arc};
-use ts_jsstring::{JsString, SourceText};
-use ts_tsoptions::{ConfigValue as C, ParsedCommandLine, TsConfigSourceFile};
-use ts_vfs::MemoryBuilder;
+use tsr_jsstring::{JsString, SourceText};
+use tsr_tsoptions::{ConfigValue as C, ParsedCommandLine, TsConfigSourceFile};
+use tsr_vfs::MemoryBuilder;
 #[path = "host.rs"]
 mod host;
 use host::Host;
@@ -55,7 +55,7 @@ fn observed(value: &C) -> Value {
         C::Enum(value) => json!({"kind":"integer","value":value}),
     }
 }
-fn diagnostic(value: &ts_ast::Diagnostic, parsed: &ParsedCommandLine) -> Value {
+fn diagnostic(value: &tsr_ast::Diagnostic, parsed: &ParsedCommandLine) -> Value {
     let file = value.file.map(|id| {
         let source = parsed
             .config_file
@@ -102,7 +102,7 @@ pub fn observe_all(requests: &[Value]) -> Result<Vec<Value>, Box<dyn std::error:
             fs: Arc::new(fs.finish()),
             cwd: JsString::from_bytes(cwd.as_bytes()),
         };
-        let filename = ts_tspath::absolute(
+        let filename = tsr_tspath::absolute(
             request["file_name"]
                 .as_str()
                 .ok_or("config filename")?
@@ -111,29 +111,29 @@ pub fn observe_all(requests: &[Value]) -> Result<Vec<Value>, Box<dyn std::error:
         );
         let source = TsConfigSourceFile::parse(
             JsString::from_bytes(filename.as_slice()),
-            ts_tspath::to_path(&filename, cwd.as_bytes(), case_sensitive),
+            tsr_tspath::to_path(&filename, cwd.as_bytes(), case_sensitive),
             SourceText::from_loaded_bytes(unhex(&request["text_hex"])?),
         );
-        let existing = ts_core::CompilerOptions {
+        let existing = tsr_core::CompilerOptions {
             run_external_code: if request["run_external_code"]
                 .as_bool()
                 .ok_or("run_external_code")?
             {
-                ts_core::Tristate::TRUE
+                tsr_core::Tristate::TRUE
             } else {
-                ts_core::Tristate::UNKNOWN
+                tsr_core::Tristate::UNKNOWN
             },
             ..Default::default()
         };
-        let parsed = ts_tsoptions::parse_json_source_file_config_file_content(
+        let parsed = tsr_tsoptions::parse_json_source_file_config_file_content(
             source,
             &host,
-            &ts_tspath::directory(&filename),
+            &tsr_tspath::directory(&filename),
             &existing,
             &C::Null,
             &filename,
         )?;
-        let options = observed(&ts_tsoptions::compiler_options_value(&parsed.options));
+        let options = observed(&tsr_tsoptions::compiler_options_value(&parsed.options));
         rows.push(json!({"id":id,"options":options,"root_file_names":parsed.root_file_names.iter().map(|name|hex(name.as_bytes())).collect::<Vec<_>>(),"config_raw":observed(&parsed.raw),"config_diagnostics":parsed.errors.iter().map(|d|diagnostic(d,&parsed)).collect::<Vec<_>>(),"option_diagnostics":[],"compile_on_save":parsed.compile_on_save}));
     }
     Ok(rows)
@@ -169,7 +169,7 @@ fn fixture(request: &Value) -> Result<Value, Box<dyn std::error::Error>> {
         .collect::<Result<_, Box<dyn std::error::Error>>>()?;
     let config_index = units.iter().position(|(name, _)| {
         matches!(
-            ts_jsstring::helpers::to_lower_go(ts_tspath::base_name(name)).as_slice(),
+            tsr_jsstring::helpers::to_lower_go(tsr_tspath::base_name(name)).as_slice(),
             b"tsconfig.json" | b"jsconfig.json"
         )
     });
@@ -189,35 +189,35 @@ fn fixture(request: &Value) -> Result<Value, Box<dyn std::error::Error>> {
             cwd: JsString::from_bytes(config_cwd),
         };
         let (name, text) = &units[index];
-        let filename = ts_tspath::absolute(name, config_cwd);
+        let filename = tsr_tspath::absolute(name, config_cwd);
         let source = TsConfigSourceFile::parse(
             JsString::from_bytes(filename.as_slice()),
-            ts_tspath::to_path(&filename, config_cwd, true),
+            tsr_tspath::to_path(&filename, config_cwd, true),
             SourceText::from_loaded_bytes(text.clone()),
         );
-        let existing = ts_core::CompilerOptions {
+        let existing = tsr_core::CompilerOptions {
             run_external_code: if request["run_external_code"]
                 .as_bool()
                 .ok_or("run external code")?
             {
-                ts_core::Tristate::TRUE
+                tsr_core::Tristate::TRUE
             } else {
-                ts_core::Tristate::UNKNOWN
+                tsr_core::Tristate::UNKNOWN
             },
             ..Default::default()
         };
-        ts_tsoptions::parse_json_source_file_config_file_content(
+        tsr_tsoptions::parse_json_source_file_config_file_content(
             source,
             &host,
-            &ts_tspath::directory(&filename),
+            &tsr_tspath::directory(&filename),
             &existing,
             &C::Null,
             &filename,
         )?
     } else {
-        ParsedCommandLine::new(ts_core::CompilerOptions::default(), Vec::new())
+        ParsedCommandLine::new(tsr_core::CompilerOptions::default(), Vec::new())
     };
-    let (_, option_diagnostics) = ts_tsoptions::apply_fixture_settings(
+    let (_, option_diagnostics) = tsr_tsoptions::apply_fixture_settings(
         &mut parsed.options,
         &settings,
         cwd,
@@ -242,7 +242,7 @@ fn fixture(request: &Value) -> Result<Value, Box<dyn std::error::Error>> {
         });
     let mut roots = Vec::new();
     for (index, (name, _)) in units.iter().enumerate() {
-        let name = ts_tspath::absolute(name, cwd);
+        let name = tsr_tspath::absolute(name, cwd);
         let selected = if config_index.is_some() {
             parsed
                 .root_file_names
@@ -256,6 +256,6 @@ fn fixture(request: &Value) -> Result<Value, Box<dyn std::error::Error>> {
         }
     }
     Ok(
-        json!({"id":request["id"],"options":observed(&ts_tsoptions::compiler_options_value(&parsed.options)),"root_file_names":roots,"config_raw":observed(&parsed.raw),"config_diagnostics":parsed.errors.iter().map(|d|diagnostic(d,&parsed)).collect::<Vec<_>>(),"option_diagnostics":option_diagnostics.iter().map(|d|diagnostic(d,&parsed)).collect::<Vec<_>>(),"compile_on_save":parsed.compile_on_save}),
+        json!({"id":request["id"],"options":observed(&tsr_tsoptions::compiler_options_value(&parsed.options)),"root_file_names":roots,"config_raw":observed(&parsed.raw),"config_diagnostics":parsed.errors.iter().map(|d|diagnostic(d,&parsed)).collect::<Vec<_>>(),"option_diagnostics":option_diagnostics.iter().map(|d|diagnostic(d,&parsed)).collect::<Vec<_>>(),"compile_on_save":parsed.compile_on_save}),
     )
 }

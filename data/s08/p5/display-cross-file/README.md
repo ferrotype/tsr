@@ -21,7 +21,7 @@ import s08_p5_display as display
 display.REQUESTS = Path('tools/s08/p5/display-cross-file-requests.json').resolve()
 display.capture(Path('target/s08/p5-display-cross-file-native-new').resolve())
 PY
-cargo test --locked -p ts_compiler --example p5_display
+cargo test --locked -p tsr_compiler --example p5_display
 ```
 
 The existing 208-request display corpus and its branch-witness archive are

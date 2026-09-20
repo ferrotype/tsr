@@ -18,16 +18,16 @@ class StagingContracts(unittest.TestCase):
             if source.exists():
                 dest=path/relative;dest.parent.mkdir(parents=True,exist_ok=True)
                 dest.write_bytes(source.read_bytes())
-        cargo=path/'crates/ts_ast/Cargo.toml';cargo.write_bytes((apply.ROOT/'crates/ts_ast/Cargo.toml').read_bytes())
+        cargo=path/'crates/tsr_ast/Cargo.toml';cargo.write_bytes((apply.ROOT/'crates/tsr_ast/Cargo.toml').read_bytes())
 
     def test_production_and_alias_destinations_are_rejected_before_mutation(self):
         with self.assertRaisesRegex(ValueError,'production'):
             apply.apply(apply.ROOT)
         with tempfile.TemporaryDirectory() as temp:
             stage=Path(temp);self.stage(stage)
-            path=stage/'crates/ts_ast/src/symbols.rs'; path.unlink()
-            path.symlink_to(apply.ROOT/'crates/ts_ast/src/symbols.rs')
-            sentinel=stage/'crates/ts_ast/src/lib.rs';before=sentinel.read_bytes()
+            path=stage/'crates/tsr_ast/src/symbols.rs'; path.unlink()
+            path.symlink_to(apply.ROOT/'crates/tsr_ast/src/symbols.rs')
+            sentinel=stage/'crates/tsr_ast/src/lib.rs';before=sentinel.read_bytes()
             with self.assertRaisesRegex(ValueError,'aliases production'):
                 apply.apply(stage)
             self.assertEqual(sentinel.read_bytes(),before)
@@ -52,7 +52,7 @@ class StagingContracts(unittest.TestCase):
     def test_new_generated_ownership_field_fails_closed(self):
         with tempfile.TemporaryDirectory() as temp:
             stage=Path(temp);self.stage(stage)
-            path=stage/'crates/ts_ast/src/data_generated.rs'
+            path=stage/'crates/tsr_ast/src/data_generated.rs'
             path.write_text(path.read_text().replace('pub struct TokenData {}','pub struct TokenData {\n    pub hidden: Vec<u8>,\n}'))
             with self.assertRaisesRegex(ValueError,'unclassified generated field'):
                 apply.apply(stage)

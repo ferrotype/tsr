@@ -104,7 +104,7 @@ def measure(root=ROOT, report_dir=None):
     for group in manifest["groups"]:
         setup([sys.executable, group["checker"], "--check"], root, directory / (group["name"]+"-oracle"))
     targets = sorted({group["target"] for group in manifest["groups"]})
-    args = ["cargo", "test", "--package", "ts_ast", "--locked", "--release", "--no-run", "--message-format=json"]
+    args = ["cargo", "test", "--package", "tsr_ast", "--locked", "--release", "--no-run", "--message-format=json"]
     for target in targets:
         args.extend(["--lib"] if target == "lib" else ["--test", target])
     output = setup(args, root, directory / "rust-build")
@@ -114,7 +114,7 @@ def measure(root=ROOT, report_dir=None):
         if artifact.get("reason") != "compiler-artifact" or not artifact.get("executable"):
             continue
         target = artifact["target"]
-        name = "lib" if target["kind"] == ["lib"] and target["name"] == "ts_ast" else target["name"]
+        name = "lib" if target["kind"] == ["lib"] and target["name"] == "tsr_ast" else target["name"]
         if name not in targets or name in binaries or not artifact["profile"]["test"]:
             raise ValueError("unexpected or duplicate AST utility test executable")
         binaries[name] = artifact["executable"]

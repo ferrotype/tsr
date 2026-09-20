@@ -1,10 +1,10 @@
-//! Reuses actual ts_ast payloads. The alternate enum is a size experiment only.
+//! Reuses actual tsr_ast payloads. The alternate enum is a size experiment only.
 #![forbid(unsafe_code)]
 #![allow(dead_code)]
 
 use std::mem::{align_of, size_of};
 use std::sync::atomic::{AtomicU32, AtomicU64};
-use ts_ast::*;
+use tsr_ast::*;
 
 struct WithBinding<T> {
     syntax: T,

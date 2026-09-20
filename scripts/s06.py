@@ -54,7 +54,7 @@ def freeze(write=False):
 
 
 def parser_binary():
-    output = command(["cargo", "build", "--package", "ts_parser", "--example", "s06", "--release", "--locked", "--message-format=json"], cwd=ROOT)
+    output = command(["cargo", "build", "--package", "tsr_parser", "--example", "s06", "--release", "--locked", "--message-format=json"], cwd=ROOT)
     artifacts = [strict_json_loads(line) for line in output.splitlines() if line.strip()]
     binaries = [item["executable"] for item in artifacts if item.get("reason") == "compiler-artifact" and item.get("target", {}).get("name") == "s06" and item.get("executable")]
     if len(binaries) != 1:

@@ -1,16 +1,16 @@
 use super::{ast, classify, Result, Row, Walker};
 use serde_json::{json, Value};
-use ts_arena::NodeId;
-use ts_ast::SyntaxKind as K;
-use ts_checker::{type_flags as tf, type_format_flags as ff, TypeRef};
-use ts_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
+use tsr_arena::NodeId;
+use tsr_ast::SyntaxKind as K;
+use tsr_checker::{type_flags as tf, type_format_flags as ff, TypeRef};
+use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 const TYPE_FLAGS: u32 = ff::NO_TRUNCATION
     | ff::ALLOW_UNIQUE_ES_SYMBOL_TYPE
     | ff::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS;
 // Keep the separate native builder flag domains visible in recorded requests.
-const IGNORE_ERRORS: u32 = ts_nodebuilder::flags::IGNORE_ERRORS;
-const ALLOW_UNRESOLVED_NAMES: i32 = ts_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
+const IGNORE_ERRORS: u32 = tsr_nodebuilder::flags::IGNORE_ERRORS;
+const ALLOW_UNRESOLVED_NAMES: i32 = tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
 
 impl Walker<'_, '_> {
     pub(super) fn stamp(&self, source: NodeId, id: NodeId, operation: &str) -> Result<Value> {
@@ -69,13 +69,13 @@ impl Walker<'_, '_> {
         let source_view = ast(program, source)?;
         let source_file = source_view.source_file(source)?;
         let text = source_file.text().as_bytes();
-        let actual_pos = ts_scanner::skip_trivia(text, i64::from(node.pos()));
-        let line = usize::try_from(ts_jsstring::scanner_positions::compute_line_of_position(
+        let actual_pos = tsr_scanner::skip_trivia(text, i64::from(node.pos()));
+        let line = usize::try_from(tsr_jsstring::scanner_positions::compute_line_of_position(
             source_file.ecma_line_map(),
             isize::try_from(actual_pos)?,
         ))?;
         let source_text =
-            ts_scanner::get_source_text_of_node_from_source_file(view, source, Some(id), false)?
+            tsr_scanner::get_source_text_of_node_from_source_file(view, source, Some(id), false)?
                 .as_bytes()
                 .to_vec();
         if symbols {
@@ -88,7 +88,7 @@ impl Walker<'_, '_> {
             ) && view
                 .node(node.type_node().ok_or("assertion type")?)?
                 .flags()
-                & ts_ast::node_flags::REPARSED
+                & tsr_ast::node_flags::REPARSED
                 != 0
             || node.kind() == K::Identifier
                 && !classify::declaration_has_value(view, parent)?
@@ -124,8 +124,8 @@ impl Walker<'_, '_> {
                         | K::MetaProperty
                 )
             )
-            && !ts_ast::utilities_middle::is_label_name(view, id)?
-            && !ts_ast::utilities::is_global_scope_augmentation(&parent_node)
+            && !tsr_ast::utilities_middle::is_label_name(view, id)?
+            && !tsr_ast::utilities::is_global_scope_augmentation(&parent_node)
             && !classify::import_or_export_name(view, id, parent)?
             && !classify::intrinsic_jsx(view, id, parent, &source_text)?;
         let display = if plain_any {
@@ -225,7 +225,7 @@ impl Walker<'_, '_> {
         self.timing.pause();
         if self.trace.record_queries {
             let mut q = self.stamp(source, parent, "SymbolToStringEx")?;
-            q["flags"] = json!(ts_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND);
+            q["flags"] = json!(tsr_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND);
             self.trace.active = q.clone();
             self.trace.queries.push(q);
         } else {
@@ -238,12 +238,12 @@ impl Walker<'_, '_> {
             self.op.symbol_to_string_at(
                 symbol,
                 Some(parent),
-                ts_ast::symbol_flags::NONE,
-                ts_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND,
+                tsr_ast::symbol_flags::NONE,
+                tsr_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND,
             )?
         };
         let mut display = b"Symbol(".to_vec();
-        display.extend_from_slice(&ts_ast::escape_all_internal_symbol_names(text.as_bytes()));
+        display.extend_from_slice(&tsr_ast::escape_all_internal_symbol_names(text.as_bytes()));
         let declarations = self.op.symbol_declarations(symbol)?;
         for (index, declaration) in declarations.iter().enumerate() {
             if index >= 5 {
@@ -254,20 +254,20 @@ impl Walker<'_, '_> {
             }
             let declaration = declaration.ok_or("nil symbol declaration")?;
             let view = ast(self.program, declaration)?;
-            let source = ts_ast::utilities::get_source_file_of_node(view, Some(declaration))?
+            let source = tsr_ast::utilities::get_source_file_of_node(view, Some(declaration))?
                 .ok_or("declaration source")?;
             let file = view.source_file(source)?;
             let pos = view.node(declaration)?.pos();
             let starts = file.ecma_line_map();
             let decl_line = usize::try_from(
-                ts_jsstring::scanner_positions::compute_line_of_position(starts, pos as isize),
+                tsr_jsstring::scanner_positions::compute_line_of_position(starts, pos as isize),
             )?;
             let start = usize::try_from(starts[decl_line])?;
-            let character = ts_jsstring::line_map::utf16_len(
+            let character = tsr_jsstring::line_map::utf16_len(
                 &file.text().as_bytes()[start..usize::try_from(pos)?],
             );
             let name = file.parse_options().file_name.as_bytes();
-            let base = ts_tspath::base_name(name);
+            let base = tsr_tspath::base_name(name);
             display.extend_from_slice(b", Decl(");
             display.extend_from_slice(base);
             display.extend_from_slice(b", ");

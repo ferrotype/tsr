@@ -51,9 +51,9 @@ def build_files(kind, before):
             paths.add(name)
     if kind == 'node':
         build = p4.read(ROOT / 'target/s10/node/build.json')
-        if build['sources'] != before or file_digest(ROOT / 'target/s10/node/ts_node.node') != build['binary_sha256']:
+        if build['sources'] != before or file_digest(ROOT / 'target/s10/node/tsr_node.node') != build['binary_sha256']:
             raise ValueError('stale or changed Node adapter')
-        paths |= {'target/s10/node/build.json', 'target/s10/node/ts_node.node'}
+        paths |= {'target/s10/node/build.json', 'target/s10/node/tsr_node.node'}
     if kind in ('portable', 'node'):
         paths.add('target/release/examples/parser')
     for pattern in ('tools/s10/wasm/*.mjs', 'tools/s10/node/*.mjs', 'tools/s10/parser/*'):

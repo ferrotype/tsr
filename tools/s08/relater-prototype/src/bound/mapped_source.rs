@@ -35,12 +35,12 @@ fn index_type_less_than(index: &Rc<TypeCell>, limit: usize) -> Result<bool, Erro
                 Err(_) => return Ok(false),
             },
             Some(LiteralValue::Number(bits)) => {
-                ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+                tsr_jsnum::Number::new(f64::from_bits(*bits)).to_string()
             }
             _ => return Ok(false),
         };
         // isNumericLiteralName: the name must round-trip through ToNumber.
-        let value = ts_jsnum::from_string(name.as_bytes());
+        let value = tsr_jsnum::from_string(name.as_bytes());
         if value.to_string() != name {
             return Ok(false);
         }
@@ -382,7 +382,7 @@ impl Construction {
                     Some(LiteralValue::String(bytes)) => String::from_utf8(bytes.clone())
                         .map_err(|_| Error::Unsupported("non-UTF8 mapped property name".into()))?,
                     Some(LiteralValue::Number(bits)) => {
-                        ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+                        tsr_jsnum::Number::new(f64::from_bits(*bits)).to_string()
                     }
                     _ => return missing("mapped nonliteral key/index signature"),
                 };
@@ -616,7 +616,7 @@ impl Construction {
             Some(LiteralValue::String(bytes)) => String::from_utf8(bytes.clone())
                 .map_err(|_| Error::Unsupported("non-UTF8 indexed property".into()))?,
             Some(LiteralValue::Number(bits)) => {
-                ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+                tsr_jsnum::Number::new(f64::from_bits(*bits)).to_string()
             }
             _ => {
                 if let Some(array) = object.array_element() {

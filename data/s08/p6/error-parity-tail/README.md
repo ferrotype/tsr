@@ -31,6 +31,6 @@ from 0 to 8 of 9; acceptance types/symbols matches rise from 398 to 410, public
 display from 403 to 412; no selected domain regresses. 26 error differences
 remain and are listed in `results.json`.
 
-Compiler tests in `crates/ts_compiler/tests/checker_semantics.rs` pin each
+Compiler tests in `crates/tsr_compiler/tests/checker_semantics.rs` pin each
 ported behavior to the named Go baseline; no native oracle programs were
 captured for this pass.

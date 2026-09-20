@@ -112,7 +112,7 @@ loc = 138
 [[file]]
 go = "tsc/internal/api/callbackfs.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "source"
 status = "planned"
@@ -125,11 +125,11 @@ loc = 242
 [[file]]
 go = "tsc/internal/api/encoder/decoder.go"
 package = "internal/api/encoder"
-crate = "ts_encoder"
+crate = "tsr_encoder"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_encoder/src/decoder.rs", "crates/ts_encoder/src/runtime_generated.rs"]
+rust = ["crates/tsr_encoder/src/decoder.rs", "crates/tsr_encoder/src/runtime_generated.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.decoder_parity == true", "run.e1.decoder_watchdog == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "00853925877c0c8dc2e2de0773eb6586689373784ce262e151c90c87676d1698"
@@ -138,11 +138,11 @@ loc = 381
 [[file]]
 go = "tsc/internal/api/encoder/decoder_generated.go"
 package = "internal/api/encoder"
-crate = "ts_encoder"
+crate = "tsr_encoder"
 phase = 0
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_encoder/src/decoder.rs", "crates/ts_encoder/src/generated.rs", "crates/ts_encoder/src/runtime_generated.rs"]
+rust = ["crates/tsr_encoder/src/decoder.rs", "crates/tsr_encoder/src/generated.rs", "crates/tsr_encoder/src/runtime_generated.rs"]
 verify = ["run.gen.drift == false", "run.e1.parity >= 0.999", "run.e1.decoder_parity == true", "run.e1.decoder_watchdog == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "13d3e8cfb0359cc5f727bb18d87857ca776ba005dd08a1a406a3f8541d34ef0d"
@@ -151,11 +151,11 @@ loc = 1141
 [[file]]
 go = "tsc/internal/api/encoder/encoder.go"
 package = "internal/api/encoder"
-crate = "ts_encoder"
+crate = "tsr_encoder"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_ast/src/node_index.rs", "crates/ts_encoder/src/encode.rs", "crates/ts_encoder/src/lib.rs", "crates/ts_encoder/src/runtime_generated.rs", "crates/ts_encoder/src/structured.rs"]
+rust = ["crates/tsr_ast/src/node_index.rs", "crates/tsr_encoder/src/encode.rs", "crates/tsr_encoder/src/lib.rs", "crates/tsr_encoder/src/runtime_generated.rs", "crates/tsr_encoder/src/structured.rs"]
 verify = ["run.e1.encoder_output_bytes == true", "run.e1.encoder_success_error == true", "run.e1.parity >= 0.999"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e29cdff08715379d241f7bbb23c6e3126d172c00d5a0e36df2e1431b63ca92ad"
@@ -164,11 +164,11 @@ loc = 935
 [[file]]
 go = "tsc/internal/api/encoder/encoder_generated.go"
 package = "internal/api/encoder"
-crate = "ts_encoder"
+crate = "tsr_encoder"
 phase = 0
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_encoder/src/encode.rs", "crates/ts_encoder/src/generated.rs", "crates/ts_encoder/src/runtime_generated.rs"]
+rust = ["crates/tsr_encoder/src/encode.rs", "crates/tsr_encoder/src/generated.rs", "crates/tsr_encoder/src/runtime_generated.rs"]
 verify = ["run.gen.drift == false", "run.e1.encoder_output_bytes == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "30debe2294133a12e47ddd5c247cf6b5494ddfa211ea32a1933be4cbdd82b644"
@@ -177,11 +177,11 @@ loc = 707
 [[file]]
 go = "tsc/internal/api/encoder/stringtable.go"
 package = "internal/api/encoder"
-crate = "ts_encoder"
+crate = "tsr_encoder"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_encoder/src/string_table.rs"]
+rust = ["crates/tsr_encoder/src/string_table.rs"]
 verify = ["run.e1.encoder_output_bytes == true", "run.e4.token_literal_bytes == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "b0c88c7d3404caf12b5bb0a2103c19835cc9b664c5842633c07754032c7e5faf"
@@ -190,7 +190,7 @@ loc = 68
 [[file]]
 go = "tsc/internal/api/enum_values_generated.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -203,7 +203,7 @@ loc = 1008
 [[file]]
 go = "tsc/internal/api/proto.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "source"
 status = "planned"
@@ -216,7 +216,7 @@ loc = 1682
 [[file]]
 go = "tsc/internal/api/protocol_msgpack.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "source"
 status = "planned"
@@ -229,7 +229,7 @@ loc = 281
 [[file]]
 go = "tsc/internal/api/server.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "source"
 status = "planned"
@@ -242,7 +242,7 @@ loc = 131
 [[file]]
 go = "tsc/internal/api/session.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "source"
 status = "planned"
@@ -255,7 +255,7 @@ loc = 4303
 [[file]]
 go = "tsc/internal/api/stringer_generated.go"
 package = "internal/api"
-crate = "ts_api"
+crate = "tsr_api"
 phase = 6
 kind = "generated"
 status = "planned"
@@ -268,11 +268,11 @@ loc = 30
 [[file]]
 go = "tsc/internal/ast/ast.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_ast/src/clone.rs", "crates/ts_ast/src/factory.rs", "crates/ts_ast/src/node_accessors.rs", "crates/ts_ast/src/node_text.rs", "crates/ts_ast/src/source_file.rs", "crates/ts_ast/src/storage.rs", "crates/ts_ast/src/subtree_facts.rs", "crates/ts_ast/src/visitor.rs", "crates/ts_parser/src/lazy_jsdoc.rs", "crates/ts_parser/src/state.rs"]
+rust = ["crates/tsr_ast/src/clone.rs", "crates/tsr_ast/src/factory.rs", "crates/tsr_ast/src/node_accessors.rs", "crates/tsr_ast/src/node_text.rs", "crates/tsr_ast/src/source_file.rs", "crates/tsr_ast/src/storage.rs", "crates/tsr_ast/src/subtree_facts.rs", "crates/tsr_ast/src/visitor.rs", "crates/tsr_parser/src/lazy_jsdoc.rs", "crates/tsr_parser/src/state.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e3.concurrent_lazy_storage == true", "run.e3.mapper_bundle_disposal == true", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "587805f5903d27e855ae68b4712f1d7b5652c8d57b46809aace802862a74f36b"
@@ -281,11 +281,11 @@ loc = 3189
 [[file]]
 go = "tsc/internal/ast/ast_generated.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "generated"
 status = "in-progress"
-rust = ["crates/ts_ast/src/accessors_generated.rs", "crates/ts_ast/src/data_generated.rs", "crates/ts_ast/src/factory_generated.rs", "crates/ts_ast/src/runtime_generated.rs", "crates/ts_ast/src/subtree_generated.rs", "crates/ts_ast/src/transform_generated.rs", "crates/ts_ast/src/visitors_generated.rs"]
+rust = ["crates/tsr_ast/src/accessors_generated.rs", "crates/tsr_ast/src/data_generated.rs", "crates/tsr_ast/src/factory_generated.rs", "crates/tsr_ast/src/runtime_generated.rs", "crates/tsr_ast/src/subtree_generated.rs", "crates/tsr_ast/src/transform_generated.rs", "crates/tsr_ast/src/visitors_generated.rs"]
 verify = ["run.gen.drift == false", "run.e1.parity >= 0.999", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "3f230a3441c80d0fcef442a29a47890712fe9866ad74dac10e77dc7ce41c1967"
@@ -294,11 +294,11 @@ loc = 10058
 [[file]]
 go = "tsc/internal/ast/checkflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_ast/src/check_flags.rs"]
+rust = ["crates/tsr_ast/src/check_flags.rs"]
 verify = ["run.e2.types_parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "665e753fe1cc48bc06a2b438d6f07c6beea2b1098174983f1effbe784ac8d7ea"
@@ -307,11 +307,11 @@ loc = 39
 [[file]]
 go = "tsc/internal/ast/deepclone.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_ast/src/clone.rs"]
+rust = ["crates/tsr_ast/src/clone.rs"]
 verify = ["run.e3.builder_cache_retention == true", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "7100eff959ac01d9cb285e832b3fe50cf19669bc68dc820ab14ad782be6d628f"
@@ -320,11 +320,11 @@ loc = 86
 [[file]]
 go = "tsc/internal/ast/diagnostic.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_ast/src/diagnostic.rs"]
+rust = ["crates/tsr_ast/src/diagnostic.rs"]
 # Future AST diagnostic integration: scanner callbacks do not provide this metric.
 verify = ["run.e1.parity >= 0.999", "run.e4.diagnostics == true", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
@@ -334,7 +334,7 @@ loc = 527
 [[file]]
 go = "tsc/internal/ast/flow.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -347,7 +347,7 @@ loc = 75
 [[file]]
 go = "tsc/internal/ast/functionflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -360,7 +360,7 @@ loc = 37
 [[file]]
 go = "tsc/internal/ast/ids.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -373,11 +373,11 @@ loc = 6
 [[file]]
 go = "tsc/internal/ast/kind_generated.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_ast/src/kinds_generated.rs"]
+rust = ["crates/tsr_ast/src/kinds_generated.rs"]
 verify = ["run.gen.drift == false", "run.e1.parity >= 0.999"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e4ad34d87478a6ed4693fb4b984e807ffd1ea75c3990756fc2e07ae52cab34eb"
@@ -386,11 +386,11 @@ loc = 463
 [[file]]
 go = "tsc/internal/ast/kind_stringer_generated.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "generated"
 status = "in-progress"
-rust = ["crates/ts_ast/src/node_kind.rs"]
+rust = ["crates/tsr_ast/src/node_kind.rs"]
 verify = ["run.gen.drift == false", "run.e1.parity >= 0.999", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c3cdd3cdc865e44c3f6dbb45295556fb6321e5c555c7dfde7c652b2dbefc0a66"
@@ -399,7 +399,7 @@ loc = 375
 [[file]]
 go = "tsc/internal/ast/modifierflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -412,7 +412,7 @@ loc = 53
 [[file]]
 go = "tsc/internal/ast/nodeflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -425,11 +425,11 @@ loc = 73
 [[file]]
 go = "tsc/internal/ast/parseoptions.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_parser/src/references.rs"]
+rust = ["crates/tsr_parser/src/references.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d9046ecd6fec852b543614c3b7e277b2dfd91804e739a624d9d2ce2397c7ec4f"
@@ -438,11 +438,11 @@ loc = 149
 [[file]]
 go = "tsc/internal/ast/positionmap.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_jsstring/src/position_map.rs"]
+rust = ["crates/tsr_jsstring/src/position_map.rs"]
 verify = ["run.e4.utf16_positions == true", "run.e4.utf8_positions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f81056ea8a0aec589f5c2b03a3eadb2691d280b99a93c4d20e1fccfd99c0e7a6"
@@ -451,11 +451,11 @@ loc = 111
 [[file]]
 go = "tsc/internal/ast/precedence.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_ast/src/precedence.rs", "crates/ts_printer/src/type_precedence.rs"]
+rust = ["crates/tsr_ast/src/precedence.rs", "crates/tsr_printer/src/type_precedence.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e2.type_to_string_parity == 1", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "94a5f9f3e4ce8ac9dc0c46d9253ffe4def40e90618ec226f4209b2e9d436aa7a"
@@ -464,11 +464,11 @@ loc = 717
 [[file]]
 go = "tsc/internal/ast/subtreefacts.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_ast/src/subtree_facts.rs"]
+rust = ["crates/tsr_ast/src/subtree_facts.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "76dabb52846aea3686afc3d70b5f8daacf4de625f977187f2bb1c1adddaef911"
@@ -477,7 +477,7 @@ loc = 133
 [[file]]
 go = "tsc/internal/ast/symbol.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -490,7 +490,7 @@ loc = 103
 [[file]]
 go = "tsc/internal/ast/symbolflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "planned"
@@ -503,11 +503,11 @@ loc = 83
 [[file]]
 go = "tsc/internal/ast/tokenflags.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_ast/src/tokens.rs"]
+rust = ["crates/tsr_ast/src/tokens.rs"]
 verify = ["run.scanner.parity == 1", "run.scanner.token_value_bytes == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "98f7010c7113b1ac781205175de9fe0c9c9c5854b10744d03e32127eb72f2b29"
@@ -516,11 +516,11 @@ loc = 33
 [[file]]
 go = "tsc/internal/ast/utilities.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_ast/src/clone.rs", "crates/ts_ast/src/runtime_id.rs", "crates/ts_ast/src/subtree_facts.rs", "crates/ts_ast/src/utilities.rs", "crates/ts_ast/src/utilities_middle.rs", "crates/ts_ast/src/utilities_tail.rs", "crates/ts_ast/src/visitor.rs", "crates/ts_parser/src/expressions.rs", "crates/ts_parser/src/js_syntax.rs", "crates/ts_parser/src/jsx.rs", "crates/ts_parser/src/predicates.rs", "crates/ts_parser/src/references.rs", "crates/ts_parser/src/reparser.rs", "crates/ts_parser/src/source_text.rs", "crates/ts_checker/src/meta_properties.rs", "crates/ts_checker/src/external_aliases.rs", "crates/ts_checker/src/unused_identifiers.rs", "crates/ts_checker/src/external_resolution.rs"]
+rust = ["crates/tsr_ast/src/clone.rs", "crates/tsr_ast/src/runtime_id.rs", "crates/tsr_ast/src/subtree_facts.rs", "crates/tsr_ast/src/utilities.rs", "crates/tsr_ast/src/utilities_middle.rs", "crates/tsr_ast/src/utilities_tail.rs", "crates/tsr_ast/src/visitor.rs", "crates/tsr_parser/src/expressions.rs", "crates/tsr_parser/src/js_syntax.rs", "crates/tsr_parser/src/jsx.rs", "crates/tsr_parser/src/predicates.rs", "crates/tsr_parser/src/references.rs", "crates/tsr_parser/src/reparser.rs", "crates/tsr_parser/src/source_text.rs", "crates/tsr_checker/src/meta_properties.rs", "crates/tsr_checker/src/external_aliases.rs", "crates/tsr_checker/src/unused_identifiers.rs", "crates/tsr_checker/src/external_resolution.rs"]
 verify = ["run.e1.parity >= 0.999", "run.binder.parity == 1", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "92efcd7eadfb9d348c30dd60a671f9481fa14ab3510a201e63ee72bf363b8a80"
@@ -529,11 +529,11 @@ loc = 4631
 [[file]]
 go = "tsc/internal/ast/visitor.go"
 package = "internal/ast"
-crate = "ts_ast"
+crate = "tsr_ast"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_ast/src/visitor.rs"]
+rust = ["crates/tsr_ast/src/visitor.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.ast_runtime == true", "run.e3.ast_runtime == true", "run.e1.ast_utilities == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "6754fe0df4e97fd31fe665408b14cb1a30c542f71ecec5b3f29288da4f2a3795"
@@ -542,11 +542,11 @@ loc = 278
 [[file]]
 go = "tsc/internal/astnav/tokens.go"
 package = "internal/astnav"
-crate = "ts_astnav"
+crate = "tsr_astnav"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_astnav/src/lib.rs"]
+rust = ["crates/tsr_astnav/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e90afdd31b9a51b8898504a6f7a13861eca614989898e40cd1f10ab70f78fbe8"
@@ -555,11 +555,11 @@ loc = 793
 [[file]]
 go = "tsc/internal/binder/binder.go"
 package = "internal/binder"
-crate = "ts_binder"
+crate = "tsr_binder"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_binder/src/bindings.rs", "crates/ts_binder/src/containers.rs", "crates/ts_binder/src/declarations.rs", "crates/ts_binder/src/diagnostics.rs", "crates/ts_binder/src/dispatch.rs", "crates/ts_binder/src/expando.rs", "crates/ts_binder/src/expressions.rs", "crates/ts_binder/src/flow.rs", "crates/ts_binder/src/lib.rs", "crates/ts_binder/src/modules.rs", "crates/ts_binder/src/statements.rs"]
+rust = ["crates/tsr_binder/src/bindings.rs", "crates/tsr_binder/src/containers.rs", "crates/tsr_binder/src/declarations.rs", "crates/tsr_binder/src/diagnostics.rs", "crates/tsr_binder/src/dispatch.rs", "crates/tsr_binder/src/expando.rs", "crates/tsr_binder/src/expressions.rs", "crates/tsr_binder/src/flow.rs", "crates/tsr_binder/src/lib.rs", "crates/tsr_binder/src/modules.rs", "crates/tsr_binder/src/statements.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "00b8528e353033a08a28f78f0c66f7c56d27d4634fd586b096e3330f6ef43883"
@@ -568,11 +568,11 @@ loc = 2802
 [[file]]
 go = "tsc/internal/binder/nameresolver.go"
 package = "internal/binder"
-crate = "ts_binder"
+crate = "tsr_binder"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_binder/src/name_resolver.rs"]
+rust = ["crates/tsr_binder/src/name_resolver.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "8e1f41019362d886e74599b9bf4dae5486d85c41d2d6f7634024c674f0fbbee2"
@@ -581,11 +581,11 @@ loc = 506
 [[file]]
 go = "tsc/internal/binder/referenceresolver.go"
 package = "internal/binder"
-crate = "ts_binder"
+crate = "tsr_binder"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_binder/src/reference_resolver.rs"]
+rust = ["crates/tsr_binder/src/reference_resolver.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d4ff84553926d47b86f38dbe9717c57d3cfd5de32596a7c0ed1f6766dec7b7b7"
@@ -594,11 +594,11 @@ loc = 262
 [[file]]
 go = "tsc/internal/bundled/bundled.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_bundled/src/lib.rs"]
+rust = ["crates/tsr_bundled/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "3e5da322496090d9993991ea5da9f3b1e9e8bbf117aa3bbcca1f5a637500fb2f"
@@ -607,11 +607,11 @@ loc = 53
 [[file]]
 go = "tsc/internal/bundled/embed.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_bundled/src/lib.rs"]
+rust = ["crates/tsr_bundled/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a38938220e12499ea4ab65dd01eadacf5f52cabfd3c3f2e797bc2bb9c7046e98"
@@ -620,7 +620,7 @@ loc = 224
 [[file]]
 go = "tsc/internal/bundled/embed_generated.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -633,7 +633,7 @@ loc = 452
 [[file]]
 go = "tsc/internal/bundled/generate.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -646,11 +646,11 @@ loc = 135
 [[file]]
 go = "tsc/internal/bundled/libs_generated.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "generated"
 status = "in-progress"
-rust = ["crates/ts_bundled/src/lib.rs"]
+rust = ["crates/tsr_bundled/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "91e502453d8dfd88b3751d8055e4da5bf969c4b5fe0b16d4a927df041f8e9600"
@@ -659,7 +659,7 @@ loc = 116
 [[file]]
 go = "tsc/internal/bundled/noembed.go"
 package = "internal/bundled"
-crate = "ts_bundled"
+crate = "tsr_bundled"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -672,11 +672,11 @@ loc = 48
 [[file]]
 go = "tsc/internal/checker/checker.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/resolution.rs", "crates/ts_checker/src/owner.rs", "crates/ts_checker/src/host.rs", "crates/ts_checker/src/types.rs", "crates/ts_checker/src/init.rs", "crates/ts_checker/src/construct.rs", "crates/ts_checker/src/union.rs", "crates/ts_checker/src/template.rs", "crates/ts_checker/src/key.rs", "crates/ts_checker/src/symbols.rs", "crates/ts_checker/src/compare.rs", "crates/ts_checker/src/signatures.rs", "crates/ts_checker/src/regular_expressions.rs", "crates/ts_checker/src/delete_expressions.rs", "crates/ts_checker/src/meta_properties.rs", "crates/ts_checker/src/unused_identifiers.rs"]
+rust = ["crates/tsr_checker/src/resolution.rs", "crates/tsr_checker/src/owner.rs", "crates/tsr_checker/src/host.rs", "crates/tsr_checker/src/types.rs", "crates/tsr_checker/src/init.rs", "crates/tsr_checker/src/construct.rs", "crates/tsr_checker/src/union.rs", "crates/tsr_checker/src/template.rs", "crates/tsr_checker/src/key.rs", "crates/tsr_checker/src/symbols.rs", "crates/tsr_checker/src/compare.rs", "crates/tsr_checker/src/signatures.rs", "crates/tsr_checker/src/regular_expressions.rs", "crates/tsr_checker/src/delete_expressions.rs", "crates/tsr_checker/src/meta_properties.rs", "crates/tsr_checker/src/unused_identifiers.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "26419963a703afd492b00b0c1b609cd2c4de07989a9f52aafc85c8373e615cb0"
@@ -685,7 +685,7 @@ loc = 32523
 [[file]]
 go = "tsc/internal/checker/emitresolver.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -698,7 +698,7 @@ loc = 1323
 [[file]]
 go = "tsc/internal/checker/exports.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -711,7 +711,7 @@ loc = 388
 [[file]]
 go = "tsc/internal/checker/flow.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -724,11 +724,11 @@ loc = 2761
 [[file]]
 go = "tsc/internal/checker/grammarchecks.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/regular_expressions.rs", "crates/ts_checker/src/meta_properties.rs"]
+rust = ["crates/tsr_checker/src/regular_expressions.rs", "crates/tsr_checker/src/meta_properties.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "542298225af85b665e6f3f77b0afb58130f154b19ff27e01a08e151274d7dcc7"
@@ -737,7 +737,7 @@ loc = 2230
 [[file]]
 go = "tsc/internal/checker/inference.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -750,7 +750,7 @@ loc = 1684
 [[file]]
 go = "tsc/internal/checker/jsdoc.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -763,7 +763,7 @@ loc = 100
 [[file]]
 go = "tsc/internal/checker/jsx.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -776,11 +776,11 @@ loc = 1488
 [[file]]
 go = "tsc/internal/checker/links.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/links.rs"]
+rust = ["crates/tsr_checker/src/links.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "afa761a66e450720a7193ab885047e0cc0c480c4abe59deaa9ad0e5223254841"
@@ -789,7 +789,7 @@ loc = 50
 [[file]]
 go = "tsc/internal/checker/mapper.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -802,7 +802,7 @@ loc = 326
 [[file]]
 go = "tsc/internal/checker/nodebuilder.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -815,7 +815,7 @@ loc = 302
 [[file]]
 go = "tsc/internal/checker/nodebuilder_hover.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -828,7 +828,7 @@ loc = 605
 [[file]]
 go = "tsc/internal/checker/nodebuilderimpl.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -841,7 +841,7 @@ loc = 3705
 [[file]]
 go = "tsc/internal/checker/nodebuilderscopes.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -854,7 +854,7 @@ loc = 251
 [[file]]
 go = "tsc/internal/checker/nodecopy.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -867,11 +867,11 @@ loc = 900
 [[file]]
 go = "tsc/internal/checker/printer.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/type_display.rs"]
+rust = ["crates/tsr_checker/src/type_display.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2b24c42ce29882d0c44b03c30ed6f0ef0761573910c111c3f8872b678fc70bb5"
@@ -880,7 +880,7 @@ loc = 356
 [[file]]
 go = "tsc/internal/checker/pseudotypenodebuilder.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -893,7 +893,7 @@ loc = 765
 [[file]]
 go = "tsc/internal/checker/relater.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -906,7 +906,7 @@ loc = 5044
 [[file]]
 go = "tsc/internal/checker/services.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -919,7 +919,7 @@ loc = 1151
 [[file]]
 go = "tsc/internal/checker/stringer_generated.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "generated"
 status = "planned"
@@ -932,7 +932,7 @@ loc = 25
 [[file]]
 go = "tsc/internal/checker/symbolaccessibility.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -945,7 +945,7 @@ loc = 876
 [[file]]
 go = "tsc/internal/checker/symboltracker.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -958,7 +958,7 @@ loc = 129
 [[file]]
 go = "tsc/internal/checker/tracer.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "planned"
@@ -971,11 +971,11 @@ loc = 366
 [[file]]
 go = "tsc/internal/checker/types.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/flags.rs", "crates/ts_checker/src/types.rs", "crates/ts_checker/src/type_display.rs", "crates/ts_checker/src/signatures.rs", "crates/ts_checker/src/value_links.rs"]
+rust = ["crates/tsr_checker/src/flags.rs", "crates/tsr_checker/src/types.rs", "crates/tsr_checker/src/type_display.rs", "crates/tsr_checker/src/signatures.rs", "crates/tsr_checker/src/value_links.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "35f747afc52153f127cbd49ceeeda10f6a8bc1c50c0fb030e93b950e1aa69198"
@@ -984,11 +984,11 @@ loc = 1473
 [[file]]
 go = "tsc/internal/checker/utilities.go"
 package = "internal/checker"
-crate = "ts_checker"
+crate = "tsr_checker"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/compare.rs", "crates/ts_checker/src/construct.rs", "crates/ts_checker/src/external_aliases.rs", "crates/ts_checker/src/unused_identifiers.rs", "crates/ts_checker/src/external_resolution.rs"]
+rust = ["crates/tsr_checker/src/compare.rs", "crates/tsr_checker/src/construct.rs", "crates/tsr_checker/src/external_aliases.rs", "crates/tsr_checker/src/unused_identifiers.rs", "crates/tsr_checker/src/external_resolution.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2963591b55987316ea926d123d3b2c86db7aea957f9b0387387fbd944fcde31b"
@@ -997,7 +997,7 @@ loc = 1882
 [[file]]
 go = "tsc/internal/collections/cow.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1010,7 +1010,7 @@ loc = 76
 [[file]]
 go = "tsc/internal/collections/multimap.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1023,7 +1023,7 @@ loc = 75
 [[file]]
 go = "tsc/internal/collections/ordered_map.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1036,7 +1036,7 @@ loc = 316
 [[file]]
 go = "tsc/internal/collections/ordered_set.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1049,7 +1049,7 @@ loc = 54
 [[file]]
 go = "tsc/internal/collections/set.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1062,7 +1062,7 @@ loc = 144
 [[file]]
 go = "tsc/internal/collections/syncmap.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1075,7 +1075,7 @@ loc = 98
 [[file]]
 go = "tsc/internal/collections/syncset.go"
 package = "internal/collections"
-crate = "ts_collections"
+crate = "tsr_collections"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1088,7 +1088,7 @@ loc = 77
 [[file]]
 go = "tsc/internal/compiler/checkerpool.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1101,7 +1101,7 @@ loc = 491
 [[file]]
 go = "tsc/internal/compiler/emitHost.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1114,11 +1114,11 @@ loc = 143
 [[file]]
 go = "tsc/internal/compiler/emitter.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/output_paths.rs"]
+rust = ["crates/tsr_compiler/src/output_paths.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2d4cd7039dcae8a35528fca3104835c81660989c2fc4e10db8bbc94a2818987c"
@@ -1127,11 +1127,11 @@ loc = 576
 [[file]]
 go = "tsc/internal/compiler/fileInclude.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/include_reason.rs"]
+rust = ["crates/tsr_compiler/src/include_reason.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "7b9507db2d24e71998776fe583b12af7c4d3c5d4d214a4c4c07f1e5180fb5f4e"
@@ -1140,11 +1140,11 @@ loc = 325
 [[file]]
 go = "tsc/internal/compiler/fileloader.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/loader.rs", "crates/ts_compiler/src/metadata.rs"]
+rust = ["crates/tsr_compiler/src/loader.rs", "crates/tsr_compiler/src/metadata.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37"
@@ -1153,11 +1153,11 @@ loc = 1083
 [[file]]
 go = "tsc/internal/compiler/filesparser.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/cache.rs", "crates/ts_compiler/src/loader.rs"]
+rust = ["crates/tsr_compiler/src/cache.rs", "crates/tsr_compiler/src/loader.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777"
@@ -1166,11 +1166,11 @@ loc = 598
 [[file]]
 go = "tsc/internal/compiler/host.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/loader.rs"]
+rust = ["crates/tsr_compiler/src/loader.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "7f1cea0567a2817c8f6a1dc840fa6d24450e121832e4a516b1e85dfaf50ef6fb"
@@ -1179,11 +1179,11 @@ loc = 122
 [[file]]
 go = "tsc/internal/compiler/includeprocessor.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/include_reason.rs", "crates/ts_compiler/src/program_diagnostics.rs"]
+rust = ["crates/tsr_compiler/src/include_reason.rs", "crates/tsr_compiler/src/program_diagnostics.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "fbe67fc26d79dc7ea3ff0f332d93587c2952877fd0b386055ed5cf92428527be"
@@ -1192,7 +1192,7 @@ loc = 184
 [[file]]
 go = "tsc/internal/compiler/pkg.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1205,11 +1205,11 @@ loc = 2
 [[file]]
 go = "tsc/internal/compiler/processingDiagnostic.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/include_reason.rs"]
+rust = ["crates/tsr_compiler/src/include_reason.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "153ce3ee7fb427f35ac5c772ce66ada89f5cb0bb2ee766a8cdde078177cb9b80"
@@ -1218,11 +1218,11 @@ loc = 135
 [[file]]
 go = "tsc/internal/compiler/program.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/loader.rs", "crates/ts_compiler/src/output_paths.rs", "crates/ts_compiler/src/program_diagnostics.rs", "crates/ts_compiler/src/verify_options.rs"]
+rust = ["crates/tsr_compiler/src/loader.rs", "crates/tsr_compiler/src/output_paths.rs", "crates/tsr_compiler/src/program_diagnostics.rs", "crates/tsr_compiler/src/verify_options.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0"
@@ -1231,7 +1231,7 @@ loc = 2398
 [[file]]
 go = "tsc/internal/compiler/projectreferencedtsfakinghost.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1244,7 +1244,7 @@ loc = 232
 [[file]]
 go = "tsc/internal/compiler/projectreferencefilemapper.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1257,7 +1257,7 @@ loc = 192
 [[file]]
 go = "tsc/internal/compiler/projectreferenceparser.go"
 package = "internal/compiler"
-crate = "ts_compiler"
+crate = "tsr_compiler"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1270,7 +1270,7 @@ loc = 115
 [[file]]
 go = "tsc/internal/contentmapper/contentmapper.go"
 package = "internal/contentmapper"
-crate = "ts_contentmapper"
+crate = "tsr_contentmapper"
 phase = 5
 kind = "source"
 status = "planned"
@@ -1283,7 +1283,7 @@ loc = 155
 [[file]]
 go = "tsc/internal/contentmapper/host.go"
 package = "internal/contentmapper"
-crate = "ts_contentmapper"
+crate = "tsr_contentmapper"
 phase = 5
 kind = "source"
 status = "planned"
@@ -1296,7 +1296,7 @@ loc = 315
 [[file]]
 go = "tsc/internal/contentmapper/hostimpl.go"
 package = "internal/contentmapper"
-crate = "ts_contentmapper"
+crate = "tsr_contentmapper"
 phase = 5
 kind = "source"
 status = "planned"
@@ -1309,7 +1309,7 @@ loc = 1372
 [[file]]
 go = "tsc/internal/contentmapper/transform.go"
 package = "internal/contentmapper"
-crate = "ts_contentmapper"
+crate = "tsr_contentmapper"
 phase = 5
 kind = "source"
 status = "planned"
@@ -1322,7 +1322,7 @@ loc = 135
 [[file]]
 go = "tsc/internal/core/arena.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1335,7 +1335,7 @@ loc = 66
 [[file]]
 go = "tsc/internal/core/bfs.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1348,7 +1348,7 @@ loc = 206
 [[file]]
 go = "tsc/internal/core/binarysearch.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1361,7 +1361,7 @@ loc = 26
 [[file]]
 go = "tsc/internal/core/buildoptions.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1374,11 +1374,11 @@ loc = 16
 [[file]]
 go = "tsc/internal/core/compileroptions.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/compiler_options.rs", "crates/ts_core/src/lib.rs"]
+rust = ["crates/tsr_core/src/compiler_options.rs", "crates/tsr_core/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "5a60c4cd3fcd7fe2e1f37be6553b7097290219a39f1dbe1a30a113b544670ec4"
@@ -1387,7 +1387,7 @@ loc = 557
 [[file]]
 go = "tsc/internal/core/context.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1400,11 +1400,11 @@ loc = 42
 [[file]]
 go = "tsc/internal/core/core.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsstring/src/line_map.rs", "crates/ts_scanner/src/spelling.rs"]
+rust = ["crates/tsr_jsstring/src/line_map.rs", "crates/tsr_scanner/src/spelling.rs"]
 verify = ["run.e4.utf8_positions == true", "run.e4.utf16_positions == true", "run.scanner.regexp_parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e94ac393477052b119bdd175c3cd5d20d7ce01cefd7b06f0334c80b2e915f814"
@@ -1413,11 +1413,11 @@ loc = 876
 [[file]]
 go = "tsc/internal/core/languagevariant.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "ported"
-rust = ["crates/ts_core/src/lib.rs"]
+rust = ["crates/tsr_core/src/lib.rs"]
 verify = ["run.scanner.parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "8f739e1d0572d0538d052d428bfdf4c1aa50b72f3eea883da7a3ea7f2e99f639"
@@ -1426,7 +1426,7 @@ loc = 11
 [[file]]
 go = "tsc/internal/core/languagevariant_stringer_generated.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1439,7 +1439,7 @@ loc = 25
 [[file]]
 go = "tsc/internal/core/linkstore.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1452,7 +1452,7 @@ loc = 93
 [[file]]
 go = "tsc/internal/core/modulekind_stringer_generated.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1465,7 +1465,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/core/nodemodules.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1478,7 +1478,7 @@ loc = 90
 [[file]]
 go = "tsc/internal/core/pattern.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1491,7 +1491,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/core/projectreference.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1504,7 +1504,7 @@ loc = 23
 [[file]]
 go = "tsc/internal/core/scriptkind.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1517,7 +1517,7 @@ loc = 20
 [[file]]
 go = "tsc/internal/core/scriptkind_stringer_generated.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1530,7 +1530,7 @@ loc = 35
 [[file]]
 go = "tsc/internal/core/scripttarget_stringer_generated.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1543,7 +1543,7 @@ loc = 50
 [[file]]
 go = "tsc/internal/core/semaphore.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1556,7 +1556,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/core/stack.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1569,11 +1569,11 @@ loc = 33
 [[file]]
 go = "tsc/internal/core/text.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/lib.rs"]
+rust = ["crates/tsr_core/src/lib.rs"]
 verify = ["run.scanner.parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "dad1b4d0bb8fbd4a1c3c686a6a4fff940cfac17551c7c5ca564c33273e2277e4"
@@ -1582,11 +1582,11 @@ loc = 82
 [[file]]
 go = "tsc/internal/core/textchange.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/text_change.rs"]
+rust = ["crates/tsr_core/src/text_change.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "09491c3d1d8c09a4b83d91f2c1cbda69dc956fce9f1535644b69dc4ce391c8c6"
@@ -1595,11 +1595,11 @@ loc = 30
 [[file]]
 go = "tsc/internal/core/tristate.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/lib.rs"]
+rust = ["crates/tsr_core/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d078d8f1eb2078c67ba66e1e37f81be2a959c6700581dfbcc4505e021e7c06f2"
@@ -1608,7 +1608,7 @@ loc = 71
 [[file]]
 go = "tsc/internal/core/tristate_stringer_generated.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1621,7 +1621,7 @@ loc = 26
 [[file]]
 go = "tsc/internal/core/typeacquisition.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1634,7 +1634,7 @@ loc = 24
 [[file]]
 go = "tsc/internal/core/version.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1647,7 +1647,7 @@ loc = 33
 [[file]]
 go = "tsc/internal/core/watchoptions.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1660,7 +1660,7 @@ loc = 53
 [[file]]
 go = "tsc/internal/core/workgroup.go"
 package = "internal/core"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1673,7 +1673,7 @@ loc = 123
 [[file]]
 go = "tsc/internal/debug/debug.go"
 package = "internal/debug"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1686,7 +1686,7 @@ loc = 61
 [[file]]
 go = "tsc/internal/diagnostics/diagnostics.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "source"
 status = "planned"
@@ -1699,11 +1699,11 @@ loc = 159
 [[file]]
 go = "tsc/internal/diagnostics/diagnostics_generated.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_diagnostics/src/generated.rs"]
+rust = ["crates/tsr_diagnostics/src/generated.rs"]
 verify = ["run.gen.drift == false", "run.e1.parity >= 0.999"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a7a61cff1876f6f899c5f75b7dbed8010586cd58e63d2cbce2ceceac3e9e4f17"
@@ -1712,7 +1712,7 @@ loc = 8854
 [[file]]
 go = "tsc/internal/diagnostics/generate.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -1725,7 +1725,7 @@ loc = 461
 [[file]]
 go = "tsc/internal/diagnostics/generate_deps.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -1738,7 +1738,7 @@ loc = 6
 [[file]]
 go = "tsc/internal/diagnostics/loc_generated.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1751,7 +1751,7 @@ loc = 151
 [[file]]
 go = "tsc/internal/diagnostics/stringer_generated.go"
 package = "internal/diagnostics"
-crate = "ts_diagnostics"
+crate = "tsr_diagnostics"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -1764,7 +1764,7 @@ loc = 27
 [[file]]
 go = "tsc/internal/diagnosticwriter/diagnosticwriter.go"
 package = "internal/diagnosticwriter"
-crate = "ts_diagnosticwriter"
+crate = "tsr_diagnosticwriter"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1777,11 +1777,11 @@ loc = 610
 [[file]]
 go = "tsc/internal/evaluator/evaluator.go"
 package = "internal/evaluator"
-crate = "ts_evaluator"
+crate = "tsr_evaluator"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_checker/src/template.rs"]
+rust = ["crates/tsr_checker/src/template.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "4dfe5a4e7f33c838bfaf3c28be4c4c547d49a84390186002f6e7f83efb6d4ef3"
@@ -1790,7 +1790,7 @@ loc = 168
 [[file]]
 go = "tsc/internal/execute/build/buildtask.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1803,7 +1803,7 @@ loc = 922
 [[file]]
 go = "tsc/internal/execute/build/compilerHost.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1816,7 +1816,7 @@ loc = 62
 [[file]]
 go = "tsc/internal/execute/build/host.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1829,7 +1829,7 @@ loc = 131
 [[file]]
 go = "tsc/internal/execute/build/orchestrator.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1842,7 +1842,7 @@ loc = 783
 [[file]]
 go = "tsc/internal/execute/build/parseCache.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1855,7 +1855,7 @@ loc = 44
 [[file]]
 go = "tsc/internal/execute/build/uptodatestatus.go"
 package = "internal/execute/build"
-crate = "ts_build"
+crate = "tsr_build"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1868,7 +1868,7 @@ loc = 133
 [[file]]
 go = "tsc/internal/execute/incremental/affectedfileshandler.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1881,7 +1881,7 @@ loc = 397
 [[file]]
 go = "tsc/internal/execute/incremental/buildInfo.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1894,7 +1894,7 @@ loc = 650
 [[file]]
 go = "tsc/internal/execute/incremental/buildinfotosnapshot.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1907,7 +1907,7 @@ loc = 200
 [[file]]
 go = "tsc/internal/execute/incremental/emitfileshandler.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1920,7 +1920,7 @@ loc = 354
 [[file]]
 go = "tsc/internal/execute/incremental/host.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1933,7 +1933,7 @@ loc = 45
 [[file]]
 go = "tsc/internal/execute/incremental/incremental.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1946,7 +1946,7 @@ loc = 62
 [[file]]
 go = "tsc/internal/execute/incremental/program.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1959,7 +1959,7 @@ loc = 505
 [[file]]
 go = "tsc/internal/execute/incremental/programtosnapshot.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1972,7 +1972,7 @@ loc = 434
 [[file]]
 go = "tsc/internal/execute/incremental/referencemap.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1985,7 +1985,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/execute/incremental/snapshot.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -1998,7 +1998,7 @@ loc = 446
 [[file]]
 go = "tsc/internal/execute/incremental/snapshottobuildinfo.go"
 package = "internal/execute/incremental"
-crate = "ts_incremental"
+crate = "tsr_incremental"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2011,7 +2011,7 @@ loc = 390
 [[file]]
 go = "tsc/internal/execute/tsc.go"
 package = "internal/execute"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2024,7 +2024,7 @@ loc = 408
 [[file]]
 go = "tsc/internal/execute/tsc/compile.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2037,7 +2037,7 @@ loc = 115
 [[file]]
 go = "tsc/internal/execute/tsc/diagnostics.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2050,7 +2050,7 @@ loc = 185
 [[file]]
 go = "tsc/internal/execute/tsc/emit.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2063,7 +2063,7 @@ loc = 162
 [[file]]
 go = "tsc/internal/execute/tsc/extendedconfigcache.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2076,7 +2076,7 @@ loc = 45
 [[file]]
 go = "tsc/internal/execute/tsc/help.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2089,7 +2089,7 @@ loc = 426
 [[file]]
 go = "tsc/internal/execute/tsc/init.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2102,7 +2102,7 @@ loc = 215
 [[file]]
 go = "tsc/internal/execute/tsc/statistics.go"
 package = "internal/execute/tsc"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2115,7 +2115,7 @@ loc = 183
 [[file]]
 go = "tsc/internal/execute/tsctests/fs.go"
 package = "internal/execute/tsctests"
-crate = "ts_tsctests"
+crate = "tsr_tsctests"
 phase = 4
 kind = "harness"
 status = "planned"
@@ -2128,7 +2128,7 @@ loc = 90
 [[file]]
 go = "tsc/internal/execute/tsctests/mock_watch_backend.go"
 package = "internal/execute/tsctests"
-crate = "ts_tsctests"
+crate = "tsr_tsctests"
 phase = 4
 kind = "harness"
 status = "planned"
@@ -2141,7 +2141,7 @@ loc = 239
 [[file]]
 go = "tsc/internal/execute/tsctests/readablebuildinfo.go"
 package = "internal/execute/tsctests"
-crate = "ts_tsctests"
+crate = "tsr_tsctests"
 phase = 4
 kind = "harness"
 status = "planned"
@@ -2154,7 +2154,7 @@ loc = 449
 [[file]]
 go = "tsc/internal/execute/tsctests/runner.go"
 package = "internal/execute/tsctests"
-crate = "ts_tsctests"
+crate = "tsr_tsctests"
 phase = 4
 kind = "harness"
 status = "planned"
@@ -2167,7 +2167,7 @@ loc = 205
 [[file]]
 go = "tsc/internal/execute/tsctests/sys.go"
 package = "internal/execute/tsctests"
-crate = "ts_tsctests"
+crate = "tsr_tsctests"
 phase = 4
 kind = "harness"
 status = "planned"
@@ -2180,7 +2180,7 @@ loc = 611
 [[file]]
 go = "tsc/internal/execute/watcher.go"
 package = "internal/execute"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2193,7 +2193,7 @@ loc = 693
 [[file]]
 go = "tsc/internal/execute/watchmanager/watchbackend.go"
 package = "internal/execute/watchmanager"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2206,7 +2206,7 @@ loc = 118
 [[file]]
 go = "tsc/internal/execute/watchmanager/watchmanager.go"
 package = "internal/execute/watchmanager"
-crate = "ts_execute"
+crate = "tsr_execute"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2219,11 +2219,11 @@ loc = 354
 [[file]]
 go = "tsc/internal/format/api.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/api.rs"]
+rust = ["crates/tsr_format/src/api.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "432fc294bb4566da21cad626e7704f22b4d51df35c1cdf0dab8ad204c146e3e5"
@@ -2232,11 +2232,11 @@ loc = 189
 [[file]]
 go = "tsc/internal/format/context.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/context.rs"]
+rust = ["crates/tsr_format/src/context.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "b5531e3b1acbf45c79160b2a7c3a9bfb07296e0b01326574a657498dc75050f7"
@@ -2245,11 +2245,11 @@ loc = 121
 [[file]]
 go = "tsc/internal/format/indent.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/indent.rs"]
+rust = ["crates/tsr_format/src/indent.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d71024887c72e2b086cbea628b9a2608fff67d26b4dc83f246ef897caa845d3a"
@@ -2258,11 +2258,11 @@ loc = 821
 [[file]]
 go = "tsc/internal/format/rule.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/rule.rs"]
+rust = ["crates/tsr_format/src/rule.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "491aa5b7ac1ad3eb8d390463c8cf7ff94667351db40a81e5d1b2c1ce54305224"
@@ -2271,11 +2271,11 @@ loc = 109
 [[file]]
 go = "tsc/internal/format/rulecontext.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/rulecontext.rs", "crates/ts_format/src/rule.rs"]
+rust = ["crates/tsr_format/src/rulecontext.rs", "crates/tsr_format/src/rule.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e1680a242c6ef5a16b477e21aea0cd69c3e7c6f43da853aafcb00ec4c80ab606"
@@ -2284,11 +2284,11 @@ loc = 629
 [[file]]
 go = "tsc/internal/format/rules.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/rules.rs"]
+rust = ["crates/tsr_format/src/rules.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "6042e71a404d16cb1e305454811fec00babe75f56c34897dde185bb407de6ac8"
@@ -2297,11 +2297,11 @@ loc = 450
 [[file]]
 go = "tsc/internal/format/rulesmap.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/rulesmap.rs"]
+rust = ["crates/tsr_format/src/rulesmap.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f47f323a1b23acada40c72aba96331124df97f9795e817ba367b63b88d25c5a9"
@@ -2310,11 +2310,11 @@ loc = 156
 [[file]]
 go = "tsc/internal/format/scanner.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/scanner.rs"]
+rust = ["crates/tsr_format/src/scanner.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "ea38a4cd70028f448c5cd013c39cd061c13d00fde00f7778d38ba2b7674b4ce3"
@@ -2323,11 +2323,11 @@ loc = 374
 [[file]]
 go = "tsc/internal/format/span.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/span.rs"]
+rust = ["crates/tsr_format/src/span.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "821ac664a2cbbffeb553dc7e0436d40d1605e1ce979931e4691a49a77d6a7d67"
@@ -2336,11 +2336,11 @@ loc = 1262
 [[file]]
 go = "tsc/internal/format/util.go"
 package = "internal/format"
-crate = "ts_format"
+crate = "tsr_format"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/util.rs"]
+rust = ["crates/tsr_format/src/util.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f6df3237020bc8da0b4d8d4c236abd0196210f2e57093e679a56446cd95ccc96"
@@ -2349,7 +2349,7 @@ loc = 148
 [[file]]
 go = "tsc/internal/fourslash/baselineutil.go"
 package = "internal/fourslash"
-crate = "ts_fourslash"
+crate = "tsr_fourslash"
 phase = 5
 kind = "harness"
 status = "planned"
@@ -2362,7 +2362,7 @@ loc = 801
 [[file]]
 go = "tsc/internal/fourslash/fourslash.go"
 package = "internal/fourslash"
-crate = "ts_fourslash"
+crate = "tsr_fourslash"
 phase = 5
 kind = "harness"
 status = "planned"
@@ -2375,7 +2375,7 @@ loc = 6053
 [[file]]
 go = "tsc/internal/fourslash/semantictokens.go"
 package = "internal/fourslash"
-crate = "ts_fourslash"
+crate = "tsr_fourslash"
 phase = 5
 kind = "harness"
 status = "planned"
@@ -2388,7 +2388,7 @@ loc = 130
 [[file]]
 go = "tsc/internal/fourslash/statebaseline.go"
 package = "internal/fourslash"
-crate = "ts_fourslash"
+crate = "tsr_fourslash"
 phase = 5
 kind = "harness"
 status = "planned"
@@ -2401,7 +2401,7 @@ loc = 511
 [[file]]
 go = "tsc/internal/fourslash/test_parser.go"
 package = "internal/fourslash"
-crate = "ts_fourslash"
+crate = "tsr_fourslash"
 phase = 5
 kind = "harness"
 status = "planned"
@@ -2414,7 +2414,7 @@ loc = 524
 [[file]]
 go = "tsc/internal/fswatch/canonicalize_darwin.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2427,7 +2427,7 @@ loc = 14
 [[file]]
 go = "tsc/internal/fswatch/canonicalize_other.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2440,7 +2440,7 @@ loc = 8
 [[file]]
 go = "tsc/internal/fswatch/debounce.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2453,7 +2453,7 @@ loc = 155
 [[file]]
 go = "tsc/internal/fswatch/event.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2466,7 +2466,7 @@ loc = 271
 [[file]]
 go = "tsc/internal/fswatch/fanotify_linux.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2479,7 +2479,7 @@ loc = 769
 [[file]]
 go = "tsc/internal/fswatch/fsevents_darwin.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2492,7 +2492,7 @@ loc = 640
 [[file]]
 go = "tsc/internal/fswatch/fsevents_darwin_ffi.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2505,7 +2505,7 @@ loc = 553
 [[file]]
 go = "tsc/internal/fswatch/inotify_linux.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2518,7 +2518,7 @@ loc = 427
 [[file]]
 go = "tsc/internal/fswatch/kqueue.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2531,7 +2531,7 @@ loc = 784
 [[file]]
 go = "tsc/internal/fswatch/walkdir.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2544,7 +2544,7 @@ loc = 57
 [[file]]
 go = "tsc/internal/fswatch/walkdir_dirent_darwin.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2557,7 +2557,7 @@ loc = 8
 [[file]]
 go = "tsc/internal/fswatch/walkdir_dirent_fileno.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2570,7 +2570,7 @@ loc = 8
 [[file]]
 go = "tsc/internal/fswatch/walkdir_dirent_linux.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2583,7 +2583,7 @@ loc = 8
 [[file]]
 go = "tsc/internal/fswatch/walkdir_dirent_noreclen.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2596,7 +2596,7 @@ loc = 22
 [[file]]
 go = "tsc/internal/fswatch/walkdir_other.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2609,7 +2609,7 @@ loc = 7
 [[file]]
 go = "tsc/internal/fswatch/walkdir_unix.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2622,7 +2622,7 @@ loc = 145
 [[file]]
 go = "tsc/internal/fswatch/walkdir_windows.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2635,7 +2635,7 @@ loc = 74
 [[file]]
 go = "tsc/internal/fswatch/watcher.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "source"
 status = "planned"
@@ -2648,7 +2648,7 @@ loc = 1108
 [[file]]
 go = "tsc/internal/fswatch/windows.go"
 package = "internal/fswatch"
-crate = "ts_fswatch"
+crate = "tsr_fswatch"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2661,7 +2661,7 @@ loc = 474
 [[file]]
 go = "tsc/internal/glob/glob.go"
 package = "internal/glob"
-crate = "ts_glob"
+crate = "tsr_glob"
 phase = 1
 kind = "source"
 status = "planned"
@@ -2674,7 +2674,7 @@ loc = 349
 [[file]]
 go = "tsc/internal/ipc/conn.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2687,7 +2687,7 @@ loc = 46
 [[file]]
 go = "tsc/internal/ipc/conn_async.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2700,7 +2700,7 @@ loc = 318
 [[file]]
 go = "tsc/internal/ipc/conn_sync.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2713,7 +2713,7 @@ loc = 211
 [[file]]
 go = "tsc/internal/ipc/protocol.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2726,7 +2726,7 @@ loc = 22
 [[file]]
 go = "tsc/internal/ipc/protocol_jsonrpc.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2739,7 +2739,7 @@ loc = 96
 [[file]]
 go = "tsc/internal/ipc/timing.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2752,7 +2752,7 @@ loc = 143
 [[file]]
 go = "tsc/internal/ipc/transport.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2765,7 +2765,7 @@ loc = 95
 [[file]]
 go = "tsc/internal/ipc/transport_unix.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2778,7 +2778,7 @@ loc = 22
 [[file]]
 go = "tsc/internal/ipc/transport_windows.go"
 package = "internal/ipc"
-crate = "ts_ipc"
+crate = "tsr_ipc"
 phase = 6
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -2791,7 +2791,7 @@ loc = 19
 [[file]]
 go = "tsc/internal/jsnum/jsnum.go"
 package = "internal/jsnum"
-crate = "ts_jsnum"
+crate = "tsr_jsnum"
 phase = 1
 kind = "source"
 status = "planned"
@@ -2804,11 +2804,11 @@ loc = 177
 [[file]]
 go = "tsc/internal/jsnum/pseudobigint.go"
 package = "internal/jsnum"
-crate = "ts_jsnum"
+crate = "tsr_jsnum"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsnum/src/bigint.rs", "crates/ts_jsnum/src/pseudobigint.rs"]
+rust = ["crates/tsr_jsnum/src/bigint.rs", "crates/tsr_jsnum/src/pseudobigint.rs"]
 verify = ["run.scanner.parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "bdd6628982a1471e6a887c54948c58d2056120f1320a1b80ccb25a75b7ea8a99"
@@ -2817,11 +2817,11 @@ loc = 66
 [[file]]
 go = "tsc/internal/jsnum/string.go"
 package = "internal/jsnum"
-crate = "ts_jsnum"
+crate = "tsr_jsnum"
 phase = 1
 kind = "source"
 status = "ported"
-rust = ["crates/ts_jsnum/src/lib.rs", "crates/ts_jsnum/src/string.rs"]
+rust = ["crates/tsr_jsnum/src/lib.rs", "crates/tsr_jsnum/src/string.rs"]
 verify = ["run.scanner.parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "79cba5294aa96796c280169b6d3d5ed1b62da2b2aad312c8d9d06dc0a563d62b"
@@ -2830,7 +2830,7 @@ loc = 341
 [[file]]
 go = "tsc/internal/json/json.go"
 package = "internal/json"
-crate = "ts_json"
+crate = "tsr_json"
 phase = 1
 kind = "source"
 status = "planned"
@@ -2843,7 +2843,7 @@ loc = 100
 [[file]]
 go = "tsc/internal/jsonrpc/baseproto.go"
 package = "internal/jsonrpc"
-crate = "ts_jsonrpc"
+crate = "tsr_jsonrpc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2856,7 +2856,7 @@ loc = 99
 [[file]]
 go = "tsc/internal/jsonrpc/jsonrpc.go"
 package = "internal/jsonrpc"
-crate = "ts_jsonrpc"
+crate = "tsr_jsonrpc"
 phase = 6
 kind = "source"
 status = "planned"
@@ -2869,7 +2869,7 @@ loc = 188
 [[file]]
 go = "tsc/internal/locale/locale.go"
 package = "internal/locale"
-crate = "ts_locale"
+crate = "tsr_locale"
 phase = 1
 kind = "source"
 status = "planned"
@@ -2882,7 +2882,7 @@ loc = 40
 [[file]]
 go = "tsc/internal/ls/api.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2895,7 +2895,7 @@ loc = 44
 [[file]]
 go = "tsc/internal/ls/autoimport/aliasresolver.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2908,7 +2908,7 @@ loc = 241
 [[file]]
 go = "tsc/internal/ls/autoimport/export.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2921,7 +2921,7 @@ loc = 142
 [[file]]
 go = "tsc/internal/ls/autoimport/export_stringer_generated.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "generated"
 status = "planned"
@@ -2934,7 +2934,7 @@ loc = 33
 [[file]]
 go = "tsc/internal/ls/autoimport/extract.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2947,7 +2947,7 @@ loc = 473
 [[file]]
 go = "tsc/internal/ls/autoimport/fix.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2960,7 +2960,7 @@ loc = 1335
 [[file]]
 go = "tsc/internal/ls/autoimport/import_adder.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2973,7 +2973,7 @@ loc = 502
 [[file]]
 go = "tsc/internal/ls/autoimport/index.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2986,7 +2986,7 @@ loc = 186
 [[file]]
 go = "tsc/internal/ls/autoimport/registry.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -2999,7 +2999,7 @@ loc = 1828
 [[file]]
 go = "tsc/internal/ls/autoimport/specifiers.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3012,7 +3012,7 @@ loc = 75
 [[file]]
 go = "tsc/internal/ls/autoimport/util.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3025,7 +3025,7 @@ loc = 323
 [[file]]
 go = "tsc/internal/ls/autoimport/view.go"
 package = "internal/ls/autoimport"
-crate = "ts_autoimport"
+crate = "tsr_autoimport"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3038,7 +3038,7 @@ loc = 262
 [[file]]
 go = "tsc/internal/ls/autoinsert.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3051,7 +3051,7 @@ loc = 106
 [[file]]
 go = "tsc/internal/ls/callhierarchy.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3064,7 +3064,7 @@ loc = 1137
 [[file]]
 go = "tsc/internal/ls/change/delete.go"
 package = "internal/ls/change"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3077,7 +3077,7 @@ loc = 262
 [[file]]
 go = "tsc/internal/ls/change/tracker.go"
 package = "internal/ls/change"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3090,7 +3090,7 @@ loc = 827
 [[file]]
 go = "tsc/internal/ls/change/trackerimpl.go"
 package = "internal/ls/change"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3103,7 +3103,7 @@ loc = 488
 [[file]]
 go = "tsc/internal/ls/codeactions.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3116,7 +3116,7 @@ loc = 402
 [[file]]
 go = "tsc/internal/ls/codeactions_fixclassincorrectlyimplementsinterface.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3129,7 +3129,7 @@ loc = 240
 [[file]]
 go = "tsc/internal/ls/codeactions_fixmissingtypeannotation.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3142,7 +3142,7 @@ loc = 1420
 [[file]]
 go = "tsc/internal/ls/codeactions_importfixes.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3155,7 +3155,7 @@ loc = 457
 [[file]]
 go = "tsc/internal/ls/codeactions_missingmemberfixer.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3168,7 +3168,7 @@ loc = 514
 [[file]]
 go = "tsc/internal/ls/codelens.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3181,7 +3181,7 @@ loc = 243
 [[file]]
 go = "tsc/internal/ls/completions.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3194,7 +3194,7 @@ loc = 6900
 [[file]]
 go = "tsc/internal/ls/constants.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3207,7 +3207,7 @@ loc = 6
 [[file]]
 go = "tsc/internal/ls/crossproject.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3220,7 +3220,7 @@ loc = 437
 [[file]]
 go = "tsc/internal/ls/definition.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3233,7 +3233,7 @@ loc = 516
 [[file]]
 go = "tsc/internal/ls/diagnostics.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3246,7 +3246,7 @@ loc = 120
 [[file]]
 go = "tsc/internal/ls/displaypartswriter.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3259,7 +3259,7 @@ loc = 217
 [[file]]
 go = "tsc/internal/ls/documenthighlights.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3272,7 +3272,7 @@ loc = 795
 [[file]]
 go = "tsc/internal/ls/file_rename.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3285,7 +3285,7 @@ loc = 403
 [[file]]
 go = "tsc/internal/ls/findallreferences.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3298,7 +3298,7 @@ loc = 2774
 [[file]]
 go = "tsc/internal/ls/folding.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3311,7 +3311,7 @@ loc = 660
 [[file]]
 go = "tsc/internal/ls/format.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3324,7 +3324,7 @@ loc = 302
 [[file]]
 go = "tsc/internal/ls/host.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3337,7 +3337,7 @@ loc = 25
 [[file]]
 go = "tsc/internal/ls/hover.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3350,7 +3350,7 @@ loc = 1159
 [[file]]
 go = "tsc/internal/ls/hovericon.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3363,7 +3363,7 @@ loc = 156
 [[file]]
 go = "tsc/internal/ls/importTracker.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3376,7 +3376,7 @@ loc = 767
 [[file]]
 go = "tsc/internal/ls/inlay_hints.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3389,7 +3389,7 @@ loc = 950
 [[file]]
 go = "tsc/internal/ls/jsdoc.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3402,7 +3402,7 @@ loc = 312
 [[file]]
 go = "tsc/internal/ls/jsdoc_snippet.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3415,7 +3415,7 @@ loc = 597
 [[file]]
 go = "tsc/internal/ls/languageservice.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3428,7 +3428,7 @@ loc = 132
 [[file]]
 go = "tsc/internal/ls/linkedediting.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3441,11 +3441,11 @@ loc = 117
 [[file]]
 go = "tsc/internal/ls/lsconv/converters.go"
 package = "internal/ls/lsconv"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsstring/src/lsp.rs"]
+rust = ["crates/tsr_jsstring/src/lsp.rs"]
 verify = ["run.e4.utf8_positions == true", "run.e4.utf16_positions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a105e6b1db5433615a33ac342f4b2e20abd90683af7796d456b076c4f236c952"
@@ -3454,11 +3454,11 @@ loc = 637
 [[file]]
 go = "tsc/internal/ls/lsconv/linemap.go"
 package = "internal/ls/lsconv"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "ported"
-rust = ["crates/ts_jsstring/src/line_map.rs"]
+rust = ["crates/tsr_jsstring/src/line_map.rs"]
 verify = ["run.e4.utf8_positions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "bbfc46d0a9fc9c3a1f8f6c73ea6a3ea9b3420ebe6dabaf404204d14d50de2cd7"
@@ -3467,11 +3467,11 @@ loc = 71
 [[file]]
 go = "tsc/internal/ls/lsutil/asi.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/lsutil.rs"]
+rust = ["crates/tsr_format/src/lsutil.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "75d4778cc14a3ea9d2402485d59f5698382b7a60fb2242fc7ed5beafd2d2e305"
@@ -3480,11 +3480,11 @@ loc = 104
 [[file]]
 go = "tsc/internal/ls/lsutil/children.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/lsutil.rs"]
+rust = ["crates/tsr_format/src/lsutil.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2cf53d3ee98979f9410cc51109c9047d6fcf7261030071ad00158f30fa1855e0"
@@ -3493,11 +3493,11 @@ loc = 130
 [[file]]
 go = "tsc/internal/ls/lsutil/completednode.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/lsutil.rs"]
+rust = ["crates/tsr_format/src/lsutil.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f3865778b6721355f9ccd2864f97134d07130901c47f35f737c299caaa3fea7c"
@@ -3506,11 +3506,11 @@ loc = 196
 [[file]]
 go = "tsc/internal/ls/lsutil/formatcodeoptions.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_format/src/settings.rs"]
+rust = ["crates/tsr_format/src/settings.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "0a30600aa9a55fed0ac9e49a825992fb084b354799d803ba1c08eca9f685d4fe"
@@ -3519,7 +3519,7 @@ loc = 141
 [[file]]
 go = "tsc/internal/ls/lsutil/organizeimports.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3532,7 +3532,7 @@ loc = 695
 [[file]]
 go = "tsc/internal/ls/lsutil/symbol_display.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3545,7 +3545,7 @@ loc = 438
 [[file]]
 go = "tsc/internal/ls/lsutil/userpreferences.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3558,7 +3558,7 @@ loc = 924
 [[file]]
 go = "tsc/internal/ls/lsutil/utilities.go"
 package = "internal/ls/lsutil"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3571,7 +3571,7 @@ loc = 160
 [[file]]
 go = "tsc/internal/ls/organizeimports.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3584,7 +3584,7 @@ loc = 957
 [[file]]
 go = "tsc/internal/ls/rename.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3597,7 +3597,7 @@ loc = 455
 [[file]]
 go = "tsc/internal/ls/selectionranges.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3610,7 +3610,7 @@ loc = 400
 [[file]]
 go = "tsc/internal/ls/semantictokens.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3623,7 +3623,7 @@ loc = 624
 [[file]]
 go = "tsc/internal/ls/signaturehelp.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3636,7 +3636,7 @@ loc = 1440
 [[file]]
 go = "tsc/internal/ls/source_map.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3649,7 +3649,7 @@ loc = 167
 [[file]]
 go = "tsc/internal/ls/sourcedefinition.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3662,7 +3662,7 @@ loc = 731
 [[file]]
 go = "tsc/internal/ls/string_completions.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3675,7 +3675,7 @@ loc = 2247
 [[file]]
 go = "tsc/internal/ls/symbols.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3688,7 +3688,7 @@ loc = 723
 [[file]]
 go = "tsc/internal/ls/utilities.go"
 package = "internal/ls"
-crate = "ts_ls"
+crate = "tsr_ls"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3701,7 +3701,7 @@ loc = 1411
 [[file]]
 go = "tsc/internal/lsp/dynamic_queue.go"
 package = "internal/lsp"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3714,7 +3714,7 @@ loc = 94
 [[file]]
 go = "tsc/internal/lsp/logger.go"
 package = "internal/lsp"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3727,7 +3727,7 @@ loc = 184
 [[file]]
 go = "tsc/internal/lsp/lsproto/baseproto.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3740,7 +3740,7 @@ loc = 33
 [[file]]
 go = "tsc/internal/lsp/lsproto/jsonrpc.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3753,7 +3753,7 @@ loc = 130
 [[file]]
 go = "tsc/internal/lsp/lsproto/lsp.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3766,7 +3766,7 @@ loc = 321
 [[file]]
 go = "tsc/internal/lsp/lsproto/lsp_generated.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "generated"
 status = "planned"
@@ -3779,7 +3779,7 @@ loc = 17566
 [[file]]
 go = "tsc/internal/lsp/lsproto/structcodec.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3792,7 +3792,7 @@ loc = 164
 [[file]]
 go = "tsc/internal/lsp/lsproto/util.go"
 package = "internal/lsp/lsproto"
-crate = "ts_lsproto"
+crate = "tsr_lsproto"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3805,7 +3805,7 @@ loc = 111
 [[file]]
 go = "tsc/internal/lsp/lspwatcher/lspwatcher.go"
 package = "internal/lsp/lspwatcher"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3818,7 +3818,7 @@ loc = 601
 [[file]]
 go = "tsc/internal/lsp/progress.go"
 package = "internal/lsp"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3831,7 +3831,7 @@ loc = 217
 [[file]]
 go = "tsc/internal/lsp/server.go"
 package = "internal/lsp"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3844,7 +3844,7 @@ loc = 2542
 [[file]]
 go = "tsc/internal/lsp/stack_sanitizer.go"
 package = "internal/lsp"
-crate = "ts_lsp"
+crate = "tsr_lsp"
 phase = 5
 kind = "source"
 status = "planned"
@@ -3857,11 +3857,11 @@ loc = 96
 [[file]]
 go = "tsc/internal/module/cache.go"
 package = "internal/module"
-crate = "ts_module"
+crate = "tsr_module"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/resolver.rs"]
+rust = ["crates/tsr_module/src/resolver.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "86949a7d67c92c12b6420c3ff45b330ddfa30be311ccf742e5752a32ed65029a"
@@ -3870,11 +3870,11 @@ loc = 89
 [[file]]
 go = "tsc/internal/module/resolver.go"
 package = "internal/module"
-crate = "ts_module"
+crate = "tsr_module"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_maps.rs", "crates/ts_module/src/resolver.rs", "crates/ts_module/src/trace.rs", "crates/ts_module/src/type_references.rs"]
+rust = ["crates/tsr_module/src/package_maps.rs", "crates/tsr_module/src/resolver.rs", "crates/tsr_module/src/trace.rs", "crates/tsr_module/src/type_references.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2327bd2509887f401591035516b643411a8a4a2ed046c928c521fcaa791cf629"
@@ -3883,11 +3883,11 @@ loc = 2372
 [[file]]
 go = "tsc/internal/module/types.go"
 package = "internal/module"
-crate = "ts_module"
+crate = "tsr_module"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/include_reason.rs", "crates/ts_module/src/resolver.rs", "crates/ts_module/src/type_references.rs"]
+rust = ["crates/tsr_compiler/src/include_reason.rs", "crates/tsr_module/src/resolver.rs", "crates/tsr_module/src/type_references.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "05ceb4962ff7740f7a09c8b42b926828b6963b8f6f4d439415a7f5fff9b74794"
@@ -3896,11 +3896,11 @@ loc = 137
 [[file]]
 go = "tsc/internal/module/util.go"
 package = "internal/module"
-crate = "ts_module"
+crate = "tsr_module"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/diagnostic.rs", "crates/ts_module/src/package_maps.rs"]
+rust = ["crates/tsr_module/src/diagnostic.rs", "crates/tsr_module/src/package_maps.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "991ae120a3d749544cd509665c76923eb2c79d8ef64e2878f3930a9325ccd480"
@@ -3909,7 +3909,7 @@ loc = 201
 [[file]]
 go = "tsc/internal/modulespecifiers/compare.go"
 package = "internal/modulespecifiers"
-crate = "ts_modulespecifiers"
+crate = "tsr_modulespecifiers"
 phase = 2
 kind = "source"
 status = "planned"
@@ -3922,7 +3922,7 @@ loc = 13
 [[file]]
 go = "tsc/internal/modulespecifiers/preferences.go"
 package = "internal/modulespecifiers"
-crate = "ts_modulespecifiers"
+crate = "tsr_modulespecifiers"
 phase = 2
 kind = "source"
 status = "planned"
@@ -3935,7 +3935,7 @@ loc = 256
 [[file]]
 go = "tsc/internal/modulespecifiers/specifiers.go"
 package = "internal/modulespecifiers"
-crate = "ts_modulespecifiers"
+crate = "tsr_modulespecifiers"
 phase = 2
 kind = "source"
 status = "planned"
@@ -3948,7 +3948,7 @@ loc = 1402
 [[file]]
 go = "tsc/internal/modulespecifiers/types.go"
 package = "internal/modulespecifiers"
-crate = "ts_modulespecifiers"
+crate = "tsr_modulespecifiers"
 phase = 2
 kind = "source"
 status = "planned"
@@ -3961,7 +3961,7 @@ loc = 125
 [[file]]
 go = "tsc/internal/modulespecifiers/util.go"
 package = "internal/modulespecifiers"
-crate = "ts_modulespecifiers"
+crate = "tsr_modulespecifiers"
 phase = 2
 kind = "source"
 status = "planned"
@@ -3974,7 +3974,7 @@ loc = 491
 [[file]]
 go = "tsc/internal/nativepath/eintr_unix.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "source"
 status = "planned"
@@ -3987,7 +3987,7 @@ loc = 14
 [[file]]
 go = "tsc/internal/nativepath/realpath_linux.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "source"
 status = "planned"
@@ -4000,7 +4000,7 @@ loc = 70
 [[file]]
 go = "tsc/internal/nativepath/realpath_other.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "source"
 status = "planned"
@@ -4013,7 +4013,7 @@ loc = 9
 [[file]]
 go = "tsc/internal/nativepath/realpath_windows.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4026,7 +4026,7 @@ loc = 100
 [[file]]
 go = "tsc/internal/nativepath/symlink_other.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "source"
 status = "planned"
@@ -4039,7 +4039,7 @@ loc = 10
 [[file]]
 go = "tsc/internal/nativepath/symlink_windows.go"
 package = "internal/nativepath"
-crate = "ts_nativepath"
+crate = "tsr_nativepath"
 phase = 4
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4052,11 +4052,11 @@ loc = 29
 [[file]]
 go = "tsc/internal/nodebuilder/types.go"
 package = "internal/nodebuilder"
-crate = "ts_nodebuilder"
+crate = "tsr_nodebuilder"
 phase = 2
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_nodebuilder/src/lib.rs"]
+rust = ["crates/tsr_nodebuilder/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "1cbbf774332b79f7747e71b20bffac1095f16a5cb4a8db87c6031cbd5707ea2e"
@@ -4065,7 +4065,7 @@ loc = 78
 [[file]]
 go = "tsc/internal/osutil/os_android.go"
 package = "internal/osutil"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -4078,7 +4078,7 @@ loc = 27
 [[file]]
 go = "tsc/internal/osutil/os_other.go"
 package = "internal/osutil"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -4091,7 +4091,7 @@ loc = 13
 [[file]]
 go = "tsc/internal/osutil/osutil.go"
 package = "internal/osutil"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -4104,7 +4104,7 @@ loc = 11
 [[file]]
 go = "tsc/internal/outputpaths/commonsourcedirectory.go"
 package = "internal/outputpaths"
-crate = "ts_outputpaths"
+crate = "tsr_outputpaths"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4117,7 +4117,7 @@ loc = 85
 [[file]]
 go = "tsc/internal/outputpaths/outputpaths.go"
 package = "internal/outputpaths"
-crate = "ts_outputpaths"
+crate = "tsr_outputpaths"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4130,11 +4130,11 @@ loc = 229
 [[file]]
 go = "tsc/internal/packagejson/cache.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_maps.rs", "crates/ts_module/src/resolver.rs"]
+rust = ["crates/tsr_module/src/package_maps.rs", "crates/tsr_module/src/resolver.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "791379a5393c89351db510879e14d296a9ec37700268aabf6fff8dee2bc45172"
@@ -4143,11 +4143,11 @@ loc = 198
 [[file]]
 go = "tsc/internal/packagejson/expected.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_json.rs"]
+rust = ["crates/tsr_module/src/package_json.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "75a23eb89d2da593bf1979b18257ae2a68e5b647212619b953c20bfe0337f177"
@@ -4156,11 +4156,11 @@ loc = 75
 [[file]]
 go = "tsc/internal/packagejson/exportsorimports.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_json.rs"]
+rust = ["crates/tsr_module/src/package_json.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "1b0ec2d19959a3762ac873a49e4012352e93a5eaef804e397fad26488c522af5"
@@ -4169,11 +4169,11 @@ loc = 84
 [[file]]
 go = "tsc/internal/packagejson/jsonvalue.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_json.rs"]
+rust = ["crates/tsr_module/src/package_json.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "3084fd38a697fbb576a1aa8c7971d71943a1546b5b1083ed4a59e21b95ac5b77"
@@ -4182,11 +4182,11 @@ loc = 175
 [[file]]
 go = "tsc/internal/packagejson/packagejson.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_json.rs"]
+rust = ["crates/tsr_module/src/package_json.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "858537735303a60c23edf6e153534934a06f751b77be900662d651d06c3f3b7b"
@@ -4195,11 +4195,11 @@ loc = 144
 [[file]]
 go = "tsc/internal/packagejson/validated.go"
 package = "internal/packagejson"
-crate = "ts_packagejson"
+crate = "tsr_packagejson"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/package_json.rs"]
+rust = ["crates/tsr_module/src/package_json.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "27ea3e73c2985e1926e86e2ed3dd2425d7d75267060521d1c83c792cf83bd6cd"
@@ -4208,11 +4208,11 @@ loc = 8
 [[file]]
 go = "tsc/internal/parser/jsdoc.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_parser/src/jsdoc.rs", "crates/ts_parser/src/lazy_jsdoc.rs"]
+rust = ["crates/tsr_parser/src/jsdoc.rs", "crates/tsr_parser/src/lazy_jsdoc.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e1.depth == true", "run.e1.parser_regressions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "02d23ecd8435148c3b69634739a75a1a5d9a1fcd5c683dcac131efe97699f51c"
@@ -4221,11 +4221,11 @@ loc = 1355
 [[file]]
 go = "tsc/internal/parser/parser.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_parser/src/access.rs", "crates/ts_parser/src/ambiguity.rs", "crates/ts_parser/src/bindings.rs", "crates/ts_parser/src/classes.rs", "crates/ts_parser/src/declarations.rs", "crates/ts_parser/src/diagnostics.rs", "crates/ts_parser/src/expressions.rs", "crates/ts_parser/src/identifiers.rs", "crates/ts_parser/src/imports.rs", "crates/ts_parser/src/js_syntax.rs", "crates/ts_parser/src/json.rs", "crates/ts_parser/src/jsx.rs", "crates/ts_parser/src/lists.rs", "crates/ts_parser/src/modifiers.rs", "crates/ts_parser/src/orchestration.rs", "crates/ts_parser/src/pragmas.rs", "crates/ts_parser/src/predicates.rs", "crates/ts_parser/src/primary.rs", "crates/ts_parser/src/signatures.rs", "crates/ts_parser/src/state.rs", "crates/ts_parser/src/statements.rs", "crates/ts_parser/src/tokens.rs", "crates/ts_parser/src/types.rs"]
+rust = ["crates/tsr_parser/src/access.rs", "crates/tsr_parser/src/ambiguity.rs", "crates/tsr_parser/src/bindings.rs", "crates/tsr_parser/src/classes.rs", "crates/tsr_parser/src/declarations.rs", "crates/tsr_parser/src/diagnostics.rs", "crates/tsr_parser/src/expressions.rs", "crates/tsr_parser/src/identifiers.rs", "crates/tsr_parser/src/imports.rs", "crates/tsr_parser/src/js_syntax.rs", "crates/tsr_parser/src/json.rs", "crates/tsr_parser/src/jsx.rs", "crates/tsr_parser/src/lists.rs", "crates/tsr_parser/src/modifiers.rs", "crates/tsr_parser/src/orchestration.rs", "crates/tsr_parser/src/pragmas.rs", "crates/tsr_parser/src/predicates.rs", "crates/tsr_parser/src/primary.rs", "crates/tsr_parser/src/signatures.rs", "crates/tsr_parser/src/state.rs", "crates/tsr_parser/src/statements.rs", "crates/tsr_parser/src/tokens.rs", "crates/tsr_parser/src/types.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e1.depth == true", "run.e1.parser_regressions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "1837634240986fc8342ce2d8b10212397b31b3c4af208a9bff3ba6cac853ac03"
@@ -4234,11 +4234,11 @@ loc = 6854
 [[file]]
 go = "tsc/internal/parser/references.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_parser/src/references.rs"]
+rust = ["crates/tsr_parser/src/references.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e1.depth == true", "run.e1.parser_regressions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "def5d5dc418fa3d9d868828a315ad6e24adfce60683d2cc818746e8a93e507d7"
@@ -4247,11 +4247,11 @@ loc = 71
 [[file]]
 go = "tsc/internal/parser/reparser.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_parser/src/reparser.rs"]
+rust = ["crates/tsr_parser/src/reparser.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e1.depth == true", "run.e1.parser_regressions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "59f3d5e33405ec35406480413e901787d0f204e7255a172f8e563a7bfefc468a"
@@ -4260,7 +4260,7 @@ loc = 752
 [[file]]
 go = "tsc/internal/parser/types.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "planned"
@@ -4273,11 +4273,11 @@ loc = 14
 [[file]]
 go = "tsc/internal/parser/utilities.go"
 package = "internal/parser"
-crate = "ts_parser"
+crate = "tsr_parser"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_parser/src/jsdoc.rs", "crates/ts_parser/src/state.rs", "crates/ts_parser/src/tokens.rs"]
+rust = ["crates/tsr_parser/src/jsdoc.rs", "crates/tsr_parser/src/state.rs", "crates/tsr_parser/src/tokens.rs"]
 verify = ["run.e1.parity >= 0.999", "run.e1.frozen_denominator == true", "run.e1.ast_runtime == true", "run.e1.depth == true", "run.e1.parser_regressions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f2b4aed094eb84605ecec2c79a83633656de0937168b43cda462da6bffdd9a46"
@@ -4286,7 +4286,7 @@ loc = 56
 [[file]]
 go = "tsc/internal/pprof/pprof.go"
 package = "internal/pprof"
-crate = "ts_pprof"
+crate = "tsr_pprof"
 phase = 4
 kind = "source"
 status = "planned"
@@ -4299,11 +4299,11 @@ loc = 169
 [[file]]
 go = "tsc/internal/printer/changetrackerwriter.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/change_tracker_writer.rs"]
+rust = ["crates/tsr_printer/src/change_tracker_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "04988b51a880b0d7a8f177d4c6454a7cf98612ae88dcdcab35fd51b336897e5b"
@@ -4312,11 +4312,11 @@ loc = 250
 [[file]]
 go = "tsc/internal/printer/emitcontext.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/emit_context.rs"]
+rust = ["crates/tsr_printer/src/emit_context.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "420f0b10319cf45f7e01e1ef88958d1b8c7a357cbc7d054f5a74eaba37894ae7"
@@ -4325,11 +4325,11 @@ loc = 1067
 [[file]]
 go = "tsc/internal/printer/emitflags.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/emit_flags.rs"]
+rust = ["crates/tsr_printer/src/emit_flags.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "9381afd50eb7e56849400ad7bff6150a2d792b7d0dad3988a6a43c00feb6b02e"
@@ -4338,7 +4338,7 @@ loc = 38
 [[file]]
 go = "tsc/internal/printer/emithost.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4351,7 +4351,7 @@ loc = 23
 [[file]]
 go = "tsc/internal/printer/emitresolver.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4364,11 +4364,11 @@ loc = 127
 [[file]]
 go = "tsc/internal/printer/emittextwriter.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/emit_text_writer.rs"]
+rust = ["crates/tsr_printer/src/emit_text_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "ff3559eed9b25ef9d207cedcb8c9a0f4d3af22c95a3a32ada9ced629fe4e1030"
@@ -4377,7 +4377,7 @@ loc = 36
 [[file]]
 go = "tsc/internal/printer/factory.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4390,7 +4390,7 @@ loc = 1315
 [[file]]
 go = "tsc/internal/printer/generatedidentifierflags.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4403,7 +4403,7 @@ loc = 57
 [[file]]
 go = "tsc/internal/printer/helpers.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4416,7 +4416,7 @@ loc = 558
 [[file]]
 go = "tsc/internal/printer/namegenerator.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4429,11 +4429,11 @@ loc = 405
 [[file]]
 go = "tsc/internal/printer/printer.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/printer.rs", "crates/ts_printer/src/printer_expressions.rs", "crates/ts_printer/src/printer_statements.rs", "crates/ts_printer/src/literal_text.rs"]
+rust = ["crates/tsr_printer/src/printer.rs", "crates/tsr_printer/src/printer_expressions.rs", "crates/tsr_printer/src/printer_statements.rs", "crates/tsr_printer/src/literal_text.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "413b37f8ba0c6036e88f5f1f98f19894d25361a13a149a422c40363a46470028"
@@ -4442,11 +4442,11 @@ loc = 6345
 [[file]]
 go = "tsc/internal/printer/semicolon_writer.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/semicolon_writer.rs"]
+rust = ["crates/tsr_printer/src/semicolon_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "29cec6e7948aa747e99654c06533d5a0671a75c8df572a8ad78eddd89d02b53a"
@@ -4455,11 +4455,11 @@ loc = 143
 [[file]]
 go = "tsc/internal/printer/singlelinestringwriter.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/single_line_string_writer.rs"]
+rust = ["crates/tsr_printer/src/single_line_string_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "def5a86a51ebc15c852e79011365c7e97490292ee3e368249dca7b3fd9f19fbf"
@@ -4468,7 +4468,7 @@ loc = 159
 [[file]]
 go = "tsc/internal/printer/sourcefilemetadataprovider.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "planned"
@@ -4481,11 +4481,11 @@ loc = 10
 [[file]]
 go = "tsc/internal/printer/syntheticfile.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/change_tracker_writer.rs"]
+rust = ["crates/tsr_printer/src/change_tracker_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "f08930178ac86e79172a1822f9e52fc09da82c0d9ead446cb6dc4133ac383579"
@@ -4494,11 +4494,11 @@ loc = 53
 [[file]]
 go = "tsc/internal/printer/textwriter.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_printer/src/text_writer.rs"]
+rust = ["crates/tsr_printer/src/text_writer.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a41ab6981ff7e604fd43f4f1b9cebc02af1aa4628f688629630b471156affa89"
@@ -4507,11 +4507,11 @@ loc = 227
 [[file]]
 go = "tsc/internal/printer/utilities.go"
 package = "internal/printer"
-crate = "ts_printer"
+crate = "tsr_printer"
 phase = 3
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsstring/src/escape.rs", "crates/ts_printer/src/literal_text.rs", "crates/ts_printer/src/printer.rs"]
+rust = ["crates/tsr_jsstring/src/escape.rs", "crates/tsr_printer/src/literal_text.rs", "crates/tsr_printer/src/printer.rs"]
 verify = ["run.e4.helper_semantics == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "8860b20ac3ce3225cc5d462c335ed132b371c20eedfdec0a6a4e5071358657c4"
@@ -4520,7 +4520,7 @@ loc = 936
 [[file]]
 go = "tsc/internal/project/api.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4533,7 +4533,7 @@ loc = 35
 [[file]]
 go = "tsc/internal/project/ata/ata.go"
 package = "internal/project/ata"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4546,7 +4546,7 @@ loc = 500
 [[file]]
 go = "tsc/internal/project/ata/discovertypings.go"
 package = "internal/project/ata"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4559,7 +4559,7 @@ loc = 334
 [[file]]
 go = "tsc/internal/project/ata/typesmap.go"
 package = "internal/project/ata"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4572,7 +4572,7 @@ loc = 505
 [[file]]
 go = "tsc/internal/project/ata/validatepackagename.go"
 package = "internal/project/ata"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4585,7 +4585,7 @@ loc = 98
 [[file]]
 go = "tsc/internal/project/autoimport.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4598,7 +4598,7 @@ loc = 180
 [[file]]
 go = "tsc/internal/project/background/queue.go"
 package = "internal/project/background"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4611,7 +4611,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/project/checkerpool.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4624,7 +4624,7 @@ loc = 530
 [[file]]
 go = "tsc/internal/project/client.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4637,7 +4637,7 @@ loc = 27
 [[file]]
 go = "tsc/internal/project/compilerhost.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4650,7 +4650,7 @@ loc = 174
 [[file]]
 go = "tsc/internal/project/configfileregistry.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4663,7 +4663,7 @@ loc = 244
 [[file]]
 go = "tsc/internal/project/configfileregistrybuilder.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4676,7 +4676,7 @@ loc = 823
 [[file]]
 go = "tsc/internal/project/dirty/box.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4689,7 +4689,7 @@ loc = 62
 [[file]]
 go = "tsc/internal/project/dirty/cloneablemap.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4702,7 +4702,7 @@ loc = 9
 [[file]]
 go = "tsc/internal/project/dirty/entry.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4715,7 +4715,7 @@ loc = 29
 [[file]]
 go = "tsc/internal/project/dirty/interfaces.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4728,7 +4728,7 @@ loc = 15
 [[file]]
 go = "tsc/internal/project/dirty/map.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4741,7 +4741,7 @@ loc = 169
 [[file]]
 go = "tsc/internal/project/dirty/mapbuilder.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4754,7 +4754,7 @@ loc = 74
 [[file]]
 go = "tsc/internal/project/dirty/syncmap.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4767,7 +4767,7 @@ loc = 362
 [[file]]
 go = "tsc/internal/project/dirty/util.go"
 package = "internal/project/dirty"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4780,7 +4780,7 @@ loc = 18
 [[file]]
 go = "tsc/internal/project/extendedconfigcache.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4793,7 +4793,7 @@ loc = 51
 [[file]]
 go = "tsc/internal/project/filechange.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4806,7 +4806,7 @@ loc = 86
 [[file]]
 go = "tsc/internal/project/logging/logcollector.go"
 package = "internal/project/logging"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4819,7 +4819,7 @@ loc = 34
 [[file]]
 go = "tsc/internal/project/logging/logger.go"
 package = "internal/project/logging"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4832,7 +4832,7 @@ loc = 135
 [[file]]
 go = "tsc/internal/project/logging/logtree.go"
 package = "internal/project/logging"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4845,7 +4845,7 @@ loc = 163
 [[file]]
 go = "tsc/internal/project/overlayfs.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4858,7 +4858,7 @@ loc = 403
 [[file]]
 go = "tsc/internal/project/ownercache.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4871,7 +4871,7 @@ loc = 107
 [[file]]
 go = "tsc/internal/project/parsecache.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4884,7 +4884,7 @@ loc = 96
 [[file]]
 go = "tsc/internal/project/programcounter.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4897,7 +4897,7 @@ loc = 48
 [[file]]
 go = "tsc/internal/project/project.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4910,7 +4910,7 @@ loc = 558
 [[file]]
 go = "tsc/internal/project/project_stringer_generated.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "generated"
 status = "planned"
@@ -4923,7 +4923,7 @@ loc = 25
 [[file]]
 go = "tsc/internal/project/projectcollection.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4936,7 +4936,7 @@ loc = 359
 [[file]]
 go = "tsc/internal/project/projectcollectionbuilder.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4949,7 +4949,7 @@ loc = 1434
 [[file]]
 go = "tsc/internal/project/refcountcache.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4962,7 +4962,7 @@ loc = 137
 [[file]]
 go = "tsc/internal/project/session.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4975,7 +4975,7 @@ loc = 2104
 [[file]]
 go = "tsc/internal/project/snapshot.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -4988,7 +4988,7 @@ loc = 833
 [[file]]
 go = "tsc/internal/project/snapshotfs.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -5001,7 +5001,7 @@ loc = 868
 [[file]]
 go = "tsc/internal/project/snapshothost.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -5014,7 +5014,7 @@ loc = 184
 [[file]]
 go = "tsc/internal/project/watch.go"
 package = "internal/project"
-crate = "ts_project"
+crate = "tsr_project"
 phase = 5
 kind = "source"
 status = "planned"
@@ -5027,7 +5027,7 @@ loc = 496
 [[file]]
 go = "tsc/internal/pseudochecker/checker.go"
 package = "internal/pseudochecker"
-crate = "ts_pseudochecker"
+crate = "tsr_pseudochecker"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5040,7 +5040,7 @@ loc = 21
 [[file]]
 go = "tsc/internal/pseudochecker/lookup.go"
 package = "internal/pseudochecker"
-crate = "ts_pseudochecker"
+crate = "tsr_pseudochecker"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5053,7 +5053,7 @@ loc = 729
 [[file]]
 go = "tsc/internal/pseudochecker/type.go"
 package = "internal/pseudochecker"
-crate = "ts_pseudochecker"
+crate = "tsr_pseudochecker"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5066,7 +5066,7 @@ loc = 376
 [[file]]
 go = "tsc/internal/repo/paths.go"
 package = "internal/repo"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5079,11 +5079,11 @@ loc = 52
 [[file]]
 go = "tsc/internal/scanner/regexp.go"
 package = "internal/scanner"
-crate = "ts_scanner"
+crate = "tsr_scanner"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_scanner/src/regexp/mod.rs", "crates/ts_scanner/src/regexp/grammar.rs", "crates/ts_scanner/src/regexp/classes.rs", "crates/ts_scanner/src/regexp/escapes.rs", "crates/ts_scanner/src/regexp/properties.rs"]
+rust = ["crates/tsr_scanner/src/regexp/mod.rs", "crates/tsr_scanner/src/regexp/grammar.rs", "crates/tsr_scanner/src/regexp/classes.rs", "crates/tsr_scanner/src/regexp/escapes.rs", "crates/tsr_scanner/src/regexp/properties.rs"]
 verify = ["run.scanner.regexp_parity == 1", "run.scanner.diagnostics == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "ddadb4e90539fd9acb8174cf58eb63a4ec168871ca55e1e0bffcfcd01459177b"
@@ -5092,11 +5092,11 @@ loc = 1105
 [[file]]
 go = "tsc/internal/scanner/scanner.go"
 package = "internal/scanner"
-crate = "ts_scanner"
+crate = "tsr_scanner"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_scanner/src/state.rs", "crates/ts_scanner/src/scan.rs", "crates/ts_scanner/src/identifier.rs", "crates/ts_scanner/src/number.rs", "crates/ts_scanner/src/literal.rs", "crates/ts_scanner/src/escape.rs", "crates/ts_scanner/src/rescan.rs", "crates/ts_scanner/src/trivia.rs", "crates/ts_jsstring/src/scanner_positions.rs"]
+rust = ["crates/tsr_scanner/src/state.rs", "crates/tsr_scanner/src/scan.rs", "crates/tsr_scanner/src/identifier.rs", "crates/tsr_scanner/src/number.rs", "crates/tsr_scanner/src/literal.rs", "crates/tsr_scanner/src/escape.rs", "crates/tsr_scanner/src/rescan.rs", "crates/tsr_scanner/src/trivia.rs", "crates/tsr_jsstring/src/scanner_positions.rs"]
 verify = ["run.scanner.parity == 1", "run.scanner.diagnostics == true", "run.scanner.token_value_bytes == true", "run.e4.utf16_positions == true", "run.e4.utf8_positions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "86a39d89a75bb17000a4ecee14fc77172496ebb27a45873f533114b181ed05cb"
@@ -5105,11 +5105,11 @@ loc = 2917
 [[file]]
 go = "tsc/internal/scanner/unicodeproperties.go"
 package = "internal/scanner"
-crate = "ts_scanner"
+crate = "tsr_scanner"
 phase = 0
 kind = "source"
 status = "ported"
-rust = ["crates/ts_scanner/src/tables_generated.rs"]
+rust = ["crates/tsr_scanner/src/tables_generated.rs"]
 verify = ["run.scanner.table_current == true", "run.scanner.regexp_parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "fe5999f1ce91a2d376d1edf4d3288f13de261227cfc91b69289f4a7f71aac437"
@@ -5118,11 +5118,11 @@ loc = 162
 [[file]]
 go = "tsc/internal/scanner/utilities.go"
 package = "internal/scanner"
-crate = "ts_scanner"
+crate = "tsr_scanner"
 phase = 0
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_scanner/src/utilities.rs", "crates/ts_jsstring/src/scanner_positions.rs"]
+rust = ["crates/tsr_scanner/src/utilities.rs", "crates/tsr_jsstring/src/scanner_positions.rs"]
 verify = ["run.scanner.parity == 1", "run.e4.utf8_positions == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "61ff9d7fd717a2112b15850aabfeeab249186f12a35e4fbf20f615f7865768f0"
@@ -5131,11 +5131,11 @@ loc = 146
 [[file]]
 go = "tsc/internal/semver/version.go"
 package = "internal/semver"
-crate = "ts_semver"
+crate = "tsr_semver"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_semver/src/version.rs"]
+rust = ["crates/tsr_semver/src/version.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "7995ec78cd25dc722ec8418e96a184d92766f626c58283ba12d9d6f5b90a66c3"
@@ -5144,11 +5144,11 @@ loc = 274
 [[file]]
 go = "tsc/internal/semver/version_range.go"
 package = "internal/semver"
-crate = "ts_semver"
+crate = "tsr_semver"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_semver/src/version_range.rs"]
+rust = ["crates/tsr_semver/src/version_range.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c85a73697841de20d84a0c042e5ffc05f3339ede5cc3ca8b696a43917cdb4d17"
@@ -5157,7 +5157,7 @@ loc = 438
 [[file]]
 go = "tsc/internal/sourcemap/decoder.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5170,7 +5170,7 @@ loc = 253
 [[file]]
 go = "tsc/internal/sourcemap/generator.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5183,7 +5183,7 @@ loc = 387
 [[file]]
 go = "tsc/internal/sourcemap/lineinfo.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5196,7 +5196,7 @@ loc = 30
 [[file]]
 go = "tsc/internal/sourcemap/source.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5209,7 +5209,7 @@ loc = 9
 [[file]]
 go = "tsc/internal/sourcemap/source_mapper.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5222,7 +5222,7 @@ loc = 313
 [[file]]
 go = "tsc/internal/sourcemap/util.go"
 package = "internal/sourcemap"
-crate = "ts_sourcemap"
+crate = "tsr_sourcemap"
 phase = 3
 kind = "source"
 status = "planned"
@@ -5235,7 +5235,7 @@ loc = 29
 [[file]]
 go = "tsc/internal/spanmap/spanmap.go"
 package = "internal/spanmap"
-crate = "ts_spanmap"
+crate = "tsr_spanmap"
 phase = 5
 kind = "source"
 status = "planned"
@@ -5248,7 +5248,7 @@ loc = 818
 [[file]]
 go = "tsc/internal/stringutil/compare.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "source"
 status = "planned"
@@ -5261,7 +5261,7 @@ loc = 128
 [[file]]
 go = "tsc/internal/stringutil/generate.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "source"
 status = "planned"
@@ -5274,7 +5274,7 @@ loc = 4
 [[file]]
 go = "tsc/internal/stringutil/identifier.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "source"
 status = "planned"
@@ -5287,11 +5287,11 @@ loc = 17
 [[file]]
 go = "tsc/internal/stringutil/identifier_parts_generated.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_scanner/src/tables_generated.rs"]
+rust = ["crates/tsr_scanner/src/tables_generated.rs"]
 verify = ["run.scanner.table_current == true", "run.scanner.parity == 1"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "5fac39c9509df8bcd337dcfc9d148c8c94b0f4569a8e4df5022b2ecbcb0ff563"
@@ -5300,11 +5300,11 @@ loc = 1391
 [[file]]
 go = "tsc/internal/stringutil/js_case.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "source"
 status = "ported"
-rust = ["crates/ts_jsstring/src/helpers.rs"]
+rust = ["crates/tsr_jsstring/src/helpers.rs"]
 verify = ["run.e4.helper_semantics == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "07d6a3663c0aed68efd975cd39840a2139e56b36cde17104ce327cb1be5d82cf"
@@ -5313,11 +5313,11 @@ loc = 157
 [[file]]
 go = "tsc/internal/stringutil/js_case_generated.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "generated"
 status = "ported"
-rust = ["crates/ts_jsstring/src/case_tables.rs"]
+rust = ["crates/tsr_jsstring/src/case_tables.rs"]
 verify = ["run.e4.helper_semantics == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c128df4cc0a8c4dd93679986a31bdf6087aa83e6fb0e9ced4ab8627072684b80"
@@ -5326,11 +5326,11 @@ loc = 3496
 [[file]]
 go = "tsc/internal/stringutil/util.go"
 package = "internal/stringutil"
-crate = "ts_stringutil"
+crate = "tsr_stringutil"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsstring/src/helpers.rs", "crates/ts_jsstring/src/wtf8.rs"]
+rust = ["crates/tsr_jsstring/src/helpers.rs", "crates/tsr_jsstring/src/wtf8.rs"]
 verify = ["run.e4.helper_semantics == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e15d8030900518eb0d8bd926751df2f7c7cfda6d49c7a82da36d58daeed22b9e"
@@ -5339,7 +5339,7 @@ loc = 371
 [[file]]
 go = "tsc/internal/symlinks/knownsymlinks.go"
 package = "internal/symlinks"
-crate = "ts_core"
+crate = "tsr_core"
 phase = 1
 kind = "source"
 status = "planned"
@@ -5352,7 +5352,7 @@ loc = 134
 [[file]]
 go = "tsc/internal/testrunner/compiler_runner.go"
 package = "internal/testrunner"
-crate = "ts_testrunner"
+crate = "tsr_testrunner"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5365,7 +5365,7 @@ loc = 607
 [[file]]
 go = "tsc/internal/testrunner/runner.go"
 package = "internal/testrunner"
-crate = "ts_testrunner"
+crate = "tsr_testrunner"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5378,7 +5378,7 @@ loc = 14
 [[file]]
 go = "tsc/internal/testrunner/test_case_parser.go"
 package = "internal/testrunner"
-crate = "ts_testrunner"
+crate = "tsr_testrunner"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5391,7 +5391,7 @@ loc = 299
 [[file]]
 go = "tsc/internal/testrunner/transpile_runner.go"
 package = "internal/testrunner"
-crate = "ts_testrunner"
+crate = "tsr_testrunner"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5404,7 +5404,7 @@ loc = 187
 [[file]]
 go = "tsc/internal/testutil/autoimporttestutil/fixtures.go"
 package = "internal/testutil/autoimporttestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5417,7 +5417,7 @@ loc = 610
 [[file]]
 go = "tsc/internal/testutil/baseline/baseline.go"
 package = "internal/testutil/baseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5430,7 +5430,7 @@ loc = 85
 [[file]]
 go = "tsc/internal/testutil/baseline/testmain.go"
 package = "internal/testutil/baseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5443,7 +5443,7 @@ loc = 103
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/component.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5456,7 +5456,7 @@ loc = 155
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/diagnostic_code_collision.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5469,7 +5469,7 @@ loc = 41
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/duplicate.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5482,7 +5482,7 @@ loc = 100
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/duplicate_projection.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5495,7 +5495,7 @@ loc = 40
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/dynamic_verbatim.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5508,7 +5508,7 @@ loc = 67
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/editing.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5521,7 +5521,7 @@ loc = 163
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/failing.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5534,7 +5534,7 @@ loc = 23
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/hoisting.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5547,7 +5547,7 @@ loc = 132
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/lisp.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5560,7 +5560,7 @@ loc = 44
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/manifest.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5573,7 +5573,7 @@ loc = 22
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/protocol.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5586,7 +5586,7 @@ loc = 80
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/registry.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5599,7 +5599,7 @@ loc = 63
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/spawner.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5612,7 +5612,7 @@ loc = 42
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/supplemental.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5625,7 +5625,7 @@ loc = 33
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/supplemental_diagnostics.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5638,7 +5638,7 @@ loc = 42
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/supplemental_globals.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5651,7 +5651,7 @@ loc = 39
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/supplemental_module.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5664,7 +5664,7 @@ loc = 29
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/synthesizing.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5677,7 +5677,7 @@ loc = 37
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/transforming.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5690,7 +5690,7 @@ loc = 274
 [[file]]
 go = "tsc/internal/testutil/contentmappertest/verbatim.go"
 package = "internal/testutil/contentmappertest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5703,7 +5703,7 @@ loc = 52
 [[file]]
 go = "tsc/internal/testutil/emittestutil/emittestutil.go"
 package = "internal/testutil/emittestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5716,7 +5716,7 @@ loc = 29
 [[file]]
 go = "tsc/internal/testutil/filefixture/filefixture.go"
 package = "internal/testutil/filefixture"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5729,7 +5729,7 @@ loc = 74
 [[file]]
 go = "tsc/internal/testutil/fixtures/benchfixtures.go"
 package = "internal/testutil/fixtures"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5742,7 +5742,7 @@ loc = 16
 [[file]]
 go = "tsc/internal/testutil/fsbaselineutil/differ.go"
 package = "internal/testutil/fsbaselineutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5755,7 +5755,7 @@ loc = 177
 [[file]]
 go = "tsc/internal/testutil/harnessutil/harnessutil.go"
 package = "internal/testutil/harnessutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5768,7 +5768,7 @@ loc = 1273
 [[file]]
 go = "tsc/internal/testutil/harnessutil/recorderfs.go"
 package = "internal/testutil/harnessutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5781,7 +5781,7 @@ loc = 45
 [[file]]
 go = "tsc/internal/testutil/harnessutil/sourcemap_recorder.go"
 package = "internal/testutil/harnessutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5794,7 +5794,7 @@ loc = 364
 [[file]]
 go = "tsc/internal/testutil/jstest/node.go"
 package = "internal/testutil/jstest"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5807,7 +5807,7 @@ loc = 95
 [[file]]
 go = "tsc/internal/testutil/lsptestutil/lspclient.go"
 package = "internal/testutil/lsptestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5820,7 +5820,7 @@ loc = 326
 [[file]]
 go = "tsc/internal/testutil/parsetestutil/parsetestutil.go"
 package = "internal/testutil/parsetestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5833,7 +5833,7 @@ loc = 88
 [[file]]
 go = "tsc/internal/testutil/projecttestutil/clientmock_generated.go"
 package = "internal/testutil/projecttestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5846,7 +5846,7 @@ loc = 644
 [[file]]
 go = "tsc/internal/testutil/projecttestutil/npmexecutormock_generated.go"
 package = "internal/testutil/projecttestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5859,7 +5859,7 @@ loc = 86
 [[file]]
 go = "tsc/internal/testutil/projecttestutil/projecttestutil.go"
 package = "internal/testutil/projecttestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5872,7 +5872,7 @@ loc = 323
 [[file]]
 go = "tsc/internal/testutil/race/norace.go"
 package = "internal/testutil/race"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5885,7 +5885,7 @@ loc = 7
 [[file]]
 go = "tsc/internal/testutil/race/race.go"
 package = "internal/testutil/race"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "out-of-scope"
 status = "out-of-scope"
@@ -5898,7 +5898,7 @@ loc = 7
 [[file]]
 go = "tsc/internal/testutil/stringtestutil/stringtestutil.go"
 package = "internal/testutil/stringtestutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5911,7 +5911,7 @@ loc = 51
 [[file]]
 go = "tsc/internal/testutil/testutil.go"
 package = "internal/testutil"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5924,7 +5924,7 @@ loc = 49
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/contentmapper_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5937,7 +5937,7 @@ loc = 92
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/error_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5950,7 +5950,7 @@ loc = 276
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/js_emit_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5963,7 +5963,7 @@ loc = 291
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/module_resolution_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5976,7 +5976,7 @@ loc = 18
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/sourcemap_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -5989,7 +5989,7 @@ loc = 130
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/sourcemap_record_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -6002,7 +6002,7 @@ loc = 34
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/type_symbol_baseline.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -6015,7 +6015,7 @@ loc = 491
 [[file]]
 go = "tsc/internal/testutil/tsbaseline/util.go"
 package = "internal/testutil/tsbaseline"
-crate = "ts_testutil"
+crate = "tsr_testutil"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -6028,7 +6028,7 @@ loc = 71
 [[file]]
 go = "tsc/internal/tracing/tracing.go"
 package = "internal/tracing"
-crate = "ts_tracing"
+crate = "tsr_tracing"
 phase = 4
 kind = "source"
 status = "planned"
@@ -6041,7 +6041,7 @@ loc = 763
 [[file]]
 go = "tsc/internal/transformers/chain.go"
 package = "internal/transformers"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6054,7 +6054,7 @@ loc = 62
 [[file]]
 go = "tsc/internal/transformers/declarations/diagnostics.go"
 package = "internal/transformers/declarations"
-crate = "ts_declarations"
+crate = "tsr_declarations"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6067,7 +6067,7 @@ loc = 736
 [[file]]
 go = "tsc/internal/transformers/declarations/supplementalreferences.go"
 package = "internal/transformers/declarations"
-crate = "ts_declarations"
+crate = "tsr_declarations"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6080,7 +6080,7 @@ loc = 54
 [[file]]
 go = "tsc/internal/transformers/declarations/tracker.go"
 package = "internal/transformers/declarations"
-crate = "ts_declarations"
+crate = "tsr_declarations"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6093,7 +6093,7 @@ loc = 252
 [[file]]
 go = "tsc/internal/transformers/declarations/transform.go"
 package = "internal/transformers/declarations"
-crate = "ts_declarations"
+crate = "tsr_declarations"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6106,7 +6106,7 @@ loc = 2984
 [[file]]
 go = "tsc/internal/transformers/declarations/util.go"
 package = "internal/transformers/declarations"
-crate = "ts_declarations"
+crate = "tsr_declarations"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6119,7 +6119,7 @@ loc = 186
 [[file]]
 go = "tsc/internal/transformers/destructuring.go"
 package = "internal/transformers"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6132,7 +6132,7 @@ loc = 510
 [[file]]
 go = "tsc/internal/transformers/estransforms/async.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6145,7 +6145,7 @@ loc = 984
 [[file]]
 go = "tsc/internal/transformers/estransforms/classfields.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6158,7 +6158,7 @@ loc = 3618
 [[file]]
 go = "tsc/internal/transformers/estransforms/classthis.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6171,7 +6171,7 @@ loc = 28
 [[file]]
 go = "tsc/internal/transformers/estransforms/definitions.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6184,7 +6184,7 @@ loc = 43
 [[file]]
 go = "tsc/internal/transformers/estransforms/esdecorator.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6197,7 +6197,7 @@ loc = 2751
 [[file]]
 go = "tsc/internal/transformers/estransforms/exponentiation.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6210,7 +6210,7 @@ loc = 90
 [[file]]
 go = "tsc/internal/transformers/estransforms/forawait.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6223,7 +6223,7 @@ loc = 856
 [[file]]
 go = "tsc/internal/transformers/estransforms/logicalassignment.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6236,7 +6236,7 @@ loc = 113
 [[file]]
 go = "tsc/internal/transformers/estransforms/namedevaluation.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6249,7 +6249,7 @@ loc = 537
 [[file]]
 go = "tsc/internal/transformers/estransforms/nullishcoalescing.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6262,7 +6262,7 @@ loc = 49
 [[file]]
 go = "tsc/internal/transformers/estransforms/objectrestspread.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6275,7 +6275,7 @@ loc = 593
 [[file]]
 go = "tsc/internal/transformers/estransforms/optionalcatch.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6288,7 +6288,7 @@ loc = 37
 [[file]]
 go = "tsc/internal/transformers/estransforms/optionalchain.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6301,7 +6301,7 @@ loc = 240
 [[file]]
 go = "tsc/internal/transformers/estransforms/taggedtemplate.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6314,7 +6314,7 @@ loc = 174
 [[file]]
 go = "tsc/internal/transformers/estransforms/usestrict.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6327,7 +6327,7 @@ loc = 50
 [[file]]
 go = "tsc/internal/transformers/estransforms/using.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6340,7 +6340,7 @@ loc = 799
 [[file]]
 go = "tsc/internal/transformers/estransforms/utilities.go"
 package = "internal/transformers/estransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6353,7 +6353,7 @@ loc = 289
 [[file]]
 go = "tsc/internal/transformers/inliners/constenum.go"
 package = "internal/transformers/inliners"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6366,7 +6366,7 @@ loc = 102
 [[file]]
 go = "tsc/internal/transformers/jsxtransforms/jsx.go"
 package = "internal/transformers/jsxtransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6379,7 +6379,7 @@ loc = 1209
 [[file]]
 go = "tsc/internal/transformers/modifiervisitor.go"
 package = "internal/transformers"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6392,7 +6392,7 @@ loc = 28
 [[file]]
 go = "tsc/internal/transformers/moduletransforms/commonjsmodule.go"
 package = "internal/transformers/moduletransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6405,7 +6405,7 @@ loc = 2162
 [[file]]
 go = "tsc/internal/transformers/moduletransforms/esmodule.go"
 package = "internal/transformers/moduletransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6418,7 +6418,7 @@ loc = 372
 [[file]]
 go = "tsc/internal/transformers/moduletransforms/externalmoduleinfo.go"
 package = "internal/transformers/moduletransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6431,7 +6431,7 @@ loc = 390
 [[file]]
 go = "tsc/internal/transformers/moduletransforms/impliedmodule.go"
 package = "internal/transformers/moduletransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6444,7 +6444,7 @@ loc = 53
 [[file]]
 go = "tsc/internal/transformers/moduletransforms/utilities.go"
 package = "internal/transformers/moduletransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6457,7 +6457,7 @@ loc = 118
 [[file]]
 go = "tsc/internal/transformers/transformer.go"
 package = "internal/transformers"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6470,7 +6470,7 @@ loc = 41
 [[file]]
 go = "tsc/internal/transformers/tstransforms/importelision.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6483,7 +6483,7 @@ loc = 153
 [[file]]
 go = "tsc/internal/transformers/tstransforms/legacydecorators.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6496,7 +6496,7 @@ loc = 1038
 [[file]]
 go = "tsc/internal/transformers/tstransforms/metadata.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6509,7 +6509,7 @@ loc = 390
 [[file]]
 go = "tsc/internal/transformers/tstransforms/runtimesyntax.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6522,7 +6522,7 @@ loc = 995
 [[file]]
 go = "tsc/internal/transformers/tstransforms/typeeraser.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6535,7 +6535,7 @@ loc = 393
 [[file]]
 go = "tsc/internal/transformers/tstransforms/typeserializer.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6548,7 +6548,7 @@ loc = 511
 [[file]]
 go = "tsc/internal/transformers/tstransforms/utilities.go"
 package = "internal/transformers/tstransforms"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6561,7 +6561,7 @@ loc = 29
 [[file]]
 go = "tsc/internal/transformers/utilities.go"
 package = "internal/transformers"
-crate = "ts_transformers"
+crate = "tsr_transformers"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6574,7 +6574,7 @@ loc = 375
 [[file]]
 go = "tsc/internal/transpile/fs.go"
 package = "internal/transpile"
-crate = "ts_transpile"
+crate = "tsr_transpile"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6587,7 +6587,7 @@ loc = 44
 [[file]]
 go = "tsc/internal/transpile/transpile.go"
 package = "internal/transpile"
-crate = "ts_transpile"
+crate = "tsr_transpile"
 phase = 3
 kind = "source"
 status = "planned"
@@ -6600,11 +6600,11 @@ loc = 258
 [[file]]
 go = "tsc/internal/tsoptions/commandlineoption.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c69fde8b95bc9d5955f56bcea37a03dc401d2a45e7876fba90d55531805083ea"
@@ -6613,11 +6613,11 @@ loc = 204
 [[file]]
 go = "tsc/internal/tsoptions/commandlineparser.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/fixture_options.rs"]
+rust = ["crates/tsr_tsoptions/src/fixture_options.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "967c681973ccb41e80588e71a63cf037b18a4cac5aecf55f8eaa97221d8fea61"
@@ -6626,11 +6626,11 @@ loc = 411
 [[file]]
 go = "tsc/internal/tsoptions/contentmappers.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_module/src/config_mapper.rs"]
+rust = ["crates/tsr_module/src/config_mapper.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c721dd6e0d4e56d0d322ed7d97a4c565faed80f457b30328cbadf1459b21bca7"
@@ -6639,11 +6639,11 @@ loc = 53
 [[file]]
 go = "tsc/internal/tsoptions/declsbuild.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations_generated.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations_generated.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "5351c7b3eb56061f0ad7dc5aa2db729dc2d4b030671903f5e9b9c864b22929c7"
@@ -6652,11 +6652,11 @@ loc = 69
 [[file]]
 go = "tsc/internal/tsoptions/declscompiler.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations_generated.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations_generated.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "cb46ae4601fe0cdfa0ef15144784ad58987601395bf33870b9e702cde5bf4e4c"
@@ -6665,11 +6665,11 @@ loc = 1272
 [[file]]
 go = "tsc/internal/tsoptions/declstypeacquisition.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations_generated.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations_generated.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "0b4a7353c5f2dd76be5c512e6015bda53d45d66c6ae448516b93241421948be7"
@@ -6678,11 +6678,11 @@ loc = 29
 [[file]]
 go = "tsc/internal/tsoptions/declswatch.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations_generated.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations_generated.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "e77d6dd05e5abdf94c95f6adc5a65fe9ee1b01f05c1004581c372f7b30075467"
@@ -6691,7 +6691,7 @@ loc = 88
 [[file]]
 go = "tsc/internal/tsoptions/diagnostics.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6704,11 +6704,11 @@ loc = 67
 [[file]]
 go = "tsc/internal/tsoptions/enummaps.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/lib.rs"]
+rust = ["crates/tsr_tsoptions/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d8df11cae0d0996a3db3c6febc8f321f06ba96242e3d26a2e5ab4728cf1ca93c"
@@ -6717,11 +6717,11 @@ loc = 255
 [[file]]
 go = "tsc/internal/tsoptions/errors.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/config_syntax.rs"]
+rust = ["crates/tsr_tsoptions/src/config_syntax.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a128a5e905fb7bd82dd4cd52a866b96128f427c759abf4126630954a89cfbe24"
@@ -6730,11 +6730,11 @@ loc = 131
 [[file]]
 go = "tsc/internal/tsoptions/namemap.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/option_declarations.rs"]
+rust = ["crates/tsr_tsoptions/src/option_declarations.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "9bfae728d91ef1e6d326aa19f0aaf005fb734ea4e8e2429aa9cae8406ecbb85b"
@@ -6743,7 +6743,7 @@ loc = 58
 [[file]]
 go = "tsc/internal/tsoptions/parsedbuildcommandline.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6756,11 +6756,11 @@ loc = 45
 [[file]]
 go = "tsc/internal/tsoptions/parsedcommandline.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/config_specs.rs", "crates/ts_tsoptions/src/lib.rs"]
+rust = ["crates/tsr_tsoptions/src/config_specs.rs", "crates/tsr_tsoptions/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "2b1423ed3a9827d34245d5d0ea9c96f25cfaac038e5beda280792de06c946b02"
@@ -6769,11 +6769,11 @@ loc = 494
 [[file]]
 go = "tsc/internal/tsoptions/parsedoptions.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/lib.rs"]
+rust = ["crates/tsr_tsoptions/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "9f63a9e04b592c75e95ec609301032f1e22353519b00b981f78d9b845d7bc63f"
@@ -6782,11 +6782,11 @@ loc = 16
 [[file]]
 go = "tsc/internal/tsoptions/parsinghelpers.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/config_mappers.rs", "crates/ts_tsoptions/src/config_parse.rs", "crates/ts_tsoptions/src/merge_options.rs", "crates/ts_tsoptions/src/parse_options.rs"]
+rust = ["crates/tsr_tsoptions/src/config_mappers.rs", "crates/tsr_tsoptions/src/config_parse.rs", "crates/tsr_tsoptions/src/merge_options.rs", "crates/tsr_tsoptions/src/parse_options.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c899d92fbf8167867b749283517e3c19f0688d3b2300ec04ed27facf0e90e62c"
@@ -6795,7 +6795,7 @@ loc = 738
 [[file]]
 go = "tsc/internal/tsoptions/showconfig.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6808,11 +6808,11 @@ loc = 389
 [[file]]
 go = "tsc/internal/tsoptions/tsconfigparsing.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_compiler/src/include_reason.rs", "crates/ts_tsoptions/src/config_files.rs", "crates/ts_tsoptions/src/config_mappers.rs", "crates/ts_tsoptions/src/config_parse.rs", "crates/ts_tsoptions/src/config_read.rs", "crates/ts_tsoptions/src/config_specs.rs", "crates/ts_tsoptions/src/config_substitution.rs", "crates/ts_tsoptions/src/config_syntax.rs", "crates/ts_tsoptions/src/config_text.rs", "crates/ts_tsoptions/src/convert_options.rs", "crates/ts_tsoptions/src/lib.rs"]
+rust = ["crates/tsr_compiler/src/include_reason.rs", "crates/tsr_tsoptions/src/config_files.rs", "crates/tsr_tsoptions/src/config_mappers.rs", "crates/tsr_tsoptions/src/config_parse.rs", "crates/tsr_tsoptions/src/config_read.rs", "crates/tsr_tsoptions/src/config_specs.rs", "crates/tsr_tsoptions/src/config_substitution.rs", "crates/tsr_tsoptions/src/config_syntax.rs", "crates/tsr_tsoptions/src/config_text.rs", "crates/tsr_tsoptions/src/convert_options.rs", "crates/tsr_tsoptions/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0"
@@ -6821,7 +6821,7 @@ loc = 2103
 [[file]]
 go = "tsc/internal/tsoptions/tsoptionstest/parsedcommandline.go"
 package = "internal/tsoptions/tsoptionstest"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -6834,7 +6834,7 @@ loc = 14
 [[file]]
 go = "tsc/internal/tsoptions/tsoptionstest/vfsparseconfighost.go"
 package = "internal/tsoptions/tsoptionstest"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -6847,7 +6847,7 @@ loc = 60
 [[file]]
 go = "tsc/internal/tsoptions/wildcarddirectories.go"
 package = "internal/tsoptions"
-crate = "ts_tsoptions"
+crate = "tsr_tsoptions"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6860,11 +6860,11 @@ loc = 134
 [[file]]
 go = "tsc/internal/tspath/extension.go"
 package = "internal/tspath"
-crate = "ts_tspath"
+crate = "tsr_tspath"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/path.rs", "crates/ts_tspath/src/lib.rs", "crates/ts_checker/src/external_resolution.rs"]
+rust = ["crates/tsr_core/src/path.rs", "crates/tsr_tspath/src/lib.rs", "crates/tsr_checker/src/external_resolution.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "c0d3ffdac4587ce7c12d5fc3d4ccfe562563ddfa5056c7e086b8c0e9c4940fed"
@@ -6873,7 +6873,7 @@ loc = 208
 [[file]]
 go = "tsc/internal/tspath/ignoredpaths.go"
 package = "internal/tspath"
-crate = "ts_tspath"
+crate = "tsr_tspath"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6886,11 +6886,11 @@ loc = 18
 [[file]]
 go = "tsc/internal/tspath/path.go"
 package = "internal/tspath"
-crate = "ts_tspath"
+crate = "tsr_tspath"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_core/src/path.rs", "crates/ts_parser/src/references.rs", "crates/ts_tspath/src/comparison.rs", "crates/ts_tspath/src/lib.rs"]
+rust = ["crates/tsr_core/src/path.rs", "crates/tsr_parser/src/references.rs", "crates/tsr_tspath/src/comparison.rs", "crates/tsr_tspath/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "547910e8b4930bb62088d9c4faee20421d348337787fe69ed88c3375a521227e"
@@ -6899,7 +6899,7 @@ loc = 1269
 [[file]]
 go = "tsc/internal/vfs/cachedvfs/cachedvfs.go"
 package = "internal/vfs/cachedvfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6912,11 +6912,11 @@ loc = 154
 [[file]]
 go = "tsc/internal/vfs/internal/internal.go"
 package = "internal/vfs/internal"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_jsstring/src/source_text.rs"]
+rust = ["crates/tsr_jsstring/src/source_text.rs"]
 verify = ["run.e4.source_decoding == true"]
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "d3a57edd68bac8026b9ec1269bc7bf1fd9fbd4612a19951c7984e9eec5e2a839"
@@ -6925,7 +6925,7 @@ loc = 194
 [[file]]
 go = "tsc/internal/vfs/iovfs/iofs.go"
 package = "internal/vfs/iovfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6938,7 +6938,7 @@ loc = 222
 [[file]]
 go = "tsc/internal/vfs/osvfs/os.go"
 package = "internal/vfs/osvfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6951,7 +6951,7 @@ loc = 243
 [[file]]
 go = "tsc/internal/vfs/trackingvfs/trackingvfs.go"
 package = "internal/vfs/trackingvfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "planned"
@@ -6964,11 +6964,11 @@ loc = 76
 [[file]]
 go = "tsc/internal/vfs/vfs.go"
 package = "internal/vfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_vfs/src/lib.rs"]
+rust = ["crates/tsr_vfs/src/lib.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "a6d7306e3da4c4b3146d620b08bc405240c7cfb77a606cd202fc9f4adef5aeb2"
@@ -6977,7 +6977,7 @@ loc = 88
 [[file]]
 go = "tsc/internal/vfs/vfsmatch/stringer_generated.go"
 package = "internal/vfs/vfsmatch"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "generated"
 status = "planned"
@@ -6990,11 +6990,11 @@ loc = 26
 [[file]]
 go = "tsc/internal/vfs/vfsmatch/vfsmatch.go"
 package = "internal/vfs/vfsmatch"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "in-progress"
-rust = ["crates/ts_tsoptions/src/glob.rs"]
+rust = ["crates/tsr_tsoptions/src/glob.rs"]
 verify = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "490645f6ee17fbc49ed5e5d51b7e64826903c2c9d25fbeb4d9e803f3d00e765a"
@@ -7003,7 +7003,7 @@ loc = 717
 [[file]]
 go = "tsc/internal/vfs/vfsmock/mock_generated.go"
 package = "internal/vfs/vfsmock"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -7016,7 +7016,7 @@ loc = 580
 [[file]]
 go = "tsc/internal/vfs/vfsmock/wrapper.go"
 package = "internal/vfs/vfsmock"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -7029,7 +7029,7 @@ loc = 21
 [[file]]
 go = "tsc/internal/vfs/vfstest/vfstest.go"
 package = "internal/vfs/vfstest"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "harness"
 status = "planned"
@@ -7042,7 +7042,7 @@ loc = 679
 [[file]]
 go = "tsc/internal/vfs/wrapvfs/wrapvfs.go"
 package = "internal/vfs/wrapvfs"
-crate = "ts_vfs"
+crate = "tsr_vfs"
 phase = 1
 kind = "source"
 status = "planned"

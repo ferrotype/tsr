@@ -1,0 +1,33 @@
+[package]
+name = "tsr_embed"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = ["checker"]
+checker = ["dep:tsr_checker", "dep:tsr_compiler"]
+
+[dependencies]
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_encoder = { version = "0.1.0", path = "../tsr_encoder" }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker", optional = true }
+tsr_compiler = { version = "0.1.0", path = "../tsr_compiler", optional = true }
+xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
+
+[dev-dependencies]
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+
+[[test]]
+name = "lifetime"
+required-features = ["checker"]
+
+[lints]
+workspace = true

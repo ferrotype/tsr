@@ -6,7 +6,7 @@ headers, replace mimalloc, or claim an acceptance timing result.
 
 ```
 python3 tools/s07/memory-profile/rust-sites/apply.py --stage STAGED_REPOSITORY
-cargo run --manifest-path STAGED_REPOSITORY/Cargo.toml -p ts_jsstring --example memory_sites_probe
+cargo run --manifest-path STAGED_REPOSITORY/Cargo.toml -p tsr_jsstring --example memory_sites_probe
 ```
 
 The applier requires the census manifest, checks every modified Rust file still
@@ -18,14 +18,14 @@ Generated payload coverage is an exact checked inventory of 37 existing
 `Box::new(data)` conversions; a changed inventory fails generation.
 
 The stage adds `alloc_tracker = "=0.5.25"`, with default features disabled, to
-`ts_jsstring`. The MIT-licensed dependency has no runtime dependencies. Its
+`tsr_jsstring`. The MIT-licensed dependency has no runtime dependencies. Its
 generic `Allocator` forwards original allocation layouts and all four native
 operations, including `alloc_zeroed` and `realloc`. The driver can declare a
 global `cap::Cap<alloc_tracker::Allocator<mimalloc::MiMalloc>>`, allowing safe
 direct access to cap's requested/live counters. All workspace instrumentation
 uses safe APIs; no custom `GlobalAlloc` implementation or allocator FFI is added.
 
-Driver API in staged `ts_jsstring::memory_sites`:
+Driver API in staged `tsr_jsstring::memory_sites`:
 
 - `initialize()` pre-registers every operation and warms every operation's
   metrics lock through its safe getter; call before the first baseline. At the

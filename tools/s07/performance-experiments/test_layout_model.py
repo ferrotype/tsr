@@ -39,7 +39,7 @@ class WeightedLayoutTests(unittest.TestCase):
                 model.weighted_bounds({"token": 2}, {"token": 0}, invalid)
 
     def test_actual_generated_shape_inventory_includes_empty_and_rare_types(self):
-        source = (model.ROOT / "crates/ts_ast/src/data_generated.rs").read_text()
+        source = (model.ROOT / "crates/tsr_ast/src/data_generated.rs").read_text()
         schema = json.loads((model.ROOT / "upstream/tools/scripts/tsc/ast.json").read_text())
         shapes = model.schema_shapes(source, schema)
         self.assertEqual(set(shapes), set(schema["nodes"]["definitions"]))

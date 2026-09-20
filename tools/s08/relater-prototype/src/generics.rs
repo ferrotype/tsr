@@ -18,7 +18,7 @@ type InstantiateSignature = Box<dyn Fn(&Checker, &[Rc<TypeCell>]) -> Result<Sign
 pub struct ReferenceShape {
     target: Weak<TypeCell>,
     arguments: Vec<TypeLink>,
-    deferred_node: Option<ts_arena::NodeId>,
+    deferred_node: Option<tsr_arena::NodeId>,
 }
 impl ReferenceShape {
     pub fn target(&self) -> Result<Rc<TypeCell>, Error> {
@@ -27,7 +27,7 @@ impl ReferenceShape {
     pub fn arguments(&self) -> Result<Vec<Rc<TypeCell>>, Error> {
         self.arguments.iter().map(TypeLink::resolve).collect()
     }
-    pub(crate) fn deferred_node(&self) -> Option<ts_arena::NodeId> {
+    pub(crate) fn deferred_node(&self) -> Option<tsr_arena::NodeId> {
         self.deferred_node
     }
 }
@@ -192,7 +192,7 @@ impl TypeCell {
         &self,
         target: &Rc<TypeCell>,
         arguments: Vec<TypeLink>,
-        node: ts_arena::NodeId,
+        node: tsr_arena::NodeId,
     ) -> Result<(), Error> {
         self.set_reference_shape_worker(target, arguments, Some(node))
     }
@@ -200,7 +200,7 @@ impl TypeCell {
         &self,
         target: &Rc<TypeCell>,
         arguments: Vec<TypeLink>,
-        deferred_node: Option<ts_arena::NodeId>,
+        deferred_node: Option<tsr_arena::NodeId>,
     ) -> Result<(), Error> {
         self.reference_shape
             .set(ReferenceShape {

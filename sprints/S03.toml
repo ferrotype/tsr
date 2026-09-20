@@ -34,7 +34,7 @@ done_when = ["run.gen.ast_schema == true"]
 
 [[item]]
 id = "S03-3"
-title = "Rust emitters and `cargo xtask gen`: ts_ast kinds, node data, accessors and visitors; ts_diagnostics messages; ts_encoder tables; generated files carry file-level port markers"
+title = "Rust emitters and `cargo xtask gen`: tsr_ast kinds, node data, accessors and visitors; tsr_diagnostics messages; tsr_encoder tables; generated files carry file-level port markers"
 kind = "task"
 required = true
 done_when = ["run.gen.drift == false", "run.workspace.build == true"]

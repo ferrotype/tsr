@@ -275,7 +275,7 @@ def summarize(observations):
 def quiet_host():
     reject_concurrent_builds()
     names = command(["ps", "-axo", "comm="], cwd=ROOT).decode().splitlines()
-    extra = {"list-pilot", "list-pilot-normal", "list-pilot-allocation", "owner-census", "ts_s07_bis_owner_census", "phase-probe", "s07-phase-probe"}
+    extra = {"list-pilot", "list-pilot-normal", "list-pilot-allocation", "owner-census", "tsr_s07_bis_owner_census", "phase-probe", "s07-phase-probe"}
     active = sorted({Path(name.strip()).name for name in names} & extra)
     require(not active, "measurement host has another diagnostic child: " + ", ".join(active))
 

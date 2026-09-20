@@ -19,18 +19,18 @@ allocation sites or parse/bind operations are changed.
 The staged APIs are:
 
 ```rust
-let mut census = ts_jsstring::census::Report::default();
+let mut census = tsr_jsstring::census::Report::default();
 for worker_files in &retained {
     for file in worker_files {
-        ts_ast::add_retained_file(file, &mut census);
+        tsr_ast::add_retained_file(file, &mut census);
     }
 }
 let json = census.json();
 ```
 
-`ts_ast::retained_census(&[BoundFile])` is the single-slice convenience API.
+`tsr_ast::retained_census(&[BoundFile])` is the single-slice convenience API.
 `Report` exposes `rows` publicly. The driver can add preloaded `SourceText` and
-`JsString` objects through `ts_jsstring::census::Walk::walk` into the **same**
+`JsString` objects through `tsr_jsstring::census::Walk::walk` into the **same**
 collector, retaining shared-backing deduplication. Counting a retained root does
 not count the driver's containing Vec, input metadata, channels, worker stacks
 or runtime state. Those are distinct native-snapshot/adapter obligations.

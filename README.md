@@ -2,7 +2,7 @@
 
 The Rust rewrite of the TypeScript 7 native compiler and language server (the Go module under `tsc/` in microsoft/TypeScript, codename Corsa). Upstream is consumed as a pinned dependency; this repository is the workspace.
 
-The first contract leaves are implemented: `ts_jsstring` preserves source/string bytes and Go position semantics; `ts_arena` provides checked identities, immutable file storage, lazy publication and bundle retention. S03 adds pinned schema generation for `ts_ast`, `ts_diagnostics` and `ts_encoder`, with drift checks and byte-identical TypeScript client regeneration; see [S03](docs/S03.md). S05 adds the scanner, rescans, regexp recovery and Unicode tables with frozen Go differential evidence; see [S05](docs/S05.md) and its [reviewed implementation plan](docs/S05-implementation-plan.md). Subsequent slices add parsing, binding, program loading, the S08 checker subset and S09 ownership contracts. S10 adds [wasm and Rust/Node embedding interfaces](docs/S10.md); their performance and parity gates are tracked separately. The [S04 synthesis plan](docs/S04-synthesis-plan.md) records the implementation choices; [S04 documentation](docs/S04.md) describes the supported APIs and verification. Mapped functions and implementation labels are reported separately from verified parity.
+The first contract leaves are implemented: `tsr_jsstring` preserves source/string bytes and Go position semantics; `tsr_arena` provides checked identities, immutable file storage, lazy publication and bundle retention. S03 adds pinned schema generation for `tsr_ast`, `tsr_diagnostics` and `tsr_encoder`, with drift checks and byte-identical TypeScript client regeneration; see [S03](docs/S03.md). S05 adds the scanner, rescans, regexp recovery and Unicode tables with frozen Go differential evidence; see [S05](docs/S05.md) and its [reviewed implementation plan](docs/S05-implementation-plan.md). Subsequent slices add parsing, binding, program loading, the S08 checker subset and S09 ownership contracts. S10 adds [wasm and Rust/Node embedding interfaces](docs/S10.md); their performance and parity gates are tracked separately. The [S04 synthesis plan](docs/S04-synthesis-plan.md) records the implementation choices; [S04 documentation](docs/S04.md) describes the supported APIs and verification. Mapped functions and implementation labels are reported separately from verified parity.
 
 ## Layout
 
@@ -21,9 +21,9 @@ The first contract leaves are implemented: `ts_jsstring` preserves source/string
 | `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); `scripts/checks.py` runs them as producers. |
 | `data/divergences.toml` | Owner-approved baseline divergences (ADR 0004); an input of the E2 producer. |
 | `.github/workflows/status.yml` | Status workflow: provenance, archived-view check, live producer metrics and S01/S03/S04/S05 on the four macOS/Linux targets, minimum-Rust builds, artifacts including the worklist and scanner failure logs. |
-| `crates/ts_jsstring/`, `crates/ts_arena/` | Text and ownership contract leaves; see [S04](docs/S04.md). |
-| `crates/ts_scanner/`, `crates/ts_jsnum/`, `crates/ts_core/` | Byte scanner, numeric conversion and shared target/range slices; see [S05](docs/S05.md). |
-| `crates/ts_embed/`, `crates/ts_wasm/`, `crates/ts_node/` | Rust sessions, bare wasm and Node-API adapters; see [S10](docs/S10.md). |
+| `crates/tsr_jsstring/`, `crates/tsr_arena/` | Text and ownership contract leaves; see [S04](docs/S04.md). |
+| `crates/tsr_scanner/`, `crates/tsr_jsnum/`, `crates/tsr_core/` | Byte scanner, numeric conversion and shared target/range slices; see [S05](docs/S05.md). |
+| `crates/tsr_embed/`, `crates/tsr_wasm/`, `crates/tsr_node/` | Rust sessions, bare wasm and Node-API adapters; see [S10](docs/S10.md). |
 | `xtask/` | Local commands for evidence capture, status generation and sprint validation. |
 | `data/import-graph.txt` | Internal import edges of the Go module (`importer imported`), produced by `go list`. 766 edges. |
 | `data/topological-order.txt` | The packages in dependency order, leaves first, produced by `tsort` over the graph. The plan's crate map groups related packages; its dependency slices also use the actual import edges. |

@@ -73,7 +73,7 @@ impl Display<'_> {
             return Ok(Printed::atom(match literal {
                 LiteralValue::String(bytes) => quote(bytes)?,
                 LiteralValue::Number(bits) => {
-                    ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+                    tsr_jsnum::Number::new(f64::from_bits(*bits)).to_string()
                 }
                 LiteralValue::Boolean(value) => value.to_string(),
                 LiteralValue::BigInt { negative, digits } => format!(
@@ -258,7 +258,7 @@ impl Display<'_> {
             let types = template.types()?;
             let mut result = "`".to_owned();
             for (index, text) in template.texts.iter().enumerate() {
-                result.push_str(&escaped(text, ts_jsstring::QuoteChar::Backtick)?);
+                result.push_str(&escaped(text, tsr_jsstring::QuoteChar::Backtick)?);
                 if let Some(ty) = types.get(index) {
                     result.push_str(&format!("${{{}}}", self.ty(ty)?.text));
                 }
@@ -407,20 +407,20 @@ impl Display<'_> {
     }
 }
 
-fn escaped(bytes: &[u8], quote: ts_jsstring::QuoteChar) -> Result<String, Error> {
-    String::from_utf8(ts_jsstring::escape::escape_string(bytes, quote))
+fn escaped(bytes: &[u8], quote: tsr_jsstring::QuoteChar) -> Result<String, Error> {
+    String::from_utf8(tsr_jsstring::escape::escape_string(bytes, quote))
         .map_err(|_| Error::Unsupported("diagnostic literal escaping produced non-UTF8".into()))
 }
 
 fn quote(bytes: &[u8]) -> Result<String, Error> {
     Ok(format!(
         "\"{}\"",
-        escaped(bytes, ts_jsstring::QuoteChar::Double)?
+        escaped(bytes, tsr_jsstring::QuoteChar::Double)?
     ))
 }
 
 fn property_name(name: &str) -> Result<String, Error> {
-    if ts_scanner::is_identifier_text(name.as_bytes(), ts_core::LanguageVariant::STANDARD)
+    if tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
         || name.parse::<u64>().is_ok()
     {
         Ok(name.to_owned())

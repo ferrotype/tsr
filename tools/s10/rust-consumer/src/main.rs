@@ -7,7 +7,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut output = io::BufWriter::new(io::stdout().lock());
     for line in input.lock().lines() {
         let request = serde_json::from_str(&line?)?;
-        let row = s10_corpus::observe(&request, ts_embed::Session::load);
+        let row = s10_corpus::observe(&request, tsr_embed::Session::load);
         serde_json::to_writer(&mut output, &row)?;
         output.write_all(b"\n")?;
         output.flush()?;

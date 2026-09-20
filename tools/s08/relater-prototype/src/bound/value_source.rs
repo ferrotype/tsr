@@ -5,7 +5,7 @@ use super::{
     instantiate, mf, missing, of, tf, Construction, Environment, Error, HashMap, LiteralValue,
     NodeId, Rc, SymbolGroup, TypeCell, TypeLink, K,
 };
-use ts_ast::{JsDocProvider, NodeDataRead};
+use tsr_ast::{JsDocProvider, NodeDataRead};
 
 #[derive(Clone, Default)]
 struct FlowTypes(HashMap<NodeId, Rc<TypeCell>>);
@@ -39,7 +39,7 @@ impl Construction {
             Some(LiteralValue::String(bytes)) => String::from_utf8(bytes.clone())
                 .map_err(|_| Error::Unsupported("non-UTF8 computed string property".into()))?,
             Some(LiteralValue::Number(bits)) => {
-                ts_jsnum::Number::new(f64::from_bits(*bits)).to_string()
+                tsr_jsnum::Number::new(f64::from_bits(*bits)).to_string()
             }
             _ if ty.flags & tf::UNIQUE_ES_SYMBOL != 0 => format!(
                 "\u{ffff}@unique:{}",
@@ -92,7 +92,7 @@ impl Construction {
                     .input
                     .node(read.parent().ok_or(Error::ResolutionFailed)?)?;
                 parent.kind() == K::VariableDeclarationList
-                    && parent.flags() & ts_ast::node_flags::CONST != 0
+                    && parent.flags() & tsr_ast::node_flags::CONST != 0
                     && read.name().is_some_and(|name| {
                         self.input
                             .node(name)
@@ -360,7 +360,7 @@ impl Construction {
 
     fn jsdoc_tags(&self, declaration: NodeId) -> Result<Vec<NodeId>, Error> {
         let source = self.input.source(declaration)?;
-        let roots = ts_parser::ParserJsDocProvider::default().jsdoc(
+        let roots = tsr_parser::ParserJsDocProvider::default().jsdoc(
             self.input.ast(declaration)?,
             source,
             declaration,
@@ -704,12 +704,12 @@ mod tests {
     use crate::bound::BoundChecker;
     use crate::bound_input::BoundInput;
     use crate::bound_input::BoundInputOptions;
-    use ts_ast::SourceFileParseOptions;
-    use ts_core::ScriptKind;
-    use ts_jsstring::{JsString, SourceText};
+    use tsr_ast::SourceFileParseOptions;
+    use tsr_core::ScriptKind;
+    use tsr_jsstring::{JsString, SourceText};
 
     fn fixture(text: &[u8], kind: ScriptKind) -> (BoundChecker, NodeId) {
-        let parsed = ts_parser::parse_source_file(
+        let parsed = tsr_parser::parse_source_file(
             SourceText::from_loaded_bytes(text),
             kind,
             SourceFileParseOptions {
@@ -721,7 +721,7 @@ mod tests {
                 ..Default::default()
             },
         );
-        let file = ts_binder::bind_parsed_file(parsed).unwrap();
+        let file = tsr_binder::bind_parsed_file(parsed).unwrap();
         let source = file.source();
         let input = BoundInput::new(
             vec![file],

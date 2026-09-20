@@ -7,7 +7,7 @@
 # the carried S03 extractor patches. See docs/S05-protocol.md.
 id = "S05"
 title = "Scanner"
-goal = "ts_scanner reproduces the Go scanner over source bytes: tokens, literal values and flags, diagnostics, regular-expression scanning, Unicode identifier tables and the rescanning modes the parser and language service use."
+goal = "tsr_scanner reproduces the Go scanner over source bytes: tokens, literal values and flags, diagnostics, regular-expression scanning, Unicode identifier tables and the rescanning modes the parser and language service use."
 exit = [
   "sprint.S03.done == 1",
   "sprint.S04.done == 1",

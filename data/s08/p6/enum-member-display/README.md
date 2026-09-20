@@ -18,7 +18,7 @@ import s08_p5_display as display
 display.REQUESTS = Path('tools/s08/p6/enum-member-display-requests.json').resolve()
 display.capture(Path('target/s08/p6-enum-member-display-native-new').resolve())
 PY
-cargo test --locked -p ts_compiler --test checker_display enum_member_display
+cargo test --locked -p tsr_compiler --test checker_display enum_member_display
 ```
 
 This supplemental comparison does not certify E2 acceptance.

@@ -77,7 +77,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_manifest(missing)
             # A package no suite names, so the retarget is a change for every one.
-            for key, value in (("package", "ts_compiler"), ("filter", "unrelated::"),
+            for key, value in (("package", "tsr_compiler"), ("filter", "unrelated::"),
                                ("skip", ["retirement_before_commit"]), ("exact", True)):
                 changed = copy.deepcopy(self.manifest)
                 changed["suites"][name][key] = value
@@ -228,7 +228,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
         with redirect_stderr(io.StringIO()):
             result = measure(Path("."), invoke, ["cargo"], [], {}, self.manifest, "debug")
         self.assertTrue(all(result.values()))
-        cases_by_package["ts_api"].append("printing::tests::new_unreviewed_case")
+        cases_by_package["tsr_api"].append("printing::tests::new_unreviewed_case")
         with redirect_stderr(io.StringIO()):
             result = measure(Path("."), invoke, ["cargo"], [], {}, self.manifest, "debug")
         self.assertFalse(result["registry"])
@@ -375,7 +375,7 @@ class OwnershipInputsAndCI(unittest.TestCase):
     def test_ci_runs_navigation_and_formatter_regressions_in_both_profiles(self):
         workflow = (ROOT / ".github/workflows/status.yml").read_text()
         commands = [line.strip() for line in workflow.splitlines() if "cargo test " in line]
-        for package in ("ts_astnav", "ts_format"):
+        for package in ("tsr_astnav", "tsr_format"):
             for release in (False, True):
                 with self.subTest(package=package, release=release):
                     self.assertTrue(any(f"-p {package} " in line and

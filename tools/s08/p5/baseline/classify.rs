@@ -1,18 +1,18 @@
 //! Syntax predicates used by the native type/symbol baseline traversal.
 use super::Result;
-use ts_arena::NodeId;
-use ts_ast::{AstView, SyntaxKind as K};
+use tsr_arena::NodeId;
+use tsr_ast::{AstView, SyntaxKind as K};
 
 pub fn declaration_name(view: AstView<'_>, id: NodeId) -> Result<bool> {
     let node = view.node(id)?;
-    if node.kind() == K::SourceFile || ts_ast::utilities::is_binding_pattern(&node) {
+    if node.kind() == K::SourceFile || tsr_ast::utilities::is_binding_pattern(&node) {
         return Ok(false);
     }
     let Some(parent) = node.parent() else {
         return Ok(false);
     };
     let parent = view.node(parent)?;
-    Ok(ts_ast::is_declaration(&parent) && parent.name() == Some(id))
+    Ok(tsr_ast::is_declaration(&parent) && parent.name() == Some(id))
 }
 
 // Harness use of tsc/internal/ast/utilities.go:GetMeaningFromDeclaration.
@@ -28,9 +28,9 @@ pub fn declaration_has_value(view: AstView<'_>, id: NodeId) -> Result<bool> {
             | K::TypeLiteral,
         ) => false,
         Some(K::ModuleDeclaration) => {
-            ts_ast::is_ambient_module(view, id)?
-                || ts_ast::get_module_instance_state(view, id)?
-                    == ts_ast::ModuleInstanceState::Instantiated
+            tsr_ast::is_ambient_module(view, id)?
+                || tsr_ast::get_module_instance_state(view, id)?
+                    == tsr_ast::ModuleInstanceState::Instantiated
         }
         _ => true,
     })
@@ -134,5 +134,5 @@ pub fn intrinsic_jsx(view: AstView<'_>, id: NodeId, parent: NodeId, text: &[u8])
             .tag_name(),
         _ => return Ok(false),
     };
-    Ok(tag == Some(id) && ts_scanner::is_intrinsic_jsx_name(text))
+    Ok(tag == Some(id) && tsr_scanner::is_intrinsic_jsx_name(text))
 }

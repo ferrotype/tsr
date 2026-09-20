@@ -26,7 +26,7 @@ def load(name, path):
 
 fixtures = load('native_equivalence_original_fixtures', HERE.with_name('access-trace') / 'test_verify.py')
 python = fixtures.verify
-BINARY = Path(os.environ.get('NATIVE_VERIFY_BINARY', ROOT / 'target/s07-bis-native-verify/release/ts_s07_access_trace_native_verify')).resolve()
+BINARY = Path(os.environ.get('NATIVE_VERIFY_BINARY', ROOT / 'target/s07-bis-native-verify/release/tsr_s07_access_trace_native_verify')).resolve()
 OUTPUT = Path(os.environ.get('NATIVE_VERIFY_TEST_OUTPUT', ROOT / f'target/s07-bis-native-verify/equivalence-{time.time_ns()}'))
 OUTPUT.mkdir(parents=True, exist_ok=False)
 

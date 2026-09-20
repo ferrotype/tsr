@@ -20,7 +20,7 @@ per chunk. Handle the final partial chunk and nil IDs without introducing a heap
 allocation. The average backing length is not an upper bound on list length.
 
 Target `bind_each` and `bind_each_statement_functions_first` in
-`crates/ts_binder/src/containers.rs`. The existing child visitor delegates to
+`crates/tsr_binder/src/containers.rs`. The existing child visitor delegates to
 `bind_each`. Keep its upfront empty-slice validation, and preserve the direct
 `bind_each` empty-descriptor no-op. Raw, mapped and lazy lookup still uses the
 checked `parsed_view().node_slice(...)` route at every chunk boundary.
