@@ -1,0 +1,874 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "predicates",
+          "tristate": 0
+        },
+        {
+          "op": "predicates",
+          "tristate": 1
+        },
+        {
+          "op": "predicates",
+          "tristate": 2
+        },
+        {
+          "op": "predicates",
+          "tristate": 3
+        },
+        {
+          "op": "predicates",
+          "tristate": 255
+        }
+      ],
+      "case": "leaves/core/tristate-predicate-domain",
+      "discriminates": "the five predicates are equality tests against the three named constants, so a byte outside the domain answers false to all of them, including the two OrUnknown predicates that a range check would have answered true",
+      "operation": "tsc/internal/core/tristate.go:Tristate.IsTrue",
+      "order_sensitive": true,
+      "subject": "core.Tristate"
+    },
+    {
+      "actions": [
+        {
+          "op": "default_if_unknown",
+          "tristate": 0,
+          "tristate_default": 2
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 0,
+          "tristate_default": 1
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 0,
+          "tristate_default": 0
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 1,
+          "tristate_default": 2
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 2,
+          "tristate_default": 1
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 3,
+          "tristate_default": 2
+        },
+        {
+          "op": "default_if_unknown",
+          "tristate": 2,
+          "tristate_default": 0
+        }
+      ],
+      "case": "leaves/core/tristate-default-if-unknown",
+      "discriminates": "only TSUnknown is replaced: a set value keeps its own value even when the default is unknown, an out-of-domain byte is returned unchanged rather than treated as unset, and an unknown default leaves the result unknown",
+      "operation": "tsc/internal/core/tristate.go:Tristate.DefaultIfUnknown",
+      "order_sensitive": true,
+      "subject": "core.Tristate"
+    },
+    {
+      "actions": [
+        {
+          "flag": true,
+          "op": "bool_to_tristate"
+        },
+        {
+          "flag": false,
+          "op": "bool_to_tristate"
+        }
+      ],
+      "case": "leaves/core/tristate-from-bool",
+      "discriminates": "false converts to TSFalse (1), never to the zero value TSUnknown (0), so an option explicitly set to false stays distinguishable from an unset one",
+      "operation": "tsc/internal/core/tristate.go:BoolToTristate",
+      "order_sensitive": true,
+      "subject": "core.Tristate"
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "tristate": 0
+        },
+        {
+          "op": "marshal",
+          "tristate": 1
+        },
+        {
+          "op": "marshal",
+          "tristate": 2
+        },
+        {
+          "op": "marshal",
+          "tristate": 3
+        },
+        {
+          "op": "marshal",
+          "tristate": 255
+        }
+      ],
+      "case": "leaves/core/tristate-marshal-json",
+      "discriminates": "the marshaller's default arm emits null for everything that is not TSTrue or TSFalse, so unknown and an out-of-domain byte are indistinguishable in the encoded form and the mapping is not round-trippable",
+      "operation": "tsc/internal/core/tristate.go:Tristate.MarshalJSON",
+      "order_sensitive": true,
+      "subject": "core.TristateJson"
+    },
+    {
+      "actions": [
+        {
+          "op": "unmarshal",
+          "raw": "true"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "false"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "null"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "\"true\""
+        },
+        {
+          "op": "unmarshal",
+          "raw": "TRUE"
+        },
+        {
+          "op": "unmarshal",
+          "raw": " true"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "0"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "1"
+        },
+        {
+          "op": "unmarshal",
+          "raw": "{}"
+        },
+        {
+          "op": "unmarshal",
+          "raw": ""
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": " true "
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": "\"true\""
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": "null"
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": "0"
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": "tru"
+        },
+        {
+          "op": "unmarshal_via_json",
+          "raw": ""
+        }
+      ],
+      "case": "leaves/core/tristate-unmarshal-json",
+      "discriminates": "UnmarshalJSON switches on the exact bytes it is handed and never reports an error, so a quoted, padded or malformed literal silently becomes TSUnknown; reaching it through encoding/json changes the answer, because the decoder strips the surrounding whitespace and rejects a syntax error before the method is ever called",
+      "operation": "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON",
+      "order_sensitive": true,
+      "subject": "core.TristateJson"
+    },
+    {
+      "actions": [
+        {
+          "end": 7,
+          "op": "new",
+          "pos": 3
+        },
+        {
+          "end": 0,
+          "op": "new",
+          "pos": 2147483648
+        },
+        {
+          "end": 0,
+          "op": "new",
+          "pos": -2147483649
+        },
+        {
+          "end": 4294967296,
+          "op": "new",
+          "pos": 0
+        },
+        {
+          "end": 4294967301,
+          "op": "new",
+          "pos": 0
+        }
+      ],
+      "case": "leaves/core/text-range-int32-narrowing",
+      "discriminates": "the constructor takes int arguments and stores int32 fields, so a position beyond the int32 domain is truncated rather than clamped or rejected, and Pos/End report the truncated value: 2^31 reads back as the most negative position and 2^32 reads back as zero",
+      "operation": "tsc/internal/core/text.go:NewTextRange",
+      "order_sensitive": true,
+      "subject": "core.TextRange"
+    },
+    {
+      "actions": [
+        {
+          "end": 2147483647,
+          "op": "new",
+          "pos": -2147483648
+        },
+        {
+          "end": -2147483648,
+          "op": "new",
+          "pos": 2147483647
+        },
+        {
+          "end": 5,
+          "op": "new",
+          "pos": 5
+        },
+        {
+          "end": 3,
+          "op": "new",
+          "pos": 7
+        },
+        {
+          "end": -1,
+          "op": "new",
+          "pos": -1
+        }
+      ],
+      "case": "leaves/core/text-range-len-wraparound",
+      "discriminates": "Len subtracts in int32 and only then widens, so a range spanning the whole int32 domain reports -1 and the reversed extreme range reports 1; a reversed ordinary range reports a negative length instead of zero",
+      "operation": "tsc/internal/core/text.go:TextRange.Len",
+      "order_sensitive": true,
+      "subject": "core.TextRange"
+    },
+    {
+      "actions": [
+        {
+          "op": "undefined"
+        },
+        {
+          "end": 0,
+          "op": "make",
+          "pos": 0
+        },
+        {
+          "end": -1,
+          "op": "make",
+          "pos": -1
+        },
+        {
+          "end": 5,
+          "op": "make",
+          "pos": -1
+        },
+        {
+          "end": 5,
+          "op": "make",
+          "pos": 0
+        },
+        {
+          "op": "contains",
+          "pos": -1
+        },
+        {
+          "op": "contains",
+          "pos": 0
+        },
+        {
+          "op": "contains",
+          "pos": 4
+        },
+        {
+          "op": "contains",
+          "pos": 5
+        },
+        {
+          "op": "with_pos",
+          "pos": 2
+        },
+        {
+          "end": 9,
+          "op": "with_end"
+        },
+        {
+          "end2": 10,
+          "op": "make2",
+          "pos2": 5
+        },
+        {
+          "op": "relate"
+        },
+        {
+          "end2": 10,
+          "op": "make2",
+          "pos2": 0
+        },
+        {
+          "op": "relate"
+        },
+        {
+          "end": 3,
+          "op": "make",
+          "pos": 2
+        },
+        {
+          "op": "relate"
+        },
+        {
+          "end": 5,
+          "op": "make",
+          "pos": 0
+        },
+        {
+          "end2": 5,
+          "op": "make2",
+          "pos2": 0
+        },
+        {
+          "op": "relate"
+        },
+        {
+          "op": "contains",
+          "pos": 4294967296
+        },
+        {
+          "op": "with_pos",
+          "pos": 4294967296
+        },
+        {
+          "end": 0,
+          "op": "make",
+          "pos": -2147483648
+        },
+        {
+          "end2": 0,
+          "op": "make2",
+          "pos2": 2147483647
+        },
+        {
+          "op": "relate"
+        },
+        {
+          "end": 2147483647,
+          "op": "make",
+          "pos": 0
+        },
+        {
+          "end2": -2147483648,
+          "op": "make2",
+          "pos2": 0
+        },
+        {
+          "op": "relate"
+        }
+      ],
+      "case": "leaves/core/text-range-predicate-family-missing",
+      "discriminates": "IsValid ORs its two endpoint tests, so a range with one non-negative endpoint is valid while UndefinedTextRange is not; Contains is half-open, ContainsInclusive admits the end and ContainsExclusive admits neither bound; Intersects treats touching ranges as intersecting where Overlaps does not; and CompareTextRanges falls through to the ends only when the positions tie. The position argument and the comparison result are machine ints rather than the stored int32: a position of 2^32 stays outside the range instead of being folded to 0, WithPos truncates that same argument to 0 the way NewTextRange does, and CompareTextRanges widens both endpoints before subtracting, so the int32 extremes report -4294967295 and 4294967295 where an int32 subtraction would wrap to 1 and -1, which is the wrap Len does report",
+      "operation": "tsc/internal/core/text.go:TextRange.IsValid",
+      "order_sensitive": true,
+      "subject": "core.TextRangePredicates"
+    },
+    {
+      "actions": [
+        {
+          "op": "from_file_name",
+          "text": "a.ts"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.TS"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.Tsx"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.d.ts"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.json"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.JSON"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.js"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.cjs"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.mjs"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.jsx"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.cts"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.mts"
+        },
+        {
+          "op": "from_file_name",
+          "text": ".ts"
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.ts.txt"
+        },
+        {
+          "op": "from_file_name",
+          "text": "noext"
+        },
+        {
+          "op": "from_file_name",
+          "text": ""
+        },
+        {
+          "op": "from_file_name",
+          "text": "a."
+        },
+        {
+          "op": "from_file_name",
+          "text": "a.TSX\u0130"
+        },
+        {
+          "hex": "612e54ff53",
+          "op": "from_file_name"
+        }
+      ],
+      "case": "leaves/core/script-kind-from-file-name",
+      "discriminates": "the extension is everything after the last dot, lowercased with strings.ToLower and matched whole: a bare '.ts' is a TS file, 'a.d.ts' is plain TS, and the fold is ASCII-only in effect, because the only two non-ASCII runes that lower to ASCII produce 'i' and 'k', which appear in no recognized extension. The last two names pin that boundary: a dotted-capital-I suffix and an invalid UTF-8 byte must both stay Unknown rather than being folded or replacement-decoded into a match",
+      "operation": "tsc/internal/core/core.go:GetScriptKindFromFileName",
+      "order_sensitive": true,
+      "subject": "core.ScriptKind"
+    },
+    {
+      "actions": [
+        {
+          "op": "ensure_from_file_name",
+          "text": "noext"
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": ""
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": "a.json"
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": "a.ts.txt"
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": ".ts"
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": "a.jsx"
+        },
+        {
+          "op": "ensure_from_file_name",
+          "text": "a."
+        }
+      ],
+      "case": "leaves/core/script-kind-ensure-default",
+      "discriminates": "only Unknown is defaulted to TS, so a .json or .jsx file keeps its own kind while an unrecognized or extensionless name becomes TS and is never left at the zero value",
+      "operation": "tsc/internal/core/core.go:EnsureScriptKindFromFileName",
+      "order_sensitive": true,
+      "subject": "core.ScriptKind"
+    },
+    {
+      "actions": [
+        {
+          "kind": 0,
+          "op": "default_extension"
+        },
+        {
+          "kind": 1,
+          "op": "default_extension"
+        },
+        {
+          "kind": 2,
+          "op": "default_extension"
+        },
+        {
+          "kind": 3,
+          "op": "default_extension"
+        },
+        {
+          "kind": 4,
+          "op": "default_extension"
+        },
+        {
+          "kind": 5,
+          "op": "default_extension"
+        },
+        {
+          "kind": 6,
+          "op": "default_extension"
+        },
+        {
+          "kind": 7,
+          "op": "default_extension"
+        },
+        {
+          "kind": 99,
+          "op": "default_extension"
+        },
+        {
+          "kind": -1,
+          "op": "default_extension"
+        }
+      ],
+      "case": "leaves/core/script-kind-default-extension",
+      "discriminates": "TS is not a case of the switch: it reaches .ts through the same default arm as Unknown, the two reserved values and any out-of-domain kind, so the extension cannot be used to recover the kind it came from",
+      "operation": "tsc/internal/core/core.go:GetDefaultExtensionForScriptKind",
+      "order_sensitive": true,
+      "subject": "core.ScriptKind"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "text": ""
+        },
+        {
+          "op": "parse",
+          "text": "abc"
+        },
+        {
+          "op": "parse",
+          "text": "*"
+        },
+        {
+          "op": "parse",
+          "text": "a*b"
+        },
+        {
+          "op": "parse",
+          "text": "*abc"
+        },
+        {
+          "op": "parse",
+          "text": "abc*"
+        },
+        {
+          "op": "parse",
+          "text": "a*b*c"
+        },
+        {
+          "op": "parse",
+          "text": "**"
+        },
+        {
+          "op": "parse",
+          "text": "*a*"
+        }
+      ],
+      "case": "leaves/core/pattern-parse-validity",
+      "discriminates": "a second star makes the parse return the zero Pattern, whose StarIndex is 0 and whose Text is empty, not the -1 that means an exact match; the parsed empty exact pattern has the same empty Text but keeps StarIndex -1 and is valid, so the recorded star index and IsValid each separate the two, and IsValid is the only predicate that rejects the zero value, because Matches panics on it instead of answering false",
+      "operation": "tsc/internal/core/pattern.go:TryParsePattern",
+      "order_sensitive": true,
+      "subject": "core.Pattern"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "text": "ab*ab"
+        },
+        {
+          "op": "matches",
+          "text": "ab"
+        },
+        {
+          "op": "matches",
+          "text": "abXab"
+        },
+        {
+          "op": "matched_text",
+          "text": "abXab"
+        },
+        {
+          "op": "matches",
+          "text": "abab"
+        },
+        {
+          "op": "matched_text",
+          "text": "abab"
+        },
+        {
+          "op": "parse",
+          "text": "a*"
+        },
+        {
+          "op": "matched_text",
+          "text": "a"
+        },
+        {
+          "op": "parse",
+          "text": "*b"
+        },
+        {
+          "op": "matched_text",
+          "text": "b"
+        },
+        {
+          "op": "parse",
+          "text": "exact"
+        },
+        {
+          "op": "matches",
+          "text": "exact"
+        },
+        {
+          "op": "matched_text",
+          "text": "exact"
+        }
+      ],
+      "case": "leaves/core/pattern-overlapping-match",
+      "discriminates": "prefix and suffix may overlap in the candidate: 'abab' matches 'ab*ab' with an empty captured text, and the shortest candidate a one-sided pattern accepts captures nothing without the end index running past the start. An exact pattern matches but captures the empty string rather than the whole candidate",
+      "operation": "tsc/internal/core/pattern.go:Pattern.MatchedText",
+      "order_sensitive": true,
+      "subject": "core.Pattern"
+    },
+    {
+      "actions": [
+        {
+          "hex": "ff2afe",
+          "op": "parse"
+        },
+        {
+          "hex": "ff80fe",
+          "op": "matches"
+        },
+        {
+          "hex": "ff80fe",
+          "op": "matched_text"
+        },
+        {
+          "hex": "fffe",
+          "op": "matches"
+        },
+        {
+          "hex": "fffe",
+          "op": "matched_text"
+        },
+        {
+          "hex": "ff80",
+          "op": "matches"
+        },
+        {
+          "hex": "fffeff",
+          "op": "matches"
+        }
+      ],
+      "case": "leaves/core/pattern-byte-domain",
+      "discriminates": "the star index, the prefix and suffix tests and the capture are all byte offsets, so a pattern and a candidate that are not valid UTF-8 are compared and captured verbatim; a decode-then-match implementation would collapse each invalid byte to U+FFFD and match candidates this one rejects",
+      "operation": "tsc/internal/core/pattern.go:Pattern.Matches",
+      "order_sensitive": true,
+      "subject": "core.Pattern"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "text": "a*b*c"
+        },
+        {
+          "op": "is_valid"
+        },
+        {
+          "op": "matches",
+          "text": "anything"
+        },
+        {
+          "op": "matched_text",
+          "text": "anything"
+        },
+        {
+          "op": "parse",
+          "text": "a*"
+        },
+        {
+          "op": "is_valid"
+        },
+        {
+          "op": "matches",
+          "text": "b"
+        },
+        {
+          "op": "matched_text",
+          "text": "b"
+        }
+      ],
+      "case": "leaves/core/pattern-zero-value-panic",
+      "discriminates": "Matches does not consult IsValid first: on the invalid zero Pattern the length guard passes, because len(Text)-1 is -1, and the suffix slice Text[1:] then runs off an empty string, so a caller that skipped IsValid panics instead of getting false. MatchedText panics separately when the candidate simply does not match. Only the panic class is compared, because the two runtimes word the same failure differently",
+      "operation": "tsc/internal/core/pattern.go:Pattern.IsValid",
+      "order_sensitive": true,
+      "subject": "core.Pattern"
+    },
+    {
+      "actions": [
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "abc",
+          "values": [
+            2,
+            4,
+            5
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "abc",
+          "values": [
+            5,
+            4
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "abc",
+          "values": [
+            2,
+            3
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "abc",
+          "values": [
+            3,
+            2
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "zzz",
+          "values": [
+            2,
+            3
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "",
+          "values": [
+            1
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "x",
+          "values": [
+            1
+          ]
+        },
+        {
+          "op": "find_best",
+          "patterns": [
+            "",
+            "ab*",
+            "a*",
+            "abc",
+            "*c"
+          ],
+          "text": "abc",
+          "values": [
+            4,
+            4
+          ]
+        }
+      ],
+      "case": "leaves/core/pattern-find-best-match",
+      "discriminates": "an exact match resets the longest prefix length to -1 rather than to its own length, so a later star pattern whose star index is 0 displaces it, while the same two patterns in the other order keep the exact match; among star patterns the longest literal prefix wins regardless of position, and when nothing matches the result is the zero value of the element type, which the 1-based indices here keep distinguishable from a real selection",
+      "operation": "tsc/internal/core/pattern.go:FindBestPatternMatch",
+      "order_sensitive": true,
+      "subject": "core.Pattern"
+    }
+  ],
+  "version": 1
+}

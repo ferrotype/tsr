@@ -1,33 +1,1642 @@
 {
   "cases": [
     {
-      "expected_contract": "ordered matched file list",
-      "family": "pilot",
+      "expected_contract": "the complete packaged asset index: all 108 names in their frozen byte-sorted order, each with its length and an FNV-1a/64 digest of its bytes. It catches a missing, extra, renamed, reordered or altered asset. It is also the checkout-independence witness for Rust: Go reads these bytes from its embedded copy of upstream/tsc/internal/bundled/libs, while crates/tsr_bundled compiles in its own crate-lo",
+      "family": "leaves",
       "host_applicability": "any",
-      "id": "pilot/matching/include-star-ts",
-      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "id": "leaves/bundled/asset-index-complete",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
-        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
+        "tsc/internal/bundled/embed.go:wrappedFS.WalkDir"
       ]
     },
     {
-      "expected_contract": "ordered matched file list",
-      "family": "pilot",
+      "expected_contract": "valid and missing asset names against the same index. Both sides are asked for the same fifteen names in the same order, and every one of them must resolve by exact case-sensitive match or not at all: no extension completion, no whitespace trimming, no re-application of the libs/ segment and no `.` or `..` resolution. lib.ES5.d.ts and LIB.ES5.D.TS catch case folding; lib.es2015 catches extension c",
+      "family": "leaves",
       "host_applicability": "any",
-      "id": "pilot/matching/recursive-exclude",
-      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "id": "leaves/bundled/asset-name-resolution",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
-        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
+        "tsc/internal/bundled/embed.go:wrappedFS.ReadFile"
       ]
     },
     {
-      "expected_contract": "parsed options, file names and formatted errors",
-      "family": "pilot",
+      "expected_contract": "the wrapper's path predicate: an exact, case-sensitive, unnormalized bundled:/// prefix test and nothing more. bundled:/// with an empty remainder is bundled, a fourth slash stays inside the remainder, and a traversal after the prefix is still bundled because the predicate never resolves the path. Shortened schemes, a leading character and an upper-case scheme are not. This is the one bundled oper",
+      "family": "leaves",
       "host_applicability": "any",
-      "id": "pilot/commandline/parse-composite-false",
-      "native_authority": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaseline",
+      "id": "leaves/bundled/bundled-path-prefix",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
       "operations": [
-        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
+        "tsc/internal/bundled/embed.go:IsBundled"
+      ]
+    },
+    {
+      "expected_contract": "the root every consumer joins asset names onto. An embedded build answers with the scheme path bundled:///libs, not a directory on disk, and that path is itself bundled. A Rust constant that carried a trailing slash, a different scheme or a filesystem path would break every consumer that concatenates a lib name onto it.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/lib-path-identity",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/bundled/bundled.go:LibPath"
+      ]
+    },
+    {
+      "expected_contract": "access outside the checkout, from the Go side. TestingLibPath locates the libs directory through runtime.Caller(0), so it resolves only where the pinned source tree is present; under -trimpath the same call returns the module-relative github.com/microsoft/TypeScript/tsc/internal/bundled/libs and does not panic, so the accessor fails silently. The payload records base names, absoluteness, existence",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/source-directory-access",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/bundled/bundled.go:TestingLibPath"
+      ]
+    },
+    {
+      "expected_contract": "the wrapper dispatch WrapFS installs, which no other case in this group reaches, and the `errors` column of the group's coverage matrix. Eight bundled:/// paths record DirectoryExists, FileExists, GetAccessibleEntries, Stat and Realpath together, which is where the pinned surface is least uniform: bundled:/// is a directory to Stat and lists libs through GetAccessibleEntries, yet DirectoryExists a",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/bundled/wrapper-dispatch-surface",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/bundled/embed.go:wrapFS"
+      ]
+    },
+    {
+      "expected_contract": "a zero-value CopyOnWriteMap is usable inside a scope: ensureOwned takes its nil-map branch and allocates rather than cloning, and the restore EnterScope returned discards that write entirely, leaving the map empty and still writable",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/cow-map-empty-scope-write-discarded",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope"
+      ]
+    },
+    {
+      "expected_contract": "scopes nest, and each restore puts back exactly the storage and ownership its own EnterScope saved, so an inherited key overwritten at two depths unwinds to the intermediate value first and only then to the original",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned"
+      ]
+    },
+    {
+      "expected_contract": "the scope shares the parent's storage for reads and clones it on the first write, so entries written inside the scope are invisible to the parent afterwards while the inherited ones survive; the restore also puts ownership back, but that is not what these rows witness -- a port that re-cloned on the parent's next write would produce the same payload -- so the trace claims only that the parent stay",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteMap.Set"
+      ]
+    },
+    {
+      "expected_contract": "CopyOnWriteSet delegates to the map's scope, so an Add inside the scope is discarded on exit while the members inherited from the parent survive both the copy-on-write clone and the restore",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/cow-set-scope-fork",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope"
+      ]
+    },
+    {
+      "expected_contract": "a zero-value MultiMap serves reads before its map exists (Get returns a nil slice, Has false, Len 0) and Add allocates on first use; Len counts keys rather than values, and a size hint changes nothing observable",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/multimap-empty-and-size-hint",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/multimap.go:MultiMap.Add"
+      ]
+    },
+    {
+      "expected_contract": "GroupBy appends in item order, so each group's values keep the input order even though the key order is a Go map's, and the grouping rule travels in the request as key_of rather than hiding in the probe; RemoveAll drops the whole key, and Clear empties the map and leaves it usable -- whether `clear(s.M)` keeps the backing map allocated is not witnessed here and cannot be, because Add allocates on ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/multimap-group-by-remove-all-clear",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/multimap.go:GroupBy"
+      ]
+    },
+    {
+      "expected_contract": "Remove compacts the value slice in place with append(values[:i], values[i+1:]...), so a slice handed out by an earlier Get keeps its old length and now shows a duplicated tail; removing the last value deletes the key outright instead of leaving an empty slice, and removing an absent value or an absent key is a no-op",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/multimap-remove-aliases-the-slice",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/multimap.go:MultiMap.Remove"
+      ]
+    },
+    {
+      "expected_contract": "Clear empties the order as well as the map, so later inserts start a fresh sequence",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-clear-reuse",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clear"
+      ]
+    },
+    {
+      "expected_contract": "a clone keeps its own order and contents after the original is mutated",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-clone-isolation",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+      ]
+    },
+    {
+      "expected_contract": "writing through the clone must not alias back into the original",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-clone-write-back",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Clone"
+      ]
+    },
+    {
+      "expected_contract": "a reinserted key goes to the end, not back to its original slot",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-delete-reinsert",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+      ]
+    },
+    {
+      "expected_contract": "the second Delete returns the zero value and false without disturbing the map",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-double-delete",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Delete"
+      ]
+    },
+    {
+      "expected_contract": "breaking out of the range-over-func iterator is observable and leaves the map intact",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-early-stop",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Keys"
+      ]
+    },
+    {
+      "expected_contract": "OrderedMap's nil guards are per method, not a property of the type: Size, Keys, Entries and Clone each test the receiver and return empty, while Get, Has and Clear reach straight through m.mp and panic on a nil receiver",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-empty-nil",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Size"
+      ]
+    },
+    {
+      "expected_contract": "overwriting an existing key must keep its original position, not move it to the end",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-insert-overwrite",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:OrderedMap.Set"
+      ]
+    },
+    {
+      "expected_contract": "a size hint changes allocation only, never iteration order",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-map-size-hint",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint"
+      ]
+    },
+    {
+      "expected_contract": "Clone copies the key order as well as the map, so neither side sees the other's deletes or additions, and Clear restarts the order on the original while leaving the clone whole",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-set-clone-clear-isolation",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Clone"
+      ]
+    },
+    {
+      "expected_contract": "Delete reports whether the value was present, a second Delete of the same value reports false without disturbing the order, and a reinserted value goes to the end rather than back to its old slot; no pinned test covers delete-then-reinsert ordering",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-set-delete-reinsert",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Delete"
+      ]
+    },
+    {
+      "expected_contract": "a nil *OrderedSet does not inherit the nil tolerance of the OrderedMap it embeds: every method reaches the map through the receiver's field, so Size, Values, Has, Delete, Clone and Add all dereference it, where OrderedMap's own Size, Keys, Entries and Clone survive a nil receiver (the committed ordered-map-empty-nil case is the contrast); the zero-value set meanwhile serves Size, Has, Values, Dele",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-set-empty-nil",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Size"
+      ]
+    },
+    {
+      "expected_contract": "Values yields insertion order, not sorted order: the pinned TestOrderedSet adds 1, 2, 3 ascending and asserts only slices.IsSorted, so it cannot tell the two apart; adding c, a, b does, and re-adding an existing value must keep its original position",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-set-insertion-order",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Add"
+      ]
+    },
+    {
+      "expected_contract": "a size hint changes allocation only and never the insertion order, and breaking out of the range-over-func Values iterator after two elements is observable and leaves the set intact",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/ordered-set-size-hint-early-stop",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/ordered_set.go:OrderedSet.Values"
+      ]
+    },
+    {
+      "expected_contract": "NewSetFromItems collapses duplicates, and NewSetWithSizeHint allocates the backing map eagerly, so its Keys is an empty non-nil map where the zero value's Keys is nil",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/set-constructors",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/set.go:NewSetFromItems"
+      ]
+    },
+    {
+      "expected_contract": "Set's nil guards are per method: Has, Len, Keys, Clear, Clone, Equals and IsSubsetOf tolerate a nil receiver and Intersects reports false, while Union's `both empty` early return fires before its own nil check so only a non-empty operand reaches the `cannot modify nil Set` panic; UnionedWith never panics on a nil receiver either, but what it returns depends on the operand: nil and nil gives nil ou",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/set-nil-receiver-guards",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Union"
+      ]
+    },
+    {
+      "expected_contract": "Union into a receiver whose backing map is nil clones the operand instead of aliasing it, Clone is a real copy that survives a later Delete, and UnionedWith builds a third set without touching either operand",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/set-union-clone-isolation",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Clone"
+      ]
+    },
+    {
+      "expected_contract": "Keys hands out the live backing map rather than a copy, so a map captured before a Delete, a Clear and a later Add reflects all three; AddIfAbsent reports whether the key was newly added, and Clear keeps the allocated map usable",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/set-zero-value-keys-alias",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/set.go:Set.Keys"
+      ]
+    },
+    {
+      "expected_contract": "the nil-value contract the pinned TestSyncMapWithNil pins, and the part it does not: Load of a key stored with nil returns (zero, true) where an absent key returns (zero, false), and LoadOrStore over a key already holding nil reports loaded=true and hands back that nil rather than the value it was offered, so it neither overwrites nor panics -- its `actualAny == nil` guard returns V's zero value, ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/syncmap-nil-value-contract",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Load"
+      ]
+    },
+    {
+      "expected_contract": "returning false from Range's callback stops the walk immediately and leaves the map untouched; only the number of visits is specified, because sync.Map specifies no order, so the case records the count and never which keys were seen",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/syncmap-range-early-stop",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Range"
+      ]
+    },
+    {
+      "expected_contract": "LoadOrStore stores only when the key is absent and otherwise returns the existing value, and Clone is a snapshot taken through Range, so a later Delete and Clear on the original leave it untouched",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/syncmap-store-clone-clear",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/syncmap.go:SyncMap.Clone"
+      ]
+    },
+    {
+      "expected_contract": "AddIfAbsent returns the inverse of LoadOrStore's loaded flag, so it is true exactly once per key and Add throws that answer away; IsEmpty answers from the first visited entry rather than counting, which its boolean alone cannot witness, so the trace claims only the boolean itself; a stopped Range visits exactly as many keys as the callback allows, which the recorded count does witness, and deletin",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core-collections/syncset-add-if-absent-and-early-stop",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent"
+      ]
+    },
+    {
+      "expected_contract": "the star index, the prefix and suffix tests and the capture are all byte offsets, so a pattern and a candidate that are not valid UTF-8 are compared and captured verbatim; a decode-then-match implementation would collapse each invalid byte to U+FFFD and match candidates this one rejects",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/pattern-byte-domain",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/pattern.go:Pattern.Matches"
+      ]
+    },
+    {
+      "expected_contract": "an exact match resets the longest prefix length to -1 rather than to its own length, so a later star pattern whose star index is 0 displaces it, while the same two patterns in the other order keep the exact match; among star patterns the longest literal prefix wins regardless of position, and when nothing matches the result is the zero value of the element type, which the 1-based indices here keep",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/pattern-find-best-match",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/pattern.go:FindBestPatternMatch"
+      ]
+    },
+    {
+      "expected_contract": "prefix and suffix may overlap in the candidate: 'abab' matches 'ab*ab' with an empty captured text, and the shortest candidate a one-sided pattern accepts captures nothing without the end index running past the start. An exact pattern matches but captures the empty string rather than the whole candidate",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/pattern-overlapping-match",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/pattern.go:Pattern.MatchedText"
+      ]
+    },
+    {
+      "expected_contract": "a second star makes the parse return the zero Pattern, whose StarIndex is 0 and whose Text is empty, not the -1 that means an exact match; the parsed empty exact pattern has the same empty Text but keeps StarIndex -1 and is valid, so the recorded star index and IsValid each separate the two, and IsValid is the only predicate that rejects the zero value, because Matches panics on it instead of answ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/pattern-parse-validity",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/pattern.go:TryParsePattern"
+      ]
+    },
+    {
+      "expected_contract": "Matches does not consult IsValid first: on the invalid zero Pattern the length guard passes, because len(Text)-1 is -1, and the suffix slice Text[1:] then runs off an empty string, so a caller that skipped IsValid panics instead of getting false. MatchedText panics separately when the candidate simply does not match. Only the panic class is compared, because the two runtimes word the same failure ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/pattern-zero-value-panic",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/pattern.go:Pattern.IsValid"
+      ]
+    },
+    {
+      "expected_contract": "TS is not a case of the switch: it reaches .ts through the same default arm as Unknown, the two reserved values and any out-of-domain kind, so the extension cannot be used to recover the kind it came from",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/script-kind-default-extension",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/core.go:GetDefaultExtensionForScriptKind"
+      ]
+    },
+    {
+      "expected_contract": "only Unknown is defaulted to TS, so a .json or .jsx file keeps its own kind while an unrecognized or extensionless name becomes TS and is never left at the zero value",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/script-kind-ensure-default",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/core.go:EnsureScriptKindFromFileName"
+      ]
+    },
+    {
+      "expected_contract": "the extension is everything after the last dot, lowercased with strings.ToLower and matched whole: a bare '.ts' is a TS file, 'a.d.ts' is plain TS, and the fold is ASCII-only in effect, because the only two non-ASCII runes that lower to ASCII produce 'i' and 'k', which appear in no recognized extension. The last two names pin that boundary: a dotted-capital-I suffix and an invalid UTF-8 byte must ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/script-kind-from-file-name",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/core.go:GetScriptKindFromFileName"
+      ]
+    },
+    {
+      "expected_contract": "the constructor takes int arguments and stores int32 fields, so a position beyond the int32 domain is truncated rather than clamped or rejected, and Pos/End report the truncated value: 2^31 reads back as the most negative position and 2^32 reads back as zero",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/text-range-int32-narrowing",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/text.go:NewTextRange"
+      ]
+    },
+    {
+      "expected_contract": "Len subtracts in int32 and only then widens, so a range spanning the whole int32 domain reports -1 and the reversed extreme range reports 1; a reversed ordinary range reports a negative length instead of zero",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/text-range-len-wraparound",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/text.go:TextRange.Len"
+      ]
+    },
+    {
+      "expected_contract": "IsValid ORs its two endpoint tests, so a range with one non-negative endpoint is valid while UndefinedTextRange is not; Contains is half-open, ContainsInclusive admits the end and ContainsExclusive admits neither bound; Intersects treats touching ranges as intersecting where Overlaps does not; and CompareTextRanges falls through to the ends only when the positions tie. The position argument and th",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/text-range-predicate-family-missing",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/text.go:TextRange.IsValid"
+      ]
+    },
+    {
+      "expected_contract": "only TSUnknown is replaced: a set value keeps its own value even when the default is unknown, an out-of-domain byte is returned unchanged rather than treated as unset, and an unknown default leaves the result unknown",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-default-if-unknown",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/tristate.go:Tristate.DefaultIfUnknown"
+      ]
+    },
+    {
+      "expected_contract": "false converts to TSFalse (1), never to the zero value TSUnknown (0), so an option explicitly set to false stays distinguishable from an unset one",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-from-bool",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/tristate.go:BoolToTristate"
+      ]
+    },
+    {
+      "expected_contract": "the marshaller's default arm emits null for everything that is not TSTrue or TSFalse, so unknown and an out-of-domain byte are indistinguishable in the encoded form and the mapping is not round-trippable",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-marshal-json",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/tristate.go:Tristate.MarshalJSON"
+      ]
+    },
+    {
+      "expected_contract": "the five predicates are equality tests against the three named constants, so a byte outside the domain answers false to all of them, including the two OrUnknown predicates that a range check would have answered true",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-predicate-domain",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/tristate.go:Tristate.IsTrue"
+      ]
+    },
+    {
+      "expected_contract": "UnmarshalJSON switches on the exact bytes it is handed and never reports an error, so a quoted, padded or malformed literal silently becomes TSUnknown; reaching it through encoding/json changes the answer, because the decoder strips the surrounding whitespace and rejects a syntax error before the method is ever called",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/core/tristate-unmarshal-json",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/core/tristate.go:Tristate.UnmarshalJSON"
+      ]
+    },
+    {
+      "expected_contract": "an ad-hoc message is a runtime-owned Message with code -1, category Error and the key '-1': its text is never a static identity, it is never translated whatever the locale, and it still goes through the same placeholder substitution and the same missing-argument panic",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/adhoc-message",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:NewAdHocMessage"
+      ]
+    },
+    {
+      "expected_contract": "Category.Name returns the lowercase reporting word for the four defined categories and panics for anything else; the panic is the contract, not a default string",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/category-name",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Category.Name"
+      ]
+    },
+    {
+      "expected_contract": "the generated stringer is a different function from Name: it returns the Go constant identifier and renders an out-of-range value as Category(n) instead of panicking",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/category-stringer",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/stringer_generated.go:Category.String"
+      ]
+    },
+    {
+      "expected_contract": "Go repairs arguments with strings.ToValidUTF8(arg, U+FFFD) before substituting, which collapses a whole run of invalid bytes into one replacement character rather than one per byte; valid multi-byte text and an embedded NUL pass through untouched. The last three rows pin the limit of that observation rather than extending it: an argument no placeholder consumes never reaches the output, and core.S",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-invalid-utf8-arguments",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "a placeholder whose index is at or past len(args) panics with 'Invalid formatting placeholder'; the len(args) == 0 short circuit means the same text with no arguments at all does not panic",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-missing-argument",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "no generated message text contains a newline at this pin, so multiline diagnostic text can only arrive through an argument or an ad-hoc message: newlines, CRLF and tabs inside an argument are substituted verbatim, and a multiline text keeps its line breaks around the replacement",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-multiline-and-control-arguments",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "every occurrence of a placeholder is replaced, out-of-order indices select by number not by position, and arguments beyond the highest placeholder are ignored without error",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-multiple-repeated-extra-arguments",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "only {(\\d+)} is a placeholder: empty, spaced, signed, hexadecimal and full-width-digit braces stay literal, a leading zero still parses as the same index, a doubled brace keeps its outer characters, and an index that does not fit an int panics rather than being ignored",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-placeholder-syntax",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "with no arguments Format returns the text unchanged, placeholders and all: it short circuits on len(args) == 0 before the replacement pass, so '{0}' survives verbatim rather than becoming empty or an error",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/format-zero-arguments",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Format"
+      ]
+    },
+    {
+      "expected_contract": "message text is compared as raw bytes: escaped backslashes, escaped double quotes, a literal '{' with no closing brace, a brace pair that is not a placeholder, four placeholders and a repeated placeholder. The two sides are not the same API: Go's Message.String is the only exported accessor for the unexported text field and returns it verbatim ('return m.text', which the pin marks as debugging onl",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-byte-exact-text",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.String"
+      ]
+    },
+    {
+      "expected_contract": "the category ordinal is the wire contract, not the name: three CategoryError identities -- a plain one, one that is elided in the compatibility pyramid and one that reports unnecessary code -- against one CategoryMessage and one CategorySuggestion, so ordinal 1 is witnessed against three different flag sets. No generated identity is CategoryWarning at this pin (the 2,211 identities are 1,385 Error",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-categories",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Category"
+      ]
+    },
+    {
+      "expected_contract": "the code range and the extra-message block: the lowest and highest codes and the first extraDiagnosticMessages entry, which a port that only reads diagnosticMessages.json would be missing",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-code-bounds",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Code"
+      ]
+    },
+    {
+      "expected_contract": "the three per-message flags are carried independently: every flagged identity at this pin, plus two unflagged controls, so a port that drops a flag or applies it to the wrong message is caught by name",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-flags",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.ReportsUnnecessary"
+      ]
+    },
+    {
+      "expected_contract": "Go's Key is a byte string, so a non-UTF-8 key is a legal query that resolves to nothing; a Rust lookup keyed on &str cannot express it at all",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-invalid-byte-key",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage"
+      ]
+    },
+    {
+      "expected_contract": "every generated identity in one comparison: a missing, renamed, recoded, recategorised, reflagged or retexted message changes the fingerprint, and the 16 chunk fingerprints localise the difference to about 138 identities",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-roster-fingerprint",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage"
+      ]
+    },
+    {
+      "expected_contract": "an unknown key resolves to nothing rather than to a neighbour: the empty key, the name without its code suffix, a case-folded key, leading and trailing space, a longer key with the same prefix, the ad-hoc key '-1' and an absent key, against one valid control",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/identity-unknown-keys",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics_generated.go:keyToMessage"
+      ]
+    },
+    {
+      "expected_contract": "Message.Localize takes ...any and runs StringifyArgs first, so a non-string argument reaches Format as its %v rendering and an invalid-UTF-8 string is still repaired; this is the public path a caller actually uses",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-argument-repair-through-message",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Localize"
+      ]
+    },
+    {
+      "expected_contract": "Localize's nil-message branch resolves the key itself through keyToMessage and reaches the same identity as the by-pointer call under every locale, including a translated table and an argument. The operation is Localize, not keyToMessage: the lookup is the part Rust already has -- by_key, witnessed by the identity cases -- so recording this case against keyToMessage would file an implemented opera",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-by-key",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "the selected table is memoised in a process-global sync.Map keyed by tag: repeating a locale in one process must return the same bytes, and an interleaved different locale must not leak its table into the next lookup",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-cache-repeat",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ]
+    },
+    {
+      "expected_contract": "an absent locale is the zero Locale, which getLocalizedMessages rejects as language.Und before any matching happens; the explicit tag 'und' and the English tags must all land on the built-in English text, whose table entry is nil rather than a loaded map",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-english-and-absent-locale",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "which table a non-exact tag selects: a bare language, a sibling region, a script subtag, an unshipped region of a shipped language, an unrelated language, a private-use tag and the undefined tag. The table's size and fingerprint identify the choice, so a wrong fallback is visible even when one probe key happens to agree",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-fallback-choice",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ]
+    },
+    {
+      "expected_contract": "the negative control for a missing translation: an identity the table does not carry falls back to the English text rather than to an empty string, and each row records whether the selected table actually held the key",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-missing-translation-key",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "every one of the 13 shipped translation tables is actually reached and returns its own bytes for the same identity; English is the first matcher entry, not a missing one -- loc_generated.go declares language.English at index 0 and localeFuncs[0] is nil -- so an English tag matches and still falls back to the built-in text, and tr-TR is the 14th and last entry. The order is load-bearing: getLocaliz",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-shipped-tables",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "translated text moves the placeholder and changes the quoting around it, so substitution has to run on the translated string, not on the English one",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-shipped-tables-with-argument",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "the per-table manifest F1a owes F1b: for each of the 13 embedded tables, how many keys it holds, how many of them the generated switch still resolves, how many are stale, and a fingerprint of its whole sorted contents. A regenerated or re-ordered table changes the fingerprint; a table that failed to decompress collapses to size zero",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-table-coverage",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/loc_generated.go:loadLocaleData"
+      ]
+    },
+    {
+      "expected_contract": "Localize with a nil message resolves the key itself and panics with 'Unknown diagnostic message: ' plus the key when it does not resolve; the panic text carries the key, so an empty key and an absent key are distinguishable failures rather than one generic error",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/localize-unknown-message",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "StringifyArgs returns nil for an empty argument list rather than an empty slice, passes a string through untouched including invalid bytes, and renders everything else with %v -- so nil becomes '<nil>', negative zero keeps its sign and a slice gets Go's bracketed form",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/diagnostics/stringify-argument-kinds",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:StringifyArgs"
+      ]
+    },
+    {
+      "expected_contract": "the token walk lsproto's jsonObjectRawField performs: ReadValue returns the raw, still-escaped name bytes, so \\u0063 does not read as c; the input offset and stack pointer after each step are the rest of the contract a streaming reader has to reproduce",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/decoder-raw-name-token-walk",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:NewDecoder"
+      ]
+    },
+    {
+      "expected_contract": "where a streaming reader stops on a truncated document: the decoder reports the tokens it did consume, then fails on the missing one, and the input offset and unread buffer say how much of the input it had taken",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/decoder-truncated-stream-position",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:NewDecoder"
+      ]
+    },
+    {
+      "expected_contract": "UnmarshalDecode consumes exactly one value and leaves the decoder on the next, with no separator required between concatenated top-level objects; the third call has nothing left and must report EOF, not a syntax error",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/decoder-unmarshal-decode-stream",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:UnmarshalDecode"
+      ]
+    },
+    {
+      "expected_contract": "the wrapper's unconditional AllowInvalidUTF8(true) is not free: joined onto an encoder that does not have it while the encoder is expecting an object name, MarshalEncode refuses with errChangingInvalidUTF8, so the same call that works at top level fails one token deeper",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-encode-inside-object-name",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:MarshalEncode"
+      ]
+    },
+    {
+      "expected_contract": "an encoder holds its own state across calls, and the newline is a terminator rather than a separator: MarshalEncode writes through the caller's encoder, which does not carry the library's internal OmitTopLevelNewline flag that Marshal and MarshalWrite set for themselves, so every completed top-level value is followed by a newline -- the first marshal_encode already returns 14 bytes for a 13-byte o",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-encode-successive-values",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:MarshalEncode"
+      ]
+    },
+    {
+      "expected_contract": "a Go float64 goes through the number formatter instead: -0 keeps its sign, the binary64 extremes keep their shortest round-trip spelling, and NaN and infinities are marshal errors rather than JSON tokens",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-float-edge-values",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "MarshalIndent forks on prefix == \"\" && indent == \"\": only that pair skips the indent options and produces compact output. Any other pair implies multiline, including a non-empty prefix with an empty indent, which breaks lines and indents them by the prefix alone; the prefix is repeated on every line after the first and the indent is repeated once per depth",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-indent-empty-is-compact",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:MarshalIndent"
+      ]
+    },
+    {
+      "expected_contract": "the writer variant carries the same empty-prefix-and-indent fork as MarshalIndent, and successive calls append to the writer without any separator, which is what the tsconfig baseline writer depends on",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-indent-write-fork",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:MarshalIndentWrite"
+      ]
+    },
+    {
+      "expected_contract": "Deterministic(true) sorts Go string map keys with slices.Sort, i.e. by UTF-8 byte order; RFC 8785 would sort by UTF-16 code units, which orders U+10000 before U+E000 while UTF-8 byte order puts it after",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-map-deterministic",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Deterministic"
+      ]
+    },
+    {
+      "expected_contract": "the wrapper prepends AllowInvalidUTF8(true) only, so marshal still rejects a duplicate member name; the rejection carries two positions and they are not the same one. The *json.SemanticError's own byte offset and JSON pointer describe the encoder, i.e. where the value would have gone in the output stream, which is 0 and \"\" because nothing had been written; the wrapped jsontext cause carries the re",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-duplicate-names",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "the caller's options are appended after the wrapper's own, so AllowDuplicateNames(true) takes effect and both members are written in source order; same bytes as the rejecting case, different option",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-duplicate-names-allowed",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:AllowDuplicateNames"
+      ]
+    },
+    {
+      "expected_contract": "PreserveRawStrings, EscapeForHTML and EscapeForJS are all off, so a pre-escaped \\u00e9 is re-emitted as literal UTF-8 while '<', '&' and U+2028 are left unescaped; a reader that preserved the source escapes, or one that escaped for HTML, would differ on every member",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-escapes",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "the wrapper's unconditional AllowInvalidUTF8(true) makes marshal accept a raw 0x80/0xff byte inside a string and mangle it to U+FFFD; the paired unmarshal case shows the opposite default on the read side",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-invalid-utf8-byte",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "a lone \\ud800 escape is not a raw invalid byte: it is well-formed JSON text that decodes to an unpaired surrogate, and AllowInvalidUTF8(true) turns it into U+FFFD rather than rejecting it or preserving the escape",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-lone-surrogate-escape",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "a raw JSON value is written through verbatim: members keep their source order and neither ReorderRawObjects nor any canonicalisation applies, so a reader that rebuilt the object through a sorted map would differ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-member-order",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "CanonicalizeRawInts and CanonicalizeRawFloats are off, so raw number tokens pass through byte for byte: a 40-digit integer keeps every digit, -0 stays -0, 1e1000 is not saturated and 1E+2 keeps its spelling",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-raw-number-tokens",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "the same tolerance applies to a Go string rather than a raw value, which is the path every struct field takes; the replacement happens during quoting, not in the caller's data",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-string-invalid-utf8-byte",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "on the write side a nil pointer becomes null, a nil slice becomes [] rather than null, and only an omitzero field disappears; a reader that emitted null for the nil slice or dropped the zero string would differ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-struct-missing-null-empty",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Marshal"
+      ]
+    },
+    {
+      "expected_contract": "Marshal with WithIndent(\"  \") is the fourslash caller's spelling; it sets no indent prefix, so it must match MarshalIndent(\"\", \"  \") exactly, and empty containers stay on one line in both",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-with-indent-option",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:WithIndent"
+      ]
+    },
+    {
+      "expected_contract": "the tracing writer's exact combination: MarshalWrite with Deterministic(true) writes the bytes Marshal produces from the same value and option, and the case observes both sides rather than asserting the equality. Two values appended to one writer are not separated -- MarshalWrite sets the library's internal OmitTopLevelNewline flag, so nothing terminates a value and the second object starts at byt",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/marshal-write-deterministic",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:MarshalWrite"
+      ]
+    },
+    {
+      "expected_contract": "the duplicate check compares unescaped names, so \\u006eame collides with name even though the two member tokens share no bytes; a reader that compared raw name bytes, as lsproto's jsonObjectRawField does, would accept this document",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-duplicate-escaped-name",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "packagejson.Parse is the real caller of AllowDuplicateNames(true); this records which repeat of a struct field survives and whether a repeated member is merged or overwritten",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-duplicate-names-allowed",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:AllowDuplicateNames"
+      ]
+    },
+    {
+      "expected_contract": "Unmarshal passes the caller's options through untouched, so the library default holds and a duplicate member name is a syntactic error with the offset and JSON pointer of the repeat",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-duplicate-names-rejected",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "the asymmetry the wrapper creates: Unmarshal never receives AllowInvalidUTF8(true), so the same bytes that marshal mangles to U+FFFD are a read error here",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-invalid-utf8-byte-rejected",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "a lone \\ud800 escape is rejected on the read side while a correctly paired surrogate decodes; this is the escape path, not the raw-byte path",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-lone-surrogate-escape-rejected",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "missing, null and empty are three different inputs, and a fresh zero destination cannot tell the first two apart: the six reads into a fresh target show {}, the all-null object, an unknown member and a null document all producing the same state. So the case reads them again into a destination new_target pre-populated with name \"a\", count 7, items [x,y] and extra \"e\". Against that, an absent member",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-missing-null-empty",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "one number token means different things per target: a 40-digit integer rounds into float64 but is out of range for int64, -0 keeps its sign bit in float64 and loses it in int64, 1e1000 overflows, and a quoted number is a type error without StringifyNumbers",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-number-targets",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "a failed read is not a rollback: Unmarshal writes each member into the destination as it reads it and leaves everything written before the fault in place. The type error at /count keeps name \"x\" and items [\"a\"] and has already allocated the count pointer, which is non-nil at 0, before rejecting the value; against a destination new_target pre-populated with name \"a\", count 7, items [x,y] and extra ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-partial-write-on-failure",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "UnmarshalRead must not depend on where the reader splits: one byte per Read has to give the same result as one whole read, and the call has to consume the trailing whitespace but reject a second top-level value",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-read-chunk-boundaries",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:UnmarshalRead"
+      ]
+    },
+    {
+      "expected_contract": "truncation has to be told apart from a syntax error, and the error class cannot do it: every failure here is a *jsontext.SyntacticError, so the distinction is the wrapped sentinel, recorded as error_unexpected_eof. It is true for each input that stops mid-value and false for {\"a\":1}{\"b\":2}, a complete value followed by an invalid character. The offsets say where the reader stopped rather than wher",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/json/unmarshal-truncated-inputs",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/json/json.go:Unmarshal"
+      ]
+    },
+    {
+      "expected_contract": "absent and explicitly-default are different states that read identically through FromContext: only HasLocale separates them, and session.go:1359 installs the session locale precisely when it is false. A Rust port modelling the carrier as Option<Locale> must keep Some(Default) distinct from None. The trace also pins that a nested WithLocale overrides rather than merges, and that a failed parse stil",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/context-absent-explicit-and-default",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:WithLocale"
+      ]
+    },
+    {
+      "expected_contract": "observed in a process where nothing has been localized yet, which the warm schedule cannot do: the process-global default locale is the zero tag, whose Locale.String() is \"\" while its language.Tag prints und, an untouched context reports HasLocale false, and the very first localisation of a tag returns the same bytes as the repeat two actions later. If the cold and warm observations of the same ta",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/default-cold-process",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Locale.String"
+      ]
+    },
+    {
+      "expected_contract": "the pinned canonicalisation table rewrites deprecated ISO codes (in->id, iw->he, ji->yi, mo->ro-MD, sh->sr-Latn, tl->fil), grandfathered tags (i-klingon->tlh, art-lojban->jbo, zh-guoyu->cmn, en-GB-oed->en-GB-oxendict, sgn-BE-FR->sfb) and the root alias (root->und), and it drops a redundant primary language in front of an extlang (zh-cmn-Hans-CN->cmn-Hans-CN). The identities are the other half of t",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/parse-aliases-and-legacy-tags",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ]
+    },
+    {
+      "expected_contract": "canonicalisation is case-normalising, not case-preserving: `--locale zh-cn` is the spelling users actually pass, and it must reach the same tag as zh-CN. The thirteen lower-cased shipped tags plus JA-jp, Ja-JP, ZH-CN and EN are the rows that witness it, because a port that hands the requested string back unchanged answers every one of them wrongly. Nothing is added anywhere in this trace: language",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/parse-case-script-region-variants",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ]
+    },
+    {
+      "expected_contract": "a syntax error and a subtag that is well-formed but unknown are two different failures that both leave ok=false, and either can still hand back a partially parsed tag, which `p.locale, _ = locale.Parse(...)` then keeps. A port that returns Option<Locale> and substitutes the default on any error would change what en-, zh-Xxxx and en--US compile under. Unknown is narrower than it looks and the trace",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/parse-malformed-and-unsupported",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ]
+    },
+    {
+      "expected_contract": "every tag the shipped matcher is built from parses with ok=true and canonicalises to itself; a port that lower-cases the region or drops it would change the tag the compiler then matches on",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/parse-shipped-tags",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Parse"
+      ]
+    },
+    {
+      "expected_contract": "Locale.String() short-circuits to \"\" for the Default sentinel, and that sentinel is the zero Tag rather than a failure: the explicitly requested und tag, the root alias that canonicalises to it, and the two inputs here whose parse salvages nothing (\"\" and zz) all print the empty string while their underlying language.Tag prints und. A Rust Display that forwards to the tag would print \"und\" where t",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/string-default-sentinel",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/locale/locale.go:Locale.String"
+      ]
+    },
+    {
+      "expected_contract": "the fallback is language.NewMatcher's, not a prefix match: base-only tags, sibling regions and script variants either reach a table at confidence >= Low or fall through to English. The matcher entry is zh-TW (loc_generated.go:18), a different canonical tag from the zh-Hant-TW this group also parses, so zh-HK/zh-MO/zh-Hant reaching a table and pt-PT reaching pt-BR are the rows a hand-written fallba",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/translation-fallback-matching",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ]
+    },
+    {
+      "expected_contract": "the pinned negative control for a missing translation key: key 1547 is present in the zh-CN, ja-JP, fr-FR, cs-CZ, es-ES, ko-KR, pl-PL, pt-BR and tr-TR tables and absent from zh-TW, de-DE, it-IT and ru-RU, so a selected table that lacks the key must yield the English text rather than an empty string, a panic or the key itself",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/translation-missing-key-english-fallback",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "the ja-JP translation of message 2513 emits {1} before {0}, so substitution has to run against the *selected* template. A port that formats the English text and then translates, or that positions arguments by order of appearance, produces the wrong sentence for exactly this row",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/translation-placeholder-order",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Message.Localize"
+      ]
+    },
+    {
+      "expected_contract": "the cache is a process-global sync.Map keyed by the *requested* tag, filled after the matcher runs, and it is never invalidated. Repeating a tag must return byte-identical text and changing tags must not leak a neighbour's table: a cache keyed by base language, by matcher index or by the last request would show zh-TW text for zh-CN here. und is answered before the cache is consulted, so it must no",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/translation-repeated-and-changed",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages"
+      ]
+    },
+    {
+      "expected_contract": "each of the 13 shipped tables is actually selected and returns its own bytes; English, und and an unparsable tag return the untranslated message text. Two keys are requested because one is not enough: fr-FR translates Modules_6244 as the byte-identical \"Modules\" (one of only 4 of its 2116 keys that match the English text), so that row on its own cannot tell the French table from the English fallba",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/locale/translation-shipped-locales",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ]
+    },
+    {
+      "expected_contract": "The length probe recognises UTF-16 BOMs the rest of the compiler cannot decode, so RemoveByteOrderMark strips two bytes from FE FF and leaves invalid UTF-8 behind, and AddUTF8ByteOrderMark refuses to prepend one whenever any BOM is already present - including a UTF-16 one it is not converting. A bare FE or FF, or an incomplete EF BB, is not a BOM, so the UTF-8 mark is prepended in front of it.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/byte-order-marks",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:RemoveByteOrderMark"
+      ]
+    },
+    {
+      "expected_contract": "The whitespace set is the ECMAScript table, not unicode.IsSpace and not unicode.Zs: U+0085 and U+200B count as single-line whitespace here while U+180E does not, and only LF, CR, U+2028 and U+2029 are line breaks, so U+0085 is whitespace without being a break. The digit and letter predicates are ASCII-only, so U+0660 and U+FF10 are not digits and '_' is not a letter.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/character-classes",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:IsWhiteSpaceLike"
+      ]
+    },
+    {
+      "expected_contract": "The fast path keys on the byte 0xED alone, so a plain U+D7FF (ED 9F BF) and a bare 0xED take the slow path and must come back unchanged. Only an adjacent high-then-low sentinel pair merges: a low followed by a high, a high followed by a letter and an unpaired half are all preserved, so a caller cannot rely on the output being valid UTF-8.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/combine-surrogate-pairs",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:CombineSurrogatePairs"
+      ]
+    },
+    {
+      "expected_contract": "EncodeURI walks BYTES, so every byte outside the unreserved set becomes one uppercase %XX pair: a malformed 0xFF becomes %FF rather than the three escapes of U+FFFD, and a multi-byte rune becomes one escape per byte. The set that is left alone is the ECMAScript one, which keeps ; / ? : @ & = + $ , # - _ . ! ~ * ' ( ) and escapes %, [, ], { and }.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/encode-uri",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:EncodeURI"
+      ]
+    },
+    {
+      "expected_contract": "EquateStringCaseInsensitive is Go simple folding (strings.EqualFold), not JavaScript casing and not byte equality: it accepts s/\u017f and k/\u212a, rejects i/\u0130 and i/\u0131 that a JS or Turkish casing would join, and decodes every malformed byte as one U+FFFD, so \\xff folds equal to \\xfe and to the encoded replacement character.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/equate-case-insensitive-fold",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive"
+      ]
+    },
+    {
+      "expected_contract": "Correction to an earlier survey: at this pin BOTH case-insensitive comparers lowercase. CompareStringsCaseInsensitive calls unicode.ToLower per rune and the eslint-compatible one calls strings.ToLower, and only the stale doc comment still says uppercase. Seven of the nine pairs invert under an uppercasing implementation, because '_' (0x5F), '[' (0x5B), '^' (0x5E) and '`' (0x60) sit between the ASC",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/eslint-comparer-lowercases",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible"
+      ]
+    },
+    {
+      "expected_contract": "The sentinel window is ED A0..BF 80..BF, so ED 9F BF still decodes as ordinary UTF-8 (U+D7FF) while ED A0 80 decodes as U+D800 with width 3, and a truncated or out-of-window sequence falls back to utf8.DecodeRuneInString's one-byte RuneError. Encoding a non-surrogate above U+10FFFF yields U+FFFD, and an ill-formed surrogate pair yields RuneError instead of a computed code point.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/js-string-rune-codec",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:DecodeJSStringRune"
+      ]
+    },
+    {
+      "expected_contract": "The shift count is ToUint32 masked with 31, so shifting by 32 is a no-op and shifting by 33 shifts one; a NaN or negative count is reduced the same way rather than panicking, which a Rust `<<` would do. The unsigned right shift is the only operator whose result leaves the int32 range, so -1 >>> 0 must be 4294967295 and not -1. Every operand is reduced to int32 first, so 2147483648 | 1 is -21474836",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-bitwise-and-shift",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/jsnum.go:Number.SignedRightShift"
+      ]
+    },
+    {
+      "expected_contract": "IsInf ignores the sign, so both infinities report true, and isNonFinite answers the same question with one exponent-mask test - a single predicate that must agree with IsNaN or IsInf on every input including a NaN payload. Floor and trunc part company below zero (-0.5 floors to -1 and truncates to -0) and Abs(-0) is +0, so the results carry bit patterns, with a NaN reporting only its category beca",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-classifiers-and-rounding",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/jsnum.go:Number.Floor"
+      ]
+    },
+    {
+      "expected_contract": "StringToNumber, not strconv: an empty or all-whitespace string is 0 and only the ECMAScript whitespace set is trimmed (so U+FEFF and U+000B are, U+0085 is not), 'Infinity' is accepted but 'infinity' is not, radix prefixes are accepted only unsigned so '-0x10' is NaN, leading zeros never mean octal, a separator is never allowed, and overflow saturates to Infinity while underflow returns +0 because ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-from-string",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/string.go:FromString"
+      ]
+    },
+    {
+      "expected_contract": "ToInt32 wraps modulo 2^32 instead of saturating, which is the opposite of a plain Rust `as i32` cast: 4294967295 is -1, 2147483648 is i32::MIN and 4294967296 is 0. Non-finite values and both zeros are 0, fractions truncate toward zero before the reduction, and ToUint32 is only a reinterpretation of the same bits, so the two must never disagree about which value they reduced.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-int32-conversions",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/jsnum.go:Number.toInt32"
+      ]
+    },
+    {
+      "expected_contract": "Number.String is Number.prototype.toString, not Go's %v: NaN, Infinity and -Infinity are spelled out, negative zero renders as '0' because the safe-integer fast path compares float64(0) to -0.0 and wins, and the exponent switch sits at 1e21 and 1e-6 - 1e20 prints in full, 1e21 prints as 1e+21 and 1e-7 prints as 1e-7 with the two-digit exponent already trimmed. The subnormal 5e-324 and 0.1+0.2 pin ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-number-to-string",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/string.go:Number.String"
+      ]
+    },
+    {
+      "expected_contract": "Remainder is the JavaScript % operator, not math.Mod alone: an infinite dividend or a zero divisor is NaN, an infinite divisor returns the dividend unchanged, and a zero dividend keeps its sign, so -0 % 5 is negative zero. Exponentiate special-cases +-1 to an infinite exponent and 1 to NaN, both of which ordinary powf gets wrong, and it routes integer base/exponent pairs whose result exceeds 53 bi",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/jsnum-remainder-and-exponentiate",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/jsnum.go:Number.Remainder"
+      ]
+    },
+    {
+      "expected_contract": "SplitLines is a byte scanner: CRLF is one break, a lone CR is a break, U+2028 is not, and a trailing break never produces a final empty line - so 'a\\n' has one line and '\\n' has one empty line. GuessIndentation measures leading whitespace in BYTES using the rune-level whitespace set, so one NBSP contributes two and U+2028 three, while U+180E is not whitespace at all; empty lines are skipped, and a",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/line-splitting-and-indentation",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:SplitLines"
+      ]
+    },
+    {
+      "expected_contract": "LowerFirstChar uses plain UTF-8 decoding and Go simple lowering, so it differs from ToLowerJS on exactly the inputs that matter: \u0130 becomes i with no combining dot, \u0391\u03a3 lowers only the first rune, and a malformed or lone-surrogate leading byte is consumed one byte at a time and replaced by the three bytes of U+FFFD, growing the string. The empty string returns unchanged because DecodeRuneInString re",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/lower-first-char",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:LowerFirstChar"
+      ]
+    },
+    {
+      "expected_contract": "The case-insensitive path folds a BYTE window cut to the affix's byte length, so it can slice a rune in half: '\u0130x' with prefix 'i' compares one byte and is false, and 'stra\u00dfe' with suffix 'SSE' is false because EqualFold is simple folding, not full case folding. The length guard is checked before slicing, and HasPrefixAndSuffixWithoutOverlap rejects 'a' with prefix 'a' and suffix 'a' although each",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/prefix-suffix-byte-window",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/compare.go:HasPrefix"
+      ]
+    },
+    {
+      "expected_contract": "The radix branch is selected by the SECOND BYTE alone, so '1_000n' takes the decimal path and keeps its separator verbatim while '0b_101n' goes through big.Int and becomes 5; a one-character input can never take the radix path. Only one trailing 'n' is stripped, so '0n0' is not a literal at all and comes back as 'n0'. An all-zero magnitude normalises to the single digit 0, and NewPseudoBigInt stor",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/pseudo-bigint-parse",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/pseudobigint.go:ParsePseudoBigInt"
+      ]
+    },
+    {
+      "expected_contract": "ParseValidBigInt splits the sign BEFORE the radix parse, which is the only way '-0x10n' becomes -16: the radix branch never accepts a sign itself. The sign is then dropped again for any zero magnitude, so '-0n' and '-000n' are indistinguishable from '0n'. Sign is the predicate the checker branches on and must agree with that normalisation rather than with the negative flag it was constructed with.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/pseudo-bigint-sign-and-valid",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt"
+      ]
+    },
+    {
+      "expected_contract": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a r",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/quote-stripping",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:StripQuotes"
+      ]
+    },
+    {
+      "expected_contract": "Each pair is compared in both directions, so an asymmetric comparator is caught. Build metadata never participates, a prerelease sorts below its release, a numeric identifier sorts below an alphanumeric one, and a shorter identifier list sorts first. The two overflow pairs pin the documented fallback: when a numeric identifier exceeds uint32 the comparison falls back to identifier LENGTH, and to p",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-compare-precedence",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/semver/version.go:Version.Compare"
+      ]
+    },
+    {
+      "expected_contract": "The outer regexp allows a bare major or major.minor and defaults the rest to zero, but rejects a leading zero, a fourth component, a 'v' prefix and any surrounding space. A prerelease is then re-validated, so 1.2.3-01 fails while the same text is a legal RANGE operand. Because the regexp is (?i), RE2 folds [a-z] onto U+017F and U+212A, which are therefore legal prerelease identifiers. Overflow is ",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-parse-boundaries",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/semver/version.go:TryParseVersion"
+      ]
+    },
+    {
+      "expected_contract": "The caret's upper bound depends on which component is the first non-zero one AND on which component was a wildcard, which is where hand-ported range code usually goes wrong: ^0.0.3 stops at 0.0.4, ^0.2.3 at 0.3.0 and ^1.2.3 at 2.0.0, while ^0.0 and ^0.0.x stop at 0.1.0 because the patch wildcard promotes the bound. The tilde's upper bound always increments the minor, or the major when the minor is",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-range-caret-and-tilde",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/semver/version_range.go:parseComparator"
+      ]
+    },
+    {
+      "expected_contract": "Test is a plain disjunction of conjunctions over Version.Compare, with no npm-style 'prereleases only match their own tuple' rule: >=1.2.3-alpha admits 1.2.3-beta and every later release, and 1.x admits 1.0.0-0 because of the injected floor while excluding 2.0.0-0. An empty disjunction accepts everything, including a nil version, while '<*' accepts ONLY a nil version, because nil sorts below 0.0.0",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-range-prerelease-membership",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/semver/version_range.go:VersionRange.Test"
+      ]
+    },
+    {
+      "expected_contract": "Range boundaries were entirely missing from the earlier survey. A wildcard major erases the whole comparator unless the operator is < or >, and then BOTH become '<0.0.0-0', so '>*' matches nothing rather than everything. An empty range, '||' and '~*' all render as '*' and accept every version. A wildcard minor or patch injects the '-0' prerelease floor, which is what makes '1.x' exclude 2.0.0-0. W",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/semver-range-wildcards-and-primitives",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/semver/version_range.go:TryParseVersionRange"
+      ]
+    },
+    {
+      "expected_contract": "Three contracts over one corpus. Byte comparison keeps \\xff above \\xfe, while CompareStringsCaseInsensitive decodes runes first and calls them equal because both are RuneError - and equal again against the encoded U+FFFD even though the byte lengths differ. It lowercases per rune rather than folding, so s/\u017f stay unequal although EqualFold accepts them; a\u0301 and \u00e1 stay unequal because nothing normali",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/string-comparers",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive"
+      ]
+    },
+    {
+      "expected_contract": "ToLowerJS is String.prototype.toLowerCase, not Go simple lowering: Final_Sigma context turns the trailing sigma of \u0391\u03a3 into \u03c2 while \u0391\u03a3\u0392 keeps \u03c3, a following Case_Ignorable code point ('.' or U+0301) is skipped rather than counted as a following cased letter, so \u0391\u03a3. and \u0391\u03a3\u0301 still end in \u03c2, and \u0130 expands to i plus U+0307. A lone-surrogate sentinel survives byte for byte while a malformed byte is repa",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/to-lower-js",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/js_case.go:ToLowerJS"
+      ]
+    },
+    {
+      "expected_contract": "ToUpperJS is a full case mapping: \u00df becomes the two characters SS and \ufb01 becomes FI, which Go's simple unicode.ToUpper does not do, and \u0131 uppercases to I while U+1E9E is already upper. Both final and medial sigma map to \u03a3, so the Final_Sigma context that ToLowerJS tracks has no upper counterpart. Lone surrogates are copied verbatim.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/to-upper-js",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/js_case.go:ToUpperJS"
+      ]
+    },
+    {
+      "expected_contract": "The early return compares the BYTE length against a RUNE budget, so 'abc' with 4 returns early while '\u00e9\u00e9\u00e9' with 2 truncates and '\u00e9' with 1 returns whole. A non-positive budget yields the empty string even for empty input, and each malformed byte counts as one rune, so \\xff\\xffab with 3 keeps three bytes.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/truncate-by-runes",
+      "last_result": "match",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/util.go:TruncateByRunes"
+      ]
+    },
+    {
+      "expected_contract": "These are the raw generated ID_Start / ID_Continue tables, not the scanner's identifier predicate: '$' is in neither, while '_' and ZWNJ/ZWJ (U+200C-U+200D, which the generated part table carries explicitly) are Continue but not Start, so any implementation that reuses the scanner's start set, which adds '$' and '_' itself, disagrees here. Surrogates, U+FFFD, a code point above U+10FFFF and a nega",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/text/unicode-identifier-predicates",
+      "last_result": "not_implemented",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operations": [
+        "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart"
       ]
     },
     {
@@ -35,9 +1644,21 @@
       "family": "pilot",
       "host_applicability": "any",
       "id": "pilot/commandline/parse-build-verbose",
+      "last_result": "not_implemented",
       "native_authority": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaselineBuild",
       "operations": [
         "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine"
+      ]
+    },
+    {
+      "expected_contract": "parsed options, file names and formatted errors",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/commandline/parse-composite-false",
+      "last_result": "not_implemented",
+      "native_authority": "tsc/internal/tsoptions/commandlineparser_test.go::formatNewBaseline",
+      "operations": [
+        "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine"
       ]
     },
     {
@@ -45,6 +1666,7 @@
       "family": "pilot",
       "host_applicability": "any",
       "id": "pilot/json/marshal-ordered",
+      "last_result": "not_implemented",
       "native_authority": "tsc/internal/json (direct probe pending F1a)",
       "operations": [
         "tsc/internal/json/json.go:Marshal"
@@ -55,9 +1677,32 @@
       "family": "pilot",
       "host_applicability": "any",
       "id": "pilot/locale/select-ja",
+      "last_result": "not_implemented",
       "native_authority": "tsc/internal/locale (direct probe pending F1a)",
       "operations": [
         "tsc/internal/locale/locale.go:Parse"
+      ]
+    },
+    {
+      "expected_contract": "ordered matched file list",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/matching/include-star-ts",
+      "last_result": "match",
+      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "operations": [
+        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
+      ]
+    },
+    {
+      "expected_contract": "ordered matched file list",
+      "family": "pilot",
+      "host_applicability": "any",
+      "id": "pilot/matching/recursive-exclude",
+      "last_result": "match",
+      "native_authority": "tools/phase1/pilot/vfsmatch_probe_test.go::TestPhase1PilotReadDirectory",
+      "operations": [
+        "tsc/internal/vfs/vfsmatch/vfsmatch.go:ReadDirectory"
       ]
     }
   ],

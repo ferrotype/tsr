@@ -129,14 +129,52 @@ FAMILIES = {
         "rust_driver": "tools/phase1/pilot/rust_observation.rs",
     },
     "leaves": {
-        "requests": "data/phase1/requests/leaves.json",
+        # One request fragment per coverage group, so each group owns its file.
+        "requests": [
+            "data/phase1/requests/leaves.json",
+            "data/phase1/requests/leaves-collections.json",
+            "data/phase1/requests/leaves-core.json",
+            "data/phase1/requests/leaves-json.json",
+            "data/phase1/requests/leaves-text.json",
+            "data/phase1/requests/leaves-locale.json",
+            "data/phase1/requests/leaves-diagnostics.json",
+            "data/phase1/requests/leaves-bundled.json",
+        ],
         "native_probes": [
-            {
-                "name": "collections",
-                "package": "collections",
-                "probe": "tools/phase1/leaves/collections_probe_test.go",
-                "test": "TestPhase1LeavesCollections",
-            },
+            {"name": "collections", "package": "collections",
+             "probe": "tools/phase1/leaves/collections_probe_test.go",
+             "test": "TestPhase1LeavesCollections"},
+            {"name": "core", "package": "core",
+             "probe": "tools/phase1/leaves/core_probe_test.go",
+             "test": "TestPhase1LeavesCore"},
+            {"name": "json", "package": "json",
+             "probe": "tools/phase1/leaves/json_probe_test.go",
+             "test": "TestPhase1LeavesJson"},
+            {"name": "stringutil", "package": "stringutil",
+             "probe": "tools/phase1/leaves/text_probe_test.go",
+             "test": "TestPhase1LeavesText"},
+            {"name": "semver", "package": "semver",
+             "probe": "tools/phase1/leaves/semver_probe_test.go",
+             "test": "TestPhase1LeavesSemver"},
+            {"name": "jsnum", "package": "jsnum",
+             "probe": "tools/phase1/leaves/jsnum_probe_test.go",
+             "test": "TestPhase1LeavesJsnum"},
+            # Two probes in one package: the second observes the process-global
+            # default locale, which needs its own process to be honest.
+            {"name": "locale", "package": "locale",
+             "probe": "tools/phase1/leaves/locale_probe_test.go",
+             "test": "TestPhase1LeavesLocale"},
+            {"name": "locale-default", "package": "locale",
+             "probe": "tools/phase1/leaves/locale_default_probe_test.go",
+             "test": "TestPhase1LeavesLocaleDefault"},
+            {"name": "diagnostics", "package": "diagnostics",
+             "probe": "tools/phase1/leaves/diagnostics_probe_test.go",
+             "test": "TestPhase1LeavesDiagnostics"},
+            # bundledSourceDir locates its package through runtime.Caller(0),
+            # which under -trimpath returns a wrong path and does NOT panic.
+            {"name": "bundled", "package": "bundled",
+             "probe": "tools/phase1/leaves/bundled_probe_test.go",
+             "test": "TestPhase1LeavesBundled", "trimpath": False},
         ],
         "rust_package": "phase1_leaves",
         "rust_target_kind": "bin",
@@ -150,6 +188,35 @@ FAMILIES = {
 DECLARED_FAMILIES = ("leaves", "filesystem", "config", "syntax", "utilities", "integration")
 
 _METADATA: dict | None = None
+
+
+def request_files(spec: dict) -> list[str]:
+    """A family's request files, in declared order.
+
+    A family may be split into per-group fragments so each coverage group owns
+    its own file. They are merged in declared order and duplicate case ids
+    across fragments are refused.
+    """
+    declared = spec["requests"]
+    return [declared] if isinstance(declared, str) else list(declared)
+
+
+def load_requests(spec: dict) -> dict:
+    version = 1
+    merged: list[dict] = []
+    seen: dict[str, str] = {}
+    for relative in request_files(spec):
+        document = strict_json_loads((ROOT / relative).read_bytes())
+        version = document.get("version", version)
+        for request in document["requests"]:
+            case = request["case"]
+            if case in seen:
+                raise ValueError(
+                    f"duplicate case id {case!r} in {relative} and {seen[case]}"
+                )
+            seen[case] = relative
+            merged.append(request)
+    return {"version": version, "requests": merged}
 
 
 def sha_file(path: Path) -> str:
@@ -231,7 +298,7 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
     spec = FAMILIES[family]
     paths: set[Path] = set()
 
-    paths.add(Path(spec["requests"]))
+    paths.update(Path(name) for name in request_files(spec))
     # The pilot's driver and Cargo target are different files (a thin example
     # includes the driver); a harness binary is its own target.
     if spec.get("rust_driver"):
@@ -479,7 +546,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if recorded_pin != recorded_gitlink:
         raise ValueError("data/upstream.json and the upstream gitlink disagree on the pin")
 
-    document = strict_json_loads((ROOT / spec["requests"]).read_bytes())
+    document = load_requests(spec)
     selected = document["requests"]
     partial = False
     if cases:
@@ -711,7 +778,7 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
     directory = Path(directory).resolve()
     provenance, requests, native_rows, rust_rows = validate_capture(directory)
 
-    inventory = strict_json_loads((ROOT / FAMILIES[provenance["family"]]["requests"]).read_bytes())
+    inventory = load_requests(FAMILIES[provenance["family"]])
     all_cases = [r["case"] for r in inventory["requests"]]
     selected = {r["case"] for r in requests}
     unknown = selected - set(all_cases)

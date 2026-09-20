@@ -31,7 +31,7 @@
         }
       ],
       "case": "leaves/core-collections/ordered-map-empty-nil",
-      "discriminates": "a nil *OrderedMap tolerates Size/Keys/Entries/Get/Has/Clone but Clear has no nil guard",
+      "discriminates": "OrderedMap's nil guards are per method, not a property of the type: Size, Keys, Entries and Clone each test the receiver and return empty, while Get, Has and Clear reach straight through m.mp and panic on a nil receiver",
       "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
       "order_sensitive": true,
       "subject": "OrderedMap"

@@ -57,16 +57,25 @@ pub fn action_op(action: &Value) -> &str {
 }
 
 pub fn action_str<'a>(action: &'a Value, field: &str) -> &'a str {
-    action.get(field).and_then(Value::as_str).unwrap_or_default()
+    action
+        .get(field)
+        .and_then(Value::as_str)
+        .unwrap_or_default()
 }
 
 pub fn action_i64(action: &Value, field: &str) -> i64 {
-    action.get(field).and_then(Value::as_i64).unwrap_or_default()
+    action
+        .get(field)
+        .and_then(Value::as_i64)
+        .unwrap_or_default()
 }
 
 /// Wrap an ordered trace in the shape an order-sensitive case requires: the
 /// payload is a list under `ordered`, because the comparison canonicalises
 /// with sorted keys and an object's member order would not survive it.
+// The vector is moved straight into the JSON array; taking a slice would force
+// a clone of every row for no benefit.
+#[allow(clippy::needless_pass_by_value)]
 pub fn ordered(rows: Vec<Value>) -> Value {
     json!({ "ordered": rows })
 }

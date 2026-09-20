@@ -1023,12 +1023,135 @@ class WitnessTests(unittest.TestCase):
         self.assertTrue(any("does not exist" in p for p in problems))
 
     def test_every_covered_operation_names_a_real_link(self):
+        # A covered row lists every case touching the operation, which can
+        # include a case that witnesses a different gap on the same symbol, so
+        # the covering links are a subset rather than the whole list.
         linked = scope.cases_by_operation()
         for row in self.scope["operations"]:
             if row["disposition"] != "covered":
                 continue
             self.assertTrue(row["cases"], row["id"])
-            self.assertEqual(sorted(row["cases"]), sorted(linked[row["id"]]), row["id"])
+            self.assertTrue(set(linked[row["id"]]).issubset(set(row["cases"])), row["id"])
+
+    def test_a_not_implemented_case_never_confers_coverage(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        gap_only = {
+            c["id"] for c in cases if c.get("last_result") == "not_implemented"
+        }
+        self.assertTrue(gap_only, "expected prepared cases reporting a missing Rust entry point")
+        covering = set()
+        for ids in scope.cases_by_operation().values():
+            covering |= set(ids)
+        self.assertEqual(covering & gap_only, set(),
+                         "a case that reports not_implemented must not cover its operation")
+
+    def test_a_case_with_no_recorded_result_does_not_confer_coverage(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        self.assertTrue(all("last_result" in c for c in cases),
+                        "every committed case should carry its last comparison result")
+
+
+class RequestFragmentTests(unittest.TestCase):
+    """A family may be split into per-group fragments."""
+
+    def test_a_string_requests_field_still_works(self):
+        self.assertEqual(capture.request_files({"requests": "a.json"}), ["a.json"])
+
+    def test_a_list_requests_field_is_returned_in_order(self):
+        self.assertEqual(capture.request_files({"requests": ["a.json", "b.json"]}),
+                         ["a.json", "b.json"])
+
+    def test_duplicate_case_ids_across_fragments_are_refused(self):
+        temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temporary, ignore_errors=True)
+        first, second = Path(temporary) / "one.json", Path(temporary) / "two.json"
+        body = {"version": 1, "requests": [{"case": "x", "operation": "o"}]}
+        first.write_text(json.dumps(body))
+        second.write_text(json.dumps(body))
+        with self.assertRaisesRegex(ValueError, "duplicate case id"):
+            capture.load_requests({"requests": [str(first), str(second)]})
+
+    def test_the_committed_leaves_fragments_have_no_duplicate_cases(self):
+        merged = capture.load_requests(capture.FAMILIES["leaves"])
+        cases = [r["case"] for r in merged["requests"]]
+        self.assertEqual(len(cases), len(set(cases)))
+
+
+class NegativeControlTests(unittest.TestCase):
+    """Plan task 6: the comparator must reject each deliberate corruption.
+
+    Each control builds a capture whose Rust side differs from the native side
+    in exactly one way, and asserts the comparison reports `different` rather
+    than `match`. A comparator that passes these cannot quietly accept the
+    corresponding real regression.
+    """
+
+    def setUp(self):
+        self.temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temporary, ignore_errors=True)
+        self.real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", self.real)
+
+    def control(self, name, native, rust, order_sensitive=True):
+        inventory = Path(self.temporary) / f"{name}-inv.json"
+        inventory.write_text(json.dumps({"version": 1, "family": "pilot", "requests": [
+            {"case": "a", "operation": "vfsmatch.readDirectory",
+             "order_sensitive": order_sensitive}]}))
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"])
+        capture.FAMILIES["pilot"]["requests"] = str(inventory)
+        directory = Path(self.temporary) / name
+        SyntheticCapture(directory, [{"case": "a", "native": native,
+                                      "rust": {"result": "observed", "observation": rust}}])
+        return capture.compare(directory)
+
+    def assert_different(self, report, what):
+        self.assertEqual(report["counts"]["different"], 1, what)
+        self.assertEqual(report["counts"]["match"], 0, what)
+
+    def test_reordered_collection_output_is_rejected(self):
+        report = self.control(
+            "collection-order",
+            {"ordered": [{"op": "entries", "result": [["a", "1"], ["b", "2"]]}]},
+            {"ordered": [{"op": "entries", "result": [["b", "2"], ["a", "1"]]}]})
+        self.assert_different(report, "a reordered ordered-map must not match")
+
+    def test_reordered_json_members_are_rejected(self):
+        report = self.control(
+            "json-order",
+            {"ordered": [{"op": "marshal", "bytes": '{"b":1,"a":2}'}]},
+            {"ordered": [{"op": "marshal", "bytes": '{"a":2,"b":1}'}]})
+        self.assert_different(report, "reordered JSON members must not match")
+
+    def test_a_wrong_fallback_locale_is_rejected(self):
+        report = self.control(
+            "locale-fallback",
+            {"ordered": [{"op": "select", "requested": "pt-BR", "selected": "pt-br"}]},
+            {"ordered": [{"op": "select", "requested": "pt-BR", "selected": "pt"}]})
+        self.assert_different(report, "a different fallback locale must not match")
+
+    def test_byte_replacement_is_rejected(self):
+        # A replacement-decoded string must never compare equal to the raw
+        # bytes: repairing malformed input early is the regression this catches.
+        report = self.control(
+            "byte-replacement",
+            {"ordered": [{"op": "read", "bytes_hex": "eda0bd"}]},
+            {"ordered": [{"op": "read", "bytes_hex": "efbfbd"}]})
+        self.assert_different(report, "replacement bytes must not match the original")
+
+    def test_a_missing_translation_key_is_rejected(self):
+        report = self.control(
+            "missing-translation",
+            {"ordered": [{"op": "localize", "key": "Cannot_find_name_0", "text": "Nome non trovato"}]},
+            {"ordered": [{"op": "localize", "key": "Cannot_find_name_0", "text": "Cannot find name"}]})
+        self.assert_different(report, "an untranslated fallback must not match a translation")
+
+    def test_an_identical_observation_still_matches(self):
+        # The controls above would be vacuous if the comparator reported
+        # `different` for everything.
+        payload = {"ordered": [{"op": "entries", "result": [["a", "1"]]}]}
+        report = self.control("identical", payload, json.loads(json.dumps(payload)))
+        self.assertEqual(report["counts"]["match"], 1)
 
 
 if __name__ == "__main__":

@@ -351,6 +351,14 @@ def cases_by_operation() -> dict[str, list[str]]:
     document = json.loads(path.read_text())
     inverted: dict[str, list[str]] = {}
     for case in document.get("cases", []):
+        # A prepared case only covers an operation once it actually compares.
+        # A case whose last result is `not_implemented` witnesses the gap; it
+        # does not close it, and calling that covered would report 108 absent
+        # implementations as done.
+        # Absent means unrun, which is not evidence either. Only a recorded
+        # match covers.
+        if case.get("last_result") != "match":
+            continue
         for operation in case.get("operations", []):
             inverted.setdefault(operation, []).append(case["id"])
     for witness in document.get("witnesses", []):
@@ -359,6 +367,21 @@ def cases_by_operation() -> dict[str, list[str]]:
         for operation in witness.get("operations", []):
             inverted.setdefault(operation, []).append(witness["id"])
     return {k: sorted(v) for k, v in inverted.items()}
+
+
+def witnessed_gaps() -> dict[str, list[str]]:
+    """Operations whose prepared case runs but reports a missing Rust entry point."""
+    path = ROOT / "data/phase1/cases.json"
+    if not path.is_file():
+        return {}
+    document = json.loads(path.read_text())
+    gaps: dict[str, list[str]] = {}
+    for case in document.get("cases", []):
+        if case.get("last_result") != "not_implemented":
+            continue
+        for operation in case.get("operations", []):
+            gaps.setdefault(operation, []).append(case["id"])
+    return {k: sorted(v) for k, v in gaps.items()}
 
 
 def witness_problems() -> list[str]:
@@ -391,6 +414,7 @@ def witness_problems() -> list[str]:
 def build() -> dict:
     rows: list[dict] = []
     index = workspace_symbol_index()
+    gaps = witnessed_gaps()
     missing_ids = unmapped_ids()
     entries = {e["go"]: e for e in ledger()}
     dependencies = package_dependencies()
@@ -409,7 +433,15 @@ def build() -> dict:
         )
         mapped = identity not in missing_ids
         linked = case_links.get(identity, [])
+        witnessing = gaps.get(identity, [])
         disposition, basis = classify(entry, symbol, mapped, index, linked)
+        if witnessing and disposition != "covered":
+            disposition = "missing"
+            basis = (
+                f"a prepared case runs and reports the Rust entry point absent: "
+                + ", ".join(witnessing[:3])
+            )
+        linked = sorted(set(linked) | set(witnessing))
         if linked and disposition == "missing":
             # A case exists for it, so the gap is witnessed rather than merely
             # inferred from the audit input.
@@ -486,7 +518,7 @@ def verify(scope: dict) -> list[str]:
             problems.append(
                 f"{row.get('id')}: covered requires exact case links, but none are recorded"
             )
-        if row.get("cases") and row.get("disposition") == "implemented_untested":
+        if row.get("disposition") == "implemented_untested" and row.get("cases"):
             problems.append(
                 f"{row.get('id')}: an operation with exact case links cannot be implemented_untested"
             )

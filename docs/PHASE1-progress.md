@@ -11,7 +11,7 @@ moved pin invalidates it.
 | Step | State |
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
-| F1a — foundation leaf tests | not started |
+| F1a — foundation leaf tests | **prepared**: 149 leaf cases frozen, 41 matching, 108 naming a missing Rust entry point |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
@@ -21,6 +21,114 @@ moved pin invalidates it.
 `f0_complete: false` with the outstanding items, separately from whether the
 manifests are internally consistent. Stage A preparation is not Phase 1
 implementation; no production behavior has been added or changed.
+
+## F1a — foundation leaf preparation
+
+149 leaf cases are frozen across the plan's six coverage groups, every one with
+a native observation from the pinned packages and a classified Rust result.
+
+| Group | Cases | match | not_implemented |
+| --- | ---: | ---: | ---: |
+| core/collections | 29 | 0 | 29 |
+| core | 16 | 13 | 3 |
+| JSON | 30 | 0 | 30 |
+| text/number/semver | 29 | 18 | 11 |
+| locale | 12 | 0 | 12 |
+| diagnostics | 27 | 6 | 21 |
+| bundled | 6 | 4 | 2 |
+| **total** | **149** | **41** | **108** |
+
+Zero `different`, zero `native_unavailable`, zero `harness_failed`: every case
+runs on both sides. The 108 `not_implemented` rows are the honest
+preparation-time result — no `tsr_core::collections`, `tsr_json` or `tsr_locale`
+exists — and each names its Go authority, intended signature and production home.
+
+Ten access-only Go probes drive the pinned packages: collections, core, json,
+stringutil, semver, jsnum, locale, locale-default, diagnostics and bundled. Two
+of them live in `package locale`, which the harness supports because the
+process-global default locale needs its own process to observe honestly. The
+bundled probe is registered with `trimpath: False`, because `bundledSourceDir`
+locates its package through `runtime.Caller(0)` and under `-trimpath` returns a
+wrong path silently rather than failing.
+
+### What the adversarial pass changed
+
+Each group was written, then reviewed by an independent agent reading the pinned
+source, then corrected. 58 findings were accepted and 18 rejected as themselves
+wrong. The corrections that mattered most:
+
+- A seed case of mine claimed a nil `*OrderedMap` tolerates `Get` and `Has`.
+  Both dereference `m.mp` and panic; only `Size`, `Keys`, `Values`, `Entries`
+  and `Clone` carry nil guards. The frozen observations were right all along;
+  the prose was wrong.
+- The diagnostics group placed English as "the 14th matcher entry". It is the
+  first, at index 0 of `loc_generated.go`'s matcher.
+- A JSON case claimed the duplicate-name error carries a byte offset and JSON
+  pointer. Its own observation records offset 0 and pointer `""`.
+- `MarshalEncode`'s newline is a terminator after every top-level value, not a
+  separator between them: the first row already shows 14 bytes for a 13-byte
+  value.
+- Two probe headers justified being in-package by naming unexported symbols
+  (`newMapWithSizeHint`, `scheme`) that the files never reference. The
+  collections probe moved to `package collections_test`, matching every other
+  test file in that directory.
+- `locale` claimed `cmn` and `und` are rewritten; both are identities at this
+  pin. And `fr-FR` maps the probed key to "Modules", byte-identical to English,
+  so that row could not witness table selection.
+- `bundled` described `CopyrightNotice.txt` as an embedded asset. It is never
+  embedded: `generate.go` reads it only to validate that each library starts
+  with it as a header.
+- A SyncMap case froze a Go *runtime* panic message as an expected value. No
+  Rust port could ever emit it, so the row had no reachable match; it is now
+  compared by panic class.
+
+### Existing coverage, mapped honestly
+
+`covered` requires an exact link **and** evidence the comparison passes. A
+prepared case that reports `not_implemented` witnesses a gap; it does not close
+one. Recording each case's comparison result moved the count from an
+inflated 112 to 43.
+
+The same rule applies to existing artifacts. `data/s07/path-observations.json`
+and `semver-observations.json` look like Rust witnesses and are not: their
+producers run `go test` and never execute Rust. They are recorded as
+`native_authority`, which confers nothing; counting them would have reported 113
+operations covered on the strength of a Go-only run.
+
+| Disposition | Count |
+| --- | ---: |
+| `covered` | 43 |
+| `implemented_untested` | 3,418 |
+| `missing` | 1,316 |
+| `equivalent_rust` | 0 |
+| `later_phase` | 18 |
+
+65 operations now carry a case that runs and reports the Rust entry point
+absent, which is a witnessed gap rather than an inferred one.
+
+### F1b queue
+
+The 108 `not_implemented` rows group into coherent ports: the ordered and
+copy-on-write containers (`OrderedMap`, `OrderedSet`, `Set`, `MultiMap`,
+`CopyOnWriteMap`, `CopyOnWriteSet`, `SyncMap`, `SyncSet`), the caller-visible
+JSON contract, locale parse and fallback, and diagnostic formatting with
+argument interpolation. `CopyOnWriteMap`'s scope guard and `SyncMap`'s
+present-with-nil contract need a deliberate Rust representation decision rather
+than a mechanical port.
+
+`data/phase1/locale-assets.json` maps the 13 shipped translation tables to their
+path, size, sha256 and message-key count, with each fallback obligation and the
+planned `xtask/src/gen/diagnostics.rs` extension recorded. The generator itself
+lands in F1b.
+
+### Known limitations
+
+- The e4 and s05 probe scenarios are still not attributed to exact operation
+  ids: `data/s04/e4-probes.json` records per-scenario counts, not Go symbols.
+- Some cases record a boolean where the pinned implementation's short-circuit is
+  genuinely unobservable through the API (`SyncSet.IsEmpty`,
+  `CopyOnWriteMap`'s ownership restore). Those claims were narrowed to what the
+  rows witness rather than dropped.
 
 ## F0 checklist
 

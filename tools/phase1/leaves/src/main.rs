@@ -25,8 +25,11 @@ mod text;
 
 use api::Outcome;
 
+/// A group module's entry point: claims a request or declines it.
+type GroupHandler = fn(&Value) -> Option<Outcome>;
+
 /// Group modules, tried in order. The first to claim a request answers it.
-const GROUPS: &[(&str, fn(&Value) -> Option<Outcome>)] = &[
+const GROUPS: &[(&str, GroupHandler)] = &[
     ("collections", collections::observe),
     ("core", core::observe),
     ("json", json_contract::observe),

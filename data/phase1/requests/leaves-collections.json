@@ -1,0 +1,1365 @@
+{
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "new_nil"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "op": "new"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-set-empty-nil",
+      "discriminates": "a nil *OrderedSet does not inherit the nil tolerance of the OrderedMap it embeds: every method reaches the map through the receiver's field, so Size, Values, Has, Delete, Clone and Add all dereference it, where OrderedMap's own Size, Keys, Entries and Clone survive a nil receiver (the committed ordered-map-empty-nil case is the contrast); the zero-value set meanwhile serves Size, Has, Values, Delete and Clear before anything is allocated",
+      "operation": "tsc/internal/collections/ordered_set.go:OrderedSet.Size",
+      "order_sensitive": true,
+      "subject": "OrderedSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "c",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-set-insertion-order",
+      "discriminates": "Values yields insertion order, not sorted order: the pinned TestOrderedSet adds 1, 2, 3 ascending and asserts only slices.IsSorted, so it cannot tell the two apart; adding c, a, b does, and re-adding an existing value must keep its original position",
+      "operation": "tsc/internal/collections/ordered_set.go:OrderedSet.Add",
+      "order_sensitive": true,
+      "subject": "OrderedSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "c",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-set-delete-reinsert",
+      "discriminates": "Delete reports whether the value was present, a second Delete of the same value reports false without disturbing the order, and a reinserted value goes to the end rather than back to its old slot; no pinned test covers delete-then-reinsert ordering",
+      "operation": "tsc/internal/collections/ordered_set.go:OrderedSet.Delete",
+      "order_sensitive": true,
+      "subject": "OrderedSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "c",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "c",
+          "op": "delete"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "clone_values"
+        },
+        {
+          "key": "z",
+          "op": "clone_add"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "clone_values"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "clone_size"
+        },
+        {
+          "op": "clone_values"
+        },
+        {
+          "key": "d",
+          "op": "add"
+        },
+        {
+          "op": "values"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-set-clone-clear-isolation",
+      "discriminates": "Clone copies the key order as well as the map, so neither side sees the other's deletes or additions, and Clear restarts the order on the original while leaving the clone whole",
+      "operation": "tsc/internal/collections/ordered_set.go:OrderedSet.Clone",
+      "order_sensitive": true,
+      "subject": "OrderedSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_size_hint",
+          "size": 4
+        },
+        {
+          "key": "c",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "op": "early_stop_values",
+          "stop": 2
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-set-size-hint-early-stop",
+      "discriminates": "a size hint changes allocation only and never the insertion order, and breaking out of the range-over-func Values iterator after two elements is observable and leaves the set intact",
+      "operation": "tsc/internal/collections/ordered_set.go:OrderedSet.Values",
+      "order_sensitive": true,
+      "subject": "OrderedSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_nil",
+          "target": "s"
+        },
+        {
+          "op": "new_nil",
+          "target": "t"
+        },
+        {
+          "key": "a",
+          "op": "has",
+          "target": "s"
+        },
+        {
+          "op": "len",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "clear",
+          "target": "s"
+        },
+        {
+          "op": "clone",
+          "target": "s"
+        },
+        {
+          "op": "equals",
+          "target": "s"
+        },
+        {
+          "op": "is_subset_of",
+          "target": "s"
+        },
+        {
+          "op": "intersects",
+          "target": "s"
+        },
+        {
+          "op": "union",
+          "target": "s"
+        },
+        {
+          "op": "unioned_with",
+          "target": "s"
+        },
+        {
+          "op": "new",
+          "target": "t"
+        },
+        {
+          "key": "x",
+          "op": "add",
+          "target": "t"
+        },
+        {
+          "op": "union",
+          "target": "s"
+        },
+        {
+          "op": "equals",
+          "target": "s"
+        },
+        {
+          "op": "is_subset_of",
+          "target": "s"
+        },
+        {
+          "op": "intersects",
+          "target": "s"
+        },
+        {
+          "op": "unioned_with",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "u"
+        },
+        {
+          "op": "keys",
+          "target": "t"
+        }
+      ],
+      "case": "leaves/core-collections/set-nil-receiver-guards",
+      "discriminates": "Set's nil guards are per method: Has, Len, Keys, Clear, Clone, Equals and IsSubsetOf tolerate a nil receiver and Intersects reports false, while Union's `both empty` early return fires before its own nil check so only a non-empty operand reaches the `cannot modify nil Set` panic; UnionedWith never panics on a nil receiver either, but what it returns depends on the operand: nil and nil gives nil outright, and only a non-nil operand makes it build a fresh set",
+      "operation": "tsc/internal/collections/set.go:Set.Union",
+      "order_sensitive": true,
+      "subject": "Set"
+    },
+    {
+      "actions": [
+        {
+          "op": "new",
+          "target": "s"
+        },
+        {
+          "key": "a",
+          "op": "has",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "key": "a",
+          "op": "add",
+          "target": "s"
+        },
+        {
+          "key": "a",
+          "op": "add_if_absent",
+          "target": "s"
+        },
+        {
+          "key": "b",
+          "op": "add_if_absent",
+          "target": "s"
+        },
+        {
+          "op": "keys_capture",
+          "target": "s"
+        },
+        {
+          "key": "c",
+          "op": "delete",
+          "target": "s"
+        },
+        {
+          "key": "a",
+          "op": "delete",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "keys_replay",
+          "target": "s"
+        },
+        {
+          "op": "len",
+          "target": "s"
+        },
+        {
+          "op": "clear",
+          "target": "s"
+        },
+        {
+          "op": "len",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "keys_replay",
+          "target": "s"
+        },
+        {
+          "key": "c",
+          "op": "add",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "keys_replay",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/core-collections/set-zero-value-keys-alias",
+      "discriminates": "Keys hands out the live backing map rather than a copy, so a map captured before a Delete, a Clear and a later Add reflects all three; AddIfAbsent reports whether the key was newly added, and Clear keeps the allocated map usable",
+      "operation": "tsc/internal/collections/set.go:Set.Keys",
+      "order_sensitive": true,
+      "subject": "Set"
+    },
+    {
+      "actions": [
+        {
+          "op": "new",
+          "target": "s"
+        },
+        {
+          "op": "new",
+          "target": "t"
+        },
+        {
+          "key": "c",
+          "op": "add",
+          "target": "t"
+        },
+        {
+          "key": "a",
+          "op": "add",
+          "target": "t"
+        },
+        {
+          "op": "union",
+          "target": "s"
+        },
+        {
+          "key": "z",
+          "op": "add",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "t"
+        },
+        {
+          "op": "clone",
+          "target": "s"
+        },
+        {
+          "key": "a",
+          "op": "delete",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "u"
+        },
+        {
+          "op": "equals",
+          "target": "s"
+        },
+        {
+          "op": "is_subset_of",
+          "target": "t"
+        },
+        {
+          "op": "intersects",
+          "target": "s"
+        },
+        {
+          "op": "unioned_with",
+          "target": "t"
+        },
+        {
+          "op": "keys",
+          "target": "u"
+        },
+        {
+          "op": "keys",
+          "target": "t"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/core-collections/set-union-clone-isolation",
+      "discriminates": "Union into a receiver whose backing map is nil clones the operand instead of aliasing it, Clone is a real copy that survives a later Delete, and UnionedWith builds a third set without touching either operand",
+      "operation": "tsc/internal/collections/set.go:Set.Clone",
+      "order_sensitive": true,
+      "subject": "Set"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "b",
+            "a",
+            "b"
+          ],
+          "op": "new_from_items",
+          "target": "s"
+        },
+        {
+          "op": "len",
+          "target": "s"
+        },
+        {
+          "op": "keys",
+          "target": "s"
+        },
+        {
+          "op": "new_size_hint",
+          "size": 8,
+          "target": "t"
+        },
+        {
+          "op": "len",
+          "target": "t"
+        },
+        {
+          "op": "keys",
+          "target": "t"
+        },
+        {
+          "key": "x",
+          "op": "add",
+          "target": "t"
+        },
+        {
+          "op": "keys",
+          "target": "t"
+        },
+        {
+          "op": "equals",
+          "target": "s"
+        }
+      ],
+      "case": "leaves/core-collections/set-constructors",
+      "discriminates": "NewSetFromItems collapses duplicates, and NewSetWithSizeHint allocates the backing map eagerly, so its Keys is an empty non-nil map where the zero value's Keys is nil",
+      "operation": "tsc/internal/collections/set.go:NewSetFromItems",
+      "order_sensitive": true,
+      "subject": "Set"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "k",
+          "op": "has"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "a"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "b"
+        },
+        {
+          "key": "j",
+          "op": "add",
+          "value": "c"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "key": "k",
+          "op": "has"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "new_size_hint",
+          "size": 4
+        },
+        {
+          "op": "len"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "a"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/multimap-empty-and-size-hint",
+      "discriminates": "a zero-value MultiMap serves reads before its map exists (Get returns a nil slice, Has false, Len 0) and Add allocates on first use; Len counts keys rather than values, and a size hint changes nothing observable",
+      "operation": "tsc/internal/collections/multimap.go:MultiMap.Add",
+      "order_sensitive": true,
+      "subject": "MultiMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "a"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "b"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "c"
+        },
+        {
+          "key": "k",
+          "op": "get_capture"
+        },
+        {
+          "key": "k",
+          "op": "remove",
+          "value": "b"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "op": "get_replay"
+        },
+        {
+          "key": "k",
+          "op": "remove",
+          "value": "zz"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "key": "j",
+          "op": "remove",
+          "value": "a"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "key": "k",
+          "op": "remove",
+          "value": "a"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "key": "k",
+          "op": "remove",
+          "value": "c"
+        },
+        {
+          "key": "k",
+          "op": "has"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/multimap-remove-aliases-the-slice",
+      "discriminates": "Remove compacts the value slice in place with append(values[:i], values[i+1:]...), so a slice handed out by an earlier Get keeps its old length and now shows a duplicated tail; removing the last value deletes the key outright instead of leaving an empty slice, and removing an absent value or an absent key is a no-op",
+      "operation": "tsc/internal/collections/multimap.go:MultiMap.Remove",
+      "order_sensitive": true,
+      "subject": "MultiMap"
+    },
+    {
+      "actions": [
+        {
+          "items": [
+            "apple",
+            "avocado",
+            "berry",
+            "blue",
+            "cherry"
+          ],
+          "key_of": "first_byte",
+          "op": "group_by"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "key": "c",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "remove_all"
+        },
+        {
+          "key": "b",
+          "op": "has"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "len"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "key": "k",
+          "op": "add",
+          "value": "x"
+        },
+        {
+          "key": "k",
+          "op": "get"
+        },
+        {
+          "op": "len"
+        }
+      ],
+      "case": "leaves/core-collections/multimap-group-by-remove-all-clear",
+      "discriminates": "GroupBy appends in item order, so each group's values keep the input order even though the key order is a Go map's, and the grouping rule travels in the request as key_of rather than hiding in the probe; RemoveAll drops the whole key, and Clear empties the map and leaves it usable -- whether `clear(s.M)` keeps the backing map allocated is not witnessed here and cannot be, because Add allocates on demand, so a port that dropped the map instead would record the same rows",
+      "operation": "tsc/internal/collections/multimap.go:GroupBy",
+      "order_sensitive": true,
+      "subject": "MultiMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "enter_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "exit_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/cow-map-empty-scope-write-discarded",
+      "discriminates": "a zero-value CopyOnWriteMap is usable inside a scope: ensureOwned takes its nil-map branch and allocates rather than cloning, and the restore EnterScope returned discards that write entirely, leaving the map empty and still writable",
+      "operation": "tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope",
+      "order_sensitive": true,
+      "subject": "CopyOnWriteMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "enter_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "key": "c",
+          "op": "get"
+        },
+        {
+          "op": "exit_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "key": "c",
+          "op": "get"
+        },
+        {
+          "key": "d",
+          "op": "set",
+          "value": "4"
+        },
+        {
+          "key": "d",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/cow-map-scope-write-not-visible-to-parent",
+      "discriminates": "the scope shares the parent's storage for reads and clones it on the first write, so entries written inside the scope are invisible to the parent afterwards while the inherited ones survive; the restore also puts ownership back, but that is not what these rows witness -- a port that re-cloned on the parent's next write would produce the same payload -- so the trace claims only that the parent stays writable and keeps its inherited entry",
+      "operation": "tsc/internal/collections/cow.go:CopyOnWriteMap.Set",
+      "order_sensitive": true,
+      "subject": "CopyOnWriteMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "enter_scope"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "op": "enter_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "99"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "op": "exit_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        },
+        {
+          "op": "exit_scope"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/cow-map-nested-scopes-restore-level-by-level",
+      "discriminates": "scopes nest, and each restore puts back exactly the storage and ownership its own EnterScope saved, so an inherited key overwritten at two depths unwinds to the intermediate value first and only then to the original",
+      "operation": "tsc/internal/collections/cow.go:CopyOnWriteMap.ensureOwned",
+      "order_sensitive": true,
+      "subject": "CopyOnWriteMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "a",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "enter_scope"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "b",
+          "op": "has"
+        },
+        {
+          "op": "exit_scope"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "b",
+          "op": "has"
+        },
+        {
+          "key": "c",
+          "op": "add"
+        },
+        {
+          "key": "c",
+          "op": "has"
+        },
+        {
+          "key": "b",
+          "op": "has"
+        }
+      ],
+      "case": "leaves/core-collections/cow-set-scope-fork",
+      "discriminates": "CopyOnWriteSet delegates to the map's scope, so an Add inside the scope is discarded on exit while the members inherited from the parent survive both the copy-on-write clone and the restore",
+      "operation": "tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope",
+      "order_sensitive": true,
+      "subject": "CopyOnWriteSet"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "foo",
+          "op": "load"
+        },
+        {
+          "key": "foo",
+          "op": "store_nil"
+        },
+        {
+          "key": "foo",
+          "op": "load"
+        },
+        {
+          "key": "too",
+          "op": "load_or_store_nil"
+        },
+        {
+          "key": "too",
+          "op": "load"
+        },
+        {
+          "key": "too",
+          "op": "load_or_store",
+          "value": "x"
+        },
+        {
+          "key": "too",
+          "op": "load"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "range"
+        },
+        {
+          "op": "to_map"
+        }
+      ],
+      "case": "leaves/core-collections/syncmap-nil-value-contract",
+      "discriminates": "the nil-value contract the pinned TestSyncMapWithNil pins, and the part it does not: Load of a key stored with nil returns (zero, true) where an absent key returns (zero, false), and LoadOrStore over a key already holding nil reports loaded=true and hands back that nil rather than the value it was offered, so it neither overwrites nor panics -- its `actualAny == nil` guard returns V's zero value, which for V=any is the stored nil itself, so the guard is a panic guard on the type assertion and never a substitution; Range nil-guards its type assertions and ToMap does not, so ToMap panics on exactly the map that test builds",
+      "operation": "tsc/internal/collections/syncmap.go:SyncMap.Load",
+      "order_sensitive": true,
+      "subject": "SyncMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "b",
+          "op": "store",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "store",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "store",
+          "value": "3"
+        },
+        {
+          "key": "a",
+          "op": "load"
+        },
+        {
+          "key": "a",
+          "op": "load_or_store",
+          "value": "9"
+        },
+        {
+          "key": "a",
+          "op": "load"
+        },
+        {
+          "key": "d",
+          "op": "load_or_store",
+          "value": "4"
+        },
+        {
+          "key": "d",
+          "op": "load"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "b",
+          "op": "delete"
+        },
+        {
+          "key": "b",
+          "op": "load"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "to_map"
+        },
+        {
+          "op": "clone_size"
+        },
+        {
+          "op": "clone_keys"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "clone_size"
+        },
+        {
+          "op": "clone_keys"
+        }
+      ],
+      "case": "leaves/core-collections/syncmap-store-clone-clear",
+      "discriminates": "LoadOrStore stores only when the key is absent and otherwise returns the existing value, and Clone is a snapshot taken through Range, so a later Delete and Clear on the original leave it untouched",
+      "operation": "tsc/internal/collections/syncmap.go:SyncMap.Clone",
+      "order_sensitive": true,
+      "subject": "SyncMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "store",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "store",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "store",
+          "value": "3"
+        },
+        {
+          "op": "range_stop",
+          "stop": 1
+        },
+        {
+          "op": "range_stop",
+          "stop": 2
+        },
+        {
+          "op": "range_stop",
+          "stop": 5
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "to_map"
+        }
+      ],
+      "case": "leaves/core-collections/syncmap-range-early-stop",
+      "discriminates": "returning false from Range's callback stops the walk immediately and leaves the map untouched; only the number of visits is specified, because sync.Map specifies no order, so the case records the count and never which keys were seen",
+      "operation": "tsc/internal/collections/syncmap.go:SyncMap.Range",
+      "order_sensitive": true,
+      "subject": "SyncMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "op": "is_empty"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "a",
+          "op": "add_if_absent"
+        },
+        {
+          "key": "a",
+          "op": "add_if_absent"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "key": "b",
+          "op": "add"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "key": "b",
+          "op": "has"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "is_empty"
+        },
+        {
+          "op": "to_slice"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "range_stop",
+          "stop": 1
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "is_empty"
+        }
+      ],
+      "case": "leaves/core-collections/syncset-add-if-absent-and-early-stop",
+      "discriminates": "AddIfAbsent returns the inverse of LoadOrStore's loaded flag, so it is true exactly once per key and Add throws that answer away; IsEmpty answers from the first visited entry rather than counting, which its boolean alone cannot witness, so the trace claims only the boolean itself; a stopped Range visits exactly as many keys as the callback allows, which the recorded count does witness, and deleting an absent key is a no-op",
+      "operation": "tsc/internal/collections/syncset.go:SyncSet.AddIfAbsent",
+      "order_sensitive": true,
+      "subject": "SyncSet"
+    }
+  ]
+}
