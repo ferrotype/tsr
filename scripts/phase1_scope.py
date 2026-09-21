@@ -711,8 +711,8 @@ def roster_exemptions(step: str | None = None) -> dict[str, dict]:
 PREPARING_RESULTS = ("match", "different", "not_implemented")
 
 
-def prepared_links(cases: dict) -> dict[str, list[str]]:
-    """Every leaf operation a case or gated witness has actually run for.
+def prepared_links(cases: dict, step: str = "leaves") -> dict[str, list[str]]:
+    """Every operation a step's case or gated witness has actually run for.
 
     Preparation is not coverage: a case reporting `not_implemented` prepares its
     operation -- it runs and classifies the gap -- while covering nothing. The
@@ -722,7 +722,7 @@ def prepared_links(cases: dict) -> dict[str, list[str]]:
     """
     links: dict[str, list[str]] = {}
     for case in cases.get("cases", []):
-        if case.get("family") != "leaves" or case.get("last_result") not in PREPARING_RESULTS:
+        if case.get("family") not in STEP_FAMILIES[step] or case.get("last_result") not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             links.setdefault(operation, []).append(case["id"])
@@ -760,7 +760,7 @@ def roster_problems(
     if cases is None:
         path = ROOT / "data/phase1/cases.json"
         cases = json.loads(path.read_text()) if path.is_file() else {}
-    prepared = prepared_links(cases)
+    prepared = prepared_links(cases, step)
     seen: set[str] = set()
     label = path.stem
     for entry in document.get("exemptions", []):

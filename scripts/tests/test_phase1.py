@@ -1593,23 +1593,29 @@ class ConfigRosterTests(unittest.TestCase):
     def test_an_exemption_for_an_operation_with_a_prepared_case_is_refused(self):
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
         scope_doc = json.loads((ROOT / "data/phase1/scope.json").read_text())
-        prepared = scope.prepared_links(cases)
-        config_packages = scope.STEP_PACKAGES["config"]
-        owned = {row["id"] for row in scope_doc["operations"]
-                 if row["go_package"] in config_packages}
-        claimed = next(op for op in sorted(prepared) if op in owned)
-        roster = scope.leaf_roster("config")
-        roster["exemptions"].append({
-            "operation": claimed, "category": "unused_at_pin",
-            "owner": "nothing", "evidence": "fabricated for this test",
-        })
-        original = scope.leaf_roster
-        scope.leaf_roster = lambda step="leaves": roster if step == "config" else original(step)
-        try:
-            problems = scope.roster_problems(scope_doc, cases, "config")
-        finally:
-            scope.leaf_roster = original
-        self.assertTrue(any(claimed in problem for problem in problems), problems)
+        witnessed = {op for witness in cases.get("witnesses", [])
+                     for op in witness.get("operations", [])}
+        for step, families in scope.STEP_FAMILIES.items():
+            owned = {row["id"] for row in scope_doc["operations"]
+                     if row["go_package"] in scope.STEP_PACKAGES[step]}
+            for result in scope.PREPARING_RESULTS:
+                with self.subTest(step=step, result=result):
+                    # A direct case, with no gated witness to mask a missing
+                    # family in prepared_links, must block the exemption.
+                    case = next(case for case in cases["cases"]
+                                if case["family"] in families
+                                and case.get("last_result") == result
+                                and set(case.get("operations", [])) & owned - witnessed)
+                    claimed = sorted(set(case["operations"]) & owned - witnessed)[0]
+                    roster = scope.leaf_roster(step)
+                    roster["exemptions"].append({
+                        "operation": claimed, "category": "unused_at_pin",
+                        "owner": "nothing", "evidence": "fabricated for this test",
+                    })
+                    with patch.object(scope, "leaf_roster", return_value=roster):
+                        problems = scope.roster_problems(scope_doc, cases, step)
+                    self.assertTrue(any(claimed in problem and "but also prepared by" in problem
+                                        for problem in problems), problems)
 
 
 class ConfigOutputPreparationTests(unittest.TestCase):

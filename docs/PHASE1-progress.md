@@ -764,14 +764,20 @@ dispatch through `outputpaths.OutputPathsHost` — and
 `checkSourceFilesBelongToPath` only as a method value. Since `internal/compiler`
 is `membership: "partial"` and F4a decides its boundary, none is exemptible here.
 
-**Twelve of the 24 need a transitive reading** of the caller rule and say so in
-their own evidence: their callers are in-step but are themselves exempt, the
-eight `showconfig.go` helpers reachable only from `ConvertToTSConfig`. The
-precedent is F2a's own `openMetadata` entry. If a reviewer rejects the reading,
-those twelve return to the roster and none becomes `unused_at_pin`.
+**Twelve of the 24 use a transitive reading** of the caller rule, accepted in
+the PR #43 re-review after checking the pinned references. Their callers are
+themselves owned by later phases, as in F2a's `openMetadata` entry. This includes
+the `showconfig.go` helpers whose results are consumed only by
+`ConvertToTSConfig`, the option-change helpers used by incremental execution,
+and the file-match helpers used by watching and the project system. `computeFn`
+runs during package initialization, but only `addImpliedOptions` consumes the
+table it builds. These remain real later-phase work, not `unused_at_pin`.
+An explicitly assigned Phase 1 operation or an additional in-scope caller would
+invalidate this reasoning.
 
-**`go_test_harness` is a new category** and wants the owner's review. None of the
-six existing categories describes upstream's own test harness, and bending
+**`go_test_harness` is a new category**, accepted in the same technical review
+for the 17 fixture and baseline-bookkeeping operations. None of the
+six original categories describes upstream's own test harness, and bending
 `build_tooling` would have been the wrong kind of convenience: that category says
 the port generates the same artifact elsewhere, and there is no artifact here.
 The port must reproduce the 309 reference outputs, and it does; it must not
@@ -1134,3 +1140,13 @@ that example mapping; the production mapping remains. Replaying existing,
 authenticated syntax and loader captures produced byte-identical selected cases
 and checker obligations. Only the operation-matrix digest and its review chain
 changed, without updating any measured outcome or producer fingerprint.
+
+The second review found that the shared exemption validator still selected
+only direct `leaves` cases. It now selects the preparation families of the step
+being validated, including `pilot` for filesystem. A regression injects a
+conflicting exemption for an unwitnessed direct case in each of the three
+steps, for each of `match`, `different` and `not_implemented`. All six config
+and filesystem subcases failed before the fix and pass afterward. The existing
+rosters contain no such conflicts, so preparation counts and recorded evidence
+are unchanged. The focused Phase 1 suite passed (161 tests, 17 subtests); broad
+compiler tests, native captures and benchmarks were not repeated.
