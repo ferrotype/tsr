@@ -2,9 +2,9 @@
   "counts": {
     "covered": 204,
     "equivalent_rust": 8,
-    "implemented_untested": 3264,
+    "implemented_untested": 3265,
     "later_phase": 18,
-    "missing": 1301
+    "missing": 1300
   },
   "dispositions": [
     "covered",
@@ -174148,14 +174148,12 @@
     },
     {
       "actual_home": null,
-      "basis": "a prepared case runs and reports the Rust entry point absent: filesystem/osvfs/nativepath-realpath-linux-procfs; witnessed by 1 prepared case(s)",
+      "basis": "unmapped in the audit input, but `realpath` is defined at crates/tsr_bundled/src/lib.rs, crates/tsr_vfs/src/lib.rs; needs a behavioral witness to become covered",
       "basis_kind": "rule",
-      "cases": [
-        "filesystem/osvfs/nativepath-realpath-linux-procfs"
-      ],
+      "cases": [],
       "depends_on": [],
       "destination_phase": 1,
-      "disposition": "missing",
+      "disposition": "implemented_untested",
       "go_package": "internal/nativepath",
       "go_source": "tsc/internal/nativepath/realpath_linux.go",
       "id": "tsc/internal/nativepath/realpath_linux.go:Realpath",
@@ -174168,7 +174166,7 @@
       "membership_reason": "native path helpers",
       "roster": {
         "owner": null,
-        "state": "prepared",
+        "state": "pending",
         "step": "filesystem"
       },
       "rust_home": [],

@@ -36,5 +36,10 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         return None;
     }
     let (authority, signature, home) = MISSING;
-    Some(Outcome::missing(authority, signature, home))
+    Some(Outcome::missing(
+        "tsoptions.matchFilesBaseline",
+        authority,
+        signature,
+        home,
+    ))
 }

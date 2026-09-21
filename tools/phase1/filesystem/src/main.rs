@@ -85,6 +85,7 @@ fn observe(request: &Value) -> Map<String, Value> {
             row.insert("observation".into(), value);
         }
         Some(Outcome::NotImplemented {
+            operation: missing_operation,
             go_authority,
             intended_signature,
             production_home,
@@ -93,7 +94,7 @@ fn observe(request: &Value) -> Map<String, Value> {
             row.insert(
                 "missing_operation".into(),
                 json!({
-                    "operation": operation,
+                    "operation": missing_operation,
                     "go_authority": go_authority,
                     "intended_signature": intended_signature,
                     "production_home": production_home,
@@ -151,4 +152,75 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Err("usage: phase1_filesystem requests.json observations.json".into());
     }
     run(&args[0], &args[1])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn usage_gap_cannot_claim_an_implemented_operation_is_absent() {
+        let row = observe(&json!({
+            "case": "identity-control", "subject": "vfsmatch.Usage", "dialect": "vfsmatch",
+            "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:IsImplicitGlob",
+        }));
+        assert_eq!(row["result"], "not_implemented");
+        assert_eq!(
+            row["missing_operation"]["operation"],
+            "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String"
+        );
+    }
+
+    #[test]
+    fn group_gap_refuses_an_identity_outside_its_reviewed_entry_points() {
+        let row = observe(&json!({
+            "case": "identity-control", "subject": "trackingvfs.FS",
+            "operation": "tsc/internal/vfs/vfsmatch/vfsmatch.go:IsImplicitGlob",
+        }));
+        assert_eq!(row["result"], "harness_failed");
+        assert!(row.get("missing_operation").is_none());
+    }
+
+    #[test]
+    fn cached_gap_uses_the_owning_source_not_the_requested_prefix() {
+        let row = observe(&json!({
+            "case": "filesystem/cachedvfs/identity-control", "subject": "CachedFS",
+            "operation": "arbitrary/source.go:From",
+        }));
+        assert_eq!(
+            row["missing_operation"]["operation"],
+            "tsc/internal/vfs/cachedvfs/cachedvfs.go:From"
+        );
+    }
+
+    #[test]
+    fn every_frozen_filesystem_gap_has_a_handler_owned_identity() {
+        // Exercise each dispatch branch over the real schedule, including the
+        // case-specific and multi-operation groups. No native children or
+        // production corpus is run by this adapter identity check.
+        let directory =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../data/phase1/requests");
+        for entry in std::fs::read_dir(directory).unwrap() {
+            let path = entry.unwrap().path();
+            if !path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("filesystem-")
+            {
+                continue;
+            }
+            let document: Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+            for request in document["requests"].as_array().unwrap() {
+                let row = observe(request);
+                assert_ne!(row["result"], "harness_failed", "{row:?}");
+                if row["result"] == "not_implemented" {
+                    assert_eq!(
+                        row["missing_operation"]["operation"], request["operation"],
+                        "{row:?}"
+                    );
+                }
+            }
+        }
+    }
 }

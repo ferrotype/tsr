@@ -1,15 +1,34 @@
 {
-  "accounted_operations": 316,
-  "complete": true,
+  "accounted_operations": 314,
+  "complete": false,
   "exempt_by_category": {
     "build_variant": 5,
     "generated_assertion": 1,
     "unused_at_pin": 1
   },
   "exempt_operations": 7,
-  "pending": [],
+  "gap_problems": [],
+  "outputs": {
+    "complete": true,
+    "exact_outputs": 68,
+    "excepted_outputs": 74,
+    "problems": [],
+    "total_outputs": 142
+  },
+  "pending": [
+    {
+      "disposition": "missing",
+      "operation": "tsc/internal/nativepath/eintr_unix.go:ignoringEINTR",
+      "rust_home": []
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/nativepath/realpath_linux.go:Realpath",
+      "rust_home": []
+    }
+  ],
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
-  "prepared_operations": 301,
+  "prepared_operations": 299,
   "roster_problems": [],
   "step": "filesystem",
   "total_operations": 316,

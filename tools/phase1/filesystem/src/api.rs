@@ -13,6 +13,7 @@ pub enum Outcome {
     /// The production entry point does not exist yet. Preparation records the
     /// gap; it never emulates the algorithm to make a comparison run.
     NotImplemented {
+        operation: String,
         go_authority: &'static str,
         intended_signature: &'static str,
         production_home: &'static str,
@@ -24,11 +25,13 @@ pub enum Outcome {
 
 impl Outcome {
     pub fn missing(
+        operation: impl Into<String>,
         go_authority: &'static str,
         intended_signature: &'static str,
         production_home: &'static str,
     ) -> Self {
         Outcome::NotImplemented {
+            operation: operation.into(),
             go_authority,
             intended_signature,
             production_home,
@@ -78,4 +81,29 @@ pub fn action_i64(action: &Value, field: &str) -> i64 {
 #[allow(clippy::needless_pass_by_value)]
 pub fn ordered(rows: Vec<Value>) -> Value {
     json!({ "ordered": rows })
+}
+
+/// Resolve a group-wide gap against its reviewed entry points. Subject dispatch
+/// alone cannot make the caller's arbitrary operation label authoritative.
+pub fn missing_for_subject(
+    request: &Value,
+    operations: &[(&str, &str)],
+    authority: &'static str,
+    signature: &'static str,
+    home: &'static str,
+) -> Outcome {
+    let requested = request
+        .get("operation")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    match operations
+        .iter()
+        .find(|(owner, identity)| *owner == subject(request) && *identity == requested)
+    {
+        Some((_, identity)) => Outcome::missing(*identity, authority, signature, home),
+        None => Outcome::Failed(format!(
+            "no reviewed missing operation {requested:?} for subject {:?}",
+            subject(request)
+        )),
+    }
 }

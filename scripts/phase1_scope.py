@@ -689,6 +689,14 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
         if entry and row["id"] not in prepared and row["id"] not in witnessed:
             by_category[entry["category"]] = by_category.get(entry["category"], 0) + 1
     problems = roster_problems(scope, cases, step)
+    gap_problems = gap_record_problems({"cases": [
+        case for case in cases.get("cases", []) if case.get("family") in families
+    ]})
+    outputs = None
+    if step == "filesystem":
+        from phase1_baselines import matchfiles_preparation
+
+        outputs = matchfiles_preparation(cases)
     return {
         "version": 2,
         "step": step,
@@ -698,7 +706,8 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
         # exempted by a reviewed ledger entry, and false while that ledger
         # itself does not validate -- an exemption nobody can defend is not an
         # answer.
-        "complete": bool(required) and not pending and not problems,
+        "complete": bool(required) and not pending and not problems and not gap_problems
+                    and (outputs is None or outputs["complete"]),
         "total_operations": len(required),
         "accounted_operations": len(accounted),
         "prepared_operations": sum(1 for r in required if r["id"] in prepared),
@@ -709,6 +718,8 @@ def leaf_preparation(scope: dict, cases: dict, step: str = "leaves") -> dict:
         "exempt_by_category": dict(sorted(by_category.items())),
         "pending": pending,
         "roster_problems": problems,
+        "gap_problems": gap_problems,
+        **({"outputs": outputs} if outputs is not None else {}),
     }
 
 

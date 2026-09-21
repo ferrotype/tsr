@@ -245,5 +245,5 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         .iter()
         .find(|(name, _, _)| *name == operation)
         .copied()?;
-    Some(Outcome::missing(authority, signature, home))
+    Some(Outcome::missing(authority, authority, signature, home))
 }

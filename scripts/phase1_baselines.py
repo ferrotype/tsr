@@ -360,3 +360,75 @@ def verify_written_subfolders() -> list[str]:
         if expected not in written:
             problems.append(f"no pinned test writes the expected subfolder {expected}")
     return problems
+
+
+def matchfiles_preparation(cases: dict) -> dict:
+    """F2a prepares outputs as well as operations, including excepted outputs.
+
+    Frozen native observations authenticate the carried renderer's bytes. A
+    baseline exception waives equality with the historical file, not the native
+    observation or the runnable Rust comparison. Do not let operations=[] make
+    these 142 cases disappear from the preparation gate.
+    """
+    index = json.loads((ROOT / "data/phase1/config-baselines.json").read_text())
+    expected = {"config/matchFiles/" + row["name"]: row
+                for row in index["groups"]["matchFiles"]["outputs"]}
+    problems = exception_problems(index)
+    directory = ROOT / "data/phase1/native/filesystem"
+    native = directory / "matchfiles/observations.json"
+    provenance = directory / "capture-provenance.json"
+    rows: dict[str, dict] = {}
+    if not native.is_file() or not provenance.is_file():
+        problems.append("matchFiles has no frozen native observations and provenance")
+    else:
+        recorded = json.loads(provenance.read_text())
+        probe = recorded.get("native_probes", {}).get("matchfiles", {})
+        if recorded.get("pin") != pin() or digest(native.read_bytes()) != probe.get("observations_sha256"):
+            problems.append("matchFiles native observations disagree with their pin or digest")
+        else:
+            for row in json.loads(native.read_text())["observations"]:
+                if row["case"] in rows:
+                    problems.append(f"matchFiles duplicates native row {row['case']}")
+                rows[row["case"]] = row
+    by_output: dict[str, list[dict]] = {}
+    for case in cases.get("cases", []):
+        if case.get("family") == "filesystem" and case.get("baseline"):
+            by_output.setdefault(case["baseline"], []).append(case)
+    for unknown in sorted(set(by_output) - set(expected)):
+        problems.append(f"matchFiles prepares unknown output {unknown}")
+    exceptions_by_name = {"config/matchFiles/" + name: entry
+                          for name, entry in exceptions_by_output().items()}
+    exact = excepted = 0
+    for name, expected_row in expected.items():
+        linked = by_output.get(name, [])
+        if len(linked) != 1:
+            problems.append(f"{name}: needs exactly one prepared case, found {len(linked)}")
+            continue
+        case = linked[0]
+        if case.get("last_result") not in ("match", "different", "not_implemented"):
+            problems.append(f"{name}: comparison is {case.get('last_result')!r}, not prepared")
+            continue
+        row = rows.get(case["id"], {})
+        observation = row.get("observation", {})
+        if row.get("result") != "observed" or observation.get("baseline") != name:
+            problems.append(f"{name}: no corresponding native observation")
+            continue
+        rendered = observation.get("rendered")
+        if not isinstance(rendered, str) or digest(rendered.encode()) != observation.get("rendered_sha256"):
+            problems.append(f"{name}: rendered bytes disagree with their digest")
+            continue
+        if observation.get("expected_sha256") != expected_row["sha256"]:
+            problems.append(f"{name}: native observation names a different reference digest")
+            continue
+        if digest(rendered.encode()) == expected_row["sha256"]:
+            if name in exceptions_by_name:
+                problems.append(f"{name}: exception now reproduces exactly and needs review")
+            else:
+                exact += 1
+        elif name in exceptions_by_name:
+            excepted += 1
+        else:
+            problems.append(f"{name}: rendering differs without an approved exception")
+    return {"total_outputs": len(expected), "exact_outputs": exact,
+            "excepted_outputs": excepted, "problems": problems,
+            "complete": len(expected) == GROUPS["matchFiles"][1] and not problems}

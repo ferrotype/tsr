@@ -142,16 +142,20 @@ fn symbol(operation: &str) -> &str {
 
 fn missing(table: &'static [(&str, &str)], operation: &str, home: &'static str) -> Option<Outcome> {
     let wanted = symbol(operation);
-    let (_, signature) = table.iter().find(|(name, _)| *name == wanted)?;
-    // The Go authority is the request's own operation id; `missing` takes a
-    // 'static authority, so the file is named and the row already carries the
-    // symbol under `missing_operation.operation`.
+    let (identity, signature) = table.iter().find(|(name, _)| *name == wanted)?;
+    // Resolve the identity from the reviewed table and its owning source,
+    // never from an arbitrary prefix supplied in the request.
     let authority = if home == CACHED_HOME {
         "tsc/internal/vfs/cachedvfs/cachedvfs.go"
     } else {
         "tsc/internal/vfs/internal/internal.go"
     };
-    Some(Outcome::missing(authority, signature, home))
+    Some(Outcome::missing(
+        format!("{authority}:{identity}"),
+        authority,
+        signature,
+        home,
+    ))
 }
 
 /// The action vocabulary each subject accepts. An unknown or malformed action

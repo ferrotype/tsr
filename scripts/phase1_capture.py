@@ -642,7 +642,7 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
         if result == "not_implemented":
             missing = row.get("missing_operation")
             required = ("operation", "go_authority", "intended_signature", "production_home")
-            if not isinstance(missing, dict) or any(not missing.get(k) for k in required):
+            if not isinstance(missing, dict) or any(not isinstance(missing.get(k), str) or not missing[k] for k in required):
                 raise ValueError(
                     f"{where} is not_implemented without a complete missing_operation record"
                 )
@@ -845,7 +845,14 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
         for row in rows:
             case = row["case"]
             if row["result"] != "observed":
-                merged.setdefault(case, row)
+                existing = merged.setdefault(case, dict(row, native_reasons={}))
+                if existing["result"] != "observed":
+                    existing["native_reasons"][probe_name] = row["reason"]
+                    # Keep the owning probe's host limitation even when other
+                    # probes declined the case earlier in the merge.
+                    existing["reason"] = "; ".join(
+                        f"{name}: {cause}" for name, cause in existing["native_reasons"].items()
+                    )
                 continue
             existing = merged.get(case)
             if existing is not None and existing.get("result") == "observed":
@@ -929,14 +936,17 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
             rows.append({"case": case, "result": "harness_failed",
                          "reason": native.get("error") or native.get("reason", "")})
             continue
+        if native["result"] == "native_unavailable":
+            rows.append({"case": case, "result": "native_unavailable",
+                         "reason": native.get("reason", ""), "rust_result": rust["result"],
+                         **({"missing_operation": rust["missing_operation"]}
+                            if rust["result"] == "not_implemented" else {})})
+            continue
         if rust["result"] == "not_implemented":
             rows.append({"case": case, "result": "not_implemented",
                          "missing_operation": rust.get("missing_operation"),
                          "native_result": native.get("result"),
                          "native_observation": native.get("observation")})
-            continue
-        if native["result"] == "native_unavailable":
-            rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
             continue
         # Canonicalisation preserves array order, and order-sensitive cases are
         # required to put their ordered payload in an array, so this comparison

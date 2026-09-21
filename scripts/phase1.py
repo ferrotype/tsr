@@ -243,26 +243,14 @@ def record_results(capture: Path, write: bool) -> dict:
         for row in report["rows"]
         if row["result"] == "not_implemented"
     }
-    # A driver names the absent entry point with the request's `operation`
-    # field. The leaf and filesystem families put a pinned operation id there;
-    # the F0 pilot predates that convention and puts a logical action name
-    # ("locale.selectTranslation"), which is not a scope id and so cannot be a
-    # witnessed gap. Where the reported name is not one the case claims to
-    # reach and the case claims exactly one operation, that one is what the
-    # driver meant and there is nothing to guess. Where it claims several, the
-    # reported name has to be resolved rather than picked, so it is left as it
-    # is and gap_record_problems reports it.
-    resolved: dict[str, str] = {}
-    renamed: list[dict] = []
+    # Identities are supplied by the handler that found the gap. An unknown
+    # identity is a broken driver contract, even when a case names only one
+    # operation: replacing it with that operation would fabricate evidence.
     declared = {case["id"]: case.get("operations", []) for case in document["cases"]}
     for case_id, named in absent.items():
-        claimed = declared.get(case_id, [])
-        if named in claimed or len(claimed) != 1:
-            resolved[case_id] = named
-            continue
-        resolved[case_id] = claimed[0]
-        renamed.append({"case": case_id, "driver_reported": named, "resolved_to": claimed[0]})
-    absent = resolved
+        claimed = declared[case_id]
+        if not isinstance(named, str) or not named or (claimed and named not in claimed):
+            raise ValueError(f"{case_id}: driver names unclaimed missing operation {named!r}")
     changed = []
     for case in document["cases"]:
         if case.get("family") != family:
@@ -283,6 +271,9 @@ def record_results(capture: Path, write: bool) -> dict:
                 "now": observed[case["id"]],
             })
             case["last_result"] = observed[case["id"]]
+    problems = scope_module.gap_record_problems(document)
+    if problems:
+        raise ValueError("invalid gap records: " + "; ".join(problems[:5]))
     if write:
         CASES.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
     counts: dict[str, int] = {}
@@ -293,7 +284,6 @@ def record_results(capture: Path, write: bool) -> dict:
         "cases": len(observed),
         "counts": dict(sorted(counts.items())),
         "changed": changed,
-        "resolved_gap_names": renamed,
         "written": write,
     }
 

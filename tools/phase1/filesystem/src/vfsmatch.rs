@@ -67,7 +67,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     let subject = subject(request);
     if subject == "vfsmatch.Usage" {
         let (authority, signature, home) = USAGE_MISSING;
-        return Some(Outcome::missing(authority, signature, home));
+        return Some(Outcome::missing(authority, authority, signature, home));
     }
     if !matches!(
         subject,

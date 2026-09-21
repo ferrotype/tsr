@@ -12,7 +12,7 @@ moved pin invalidates it.
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
 | F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
-| F2a — filesystem, path and matching tests | **complete**: `filesystem_prepared: true`; 359 cases over ten probe groups plus the carried matchFiles renderer; all 316 roster operations prepared, witnessed or exempted; the 309 exact-baseline requirement amended by 74 owner-approved, individually evidenced exceptions |
+| F2a — filesystem, path and matching tests | **pending Linux observation**: `filesystem_prepared: false`; 359 cases, 314 of 316 roster operations accounted for; all 142 baselines prepared (68 exact, 74 owner-approved exceptions). The Linux realpath case must observe `Realpath` and `ignoringEINTR`. |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
 | F5a — integration checks and the stage A review | not started |
@@ -325,37 +325,64 @@ more than one that does not.
 
 ## F2a — filesystem, path and matching preparation
 
-**`filesystem_prepared: true`.** All 316 operations on the filesystem roster are
-prepared by a runnable case, witnessed by a rust-gated artifact, or removed by a
-reviewed ledger entry: 301 prepared, 8 witnessed, 7 exempt, none pending.
+**`filesystem_prepared: false`.** Of 316 filesystem operations, 299 are
+prepared by a runnable case, 8 witnessed and 7 exempt. Two remain pending:
+`nativepath/realpath_linux.go:Realpath` and `nativepath/eintr_unix.go:ignoringEINTR`.
+They share the Linux procfs case, which cannot execute on this Darwin host.
 
-359 cases across ten probe groups plus the carried matchFiles renderer, every
-one with a native observation from the pinned packages and a classified result.
+359 cases across ten probe groups plus the carried matchFiles renderer: 358
+have native observations and one records its native host limitation. Missing
+Rust implementations never turn an unavailable native observation into a
+prepared result.
 
-| Group | Cases | match | not_impl | different |
-| --- | ---: | ---: | ---: | ---: |
-| tspath | 46 | 13 | 30 | 3 |
-| vfsmatch | 22 | 20 | 1 | 1 |
-| cachedvfs | 32 | 1 | 30 | 1 |
-| vfstest | 19 | 0 | 17 | 2 |
-| wrapvfs | 28 | 0 | 28 | 0 |
-| iovfs | 16 | 0 | 16 | 0 |
-| vfsmock | 10 | 0 | 10 | 0 |
-| osvfs | 23 | 0 | 23 | 0 |
-| glob | 10 | 0 | 10 | 0 |
-| symlinks | 11 | 0 | 11 | 0 |
-| matchFiles | 142 | 0 | 142 | 0 |
-| **total** | **359** | **34** | **318** | **7** |
+| Group | Cases | match | not_impl | different | native_unavailable |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| tspath | 46 | 13 | 30 | 3 | 0 |
+| vfsmatch | 22 | 20 | 1 | 1 | 0 |
+| cachedvfs | 32 | 1 | 30 | 1 | 0 |
+| vfstest | 19 | 0 | 17 | 2 | 0 |
+| wrapvfs | 28 | 0 | 28 | 0 | 0 |
+| iovfs | 16 | 0 | 16 | 0 | 0 |
+| vfsmock | 10 | 0 | 10 | 0 | 0 |
+| osvfs | 23 | 0 | 22 | 0 | 1 |
+| glob | 10 | 0 | 10 | 0 | 0 |
+| symlinks | 11 | 0 | 11 | 0 | 0 |
+| matchFiles | 142 | 0 | 142 | 0 | 0 |
+| **total** | **359** | **34** | **317** | **7** | **1** |
 
 Zero harness failures. The seven `different` rows are real divergences between
-the port and the pin, listed below. The 318 `not_implemented` rows are the
+the port and the pin, listed below. The 317 `not_implemented` rows are the
 honest preparation-time answer for a surface the port has barely begun: there is
 no `tsr_glob`, no cached, tracking, wrapping or mock filesystem adapter, no
 symlink cache reachable from outside `tsr_compiler`, and no baseline renderer.
 
 `inventory --check` publishes `filesystem_prepared` alongside `leaves_prepared`,
 and each is false while any operation on that step's roster is neither prepared,
-witnessed nor exempted, or while that step's ledger does not validate.
+witnessed nor exempted, or while that step's ledger does not validate. F2a also
+requires every one of its 142 output cases to remain prepared, with the native
+rendering authenticated and either exact or individually excepted. Those cases
+have no operation links, so an operation-only count cannot certify them.
+
+### Review corrections
+
+The driver now carries a handler-owned missing-operation identity in its result;
+it no longer copies an arbitrary request label. A mutation of `vfsmatch.Usage`
+to request the implemented `IsImplicitGlob` reproduced the old false absence
+claim. The regression now requires `Usage.String` as the missing identity.
+Group-wide gaps validate identities against their reviewed entry points, and
+case-specific gaps carry explicit identities. All frozen filesystem gap rows
+were exercised through the Rust driver. `record` rejects unclaimed identities
+before writing, including single-operation cases; the pilot now emits exact
+identities itself instead of relying on a guessing fallback.
+
+A fresh filesystem capture under `target/pr42-review-fixes/filesystem` preserves
+all 34 matches and seven differences. Its only classification change is the
+Linux case above. The native merge preserves all unavailable reasons so an
+earlier probe's generic decline cannot hide the owning probe's platform reason.
+The frozen native results, case manifest and generated preparation views were
+refreshed. Targeted validation: four Rust driver tests, filesystem-harness
+clippy with warnings denied, and 143 Phase 1 Python tests. No compiler corpus or
+performance producers were rerun.
 
 The roster machinery is no longer written for one step. It is written once over
 `STEP_PACKAGES`, so F2a is held to F1a's bar rather than getting a weaker gate

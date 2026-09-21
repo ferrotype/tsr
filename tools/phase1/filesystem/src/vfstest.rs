@@ -242,7 +242,9 @@ fn missing_for(request: &Value) -> Outcome {
         .and_then(Value::as_str)
         .unwrap_or_default();
     match MISSING.iter().find(|(name, _, _)| *name == operation) {
-        Some((authority, signature, home)) => Outcome::missing(authority, signature, home),
+        Some((authority, signature, home)) => {
+            Outcome::missing(*authority, authority, signature, home)
+        }
         // A gap has to name a real operation. Inventing a record for an
         // operation nobody read would be exactly the over-attribution this
         // step exists to prevent.

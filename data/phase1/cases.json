@@ -5293,10 +5293,7 @@
       "family": "filesystem",
       "host_applicability": "host-specific: linux only, by realpath_linux.go having no build constraint while realpath_other.go excludes linux. On this darwin capture the row is native_unavailable and is NOT replaced by the darwin answer: one host's results never certify the other.",
       "id": "filesystem/osvfs/nativepath-realpath-linux-procfs",
-      "last_result": "not_implemented",
-      "missing_operations": [
-        "tsc/internal/nativepath/realpath_linux.go:Realpath"
-      ],
+      "last_result": "native_unavailable",
       "native_authority": "tools/phase1/filesystem probes against the pinned packages",
       "operation_actions": {
         "realpath": [

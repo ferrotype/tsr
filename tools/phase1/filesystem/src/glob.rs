@@ -123,6 +123,25 @@ const VOCABULARY: &[(&str, &[&str])] = &[
     ("use_nil", &[]),
 ];
 
+// Missing entry points, qualified by the subject that owns them.
+const MISSING_OPERATIONS: &[(&str, &str)] = &[
+    ("glob.Glob", "tsc/internal/glob/glob.go:Glob.Match"),
+    ("glob.Glob", "tsc/internal/glob/glob.go:Glob.String"),
+    ("glob.Glob", "tsc/internal/glob/glob.go:Parse"),
+    ("glob.element", "tsc/internal/glob/glob.go:charRange.String"),
+    ("glob.match", "tsc/internal/glob/glob.go:match"),
+    ("glob.parse", "tsc/internal/glob/glob.go:parse"),
+    (
+        "glob.parseLiteral",
+        "tsc/internal/glob/glob.go:Glob.parseLiteral",
+    ),
+    (
+        "glob.readRangeRune",
+        "tsc/internal/glob/glob.go:readRangeRune",
+    ),
+    ("glob.split", "tsc/internal/glob/glob.go:split"),
+];
+
 pub fn observe(request: &Value) -> Option<Outcome> {
     let (_, authority, signature, home) = MISSING
         .iter()
@@ -130,7 +149,13 @@ pub fn observe(request: &Value) -> Option<Outcome> {
     if let Err(problem) = check(request) {
         return Some(Outcome::Failed(problem));
     }
-    Some(Outcome::missing(authority, signature, home))
+    Some(crate::api::missing_for_subject(
+        request,
+        MISSING_OPERATIONS,
+        authority,
+        signature,
+        home,
+    ))
 }
 
 fn check(request: &Value) -> Result<(), String> {

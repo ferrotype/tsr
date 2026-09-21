@@ -86,10 +86,107 @@ const MISSING: &[(&str, &str, &str, &str)] = &[
       crates/ for wrapvfs and Replacements finds nothing"),
 ];
 
+// Missing entry points, qualified by the subject that owns them.
+const MISSING_OPERATIONS: &[(&str, &str)] = &[
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.AppendFile",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Chtimes",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.FileExists",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.GetAccessibleEntries",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.ReadFile",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Realpath",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Remove",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.Stat",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.UseCaseSensitiveFileNames",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WalkDir",
+    ),
+    (
+        "trackingvfs.FS",
+        "tsc/internal/vfs/trackingvfs/trackingvfs.go:FS.WriteFile",
+    ),
+    ("wrapvfs.Wrap", "tsc/internal/vfs/wrapvfs/wrapvfs.go:Wrap"),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.AppendFile",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Chtimes",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.FileExists",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.GetAccessibleEntries",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.ReadFile",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Realpath",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Remove",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.Stat",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.UseCaseSensitiveFileNames",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WalkDir",
+    ),
+    (
+        "wrapvfs.Wrap",
+        "tsc/internal/vfs/wrapvfs/wrapvfs.go:wrappedFS.WriteFile",
+    ),
+];
+
 pub fn observe(request: &Value) -> Option<Outcome> {
     let subject = crate::api::subject(request);
-    MISSING
-        .iter()
-        .find(|(name, ..)| *name == subject)
-        .map(|(_, authority, signature, home)| Outcome::missing(authority, signature, home))
+    let (_, authority, signature, home) = MISSING.iter().find(|(name, ..)| *name == subject)?;
+    Some(crate::api::missing_for_subject(
+        request,
+        MISSING_OPERATIONS,
+        authority,
+        signature,
+        home,
+    ))
 }

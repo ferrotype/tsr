@@ -258,7 +258,7 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         .get("operation")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let Some((_, authority, signature, home)) =
+    let Some((identity, authority, signature, home)) =
         MISSING.iter().find(|(id, _, _, _)| *id == operation)
     else {
         return Some(Outcome::Failed(format!(
@@ -266,5 +266,5 @@ pub fn observe(request: &Value) -> Option<Outcome> {
              fifteen operations of tsc/internal/vfs/iovfs/iofs.go"
         )));
     };
-    Some(Outcome::missing(authority, signature, home))
+    Some(Outcome::missing(*identity, authority, signature, home))
 }

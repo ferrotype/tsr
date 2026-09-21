@@ -17,6 +17,7 @@ use tsr_vfs::MemoryBuilder;
 /// the identity the gap queue needs; none of them is emulated here.
 struct Missing {
     operation: &'static str,
+    missing_identity: &'static str,
     go_authority: &'static str,
     intended_signature: &'static str,
     production_home: &'static str,
@@ -25,6 +26,7 @@ struct Missing {
 const MISSING: &[Missing] = &[
     Missing {
         operation: "tsoptions.parseCommandLine",
+        missing_identity: "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
         go_authority: "tsc/internal/tsoptions/commandlineparser.go:ParseCommandLine",
         intended_signature:
             "pub fn parse_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> ParsedCommandLine",
@@ -32,6 +34,7 @@ const MISSING: &[Missing] = &[
     },
     Missing {
         operation: "tsoptions.parseBuildCommandLine",
+        missing_identity: "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
         go_authority: "tsc/internal/tsoptions/commandlineparser.go:ParseBuildCommandLine",
         intended_signature:
             "pub fn parse_build_command_line(args: &[JsString], host: &dyn ParseConfigHost) -> ParsedBuildCommandLine",
@@ -39,12 +42,14 @@ const MISSING: &[Missing] = &[
     },
     Missing {
         operation: "json.marshalOrdered",
+        missing_identity: "tsc/internal/json/json.go:Marshal",
         go_authority: "tsc/internal/json/json.go:Marshal",
         intended_signature: "pub fn marshal(value: &OrderedValue, options: MarshalOptions) -> Vec<u8>",
         production_home: "no dedicated Rust home; order-sensitive readers live in their consumers",
     },
     Missing {
         operation: "locale.selectTranslation",
+        missing_identity: "tsc/internal/locale/locale.go:Parse",
         go_authority: "tsc/internal/locale/locale.go",
         intended_signature: "pub fn select(requested: &str) -> Option<Translation>",
         production_home: "no Rust home at this pin",
@@ -128,7 +133,7 @@ fn observe(request: &Value) -> Map<String, Value> {
         row.insert(
             "missing_operation".into(),
             json!({
-                "operation": missing.operation,
+                "operation": missing.missing_identity,
                 "go_authority": missing.go_authority,
                 "intended_signature": missing.intended_signature,
                 "production_home": missing.production_home,

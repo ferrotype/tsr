@@ -289,10 +289,10 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         .get("operation")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    if let Some((_, authority, signature, home)) =
+    if let Some((identity, authority, signature, home)) =
         MISSING.iter().find(|(name, ..)| *name == operation)
     {
-        return Some(Outcome::missing(authority, signature, home));
+        return Some(Outcome::missing(*identity, authority, signature, home));
     }
     Some(match replay(actions(request)) {
         Ok(rows) => Outcome::Observed(ordered(rows)),

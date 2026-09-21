@@ -10,6 +10,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -220,6 +221,19 @@ class ComparisonTests(unittest.TestCase):
         report = capture.compare(self.build("missing", rows))
         self.assertEqual(report["counts"]["not_implemented"], 1)
         self.assertEqual(report["required_non_match"], 1)
+
+    def test_missing_rust_cannot_hide_an_unavailable_native_observation(self):
+        rows = [{"case": "a", "rust": {"result": "not_implemented", "missing_operation": {
+            "operation": "actual.missing", "go_authority": "pin.go:Missing",
+            "intended_signature": "missing()", "production_home": "missing.rs"}}}]
+        native = [{"case": "a", "operation": "vfsmatch.readDirectory",
+                   "result": "native_unavailable", "reason": "requires Linux"}]
+        self.with_inventory(["a"])
+        report = capture.compare(self.build("unavailable", rows, native_rows=native))
+        self.assertEqual(report["counts"]["native_unavailable"], 1)
+        self.assertEqual(report["counts"]["not_implemented"], 0)
+        self.assertIn("requires Linux", report["rows"][0]["reason"])
+        self.assertEqual(report["rows"][0]["missing_operation"]["operation"], "actual.missing")
 
     def test_harness_failure_invalidates_the_capture(self):
         rows = [{"case": "a", "native": {"files": []},
@@ -1338,7 +1352,9 @@ class RecordedResultTests(unittest.TestCase):
         """
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
         leaves = [c for c in cases if c.get("family") == "leaves"]
-        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows = [{"case": c["id"], "result": c["last_result"],
+                 **({"missing_operation": {"operation": c["missing_operations"][0]}}
+                    if c["last_result"] == "not_implemented" else {})} for c in leaves]
         rows[1:] = [{"case": r["case"], "result": "not_run"} for r in rows[1:]]
 
         def fake_compare(directory, require):
@@ -1359,7 +1375,9 @@ class RecordedResultTests(unittest.TestCase):
         """The `partial` flag is not the only way an unrun row can arrive."""
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
         leaves = [c for c in cases if c.get("family") == "leaves"]
-        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows = [{"case": c["id"], "result": c["last_result"],
+                 **({"missing_operation": {"operation": c["missing_operations"][0]}}
+                    if c["last_result"] == "not_implemented" else {})} for c in leaves]
         rows[0] = {"case": rows[0]["case"], "result": "not_run"}
 
         def fake_compare(directory, require):
@@ -1376,12 +1394,41 @@ class RecordedResultTests(unittest.TestCase):
         self.assertIn("were not run", str(caught.exception))
         self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before)
 
+    def test_record_refuses_unknown_identity_without_guessing_or_writing(self):
+        for claimed in (["known"], ["known", "also_known"]):
+            with self.subTest(claimed=claimed), tempfile.TemporaryDirectory() as tmp:
+                path = Path(tmp) / "cases.json"
+                path.write_text(json.dumps({"cases": [{"id": "a", "family": "filesystem",
+                    "operations": claimed, "last_result": "match"}]}))
+                before = path.read_bytes()
+                report = {"family": "filesystem", "rows": [{"case": "a",
+                    "result": "not_implemented", "missing_operation": {"operation": "wrong"}}]}
+                with patch.object(phase1, "CASES", path), \
+                        patch.object(capture, "compare", return_value=report):
+                    with self.assertRaisesRegex(ValueError, "unclaimed missing operation"):
+                        phase1.record_results(Path(tmp), True)
+                self.assertEqual(path.read_bytes(), before)
+
+    def test_record_preserves_only_the_gap_identified_by_the_driver(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cases.json"
+            path.write_text(json.dumps({"cases": [{"id": "a", "family": "filesystem",
+                "operations": ["present", "absent"], "last_result": "different"}]}))
+            report = {"family": "filesystem", "rows": [{"case": "a",
+                "result": "not_implemented", "missing_operation": {"operation": "absent"}}]}
+            with patch.object(phase1, "CASES", path), \
+                    patch.object(capture, "compare", return_value=report):
+                phase1.record_results(Path(tmp), True)
+            self.assertEqual(json.loads(path.read_text())["cases"][0]["missing_operations"], ["absent"])
+
     def test_record_reports_what_it_would_change_without_writing(self):
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
         leaves = [c for c in cases["cases"] if c.get("family") == "leaves"]
         self.assertTrue(leaves)
         flipped = "different" if leaves[0]["last_result"] != "different" else "match"
-        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows = [{"case": c["id"], "result": c["last_result"],
+                 **({"missing_operation": {"operation": c["missing_operations"][0]}}
+                    if c["last_result"] == "not_implemented" else {})} for c in leaves]
         rows[0] = {"case": leaves[0]["id"], "result": flipped}
 
         def fake_compare(directory, require):
@@ -1400,6 +1447,39 @@ class RecordedResultTests(unittest.TestCase):
             {"case": leaves[0]["id"], "was": leaves[0]["last_result"], "now": flipped}
         ])
         self.assertEqual(result["cases"], len(leaves))
+
+
+class FilesystemPreparationTests(unittest.TestCase):
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_current_baselines_keep_exact_and_excepted_counts_separate(self):
+        report = baselines.matchfiles_preparation(self.cases)
+        self.assertEqual(report["problems"], [])
+        self.assertEqual(report["exact_outputs"], 68)
+        self.assertEqual(report["excepted_outputs"], 74)
+
+    def test_removing_output_cases_cannot_leave_filesystem_prepared(self):
+        self.cases["cases"] = [c for c in self.cases["cases"] if not c.get("baseline")]
+        report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
+        self.assertFalse(report["complete"])
+        self.assertEqual(len(report["outputs"]["problems"]), 142)
+
+    def test_an_excepted_output_still_needs_a_prepared_comparison(self):
+        case = next(c for c in self.cases["cases"] if c.get("baseline"))
+        case["last_result"] = "not_run"
+        report = baselines.matchfiles_preparation(self.cases)
+        self.assertFalse(report["complete"])
+        self.assertTrue(any(case["baseline"] in problem for problem in report["problems"]))
+
+    def test_a_gap_without_identity_cannot_prepare_a_step(self):
+        case = next(c for c in self.cases["cases"]
+                    if c["family"] == "filesystem" and c.get("missing_operations"))
+        case.pop("missing_operations")
+        report = scope.leaf_preparation(self.scope, self.cases, "filesystem")
+        self.assertFalse(report["complete"])
+        self.assertTrue(any(case["id"] in problem for problem in report["gap_problems"]))
 
 
 class RosterLedgerTests(unittest.TestCase):

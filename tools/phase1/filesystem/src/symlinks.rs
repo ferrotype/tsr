@@ -74,8 +74,9 @@ const HOME: &str = "crates/tsr_core/src/symlinks.rs (absent). PORTS.toml:5339-53
 /// missing surface and the gap it needs named is different. Each row names the
 /// pinned Go authority, the signature the port is expected to carry and the
 /// file that does not have it yet.
-const MISSING: &[(&str, &str, &str)] = &[
+const MISSING: &[(&str, &str, &str, &str)] = &[
     ("filesystem/symlinks/the-constructor-captures-cwd-and-case-sensitivity-for-the-cache-s-lifetime",
+     "tsc/internal/symlinks/knownsymlinks.go:NewKnownSymlink",
      "tsc/internal/symlinks/knownsymlinks.go:NewKnownSymlink (:74-79), whose captured cwd and \
       useCaseSensitiveFileNames (:27-28) are read by ProcessResolution (:97, :98, :100, :107) and \
       SetFile (:67)",
@@ -86,6 +87,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       KnownSymlinks::default() and passes cwd and the case flag per call instead (:43, :83), so \
       two caches cannot disagree about one input -- which is the whole observation here"),
     ("filesystem/symlinks/has-directory-appends-the-separator-and-set-directory-does-not",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.HasDirectory",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.HasDirectory (:31-34) beside \
       KnownSymlinks.SetDirectory (:55-63)",
      "pub fn has_directory(&self, symlink_path: &Path) -> bool taking an ALREADY canonical path, \
@@ -95,6 +97,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       pub(crate), and it calls to_path itself (:84) where the pin canonicalises nothing, so a \
       caller handing it a raw relative path gets an answer the pin would not give"),
     ("filesystem/symlinks/the-reverse-directory-index-is-written-once-and-never-corrected",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory (:55-63) and \
       KnownSymlinks.DirectoriesByRealpath (:41-43)",
      "pub fn set_directory(&self, symlink: &[u8], symlink_path: &Path, \
@@ -105,6 +108,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       rule, but `directories` is a BTreeSet<JsString> (:11) with no value, so there is no forward \
       entry to overwrite and the divergence this case pins cannot arise"),
     ("filesystem/symlinks/a-nil-link-is-present-and-blocks-the-reverse-index-forever",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetDirectory's nil branch (:56-62), \
       read back through KnownSymlinks.HasDirectory (:31-34) and KnownSymlinks.Directories (:37-39)",
      "the same set_directory over a forward map that can hold an ABSENT link -- \
@@ -114,6 +118,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       key-presence guard. crates/tsr_compiler/src/checker_module_specifiers.rs:11 stores no value \
       at all, so absence is unrepresentable and the poisoned-key state has no Rust expression"),
     ("filesystem/symlinks/set-file-canonicalises-only-the-reverse-key",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetFile",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetFile (:65-72), \
       KnownSymlinks.Files (:46-48) and KnownSymlinks.FilesByRealpath (:51-53)",
      "pub fn set_file(&self, symlink: &[u8], symlink_path: &Path, realpath: &[u8]) storing the \
@@ -124,6 +129,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       crates/tsr_compiler/src/checker_module_specifiers.rs:10-13 has no file index of any kind \
       and nothing in crates/ records one"),
     ("filesystem/symlinks/process-resolution-records-the-file-even-when-it-guesses-no-directory",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution (:93-112), whose \
       SetFile call at :97 precedes the guess at :98 and is not conditional on it",
      "pub fn process_resolution(&self, original_path: &[u8], resolved_file_name: &[u8]) that \
@@ -133,6 +139,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       component was consumed, so the file the pin records in exactly that situation is never \
       recorded. It is also pub(crate) and takes cwd and the case flag as arguments"),
     ("filesystem/symlinks/the-common-ancestor-walk-stops-at-the-package-boundary",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.guessDirectorySymlink",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.guessDirectorySymlink (:114-130)",
      "fn guess_directory_symlink(&self, a: &[u8], b: &[u8], cwd: &[u8]) -> (JsString, JsString) \
       returning the two common ancestors, or two EMPTY strings when the walk consumed nothing, \
@@ -141,6 +148,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       `process` and keeps only a bool (:53, :63), so nothing in the tree can answer the two paths \
       this operation returns"),
     ("filesystem/symlinks/the-package-boundary-test-folds-node-modules-but-not-the-scope-sigil",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.isNodeModulesOrScopedPackageDirectory",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.isNodeModulesOrScopedPackageDirectory \
       (:132-134)",
      "fn is_node_modules_or_scoped_package_directory(&self, s: &[u8]) -> bool, total, false on an \
@@ -149,6 +157,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       closure `is_package` inside `process`, with the same two tests and the same asymmetry, but \
       it is a local binding rather than a callable member and it reads a per-call case flag"),
     ("filesystem/symlinks/resolutions-are-drained-modules-first-with-a-nil-source-file",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetSymlinksFromResolutions",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.SetSymlinksFromResolutions (:81-91)",
      "pub fn set_symlinks_from_resolutions(&self, for_each_resolved_module: &dyn Fn(&mut dyn \
       FnMut(&ResolvedModule, &[u8], ResolutionMode, &Path), Option<&SourceFile>), \
@@ -161,6 +170,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       program.resolutions() then program.type_resolutions() in the same order, but it takes no \
       callbacks at all, so the seam this operation exists to expose is not present"),
     ("filesystem/symlinks/the-ignored-path-test-runs-on-the-canonical-path-and-spares-the-file-half",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution's ignored-path guard \
       (:100-101), which tests tspath.ContainsIgnoredPath against the CANONICALISED symlink path \
       and guards only the SetDirectory call",
@@ -172,6 +182,7 @@ const MISSING: &[(&str, &str, &str)] = &[
       to the same canonical key, but it reaches that line only after the early return at :65-67 \
       and it has no file record to spare"),
     ("filesystem/symlinks/the-four-accessors-hand-back-the-cache-s-own-storage",
+     "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.Directories",
      "tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.Directories (:37-39), \
       KnownSymlinks.DirectoriesByRealpath (:41-43), KnownSymlinks.Files (:46-48) and \
       KnownSymlinks.FilesByRealpath (:51-53), each of which returns &cache.<field>",
@@ -191,7 +202,8 @@ pub fn observe(request: &Value) -> Option<Outcome> {
         return None;
     }
     let case = request.get("case").and_then(Value::as_str).unwrap_or("");
-    let Some((_, authority, signature)) = MISSING.iter().find(|(id, ..)| *id == case) else {
+    let Some((_, identity, authority, signature)) = MISSING.iter().find(|(id, ..)| *id == case)
+    else {
         // The request schedule and this module disagree. That is a harness
         // failure, not an observation: a generic gap record here would let a
         // case nobody described still report a tidy result.
@@ -200,5 +212,5 @@ pub fn observe(request: &Value) -> Option<Outcome> {
              record of the gap it needs named"
         )));
     };
-    Some(Outcome::missing(authority, signature, HOME))
+    Some(Outcome::missing(*identity, authority, signature, HOME))
 }
