@@ -1,0 +1,6155 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "equate_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "equate_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "equate_ci",
+          "right_hex": "62"
+        },
+        {
+          "left_hex": "616263",
+          "op": "equate_ci",
+          "right_hex": "61626364"
+        },
+        {
+          "left_hex": "73",
+          "op": "equate_ci",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "53",
+          "op": "equate_ci",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "6b",
+          "op": "equate_ci",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "4b",
+          "op": "equate_ci",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "7373",
+          "op": "equate_ci",
+          "right_hex": "c39f"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "equate_ci",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "69",
+          "op": "equate_ci",
+          "right_hex": "c4b0"
+        },
+        {
+          "left_hex": "69",
+          "op": "equate_ci",
+          "right_hex": "c4b1"
+        },
+        {
+          "left_hex": "41e284aa62",
+          "op": "equate_ci",
+          "right_hex": "614b42"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equate_ci",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equate_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equate_ci",
+          "right_hex": "ff"
+        },
+        {
+          "left_hex": "c3",
+          "op": "equate_ci",
+          "right_hex": "c3a9"
+        }
+      ],
+      "case": "leaves/text/equate-case-insensitive-fold",
+      "discriminates": "EquateStringCaseInsensitive is Go simple folding (strings.EqualFold), not JavaScript casing and not byte equality: it accepts s/\u017f and k/\u212a, rejects i/\u0130 and i/\u0131 that a JS or Turkish casing would join, and decodes every malformed byte as one U+FFFD, so \\xff folds equal to \\xfe and to the encoded replacement character.",
+      "operation": "tsc/internal/stringutil/compare.go:EquateStringCaseInsensitive",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "616263",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "414243",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "41315f7a",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "ce91cea3",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "ce91cea3ce92",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "ce91cea32e",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "ce91cea3cc81",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "cea3",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "cea3cea3",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "c4b0",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "c39f",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "efac81",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "c785",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "e284aa",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "eda080",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "edb080",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "61eda08062",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "ff",
+          "op": "to_lower_js"
+        },
+        {
+          "left_hex": "61ff62",
+          "op": "to_lower_js"
+        }
+      ],
+      "case": "leaves/text/to-lower-js",
+      "discriminates": "ToLowerJS is String.prototype.toLowerCase, not Go simple lowering: Final_Sigma context turns the trailing sigma of \u0391\u03a3 into \u03c2 while \u0391\u03a3\u0392 keeps \u03c3, a following Case_Ignorable code point ('.' or U+0301) is skipped rather than counted as a following cased letter, so \u0391\u03a3. and \u0391\u03a3\u0301 still end in \u03c2, and \u0130 expands to i plus U+0307. A lone-surrogate sentinel survives byte for byte while a malformed byte is repaired to U+FFFD, so the two byte classes must not be conflated.",
+      "operation": "tsc/internal/stringutil/js_case.go:ToLowerJS",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "616263",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "414243",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "c39f",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "e1ba9e",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "efac81",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "c785",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "c4b1",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "c4b0",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "cf82",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "cf83",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "e284aa",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "eda080",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "61edb08062",
+          "op": "to_upper_js"
+        },
+        {
+          "left_hex": "ff",
+          "op": "to_upper_js"
+        }
+      ],
+      "case": "leaves/text/to-upper-js",
+      "discriminates": "ToUpperJS is a full case mapping: \u00df becomes the two characters SS and \ufb01 becomes FI, which Go's simple unicode.ToUpper does not do, and \u0131 uppercases to I while U+1E9E is already upper. Both final and medial sigma map to \u03a3, so the Final_Sigma context that ToLowerJS tracks has no upper counterpart. Lone surrogates are copied verbatim.",
+      "operation": "tsc/internal/stringutil/js_case.go:ToUpperJS",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "41",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "414243",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "c38978",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "ce91cea3",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "c4b078",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "e284aa78",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "c39f",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "ff41",
+          "op": "lower_first_char"
+        },
+        {
+          "left_hex": "eda08041",
+          "op": "lower_first_char"
+        }
+      ],
+      "case": "leaves/text/lower-first-char",
+      "discriminates": "LowerFirstChar uses plain UTF-8 decoding and Go simple lowering, so it differs from ToLowerJS on exactly the inputs that matter: \u0130 becomes i with no combining dot, \u0391\u03a3 lowers only the first rune, and a malformed or lone-surrogate leading byte is consumed one byte at a time and replaced by the three bytes of U+FFFD, growing the string. The empty string returns unchanged because DecodeRuneInString reports width zero.",
+      "operation": "tsc/internal/stringutil/util.go:LowerFirstChar",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "count": 5,
+          "left_hex": "",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 0,
+          "left_hex": "",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": -1,
+          "left_hex": "",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 0,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": -1,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 1,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 2,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 3,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 4,
+          "left_hex": "616263",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 1,
+          "left_hex": "c3a9",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 2,
+          "left_hex": "c3a9",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 2,
+          "left_hex": "c3a9c3a9c3a9",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 1,
+          "left_hex": "f09d92b379",
+          "op": "truncate_by_runes"
+        },
+        {
+          "count": 3,
+          "left_hex": "ffff6162",
+          "op": "truncate_by_runes"
+        }
+      ],
+      "case": "leaves/text/truncate-by-runes",
+      "discriminates": "The early return compares the BYTE length against a RUNE budget, so 'abc' with 4 returns early while '\u00e9\u00e9\u00e9' with 2 truncates and '\u00e9' with 1 returns whole. A non-positive budget yields the empty string even for empty input, and each malformed byte counts as one rune, so \\xff\\xffab with 3 keeps three bytes.",
+      "operation": "tsc/internal/stringutil/util.go:TruncateByRunes",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "eda080",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "edafbf",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "edb080",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "edbfbf",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "ed9fbf",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "eda0",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "eda07f",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "e282ac",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "41",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "ff",
+          "op": "decode_js_rune"
+        },
+        {
+          "left_hex": "ed",
+          "op": "decode_js_rune"
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 55296
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 56319
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 56320
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 57343
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 65
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 66615
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 65533
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 2047
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 2048
+        },
+        {
+          "op": "encode_js_rune",
+          "rune": 1114112
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 55295
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 55295
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 55295
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 55296
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 55296
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 55296
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 56319
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 56319
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 56319
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 56320
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 56320
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 56320
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 57343
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 57343
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 57343
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 57344
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 57344
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 57344
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 65
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 65
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 65
+        },
+        {
+          "op": "is_surrogate",
+          "rune": 1114111
+        },
+        {
+          "op": "is_high_surrogate",
+          "rune": 1114111
+        },
+        {
+          "op": "is_low_surrogate",
+          "rune": 1114111
+        },
+        {
+          "op": "surrogate_pair_to_code_point",
+          "rune": 55297,
+          "rune2": 56375
+        },
+        {
+          "op": "surrogate_pair_to_code_point",
+          "rune": 55296,
+          "rune2": 56320
+        },
+        {
+          "op": "surrogate_pair_to_code_point",
+          "rune": 56319,
+          "rune2": 57343
+        },
+        {
+          "op": "surrogate_pair_to_code_point",
+          "rune": 55297,
+          "rune2": 65
+        },
+        {
+          "op": "surrogate_pair_to_code_point",
+          "rune": 65,
+          "rune2": 56375
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 66615
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 65536
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 1114111
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 65
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 65535
+        },
+        {
+          "op": "code_point_to_surrogate_pair",
+          "rune": 1114112
+        }
+      ],
+      "case": "leaves/text/js-string-rune-codec",
+      "discriminates": "The sentinel window is ED A0..BF 80..BF, so ED 9F BF still decodes as ordinary UTF-8 (U+D7FF) while ED A0 80 decodes as U+D800 with width 3, and a truncated or out-of-window sequence falls back to utf8.DecodeRuneInString's one-byte RuneError. Encoding a non-surrogate above U+10FFFF yields U+FFFD, and an ill-formed surrogate pair yields RuneError instead of a computed code point.",
+      "operation": "tsc/internal/stringutil/util.go:DecodeJSStringRune",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "616263",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "eda081edb0b7",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "eda081",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "edb0b7",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "eda081eda081",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "eda08141edb0b7",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "78eda081edb0b779",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "ed",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "c3ad",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "ed9fbf",
+          "op": "combine_surrogate_pairs"
+        },
+        {
+          "left_hex": "edb0b7eda081",
+          "op": "combine_surrogate_pairs"
+        }
+      ],
+      "case": "leaves/text/combine-surrogate-pairs",
+      "discriminates": "The fast path keys on the byte 0xED alone, so a plain U+D7FF (ED 9F BF) and a bare 0xED take the slow path and must come back unchanged. Only an adjacent high-then-low sentinel pair merges: a low followed by a high, a high followed by a letter and an unpaired half are all preserved, so a caller cannot rely on the output being valid UTF-8.",
+      "operation": "tsc/internal/stringutil/util.go:CombineSurrogatePairs",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "compare_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "compare_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "compare_ci_then_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "comparer_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "comparer_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "equate_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "equality_comparer_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "equality_comparer_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "compare_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "compare_ci_then_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "equate_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "equality_comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "",
+          "op": "equality_comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci_then_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "equate_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_ci",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_cs",
+          "right_hex": ""
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci_then_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "equate_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "compare_ci_then_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "comparer_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "equate_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "61",
+          "op": "equality_comparer_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "41",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "compare_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "compare_ci_then_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "equate_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "equality_comparer_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "41",
+          "op": "equality_comparer_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "616263",
+          "op": "compare_ci",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "compare_cs",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "compare_ci_then_cs",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "comparer_ci",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "comparer_cs",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "equate_cs",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "equality_comparer_ci",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "616263",
+          "op": "equality_comparer_cs",
+          "right_hex": "616264"
+        },
+        {
+          "left_hex": "73",
+          "op": "compare_ci",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "compare_cs",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "compare_ci_then_cs",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "comparer_ci",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "comparer_cs",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "equate_cs",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "equality_comparer_ci",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "73",
+          "op": "equality_comparer_cs",
+          "right_hex": "c5bf"
+        },
+        {
+          "left_hex": "6b",
+          "op": "compare_ci",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "compare_cs",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "compare_ci_then_cs",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "comparer_ci",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "comparer_cs",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "equate_cs",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "equality_comparer_ci",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "6b",
+          "op": "equality_comparer_cs",
+          "right_hex": "e284aa"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "compare_ci",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "compare_cs",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "compare_ci_then_cs",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "comparer_ci",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "comparer_cs",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "equate_cs",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "equality_comparer_ci",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "c3a9",
+          "op": "equality_comparer_cs",
+          "right_hex": "c389"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "compare_ci",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "compare_cs",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "compare_ci_then_cs",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "comparer_ci",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "comparer_cs",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "equate_cs",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "equality_comparer_ci",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "61cc81",
+          "op": "equality_comparer_cs",
+          "right_hex": "c3a1"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_ci",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_cs",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_ci_then_cs",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "comparer_ci",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "comparer_cs",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equate_cs",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equality_comparer_ci",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equality_comparer_cs",
+          "right_hex": "fe"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "compare_ci_then_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "comparer_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "comparer_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equate_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equality_comparer_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ff",
+          "op": "equality_comparer_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "compare_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "compare_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "compare_ci_then_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "comparer_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "comparer_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "equate_cs",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "equality_comparer_ci",
+          "right_hex": "efbfbd"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "equality_comparer_cs",
+          "right_hex": "efbfbd"
+        }
+      ],
+      "case": "leaves/text/string-comparers",
+      "discriminates": "Three contracts over one corpus. Byte comparison keeps \\xff above \\xfe, while CompareStringsCaseInsensitive decodes runes first and calls them equal because both are RuneError - and equal again against the encoded U+FFFD even though the byte lengths differ. It lowercases per rune rather than folding, so s/\u017f stay unequal although EqualFold accepts them; a\u0301 and \u00e1 stay unequal because nothing normalises. The then-sensitive comparer breaks the a/A tie by bytes, and the two selector functions must return exactly those implementations.",
+      "operation": "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitive",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "5f5f537472696e67",
+          "op": "compare_eslint",
+          "right_hex": "466f6f"
+        },
+        {
+          "left_hex": "5f5f537472696e67",
+          "op": "compare_ci",
+          "right_hex": "466f6f"
+        },
+        {
+          "left_hex": "5f5f537472696e67",
+          "op": "compare_cs",
+          "right_hex": "466f6f"
+        },
+        {
+          "left_hex": "5f61",
+          "op": "compare_eslint",
+          "right_hex": "4162"
+        },
+        {
+          "left_hex": "5f61",
+          "op": "compare_ci",
+          "right_hex": "4162"
+        },
+        {
+          "left_hex": "5f61",
+          "op": "compare_cs",
+          "right_hex": "4162"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_eslint",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_eslint",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5b",
+          "op": "compare_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "7b",
+          "op": "compare_eslint",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "7b",
+          "op": "compare_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "7b",
+          "op": "compare_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "60",
+          "op": "compare_eslint",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "60",
+          "op": "compare_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "60",
+          "op": "compare_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5e",
+          "op": "compare_eslint",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5e",
+          "op": "compare_ci",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5e",
+          "op": "compare_cs",
+          "right_hex": "41"
+        },
+        {
+          "left_hex": "5a",
+          "op": "compare_eslint",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5a",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5a",
+          "op": "compare_cs",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5f",
+          "op": "compare_eslint",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5f",
+          "op": "compare_ci",
+          "right_hex": "61"
+        },
+        {
+          "left_hex": "5f",
+          "op": "compare_cs",
+          "right_hex": "61"
+        }
+      ],
+      "case": "leaves/text/eslint-comparer-lowercases",
+      "discriminates": "Correction to an earlier survey: at this pin BOTH case-insensitive comparers lowercase. CompareStringsCaseInsensitive calls unicode.ToLower per rune and the eslint-compatible one calls strings.ToLower, and only the stale doc comment still says uppercase. Seven of the nine pairs invert under an uppercasing implementation, because '_' (0x5F), '[' (0x5B), '^' (0x5E) and '`' (0x60) sit between the ASCII upper and lower letter blocks - the range 91-96 the doc comment names. The last two are the boundary controls that do not invert: '{' (0x7B) sits above both blocks and so stays above every letter either way, and 'Z' vs 'a' answers 1 under both foldings, separating the two case-insensitive comparers from the byte comparer, which answers -1.",
+      "operation": "tsc/internal/stringutil/compare.go:CompareStringsCaseInsensitiveEslintCompatible",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "c38472676572",
+          "op": "has_prefix",
+          "right_hex": "c3a4"
+        },
+        {
+          "enabled": true,
+          "extra_hex": "",
+          "left_hex": "c38472676572",
+          "op": "has_prefix",
+          "right_hex": "c3a4"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "c4b078",
+          "op": "has_prefix",
+          "right_hex": "69"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "616263",
+          "op": "has_prefix",
+          "right_hex": ""
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "616263",
+          "op": "has_prefix",
+          "right_hex": "61626364"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "e282ac616263",
+          "op": "has_prefix",
+          "right_hex": "c3a9"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "414243",
+          "op": "has_prefix",
+          "right_hex": "616263"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "616263c389",
+          "op": "has_suffix",
+          "right_hex": "c3a9"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "73747261c39f65",
+          "op": "has_suffix",
+          "right_hex": "535345"
+        },
+        {
+          "enabled": true,
+          "extra_hex": "",
+          "left_hex": "616263",
+          "op": "has_suffix",
+          "right_hex": ""
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "6162",
+          "op": "has_suffix",
+          "right_hex": "616263"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "",
+          "left_hex": "414243",
+          "op": "has_suffix",
+          "right_hex": "6263"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "61",
+          "left_hex": "6161",
+          "op": "has_prefix_and_suffix",
+          "right_hex": "61"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "61",
+          "left_hex": "61",
+          "op": "has_prefix_and_suffix",
+          "right_hex": "61"
+        },
+        {
+          "enabled": false,
+          "extra_hex": "63",
+          "left_hex": "416243",
+          "op": "has_prefix_and_suffix",
+          "right_hex": "61"
+        },
+        {
+          "enabled": true,
+          "extra_hex": "63",
+          "left_hex": "416243",
+          "op": "has_prefix_and_suffix",
+          "right_hex": "61"
+        },
+        {
+          "enabled": true,
+          "extra_hex": "",
+          "left_hex": "6162",
+          "op": "has_prefix_and_suffix",
+          "right_hex": ""
+        }
+      ],
+      "case": "leaves/text/prefix-suffix-byte-window",
+      "discriminates": "The case-insensitive path folds a BYTE window cut to the affix's byte length, so it can slice a rune in half: '\u0130x' with prefix 'i' compares one byte and is false, and 'stra\u00dfe' with suffix 'SSE' is false because EqualFold is simple folding, not full case folding. The length guard is checked before slicing, and HasPrefixAndSuffixWithoutOverlap rejects 'a' with prefix 'a' and suffix 'a' although each matches on its own.",
+      "operation": "tsc/internal/stringutil/compare.go:HasPrefix",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "op": "identifier_start",
+          "rune": 65
+        },
+        {
+          "op": "identifier_part",
+          "rune": 65
+        },
+        {
+          "op": "identifier_start",
+          "rune": 122
+        },
+        {
+          "op": "identifier_part",
+          "rune": 122
+        },
+        {
+          "op": "identifier_start",
+          "rune": 36
+        },
+        {
+          "op": "identifier_part",
+          "rune": 36
+        },
+        {
+          "op": "identifier_start",
+          "rune": 95
+        },
+        {
+          "op": "identifier_part",
+          "rune": 95
+        },
+        {
+          "op": "identifier_start",
+          "rune": 48
+        },
+        {
+          "op": "identifier_part",
+          "rune": 48
+        },
+        {
+          "op": "identifier_start",
+          "rune": 57
+        },
+        {
+          "op": "identifier_part",
+          "rune": 57
+        },
+        {
+          "op": "identifier_start",
+          "rune": 170
+        },
+        {
+          "op": "identifier_part",
+          "rune": 170
+        },
+        {
+          "op": "identifier_start",
+          "rune": 181
+        },
+        {
+          "op": "identifier_part",
+          "rune": 181
+        },
+        {
+          "op": "identifier_start",
+          "rune": 183
+        },
+        {
+          "op": "identifier_part",
+          "rune": 183
+        },
+        {
+          "op": "identifier_start",
+          "rune": 8472
+        },
+        {
+          "op": "identifier_part",
+          "rune": 8472
+        },
+        {
+          "op": "identifier_start",
+          "rune": 8494
+        },
+        {
+          "op": "identifier_part",
+          "rune": 8494
+        },
+        {
+          "op": "identifier_start",
+          "rune": 6277
+        },
+        {
+          "op": "identifier_part",
+          "rune": 6277
+        },
+        {
+          "op": "identifier_start",
+          "rune": 8204
+        },
+        {
+          "op": "identifier_part",
+          "rune": 8204
+        },
+        {
+          "op": "identifier_start",
+          "rune": 8205
+        },
+        {
+          "op": "identifier_part",
+          "rune": 8205
+        },
+        {
+          "op": "identifier_start",
+          "rune": 1632
+        },
+        {
+          "op": "identifier_part",
+          "rune": 1632
+        },
+        {
+          "op": "identifier_start",
+          "rune": 160
+        },
+        {
+          "op": "identifier_part",
+          "rune": 160
+        },
+        {
+          "op": "identifier_start",
+          "rune": 55296
+        },
+        {
+          "op": "identifier_part",
+          "rune": 55296
+        },
+        {
+          "op": "identifier_start",
+          "rune": 57343
+        },
+        {
+          "op": "identifier_part",
+          "rune": 57343
+        },
+        {
+          "op": "identifier_start",
+          "rune": 65533
+        },
+        {
+          "op": "identifier_part",
+          "rune": 65533
+        },
+        {
+          "op": "identifier_start",
+          "rune": 1114111
+        },
+        {
+          "op": "identifier_part",
+          "rune": 1114111
+        },
+        {
+          "op": "identifier_start",
+          "rune": 1114112
+        },
+        {
+          "op": "identifier_part",
+          "rune": 1114112
+        },
+        {
+          "op": "identifier_start",
+          "rune": 0
+        },
+        {
+          "op": "identifier_part",
+          "rune": 0
+        },
+        {
+          "op": "identifier_start",
+          "rune": -1
+        },
+        {
+          "op": "identifier_part",
+          "rune": -1
+        }
+      ],
+      "case": "leaves/text/unicode-identifier-predicates",
+      "discriminates": "These are the raw generated ID_Start / ID_Continue tables, not the scanner's identifier predicate: '$' is in neither, while '_' and ZWNJ/ZWJ (U+200C-U+200D, which the generated part table carries explicitly) are Continue but not Start, so any implementation that reuses the scanner's start set, which adds '$' and '_' itself, disagrees here. Surrogates, U+FFFD, a code point above U+10FFFF and a negative rune must all answer false rather than panicking or indexing out of range.",
+      "operation": "tsc/internal/stringutil/identifier.go:IsUnicodeIdentifierStart",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "op": "white_space_like",
+          "rune": 32
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 32
+        },
+        {
+          "op": "line_break",
+          "rune": 32
+        },
+        {
+          "op": "white_space_like",
+          "rune": 9
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 9
+        },
+        {
+          "op": "line_break",
+          "rune": 9
+        },
+        {
+          "op": "white_space_like",
+          "rune": 11
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 11
+        },
+        {
+          "op": "line_break",
+          "rune": 11
+        },
+        {
+          "op": "white_space_like",
+          "rune": 12
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 12
+        },
+        {
+          "op": "line_break",
+          "rune": 12
+        },
+        {
+          "op": "white_space_like",
+          "rune": 10
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 10
+        },
+        {
+          "op": "line_break",
+          "rune": 10
+        },
+        {
+          "op": "white_space_like",
+          "rune": 13
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 13
+        },
+        {
+          "op": "line_break",
+          "rune": 13
+        },
+        {
+          "op": "white_space_like",
+          "rune": 133
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 133
+        },
+        {
+          "op": "line_break",
+          "rune": 133
+        },
+        {
+          "op": "white_space_like",
+          "rune": 160
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 160
+        },
+        {
+          "op": "line_break",
+          "rune": 160
+        },
+        {
+          "op": "white_space_like",
+          "rune": 5760
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 5760
+        },
+        {
+          "op": "line_break",
+          "rune": 5760
+        },
+        {
+          "op": "white_space_like",
+          "rune": 6158
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 6158
+        },
+        {
+          "op": "line_break",
+          "rune": 6158
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8192
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8192
+        },
+        {
+          "op": "line_break",
+          "rune": 8192
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8199
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8199
+        },
+        {
+          "op": "line_break",
+          "rune": 8199
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8202
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8202
+        },
+        {
+          "op": "line_break",
+          "rune": 8202
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8203
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8203
+        },
+        {
+          "op": "line_break",
+          "rune": 8203
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8232
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8232
+        },
+        {
+          "op": "line_break",
+          "rune": 8232
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8233
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8233
+        },
+        {
+          "op": "line_break",
+          "rune": 8233
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8239
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8239
+        },
+        {
+          "op": "line_break",
+          "rune": 8239
+        },
+        {
+          "op": "white_space_like",
+          "rune": 8287
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 8287
+        },
+        {
+          "op": "line_break",
+          "rune": 8287
+        },
+        {
+          "op": "white_space_like",
+          "rune": 12288
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 12288
+        },
+        {
+          "op": "line_break",
+          "rune": 12288
+        },
+        {
+          "op": "white_space_like",
+          "rune": 65279
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 65279
+        },
+        {
+          "op": "line_break",
+          "rune": 65279
+        },
+        {
+          "op": "white_space_like",
+          "rune": 65
+        },
+        {
+          "op": "white_space_single_line",
+          "rune": 65
+        },
+        {
+          "op": "line_break",
+          "rune": 65
+        },
+        {
+          "op": "digit",
+          "rune": 48
+        },
+        {
+          "op": "octal_digit",
+          "rune": 48
+        },
+        {
+          "op": "hex_digit",
+          "rune": 48
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 48
+        },
+        {
+          "op": "digit",
+          "rune": 55
+        },
+        {
+          "op": "octal_digit",
+          "rune": 55
+        },
+        {
+          "op": "hex_digit",
+          "rune": 55
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 55
+        },
+        {
+          "op": "digit",
+          "rune": 56
+        },
+        {
+          "op": "octal_digit",
+          "rune": 56
+        },
+        {
+          "op": "hex_digit",
+          "rune": 56
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 56
+        },
+        {
+          "op": "digit",
+          "rune": 57
+        },
+        {
+          "op": "octal_digit",
+          "rune": 57
+        },
+        {
+          "op": "hex_digit",
+          "rune": 57
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 57
+        },
+        {
+          "op": "digit",
+          "rune": 97
+        },
+        {
+          "op": "octal_digit",
+          "rune": 97
+        },
+        {
+          "op": "hex_digit",
+          "rune": 97
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 97
+        },
+        {
+          "op": "digit",
+          "rune": 102
+        },
+        {
+          "op": "octal_digit",
+          "rune": 102
+        },
+        {
+          "op": "hex_digit",
+          "rune": 102
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 102
+        },
+        {
+          "op": "digit",
+          "rune": 103
+        },
+        {
+          "op": "octal_digit",
+          "rune": 103
+        },
+        {
+          "op": "hex_digit",
+          "rune": 103
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 103
+        },
+        {
+          "op": "digit",
+          "rune": 65
+        },
+        {
+          "op": "octal_digit",
+          "rune": 65
+        },
+        {
+          "op": "hex_digit",
+          "rune": 65
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 65
+        },
+        {
+          "op": "digit",
+          "rune": 70
+        },
+        {
+          "op": "octal_digit",
+          "rune": 70
+        },
+        {
+          "op": "hex_digit",
+          "rune": 70
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 70
+        },
+        {
+          "op": "digit",
+          "rune": 90
+        },
+        {
+          "op": "octal_digit",
+          "rune": 90
+        },
+        {
+          "op": "hex_digit",
+          "rune": 90
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 90
+        },
+        {
+          "op": "digit",
+          "rune": 95
+        },
+        {
+          "op": "octal_digit",
+          "rune": 95
+        },
+        {
+          "op": "hex_digit",
+          "rune": 95
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 95
+        },
+        {
+          "op": "digit",
+          "rune": 1632
+        },
+        {
+          "op": "octal_digit",
+          "rune": 1632
+        },
+        {
+          "op": "hex_digit",
+          "rune": 1632
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 1632
+        },
+        {
+          "op": "digit",
+          "rune": 65296
+        },
+        {
+          "op": "octal_digit",
+          "rune": 65296
+        },
+        {
+          "op": "hex_digit",
+          "rune": 65296
+        },
+        {
+          "op": "ascii_letter",
+          "rune": 65296
+        }
+      ],
+      "case": "leaves/text/character-classes",
+      "discriminates": "The whitespace set is the ECMAScript table, not unicode.IsSpace and not unicode.Zs: U+0085 and U+200B count as single-line whitespace here while U+180E does not, and only LF, CR, U+2028 and U+2029 are line breaks, so U+0085 is whitespace without being a break. The digit and letter predicates are ASCII-only, so U+0660 and U+FF10 are not digits and '_' is not a letter.",
+      "operation": "tsc/internal/stringutil/util.go:IsWhiteSpaceLike",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "616263",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "612062",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "c3a4",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "e282ac",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "ff",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "61ff62",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "612f623f633d6426652366",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "2d5f2e217e2a272829",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "3b3a40263d2b242c",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "25",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "00",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "5b5d7b7d",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "c4b0",
+          "op": "encode_uri"
+        },
+        {
+          "left_hex": "5c",
+          "op": "encode_uri"
+        }
+      ],
+      "case": "leaves/text/encode-uri",
+      "discriminates": "EncodeURI walks BYTES, so every byte outside the unreserved set becomes one uppercase %XX pair: a malformed 0xFF becomes %FF rather than the three escapes of U+FFFD, and a multi-byte rune becomes one escape per byte. The set that is left alone is the ECMAScript one, which keeps ; / ? : @ & = + $ , # - _ . ! ~ * ' ( ) and escapes %, [, ], { and }.",
+      "operation": "tsc/internal/stringutil/util.go:EncodeURI",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "efbbbf61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "efbbbf61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "feff61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "feff61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "fffe61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "fffe61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "efbb61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "efbb61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "ef61",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "ef61",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "fe",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "fe",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "ff",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "ff",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "efbbbf",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "efbbbf",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "feff",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "feff",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "fffe",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "fffe",
+          "op": "add_bom"
+        },
+        {
+          "left_hex": "efbbbf",
+          "op": "remove_bom"
+        },
+        {
+          "left_hex": "efbbbf",
+          "op": "add_bom"
+        }
+      ],
+      "case": "leaves/text/byte-order-marks",
+      "discriminates": "The length probe recognises UTF-16 BOMs the rest of the compiler cannot decode, so RemoveByteOrderMark strips two bytes from FE FF and leaves invalid UTF-8 behind, and AddUTF8ByteOrderMark refuses to prepend one whenever any BOM is already present - including a UTF-16 one it is not converting. A bare FE or FF, or an incomplete EF BB, is not a BOM, so the UTF-8 mark is prepended in front of it.",
+      "operation": "tsc/internal/stringutil/util.go:RemoveByteOrderMark",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "0a",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "61",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610a",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610a62",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610d0a62",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610d62",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610d",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610a0a62",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "61e280a862",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "0d0a",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "610a0d",
+          "op": "split_lines"
+        },
+        {
+          "left_hex": "ff0afe",
+          "op": "split_lines"
+        },
+        {
+          "lines_hex": [
+            "202061",
+            "20202062"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "",
+            "202061"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "61",
+            "202062"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "202020"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "20c2a061"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "092061"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "e280a861"
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "",
+            ""
+          ],
+          "op": "guess_indentation"
+        },
+        {
+          "lines_hex": [
+            "e1a08e61"
+          ],
+          "op": "guess_indentation"
+        }
+      ],
+      "case": "leaves/text/line-splitting-and-indentation",
+      "discriminates": "SplitLines is a byte scanner: CRLF is one break, a lone CR is a break, U+2028 is not, and a trailing break never produces a final empty line - so 'a\\n' has one line and '\\n' has one empty line. GuessIndentation measures leading whitespace in BYTES using the rune-level whitespace set, so one NBSP contributes two and U+2028 three, while U+180E is not whitespace at all; empty lines are skipped, and an all-empty or empty input returns 0 rather than the MAX_SMI sentinel.",
+      "operation": "tsc/internal/stringutil/util.go:SplitLines",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "left_hex": "",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "2222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "2222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "226122",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "226122",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "276127",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "276127",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "606160",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "606160",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "226127",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "226127",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "6122",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "6122",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "2261",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "2261",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "2727",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "2727",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "6060",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "6060",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "c3a9c3a9",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "c3a9c3a9",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22c3a922",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22c3a922",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "ffff",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0a6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c0a6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0d6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c0d6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "27615c276227",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "27615c276227",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "225c22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c6e6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c5c6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c2222",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "225c2222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "275c2727",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "275c2727",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "22615c22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c5c5c5c22",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "225c5c5c5c22",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "615c6e62",
+          "op": "strip_quotes"
+        },
+        {
+          "left_hex": "615c6e62",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0a6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "22615c0a5c0a6222",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "615c0a62",
+          "op": "unquote_string"
+        },
+        {
+          "left_hex": "225c0a22",
+          "op": "unquote_string"
+        }
+      ],
+      "case": "leaves/text/quote-stripping",
+      "discriminates": "StripQuotes compares the first and last RUNES and strips only ' \" or `, so a two-byte \\xff\\xff whose halves both decode to RuneError is left alone, and a string shorter than two bytes is returned as is. UnquoteString's `\\\\.` replacement drops the backslash before any rune except LF, because Go's '.' excludes it: a backslash before a real newline survives while one before CR does not. It is not a real unescape, so \\n stays the letter n. The backslash inputs reach the replacement the quoted form performs: the pinned code replaces every backslash-something pair with the something, faithfully reproducing the original regular expression rather than unescaping, so a quoted backslash-n becomes the letter n and not a line feed, a doubled backslash becomes one, and an escaped quote becomes a bare quote. A port that called a real unquote would differ on every one of them. The unquoted input with a backslash shows that the replacement runs on whatever StripQuotes returned, quoted or not. The backslash-newline inputs separate the replacement from a naive unescape in the other direction: the pinned pattern is the regular expression \\\\. and Go's dot does not match a line feed by default, so a backslash immediately before a newline is left in place where every other backslash is removed",
+      "operation": "tsc/internal/stringutil/util.go:StripQuotes",
+      "order_sensitive": true,
+      "subject": "stringutil"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "text": "1"
+        },
+        {
+          "op": "parse",
+          "text": "1.2"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3"
+        },
+        {
+          "op": "parse",
+          "text": "0.0.0"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-alpha.1+build.2"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3+build"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-0"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-01"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-alpha_1"
+        },
+        {
+          "op": "parse",
+          "text": "01.2.3"
+        },
+        {
+          "op": "parse",
+          "text": "1.02.3"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3+"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3.4"
+        },
+        {
+          "op": "parse",
+          "text": ""
+        },
+        {
+          "op": "parse",
+          "text": "v1.2.3"
+        },
+        {
+          "op": "parse",
+          "text": " 1.2.3"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3 "
+        },
+        {
+          "op": "parse",
+          "text": "4294967295.0.0"
+        },
+        {
+          "op": "parse",
+          "text": "4294967296.0.0"
+        },
+        {
+          "op": "parse",
+          "text": "1.4294967296.0"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-\u017f"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-\u212a"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3-A"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3--"
+        },
+        {
+          "op": "parse",
+          "text": "1.2.3+-"
+        },
+        {
+          "op": "parse",
+          "text_hex": "ff"
+        },
+        {
+          "op": "parse",
+          "text_hex": "312e322e332dff"
+        },
+        {
+          "op": "must_parse_round_trip",
+          "text": "1"
+        },
+        {
+          "op": "must_parse_round_trip",
+          "text": "1.2"
+        },
+        {
+          "op": "must_parse_round_trip",
+          "text": "1.2.3-alpha.1+build.2"
+        },
+        {
+          "op": "must_parse_round_trip",
+          "text": "1.2.3+build"
+        }
+      ],
+      "case": "leaves/text/semver-parse-boundaries",
+      "discriminates": "The outer regexp allows a bare major or major.minor and defaults the rest to zero, but rejects a leading zero, a fourth component, a 'v' prefix and any surrounding space. A prerelease is then re-validated, so 1.2.3-01 fails while the same text is a legal RANGE operand. Because the regexp is (?i), RE2 folds [a-z] onto U+017F and U+212A, which are therefore legal prerelease identifiers. Overflow is the sharpest case: the numeric component keeps strconv's saturated 4294967295 and the partially filled Version is returned beside the strconv range error, so both the value and the error text are frozen.",
+      "operation": "tsc/internal/semver/version.go:TryParseVersion",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "compare",
+          "right": "1.2.4",
+          "text": "1.2.3"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3",
+          "text": "1.2.3"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3+x",
+          "text": "1.2.3"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3+b",
+          "text": "1.2.3+a"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3",
+          "text": "1.2.3-alpha"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-alpha.1",
+          "text": "1.2.3-alpha"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-alpha",
+          "text": "1.2.3-1"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-2",
+          "text": "1.2.3-1"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-B",
+          "text": "1.2.3-a"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-100000000000",
+          "text": "1.2.3-99999999999"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-4294967297",
+          "text": "1.2.3-4294967296"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-5",
+          "text": "1.2.3-9999999999"
+        },
+        {
+          "op": "compare",
+          "right": "1.2.3-4294967295",
+          "text": "1.2.3-4294967296"
+        },
+        {
+          "op": "compare",
+          "right": "10.0.0",
+          "text": "2.0.0"
+        },
+        {
+          "op": "compare",
+          "right": "1.3.0",
+          "text": "1.2.3"
+        },
+        {
+          "op": "compare",
+          "right": "1.10.0",
+          "text": "1.9.0"
+        },
+        {
+          "op": "compare_nil_left",
+          "right": "1.0.0"
+        },
+        {
+          "op": "compare_nil_both"
+        }
+      ],
+      "case": "leaves/text/semver-compare-precedence",
+      "discriminates": "Each pair is compared in both directions, so an asymmetric comparator is caught. Build metadata never participates, a prerelease sorts below its release, a numeric identifier sorts below an alphanumeric one, and a shorter identifier list sorts first. The two overflow pairs pin the documented fallback: when a numeric identifier exceeds uint32 the comparison falls back to identifier LENGTH, and to plain ASCII order when the lengths are equal. A nil version sorts below every parsed version and equal to another nil.",
+      "operation": "tsc/internal/semver/version.go:Version.Compare",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "^1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.0.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.0.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^1.2.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^1.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~0.0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~0.0.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-caret-and-tilde",
+      "discriminates": "The caret's upper bound depends on which component is the first non-zero one AND on which component was a wildcard, which is where hand-ported range code usually goes wrong: ^0.0.3 stops at 0.0.4, ^0.2.3 at 0.3.0 and ^1.2.3 at 2.0.0, while ^0.0 and ^0.0.x stop at 0.1.0 because the patch wildcard promotes the bound. The tilde's upper bound always increments the minor, or the major when the minor is a wildcard, so ~0.0.3 stops at 0.1.0 where ^0.0.3 stops at 0.0.4. ~1.2 and ~1.2.3 share the upper bound <1.3.0 but not the lower one: a missing patch defaults to 0 and the tilde branch gives its >= comparator no prerelease floor, so ~1.2 is >=1.2.0 and admits 1.2.3-alpha while ~1.2.3 is >=1.2.3 and rejects it. ~1 widens to >=1.0.0 <2.0.0. Every bound is also probed by membership, so a correct rendering with wrong comparators still fails.",
+      "operation": "tsc/internal/semver/version_range.go:parseComparator",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "X",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0",
+            "2.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "=1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "=1.2.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">1.2",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<1.2",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=1.2.x",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<=1.2",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<=1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "=*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^*",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">= 1.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "||",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 || >=2.0.0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 - 2.3.4",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2 - 2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "* - 2.3.4",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 - *",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.0.0 - 2.0.0 - 3.0.0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "4294967296.0.0",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3.4",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "01.2.3",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3+build",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3-01",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "  1.2.3  ",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3\u000b",
+          "versions": [
+            "0.0.0",
+            "0.0.3",
+            "0.0.4",
+            "0.1.0",
+            "0.2.3",
+            "0.3.0",
+            "1.0.0",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0",
+            "2.0.0",
+            "1.2.3-alpha",
+            "0.0.3-alpha",
+            "1.0.0-0"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-wildcards-and-primitives",
+      "discriminates": "Range boundaries were entirely missing from the earlier survey. A wildcard major erases the whole comparator unless the operator is < or >, and then BOTH become '<0.0.0-0', so '>*' matches nothing rather than everything. An empty range, '||' and '~*' all render as '*' and accept every version. A wildcard minor or patch injects the '-0' prerelease floor, which is what makes '1.x' exclude 2.0.0-0. Whitespace is split with the regexp's ASCII \\s before each token is matched, so '>= 1.2.3' is INVALID while a trailing vertical tab is trimmed by strings.TrimSpace and '1.2.3\\v' is valid. A range operand skips the stricter identifier check, so '1.2.3-01' parses here although it fails TryParseVersion.",
+      "operation": "tsc/internal/semver/version_range.go:TryParseVersionRange",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": ">=1.2.3-alpha",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.x",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=1.2.0-0",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 - 2.3.4",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">1.2.3",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "<=2.3.4",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 || >=2.0.0",
+          "versions": [
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.0.0-0",
+            "1.0.0",
+            "2.0.0-0",
+            "2.0.0",
+            "2.3.4",
+            "2.3.5",
+            "0.9.9"
+          ]
+        },
+        {
+          "op": "range_nil_version",
+          "text": "*"
+        },
+        {
+          "op": "range_nil_version",
+          "text": "<*"
+        },
+        {
+          "op": "range_nil_version",
+          "text": ">=1.0.0"
+        },
+        {
+          "op": "range_nil_version",
+          "text": ""
+        },
+        {
+          "op": "range_nil_version",
+          "text": "1.x"
+        }
+      ],
+      "case": "leaves/text/semver-range-prerelease-membership",
+      "discriminates": "Test is a plain disjunction of conjunctions over Version.Compare, with no npm-style 'prereleases only match their own tuple' rule: >=1.2.3-alpha admits 1.2.3-beta and every later release, and 1.x admits 1.0.0-0 because of the injected floor while excluding 2.0.0-0. An empty disjunction accepts everything, including a nil version, while '<*' accepts ONLY a nil version, because nil sorts below 0.0.0-0.",
+      "operation": "tsc/internal/semver/version_range.go:VersionRange.Test",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "bits": "7ff8000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "to_text"
+        },
+        {
+          "bits": "4415af1d78b58c40",
+          "op": "to_text"
+        },
+        {
+          "bits": "3eb0c6f7a0b5ed8d",
+          "op": "to_text"
+        },
+        {
+          "bits": "3e7ad7f29abcaf48",
+          "op": "to_text"
+        },
+        {
+          "bits": "3ee4f8b588e368f1",
+          "op": "to_text"
+        },
+        {
+          "bits": "0000000000000001",
+          "op": "to_text"
+        },
+        {
+          "bits": "0000000000000002",
+          "op": "to_text"
+        },
+        {
+          "bits": "433fffffffffffff",
+          "op": "to_text"
+        },
+        {
+          "bits": "4340000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "c33fffffffffffff",
+          "op": "to_text"
+        },
+        {
+          "bits": "7fefffffffffffff",
+          "op": "to_text"
+        },
+        {
+          "bits": "3fd3333333333334",
+          "op": "to_text"
+        },
+        {
+          "bits": "441ac53a7e04bcda",
+          "op": "to_text"
+        },
+        {
+          "bits": "4341c37937e08000",
+          "op": "to_text"
+        },
+        {
+          "bits": "c1e0000000000000",
+          "op": "to_text"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "to_text"
+        }
+      ],
+      "case": "leaves/text/jsnum-number-to-string",
+      "discriminates": "Number.String is Number.prototype.toString, not Go's %v: NaN, Infinity and -Infinity are spelled out, negative zero renders as '0' because the safe-integer fast path compares float64(0) to -0.0 and wins, and the exponent switch sits at 1e21 and 1e-6 - 1e20 prints in full, 1e21 prints as 1e+21 and 1e-7 prints as 1e-7 with the two-digit exponent already trimmed. The subnormal 5e-324 and 0.1+0.2 pin shortest round-trip formatting.",
+      "operation": "tsc/internal/jsnum/string.go:Number.String",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "op": "from_text",
+          "text": ""
+        },
+        {
+          "op": "from_text",
+          "text": " "
+        },
+        {
+          "op": "from_text",
+          "text": "\t\n\r\u000b\f"
+        },
+        {
+          "op": "from_text",
+          "text": "\u00a0"
+        },
+        {
+          "op": "from_text",
+          "text": "\ufeff"
+        },
+        {
+          "op": "from_text",
+          "text": "Infinity"
+        },
+        {
+          "op": "from_text",
+          "text": "+Infinity"
+        },
+        {
+          "op": "from_text",
+          "text": "-Infinity"
+        },
+        {
+          "op": "from_text",
+          "text": "infinity"
+        },
+        {
+          "op": "from_text",
+          "text": " Infinity "
+        },
+        {
+          "op": "from_text",
+          "text": "0"
+        },
+        {
+          "op": "from_text",
+          "text": "-0"
+        },
+        {
+          "op": "from_text",
+          "text": "+0"
+        },
+        {
+          "op": "from_text",
+          "text": "1"
+        },
+        {
+          "op": "from_text",
+          "text": "-1"
+        },
+        {
+          "op": "from_text",
+          "text": "0x10"
+        },
+        {
+          "op": "from_text",
+          "text": "0X1F"
+        },
+        {
+          "op": "from_text",
+          "text": "0x"
+        },
+        {
+          "op": "from_text",
+          "text": "0xg"
+        },
+        {
+          "op": "from_text",
+          "text": "-0x10"
+        },
+        {
+          "op": "from_text",
+          "text": "0b101"
+        },
+        {
+          "op": "from_text",
+          "text": "0b2"
+        },
+        {
+          "op": "from_text",
+          "text": "0b"
+        },
+        {
+          "op": "from_text",
+          "text": "0o17"
+        },
+        {
+          "op": "from_text",
+          "text": "0O17"
+        },
+        {
+          "op": "from_text",
+          "text": "0o8"
+        },
+        {
+          "op": "from_text",
+          "text": "00123"
+        },
+        {
+          "op": "from_text",
+          "text": "0123"
+        },
+        {
+          "op": "from_text",
+          "text": "1_0"
+        },
+        {
+          "op": "from_text",
+          "text": "1e1000"
+        },
+        {
+          "op": "from_text",
+          "text": "-1e1000"
+        },
+        {
+          "op": "from_text",
+          "text": "1e-1000"
+        },
+        {
+          "op": "from_text",
+          "text": ".5"
+        },
+        {
+          "op": "from_text",
+          "text": "5."
+        },
+        {
+          "op": "from_text",
+          "text": "."
+        },
+        {
+          "op": "from_text",
+          "text": "-."
+        },
+        {
+          "op": "from_text",
+          "text": "1."
+        },
+        {
+          "op": "from_text",
+          "text": "1e"
+        },
+        {
+          "op": "from_text",
+          "text": "1e+"
+        },
+        {
+          "op": "from_text",
+          "text": "1e-2"
+        },
+        {
+          "op": "from_text",
+          "text": "1E2"
+        },
+        {
+          "op": "from_text",
+          "text": "12345678901234567890123"
+        },
+        {
+          "op": "from_text",
+          "text": " 12 "
+        },
+        {
+          "op": "from_text",
+          "text": "1 2"
+        },
+        {
+          "op": "from_text",
+          "text": "+-1"
+        },
+        {
+          "op": "from_text",
+          "text": "1.2.3"
+        },
+        {
+          "op": "from_text",
+          "text": "0.0000001"
+        },
+        {
+          "op": "from_text",
+          "text": "\u0661\u0662\u0663"
+        },
+        {
+          "op": "from_text",
+          "text_hex": "ff"
+        },
+        {
+          "op": "from_text",
+          "text_hex": "31ff"
+        },
+        {
+          "op": "from_text",
+          "text": "1.500"
+        },
+        {
+          "op": "from_text",
+          "text": "1.000"
+        },
+        {
+          "op": "from_text",
+          "text": "000.5"
+        },
+        {
+          "op": "from_text",
+          "text": "0.0"
+        },
+        {
+          "op": "from_text",
+          "text": "1e007"
+        },
+        {
+          "op": "from_text",
+          "text": "1e+0007"
+        },
+        {
+          "op": "from_text",
+          "text": "1e-007"
+        },
+        {
+          "op": "from_text",
+          "text": "0.000"
+        },
+        {
+          "op": "from_text",
+          "text": "1.0e0"
+        },
+        {
+          "op": "from_text",
+          "text": "000"
+        },
+        {
+          "op": "from_text",
+          "text": ".000"
+        },
+        {
+          "op": "from_text",
+          "text": "12.30"
+        }
+      ],
+      "case": "leaves/text/jsnum-from-string",
+      "discriminates": "StringToNumber, not strconv: an empty or all-whitespace string is 0 and only the ECMAScript whitespace set is trimmed (so U+FEFF and U+000B are, U+0085 is not), 'Infinity' is accepted but 'infinity' is not, radix prefixes are accepted only unsigned so '-0x10' is NaN, leading zeros never mean octal, a separator is never allowed, and overflow saturates to Infinity while underflow returns +0 because strconv's range error carries a usable value. '-0' must come back as negative zero, which is why every result carries its bit pattern; a NaN reports the category instead, because ECMAScript has one NaN and Go's runtime payload is not a contract.",
+      "operation": "tsc/internal/jsnum/string.go:FromString",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "bits": "7ff8000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41dfffffffc00000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41dfffffffc00000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41e0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41e0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "c1e0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "c1e0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "c1e0000000200000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "c1e0000000200000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41f0000000100000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41f0000000100000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "c1f00000001c0000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "c1f00000001c0000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "to_int32"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "c44b1ae4d6e2ef50",
+          "op": "to_int32"
+        },
+        {
+          "bits": "c44b1ae4d6e2ef50",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "c004000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "c004000000000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "41e65a0bc0000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "41e65a0bc0000000",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "3fb999999999999a",
+          "op": "to_int32"
+        },
+        {
+          "bits": "3fb999999999999a",
+          "op": "to_uint32"
+        },
+        {
+          "bits": "4340000000000000",
+          "op": "to_int32"
+        },
+        {
+          "bits": "4340000000000000",
+          "op": "to_uint32"
+        }
+      ],
+      "case": "leaves/text/jsnum-int32-conversions",
+      "discriminates": "ToInt32 wraps modulo 2^32 instead of saturating, which is the opposite of a plain Rust `as i32` cast: 4294967295 is -1, 2147483648 is i32::MIN and 4294967296 is 0. Non-finite values and both zeros are 0, fractions truncate toward zero before the reduction, and ToUint32 is only a reinterpretation of the same bits, so the two must never disagree about which value they reduced.",
+      "operation": "tsc/internal/jsnum/jsnum.go:Number.toInt32",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "4040800000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "bff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "bff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "41e0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "41e0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "403f000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "4040000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "404f800000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "left_shift"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "3ffe666666666666",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "4014000000000000",
+          "op": "bitwise_not"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "signed_right_shift"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "unsigned_right_shift"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "left_shift"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_or"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_and"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "bits2": "0000000000000000",
+          "op": "bitwise_xor"
+        },
+        {
+          "bits": "41efffffffe00000",
+          "op": "bitwise_not"
+        }
+      ],
+      "case": "leaves/text/jsnum-bitwise-and-shift",
+      "discriminates": "The shift count is ToUint32 masked with 31, so shifting by 32 is a no-op and shifting by 33 shifts one; a NaN or negative count is reduced the same way rather than panicking, which a Rust `<<` would do. The unsigned right shift is the only operator whose result leaves the int32 range, so -1 >>> 0 must be 4294967295 and not -1. Every operand is reduced to int32 first, so 2147483648 | 1 is -2147483647, and the count is masked rather than clamped, which is why 1 << 63 is i32::MIN rather than zero.",
+      "operation": "tsc/internal/jsnum/jsnum.go:Number.SignedRightShift",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "3ff0000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "bits2": "4000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "fff0000000000000",
+          "bits2": "4000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "4000000000000000",
+          "bits2": "7ff0000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "4000000000000000",
+          "bits2": "fff0000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "0000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "0000000000000000",
+          "bits2": "4014000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "4014000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "4016000000000000",
+          "bits2": "4000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "c016000000000000",
+          "bits2": "4000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "4014000000000000",
+          "bits2": "c000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "c014000000000000",
+          "bits2": "c000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "0000000000000000",
+          "bits2": "0000000000000000",
+          "op": "remainder"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "bff0000000000000",
+          "bits2": "7ff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "fff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "3ff0000000000000",
+          "bits2": "7ff8000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "bits2": "0000000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "0000000000000000",
+          "bits2": "0000000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "bff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "c000000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "8000000000000000",
+          "bits2": "4008000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "4000000000000000",
+          "bits2": "4024000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "4000000000000000",
+          "bits2": "bff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "0000000000000000",
+          "bits2": "bff0000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "4008000000000000",
+          "bits2": "4041000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "4024000000000000",
+          "bits2": "4035000000000000",
+          "op": "exponentiate"
+        },
+        {
+          "bits": "4000000000000000",
+          "bits2": "4090000000000000",
+          "op": "exponentiate"
+        }
+      ],
+      "case": "leaves/text/jsnum-remainder-and-exponentiate",
+      "discriminates": "Remainder is the JavaScript % operator, not math.Mod alone: an infinite dividend or a zero divisor is NaN, an infinite divisor returns the dividend unchanged, and a zero dividend keeps its sign, so -0 % 5 is negative zero. Exponentiate special-cases +-1 to an infinite exponent and 1 to NaN, both of which ordinary powf gets wrong, and it routes integer base/exponent pairs whose result exceeds 53 bits through exact big-integer arithmetic rounded at 256 bits, so 3**34 and 10**21 must match that path and not powf. Results carry bit patterns; a NaN reports only its category, because its payload is not observable.",
+      "operation": "tsc/internal/jsnum/jsnum.go:Number.Remainder",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "bits": "7ff8000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "7ff8000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "7ff0000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "fff0000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "0000000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "8000000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "bfe0000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "3fe0000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "bff8000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "3ff8000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "is_nan"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "is_inf"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "floor"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "abs"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "trunc"
+        },
+        {
+          "bits": "444b1ae4d6e2ef50",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "is_nan"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "is_inf"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "floor"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "abs"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "trunc"
+        },
+        {
+          "bits": "c1e0000000166666",
+          "op": "to_shift_count"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "is_nan"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "is_inf"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "is_non_finite"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "floor"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "abs"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "trunc"
+        },
+        {
+          "bits": "41f0000000000000",
+          "op": "to_shift_count"
+        },
+        {
+          "op": "nan_constructor"
+        },
+        {
+          "count": 1,
+          "op": "inf_constructor"
+        },
+        {
+          "count": -1,
+          "op": "inf_constructor"
+        }
+      ],
+      "case": "leaves/text/jsnum-classifiers-and-rounding",
+      "discriminates": "IsInf ignores the sign, so both infinities report true, and isNonFinite answers the same question with one exponent-mask test - a single predicate that must agree with IsNaN or IsInf on every input including a NaN payload. Floor and trunc part company below zero (-0.5 floors to -1 and truncates to -0) and Abs(-0) is +0, so the results carry bit patterns, with a NaN reporting only its category because its payload is not observable. toShiftCount is the masked count the shift operators are built on, recorded directly rather than inferred from a shift result.",
+      "operation": "tsc/internal/jsnum/jsnum.go:Number.Floor",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "000n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "123n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0123n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0x1fn"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0X1Fn"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0b101n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0o17n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0O17n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0b_101n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "1_000n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "5"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": ""
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "00"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "0n0"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "9007199254740993n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text": "-0x10n"
+        },
+        {
+          "op": "parse_pseudo_big_int",
+          "text_hex": "31ff306e"
+        },
+        {
+          "enabled": true,
+          "op": "new_pseudo_big_int",
+          "text": "000"
+        },
+        {
+          "enabled": true,
+          "op": "new_pseudo_big_int",
+          "text": "0042"
+        },
+        {
+          "enabled": false,
+          "op": "new_pseudo_big_int",
+          "text": "42"
+        },
+        {
+          "enabled": true,
+          "op": "new_pseudo_big_int",
+          "text": "42"
+        },
+        {
+          "enabled": true,
+          "op": "new_pseudo_big_int",
+          "text": ""
+        },
+        {
+          "enabled": false,
+          "op": "new_pseudo_big_int",
+          "text": "0"
+        }
+      ],
+      "case": "leaves/text/pseudo-bigint-parse",
+      "discriminates": "The radix branch is selected by the SECOND BYTE alone, so '1_000n' takes the decimal path and keeps its separator verbatim while '0b_101n' goes through big.Int and becomes 5; a one-character input can never take the radix path. Only one trailing 'n' is stripped, so '0n0' is not a literal at all and comes back as 'n0'. An all-zero magnitude normalises to the single digit 0, and NewPseudoBigInt stores zero as the EMPTY string and refuses to mark it negative, which is the representation every consumer compares against. A leading '-' shifts the byte the radix switch reads, so '-0x10n' takes the decimal path too and comes back as the literal '-0x10', and that path copies BYTES rather than text, so the malformed 0xFF of '1\\xff0n' survives it - which is why every result here is reported as hex rather than as a JSON string that encoding/json and from_utf8_lossy would both repair to U+FFFD.",
+      "operation": "tsc/internal/jsnum/pseudobigint.go:ParsePseudoBigInt",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse_valid_big_int",
+          "text": "-0x10n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "0x10n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "-0n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "-000n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "123n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "-123n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "0n"
+        },
+        {
+          "op": "parse_valid_big_int",
+          "text": "-5"
+        },
+        {
+          "enabled": false,
+          "op": "pseudo_big_int_sign",
+          "text": "42"
+        },
+        {
+          "enabled": true,
+          "op": "pseudo_big_int_sign",
+          "text": "42"
+        },
+        {
+          "enabled": true,
+          "op": "pseudo_big_int_sign",
+          "text": "000"
+        },
+        {
+          "enabled": false,
+          "op": "pseudo_big_int_sign",
+          "text": ""
+        },
+        {
+          "enabled": true,
+          "op": "pseudo_big_int_sign",
+          "text": "0"
+        }
+      ],
+      "case": "leaves/text/pseudo-bigint-sign-and-valid",
+      "discriminates": "ParseValidBigInt splits the sign BEFORE the radix parse, which is the only way '-0x10n' becomes -16: the radix branch never accepts a sign itself. The sign is then dropped again for any zero magnitude, so '-0n' and '-000n' are indistinguishable from '0n'. Sign is the predicate the checker branches on and must agree with that normalisation rather than with the negative flag it was constructed with.",
+      "operation": "tsc/internal/jsnum/pseudobigint.go:ParseValidBigInt",
+      "order_sensitive": true,
+      "subject": "jsnum"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "^1.2.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.2.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^0.0.3-alpha",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.3-beta.1",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~0.2.3-rc",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "^1.2.3+build.9",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "~1.2.3+build.9",
+          "versions": [
+            "0.0.0",
+            "1.2.3-alpha",
+            "1.2.3-beta",
+            "1.2.3",
+            "1.2.4",
+            "1.3.0-0",
+            "1.3.0",
+            "2.0.0-0",
+            "2.0.0",
+            "0.2.3-alpha",
+            "0.2.3",
+            "0.3.0",
+            "0.0.3-alpha",
+            "0.0.4"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-increment-drops-prerelease",
+      "discriminates": "the increment helpers build a fresh version from the incremented component alone, so the upper bound a caret or tilde range derives carries no prerelease and no build: the operand's own prerelease survives in the lower bound while the upper bound is a bare release. A port that copied the operand and bumped one field would keep them, and the rendered range would differ even where the membership answers happened to agree, which is why the rendered form is compared and not only the tests",
+      "operation": "tsc/internal/semver/version.go:Version.incrementMajor",
+      "order_sensitive": true,
+      "subject": "semver"
+    },
+    {
+      "actions": [
+        {
+          "op": "range",
+          "text": "not a range",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 -",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "@#$",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": ">=1.2.3 || garbage",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        },
+        {
+          "op": "range",
+          "text": "1.2.3 || ",
+          "versions": [
+            "0.0.0",
+            "1.2.3",
+            "999.0.0"
+          ]
+        }
+      ],
+      "case": "leaves/text/semver-range-unparsed-matches-everything",
+      "discriminates": "a range that fails to parse is still returned, carrying no alternatives, and an empty disjunction is specified to admit every version, so a failed parse yields a range that matches everything rather than nothing; a port that returned an error and defaulted to no match would invert every answer here. The rendered form is the wildcard for the same reason: the disjunction writes it when it emitted no bytes of its own",
+      "operation": "tsc/internal/semver/version_range.go:testDisjunction",
+      "order_sensitive": true,
+      "subject": "semver"
+    }
+  ],
+  "version": 1
+}

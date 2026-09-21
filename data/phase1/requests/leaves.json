@@ -1,0 +1,859 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "new_nil"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "a",
+          "op": "has"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "op": "clear"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-empty-nil",
+      "discriminates": "OrderedMap's nil guards are per method, not a property of the type: Size, Keys, Entries and Clone each test the receiver and return empty, while Get, Has and Clear reach straight through m.mp and panic on a nil receiver",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Size",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-insert-overwrite",
+      "discriminates": "overwriting an existing key must keep its original position, not move it to the end",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Set",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "key": "b",
+          "op": "delete"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-delete-reinsert",
+      "discriminates": "a reinserted key goes to the end, not back to its original slot",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-double-delete",
+      "discriminates": "the second Delete returns the zero value and false without disturbing the map",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Delete",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "early_stop_keys",
+          "stop": 2
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-early-stop",
+      "discriminates": "breaking out of the range-over-func iterator is observable and leaves the map intact",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Keys",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "clone_entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clone-isolation",
+      "discriminates": "a clone keeps its own order and contents after the original is mutated",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "clone"
+        },
+        {
+          "key": "z",
+          "op": "clone_set",
+          "value": "9"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "clone_entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clone-write-back",
+      "discriminates": "writing through the clone must not alias back into the original",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clone",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clear-reuse",
+      "discriminates": "Clear empties the order as well as the map, so later inserts start a fresh sequence",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Clear",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_size_hint",
+          "size": 4
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-size-hint",
+      "discriminates": "a size hint changes allocation only, never iteration order",
+      "operation": "tsc/internal/collections/ordered_map.go:NewOrderedMapWithSizeHint",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_nil"
+        },
+        {
+          "op": "clone_is_nil"
+        },
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "clone_is_nil"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-clone-tolerates-nil",
+      "discriminates": "Clone answers nil for a nil receiver instead of an empty map or a panic, and the unexported clone it delegates to is reached only on the non-nil path, where it copies both the key slice and the map",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "entries": [
+            [
+              "b",
+              "2"
+            ],
+            [
+              "c",
+              "30"
+            ],
+            [
+              "d",
+              "4"
+            ]
+          ],
+          "op": "diff"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-diff-callback-sequence",
+      "discriminates": "the diff makes two passes: additions while iterating the second map, then modifications and removals while iterating the first, so the callbacks arrive as added d, removed a, modified c rather than in the key order a, c, d that a single pass over the union of the keys would produce; onModified receives the old value before the new one",
+      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "22"
+        },
+        {
+          "entries": [
+            [
+              "a",
+              "9"
+            ],
+            [
+              "b",
+              "7"
+            ]
+          ],
+          "equality": "length",
+          "op": "diff_func"
+        },
+        {
+          "entries": [
+            [
+              "a",
+              "9"
+            ],
+            [
+              "b",
+              "7"
+            ]
+          ],
+          "equality": "always",
+          "op": "diff_func"
+        },
+        {
+          "entries": [
+            [
+              "a",
+              "1"
+            ],
+            [
+              "b",
+              "22"
+            ]
+          ],
+          "equality": "never",
+          "op": "diff_func"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-diff-func-uses-the-callback",
+      "discriminates": "the Func variant consults the supplied comparison for every shared key: under a length comparison a:1 against a:9 is equal while b:22 against b:7 is modified, an always-equal comparison reports no modification at all, and a never-equal comparison reports every shared key modified even where the values are byte identical; a port that compared the values directly would answer the same in all three",
+      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMapsFunc",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "index": 0,
+          "op": "entry_at"
+        },
+        {
+          "index": 2,
+          "op": "entry_at"
+        },
+        {
+          "index": 3,
+          "op": "entry_at"
+        },
+        {
+          "index": -1,
+          "op": "entry_at"
+        },
+        {
+          "index": -100,
+          "op": "entry_at"
+        },
+        {
+          "index": 2147483647,
+          "op": "entry_at"
+        },
+        {
+          "key": "b",
+          "op": "delete"
+        },
+        {
+          "index": 1,
+          "op": "entry_at"
+        },
+        {
+          "index": 2,
+          "op": "entry_at"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-entry-at-bounds",
+      "discriminates": "EntryAt guards both ends before it indexes the key slice, so -1 and any index at or past the size answer (zero key, zero value, false) rather than wrapping round to the last entry or panicking on the slice; deleting the middle key shifts c down to index 1 in the same step that makes index 2 out of range",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.EntryAt",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "entries": [
+            [
+              "a",
+              "1"
+            ],
+            [
+              "b",
+              "2"
+            ],
+            [
+              "a",
+              "3"
+            ],
+            [
+              "c",
+              "4"
+            ],
+            [
+              "b",
+              "5"
+            ]
+          ],
+          "op": "from_list"
+        },
+        {
+          "op": "size"
+        },
+        {
+          "op": "keys"
+        },
+        {
+          "key": "a",
+          "op": "get"
+        },
+        {
+          "key": "b",
+          "op": "get"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-from-list-repeated-keys",
+      "discriminates": "the constructor replays Set over the list, so a repeated key keeps the position of its first appearance and takes the value of its last, and the resulting size is smaller than the input; a port that appended every entry would report five keys in input order",
+      "operation": "tsc/internal/collections/ordered_map.go:NewOrderedMapFromList",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "stored-empty",
+          "op": "set",
+          "value": ""
+        },
+        {
+          "key": "filled",
+          "op": "set",
+          "value": "x"
+        },
+        {
+          "key": "stored-empty",
+          "op": "get_or_zero"
+        },
+        {
+          "key": "filled",
+          "op": "get_or_zero"
+        },
+        {
+          "key": "absent",
+          "op": "get_or_zero"
+        },
+        {
+          "key": "stored-empty",
+          "op": "get"
+        },
+        {
+          "key": "absent",
+          "op": "get"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-get-or-zero-hides-absence",
+      "discriminates": "GetOrZero indexes the map directly and yields the value type's zero for an absent key, so a stored empty string and an absent key are indistinguishable through it while Get still separates them by its second result; a port that returned an option and rendered absence as a sentinel would separate them",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.GetOrZero",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "entries": [
+            [
+              "10",
+              "ten"
+            ],
+            [
+              "2",
+              "two"
+            ],
+            [
+              "-1",
+              "negative"
+            ]
+          ],
+          "op": "marshal_int_keys"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-marshal-integer-keys",
+      "discriminates": "resolveKeyName renders a non-string key through strconv, so an integer-keyed map produces quoted decimal member names in insertion order, not JSON numbers and not sorted names; the pin instantiates OrderedMap[int, string], so this branch is reachable behavior rather than an invented one",
+      "operation": "tsc/internal/collections/ordered_map.go:resolveKeyName",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "zulu",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "alpha",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "mike",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "marshal"
+        },
+        {
+          "key": "alpha",
+          "op": "delete"
+        },
+        {
+          "key": "alpha",
+          "op": "set",
+          "value": "4"
+        },
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-marshal-member-order",
+      "discriminates": "MarshalJSONTo writes members by walking the key slice, so the bytes carry insertion order rather than sorted or hash order, and a delete followed by a set moves that member to the end of the object; the observation keeps the raw bytes because a decoded object would lose exactly the property under test",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.MarshalJSONTo",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "op": "unmarshal",
+          "source": "{\"zulu\":\"1\",\"alpha\":\"2\",\"mike\":\"3\"}"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-unmarshal-keeps-document-order",
+      "discriminates": "members are Set in the order the decoder yields them, so a round trip through marshal reproduces the document's own member order rather than a sorted or hashed one",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "op": "unmarshal",
+          "source": "null"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "unmarshal",
+          "source": "{\"c\":\"3\"}"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-unmarshal-null-is-not-a-clear",
+      "discriminates": "a null document returns immediately without touching the receiver, following the Unmarshaler convention the source cites, so members set beforehand survive it; a port that treated null as an empty object would clear them. The object that follows merges into the survivors rather than replacing them",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "kept",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "op": "unmarshal",
+          "source": "[]"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "unmarshal",
+          "source": "3"
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "unmarshal",
+          "source": "\"text\""
+        },
+        {
+          "op": "entries"
+        },
+        {
+          "op": "unmarshal",
+          "source": "{"
+        },
+        {
+          "op": "entries"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-unmarshal-rejects-non-objects",
+      "discriminates": "every token that is neither null nor an object start is refused and the receiver is left exactly as it was; the array, number and string documents are refused by this method's own sentence while the truncated document fails earlier, in the decoder, which separates a refusal the pinned source raises from one it never reaches. Only the class and the pinned sentence are recorded: the surrounding wording names a Go type and a byte offset, which no port could reproduce",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.UnmarshalJSONFrom",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "set",
+          "value": "3"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "b",
+          "op": "delete"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "9"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "clear"
+        },
+        {
+          "op": "values"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-values-follow-insertion",
+      "discriminates": "Values walks the key slice rather than the map, so it answers in insertion order, and a key that is deleted and set again moves to the end instead of returning to its original place; a port iterating the hash map would answer in an unspecified order",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Values",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    },
+    {
+      "actions": [
+        {
+          "op": "new"
+        },
+        {
+          "key": "a",
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "key": "b",
+          "op": "set",
+          "value": "2"
+        },
+        {
+          "key": "c",
+          "op": "values_while_growing",
+          "value": "3"
+        },
+        {
+          "op": "values"
+        },
+        {
+          "op": "size"
+        }
+      ],
+      "case": "leaves/core-collections/ordered-map-values-see-appended-key",
+      "discriminates": "the pinned iterator re-reads the key slice length on every step, which the source calls out deliberately, so a key appended by the loop body is enumerated by the same loop and three values are seen where the map held two; a port that iterated a snapshot, or that borrowed the container for the loop and so could not append at all, would answer two",
+      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.Values",
+      "order_sensitive": true,
+      "subject": "OrderedMap"
+    }
+  ],
+  "version": 1
+}

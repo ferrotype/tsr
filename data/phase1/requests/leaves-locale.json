@@ -1,0 +1,1237 @@
+{
+  "family": "leaves",
+  "group": "locale",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "tag": "en"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-CN"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-TW"
+        },
+        {
+          "op": "parse",
+          "tag": "cs-CZ"
+        },
+        {
+          "op": "parse",
+          "tag": "de-DE"
+        },
+        {
+          "op": "parse",
+          "tag": "es-ES"
+        },
+        {
+          "op": "parse",
+          "tag": "fr-FR"
+        },
+        {
+          "op": "parse",
+          "tag": "it-IT"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-JP"
+        },
+        {
+          "op": "parse",
+          "tag": "ko-KR"
+        },
+        {
+          "op": "parse",
+          "tag": "pl-PL"
+        },
+        {
+          "op": "parse",
+          "tag": "pt-BR"
+        },
+        {
+          "op": "parse",
+          "tag": "ru-RU"
+        },
+        {
+          "op": "parse",
+          "tag": "tr-TR"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/locale/locale.go:Locale.String"
+      ],
+      "case": "leaves/locale/parse-shipped-tags",
+      "discriminates": "every tag the shipped matcher is built from parses with ok=true and canonicalises to itself; a port that lower-cases the region or drops it would change the tag the compiler then matches on",
+      "go_callers": [
+        "tsc/internal/tsoptions/parsedcommandline.go:491 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/parsedbuildcommandline.go:42 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/tsconfigparsing.go:393 (rejects the option when ok is false)",
+        "tsc/internal/execute/tsc/compile.go:93 (keeps the tag and discards ok)",
+        "tsc/internal/lsp/server.go:790, 1544"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:36 func Parse(localeStr string) (locale Locale, ok bool)",
+      "operation": "tsc/internal/locale/locale.go:Parse",
+      "subject": "locale.parse"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "tag": "zh-cn"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-tw"
+        },
+        {
+          "op": "parse",
+          "tag": "cs-cz"
+        },
+        {
+          "op": "parse",
+          "tag": "de-de"
+        },
+        {
+          "op": "parse",
+          "tag": "es-es"
+        },
+        {
+          "op": "parse",
+          "tag": "fr-fr"
+        },
+        {
+          "op": "parse",
+          "tag": "it-it"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-jp"
+        },
+        {
+          "op": "parse",
+          "tag": "ko-kr"
+        },
+        {
+          "op": "parse",
+          "tag": "pl-pl"
+        },
+        {
+          "op": "parse",
+          "tag": "pt-br"
+        },
+        {
+          "op": "parse",
+          "tag": "ru-ru"
+        },
+        {
+          "op": "parse",
+          "tag": "tr-tr"
+        },
+        {
+          "op": "parse",
+          "tag": "JA-jp"
+        },
+        {
+          "op": "parse",
+          "tag": "Ja-JP"
+        },
+        {
+          "op": "parse",
+          "tag": "ZH-CN"
+        },
+        {
+          "op": "parse",
+          "tag": "EN"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-Hans"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-Hant"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-Hans-CN"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-Hant-TW"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-HK"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-SG"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-MO"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-Latn-JP"
+        },
+        {
+          "op": "parse",
+          "tag": "sr-Latn-RS"
+        },
+        {
+          "op": "parse",
+          "tag": "de-AT"
+        },
+        {
+          "op": "parse",
+          "tag": "de-CH"
+        },
+        {
+          "op": "parse",
+          "tag": "fr-CA"
+        },
+        {
+          "op": "parse",
+          "tag": "fr-BE"
+        },
+        {
+          "op": "parse",
+          "tag": "pt-PT"
+        },
+        {
+          "op": "parse",
+          "tag": "es-MX"
+        },
+        {
+          "op": "parse",
+          "tag": "es-419"
+        },
+        {
+          "op": "parse",
+          "tag": "en-GB"
+        },
+        {
+          "op": "parse",
+          "tag": "en-US"
+        },
+        {
+          "op": "parse",
+          "tag": "en-001"
+        }
+      ],
+      "case": "leaves/locale/parse-case-script-region-variants",
+      "discriminates": "canonicalisation is case-normalising, not case-preserving: `--locale zh-cn` is the spelling users actually pass, and it must reach the same tag as zh-CN. The thirteen lower-cased shipped tags plus JA-jp, Ja-JP, ZH-CN and EN are the rows that witness it, because a port that hands the requested string back unchanged answers every one of them wrongly. Nothing is added anywhere in this trace: language.Parse applies no likely-subtags expansion at the pin, so zh-Hans stays zh-Hans and zh-CN stays zh-CN rather than being maximised to zh-Hans-CN, and a Rust dependency that maximises diverges on both. The already-canonical spellings are recorded for the opposite reason -- zh-Hans-CN, zh-Hant-TW, ja-Latn-JP and sr-Latn-RS pin the script subtag as title case, so a port that upper-cases every non-language subtag by hand answers zh-HANS-CN, and es-419 and en-001 pin a numeric region as passed through untouched",
+      "go_callers": [
+        "tsc/internal/tsoptions/parsedcommandline.go:491 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/parsedbuildcommandline.go:42 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/tsconfigparsing.go:393 (rejects the option when ok is false)",
+        "tsc/internal/execute/tsc/compile.go:93 (keeps the tag and discards ok)",
+        "tsc/internal/lsp/server.go:790, 1544"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:36 func Parse(localeStr string) (locale Locale, ok bool)",
+      "operation": "tsc/internal/locale/locale.go:Parse",
+      "subject": "locale.parse"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "tag": "in"
+        },
+        {
+          "op": "parse",
+          "tag": "iw"
+        },
+        {
+          "op": "parse",
+          "tag": "ji"
+        },
+        {
+          "op": "parse",
+          "tag": "no"
+        },
+        {
+          "op": "parse",
+          "tag": "nb"
+        },
+        {
+          "op": "parse",
+          "tag": "mo"
+        },
+        {
+          "op": "parse",
+          "tag": "sh"
+        },
+        {
+          "op": "parse",
+          "tag": "tl"
+        },
+        {
+          "op": "parse",
+          "tag": "cmn"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-cmn-Hans-CN"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-guoyu"
+        },
+        {
+          "op": "parse",
+          "tag": "i-klingon"
+        },
+        {
+          "op": "parse",
+          "tag": "art-lojban"
+        },
+        {
+          "op": "parse",
+          "tag": "sgn-BE-FR"
+        },
+        {
+          "op": "parse",
+          "tag": "en-GB-oed"
+        },
+        {
+          "op": "parse",
+          "tag": "und-Latn"
+        },
+        {
+          "op": "parse",
+          "tag": "root"
+        },
+        {
+          "op": "parse",
+          "tag": "und"
+        }
+      ],
+      "case": "leaves/locale/parse-aliases-and-legacy-tags",
+      "discriminates": "the pinned canonicalisation table rewrites deprecated ISO codes (in->id, iw->he, ji->yi, mo->ro-MD, sh->sr-Latn, tl->fil), grandfathered tags (i-klingon->tlh, art-lojban->jbo, zh-guoyu->cmn, en-GB-oed->en-GB-oxendict, sgn-BE-FR->sfb) and the root alias (root->und), and it drops a redundant primary language in front of an extlang (zh-cmn-Hans-CN->cmn-Hans-CN). The identities are the other half of the evidence and discriminate just as sharply: cmn is *not* folded into zh, no is not normalised to nb, and und and und-Latn come back exactly as written. This is the row that decides whether a Rust dependency has to ship the CLDR alias data at all, and which alias rules it must not apply",
+      "go_callers": [
+        "tsc/internal/tsoptions/parsedcommandline.go:491 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/parsedbuildcommandline.go:42 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/tsconfigparsing.go:393 (rejects the option when ok is false)",
+        "tsc/internal/execute/tsc/compile.go:93 (keeps the tag and discards ok)",
+        "tsc/internal/lsp/server.go:790, 1544"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:36 func Parse(localeStr string) (locale Locale, ok bool)",
+      "operation": "tsc/internal/locale/locale.go:Parse",
+      "subject": "locale.parse"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "tag": ""
+        },
+        {
+          "op": "parse",
+          "tag": " "
+        },
+        {
+          "op": "parse",
+          "tag": "-"
+        },
+        {
+          "op": "parse",
+          "tag": "e"
+        },
+        {
+          "op": "parse",
+          "tag": "en-"
+        },
+        {
+          "op": "parse",
+          "tag": "-en"
+        },
+        {
+          "op": "parse",
+          "tag": "en--US"
+        },
+        {
+          "op": "parse",
+          "tag": "ja_JP"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-JP-"
+        },
+        {
+          "op": "parse",
+          "tag": "japanese"
+        },
+        {
+          "op": "parse",
+          "tag": "toolongsubtag"
+        },
+        {
+          "op": "parse",
+          "tag": "abcdefghijklmnop"
+        },
+        {
+          "op": "parse",
+          "tag": "en US"
+        },
+        {
+          "op": "parse",
+          "tag": "123"
+        },
+        {
+          "op": "parse",
+          "tag": "*"
+        },
+        {
+          "op": "parse",
+          "tag": "x-private"
+        },
+        {
+          "op": "parse",
+          "tag": "en-US-u-co-phonebk"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-JP-x-private"
+        },
+        {
+          "op": "parse",
+          "tag": "zz"
+        },
+        {
+          "op": "parse",
+          "tag": "qqq"
+        },
+        {
+          "op": "parse",
+          "tag": "en-ZZ"
+        },
+        {
+          "op": "parse",
+          "tag": "zh-Xxxx"
+        },
+        {
+          "op": "parse",
+          "tag": "nl-NL"
+        },
+        {
+          "op": "parse",
+          "tag": "sv-SE"
+        },
+        {
+          "op": "parse",
+          "tag": "ar-SA"
+        },
+        {
+          "op": "parse",
+          "tag": "he-IL"
+        },
+        {
+          "op": "parse",
+          "tag": "hi-IN"
+        }
+      ],
+      "case": "leaves/locale/parse-malformed-and-unsupported",
+      "discriminates": "a syntax error and a subtag that is well-formed but unknown are two different failures that both leave ok=false, and either can still hand back a partially parsed tag, which `p.locale, _ = locale.Parse(...)` then keeps. A port that returns Option<Locale> and substitutes the default on any error would change what en-, zh-Xxxx and en--US compile under. Unknown is narrower than it looks and the trace pins where the line falls: zz and the script Xxxx are rejected with a language.ValueError naming the subtag, while the region ZZ (en-ZZ) and the reserved-range language qqq are accepted with ok=true. The row also separates 'parses but no table ships' (nl-NL, sv-SE, ar-SA) from 'does not parse', and fixes whether the underscore spelling ja_JP and the -u- extension survive at all",
+      "go_callers": [
+        "tsc/internal/tsoptions/parsedcommandline.go:491 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/parsedbuildcommandline.go:42 (keeps the tag and discards ok)",
+        "tsc/internal/tsoptions/tsconfigparsing.go:393 (rejects the option when ok is false)",
+        "tsc/internal/execute/tsc/compile.go:93 (keeps the tag and discards ok)",
+        "tsc/internal/lsp/server.go:790, 1544"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:36 func Parse(localeStr string) (locale Locale, ok bool)",
+      "operation": "tsc/internal/locale/locale.go:Parse",
+      "subject": "locale.parse"
+    },
+    {
+      "actions": [
+        {
+          "op": "parse",
+          "tag": "und"
+        },
+        {
+          "op": "parse",
+          "tag": "root"
+        },
+        {
+          "op": "parse",
+          "tag": ""
+        },
+        {
+          "op": "parse",
+          "tag": "en"
+        },
+        {
+          "op": "parse",
+          "tag": "zz"
+        },
+        {
+          "op": "parse",
+          "tag": "und-Latn"
+        },
+        {
+          "op": "parse",
+          "tag": "ja-JP"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/locale/locale.go:Parse"
+      ],
+      "case": "leaves/locale/string-default-sentinel",
+      "discriminates": "Locale.String() short-circuits to \"\" for the Default sentinel, and that sentinel is the zero Tag rather than a failure: the explicitly requested und tag, the root alias that canonicalises to it, and the two inputs here whose parse salvages nothing (\"\" and zz) all print the empty string while their underlying language.Tag prints und. A Rust Display that forwards to the tag would print \"und\" where the compiler prints nothing. ok=false does not imply the empty string -- the sibling case leaves/locale/parse-malformed-and-unsupported observes en- failing with \"en\" and zh-Xxxx failing with \"zh\" -- and neither does an und prefix: und-Latn is a non-zero tag and prints itself",
+      "go_callers": [
+        "tsc/internal/locale/locale.go:15-20 compares against the package var Default"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:15 func (l Locale) String() string",
+      "operation": "tsc/internal/locale/locale.go:Locale.String",
+      "subject": "locale.string"
+    },
+    {
+      "actions": [
+        {
+          "op": "ctx_root"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "op": "ctx_with",
+          "tag": "ja-JP"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "op": "ctx_with",
+          "tag": "de-DE"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "op": "ctx_with_default"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "op": "ctx_root"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "op": "ctx_with",
+          "tag": "not a locale"
+        },
+        {
+          "op": "ctx_read"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/locale/locale.go:FromContext",
+        "tsc/internal/locale/locale.go:HasLocale"
+      ],
+      "case": "leaves/locale/context-absent-explicit-and-default",
+      "discriminates": "absent and explicitly-default are different states that read identically through FromContext: only HasLocale separates them, and session.go:1359 installs the session locale precisely when it is false. A Rust port modelling the carrier as Option<Locale> must keep Some(Default) distinct from None. The trace also pins that a nested WithLocale overrides rather than merges, and that a failed parse still stores whatever Locale the caller was handed -- for `not a locale` that is the zero tag, so a rejected --locale reads back as present-and-default, byte for byte the state an explicit WithLocale(Default) produces and still distinct from absent",
+      "go_callers": [
+        "tsc/internal/project/session.go:275 WithLocale",
+        "tsc/internal/project/session.go:1359 HasLocale decides whether the session locale is installed",
+        "tsc/internal/project/compilerhost.go:119 FromContext",
+        "tsc/internal/ls/codeactions.go:299, 308 FromContext"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:22 func WithLocale(ctx context.Context, locale Locale) context.Context",
+      "operation": "tsc/internal/locale/locale.go:WithLocale",
+      "order_sensitive": true,
+      "subject": "locale.context"
+    },
+    {
+      "actions": [
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "en"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "cs-CZ"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "de-DE"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "es-ES"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "fr-FR"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "it-IT"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ko-KR"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "pl-PL"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "pt-BR"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ru-RU"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "tr-TR"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "und"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": ""
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-cn"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "en"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "cs-CZ"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "de-DE"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "es-ES"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "fr-FR"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "it-IT"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "ko-KR"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "pl-PL"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "pt-BR"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "ru-RU"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "tr-TR"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "und"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": ""
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-cn"
+        }
+      ],
+      "case": "leaves/locale/translation-shipped-locales",
+      "discriminates": "each of the 13 shipped tables is actually selected and returns its own bytes; English, und and an unparsable tag return the untranslated message text. Two keys are requested because one is not enough: fr-FR translates Modules_6244 as the byte-identical \"Modules\" (one of only 4 of its 2116 keys that match the English text), so that row on its own cannot tell the French table from the English fallback, whereas every one of the 13 tables carries its own text for Type_expected_1110, distinct from English and from each other. zh-CN and zh-TW differ on both keys, so a port that keys tables by base language collapses them",
+      "go_callers": [
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go",
+        "tsc/internal/ls/rename.go:434 message.Localize(locale.FromContext(ctx))"
+      ],
+      "go_declaration": "tsc/internal/diagnostics/diagnostics.go:71 func Localize(locale locale.Locale, message *Message, key Key, args ...string) string",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Localize",
+      "subject": "locale.translation"
+    },
+    {
+      "actions": [
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-Hans"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-Hant"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-HK"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-SG"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-MO"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "cmn-Hans-CN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "de"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "de-AT"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "de-CH"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "fr-CA"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "pt"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "pt-PT"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "es-MX"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "es-419"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "en-GB"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-Latn-JP"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "nl-NL"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "sv-SE"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ar-SA"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "hi-IN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "yue"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "wuu"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-Hans"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-Hant"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-HK"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-SG"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "zh-MO"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "cmn-Hans-CN"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "de"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "de-AT"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "de-CH"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "fr-CA"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "pt"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "pt-PT"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "es-MX"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "es-419"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "en-GB"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "ja-Latn-JP"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "nl-NL"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "sv-SE"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "ar-SA"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "hi-IN"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "yue"
+        },
+        {
+          "key": "Type_expected_1110",
+          "op": "localize",
+          "tag": "wuu"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "case": "leaves/locale/translation-fallback-matching",
+      "discriminates": "the fallback is language.NewMatcher's, not a prefix match: base-only tags, sibling regions and script variants either reach a table at confidence >= Low or fall through to English. The matcher entry is zh-TW (loc_generated.go:18), a different canonical tag from the zh-Hant-TW this group also parses, so zh-HK/zh-MO/zh-Hant reaching a table and pt-PT reaching pt-BR are the rows a hand-written fallback chain gets wrong, and yue/wuu/nl-NL/ar-SA fix where the threshold actually cuts off. Type_expected_1110 is requested beside Modules_6244 for the reason given in leaves/locale/translation-shipped-locales: fr-FR's Modules_6244 is byte-identical to English, so fr-CA selecting the French table is only witnessed on the second key. en-GB is a negative control rather than a witness in either key: English is matcher index 0 with a nil table entry (loc_generated.go:33), so its answer is the untranslated text by construction",
+      "go_authority": "tsc/internal/diagnostics/loc_generated.go:15-30 language.NewMatcher over [en, zh-CN, zh-TW, cs-CZ, de-DE, es-ES, fr-FR, it-IT, ja-JP, ko-KR, pl-PL, pt-BR, ru-RU, tr-TR]; diagnostics.go:104-109 accepts the match when confidence >= language.Low and the index is inside localeFuncs",
+      "go_callers": [
+        "tsc/internal/diagnostics/diagnostics.go:80 inside Localize"
+      ],
+      "go_declaration": "tsc/internal/diagnostics/diagnostics.go:89 func getLocalizedMessages(loc language.Tag) map[Key]string",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+      "subject": "locale.translation"
+    },
+    {
+      "actions": [
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "de-DE"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "fr-FR"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "ru-RU"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "it-IT"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "en"
+        }
+      ],
+      "case": "leaves/locale/translation-missing-key-english-fallback",
+      "discriminates": "the pinned negative control for a missing translation key: key 1547 is present in the zh-CN, ja-JP, fr-FR, cs-CZ, es-ES, ko-KR, pl-PL, pt-BR and tr-TR tables and absent from zh-TW, de-DE, it-IT and ru-RU, so a selected table that lacks the key must yield the English text rather than an empty string, a panic or the key itself",
+      "go_callers": [
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go",
+        "tsc/internal/ls/rename.go:434 message.Localize(locale.FromContext(ctx))"
+      ],
+      "go_declaration": "tsc/internal/diagnostics/diagnostics.go:71 func Localize(locale locale.Locale, message *Message, key Key, args ...string) string",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Localize",
+      "subject": "locale.translation"
+    },
+    {
+      "actions": [
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "en"
+        },
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "ja-JP"
+        },
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "de-DE"
+        },
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "zh-CN"
+        },
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "cs-CZ"
+        },
+        {
+          "args": [
+            "doWork",
+            "Base"
+          ],
+          "key": "Abstract_method_0_in_class_1_cannot_be_accessed_via_super_expression_2513",
+          "op": "localize_message",
+          "tag": "und"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "case": "leaves/locale/translation-placeholder-order",
+      "discriminates": "the ja-JP translation of message 2513 emits {1} before {0}, so substitution has to run against the *selected* template. A port that formats the English text and then translates, or that positions arguments by order of appearance, produces the wrong sentence for exactly this row",
+      "go_callers": [
+        "tsc/internal/ast/diagnostic.go:Diagnostic.Localize",
+        "tsc/internal/diagnosticwriter/diagnosticwriter.go",
+        "tsc/internal/ls/rename.go:434 message.Localize(locale.FromContext(ctx))"
+      ],
+      "go_declaration": "tsc/internal/diagnostics/diagnostics.go:67 func (m *Message) Localize(locale locale.Locale, args ...any) string",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:Message.Localize",
+      "subject": "locale.translation-args"
+    },
+    {
+      "actions": [
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "und"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-Hans"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "zh-CN"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-CN"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "case": "leaves/locale/translation-repeated-and-changed",
+      "discriminates": "the cache is a process-global sync.Map keyed by the *requested* tag, filled after the matcher runs, and it is never invalidated. Repeating a tag must return byte-identical text and changing tags must not leak a neighbour's table: a cache keyed by base language, by matcher index or by the last request would show zh-TW text for zh-CN here. und is answered before the cache is consulted, so it must not poison the entries around it",
+      "go_authority": "tsc/internal/diagnostics/loc_generated.go:15-30 language.NewMatcher over [en, zh-CN, zh-TW, cs-CZ, de-DE, es-ES, fr-FR, it-IT, ja-JP, ko-KR, pl-PL, pt-BR, ru-RU, tr-TR]; diagnostics.go:104-109 accepts the match when confidence >= language.Low and the index is inside localeFuncs",
+      "go_callers": [
+        "tsc/internal/diagnostics/diagnostics.go:87 var localizedMessagesCache sync.Map"
+      ],
+      "go_declaration": "tsc/internal/diagnostics/diagnostics.go:89 func getLocalizedMessages(loc language.Tag) map[Key]string",
+      "operation": "tsc/internal/diagnostics/diagnostics.go:getLocalizedMessages",
+      "order_sensitive": true,
+      "subject": "locale.translation-cache"
+    },
+    {
+      "actions": [
+        {
+          "op": "default_read"
+        },
+        {
+          "op": "ctx_read"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "ja-JP"
+        },
+        {
+          "key": "using_declarations_are_not_allowed_in_case_or_default_clauses_unless_contained_within_a_block_1547",
+          "op": "localize",
+          "tag": "zh-TW"
+        },
+        {
+          "key": "Modules_6244",
+          "op": "localize",
+          "tag": "und"
+        },
+        {
+          "op": "default_read"
+        }
+      ],
+      "also_covers": [
+        "tsc/internal/locale/locale.go:FromContext",
+        "tsc/internal/locale/locale.go:HasLocale",
+        "tsc/internal/diagnostics/diagnostics.go:Localize"
+      ],
+      "case": "leaves/locale/default-cold-process",
+      "discriminates": "observed in a process where nothing has been localized yet, which the warm schedule cannot do: the process-global default locale is the zero tag, whose Locale.String() is \"\" while its language.Tag prints und, an untouched context reports HasLocale false, and the very first localisation of a tag returns the same bytes as the repeat two actions later. If the cold and warm observations of the same tag ever differ, the cache is not transparent and every other translation row is order-dependent",
+      "go_callers": [
+        "tsc/internal/project/session.go:203 diagnosticLocale := locale.Default",
+        "tsc/internal/project/compilerhost.go:173 msg.Localize(locale.Default, args...)"
+      ],
+      "go_declaration": "tsc/internal/locale/locale.go:13 var Default Locale",
+      "native_probe": "locale-default",
+      "operation": "tsc/internal/locale/locale.go:Locale.String",
+      "order_sensitive": true,
+      "subject": "locale.default"
+    }
+  ],
+  "version": 1
+}

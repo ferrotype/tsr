@@ -119,7 +119,7 @@ class SyntheticCapture:
     def __init__(self, directory: Path, rows, native_rows=None, partial=False, selected=None,
                  closure=None):
         self.directory = directory
-        probe_directory = directory / "native" / "vfs-vfsmatch"
+        probe_directory = directory / "native" / "vfsmatch"
         probe_directory.mkdir(parents=True)
         requests = {"version": 1, "family": "pilot",
                     "requests": [{"case": r["case"], "operation": "vfsmatch.readDirectory"} for r in rows]}
@@ -147,13 +147,14 @@ class SyntheticCapture:
 
         recorded = capture.source_closure("pilot") if closure is None else closure
         provenance = {
-            "version": 2, "family": "pilot", "pin": capture.pin(),
+            "version": 3, "family": "pilot", "pin": capture.pin(),
             "upstream_gitlink": capture.gitlink(), "partial": partial,
             "selected_cases": selected if selected is not None else [r["case"] for r in rows],
             "requests_sha256": sha(request_bytes),
             "native_probes": {
-                "vfs/vfsmatch": {
-                    "directory": "native/vfs-vfsmatch",
+                "vfsmatch": {
+                    "package": "vfs/vfsmatch",
+                    "directory": "native/vfsmatch",
                     "observations_sha256": sha(native_bytes),
                     "go": "go1.27.1", "goos": "darwin", "goarch": "arm64", "trimpath": True,
                 }
@@ -613,12 +614,13 @@ class NativeMergeTests(unittest.TestCase):
         requests = [{"case": "a", "operation": "vfsmatch.readDirectory"}]
         provenance = {"native_probes": {}}
         for package, row in probe_rows.items():
-            probe_directory = directory / "native" / package.replace("/", "-")
+            probe_directory = directory / "native" / package
             probe_directory.mkdir(parents=True)
             body = canonical({"version": 1, "observations": [row]}) + b"\n"
             (probe_directory / "observations.json").write_bytes(body)
             provenance["native_probes"][package] = {
-                "directory": f"native/{package.replace('/', '-')}",
+                "package": "vfs/vfsmatch",
+                "directory": f"native/{package}",
                 "observations_sha256": sha(body),
             }
         return directory, provenance, requests
@@ -849,6 +851,700 @@ class FreezeTests(unittest.TestCase):
             directory = installed / probe["directory"].removeprefix("native/")
             self.assertTrue((directory / "observations.json").is_file(), str(directory))
             self.assertTrue((directory / "provenance.json").is_file(), str(directory))
+
+
+class OrderSensitiveTests(unittest.TestCase):
+    """Order-sensitive cases must not be compared through a sorting canonicaliser."""
+
+    def test_canonical_alone_is_order_blind(self):
+        # The premise: this is why the extra rules exist.
+        self.assertEqual(canonical({"b": 1, "a": 2}), canonical({"a": 2, "b": 1}))
+
+    def test_entry_arrays_survive_canonicalisation(self):
+        self.assertNotEqual(canonical([["b", 1], ["a", 2]]), canonical([["a", 2], ["b", 1]]))
+
+    def test_order_safe_problems_flags_a_nested_ordered_map(self):
+        # A multi-key object *inside* an element is an ordered map whose order
+        # canonicalisation would erase.
+        self.assertTrue(capture.order_safe_problems(
+            {"ordered": [{"op": "entries", "result": {"a": 1, "b": 2}}]}))
+        self.assertTrue(capture.order_safe_problems(
+            {"ordered": [{"op": "entries", "result": [{"a": 1, "b": 2}]}]}))
+
+    def test_order_safe_problems_accepts_entry_arrays_and_named_fields(self):
+        # An element's own named fields are fine: their order carries no
+        # information and canonicalisation sorts them the same on both sides.
+        self.assertEqual(capture.order_safe_problems(
+            {"ordered": [{"op": "set", "panic": ""}, {"op": "entries",
+                                                      "result": [["a", 1], ["b", 2]]}]}), [])
+        self.assertEqual(capture.order_safe_problems(
+            {"ordered": [{"bytes": "{\"b\":1,\"a\":2}"}]}), [])
+
+    def test_an_order_sensitive_observation_must_declare_its_ordered_payload(self):
+        self.assertTrue(capture.order_safe_problems({"entries": [["a", 1]]}))
+        self.assertTrue(capture.order_safe_problems({"ordered": {"a": 1}}))
+
+    def test_an_order_sensitive_case_rejects_an_order_erasing_observation(self):
+        requests = [{"case": "m", "operation": "collections.orderedMap",
+                     "order_sensitive": True}]
+        document = {"version": 1, "observations": [
+            {"case": "m", "operation": "collections.orderedMap", "result": "observed",
+             "observation": {"ordered": [{"op": "entries", "result": {"a": 1, "b": 2}}]}}]}
+        with self.assertRaisesRegex(ValueError, "order-erasing representation"):
+            capture.validate_response(document, requests, "rust")
+
+    def test_an_order_sensitive_case_accepts_an_entry_array(self):
+        requests = [{"case": "m", "operation": "collections.orderedMap",
+                     "order_sensitive": True}]
+        document = {"version": 1, "observations": [
+            {"case": "m", "operation": "collections.orderedMap", "result": "observed",
+             "observation": {"ordered": [{"op": "entries", "result": [["a", 1], ["b", 2]]}]}}]}
+        self.assertEqual(len(capture.validate_response(document, requests, "rust")), 1)
+
+    def test_a_pure_member_order_difference_is_reported_as_different(self):
+        temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temporary, ignore_errors=True)
+        # Override the family inventory *before* building the capture, so the
+        # recorded closure covers the same inputs the replay recomputes.
+        real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", real)
+        inventory = Path(temporary) / "inv.json"
+        inventory.write_text(json.dumps({"version": 1, "family": "pilot", "requests": [
+            {"case": "a", "operation": "vfsmatch.readDirectory", "order_sensitive": True}]}))
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"])
+        capture.FAMILIES["pilot"]["requests"] = str(inventory)
+
+        rows = [{"case": "a",
+                 "native": {"ordered": [{"result": [["b", 1], ["a", 2]]}]},
+                 "rust": {"result": "observed",
+                          "observation": {"ordered": [{"result": [["a", 2], ["b", 1]]}]}}}]
+        directory = Path(temporary) / "ordered"
+        SyntheticCapture(directory, rows)
+        report = capture.compare(directory)
+        self.assertEqual(report["counts"]["different"], 1,
+                         "a member-order difference must not canonicalise away")
+
+
+class ProbeRegistryTests(unittest.TestCase):
+    """A Go package may host more than one probe."""
+
+    def test_every_declared_probe_has_a_unique_name(self):
+        for family, spec in capture.FAMILIES.items():
+            names = [p["name"] for p in spec["native_probes"]]
+            self.assertEqual(len(names), len(set(names)), family)
+            for probe in spec["native_probes"]:
+                self.assertIn("package", probe, family)
+
+    def test_probe_directories_are_named_per_probe_not_per_package(self):
+        # Two probes in one package must not collide; the pilot's four probes
+        # already exercise the keying.
+        spec = capture.FAMILIES["pilot"]
+        directories = [p["name"] for p in spec["native_probes"]]
+        self.assertEqual(len(directories), len(set(directories)))
+
+    def test_the_committed_capture_is_keyed_by_probe_name(self):
+        installed = ROOT / "data/phase1/native/pilot"
+        if not installed.is_dir():
+            self.skipTest("no frozen pilot observations are committed")
+        provenance = json.loads((installed / "capture-provenance.json").read_text())
+        for name, probe in provenance["native_probes"].items():
+            self.assertEqual(probe["directory"], f"native/{name}")
+            self.assertIn("package", probe)
+
+    def test_unknown_rust_target_kind_is_refused(self):
+        real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", real)
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"], rust_target_kind="lib")
+        with self.assertRaisesRegex(ValueError, "unknown rust_target_kind"):
+            capture.build_rust("pilot")
+
+
+class WitnessTests(unittest.TestCase):
+    """An existing artifact only confers coverage when it actually runs Rust."""
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+
+    def test_committed_witnesses_validate(self):
+        self.assertEqual(scope.witness_problems(), [])
+
+    def test_only_rust_gated_witnesses_confer_coverage(self):
+        self.assertEqual(scope.COVERING_WITNESS_KINDS, ("rust_gated",))
+        linked = scope.cases_by_operation()
+        for witness in self.cases.get("witnesses", []):
+            if witness["kind"] == "rust_gated":
+                continue
+            for operation in witness["operations"]:
+                self.assertNotIn(
+                    witness["id"], linked.get(operation, []),
+                    f"{witness['kind']} witness {witness['id']} must not confer coverage",
+                )
+
+    def test_go_only_producers_are_recorded_as_native_authorities(self):
+        """s07_path_helpers and s07_semver run `go test` and never execute Rust."""
+        by_id = {w["id"]: w for w in self.cases.get("witnesses", [])}
+        for identity in ("witness/s07-path-observations", "witness/s07-semver-observations"):
+            self.assertIn(identity, by_id)
+            self.assertEqual(by_id[identity]["kind"], "native_authority", identity)
+
+    def test_a_rust_gated_witness_must_name_its_gate(self):
+        forged = json.loads(json.dumps(self.cases))
+        forged["witnesses"].append({
+            "id": "witness/forged", "kind": "rust_gated",
+            "artifact": "data/phase1/cases.json", "operations": [],
+            "witnesses": "claims coverage with no gate",
+        })
+        path = ROOT / "data/phase1/cases.json"
+        original = path.read_bytes()
+        try:
+            path.write_text(json.dumps(forged))
+            problems = scope.witness_problems()
+        finally:
+            path.write_bytes(original)
+        self.assertTrue(any("must name the producer command" in p for p in problems))
+
+    def test_a_witness_pointing_at_a_missing_artifact_is_rejected(self):
+        forged = json.loads(json.dumps(self.cases))
+        forged["witnesses"].append({
+            "id": "witness/absent", "kind": "native_authority",
+            "artifact": "data/phase1/does-not-exist.json", "operations": [],
+            "witnesses": "points nowhere",
+        })
+        path = ROOT / "data/phase1/cases.json"
+        original = path.read_bytes()
+        try:
+            path.write_text(json.dumps(forged))
+            problems = scope.witness_problems()
+        finally:
+            path.write_bytes(original)
+        self.assertTrue(any("does not exist" in p for p in problems))
+
+    def test_every_covered_operation_names_a_real_link(self):
+        # A covered row lists every case touching the operation, which can
+        # include a case that witnesses a different gap on the same symbol, so
+        # the covering links are a subset rather than the whole list.
+        linked = scope.cases_by_operation()
+        for row in self.scope["operations"]:
+            if row["disposition"] != "covered":
+                continue
+            self.assertTrue(row["cases"], row["id"])
+            self.assertTrue(set(linked[row["id"]]).issubset(set(row["cases"])), row["id"])
+
+    def test_a_not_implemented_case_never_confers_coverage(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        gap_only = {
+            c["id"] for c in cases if c.get("last_result") == "not_implemented"
+        }
+        self.assertTrue(gap_only, "expected prepared cases reporting a missing Rust entry point")
+        covering = set()
+        for ids in scope.cases_by_operation().values():
+            covering |= set(ids)
+        self.assertEqual(covering & gap_only, set(),
+                         "a case that reports not_implemented must not cover its operation")
+
+    def test_a_case_with_no_recorded_result_does_not_confer_coverage(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        self.assertTrue(all("last_result" in c for c in cases),
+                        "every committed case should carry its last comparison result")
+
+
+class RequestFragmentTests(unittest.TestCase):
+    """A family may be split into per-group fragments."""
+
+    def test_a_string_requests_field_still_works(self):
+        self.assertEqual(capture.request_files({"requests": "a.json"}), ["a.json"])
+
+    def test_a_list_requests_field_is_returned_in_order(self):
+        self.assertEqual(capture.request_files({"requests": ["a.json", "b.json"]}),
+                         ["a.json", "b.json"])
+
+    def test_duplicate_case_ids_across_fragments_are_refused(self):
+        temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, temporary, ignore_errors=True)
+        first, second = Path(temporary) / "one.json", Path(temporary) / "two.json"
+        body = {"version": 1, "requests": [{"case": "x", "operation": "o"}]}
+        first.write_text(json.dumps(body))
+        second.write_text(json.dumps(body))
+        with self.assertRaisesRegex(ValueError, "duplicate case id"):
+            capture.load_requests({"requests": [str(first), str(second)]})
+
+    def test_the_committed_leaves_fragments_have_no_duplicate_cases(self):
+        merged = capture.load_requests(capture.FAMILIES["leaves"])
+        cases = [r["case"] for r in merged["requests"]]
+        self.assertEqual(len(cases), len(set(cases)))
+
+
+class NegativeControlTests(unittest.TestCase):
+    """Plan task 6: the comparator must reject each deliberate corruption.
+
+    Each control builds a capture whose Rust side differs from the native side
+    in exactly one way, and asserts the comparison reports `different` rather
+    than `match`. A comparator that passes these cannot quietly accept the
+    corresponding real regression.
+    """
+
+    def setUp(self):
+        self.temporary = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temporary, ignore_errors=True)
+        self.real = dict(capture.FAMILIES)
+        self.addCleanup(setattr, capture, "FAMILIES", self.real)
+
+    def control(self, name, native, rust, order_sensitive=True):
+        inventory = Path(self.temporary) / f"{name}-inv.json"
+        inventory.write_text(json.dumps({"version": 1, "family": "pilot", "requests": [
+            {"case": "a", "operation": "vfsmatch.readDirectory",
+             "order_sensitive": order_sensitive}]}))
+        capture.FAMILIES = dict(capture.FAMILIES)
+        capture.FAMILIES["pilot"] = dict(capture.FAMILIES["pilot"])
+        capture.FAMILIES["pilot"]["requests"] = str(inventory)
+        directory = Path(self.temporary) / name
+        SyntheticCapture(directory, [{"case": "a", "native": native,
+                                      "rust": {"result": "observed", "observation": rust}}])
+        return capture.compare(directory)
+
+    def assert_different(self, report, what):
+        self.assertEqual(report["counts"]["different"], 1, what)
+        self.assertEqual(report["counts"]["match"], 0, what)
+
+    def test_reordered_collection_output_is_rejected(self):
+        report = self.control(
+            "collection-order",
+            {"ordered": [{"op": "entries", "result": [["a", "1"], ["b", "2"]]}]},
+            {"ordered": [{"op": "entries", "result": [["b", "2"], ["a", "1"]]}]})
+        self.assert_different(report, "a reordered ordered-map must not match")
+
+    def test_reordered_json_members_are_rejected(self):
+        report = self.control(
+            "json-order",
+            {"ordered": [{"op": "marshal", "bytes": '{"b":1,"a":2}'}]},
+            {"ordered": [{"op": "marshal", "bytes": '{"a":2,"b":1}'}]})
+        self.assert_different(report, "reordered JSON members must not match")
+
+    def test_a_wrong_fallback_locale_is_rejected(self):
+        report = self.control(
+            "locale-fallback",
+            {"ordered": [{"op": "select", "requested": "pt-BR", "selected": "pt-br"}]},
+            {"ordered": [{"op": "select", "requested": "pt-BR", "selected": "pt"}]})
+        self.assert_different(report, "a different fallback locale must not match")
+
+    def test_byte_replacement_is_rejected(self):
+        # A replacement-decoded string must never compare equal to the raw
+        # bytes: repairing malformed input early is the regression this catches.
+        report = self.control(
+            "byte-replacement",
+            {"ordered": [{"op": "read", "bytes_hex": "eda0bd"}]},
+            {"ordered": [{"op": "read", "bytes_hex": "efbfbd"}]})
+        self.assert_different(report, "replacement bytes must not match the original")
+
+    def test_a_missing_translation_key_is_rejected(self):
+        report = self.control(
+            "missing-translation",
+            {"ordered": [{"op": "localize", "key": "Cannot_find_name_0", "text": "Nome non trovato"}]},
+            {"ordered": [{"op": "localize", "key": "Cannot_find_name_0", "text": "Cannot find name"}]})
+        self.assert_different(report, "an untranslated fallback must not match a translation")
+
+    def test_an_identical_observation_still_matches(self):
+        # The controls above would be vacuous if the comparator reported
+        # `different` for everything.
+        payload = {"ordered": [{"op": "entries", "result": [["a", "1"]]}]}
+        report = self.control("identical", payload, json.loads(json.dumps(payload)))
+        self.assertEqual(report["counts"]["match"], 1)
+
+
+class LeafReviewRegressions(unittest.TestCase):
+    def test_embedded_assets_are_capture_inputs(self):
+        import unittest.mock
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            asset = root / "crates/leaf/data/value.d.ts"
+            asset.parent.mkdir(parents=True)
+            asset.write_bytes(b"interface Before {}")
+            with unittest.mock.patch.object(capture, "ROOT", root):
+                before = capture.source_closure("leaves", ["crates/leaf"])
+                asset.write_bytes(b"interface After {}")
+                after = capture.source_closure("leaves", ["crates/leaf"])
+            name = "crates/leaf/data/value.d.ts"
+            self.assertIn(name, before)
+            self.assertNotEqual(before[name], after[name])
+        real = capture.source_closure("leaves")
+        self.assertIn("crates/tsr_bundled/bundled/libs/lib.d.ts", real)
+        self.assertIn("crates/tsr_bundled/bundled/CopyrightNotice.txt", real)
+
+    def test_unknown_actions_cannot_agree_as_observations(self):
+        requests = [{"case": "x", "operation": "NewTextRange", "actions": [{"op": "typo"}]}]
+        rows = [{"case": "x", "operation": "NewTextRange", "result": "observed",
+                 "observation": {"ordered": [{"op": "typo", "unsupported_action": "typo"}]}}]
+        for side in ("native", "rust"):
+            with self.subTest(side=side), self.assertRaisesRegex(ValueError, "unsupported action"):
+                capture.validate_response({"observations": rows}, requests, side)
+
+    def test_decoding_cannot_erase_a_requested_trace(self):
+        request = {"case": "x", "operation": "trace", "actions": [{"op": "get"}]}
+        result = {"case": "x", "operation": "trace", "result": "observed",
+                  "observation": {"ordered": []}}
+        for side in ("native", "rust"):
+            with self.subTest(side=side), self.assertRaisesRegex(ValueError, "action result"):
+                capture.validate_response({"observations": [result]}, [request], side)
+        request["actions"] = {"op": "get"}
+        with self.assertRaisesRegex(ValueError, "nonempty array"):
+            capture.validate_response({"observations": [result]}, [request], "native")
+
+    def test_asset_content_does_not_cover_a_filesystem_walk(self):
+        linked = scope.cases_by_operation()
+        self.assertNotIn("leaves/bundled/asset-index-complete",
+                         linked.get("tsc/internal/bundled/embed.go:wrappedFS.WalkDir", []))
+
+    def test_prepared_links_include_all_named_actions(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        operations = {op for c in cases if c["family"] == "leaves" for op in c["operations"]}
+        for operation in ("tsc/internal/locale/locale.go:FromContext",
+                          "tsc/internal/locale/locale.go:HasLocale",
+                          "tsc/internal/collections/multimap.go:MultiMap.Clear"):
+            self.assertIn(operation, operations)
+        for case in cases:
+            for actions in case.get("operation_actions", {}).values():
+                self.assertTrue(set(actions) <= set(case["operations"]), case["id"])
+
+    def test_the_preparation_inventory_accounts_for_every_leaf_operation(self):
+        """Every leaf operation lands in exactly one bucket, and the arithmetic says so.
+
+        This is the published `leaves_prepared` result's own audit: if the
+        buckets did not add up to the roster, a shrinking denominator could
+        report completion without anything being prepared.
+        """
+        current = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        report = scope.leaf_preparation(current, cases)
+        committed = json.loads((ROOT / "data/phase1/leaves-preparation.json").read_text())
+        self.assertEqual(report, committed,
+                         "run `python3 scripts/phase1.py inventory --write`")
+        self.assertEqual(
+            report["total_operations"],
+            report["accounted_operations"] + len(report["pending"]),
+        )
+        self.assertEqual(
+            report["accounted_operations"],
+            report["prepared_operations"]
+            + report["witnessed_operations"]
+            + report["exempt_operations"],
+        )
+        self.assertEqual(report["exempt_operations"], sum(report["exempt_by_category"].values()))
+        # The roster is the whole leaf surface, counted from the scope itself,
+        # so a denominator that quietly shrank would fail here.
+        expected = sum(
+            1 for row in current["operations"] if row["go_package"] in scope.LEAF_PACKAGES
+        )
+        self.assertEqual(report["total_operations"], expected)
+        self.assertEqual(report["complete"], not report["pending"] and not report["roster_problems"])
+
+
+class FrozenObservationTests(unittest.TestCase):
+    """A declared case and a frozen native observation must be the same set.
+
+    `last_result` decides coverage, and it is written into the manifest rather
+    than derived at read time. The cheapest way for that to become fiction is a
+    case that no probe ever ran, or a frozen row for a case nobody declared, so
+    both directions are checked against the committed capture.
+    """
+
+    def setUp(self):
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.root = ROOT / "data/phase1/native"
+
+    def frozen(self, family):
+        provenance = json.loads((self.root / family / "capture-provenance.json").read_text())
+        seen = {}
+        for probe in provenance["native_probes"].values():
+            directory = probe["directory"].removeprefix("native/")
+            document = json.loads((self.root / family / directory / "observations.json").read_text())
+            for row in document["observations"]:
+                # A probe declines the subjects it does not serve; the case is
+                # answered by whichever probe actually observed it.
+                if row["result"] == "native_unavailable" and row["case"] in seen:
+                    continue
+                if row["result"] != "native_unavailable" or row["case"] not in seen:
+                    seen[row["case"]] = row["result"]
+        return seen
+
+    def test_every_declared_case_has_a_frozen_native_observation(self):
+        for family in sorted(capture.FAMILIES):
+            if not (self.root / family / "capture-provenance.json").is_file():
+                continue
+            frozen = self.frozen(family)
+            declared = {c["id"] for c in self.cases["cases"] if c.get("family") == family}
+            self.assertEqual(declared - set(frozen), set(),
+                             f"{family}: declared cases with no frozen observation")
+            self.assertEqual(set(frozen) - declared, set(),
+                             f"{family}: frozen observations for undeclared cases")
+
+    def test_no_case_claims_a_result_its_probe_could_not_produce(self):
+        """A match needs a native observation, not a declined one."""
+        for family in sorted(capture.FAMILIES):
+            if not (self.root / family / "capture-provenance.json").is_file():
+                continue
+            frozen = self.frozen(family)
+            for case in self.cases["cases"]:
+                if case.get("family") != family:
+                    continue
+                if case.get("last_result") in ("match", "different"):
+                    self.assertEqual(
+                        frozen[case["id"]], "observed",
+                        f"{case['id']} claims {case['last_result']} but the frozen native row is "
+                        f"{frozen[case['id']]}",
+                    )
+
+    def test_every_case_id_is_declared_by_a_request(self):
+        for family in sorted(capture.FAMILIES):
+            document = capture.load_requests(capture.FAMILIES[family])
+            requested = {r["case"] for r in document["requests"]}
+            declared = {c["id"] for c in self.cases["cases"] if c.get("family") == family}
+            self.assertEqual(declared - requested, set(),
+                             f"{family}: cases with no request")
+            self.assertEqual(requested - declared, set(),
+                             f"{family}: requests with no case record")
+
+
+class RecordedResultTests(unittest.TestCase):
+    """`last_result` is derived from a capture, never asserted by hand."""
+
+    def test_record_refuses_a_capture_that_does_not_match_the_manifest(self):
+        """A capture missing a declared case, or carrying an undeclared one, is a defect."""
+        calls = {}
+
+        def fake_compare(directory, require):
+            calls["directory"] = directory
+            return {"family": "leaves", "rows": [{"case": "leaves/not-declared", "result": "match"}]}
+
+        original = phase1.capture_module.compare
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), False)
+        finally:
+            phase1.capture_module.compare = original
+        message = str(caught.exception)
+        self.assertIn("declared but", message)
+        self.assertIn("run but not declared", message)
+
+    def test_record_refuses_a_partial_capture(self):
+        """A partial capture reports unselected cases as `not_run`.
+
+        That satisfies the case-set check while carrying no result for them, so
+        recording one would replace every unselected case's result with
+        `not_run` and silently unprepare it.
+        """
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        leaves = [c for c in cases if c.get("family") == "leaves"]
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[1:] = [{"case": r["case"], "result": "not_run"} for r in rows[1:]]
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "partial": True, "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), True)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertIn("partial capture", str(caught.exception))
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before)
+
+    def test_record_refuses_an_unrun_case_even_in_a_whole_family_capture(self):
+        """The `partial` flag is not the only way an unrun row can arrive."""
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        leaves = [c for c in cases if c.get("family") == "leaves"]
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[0] = {"case": rows[0]["case"], "result": "not_run"}
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "partial": False, "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), True)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertIn("were not run", str(caught.exception))
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before)
+
+    def test_record_reports_what_it_would_change_without_writing(self):
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        leaves = [c for c in cases["cases"] if c.get("family") == "leaves"]
+        self.assertTrue(leaves)
+        flipped = "different" if leaves[0]["last_result"] != "different" else "match"
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[0] = {"case": leaves[0]["id"], "result": flipped}
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            result = phase1.record_results(Path("/nowhere"), False)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before,
+                         "a dry run must not write")
+        self.assertEqual(result["changed"], [
+            {"case": leaves[0]["id"], "was": leaves[0]["last_result"], "now": flipped}
+        ])
+        self.assertEqual(result["cases"], len(leaves))
+
+
+class RosterLedgerTests(unittest.TestCase):
+    """The F1a roster shrinks only through a ledger that itself has to validate.
+
+    Dropping an operation from the roster is a claim, not a bookkeeping step:
+    it says this step does not owe a prepared case for it. Every way of making
+    that claim without evidence is rejected here, because a roster that can be
+    trimmed silently turns a green gate into an unfalsifiable one.
+    """
+
+    def setUp(self):
+        self.scope = json.loads((ROOT / "data/phase1/scope.json").read_text())
+        self.cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
+        self.path = ROOT / "data/phase1/leaf-roster.json"
+        self.original = self.path.read_bytes() if self.path.is_file() else None
+
+    def tearDown(self):
+        if self.original is None:
+            self.path.unlink(missing_ok=True)
+        else:
+            self.path.write_bytes(self.original)
+
+    def forge(self, exemptions):
+        document = json.loads(self.original) if self.original else {"version": 1}
+        document["exemptions"] = exemptions
+        self.path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+        return scope.roster_problems(self.scope, self.cases)
+
+    def a_leaf_operation(self, disposition="missing"):
+        for row in self.scope["operations"]:
+            if row["go_package"] in scope.LEAF_PACKAGES and not row["cases"] \
+                    and row["disposition"] == disposition:
+                return row["id"]
+        self.fail(f"no unlinked leaf operation with disposition {disposition}")
+
+    def test_the_committed_ledger_validates(self):
+        self.assertEqual(scope.roster_problems(self.scope, self.cases), [])
+
+    def test_an_exemption_naming_an_unknown_operation_is_rejected(self):
+        problems = self.forge([{
+            "operation": "tsc/internal/core/core.go:NoSuchFunction",
+            "category": "go_runtime", "owner": "nothing", "evidence": "invented",
+        }])
+        self.assertTrue(any("not an operation in the frozen scope" in p for p in problems))
+
+    def test_an_exemption_outside_the_leaf_packages_is_rejected(self):
+        outside = next(
+            row["id"] for row in self.scope["operations"]
+            if row["go_package"] not in scope.LEAF_PACKAGES
+        )
+        problems = self.forge([{
+            "operation": outside, "category": "later_step",
+            "owner": "F2a", "evidence": "read at the pin",
+        }])
+        self.assertTrue(any("never on F1a's roster" in p for p in problems))
+
+    def test_an_unknown_category_is_rejected(self):
+        problems = self.forge([{
+            "operation": self.a_leaf_operation(), "category": "because_i_say_so",
+            "owner": "nobody", "evidence": "none",
+        }])
+        self.assertTrue(any("unknown category" in p for p in problems))
+
+    def test_an_exemption_without_owner_or_evidence_is_rejected(self):
+        operation = self.a_leaf_operation()
+        for field in ("owner", "evidence"):
+            entry = {"operation": operation, "category": "go_runtime",
+                     "owner": "Rust ownership", "evidence": "upstream/... :1"}
+            entry[field] = ""
+            problems = self.forge([entry])
+            self.assertTrue(any(f"records no {field}" in p for p in problems), field)
+
+    def test_a_duplicate_exemption_is_rejected(self):
+        operation = self.a_leaf_operation()
+        entry = {"operation": operation, "category": "go_runtime",
+                 "owner": "Rust ownership", "evidence": "upstream/... :1"}
+        problems = self.forge([entry, dict(entry)])
+        self.assertTrue(any("duplicate exemption" in p for p in problems))
+
+    def test_exempting_an_operation_that_has_a_prepared_case_is_rejected(self):
+        """Two contradictory answers about the same operation is a defect, not a choice."""
+        covered = next(iter(scope.cases_by_operation()))
+        problems = self.forge([{
+            "operation": covered, "category": "equivalent_rust",
+            "owner": "Iterator::filter", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("but also prepared by" in p for p in problems))
+
+    def test_a_not_implemented_case_still_blocks_an_exemption(self):
+        """Preparation is not coverage, and the contradiction check must use preparation.
+
+        A case reporting `not_implemented` runs and classifies the gap, so it
+        prepares its operation while covering nothing. Asking only for covering
+        links let an operation be prepared and exempted at the same time, which
+        is how two committed exemptions survived a validating ledger.
+        """
+        prepared = scope.prepared_links(self.cases)
+        covering = scope.cases_by_operation()
+        gap_only = sorted(set(prepared) - set(covering))
+        self.assertTrue(gap_only, "expected operations prepared only by a recorded gap")
+        problems = self.forge([{
+            "operation": gap_only[0], "category": "later_step",
+            "owner": "some other step", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("but also prepared by" in p for p in problems), problems)
+
+    def test_prepared_links_and_the_gate_agree(self):
+        report = scope.leaf_preparation(self.scope, self.cases)
+        links = scope.prepared_links(self.cases)
+        leaf = {row["id"] for row in self.scope["operations"]
+                if row["go_package"] in scope.LEAF_PACKAGES}
+        self.assertEqual(
+            report["prepared_operations"] + report["witnessed_operations"],
+            len(leaf & set(links)),
+        )
+
+    def test_an_equivalent_rust_exemption_must_agree_with_the_scope_row(self):
+        problems = self.forge([{
+            "operation": self.a_leaf_operation("missing"),
+            "category": "equivalent_rust",
+            "owner": "Iterator::find", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("rebuild the scope" in p for p in problems))
+
+    def test_a_ledger_problem_keeps_the_published_result_false(self):
+        """Even with nothing pending, an indefensible ledger cannot publish green."""
+        self.forge([{
+            "operation": self.a_leaf_operation(), "category": "nonsense",
+            "owner": "", "evidence": "",
+        }])
+        report = scope.leaf_preparation(self.scope, self.cases)
+        self.assertTrue(report["roster_problems"])
+        self.assertFalse(report["complete"])
+
+    def test_an_absent_ledger_is_itself_a_problem(self):
+        self.path.unlink(missing_ok=True)
+        self.assertTrue(any("has no reviewed ledger" in p
+                            for p in scope.roster_problems(self.scope, self.cases)))
+
+    def test_every_exempt_category_is_documented(self):
+        document = json.loads(self.original) if self.original else {"exemptions": []}
+        for entry in document.get("exemptions", []):
+            self.assertIn(entry["category"], scope.ROSTER_CATEGORIES)
+            self.assertTrue(scope.ROSTER_CATEGORIES[entry["category"]])
 
 
 if __name__ == "__main__":

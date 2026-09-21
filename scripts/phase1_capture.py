@@ -38,6 +38,26 @@ from s08_oracle import ROOT, canonical, digest  # noqa: E402
 
 RESULTS = ("match", "different", "not_implemented", "native_unavailable", "harness_failed", "not_run")
 
+# `s08_oracle.canonical` serialises with sort_keys=True, so two observations
+# whose JSON objects differ only in member order compare equal. That is fatal
+# for any case whose subject *is* order -- ordered maps and sets, JSON member
+# order, iteration order.
+#
+# The fix is representational, not a different comparison. Canonicalisation
+# preserves *array* order, so ordered data travels as an array and compares
+# correctly through the existing canonical path. Comparing the raw emitted
+# bytes instead would be actively wrong: Go's encoding/json sorts map keys
+# while Rust's serde_json preserve_order does not, so two agreeing sides would
+# differ on named fields alone.
+#
+# A request declares `order_sensitive: true`. Its observation must then carry
+# the ordered payload under `ordered` as a list, and no value nested inside
+# those elements may be a multi-key object, because such an object is an
+# ordered map whose order canonicalisation would erase. An element may itself
+# be a multi-key object: those are named result fields, and their order carries
+# no information.
+ORDER_SENSITIVE_KEY = "order_sensitive"
+
 # Each side may only report the statuses it can legitimately produce. A Rust
 # driver cannot declare the native authority unavailable, and the native probe
 # cannot declare a Rust entry point missing.
@@ -75,11 +95,13 @@ FAMILIES = {
         "requests": "data/phase1/requests/pilot.json",
         "native_probes": [
             {
+                "name": "vfsmatch",
                 "package": "vfs/vfsmatch",
                 "probe": "tools/phase1/pilot/vfsmatch_probe_test.go",
                 "test": "TestPhase1PilotReadDirectory",
             },
             {
+                "name": "commandline",
                 "package": "tsoptions",
                 "probe": "tools/phase1/pilot/commandline_probe_test.go",
                 "test": "TestPhase1PilotCommandLine",
@@ -88,20 +110,87 @@ FAMILIES = {
                 "trimpath": False,
             },
             {
+                "name": "json",
                 "package": "json",
                 "probe": "tools/phase1/pilot/json_probe_test.go",
                 "test": "TestPhase1PilotJson",
             },
             {
+                "name": "locale",
                 "package": "locale",
                 "probe": "tools/phase1/pilot/locale_probe_test.go",
                 "test": "TestPhase1PilotLocale",
             },
         ],
         "rust_package": "tsr_tsoptions",
+        "rust_target_kind": "example",
         "rust_example": "phase1_pilot",
         "rust_target": "crates/tsr_tsoptions/examples/phase1_pilot.rs",
         "rust_driver": "tools/phase1/pilot/rust_observation.rs",
+    },
+    "leaves": {
+        # One request fragment per coverage group, so each group owns its file.
+        "requests": [
+            "data/phase1/requests/leaves.json",
+            "data/phase1/requests/leaves-collections.json",
+            "data/phase1/requests/leaves-core.json",
+            "data/phase1/requests/leaves-options.json",
+            "data/phase1/requests/leaves-helpers.json",
+            "data/phase1/requests/leaves-json.json",
+            "data/phase1/requests/leaves-text.json",
+            "data/phase1/requests/leaves-locale.json",
+            "data/phase1/requests/leaves-diagnostics.json",
+            "data/phase1/requests/leaves-bundled.json",
+        ],
+        "native_probes": [
+            {"name": "collections", "package": "collections",
+             "probe": "tools/phase1/leaves/collections_probe_test.go",
+             "test": "TestPhase1LeavesCollections"},
+            {"name": "core", "package": "core",
+             "probe": "tools/phase1/leaves/core_probe_test.go",
+             "test": "TestPhase1LeavesCore"},
+            # Three probes share package `core`: the option getters and the
+            # generic helpers are separate surfaces with separate action
+            # vocabularies, and one overlay file per probe keeps them so.
+            {"name": "options", "package": "core",
+             "probe": "tools/phase1/leaves/options_probe_test.go",
+             "test": "TestPhase1LeavesOptions"},
+            {"name": "helpers", "package": "core",
+             "probe": "tools/phase1/leaves/helpers_probe_test.go",
+             "test": "TestPhase1LeavesHelpers"},
+            {"name": "json", "package": "json",
+             "probe": "tools/phase1/leaves/json_probe_test.go",
+             "test": "TestPhase1LeavesJson"},
+            {"name": "stringutil", "package": "stringutil",
+             "probe": "tools/phase1/leaves/text_probe_test.go",
+             "test": "TestPhase1LeavesText"},
+            {"name": "semver", "package": "semver",
+             "probe": "tools/phase1/leaves/semver_probe_test.go",
+             "test": "TestPhase1LeavesSemver"},
+            {"name": "jsnum", "package": "jsnum",
+             "probe": "tools/phase1/leaves/jsnum_probe_test.go",
+             "test": "TestPhase1LeavesJsnum"},
+            # Two probes in one package: the second observes the process-global
+            # default locale, which needs its own process to be honest.
+            {"name": "locale", "package": "locale",
+             "probe": "tools/phase1/leaves/locale_probe_test.go",
+             "test": "TestPhase1LeavesLocale"},
+            {"name": "locale-default", "package": "locale",
+             "probe": "tools/phase1/leaves/locale_default_probe_test.go",
+             "test": "TestPhase1LeavesLocaleDefault"},
+            {"name": "diagnostics", "package": "diagnostics",
+             "probe": "tools/phase1/leaves/diagnostics_probe_test.go",
+             "test": "TestPhase1LeavesDiagnostics"},
+            # bundledSourceDir locates its package through runtime.Caller(0),
+            # which under -trimpath returns a wrong path and does NOT panic.
+            {"name": "bundled", "package": "bundled",
+             "probe": "tools/phase1/leaves/bundled_probe_test.go",
+             "test": "TestPhase1LeavesBundled", "trimpath": False},
+        ],
+        "rust_package": "phase1_leaves",
+        "rust_target_kind": "bin",
+        "rust_example": "phase1_leaves",
+        "rust_target": "tools/phase1/leaves/src/main.rs",
     },
 }
 # The six command families the plan names. Only `pilot` is wired at F0; the
@@ -110,6 +199,35 @@ FAMILIES = {
 DECLARED_FAMILIES = ("leaves", "filesystem", "config", "syntax", "utilities", "integration")
 
 _METADATA: dict | None = None
+
+
+def request_files(spec: dict) -> list[str]:
+    """A family's request files, in declared order.
+
+    A family may be split into per-group fragments so each coverage group owns
+    its own file. They are merged in declared order and duplicate case ids
+    across fragments are refused.
+    """
+    declared = spec["requests"]
+    return [declared] if isinstance(declared, str) else list(declared)
+
+
+def load_requests(spec: dict) -> dict:
+    version = 1
+    merged: list[dict] = []
+    seen: dict[str, str] = {}
+    for relative in request_files(spec):
+        document = strict_json_loads((ROOT / relative).read_bytes())
+        version = document.get("version", version)
+        for request in document["requests"]:
+            case = request["case"]
+            if case in seen:
+                raise ValueError(
+                    f"duplicate case id {case!r} in {relative} and {seen[case]}"
+                )
+            seen[case] = relative
+            merged.append(request)
+    return {"version": version, "requests": merged}
 
 
 def sha_file(path: Path) -> str:
@@ -191,8 +309,11 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
     spec = FAMILIES[family]
     paths: set[Path] = set()
 
-    paths.add(Path(spec["requests"]))
-    paths.add(Path(spec["rust_driver"]))
+    paths.update(Path(name) for name in request_files(spec))
+    # The pilot's driver and Cargo target are different files (a thin example
+    # includes the driver); a harness binary is its own target.
+    if spec.get("rust_driver"):
+        paths.add(Path(spec["rust_driver"]))
     paths.add(Path(spec["rust_target"]))
     for probe in spec["native_probes"]:
         paths.add(Path(probe["probe"]))
@@ -225,7 +346,10 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
             relative = path.relative_to(ROOT)
             if relative.parts[0] == "target" or "target" in relative.parts[:2]:
                 continue
-            if path.suffix in (".rs", ".toml") or path.name in ("README.md", "NOTICE", "LICENSE"):
+            # Embedded assets and build-script inputs are compiler inputs too.
+            # Restricting this to Rust/TOML misses e.g. bundled/libs/*.d.ts,
+            # whose bytes are exactly what the leaf asset probes measure.
+            if not any(part in (".git", "target", "__pycache__") for part in path.relative_to(directory).parts):
                 paths.add(relative)
 
     closure: dict[str, str] = {}
@@ -238,10 +362,17 @@ def source_closure(family: str, packages: list[str] | None = None) -> dict[str, 
 
 def build_rust(family: str) -> Path:
     spec = FAMILIES[family]
+    # A family's driver is either an example on an existing crate or a private
+    # harness binary under tools/phase1/. Both are supported so a family whose
+    # leaf crates no published crate depends on directly can own its host.
+    kind = spec.get("rust_target_kind", "example")
+    if kind not in ("example", "bin"):
+        raise ValueError(f"unknown rust_target_kind {kind!r} for {family}")
+    selector = ["--example", spec["rust_example"]] if kind == "example" else ["--bin", spec["rust_example"]]
     messages = command(
         [
             "cargo", "build", "--locked", "--offline", "-p", spec["rust_package"],
-            "--example", spec["rust_example"], "--message-format=json",
+            *selector, "--message-format=json",
         ],
         cwd=ROOT,
     )
@@ -311,6 +442,42 @@ def run_probe(directory: Path, package: str, source: str, request: dict, test: s
     return report
 
 
+def order_safe_problems(observation: object) -> list[str]:
+    """Check an order-sensitive observation uses an order-preserving shape."""
+    if not isinstance(observation, dict) or "ordered" not in observation:
+        return [
+            "an order-sensitive observation must carry its ordered payload under `ordered`"
+        ]
+    payload = observation["ordered"]
+    if not isinstance(payload, list):
+        return [
+            "`ordered` must be a list; a JSON object's member order is lost to canonicalisation"
+        ]
+
+    def nested(value: object, path: str) -> list[str]:
+        if isinstance(value, dict):
+            if len(value) > 1:
+                return [
+                    f"{path} is a {len(value)}-key object nested inside the ordered payload; "
+                    "ordered data must be an entry array, because canonicalisation sorts keys"
+                ]
+            return [p for k, v in value.items() for p in nested(v, f"{path}.{k}")]
+        if isinstance(value, list):
+            return [p for i, v in enumerate(value) for p in nested(v, f"{path}[{i}]")]
+        return []
+
+    problems: list[str] = []
+    for index, element in enumerate(payload):
+        where = f"ordered[{index}]"
+        if isinstance(element, dict):
+            # The element's own named fields are fine; their values are not.
+            for key, value in element.items():
+                problems.extend(nested(value, f"{where}.{key}"))
+        else:
+            problems.extend(nested(element, where))
+    return problems
+
+
 def validate_response(document: object, requests: list[dict], side: str) -> list[dict]:
     """Validate an observation document as an ordered sequence.
 
@@ -357,6 +524,31 @@ def validate_response(document: object, requests: list[dict], side: str) -> list
             )
         if result == "observed" and "observation" not in row:
             raise ValueError(f"{where} is observed but carries no observation payload")
+        if "actions" in request:
+            actions = request["actions"]
+            if not isinstance(actions, list) or not actions or any(
+                not isinstance(action, dict) or not isinstance(action.get("op"), str)
+                or not action["op"] for action in actions
+            ):
+                raise ValueError(f"{where}: actions must be a nonempty array of named operations")
+            if result == "observed":
+                observed = row["observation"]
+                trace = observed.get("ordered") if isinstance(observed, dict) else None
+                if not isinstance(trace, list) or len(trace) != len(actions):
+                    raise ValueError(f"{where}: observation omitted or added an action result")
+        if result == "observed" and isinstance(row["observation"], dict):
+            for action in row["observation"].get("ordered", []):
+                if (isinstance(action, dict) and "unsupported_action" in action) or (
+                    isinstance(action, list) and action and action[0] == "unsupported_action"
+                ):
+                    raise ValueError(f"{where}: unsupported action is a harness failure: {action}")
+        if result == "observed" and request.get(ORDER_SENSITIVE_KEY):
+            problems = order_safe_problems(row["observation"])
+            if problems:
+                raise ValueError(
+                    f"{where} answers order-sensitive case {case!r} with an order-erasing "
+                    f"representation: {problems[0]}"
+                )
         if result == "not_implemented":
             missing = row.get("missing_operation")
             required = ("operation", "go_authority", "intended_signature", "production_home")
@@ -386,7 +578,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     if recorded_pin != recorded_gitlink:
         raise ValueError("data/upstream.json and the upstream gitlink disagree on the pin")
 
-    document = strict_json_loads((ROOT / spec["requests"]).read_bytes())
+    document = load_requests(spec)
     selected = document["requests"]
     partial = False
     if cases:
@@ -407,8 +599,15 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
     # One native probe per Go package. Each sees the whole schedule and declines
     # the operations it does not serve, so every case has a native row.
     native_reports = {}
+    seen_probe_names = set()
     for probe in spec["native_probes"]:
-        name = probe["package"].replace("/", "-")
+        # Keyed by the probe's own name, not its package: a family may need two
+        # probes in one Go package, for instance to give a process-global
+        # default a fresh process per case.
+        name = probe["name"]
+        if name in seen_probe_names:
+            raise ValueError(f"duplicate native probe name {name!r} in family {family}")
+        seen_probe_names.add(name)
         report = run_probe(
             output / "native" / name,
             probe["package"],
@@ -418,7 +617,8 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
             probe.get("trimpath", True),
         )
         validate_response(report, selected, "native")
-        native_reports[probe["package"]] = {
+        native_reports[name] = {
+            "package": probe["package"],
             "directory": f"native/{name}",
             "observations_sha256": sha_file(output / "native" / name / "observations.json"),
             "go": report.get("go"),
@@ -444,7 +644,7 @@ def capture(family: str, output: Path, cases: list[str] | None = None) -> dict:
         )
 
     provenance = {
-        "version": 2,
+        "version": 3,
         "family": family,
         "pin": recorded_pin,
         "upstream_gitlink": recorded_gitlink,
@@ -470,7 +670,7 @@ def authenticate(directory: Path) -> dict:
 
 def _authenticate(directory: Path) -> dict:
     provenance = strict_json_loads((directory / "provenance.json").read_bytes())
-    if provenance.get("version") != 2:
+    if provenance.get("version") != 3:
         raise ValueError(
             f"capture provenance version {provenance.get('version')!r} is not readable by this "
             "comparator; recapture the family"
@@ -534,14 +734,14 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
     """
     documents = {}
     failures: list[str] = []
-    for package, probe in sorted(provenance["native_probes"].items()):
+    for probe_name, probe in sorted(provenance["native_probes"].items()):
         document = strict_json_loads((directory / probe["directory"] / "observations.json").read_bytes())
         rows = validate_response(document, requests, "native")
-        documents[package] = rows
+        documents[probe_name] = rows
         for row in rows:
             if row["result"] == "harness_failed":
                 cause = row.get("error") or row.get("reason") or "no cause recorded"
-                failures.append(f"{package} failed on {row['case']}: {cause}")
+                failures.append(f"{probe_name} failed on {row['case']}: {cause}")
     if failures:
         raise ValueError(
             f"{len(failures)} native harness failure(s) invalidate this capture: "
@@ -549,7 +749,7 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
         )
 
     merged: dict[str, dict] = {}
-    for package, rows in documents.items():
+    for probe_name, rows in documents.items():
         for row in rows:
             case = row["case"]
             if row["result"] != "observed":
@@ -560,7 +760,7 @@ def _merge_native(directory: Path, provenance: dict, requests: list[dict]) -> di
                 raise ValueError(
                     f"two native probes both observed case {case}; the authority is ambiguous"
                 )
-            merged[case] = dict(row, native_package=package)
+            merged[case] = dict(row, native_probe=probe_name)
     return merged
 
 
@@ -610,7 +810,7 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
     directory = Path(directory).resolve()
     provenance, requests, native_rows, rust_rows = validate_capture(directory)
 
-    inventory = strict_json_loads((ROOT / FAMILIES[provenance["family"]]["requests"]).read_bytes())
+    inventory = load_requests(FAMILIES[provenance["family"]])
     all_cases = [r["case"] for r in inventory["requests"]]
     selected = {r["case"] for r in requests}
     unknown = selected - set(all_cases)
@@ -646,6 +846,9 @@ def compare(directory: Path, require_parity: bool = False) -> dict:
         if native["result"] == "native_unavailable":
             rows.append({"case": case, "result": "native_unavailable", "reason": native.get("reason", "")})
             continue
+        # Canonicalisation preserves array order, and order-sensitive cases are
+        # required to put their ordered payload in an array, so this comparison
+        # sees order differences without being confused by named-field order.
         same = canonical(native.get("observation")) == canonical(rust.get("observation"))
         rows.append({
             "case": case,

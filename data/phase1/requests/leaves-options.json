@@ -1,0 +1,2007 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "clone",
+          "options": {}
+        },
+        {
+          "op": "clone",
+          "options": {
+            "all": 2,
+            "allowArbitraryExtensions": 2,
+            "allowImportingTsExtensions": 1,
+            "allowJs": 1,
+            "allowNonTsExtensions": 2,
+            "allowSyntheticDefaultImports": 1,
+            "allowUmdGlobalAccess": 1,
+            "allowUnreachableCode": 2,
+            "allowUnusedLabels": 1,
+            "alwaysStrict": 2,
+            "assumeChangesOnlyAffectDirectDependencies": 2,
+            "baseUrl": "baseUrl#102",
+            "build": 2,
+            "checkJs": 1,
+            "checkers": 3,
+            "composite": 1,
+            "configFilePath": "configFilePath#106",
+            "customConditions": [
+              "customConditions#9a",
+              "customConditions#9b"
+            ],
+            "declaration": 1,
+            "declarationDir": "declarationDir#15",
+            "declarationMap": 1,
+            "deduplicatePackages": 2,
+            "diagnostics": 2,
+            "disableReferencedProjectLoad": 2,
+            "disableSizeLimit": 1,
+            "disableSolutionSearching": 1,
+            "disableSourceOfProjectReferenceRedirect": 2,
+            "downlevelIteration": 2,
+            "emitBOM": 1,
+            "emitDeclarationOnly": 2,
+            "emitDecoratorMetadata": 2,
+            "erasableSyntaxOnly": 1,
+            "esModuleInterop": 1,
+            "exactOptionalPropertyTypes": 2,
+            "experimentalDecorators": 1,
+            "explainFiles": 2,
+            "extendedDiagnostics": 1,
+            "forceConsistentCasingInFileNames": 2,
+            "generateCpuProfile": "generateCpuProfile#111",
+            "generateTrace": "generateTrace#112",
+            "help": 1,
+            "ignoreConfig": 1,
+            "ignoreDeprecations": "ignoreDeprecations#29",
+            "importHelpers": 1,
+            "incremental": 1,
+            "init": 2,
+            "inlineSourceMap": 2,
+            "inlineSources": 1,
+            "isolatedDeclarations": 2,
+            "isolatedModules": 1,
+            "jsx": 5,
+            "jsxFactory": "jsxFactory#36",
+            "jsxFragmentFactory": "jsxFragmentFactory#37",
+            "jsxImportSource": "jsxImportSource#38",
+            "lib": [
+              "lib#39a",
+              "lib#39b"
+            ],
+            "libReplacement": 1,
+            "listEmittedFiles": 2,
+            "listFiles": 1,
+            "listFilesOnly": 1,
+            "locale": "locale#41",
+            "mapRoot": "mapRoot#42",
+            "maxNodeModuleJsDepth": 7,
+            "module": 102,
+            "moduleDetection": 2,
+            "moduleResolution": 99,
+            "moduleSuffixes": [
+              "moduleSuffixes#45a",
+              "moduleSuffixes#45b"
+            ],
+            "newLine": 1,
+            "noCheck": 2,
+            "noDtsResolution": 2,
+            "noEmit": 1,
+            "noEmitForJsFiles": 2,
+            "noEmitHelpers": 2,
+            "noEmitOnError": 2,
+            "noErrorTruncation": 1,
+            "noFallthroughCasesInSwitch": 2,
+            "noImplicitAny": 1,
+            "noImplicitOverride": 2,
+            "noImplicitReturns": 1,
+            "noImplicitThis": 2,
+            "noLib": 1,
+            "noPropertyAccessFromIndexSignature": 2,
+            "noResolve": 1,
+            "noUncheckedIndexedAccess": 1,
+            "noUncheckedSideEffectImports": 1,
+            "noUnusedLocals": 1,
+            "noUnusedParameters": 2,
+            "outDir": "outDir#65",
+            "outFile": "outFile#105",
+            "paths": [
+              [
+                "@app/*",
+                [
+                  "src/app/*",
+                  "lib/app/*"
+                ]
+              ],
+              [
+                "@absent/*",
+                null
+              ]
+            ],
+            "pathsBasePath": "pathsBasePath#108",
+            "pprofDir": "pprofDir#127",
+            "preserveConstEnums": 2,
+            "preserveSymlinks": 1,
+            "preserveWatchOutput": 1,
+            "pretty": 2,
+            "project": "project#69",
+            "quiet": 2,
+            "reactNamespace": "reactNamespace#75",
+            "removeComments": 2,
+            "resolveJsonModule": 1,
+            "resolvePackageJsonExports": 2,
+            "resolvePackageJsonImports": 1,
+            "rewriteRelativeImportExtensions": 1,
+            "rootDir": "rootDir#76",
+            "rootDirs": [
+              "rootDirs#77a",
+              "rootDirs#77b"
+            ],
+            "runExternalCode": 1,
+            "showConfig": 1,
+            "singleThreaded": 1,
+            "skipDefaultLibCheck": 2,
+            "skipLibCheck": 1,
+            "sourceMap": 1,
+            "sourceRoot": "sourceRoot#89",
+            "stableTypeOrdering": 2,
+            "strict": 1,
+            "strictBindCallApply": 2,
+            "strictBuiltinIteratorReturn": 1,
+            "strictFunctionTypes": 2,
+            "strictNullChecks": 1,
+            "strictPropertyInitialization": 2,
+            "stripInternal": 1,
+            "suppressOutputPathCheck": 1,
+            "target": 11,
+            "traceResolution": 1,
+            "tsBuildInfoFile": "tsBuildInfoFile#93",
+            "typeRoots": [
+              "typeRoots#94a",
+              "typeRoots#94b"
+            ],
+            "types": [
+              "types#95a",
+              "types#95b"
+            ],
+            "useDefineForClassFields": 1,
+            "useUnknownInCatchVariables": 2,
+            "verbatimModuleSyntax": 1,
+            "version": 1,
+            "watch": 2
+          }
+        },
+        {
+          "op": "clone",
+          "options": {
+            "all": 2,
+            "allowSyntheticDefaultImports": 1,
+            "alwaysStrict": 2,
+            "baseUrl": "baseUrl#102",
+            "build": 2,
+            "checkers": 3,
+            "configFilePath": "configFilePath#106",
+            "diagnostics": 2,
+            "downlevelIteration": 2,
+            "esModuleInterop": 1,
+            "explainFiles": 2,
+            "extendedDiagnostics": 1,
+            "generateCpuProfile": "generateCpuProfile#111",
+            "generateTrace": "generateTrace#112",
+            "help": 1,
+            "listEmittedFiles": 2,
+            "listFiles": 1,
+            "listFilesOnly": 1,
+            "noDtsResolution": 2,
+            "noEmitForJsFiles": 2,
+            "outFile": "outFile#105",
+            "pathsBasePath": "pathsBasePath#108",
+            "pprofDir": "pprofDir#127",
+            "preserveWatchOutput": 1,
+            "pretty": 2,
+            "quiet": 2,
+            "runExternalCode": 1,
+            "showConfig": 1,
+            "singleThreaded": 1,
+            "version": 1,
+            "watch": 2
+          }
+        }
+      ],
+      "case": "leaves/options/clone-field-roster",
+      "discriminates": "a Clone that dropped a field: the row names every field the pinned struct declares with the value the copy carries, so a copy that skipped the six deprecated fields, the twenty-four internal ones or configFilePath is named rather than hidden inside a whole-struct comparison. The second action populates every field and the third only the deprecated and internal ones, so a copy that preserves the documented surface and drops the rest still fails the third action alone. The first action pins the zero value, where an absent slice, pointer and path map must stay absent rather than becoming empty. On the Rust side no wrong clone can fail this: tsr_core::CompilerOptions derives Clone, which copies every field by construction. What it catches there is a roster that has drifted from the pinned struct, and on the Go side it catches a hand-written clone that dropped a field",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.Clone",
+      "order_sensitive": true,
+      "subject": "options.Clone"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_allow_js",
+          "options": {}
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "checkJs": 2
+          }
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "allowJs": 1,
+            "checkJs": 2
+          }
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "allowJs": 2,
+            "checkJs": 1
+          }
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "allowJs": 3,
+            "checkJs": 2
+          }
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "checkJs": 3
+          }
+        },
+        {
+          "op": "get_allow_js",
+          "options": {
+            "checkJs": 0
+          }
+        }
+      ],
+      "case": "leaves/options/allow-js-falls-back-to-check-js",
+      "discriminates": "a port written as `allowJs.is_true() || checkJs.is_true()`: allowJs explicitly false with checkJs true is false, because the fallback is reached only when allowJs is unset. The out-of-domain allowJs byte is not unset either, so it answers false while an `if allowJs.is_true() {..} else {checkJs..}` port would consult checkJs; and an out-of-domain checkJs is not TSTrue, so a port testing `!checkJs.is_false()` answers true where the pin answers false",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowJS",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_emit_script_target",
+          "options": {}
+        },
+        {
+          "op": "get_emit_script_target",
+          "options": {
+            "target": 1
+          }
+        },
+        {
+          "op": "get_emit_script_target",
+          "options": {
+            "target": 12
+          }
+        },
+        {
+          "op": "get_emit_script_target",
+          "options": {
+            "target": 99
+          }
+        },
+        {
+          "op": "get_emit_script_target",
+          "options": {
+            "target": 100
+          }
+        },
+        {
+          "op": "get_emit_script_target",
+          "options": {
+            "target": -1
+          }
+        }
+      ],
+      "case": "leaves/options/emit-script-target-default",
+      "discriminates": "a port defaulting to ScriptTargetLatest: the unset target answers ScriptTargetLatestStandard (ES2025, 12), not ESNext (99). Only the zero value None is unset, so ES5, ESNext, JSON and an out-of-domain negative are all returned unchanged rather than defaulted",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitScriptTarget",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_emit_module_kind",
+          "options": {}
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "module": 4
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "module": 0,
+            "target": 1
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 99
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 100
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 9
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 8
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 7
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 6
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 2
+          }
+        },
+        {
+          "op": "get_emit_module_kind",
+          "options": {
+            "target": 1
+          }
+        }
+      ],
+      "case": "leaves/options/emit-module-kind-target-cascade",
+      "discriminates": "a port testing `target >= ESNext` instead of `target == ESNext` for the first arm: ScriptTargetJSON is 100 and would take that arm, but the pin compares for equality and falls through to the `>= ES2022` arm, answering ModuleKindES2022. Each later arm is driven at its boundary and one below it, and an explicitly set module wins over the whole cascade",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleKind",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_module_resolution_kind",
+          "options": {}
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 1
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 2
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "module": 100,
+            "moduleResolution": 2
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "module": 101
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "module": 102
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "module": 199
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "module": 200
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 3
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 99
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 100
+          }
+        },
+        {
+          "op": "get_module_resolution_kind",
+          "options": {
+            "moduleResolution": 42
+          }
+        }
+      ],
+      "case": "leaves/options/module-resolution-kind-arms",
+      "discriminates": "a port that derives only for the unset moduleResolution, or that maps an unrecognised one to Bundler: Classic and Node10 are both re-derived from the emitted module kind like the unset value, while an out-of-domain 42 takes the default arm and is returned unchanged. The derivation is driven on all four of its arms, including ModuleKindPreserve, which is 200 and therefore not one of the three module kinds the switch lists (Node16, Node18, Node20), so it falls to the default",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetModuleResolutionKind",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {}
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "moduleDetection": 1
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "moduleDetection": 2
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "moduleDetection": 3
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "moduleDetection": 7
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 99
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 100
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 101
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 102
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 199
+          }
+        },
+        {
+          "op": "get_emit_module_detection_kind",
+          "options": {
+            "module": 200
+          }
+        }
+      ],
+      "case": "leaves/options/emit-module-detection-kind-range",
+      "discriminates": "a port testing `moduleKind >= Node16` without the upper bound: ModuleKindPreserve is 200, past NodeNext (199), so it answers Auto and not Force. An explicitly set detection kind wins even when it is Auto or out of domain, so a port that treated Auto as unset would be caught by the out-of-domain value it would then also re-derive",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitModuleDetectionKind",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_resolve_json_module",
+          "options": {}
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "resolveJsonModule": 1
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "resolveJsonModule": 2
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "resolveJsonModule": 3
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 100
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 101
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 102
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 199
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 1,
+            "moduleResolution": 3
+          }
+        },
+        {
+          "op": "get_resolve_json_module",
+          "options": {
+            "module": 1,
+            "moduleResolution": 1
+          }
+        }
+      ],
+      "case": "leaves/options/resolve-json-module-cascade",
+      "discriminates": "a port that added Node16 and Node18 to the module-kind switch the pin's TODO leaves for 6.0: ModuleKindNode16 and Node18 fall through to the resolution-kind test and answer false, while Node20 and NodeNext answer true there even though their resolution kind is not Bundler. It also catches a port reading options.ModuleResolution instead of GetModuleResolutionKind (Classic re-derives to Bundler and answers true) and one testing IsTrueOrUnknown instead of `!= TSUnknown` (the out-of-domain byte is set, so it answers false without consulting the module kind at all)",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolveJsonModule",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_resolve_package_json_exports",
+          "options": {}
+        },
+        {
+          "op": "get_resolve_package_json_exports",
+          "options": {
+            "resolvePackageJsonExports": 2
+          }
+        },
+        {
+          "op": "get_resolve_package_json_exports",
+          "options": {
+            "resolvePackageJsonExports": 1
+          }
+        },
+        {
+          "op": "get_resolve_package_json_exports",
+          "options": {
+            "resolvePackageJsonExports": 3
+          }
+        },
+        {
+          "op": "get_resolve_package_json_exports",
+          "options": {
+            "resolvePackageJsonImports": 1
+          }
+        }
+      ],
+      "case": "leaves/options/resolve-package-json-exports-domain",
+      "discriminates": "a port testing `!= TSFalse` instead of IsTrueOrUnknown: the out-of-domain byte is neither TSTrue nor TSUnknown, so the pin answers false where `!= TSFalse` answers true. Setting resolvePackageJsonImports alone leaves the exports answer at its unset default, so a port that read the neighbouring field is caught",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonExports",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_resolve_package_json_imports",
+          "options": {}
+        },
+        {
+          "op": "get_resolve_package_json_imports",
+          "options": {
+            "resolvePackageJsonImports": 2
+          }
+        },
+        {
+          "op": "get_resolve_package_json_imports",
+          "options": {
+            "resolvePackageJsonImports": 1
+          }
+        },
+        {
+          "op": "get_resolve_package_json_imports",
+          "options": {
+            "resolvePackageJsonImports": 3
+          }
+        },
+        {
+          "op": "get_resolve_package_json_imports",
+          "options": {
+            "resolvePackageJsonExports": 1
+          }
+        }
+      ],
+      "case": "leaves/options/resolve-package-json-imports-domain",
+      "discriminates": "the same out-of-domain byte on the imports side, plus a crossed wire: the last action sets exports false and leaves imports unset, so a port reading resolvePackageJsonExports here answers false where the pin answers true",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetResolvePackageJsonImports",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 0
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 1
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 2
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 3
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 4
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 5
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 6
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": -1
+          }
+        },
+        {
+          "op": "get_jsx_transform_enabled",
+          "options": {
+            "jsx": 7
+          }
+        }
+      ],
+      "case": "leaves/options/jsx-transform-enabled-membership",
+      "discriminates": "a port written as a range test `jsx >= JsxEmitReact`: the pin is an equality test against three named values, so the undeclared 6 and 7 answer false where a range test answers true. JsxEmitReactNative sits between Preserve and React and is not a transform either",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetJSXTransformEnabled",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_strict_option_value",
+          "options": {},
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 2
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 1
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 3
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strictNullChecks": 2
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 2,
+            "strictNullChecks": 1
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 1,
+            "strictNullChecks": 3
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 2,
+            "strictFunctionTypes": 1
+          },
+          "strict_option": "strictNullChecks"
+        },
+        {
+          "op": "get_strict_option_value",
+          "options": {
+            "strict": 2,
+            "strictFunctionTypes": 1
+          },
+          "strict_option": "strictFunctionTypes"
+        }
+      ],
+      "case": "leaves/options/strict-option-value-fallback",
+      "discriminates": "a port whose fallback is `strict.is_true()`: the pin falls back to `strict != TSFalse`, so an unset sub-option with strict also unset answers true, and an out-of-domain strict byte answers true as well. The explicit sub-option wins in both directions -- false beats strict true -- and an out-of-domain sub-option byte is set but not TSTrue, so it answers false without consulting strict. The pinned getter takes a tristate rather than a name, so what the second sub-option pins is that both harnesses resolve the request's option name to the same declared field: a roster that mapped it onto a different field is caught there, not in the getter",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetStrictOptionValue",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_isolated_modules",
+          "options": {}
+        },
+        {
+          "op": "get_isolated_modules",
+          "options": {
+            "isolatedModules": 2
+          }
+        },
+        {
+          "op": "get_isolated_modules",
+          "options": {
+            "verbatimModuleSyntax": 2
+          }
+        },
+        {
+          "op": "get_isolated_modules",
+          "options": {
+            "isolatedModules": 1,
+            "verbatimModuleSyntax": 2
+          }
+        },
+        {
+          "op": "get_isolated_modules",
+          "options": {
+            "isolatedModules": 3
+          }
+        },
+        {
+          "op": "get_isolated_modules",
+          "options": {
+            "verbatimModuleSyntax": 3
+          }
+        }
+      ],
+      "case": "leaves/options/isolated-modules-or-verbatim",
+      "discriminates": "a port that copied the GetAllowJS shape, consulting verbatimModuleSyntax only when isolatedModules is unset: the pin is a plain `or`, so isolatedModules explicitly false with verbatimModuleSyntax true is still true. Both halves are equality tests against TSTrue, so an out-of-domain byte on either side answers false",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetIsolatedModules",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_emit_declarations",
+          "options": {}
+        },
+        {
+          "op": "get_emit_declarations",
+          "options": {
+            "declaration": 2
+          }
+        },
+        {
+          "op": "get_emit_declarations",
+          "options": {
+            "composite": 2
+          }
+        },
+        {
+          "op": "get_emit_declarations",
+          "options": {
+            "composite": 2,
+            "declaration": 1
+          }
+        },
+        {
+          "op": "get_emit_declarations",
+          "options": {
+            "declaration": 3
+          }
+        },
+        {
+          "op": "get_emit_declarations",
+          "options": {
+            "composite": 3
+          }
+        }
+      ],
+      "case": "leaves/options/emit-declarations-or-composite",
+      "discriminates": "a port testing `!= TSFalse` on either half: both are IsTrue, so an unset or out-of-domain byte answers false. declaration explicitly false with composite true is still true, so a port that consulted composite only when declaration is unset is caught",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitDeclarations",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declarationMap": 2
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declaration": 2,
+            "declarationMap": 2
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "composite": 2,
+            "declarationMap": 2
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declaration": 2,
+            "declarationMap": 1
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declaration": 2
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declaration": 2,
+            "declarationMap": 3
+          }
+        },
+        {
+          "op": "get_are_declaration_maps_enabled",
+          "options": {
+            "declaration": 3,
+            "declarationMap": 2
+          }
+        }
+      ],
+      "case": "leaves/options/declaration-maps-need-declarations",
+      "discriminates": "a port that returns declarationMap alone: the pin conjoins it with GetEmitDeclarations, so declarationMap true with neither declaration nor composite set is false. declarationMap is an equality test against TSTrue, so its out-of-domain byte answers false, and an out-of-domain declaration byte fails the second conjunct",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAreDeclarationMapsEnabled",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {}
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "useDefineForClassFields": 1
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 1,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 8,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 9,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 9,
+            "useDefineForClassFields": 3
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 8,
+            "useDefineForClassFields": 3
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 99,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 100,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_emit_standard_class_fields",
+          "options": {
+            "target": 1
+          }
+        }
+      ],
+      "case": "leaves/options/emit-standard-class-fields-target",
+      "discriminates": "a port testing `useDefineForClassFields.is_true()`: the pin tests `!= TSFalse`, so the unset value passes the first conjunct and the unset options answer true through the ES2025 target default. A port testing IsTrueOrUnknown is caught by the out-of-domain byte, which is neither. The target conjunct is driven at ES2022 and one below it",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEmitStandardClassFields",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": null
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": []
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "node"
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "*"
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "node",
+              "*"
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "**"
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "*.js"
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              ""
+            ]
+          }
+        },
+        {
+          "op": "uses_wildcard_types",
+          "options": {
+            "types": [
+              "*",
+              "*"
+            ]
+          }
+        }
+      ],
+      "case": "leaves/options/uses-wildcard-types-exact",
+      "discriminates": "a port that pattern-matches instead of comparing for equality: `**` and `*.js` are not the wildcard, and neither is the empty string. The nil types slice and the empty non-nil one both answer false, and the wildcard is found anywhere in the list, not only first",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.UsesWildcardTypes",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": null
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": []
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": null,
+            "pathsBasePath": "/base"
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": [
+              [
+                "@app/*",
+                [
+                  "src/app/*"
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": [
+              [
+                "@app/*",
+                [
+                  "src/app/*"
+                ]
+              ]
+            ],
+            "pathsBasePath": "/base"
+          }
+        },
+        {
+          "current_directory": "",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": [
+              [
+                "@app/*",
+                [
+                  "src/app/*"
+                ]
+              ]
+            ],
+            "pathsBasePath": "/base"
+          }
+        },
+        {
+          "current_directory": "",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": [
+              [
+                "@app/*",
+                [
+                  "src/app/*"
+                ]
+              ]
+            ]
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_paths_base_path",
+          "options": {
+            "paths": [
+              [
+                "@app/*",
+                null
+              ]
+            ]
+          }
+        }
+      ],
+      "case": "leaves/options/paths-base-path-precedence",
+      "discriminates": "a port that consults pathsBasePath before the size test: the pin answers the empty string whenever paths is absent or empty, even with pathsBasePath set, and the nil map and the empty non-nil one behave alike because Size() is nil-safe. With a non-empty map, an explicit pathsBasePath wins over the current directory, and an empty current directory is answered as the empty string rather than refused",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetPathsBasePath",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "typeRoots": [
+              "/a",
+              "/b"
+            ]
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "typeRoots": []
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "typeRoots": [
+              "rel",
+              "/a/../b",
+              ""
+            ]
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "/p/q/tsconfig.json",
+            "typeRoots": [
+              "/a"
+            ]
+          }
+        },
+        {
+          "current_directory": "/cwd/inner",
+          "op": "get_effective_type_roots",
+          "options": {
+            "typeRoots": null
+          }
+        }
+      ],
+      "case": "leaves/options/effective-type-roots-explicit",
+      "discriminates": "a port testing whether typeRoots is empty rather than whether it is absent: the pin returns a non-nil empty typeRoots unchanged, with fromConfig true, instead of walking the ancestors. An explicit list is returned verbatim and is not normalised, combined or deduplicated, and it wins over a configFilePath that would otherwise choose the base",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "/p/q/tsconfig.json"
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "/tsconfig.json"
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "/p/q/"
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "/p//q/tsconfig.json"
+          }
+        }
+      ],
+      "case": "leaves/options/effective-type-roots-config-base",
+      "discriminates": "a port that walks the configFilePath itself rather than its directory, or that uses the current directory when a configFilePath is present: the base is the config file's directory and the current directory is then ignored entirely. The walk stops where the parent equals the directory, so an absolute config file at the root yields exactly one root, and every entry is dir + node_modules + @types with no normalisation of the base",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "sub/tsconfig.json"
+          }
+        },
+        {
+          "current_directory": "/cwd",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "tsconfig.json"
+          }
+        },
+        {
+          "current_directory": "",
+          "op": "get_effective_type_roots",
+          "options": {
+            "configFilePath": "tsconfig.json"
+          }
+        },
+        {
+          "current_directory": "rel/base",
+          "op": "get_effective_type_roots",
+          "options": {}
+        },
+        {
+          "current_directory": "",
+          "op": "get_effective_type_roots",
+          "options": {
+            "typeRoots": null
+          }
+        }
+      ],
+      "case": "leaves/options/effective-type-roots-relative-and-empty-base",
+      "discriminates": "a port whose ancestor walk stops as soon as the parent is empty: a relative base has the empty string as its last ancestor, so `sub/tsconfig.json` yields two roots -- sub/node_modules/@types and node_modules/@types -- and a relative current directory yields one per component plus that last bare entry. A config file with no directory part gives an empty base and still yields one root, because the empty-base panic guards only the current-directory branch; the current directory is refused only when there is no configFilePath at all, and then with the pinned message",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetEffectiveTypeRoots",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "module_kind": 0,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 1,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 2,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 3,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 4,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 5,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 6,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 7,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 8,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 98,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 99,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 100,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 101,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 102,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 199,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": 200,
+          "op": "is_non_node_esm"
+        },
+        {
+          "module_kind": -1,
+          "op": "is_non_node_esm"
+        }
+      ],
+      "case": "leaves/options/module-kind-is-non-node-esm",
+      "discriminates": "a port written as a set membership over the declared ES module kinds: the pin is a range over ES2015..ESNext, so the undeclared 8 and 98 inside that run answer true. A port without the upper bound answers true for Node16 and Preserve, which sit above ESNext",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleKind.IsNonNodeESM",
+      "order_sensitive": true,
+      "subject": "options.ModuleKind"
+    },
+    {
+      "actions": [
+        {
+          "jsx": 0,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 1,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 2,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 3,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 4,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 5,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": 6,
+          "op": "jsx_emit_text"
+        },
+        {
+          "jsx": -1,
+          "op": "jsx_emit_text"
+        }
+      ],
+      "case": "leaves/options/jsx-emit-text-domain",
+      "discriminates": "a port generated the way the five stringer enums are: JsxEmit.String is hand written and closes its domain with two panics rather than a numeric fallback, so the zero value and any undeclared value must panic with the pinned wording instead of rendering JsxEmit(0). It also catches a renderer that named only the three transform kinds, or that spelled react-jsxdev as react-jsxDev",
+      "operation": "tsc/internal/core/compileroptions.go:JsxEmit.String",
+      "order_sensitive": true,
+      "subject": "options.JsxEmitText"
+    },
+    {
+      "actions": [
+        {
+          "module_resolution": 0,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 1,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 2,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 3,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 99,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 100,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": 4,
+          "op": "module_resolution_text"
+        },
+        {
+          "module_resolution": -1,
+          "op": "module_resolution_text"
+        }
+      ],
+      "case": "leaves/options/module-resolution-text-domain",
+      "discriminates": "a port that renders the deprecated Classic and Node10 as Unknown, or that panics on them: the pin names all five non-zero declared values and panics only on the zero value and on an undeclared one, with two different messages. The undeclared 4 sits between Node16 and NodeNext, so a range-based renderer is caught too",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleResolutionKind.String",
+      "order_sensitive": true,
+      "subject": "options.ModuleResolutionText"
+    },
+    {
+      "actions": [
+        {
+          "new_line": 0,
+          "op": "new_line_character"
+        },
+        {
+          "new_line": 1,
+          "op": "new_line_character"
+        },
+        {
+          "new_line": 2,
+          "op": "new_line_character"
+        },
+        {
+          "new_line": 7,
+          "op": "new_line_character"
+        },
+        {
+          "new_line": -1,
+          "op": "new_line_character"
+        }
+      ],
+      "case": "leaves/options/new-line-character-default",
+      "discriminates": "a port written as a three-way match that panics on NewLineKindNone or on an undeclared value: the pin has one named case and a default, so None, LF and every out-of-domain value all answer the single linefeed. Only CRLF answers the carriage-return pair",
+      "operation": "tsc/internal/core/compileroptions.go:NewLineKind.GetNewLineCharacter",
+      "order_sensitive": true,
+      "subject": "options.NewLineText"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {}
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "allowImportingTsExtensions": 2
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "allowImportingTsExtensions": 1
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "rewriteRelativeImportExtensions": 2
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "allowImportingTsExtensions": 1,
+            "rewriteRelativeImportExtensions": 2
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "allowImportingTsExtensions": 2,
+            "rewriteRelativeImportExtensions": 1
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "allowImportingTsExtensions": 7
+          }
+        },
+        {
+          "op": "get_allow_importing_ts_extensions",
+          "options": {
+            "rewriteRelativeImportExtensions": 255
+          }
+        }
+      ],
+      "case": "leaves/options/allow-importing-ts-extensions-second-disjunct",
+      "discriminates": "the getter is a disjunction over two fields, so rewriteRelativeImportExtensions alone enables ts-extension imports even where allowImportingTsExtensions is explicitly false; a port reading only the first field answers false for those rows. Both fields are IsTrue tests rather than range checks, so an out-of-domain byte answers false to both",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetAllowImportingTsExtensions",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "file_name": "a.d.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.d.mts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.d.cts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.mts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.tsx",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.D.TS",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "d.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": ".d.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {}
+        },
+        {
+          "file_name": "a.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {
+            "allowImportingTsExtensions": 2
+          }
+        },
+        {
+          "file_name": "a.ts",
+          "op": "allow_importing_ts_extensions_from",
+          "options": {
+            "rewriteRelativeImportExtensions": 2
+          }
+        }
+      ],
+      "case": "leaves/options/allow-importing-ts-extensions-from-declaration-file",
+      "discriminates": "the file-name arm is the declaration-file predicate, not a .ts suffix test, so with the option off a.d.ts, a.d.mts and a.d.cts answer true while a.ts, a.mts and a.tsx answer false; a port that short-circuited on the options alone would answer false for every row with the option off, and one that tested for a plain .ts suffix would answer true for a.ts. The upper-case spelling separates a case-sensitive predicate from a folded one",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.AllowImportingTsExtensionsFrom",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {}
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 9
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 8
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 99
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 1
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 9,
+            "useDefineForClassFields": 1
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 99,
+            "useDefineForClassFields": 1
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 1,
+            "useDefineForClassFields": 2
+          }
+        },
+        {
+          "op": "get_use_define_for_class_fields",
+          "options": {
+            "target": 9,
+            "useDefineForClassFields": 7
+          }
+        }
+      ],
+      "case": "leaves/options/use-define-for-class-fields-target-default",
+      "discriminates": "the target default applies only where useDefineForClassFields is UNSET: with it explicitly false and target ES2022 the answer is false, where a port written as `use_define.is_true() || target >= ES2022` answers true. The unset rows straddle the ES2022 boundary in both directions, and the unset target itself resolves through GetEmitScriptTarget rather than being read as zero",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.GetUseDefineForClassFields",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "is_incremental",
+          "options": {}
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "incremental": 2
+          }
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "composite": 2
+          }
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "composite": 2,
+            "incremental": 1
+          }
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "composite": 1,
+            "incremental": 1
+          }
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "incremental": 255
+          }
+        },
+        {
+          "op": "is_incremental",
+          "options": {
+            "composite": 3
+          }
+        }
+      ],
+      "case": "leaves/options/is-incremental-or-composite",
+      "discriminates": "composite alone makes the build incremental, so a port reading only the incremental field answers false for that row; both tests are IsTrue equality tests, so an out-of-domain byte in either field answers false rather than true",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.IsIncremental",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "op": "should_preserve_const_enums",
+          "options": {}
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "preserveConstEnums": 2
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "isolatedModules": 2
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "verbatimModuleSyntax": 2
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "isolatedModules": 2,
+            "preserveConstEnums": 1
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "preserveConstEnums": 1,
+            "verbatimModuleSyntax": 2
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "isolatedModules": 1,
+            "preserveConstEnums": 1,
+            "verbatimModuleSyntax": 1
+          }
+        },
+        {
+          "op": "should_preserve_const_enums",
+          "options": {
+            "preserveConstEnums": 9
+          }
+        }
+      ],
+      "case": "leaves/options/should-preserve-const-enums-through-isolated-modules",
+      "discriminates": "the second disjunct is GetIsolatedModules, itself a disjunction, so verbatimModuleSyntax alone preserves const enums even with preserveConstEnums explicitly false; a port that read isolatedModules only, or that read preserveConstEnums only, answers false for rows the pin answers true. The first test is == TSTrue, so an out-of-domain byte is false",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.ShouldPreserveConstEnums",
+      "order_sensitive": true,
+      "subject": "options.Getters"
+    },
+    {
+      "actions": [
+        {
+          "module_kind": 0,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 1,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 5,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 7,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 98,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 99,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 100,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 101,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 102,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 103,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 150,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 198,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 199,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 200,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": 201,
+          "op": "supports_import_attributes"
+        },
+        {
+          "module_kind": -1,
+          "op": "supports_import_attributes"
+        }
+      ],
+      "case": "leaves/options/module-kind-supports-import-attributes",
+      "discriminates": "the first test is a RANGE over Node18 (101) to NodeNext (199), so every unnamed value between them answers true: 150 is not a declared ModuleKind and is still supported. A port enumerating only the named constants answers false there, and a port doing only the range check misses Preserve (200) and ESNext (99), which are separate equalities sitting either side of the range",
+      "operation": "tsc/internal/core/compileroptions.go:ModuleKind.SupportsImportAttributes",
+      "order_sensitive": true,
+      "subject": "options.ModuleKind"
+    },
+    {
+      "actions": [
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\r\n"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\n"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\r"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\n\r"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\r\n\r\n"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": ""
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\n "
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": " \n"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\t"
+        },
+        {
+          "op": "new_line_kind_from_text",
+          "text": "\u2028"
+        }
+      ],
+      "case": "leaves/options/new-line-kind-from-text",
+      "discriminates": "only the two exact literals classify: a lone carriage return, a line feed followed by a carriage return, a doubled newline and any surrounding whitespace all fall to the default rather than being trimmed or matched by prefix, and the empty string is None too. A port matching by prefix or suffix would classify the first four as CRLF or LF",
+      "operation": "tsc/internal/core/compileroptions.go:GetNewLineKind",
+      "order_sensitive": true,
+      "subject": "options.NewLineFromText"
+    },
+    {
+      "actions": [
+        {
+          "mutate_checkers": 7,
+          "mutate_type": "rewritten",
+          "op": "clone_then_mutate_source",
+          "options": {
+            "checkers": 2,
+            "types": [
+              "alpha",
+              "beta"
+            ]
+          }
+        },
+        {
+          "mutate_checkers": -1,
+          "mutate_type": "",
+          "op": "clone_then_mutate_source",
+          "options": {
+            "checkers": 0,
+            "types": [
+              "only"
+            ]
+          }
+        },
+        {
+          "mutate_checkers": 7,
+          "mutate_type": "rewritten",
+          "op": "clone_then_mutate_source",
+          "options": {}
+        }
+      ],
+      "case": "leaves/options/clone-shares-pointer-backed-fields",
+      "discriminates": "Clone is a field-by-field reflective Set, so a pointer-backed field is copied as the pointer and a slice as its header: writing through the source AFTER the clone is visible in the clone. The sibling field-roster case cannot see this, because at the instant of the clone the two agree. A port whose clone owns its data reads the pre-mutation value instead, which is the difference this case exists to record",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.Clone",
+      "order_sensitive": true,
+      "subject": "options.Clone"
+    }
+  ],
+  "version": 1
+}

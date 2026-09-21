@@ -755,16 +755,24 @@ Implement the seam as follows:
    observations, formatted diagnostics and final baseline bytes so a difference
    can be attributed to semantics, production formatting or the test bridge.
 
-**Do not extrapolate a Go renderer to all 309 files.** The pinned `vfsmatch`
+**Owner-approved on 2026-09-20: retain all 309 byte-for-byte baselines and carry
+a test-only renderer for the 142 `config/matchFiles` outputs.** F2a implements
+and verifies this renderer; F3a reuses the same seam. First reproduce the frozen
+bytes from native observations, then render Rust observations through it. This
+is approved implementation work, not an outstanding authority choice. Keep
+unverified outputs pending and retain pinned Go as the semantic authority.
+
+**Do not extrapolate an existing Go renderer to all 309 files.** The pinned `vfsmatch`
 tests assert ordered file lists and reference a TypeScript `matchFiles.ts`
 fixture that is absent at the referenced path in this pin. That is not proof
 of an executable renderer for every `config/matchFiles` baseline. F0 must trace
 those 142 files' request and rendering authority separately. If a group only
 has a carried test-format implementation, identify it explicitly, keep native
 matching as the semantic authority, and verify its native-result rendering
-against the frozen files. If authority cannot be established, stop under the
-existing baseline-authority rule; do not promise a nonexistent Go renderer or
-write an envelope that copies the expected result sections.
+against the frozen files. A new conflict in request or semantic authority still
+uses the baseline-authority stop rule; the already-known absence of a renderer
+does not require repeated approval. Do not promise a nonexistent Go renderer
+or write an envelope that copies the expected result sections.
 
 #### F3a — prepare config, command-line and resolution tests
 

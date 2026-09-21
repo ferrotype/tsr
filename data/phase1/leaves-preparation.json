@@ -1,0 +1,21 @@
+{
+  "accounted_operations": 460,
+  "complete": true,
+  "exempt_by_category": {
+    "build_tooling": 8,
+    "build_variant": 2,
+    "equivalent_rust": 8,
+    "generated_assertion": 6,
+    "go_runtime": 12,
+    "later_step": 68,
+    "unused_at_pin": 4
+  },
+  "exempt_operations": 108,
+  "pending": [],
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "prepared_operations": 342,
+  "roster_problems": [],
+  "total_operations": 460,
+  "version": 2,
+  "witnessed_operations": 10
+}

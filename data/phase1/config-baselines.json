@@ -2,12 +2,13 @@
   "groups": {
     "matchFiles": {
       "authority": {
-        "blocker": "phase1-matchfiles-baseline-authority",
+        "blocker": "phase1-matchfiles-renderer-not-yet-verified",
         "invocation": null,
         "mapping_complete": false,
         "native_semantic_authority": "tsc/internal/vfs/vfsmatch/vfsmatch_test.go::TestReadDirectory and TestReadDirectoryMatchesTypeScriptBaselines assert ordered matchFiles() results",
         "output_name_rule": "<title> with {json,jsonSourceFile} api.js",
         "output_relationship": "unknown until authority is decided",
+        "owner_decision": "2026-09-20: keep all 309 byte-for-byte baselines and carry a test-only implementation of the matchFiles envelope, with pinned Go matching and configuration behavior retained as the semantic authority. Implementation and native-byte verification are owned by F2a; expected result sections are never copied from the baseline.",
         "reason": "No pinned Go test writes baseline.Options{Subfolder: \"config/matchFiles\"}, and the group's envelope (a 'config:' heading followed by the whole ParsedCommandLine as JSON, with no 'FileNames::' section) matches no renderer in the pin. baselineParseConfigWith emits configFileName::/CompilerOptions::/FileNames::/Errors:: instead. The vfsmatch tests reference tsc/testdata/fixtures/testRunner/unittests/config/matchFiles.ts, which is absent at this pin. These are promoted TypeScript outputs whose renderer was not ported.",
         "renderer": null,
         "status": "blocked",

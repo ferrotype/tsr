@@ -131,6 +131,19 @@ pub fn base_name(path: &[u8]) -> &[u8] {
 pub fn has_extension(path: &[u8]) -> bool {
     base_name(path).contains(&b'.')
 }
+/// The walk ends where the pinned one ends: when a path is its own parent. It
+/// must not also stop on an empty path. For a rooted input that guard never
+/// fires, because `directory` of a rooted path keeps the root and so is never
+/// empty; for a relative one it fired exactly once, dropping the empty-string
+/// ancestor the pin yields last. That is one type root lost per relative base
+/// in `GetEffectiveTypeRoots`, and the same missing step in every other walk
+/// that starts relative.
+///
+/// Deliberately carries no `port:` marker yet. Adding one is a mapping claim
+/// that rewrites data/s07/operations.json, and that file's fingerprint is what
+/// the frozen S07 subset rule anchors on, so recording the mapping requires an
+/// S07 subset re-freeze and the producer run behind it. That is a separate,
+/// owner-sequenced change; this one is only the behavioral fix.
 pub fn ancestors(path: &[u8]) -> Vec<Vec<u8>> {
     let mut path = path.to_vec();
     let mut result = Vec::new();
@@ -141,9 +154,6 @@ pub fn ancestors(path: &[u8]) -> Vec<Vec<u8>> {
             break;
         }
         path = parent;
-        if path.is_empty() {
-            break;
-        }
     }
     result
 }

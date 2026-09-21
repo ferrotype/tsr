@@ -1,0 +1,296 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "case": "leaves/bundled/asset-index-complete",
+      "discriminates": "Complete ordered asset names, sizes and bytes. Go observes these through WalkDir/ReadFile; Rust enumerates the embedded asset table. This is content evidence, not Rust WalkDir coverage.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.WalkDir",
+      "order_sensitive": true,
+      "subject": "BundledIndex"
+    },
+    {
+      "actions": [
+        {
+          "name": "lib.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.es5.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.es2015.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.esnext.full.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.webworker.iterable.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.nope.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "LIB.ES5.D.TS",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.ES5.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "",
+          "op": "lookup"
+        },
+        {
+          "name": "libs/lib.es5.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "../CopyrightNotice.txt",
+          "op": "lookup"
+        },
+        {
+          "name": "./lib.es5.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "../libs/lib.es5.d.ts",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.es5.d.ts ",
+          "op": "lookup"
+        },
+        {
+          "name": "lib.es2015",
+          "op": "lookup"
+        }
+      ],
+      "case": "leaves/bundled/asset-name-resolution",
+      "discriminates": "Both sides call their production filesystem wrapper on LibPath()+\"/\"+name. Exact case, no extension completion, trimming or dot-segment normalization; missing and malformed asset names remain missing.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.ReadFile",
+      "order_sensitive": true,
+      "subject": "BundledLookup"
+    },
+    {
+      "actions": [
+        {
+          "op": "is_bundled",
+          "path": "bundled:///libs/lib.d.ts"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled:///libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled:///"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled:////libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled:///libs/../../etc/passwd"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled://libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled:/libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "BUNDLED:///libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "Bundled:///libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "bundled"
+        },
+        {
+          "op": "is_bundled",
+          "path": ""
+        },
+        {
+          "op": "is_bundled",
+          "path": "/bundled:///libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "xbundled:///libs"
+        },
+        {
+          "op": "is_bundled",
+          "path": "/usr/local/lib/node_modules/typescript/lib/lib.d.ts"
+        }
+      ],
+      "case": "leaves/bundled/bundled-path-prefix",
+      "discriminates": "the wrapper's path predicate: an exact, case-sensitive, unnormalized bundled:/// prefix test and nothing more. bundled:/// with an empty remainder is bundled, a fourth slash stays inside the remainder, and a traversal after the prefix is still bundled because the predicate never resolves the path. Shortened schemes, a leading character and an upper-case scheme are not. This is the one bundled operation scope.json records as implemented_untested, awaiting exactly this witness.",
+      "operation": "tsc/internal/bundled/embed.go:IsBundled",
+      "order_sensitive": true,
+      "subject": "BundledPath"
+    },
+    {
+      "case": "leaves/bundled/lib-path-identity",
+      "discriminates": "the root every consumer joins asset names onto. An embedded build answers with the scheme path bundled:///libs, not a directory on disk, and that path is itself bundled. A Rust constant that carried a trailing slash, a different scheme or a filesystem path would break every consumer that concatenates a lib name onto it.",
+      "operation": "tsc/internal/bundled/bundled.go:LibPath",
+      "subject": "BundledLibPath"
+    },
+    {
+      "case": "leaves/bundled/wrapper-dispatch-surface",
+      "discriminates": "the wrapper dispatch WrapFS installs, which no other case in this group reaches, and the `errors` column of the group's coverage matrix. Eight bundled:/// paths record DirectoryExists, FileExists, GetAccessibleEntries, Stat and Realpath together, which is where the pinned surface is least uniform: bundled:/// is a directory to Stat and lists libs through GetAccessibleEntries, yet DirectoryExists answers false for it, because that method tests rest == \"libs\" and the scheme root's remainder is empty. A trailing slash, an upper-case LIBS, a fourth slash and libs/../libs are all unknown to every one of the five, so nothing in the dispatch normalizes a path or folds case. Seven walks then record the walk contract: from bundled:/// the first callback receives bundled:////libs, because walkDir joins rest + \"/\" + name onto a scheme that already ends in a slash; fs.SkipAll stops the walk and WalkDir still returns nil; fs.SkipDir returned for a file entry skips only that entry, so all 108 still arrive; fs.SkipDir returned for the libs directory entry prunes the recursion and ends the walk after one callback; any other error is returned to the caller verbatim; and an unknown bundled directory walks zero entries without an error. Six rows then record the mutation refusals: WriteFile, AppendFile, Remove and Chtimes each panic on a bundled path with the pinned message, whether the asset exists or not, and whether the path is an asset or the scheme root. The Rust side reports a named gap for all of it: tsr_bundled::BundledFs is the counterpart and is reachable only with a direct tsr_vfs dependency this harness does not declare, tsr_vfs::FileSystem has no walk method, and BundledFs overrides none of the trait's mutators, so it would answer Error::Unsupported for every path rather than panicking on a bundled one.",
+      "operation": "tsc/internal/bundled/embed.go:wrapFS",
+      "order_sensitive": true,
+      "subject": "BundledWrapper"
+    },
+    {
+      "case": "leaves/bundled/source-directory-access",
+      "discriminates": "access outside the checkout, from the Go side. TestingLibPath locates the libs directory through runtime.Caller(0), so it resolves only where the pinned source tree is present; under -trimpath the same call returns the module-relative github.com/microsoft/TypeScript/tsc/internal/bundled/libs and does not panic, so the accessor fails silently. The payload records base names, absoluteness, existence and entry count rather than a machine path, so it distinguishes both worlds without freezing anyone's directory layout. crates/tsr_bundled has no counterpart by construction and reports the gap.",
+      "operation": "tsc/internal/bundled/bundled.go:TestingLibPath",
+      "subject": "BundledSourceDir"
+    },
+    {
+      "actions": [
+        {
+          "op": "read_path",
+          "path": "bundled:///"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///LIBS"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/../libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:////libs"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/lib.d.ts"
+        },
+        {
+          "op": "read_path",
+          "path": "bundled:///libs/nope.d.ts"
+        }
+      ],
+      "case": "leaves/bundled/wrapper-read-paths",
+      "discriminates": "Production wrapper directory/file predicates, listing, stat and realpath for bundled roots, files, and malformed paths. Walk and mutation behavior are separate pending operations.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.GetAccessibleEntries",
+      "order_sensitive": true,
+      "subject": "BundledReads"
+    },
+    {
+      "actions": [
+        {
+          "op": "delegate_path",
+          "path": "/inner/known.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/sub/deep.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/missing.txt"
+        },
+        {
+          "op": "delegate_path",
+          "path": "/inner/KNOWN.TXT"
+        },
+        {
+          "op": "delegate_path",
+          "path": "bundled:///libs/lib.d.ts"
+        }
+      ],
+      "case": "leaves/bundled/inner-filesystem-delegation",
+      "discriminates": "the half of the wrapper no other case in this group can reach: the else branch of every method, which forwards to the filesystem WrapFS was handed. The other bundled cases install an inner filesystem that panics on any delegated call, which is what makes their non-delegation claim meaningful but also what makes a delegated path unobservable there; this case installs one that answers. It would catch a wrapper that served every path from the embedded table -- reporting /inner/known.txt missing because it is not an asset -- and equally one that case-folded the path before forwarding, because /inner/KNOWN.TXT must stay missing under a case-sensitive inner filesystem while /inner/known.txt is found. The five delegated paths cover the read, the stat, the two existence predicates, the directory listing and the realpath together, because embed.go:49-99 and :148-153 each carry their own copy of the splitPath test rather than sharing one. The last action closes the loop from the other side: with an inner filesystem that could have answered, a bundled path is still served from the embedded assets, so delegation is not merely a fallback for whatever the embedded table lacks.",
+      "operation": "tsc/internal/bundled/bundled.go:WrapFS",
+      "order_sensitive": true,
+      "subject": "BundledDelegation"
+    },
+    {
+      "actions": [
+        {
+          "case_sensitive": true,
+          "op": "use_case_sensitive_file_names"
+        },
+        {
+          "case_sensitive": false,
+          "op": "use_case_sensitive_file_names"
+        }
+      ],
+      "case": "leaves/bundled/case-sensitivity-forwarding",
+      "discriminates": "whether the wrapper answers this question for itself or forwards it. embed.go:45-47 has no bundled branch at all -- it is the one method of the wrapper that never calls splitPath -- so the answer is the inner filesystem's, whatever it is. A port that hardcoded true, or that derived the answer from the embedded table's own exact-match lookup, would return the same value for both actions; the pinned wrapper returns a different value for each. The three existence probes in every row keep the two halves apart: the embedded lookup is exact under both settings, so LIB.D.TS is missing and lib.d.ts is found either way, while the delegated lookup of /inner/KNOWN.TXT follows the setting. That combination would also catch the inverse error, a port that let the inner filesystem's case-insensitivity reach the asset table.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.UseCaseSensitiveFileNames",
+      "order_sensitive": true,
+      "subject": "BundledCaseSensitivity"
+    },
+    {
+      "actions": [
+        {
+          "op": "walk",
+          "root": "/inner",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "/inner/missing",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///libs/lib.d.ts",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///libs/",
+          "stop": "none"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///",
+          "stop": "skip_all_at_2"
+        },
+        {
+          "op": "walk",
+          "root": "bundled:///",
+          "stop": "error_at_2"
+        }
+      ],
+      "case": "leaves/bundled/walk-delegation-and-recursion",
+      "discriminates": "the four walk branches the dispatch case cannot reach, recorded as the callback sequence because the order is the contract. (1) A non-bundled root never enters walkDir: WalkDir forwards it at embed.go:112, so the inner filesystem's own traversal runs, and that traversal reports the root itself first -- the bundled walk never does, because walkDir only ever calls back on the entries of a directory (embed.go:126-137). A port that routed every walk through one implementation would make the two roots agree. (2) A missing delegated root reaches the inner filesystem's error, not a bundled answer. (3) A bundled root that is an asset, and (4) a bundled root with a trailing slash, both fall into walkDir's default branch (embed.go:122) and walk zero entries WITHOUT an error, which is the branch a port would most plausibly turn into a not-found error or, for the trailing slash, into the libs directory. (5) and (6) stop the callback inside the nested libs walk rather than at the top level, where the dispatch case stops it: fs.SkipAll returned there is propagated out of the recursion by embed.go:139-141 and only then turned into a nil result by :105-107, while any other error travels the same path and is returned to the caller unchanged. A port that handled SkipAll only in the outer loop would end the walk but return the signal as an error.",
+      "operation": "tsc/internal/bundled/embed.go:wrappedFS.walkDir",
+      "order_sensitive": true,
+      "subject": "BundledWalk"
+    }
+  ],
+  "version": 1
+}

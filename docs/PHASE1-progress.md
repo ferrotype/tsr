@@ -10,8 +10,8 @@ moved pin invalidates it.
 
 | Step | State |
 | --- | --- |
-| F0 — inventory, manifests and executable setup | **incomplete**: the matchFiles authority decision, and connecting existing evidence to operation ids |
-| F1a — foundation leaf tests | not started |
+| F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
+| F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, all 460 inventoried leaf operations prepared, witnessed or exempted by the reviewed ledger, and both divergences triaged |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
@@ -22,19 +22,307 @@ moved pin invalidates it.
 manifests are internally consistent. Stage A preparation is not Phase 1
 implementation; no production behavior has been added or changed.
 
+## F1a — foundation leaf preparation
+
+**`leaves_prepared: true`.** Every operation in the leaf package roster is
+linked to a runnable prepared case, a verified rust-gated witness, or a reviewed
+exemption in `data/phase1/leaf-roster.json`, and the ledger itself validates.
+`python3 scripts/phase1.py inventory --check` publishes the result.
+
+225 leaf cases are frozen, every one with a native observation from the pinned
+packages and a classified Rust result.
+
+| Group | Cases | match | not_implemented | different |
+| --- | ---: | ---: | ---: | ---: |
+| core/collections | 42 | 0 | 42 | 0 |
+| core | 21 | 13 | 8 | 0 |
+| core helpers | 20 | 1 | 19 | 0 |
+| compiler options | 32 | 27 | 4 | 1 |
+| JSON | 30 | 0 | 30 | 0 |
+| text/number/semver | 31 | 20 | 11 | 0 |
+| locale | 12 | 0 | 12 | 0 |
+| diagnostics | 27 | 6 | 21 | 0 |
+| bundled | 10 | 7 | 3 | 0 |
+| **total** | **225** | **74** | **150** | **1** |
+
+Zero `native_unavailable`, zero `harness_failed`, zero `not_run`: every case
+runs on both sides. The two divergences this step found were triaged: one was a
+defect and is fixed, the other is a deliberate representation difference and is
+left recorded as the single `different` row. The 150 `not_implemented` rows are
+the honest preparation-time result — no `tsr_core::collections`, `tsr_json` or
+`tsr_locale` exists, and neither do most of the generic helpers — and each names
+its Go authority, intended signature and production home.
+
+The roster itself: **460 leaf operations**, of which 151 are `covered` by a
+matched comparison or a rust-gated witness, and 110 are removed from the roster
+by a ledger entry. `equivalent_rust` is no longer zero: eight operations are
+recorded as reproduced exactly by a Rust language construct, each held to the
+plan's `basis_kind: "review"` bar.
+
+Twelve access-only Go probes drive the pinned packages: collections, core,
+options, helpers, json, stringutil, semver, jsnum, locale, locale-default,
+diagnostics and bundled. Three of them compile into `package core` and two into
+`package locale`, which the harness supports because one overlay file per probe
+keeps separate action vocabularies separate, and because the process-global
+default locale needs its own process to observe honestly. The bundled probe is
+registered with `trimpath: False`, because `bundledSourceDir` locates its
+package through `runtime.Caller(0)` and under `-trimpath` returns a wrong path
+silently rather than failing.
+
+### What the adversarial pass changed
+
+Each group was written, then reviewed by an independent agent reading the pinned
+source, then corrected. 58 findings were accepted and 18 rejected as themselves
+wrong. The corrections that mattered most:
+
+- A seed case of mine claimed a nil `*OrderedMap` tolerates `Get` and `Has`.
+  Both dereference `m.mp` and panic; only `Size`, `Keys`, `Values`, `Entries`
+  and `Clone` carry nil guards. The frozen observations were right all along;
+  the prose was wrong.
+- The diagnostics group placed English as "the 14th matcher entry". It is the
+  first, at index 0 of `loc_generated.go`'s matcher.
+- A JSON case claimed the duplicate-name error carries a byte offset and JSON
+  pointer. Its own observation records offset 0 and pointer `""`.
+- `MarshalEncode`'s newline is a terminator after every top-level value, not a
+  separator between them: the first row already shows 14 bytes for a 13-byte
+  value.
+- Two probe headers justified being in-package by naming unexported symbols
+  (`newMapWithSizeHint`, `scheme`) that the files never reference. The
+  collections probe moved to `package collections_test`, matching every other
+  test file in that directory.
+- `locale` claimed `cmn` and `und` are rewritten; both are identities at this
+  pin. And `fr-FR` maps the probed key to "Modules", byte-identical to English,
+  so that row could not witness table selection.
+- `bundled` described `CopyrightNotice.txt` as an embedded asset. It is never
+  embedded: `generate.go` reads it only to validate that each library starts
+  with it as a header.
+- A SyncMap case froze a Go *runtime* panic message as an expected value. No
+  Rust port could ever emit it, so the row had no reachable match; it is now
+  compared by panic class.
+
+### Existing coverage, mapped honestly
+
+`covered` requires an exact link **and** evidence the comparison passes. A
+prepared case that reports `not_implemented` witnesses a gap; it does not close
+one. Expanding the direct action links and checking the production bundled
+wrapper gives 69 covered operations. The asset-content index does not cover
+`wrappedFS.WalkDir`; it remains a named missing API. ReadFile coverage now
+comes from calling `BundledFs::read_file`, not its backing asset table.
+
+The same rule applies to existing artifacts. `data/s07/path-observations.json`
+and `semver-observations.json` look like Rust witnesses and are not: their
+producers run `go test` and never execute Rust. They are recorded as
+`native_authority`, which confers nothing; counting them would have reported 113
+operations covered on the strength of a Go-only run.
+
+| Disposition | Count |
+| --- | ---: |
+| `covered` | 69 |
+| `implemented_untested` | 3,400 |
+| `missing` | 1,308 |
+| `equivalent_rust` | 0 |
+| `later_phase` | 18 |
+
+74 operations now carry a case that runs and reports the Rust entry point
+absent, which is a witnessed gap rather than an inferred one.
+
+### The F1a roster and how it is allowed to shrink
+
+F1a's exit condition is that *every leaf operation* is linked to a runnable
+prepared case or a verified existing witness. That makes the roster itself a
+claim: an operation dropped from it quietly is work hidden behind a green gate.
+So the roster is the whole leaf surface computed from the scope, and it shrinks
+only through `data/phase1/leaf-roster.json`, a reviewed ledger where every entry
+names a category, the owner that does have the operation, and the evidence read
+at the pin.
+
+`scripts/phase1_scope.py:roster_problems` validates the ledger the way any other
+claim is validated. An entry is rejected when it names an operation outside the
+frozen scope, an operation outside the leaf packages, an unknown category, or no
+owner or evidence; when it duplicates another entry; when it claims
+`equivalent_rust` but the scope row disagrees; and — the one that has already
+caught a real mistake — when the same operation is both exempted and linked to a
+prepared case. `leaves_prepared` is false while the ledger does not validate,
+not only while operations are pending, because an exemption nobody can defend is
+not an answer.
+
+The categories are:
+
+| Category | What it claims |
+| --- | --- |
+| `build_tooling` | Runs at build time and never in a compile; the port generates the same artifact elsewhere (`xtask/src/gen`, `scripts/package_assets.py`). |
+| `go_runtime` | A Go language mechanism — scheduling, sync, arenas, the `go vet` copylocks marker — with no caller-visible contract to reproduce. |
+| `generated_assertion` | Not an operation: the blank-identifier compile-time check `stringer` emits. |
+| `later_step` | A real operation that a different named step prepares. |
+| `equivalent_rust` | The Go contract is reproduced exactly by a Rust language or standard library construct. This one also updates the scope row, and is held to the plan's `basis_kind: "review"` bar. |
+| `unused_at_pin` | Exported but called by nothing at the pin, tests included, so no caller fixes the contract. |
+
+`later_step` is decided by the pinned callers, not by intuition: when every
+non-test caller of an operation is outside this step, the step that ports those
+callers owns it, because the plan requires a generic helper's callers to be read
+before its Rust contract is chosen. Two corrections came out of applying that
+rule rather than asserting it. Go method *values* — `(*core.CompilerOptions).IsIncremental`
+at `upstream/tsc/internal/tsoptions/showconfig.go:43` — are caller references
+that a search for `.IsIncremental(` does not find, so the first pass recorded a
+false "no Phase 1 caller" for four option getters. And the rule does not
+override an operation the plan names as this step's own work:
+`docs/PHASE1-implementation-plan.md:432-434` puts "tri-state/default option
+semantics" in F1 explicitly, so the compiler-option getters stay on this roster
+whoever calls them, and their contract is self-contained rather than
+caller-derived.
+
+The derived manifests are no longer hand-maintained. `python3 scripts/phase1.py
+inventory --write` rebuilds `scope.json` and `leaves-preparation.json` from
+their builders, and `python3 scripts/phase1.py record --capture DIR --write`
+writes each case's `last_result` from a real comparison, refusing a capture
+whose case set disagrees with the manifest in either direction. Before that
+command existed, `last_result` decided coverage and was written by hand, so a
+case could claim `match` without the run ever happening.
+
+### A port defect preparation found, and fixed
+
+`crates/tsr_tspath/src/lib.rs` ended its ancestor walk with
+`if path.is_empty() { break; }`. The pinned `ForEachAncestorDirectory`
+(`upstream/tsc/internal/tspath/path.go:1116`) has no such guard: it stops only
+when the parent equals the directory.
+
+The two are otherwise identical, and both languages compute a parent as
+`path[..max(root_length, last_slash)]`. For a **rooted** path that always
+retains the root and is never empty, so the extra guard cannot fire; for a
+**relative** one it fires exactly once, dropping the empty-string ancestor the
+pin yields last. So the walks agreed exactly on rooted input and differed by
+exactly one element on relative input — a proof from the source rather than a
+sample, and the reason the fix is safe: deleting the guard cannot change any
+rooted caller's answer.
+
+It surfaced through `GetEffectiveTypeRoots`, where a `configFilePath` of
+`sub/tsconfig.json` made Go answer
+`["sub/node_modules/@types", "node_modules/@types"]` and Rust answer only the
+first. Absolute bases agreed, which is why nothing had noticed.
+`leaves/options/effective-type-roots-relative-and-empty-base` now matches, and
+616 workspace tests pass with the guard gone.
+
+A sweep for the same class found nothing else.
+`crates/tsr_checker/src/module_specifiers.rs:156` looks similar but its
+`remaining.is_empty()` exit is behaviour-preserving, because whatever is left is
+appended after the loop; `contains_path` carries the identical empty check the
+pin has.
+
+### The one divergence left standing: `Clone` shares what it copies
+
+`CompilerOptions.Clone` is a field-by-field reflective `Set`
+(`upstream/tsc/internal/core/compileroptions.go:180-192`), so a pointer-backed
+field is copied as the pointer and a slice as its header. Writing through the
+source *after* the clone is therefore read back by the clone: with `Checkers`
+(`*int`) at 2 and `Types` at `["alpha", "beta"]`, mutating the source to 7 and
+`"rewritten"` leaves the Go clone reading 7 and `"rewritten"`.
+`tsr_core::CompilerOptions` derives `Clone` over owned fields, so the port's
+clone reads 2 and `"alpha"`. Nine of the pinned struct's 131 fields can share:
+`Paths`, `MaxNodeModuleJsDepth`, `Checkers` and six `[]string`.
+
+**Triaged as a deliberate difference, not a defect.** The sharing is incidental
+in the pin, not load-bearing:
+
+- Every pinned `Clone()` caller assigns whole fields afterwards —
+  `transpile.go:127`, `ls/sourcedefinition.go:149`, and `harnessutil.go:260`
+  through `ParseCompilerOptions`, which assigns.
+- The one place the pin needs an independent `Paths` it deep-clones
+  **explicitly**: `tsoptions/tsconfigparsing.go:1830-1839` does
+  `paths = compilerOptions.Paths.Clone()` and reassigns before mutating. That is
+  the pin working around its own shallow `Clone`.
+
+The port never had the sharing to lose, either: `paths` is
+`Vec<(JsString, Option<Vec<JsString>>)>`, an owned value rather than a pointer
+to an `OrderedMap`. Reproducing the sharing would mean `Arc` or interior
+mutability across nine fields to carry a property no caller uses.
+
+So the recommendation is to leave the port deep and keep
+`leaves/options/clone-shares-pointer-backed-fields` reporting `different`, so
+the difference stays visible rather than being waived. F3b confirms it as the
+option-consuming callers land. The original field-roster case could not see any
+of this: at the instant of the clone the two sides agree, which is exactly why
+the mutation case exists. Its third action sets neither field, so the mutation
+is a no-op there and both sides agree, keeping the difference attributable to
+the sharing rather than to the action.
+
+### F1b queue
+
+The 150 `not_implemented` rows group into coherent ports: the ordered and
+copy-on-write containers (`OrderedMap`, `OrderedSet`, `Set`, `MultiMap`,
+`CopyOnWriteMap`, `CopyOnWriteSet`, `SyncMap`, `SyncSet`), the caller-visible
+JSON contract, locale parse and fallback, and diagnostic formatting with
+argument interpolation. `CopyOnWriteMap`'s scope guard and `SyncMap`'s
+present-with-nil contract need a deliberate Rust representation decision rather
+than a mechanical port.
+
+Two groups are new to this queue and both carry a decision rather than a
+transcription:
+
+- **The generic `internal/core` helpers.** Their contract is not "filter
+  filters": it is nil versus empty, and result identity. Three neighbouring
+  functions in one file give three different answers to "nothing survived" —
+  `Filter`'s rejecting arm is `slices.Clone(slice[:i])` and yields a non-nil
+  empty slice, `Map` guards `if slice == nil` and otherwise allocates, and
+  `MapFiltered`, `FlatMap` and `Flatten` accumulate into `var result []U` and
+  yield nil. A port that collapses all three to `Vec::new()` erases a
+  distinction that survives into JSON as `[]` versus `null`. Several of them
+  also return the *input slice itself* when nothing changed, which the cases
+  witness by writing through the result and reading the input back. Where the Go
+  contract genuinely is the Rust idiom, the operation is recorded as
+  `equivalent_rust` in the roster ledger instead of being ported.
+- **The five generated enum stringers.** None of the five has a home on its type
+  in the port. Two renderings exist, both private to a consumer crate and
+  written for one call site: `module_kind_text`
+  (`crates/tsr_checker/src/emit_checks.rs:514`, complete) and
+  `script_target_text` (`crates/tsr_compiler/src/include_reason.rs:684`). The
+  gap record asks for one shared renderer per type, including the numeric
+  fallback for the values in each enum's numbering gaps.
+
+`data/phase1/locale-assets.json` maps the 13 shipped translation tables to their
+path, size, sha256 and message-key count, with each fallback obligation and the
+planned `xtask/src/gen/diagnostics.rs` extension recorded. The generator itself
+lands in F1b.
+
+### Known limitations
+
+These are stated rather than hidden, because a gate that reports them is worth
+more than one that does not.
+
+- Two `jsnum` helpers are reached but not separately discriminated: trimming a
+  fraction's trailing zeros and an exponent's leading zeros cannot change the
+  value the parse produces, so no input in the corpus separates them from doing
+  nothing. They are linked because the corpus calls them, not because it pins
+  them.
+- `leaves/options/clone-field-roster` compares fields at the instant of the
+  clone, where the two sides agree by construction, so on the Rust side it
+  catches a *roster* that has drifted from the pinned struct rather than a
+  wrong clone. The sharing it cannot see is covered by
+  `leaves/options/clone-shares-pointer-backed-fields` instead.
+- The bundled walk has no Rust counterpart to compare against —
+  `tsr_vfs::FileSystem` declares no walk method — so that case is Go-side native
+  authority. It witnesses the pinned branches but cannot catch a wrong port
+  until the trait grows one.
+- `noembed.go:wrapFS` and `noembed.go:IsBundled` are unreachable in every build
+  this repository makes, and no case was invented for them. The ledger records
+  that as `build_variant` with the build tags as evidence.
+- Some cases record a boolean where the pinned implementation's short-circuit is
+  genuinely unobservable through the API (`SyncSet.IsEmpty`,
+  `CopyOnWriteMap`'s ownership restore). Those claims were narrowed to what the
+  rows witness rather than dropped.
+
 ## F0 checklist
 
 | Requirement | Result |
 | --- | --- |
 | Scope has zero unclassified operations | 4,795 operations, each with a disposition, basis, case links and dependencies |
-| `covered` carries exact case/artifact links | **1 of 4,795.** 2,720 mapped operations have only file-level producer metrics; see Scope |
+| `covered` carries exact case/artifact links | **69 of 4,795.** 2,694 mapped operations have only file-level producer metrics; see Scope |
 | All 309 outputs have verified invocation mappings | **167 of 309.** 142 blocked; see below |
-| Manifests and failure tests pass | 79 Phase 1 tests, plus the extended discovery regression |
+| Manifests and failure tests pass | 115 Phase 1 tests, plus the extended discovery regression |
 | The real pilot has an observed match and a named missing operation | 2 matches against pinned Go, 4 named missing Rust operations, each with a native expectation |
 | Replay is read-only | `compare` spawns no build or observation child, and a test asserts neither `go` nor `cargo` is invoked |
 | The pending queue is generated from concrete rows | derived from `data/phase1/scope.json` |
 
-## Blocker: `config/matchFiles` baseline authority
+## Approved: carry the `config/matchFiles` test renderer
 
 **The 142 `config/matchFiles` reference outputs have no Go invocation and no Go
 renderer at this pin.** The plan anticipated this and required it be named
@@ -64,18 +352,20 @@ The **semantic** authority does exist: `vfsmatch_test.go`'s `TestReadDirectory`
 and `TestReadDirectoryMatchesTypeScriptBaselines` assert ordered `matchFiles()`
 results, and the pilot already matches Rust against it.
 
-This is an owner decision under the plan's stop conditions. The options:
+**Owner-approved on 2026-09-20: keep all 309 byte-for-byte baselines.** Carry a
+test-only implementation of the matchFiles envelope, retaining pinned Go
+matching/configuration behavior as the semantic authority. First prove that
+native observations rendered through it reproduce all 142 frozen files; then
+render Rust observations through the same test-envelope seam. Expected result
+sections must never be copied from the baseline or completed using native
+semantics on Rust's behalf.
 
-- **A.** Keep 309 as the byte-baseline denominator and carry a reviewed
-  test-format implementation for the matchFiles envelope, verifying it
-  reproduces the frozen bytes from native results before any Rust comparison.
-- **B.** Hold the 142 as ordered-list semantic comparisons against the native
-  `vfsmatch` authority, and reduce the byte-baseline denominator to 167 with
-  that reduction recorded explicitly.
-- **C.** Treat the 142 as unreachable at this pin and record them as a standing
-  qualification.
-
-F0 does not choose, and F0 is not complete until one is chosen.
+The authority decision is settled. The remaining work is request/invocation
+mapping, renderer implementation and native-byte verification, owned by F2a's
+matching preparation and reused by F3a. Keep the manifest's authority blocked
+until that proof exists; approval alone is not a successful observation. This
+does not block F1a's leaf preparation and does not require another approval to
+implement the agreed renderer.
 
 ## The 309 index and its per-output mapping
 
@@ -91,7 +381,7 @@ bytes — not an assumption about a generic renderer.
 
 | Group | Outputs | Verified | Authority |
 | --- | ---: | ---: | --- |
-| `config/matchFiles` | 142 | **0** | blocked |
+| `config/matchFiles` | 142 | **0** | carried test renderer approved; implementation and verification pending |
 | `config/tsconfigParsing` | 87 | 87 | `baselineParseConfigWith`, plus inline assembly in `TestParseConfigFileTextToJson` |
 | `.../parseCommandLine` | 53 | 53 | `formatNewBaseline` |
 | `.../parseBuildOptions` | 27 | 27 | `formatNewBaselineBuild` |
@@ -124,9 +414,9 @@ operations are Phase 1 obligations, and F4a enumerates that exact surface.
 
 | Disposition | Count |
 | --- | ---: |
-| `covered` | 1 |
-| `implemented_untested` | 3,449 |
-| `missing` | 1,327 |
+| `covered` | 69 |
+| `implemented_untested` | 3,400 |
+| `missing` | 1,308 |
 | `equivalent_rust` | 0 |
 | `later_phase` | 18 |
 
@@ -189,7 +479,7 @@ end to end:
 
 **A production change stales the capture.** The source closure is derived from
 `cargo metadata`, not hand-listed, so it contains the driver package's whole
-workspace dependency closure — 327 inputs, including
+workspace dependency closure — 444 pilot inputs and 238 leaf inputs, including
 `crates/tsr_tsoptions/src/glob.rs`, all of `tsr_vfs`, the example target,
 `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` and `.cargo/**`. It also
 covers what the *native* side executes: `data/s04/toolchains.toml` (which
@@ -201,7 +491,9 @@ capture. Appending a comment to `glob.rs` makes `compare` fail with
 Replay recomputes the expected key set rather than trusting the recorded one,
 so a capture that recorded too few inputs cannot authenticate; the workspace
 package list is itself authenticated, and a dependency added since the capture
-is caught through the `Cargo.toml`/`Cargo.lock` hashes.
+is caught through the `Cargo.toml`/`Cargo.lock` hashes. All regular package
+files are included, including embedded `.d.ts` libraries and their notice;
+production asset edits now stale the leaf capture as source edits do.
 
 **A malformed response cannot reach parity.** Each response is validated as an
 ordered sequence before anything is indexed by case id, checking count, order,
@@ -215,6 +507,11 @@ statuses. Against a real capture:
 | extra failing row | `rust response has 7 rows for 6 requests` |
 | reordered rows | `row 0 reports case '...' where the request schedule has '...'` |
 | unknown status | `unknown rust status 'looks_fine'; allowed statuses are ...` |
+
+Unknown action markers are harness failures, not comparable observations.
+Malformed action arrays are rejected, and an observed trace must retain one
+result per requested action. Native action decoding no longer turns malformed
+JSON into an empty successful trace.
 
 A side may only report its own statuses: a Rust driver cannot claim
 `native_unavailable`, and a native probe cannot claim `not_implemented`.
@@ -279,8 +576,9 @@ metrics. Every item is open and no metric is populated.
 
 The `foundations`, `config` and `syntax` producers are **not** registered in
 `status/runs.toml`. The plan registers a producer only once it can validate its
-complete declared inventory and report honest failures; only the `pilot` family
-has an adapter. F1a–F5a register them as their family adapters land.
+complete declared inventory and report honest failures. The `pilot` and
+`leaves` families have adapters; the leaf preparation inventory is still
+incomplete. F1a–F5a register producers when their declared inventory is ready.
 
 `cargo xtask validate` and `cargo xtask status --check-committed` both pass with
 P1A registered, and S01–S12 are unchanged.

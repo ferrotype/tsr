@@ -1,0 +1,522 @@
+{
+  "authority": {
+    "go_cache": "tsc/internal/diagnostics/diagnostics.go:87 localizedMessagesCache (sync.Map, process lifetime)",
+    "go_generate_directive": "tsc/internal/diagnostics/diagnostics.go:16",
+    "go_generator": "tsc/internal/diagnostics/generate.go:generateLocalizations",
+    "go_locale_api": "tsc/internal/locale/locale.go",
+    "go_matcher": "tsc/internal/diagnostics/loc_generated.go:15 language.NewMatcher",
+    "go_selection": "tsc/internal/diagnostics/diagnostics.go:71 Localize, :89 getLocalizedMessages"
+  },
+  "default_locale": {
+    "go_table_func": "nil",
+    "locale_tag": "en",
+    "matcher_index": 0,
+    "message_key_count": 2211,
+    "note": "localeFuncs[0] is nil: English is the untranslated Message.text compiled into diagnostics_generated.go, not a table. language.Und short-circuits before the matcher runs (diagnostics.go:90-92) and reaches the same text.",
+    "shipped_path": null
+  },
+  "dependency": {
+    "declared_in": "upstream/tsc/go.mod",
+    "go_sum_h1": "h1:sXmwo9DwP3OK9EZ7PqAdaooSGozfl/3a6/xJcbzPRhE=",
+    "module": "golang.org/x/text",
+    "note": "No Rust BCP 47 dependency has been chosen. The plan requires the discriminating native cases to be frozen first; they are leaves/locale/parse-* and leaves/locale/translation-fallback-matching.",
+    "rust_equivalent": null,
+    "used_for": "language.Parse canonicalisation and language.NewMatcher fallback selection",
+    "version": "v0.38.0"
+  },
+  "english_message_count": 2211,
+  "fallback_obligations": [
+    {
+      "authority": "tsc/internal/diagnostics/diagnostics.go:90-92",
+      "established_by": [
+        "leaves/locale/translation-shipped-locales",
+        "leaves/locale/default-cold-process"
+      ],
+      "id": "und-selects-no-table",
+      "obligation": "language.Und selects no table and yields the English text"
+    },
+    {
+      "authority": "tsc/internal/diagnostics/loc_generated.go:32-46",
+      "established_by": [
+        "leaves/locale/translation-shipped-locales"
+      ],
+      "id": "english-index-is-nil",
+      "obligation": "matcher index 0 maps to a nil table function, so an English request is the untranslated text"
+    },
+    {
+      "authority": "tsc/internal/diagnostics/diagnostics.go:104-109",
+      "established_by": [
+        "leaves/locale/translation-fallback-matching"
+      ],
+      "id": "confidence-threshold",
+      "obligation": "a match is accepted only at confidence >= language.Low and with an index inside localeFuncs; anything else yields the English text",
+      "tags_measured": [
+        "zh",
+        "zh-Hans",
+        "zh-Hant",
+        "zh-HK",
+        "zh-SG",
+        "zh-MO",
+        "cmn-Hans-CN",
+        "de",
+        "de-AT",
+        "de-CH",
+        "fr-CA",
+        "pt",
+        "pt-PT",
+        "es-MX",
+        "es-419",
+        "en-GB",
+        "ja-Latn-JP",
+        "nl-NL",
+        "sv-SE",
+        "ar-SA",
+        "hi-IN",
+        "yue",
+        "wuu"
+      ],
+      "tags_measured_note": "English is matcher index 0 and ships no table, so en-GB appears in the list above even though English is a matcher entry",
+      "tags_measured_outside_every_table_base_language": [
+        "cmn-Hans-CN",
+        "en-GB",
+        "nl-NL",
+        "sv-SE",
+        "ar-SA",
+        "hi-IN",
+        "yue",
+        "wuu"
+      ]
+    },
+    {
+      "authority": "tsc/internal/diagnostics/loc_generated.go:15-30",
+      "established_by": [
+        "leaves/locale/translation-shipped-locales"
+      ],
+      "id": "shipped-tag-selects-itself",
+      "obligation": "every tag the matcher is constructed from selects its own table"
+    },
+    {
+      "authority": "tsc/internal/diagnostics/diagnostics.go:79-82",
+      "english_keys_absent_per_table": {
+        "cs-CZ": 95,
+        "de-DE": 99,
+        "es-ES": 95,
+        "fr-FR": 95,
+        "it-IT": 99,
+        "ja-JP": 95,
+        "ko-KR": 95,
+        "pl-PL": 95,
+        "pt-BR": 95,
+        "ru-RU": 99,
+        "tr-TR": 95,
+        "zh-CN": 95,
+        "zh-TW": 99
+      },
+      "established_by": [
+        "leaves/locale/translation-missing-key-english-fallback"
+      ],
+      "id": "missing-key-falls-back-to-english",
+      "obligation": "a key absent from the selected table falls back to that message's English text, not to an empty string or the key"
+    },
+    {
+      "authority": "tsc/internal/diagnostics/diagnostics.go:117 Format, called after the table lookup",
+      "established_by": [
+        "leaves/locale/translation-placeholder-order"
+      ],
+      "id": "placeholder-order-follows-the-selected-template",
+      "obligation": "{0}.. substitution runs against the selected translation, which may order placeholders differently from English"
+    },
+    {
+      "authority": "tsc/internal/diagnostics/diagnostics.go:87 localizedMessagesCache, :95 Load, :111 Store",
+      "established_by": [
+        "leaves/locale/translation-repeated-and-changed",
+        "leaves/locale/default-cold-process"
+      ],
+      "id": "table-cache-is-transparent",
+      "obligation": "the selected table is cached per requested tag for the process lifetime and never invalidated; a repeat must be byte-identical to the first request and must not leak into another tag"
+    }
+  ],
+  "generator_extension": "xtask/src/gen/diagnostics.rs",
+  "generator_extension_status": {
+    "f1a_contract": "F1a reports the absence: every locale.translation* case answers not_implemented naming crates/tsr_diagnostics/src/localize.rs. Hand-maintained translations are not acceptable in place of the generator.",
+    "lands_in": "F1b",
+    "state": "absent",
+    "today": "xtask/src/gen/diagnostics.rs generates the English message identities only (crates/tsr_diagnostics/src/generated.rs); it emits no locale tables, no matcher and no selection code."
+  },
+  "phase": "F1a",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "purpose": "Maps every shipped translation table to its source, hash and message-key count, and names the fallback obligations the F1b localisation generator has to satisfy. Counts and hashes are read from the pinned tree; no fallback outcome is predicted here, because the native cases that measure them are frozen first.",
+  "rust_status": {
+    "crate": null,
+    "planned_homes": [
+      "crates/tsr_locale/src/lib.rs (absent): tag parse, canonicalisation, the Default sentinel and the locale carrier",
+      "crates/tsr_diagnostics/src/localize.rs (absent): table selection, per-key English fallback and the formatting entry point"
+    ],
+    "reported_by": "every locale.* row of the leaves family answers not_implemented",
+    "today": "crates/tsr_diagnostics ships message identities and English text only, and says so in its own header: locale negotiation belongs to a later slice."
+  },
+  "shipped_encoding": {
+    "compression": "github.com/klauspost/compress/gzip at BestCompression with gzipWriter.ModTime = time.Unix(0, 0)",
+    "filter": "only keys that exist in the English message set survive; generate.go deletes every other key before writing",
+    "payload": "a JSON object of key -> localized text, keys sorted ascending, built as a collections.OrderedMap and marshalled with internal/json",
+    "reproducibility": "byte-identical regeneration depends on the writer and level above, so F1b has to reproduce the payload, not only the key set"
+  },
+  "table_count": 13,
+  "tables": [
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "zh",
+          "zh-Hans",
+          "zh-Hant",
+          "zh-HK",
+          "zh-SG",
+          "zh-MO"
+        ],
+        "must_select_for": [
+          "zh-CN"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/zh-CN.json.gz",
+      "go_table_func": "zhCN",
+      "lcl_directory": "chs",
+      "locale_tag": "zh-CN",
+      "matcher_index": 1,
+      "message_key_count": 2116,
+      "shipped_bytes": 80296,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/zh-CN.json.gz",
+      "shipped_sha256": "b2f58db33f4b160488ef9d7cc3952dc0f1de486b4f4293d7625183e7073a67d0",
+      "source_bytes": 1054799,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/chs/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "c372a51e9ccca7a913118384c80752684d7ee47ee3cfbd8221f272276800f084",
+      "source_target_culture": "zh-CN",
+      "values_identical_to_english": 0
+    },
+    {
+      "english_keys_absent": 99,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "zh",
+          "zh-Hans",
+          "zh-Hant",
+          "zh-HK",
+          "zh-SG",
+          "zh-MO"
+        ],
+        "must_select_for": [
+          "zh-TW"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/zh-TW.json.gz",
+      "go_table_func": "zhTW",
+      "lcl_directory": "cht",
+      "locale_tag": "zh-TW",
+      "matcher_index": 2,
+      "message_key_count": 2112,
+      "shipped_bytes": 80053,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/zh-TW.json.gz",
+      "shipped_sha256": "f1a0d13e0d586b4d86a2149acc75664d161385eaa71350b9dc41cd411c79255b",
+      "source_bytes": 1050832,
+      "source_localized_items": 2123,
+      "source_path": "upstream/tsc/internal/locale/lcl/cht/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "777f588bcd18de195c6a862465363580c4eb93ebcd64317fd95cdc6a9f33ee08",
+      "source_target_culture": "zh-TW",
+      "values_identical_to_english": 0
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "cs-CZ"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/cs-CZ.json.gz",
+      "go_table_func": "csCZ",
+      "lcl_directory": "csy",
+      "locale_tag": "cs-CZ",
+      "matcher_index": 3,
+      "message_key_count": 2116,
+      "shipped_bytes": 83220,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/cs-CZ.json.gz",
+      "shipped_sha256": "4abf79ee444532a03f4c86aa8472ee86e8c3b67ec439f23c2dcdef4d3fe1fd0e",
+      "source_bytes": 1081408,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/csy/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "bdf4f1f67b173670c0331b3436bd4bddd246db6348b10d6de39bd6f95df645db",
+      "source_target_culture": "cs-CZ",
+      "values_identical_to_english": 1
+    },
+    {
+      "english_keys_absent": 99,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "de",
+          "de-AT",
+          "de-CH"
+        ],
+        "must_select_for": [
+          "de-DE"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/de-DE.json.gz",
+      "go_table_func": "deDE",
+      "lcl_directory": "deu",
+      "locale_tag": "de-DE",
+      "matcher_index": 4,
+      "message_key_count": 2112,
+      "shipped_bytes": 84451,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/de-DE.json.gz",
+      "shipped_sha256": "327e779088146a0902304698c9ceb589576f1a96954bd643e4752b2dcdbdb0b7",
+      "source_bytes": 1099032,
+      "source_localized_items": 2123,
+      "source_path": "upstream/tsc/internal/locale/lcl/deu/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "3f064d19e3ed21198d1128b8d928d41f0604559baccdf0445294c4e7d9576875",
+      "source_target_culture": "de-DE",
+      "values_identical_to_english": 3
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "es-MX",
+          "es-419"
+        ],
+        "must_select_for": [
+          "es-ES"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/es-ES.json.gz",
+      "go_table_func": "esES",
+      "lcl_directory": "esn",
+      "locale_tag": "es-ES",
+      "matcher_index": 5,
+      "message_key_count": 2116,
+      "shipped_bytes": 81448,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/es-ES.json.gz",
+      "shipped_sha256": "70b20dfd23d003f63b6e6565dd0562c8b10281e50a5106bb9ecd4d453905750e",
+      "source_bytes": 1098253,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/esn/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "07955096fd02c5316bc44d3911161086828e94e49354faba54565b99f31186ae",
+      "source_target_culture": "es-ES",
+      "values_identical_to_english": 0
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "fr-CA"
+        ],
+        "must_select_for": [
+          "fr-FR"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/fr-FR.json.gz",
+      "go_table_func": "frFR",
+      "lcl_directory": "fra",
+      "locale_tag": "fr-FR",
+      "matcher_index": 6,
+      "message_key_count": 2116,
+      "shipped_bytes": 82998,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/fr-FR.json.gz",
+      "shipped_sha256": "318cfeaffce1b73d20d97bd542e85025a6eefd9a3f7b75cf55bf1303d3d69e29",
+      "source_bytes": 1107329,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/fra/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "f3a0b873dfc47addebc13419871441bc2771997de19a5635dbc13914595db96c",
+      "source_target_culture": "fr-FR",
+      "values_identical_to_english": 4
+    },
+    {
+      "english_keys_absent": 99,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "it-IT"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/it-IT.json.gz",
+      "go_table_func": "itIT",
+      "lcl_directory": "ita",
+      "locale_tag": "it-IT",
+      "matcher_index": 7,
+      "message_key_count": 2112,
+      "shipped_bytes": 79648,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/it-IT.json.gz",
+      "shipped_sha256": "47d98295fedc36d147a203fe45ed637ec4a89b65b5ad49d941c9283fbf60de54",
+      "source_bytes": 1097799,
+      "source_localized_items": 2123,
+      "source_path": "upstream/tsc/internal/locale/lcl/ita/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "89bf067ae94ab1eba532ffa19a1c7368f3fe3c9e4f8e4189efa23e642b3ab979",
+      "source_target_culture": "it-IT",
+      "values_identical_to_english": 4
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "ja-Latn-JP"
+        ],
+        "must_select_for": [
+          "ja-JP"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/ja-JP.json.gz",
+      "go_table_func": "jaJP",
+      "lcl_directory": "jpn",
+      "locale_tag": "ja-JP",
+      "matcher_index": 8,
+      "message_key_count": 2116,
+      "shipped_bytes": 85168,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/ja-JP.json.gz",
+      "shipped_sha256": "514b29583405ea622ebba54ba51ca4beeb82308acc1ea9d5beb8b50df6432dd0",
+      "source_bytes": 1142474,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/jpn/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "eca4c0030770a67503ac15c89e587e7220849b4b317cd57d7554684a472f7eb7",
+      "source_target_culture": "ja-JP",
+      "values_identical_to_english": 1
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "ko-KR"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/ko-KR.json.gz",
+      "go_table_func": "koKR",
+      "lcl_directory": "kor",
+      "locale_tag": "ko-KR",
+      "matcher_index": 9,
+      "message_key_count": 2116,
+      "shipped_bytes": 81187,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/ko-KR.json.gz",
+      "shipped_sha256": "8a4699cd9405e55bed2a9693bf4ef9582c35b12834086a5cd7d8fea7044a768d",
+      "source_bytes": 1106930,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/kor/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "9c9d2a9f6f2148bb58ba0c44e8c0d68a74b32c7b9c20fabea7f59ad1b3c183d9",
+      "source_target_culture": "ko-KR",
+      "values_identical_to_english": 2
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "pl-PL"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/pl-PL.json.gz",
+      "go_table_func": "plPL",
+      "lcl_directory": "plk",
+      "locale_tag": "pl-PL",
+      "matcher_index": 10,
+      "message_key_count": 2116,
+      "shipped_bytes": 85402,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/pl-PL.json.gz",
+      "shipped_sha256": "2b77e3cc96768b90fc49cbc9bcb26ede150b737d477c5543d3894f9b300c0170",
+      "source_bytes": 1102163,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/plk/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "db591b9d73b6beb6383f69648bbe940a84b7e2ab8b5ea449bcea80bdcded079d",
+      "source_target_culture": "pl-PL",
+      "values_identical_to_english": 1
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [
+          "pt",
+          "pt-PT"
+        ],
+        "must_select_for": [
+          "pt-BR"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/pt-BR.json.gz",
+      "go_table_func": "ptBR",
+      "lcl_directory": "ptb",
+      "locale_tag": "pt-BR",
+      "matcher_index": 11,
+      "message_key_count": 2116,
+      "shipped_bytes": 80024,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/pt-BR.json.gz",
+      "shipped_sha256": "4fda581aba82cba6a61b50d2915a4d27e828aea01a6a99a87b01c0866d921f5a",
+      "source_bytes": 1090720,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/ptb/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "ba730dc1dd22d80448f0b4b76ba752ec925ecf2077a00ed418fecffa5d08bef0",
+      "source_target_culture": "pt-BR",
+      "values_identical_to_english": 2
+    },
+    {
+      "english_keys_absent": 99,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "ru-RU"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/ru-RU.json.gz",
+      "go_table_func": "ruRU",
+      "lcl_directory": "rus",
+      "locale_tag": "ru-RU",
+      "matcher_index": 12,
+      "message_key_count": 2112,
+      "shipped_bytes": 94627,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/ru-RU.json.gz",
+      "shipped_sha256": "b80f394dc7f891ea177dd8c5f7fe57deac80e5f45631e7f479ef85a05e4f2e18",
+      "source_bytes": 1198080,
+      "source_localized_items": 2123,
+      "source_path": "upstream/tsc/internal/locale/lcl/rus/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "eb53183a392785c3637e4987346299e972cafa2e4fddf7b22019674ad1df248d",
+      "source_target_culture": "ru-RU",
+      "values_identical_to_english": 0
+    },
+    {
+      "english_keys_absent": 95,
+      "fallback_obligation": {
+        "candidate_tags_frozen": [],
+        "must_select_for": [
+          "tr-TR"
+        ],
+        "outcome_authority": "the native observation of leaves/locale/translation-fallback-matching; this manifest records which tags are measured, never which table they reach"
+      },
+      "go_embed": "loc/tr-TR.json.gz",
+      "go_table_func": "trTR",
+      "lcl_directory": "trk",
+      "locale_tag": "tr-TR",
+      "matcher_index": 13,
+      "message_key_count": 2116,
+      "shipped_bytes": 80981,
+      "shipped_path": "upstream/tsc/internal/diagnostics/loc/tr-TR.json.gz",
+      "shipped_sha256": "b4163c0ebb537fdde9e98125f208564a1f633de36ea1fad19b74db12ea8ddaae",
+      "source_bytes": 1090976,
+      "source_localized_items": 2127,
+      "source_path": "upstream/tsc/internal/locale/lcl/trk/diagnosticMessages/diagnosticMessages.generated.json.lcl",
+      "source_sha256": "59542a8687b7519dc4b7032fc716be81bdd42d3a2ae871dbf4f8d82c61a28648",
+      "source_target_culture": "tr-TR",
+      "values_identical_to_english": 0
+    }
+  ],
+  "values_identical_to_english_note": "Per table, the number of keys whose shipped text is byte-identical to the English message text. It is why leaves/locale/translation-shipped-locales and leaves/locale/translation-fallback-matching request two keys: fr-FR's Modules_6244 is one of these 4, so a French row on that key alone is indistinguishable from the English fallback. Type_expected_1110 is present in all 13 tables and differs from English and from every other table.",
+  "version": 1
+}

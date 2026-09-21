@@ -1,0 +1,922 @@
+{
+  "family": "leaves",
+  "requests": [
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-member-order",
+      "discriminates": "a raw JSON value is written through verbatim: members keep their source order and neither ReorderRawObjects nor any canonicalisation applies, so a reader that rebuilt the object through a sorted map would differ",
+      "input_hex": "7b2262223a312c2261223a322c2242223a332c22c3a9223a347d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-map-deterministic",
+      "discriminates": "Deterministic(true) sorts Go string map keys with slices.Sort, i.e. by UTF-8 byte order; RFC 8785 would sort by UTF-16 code units, which orders U+10000 before U+E000 while UTF-8 byte order puts it after",
+      "operation": "tsc/internal/json/json.go:Deterministic",
+      "options": [
+        {
+          "enabled": true,
+          "option": "Deterministic"
+        }
+      ],
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "entries": [
+          [
+            "b",
+            "1"
+          ],
+          [
+            "B",
+            "2"
+          ],
+          [
+            "\ue000",
+            "3"
+          ],
+          [
+            "\ud800\udc00",
+            "4"
+          ],
+          [
+            "a\u00e9",
+            "5"
+          ],
+          [
+            "",
+            "6"
+          ]
+        ],
+        "kind": "map"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-duplicate-names",
+      "discriminates": "the wrapper prepends AllowInvalidUTF8(true) only, so marshal still rejects a duplicate member name; the rejection carries two positions and they are not the same one. The *json.SemanticError's own byte offset and JSON pointer describe the encoder, i.e. where the value would have gone in the output stream, which is 0 and \"\" because nothing had been written; the wrapped jsontext cause carries the repeat itself, offset 7 and pointer /a. A port that put the source position on the outer error, or reported no position at all, would differ",
+      "input_hex": "7b2261223a312c2261223a327d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-duplicate-names-allowed",
+      "discriminates": "the caller's options are appended after the wrapper's own, so AllowDuplicateNames(true) takes effect and both members are written in source order; same bytes as the rejecting case, different option",
+      "input_hex": "7b2261223a312c2261223a327d",
+      "operation": "tsc/internal/json/json.go:AllowDuplicateNames",
+      "options": [
+        {
+          "enabled": true,
+          "option": "AllowDuplicateNames"
+        }
+      ],
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-escapes",
+      "discriminates": "PreserveRawStrings, EscapeForHTML and EscapeForJS are all off, so a pre-escaped \\u00e9 is re-emitted as literal UTF-8 while '<', '&' and U+2028 are left unescaped; a reader that preserved the source escapes, or one that escaped for HTML, would differ on every member",
+      "input_hex": "7b2265736361706564223a226361665c7530306539222c2268746d6c223a22613c6226633e64222c226a73223a225c75323032385c7532303239222c22636f6e74726f6c223a225c75303030375c74222c22736f6c69647573223a22615c2f62227d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-invalid-utf8-byte",
+      "discriminates": "the wrapper's unconditional AllowInvalidUTF8(true) makes marshal accept a raw 0x80/0xff byte inside a string and mangle it to U+FFFD; the paired unmarshal case shows the opposite default on the read side",
+      "input_hex": "7b2273223a22618062ff63227d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-string-invalid-utf8-byte",
+      "discriminates": "the same tolerance applies to a Go string rather than a raw value, which is the path every struct field takes; the replacement happens during quoting, not in the caller's data",
+      "input_hex": "618062ff63",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "string"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-lone-surrogate-escape",
+      "discriminates": "a lone \\ud800 escape is not a raw invalid byte: it is well-formed JSON text that decodes to an unpaired surrogate, and AllowInvalidUTF8(true) turns it into U+FFFD rather than rejecting it or preserving the escape",
+      "input_hex": "7b226c6f6e65223a225c7564383030222c22706169726564223a225c75643833645c7564653030227d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-raw-number-tokens",
+      "discriminates": "CanonicalizeRawInts and CanonicalizeRawFloats are off, so raw number tokens pass through byte for byte: a 40-digit integer keeps every digit, -0 stays -0, 1e1000 is not saturated and 1E+2 keeps its spelling",
+      "input_hex": "5b313233343536373839303132333435363738393031323334353637383930313233343536373839302c2d302c3165313030302c31452b322c302e313030303030303030303030303030303035353531313135313233313235373832372c2d302e305d",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "-0"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "0"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "1.7976931348623157e308"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "5e-324"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "NaN"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "Inf"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "float",
+          "value_text": "-Inf"
+        }
+      ],
+      "case": "leaves/json/marshal-float-edge-values",
+      "discriminates": "a Go float64 goes through the number formatter instead: -0 keeps its sign, the binary64 extremes keep their shortest round-trip spelling, and NaN and infinities are marshal errors rather than JSON tokens",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal"
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal",
+          "value_kind": "sample",
+          "value_text": "zero"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "sample",
+          "value_text": "empty_slice"
+        },
+        {
+          "op": "marshal",
+          "value_kind": "sample",
+          "value_text": "populated"
+        }
+      ],
+      "case": "leaves/json/marshal-struct-missing-null-empty",
+      "discriminates": "on the write side a nil pointer becomes null, a nil slice becomes [] rather than null, and only an omitzero field disappears; a reader that emitted null for the nil slice or dropped the zero string would differ",
+      "operation": "tsc/internal/json/json.go:Marshal",
+      "order_sensitive": true,
+      "subject": "json.Marshal"
+    },
+    {
+      "actions": [
+        {
+          "indent": "",
+          "op": "marshal_indent",
+          "prefix": ""
+        },
+        {
+          "indent": "  ",
+          "op": "marshal_indent",
+          "prefix": ""
+        },
+        {
+          "indent": "\t",
+          "op": "marshal_indent",
+          "prefix": ""
+        },
+        {
+          "indent": "  ",
+          "op": "marshal_indent",
+          "prefix": "\t"
+        },
+        {
+          "indent": "",
+          "op": "marshal_indent",
+          "prefix": "  "
+        }
+      ],
+      "case": "leaves/json/marshal-indent-empty-is-compact",
+      "discriminates": "MarshalIndent forks on prefix == \"\" && indent == \"\": only that pair skips the indent options and produces compact output. Any other pair implies multiline, including a non-empty prefix with an empty indent, which breaks lines and indents them by the prefix alone; the prefix is repeated on every line after the first and the indent is repeated once per depth",
+      "input_hex": "7b2262223a312c2261223a5b312c325d2c2263223a7b7d2c2264223a5b5d7d",
+      "operation": "tsc/internal/json/json.go:MarshalIndent",
+      "order_sensitive": true,
+      "subject": "json.MarshalIndent",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        }
+      ],
+      "case": "leaves/json/marshal-with-indent-option",
+      "discriminates": "Marshal with WithIndent(\"  \") is the fourslash caller's spelling; it sets no indent prefix, so it must match MarshalIndent(\"\", \"  \") exactly, and empty containers stay on one line in both",
+      "input_hex": "7b2262223a312c2261223a5b312c325d2c2263223a7b7d2c2264223a5b5d7d",
+      "operation": "tsc/internal/json/json.go:WithIndent",
+      "options": [
+        {
+          "indent": "  ",
+          "option": "WithIndent"
+        }
+      ],
+      "order_sensitive": true,
+      "subject": "json.Marshal",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "indent": "  ",
+          "op": "marshal_indent_write",
+          "prefix": ""
+        },
+        {
+          "indent": "",
+          "op": "marshal_indent_write",
+          "prefix": ""
+        },
+        {
+          "op": "written_bytes"
+        }
+      ],
+      "case": "leaves/json/marshal-indent-write-fork",
+      "discriminates": "the writer variant carries the same empty-prefix-and-indent fork as MarshalIndent, and successive calls append to the writer without any separator, which is what the tsconfig baseline writer depends on",
+      "input_hex": "7b2262223a312c2261223a5b312c325d7d",
+      "operation": "tsc/internal/json/json.go:MarshalIndentWrite",
+      "order_sensitive": true,
+      "subject": "json.MarshalIndentWrite",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "marshal"
+        },
+        {
+          "op": "marshal_write"
+        },
+        {
+          "op": "marshal_write"
+        },
+        {
+          "op": "written_bytes"
+        }
+      ],
+      "case": "leaves/json/marshal-write-deterministic",
+      "discriminates": "the tracing writer's exact combination: MarshalWrite with Deterministic(true) writes the bytes Marshal produces from the same value and option, and the case observes both sides rather than asserting the equality. Two values appended to one writer are not separated -- MarshalWrite sets the library's internal OmitTopLevelNewline flag, so nothing terminates a value and the second object starts at byte 32 -- which is what the tsconfig baseline writer depends on",
+      "operation": "tsc/internal/json/json.go:MarshalWrite",
+      "options": [
+        {
+          "enabled": true,
+          "option": "Deterministic"
+        }
+      ],
+      "order_sensitive": true,
+      "subject": "json.MarshalWrite",
+      "value": {
+        "entries": [
+          [
+            "name",
+            "n"
+          ],
+          [
+            "cat",
+            "c"
+          ],
+          [
+            "Cat",
+            "C"
+          ]
+        ],
+        "kind": "map"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "new_encoder"
+        },
+        {
+          "op": "marshal_encode"
+        },
+        {
+          "op": "encoder_offset"
+        },
+        {
+          "op": "marshal_encode"
+        },
+        {
+          "op": "encoder_offset"
+        },
+        {
+          "op": "written_bytes"
+        }
+      ],
+      "case": "leaves/json/marshal-encode-successive-values",
+      "discriminates": "an encoder holds its own state across calls, and the newline is a terminator rather than a separator: MarshalEncode writes through the caller's encoder, which does not carry the library's internal OmitTopLevelNewline flag that Marshal and MarshalWrite set for themselves, so every completed top-level value is followed by a newline -- the first marshal_encode already returns 14 bytes for a 13-byte object -- and the output offset advances past each one. A port that emitted the newline only between values would differ on the last byte; the marshal-write-deterministic case shows two values appended to a writer back to back with no newline at all",
+      "input_hex": "7b2262223a312c2261223a327d",
+      "operation": "tsc/internal/json/json.go:MarshalEncode",
+      "order_sensitive": true,
+      "subject": "json.MarshalEncode",
+      "value": {
+        "kind": "raw"
+      }
+    },
+    {
+      "actions": [
+        {
+          "op": "new_encoder"
+        },
+        {
+          "op": "encoder_write_token",
+          "token": "begin_object"
+        },
+        {
+          "input_hex": "6e616d65",
+          "op": "marshal_encode",
+          "value_kind": "string"
+        },
+        {
+          "op": "encoder_offset"
+        },
+        {
+          "op": "written_bytes"
+        }
+      ],
+      "case": "leaves/json/marshal-encode-inside-object-name",
+      "discriminates": "the wrapper's unconditional AllowInvalidUTF8(true) is not free: joined onto an encoder that does not have it while the encoder is expecting an object name, MarshalEncode refuses with errChangingInvalidUTF8, so the same call that works at top level fails one token deeper",
+      "operation": "tsc/internal/json/json.go:MarshalEncode",
+      "order_sensitive": true,
+      "subject": "json.MarshalEncode"
+    },
+    {
+      "actions": [
+        {
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-duplicate-names-rejected",
+      "discriminates": "Unmarshal passes the caller's options through untouched, so the library default holds and a duplicate member name is a syntactic error with the offset and JSON pointer of the repeat",
+      "input_hex": "7b2261223a312c2261223a327d",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "raw_value"
+    },
+    {
+      "actions": [
+        {
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-duplicate-names-allowed",
+      "discriminates": "packagejson.Parse is the real caller of AllowDuplicateNames(true); this records which repeat of a struct field survives and whether a repeated member is merged or overwritten",
+      "input_hex": "7b226e616d65223a226669727374222c226974656d73223a5b2261225d2c226e616d65223a227365636f6e64222c226974656d73223a5b2262225d7d",
+      "operation": "tsc/internal/json/json.go:AllowDuplicateNames",
+      "options": [
+        {
+          "enabled": true,
+          "option": "AllowDuplicateNames"
+        }
+      ],
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-duplicate-escaped-name",
+      "discriminates": "the duplicate check compares unescaped names, so \\u006eame collides with name even though the two member tokens share no bytes; a reader that compared raw name bytes, as lsproto's jsonObjectRawField does, would accept this document",
+      "input_hex": "7b226e616d65223a226669727374222c225c7530303665616d65223a227365636f6e64227d",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-invalid-utf8-byte-rejected",
+      "discriminates": "the asymmetry the wrapper creates: Unmarshal never receives AllowInvalidUTF8(true), so the same bytes that marshal mangles to U+FFFD are a read error here",
+      "input_hex": "7b2273223a22618062ff63227d",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "raw_value"
+    },
+    {
+      "actions": [
+        {
+          "input_hex": "7b2273223a225c7564383030227d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2273223a225c75643833645c7564653030227d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2273223a225c75643830305c7530303431227d",
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-lone-surrogate-escape-rejected",
+      "discriminates": "a lone \\ud800 escape is rejected on the read side while a correctly paired surrogate decodes; this is the escape path, not the raw-byte path",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "raw_value"
+    },
+    {
+      "actions": [
+        {
+          "input_hex": "31323334353637383930313233343536373839303132333435363738393031323334353637383930",
+          "op": "unmarshal",
+          "target": "float64"
+        },
+        {
+          "input_hex": "31323334353637383930313233343536373839303132333435363738393031323334353637383930",
+          "op": "unmarshal",
+          "target": "int64"
+        },
+        {
+          "input_hex": "2d30",
+          "op": "unmarshal",
+          "target": "float64"
+        },
+        {
+          "input_hex": "2d30",
+          "op": "unmarshal",
+          "target": "int64"
+        },
+        {
+          "input_hex": "2d302e30",
+          "op": "unmarshal",
+          "target": "float64"
+        },
+        {
+          "input_hex": "316531303030",
+          "op": "unmarshal",
+          "target": "float64"
+        },
+        {
+          "input_hex": "39323233333732303336383534373735383038",
+          "op": "unmarshal",
+          "target": "int64"
+        },
+        {
+          "input_hex": "39323233333732303336383534373735383037",
+          "op": "unmarshal",
+          "target": "int64"
+        },
+        {
+          "input_hex": "2d31",
+          "op": "unmarshal",
+          "target": "uint64"
+        },
+        {
+          "input_hex": "223122",
+          "op": "unmarshal",
+          "target": "int64"
+        },
+        {
+          "input_hex": "312e35",
+          "op": "unmarshal",
+          "target": "int64"
+        }
+      ],
+      "case": "leaves/json/unmarshal-number-targets",
+      "discriminates": "one number token means different things per target: a 40-digit integer rounds into float64 but is out of range for int64, -0 keeps its sign bit in float64 and loses it in int64, 1e1000 overflows, and a quoted number is a type error without StringifyNumbers",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal"
+    },
+    {
+      "actions": [
+        {
+          "input_hex": "7b7d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b226e616d65223a6e756c6c2c22636f756e74223a6e756c6c2c226974656d73223a6e756c6c7d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b226974656d73223a5b5d7d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b22636f756e74223a302c226974656d73223a5b2261225d2c226578747261223a22227d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b22756e6b6e6f776e223a317d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "6e756c6c",
+          "op": "unmarshal"
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "7b7d",
+          "op": "unmarshal",
+          "reuse": true
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "7b226e616d65223a6e756c6c2c22636f756e74223a6e756c6c2c226974656d73223a6e756c6c7d",
+          "op": "unmarshal",
+          "reuse": true
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "7b226974656d73223a5b5d7d",
+          "op": "unmarshal",
+          "reuse": true
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "7b22756e6b6e6f776e223a317d",
+          "op": "unmarshal",
+          "reuse": true
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "6e756c6c",
+          "op": "unmarshal",
+          "reuse": true
+        }
+      ],
+      "case": "leaves/json/unmarshal-missing-null-empty",
+      "discriminates": "missing, null and empty are three different inputs, and a fresh zero destination cannot tell the first two apart: the six reads into a fresh target show {}, the all-null object, an unknown member and a null document all producing the same state. So the case reads them again into a destination new_target pre-populated with name \"a\", count 7, items [x,y] and extra \"e\". Against that, an absent member leaves every field as it was, an explicit null zeroes exactly the fields it names (the pointer to nil, the string to \"\", the slice to nil) and leaves the unnamed extra alone, an unknown member changes nothing, and a null document zeroes the whole struct. [] gives a non-nil empty slice against either destination, where null and absence give nil",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "input_hex": "7b226e616d65223a2278222c226974656d73223a5b2261225d2c22636f756e74223a226f6f7073227d",
+          "op": "unmarshal"
+        },
+        {
+          "op": "new_target",
+          "preset": "populated",
+          "target": "sample"
+        },
+        {
+          "input_hex": "7b226e616d65223a227a222c22636f756e74223a226f6f7073227d",
+          "op": "unmarshal",
+          "reuse": true
+        },
+        {
+          "input_hex": "7b226e616d65223a2278222c226974656d73223a5b2261225d2c22636f756e74223a",
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-partial-write-on-failure",
+      "discriminates": "a failed read is not a rollback: Unmarshal writes each member into the destination as it reads it and leaves everything written before the fault in place. The type error at /count keeps name \"x\" and items [\"a\"] and has already allocated the count pointer, which is non-nil at 0, before rejecting the value; against a destination new_target pre-populated with name \"a\", count 7, items [x,y] and extra \"e\", the same failure leaves the overwritten name \"z\" behind while count, items and the unnamed extra keep their old values; a truncated input leaves the same partial state and differs only in the error. A port that decoded into a temporary and assigned it on success would differ on every row",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "input_hex": "",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "202020",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b226122",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2261223a",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2261223a31",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "22616263",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "225c753030",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2261223a317d7b2262223a327d",
+          "op": "unmarshal"
+        },
+        {
+          "input_hex": "7b2261223a317d20",
+          "op": "unmarshal"
+        }
+      ],
+      "case": "leaves/json/unmarshal-truncated-inputs",
+      "discriminates": "truncation has to be told apart from a syntax error, and the error class cannot do it: every failure here is a *jsontext.SyntacticError, so the distinction is the wrapped sentinel, recorded as error_unexpected_eof. It is true for each input that stops mid-value and false for {\"a\":1}{\"b\":2}, a complete value followed by an invalid character. The offsets say where the reader stopped rather than where the input ran out: an empty input reports 0, a truncated \\u escape reports 1, the start of the unfinished string, and trailing whitespace after a complete value is accepted",
+      "operation": "tsc/internal/json/json.go:Unmarshal",
+      "order_sensitive": true,
+      "subject": "json.Unmarshal",
+      "target": "raw_value"
+    },
+    {
+      "actions": [
+        {
+          "chunk": 0,
+          "op": "unmarshal_read"
+        },
+        {
+          "chunk": 1,
+          "op": "unmarshal_read"
+        },
+        {
+          "chunk": 3,
+          "op": "unmarshal_read"
+        },
+        {
+          "chunk": 1,
+          "input_hex": "7b226e616d65223a2261227d20200a",
+          "op": "unmarshal_read"
+        },
+        {
+          "chunk": 1,
+          "input_hex": "7b226e616d65223a2261227d7b226e616d65223a2262227d",
+          "op": "unmarshal_read"
+        }
+      ],
+      "case": "leaves/json/unmarshal-read-chunk-boundaries",
+      "discriminates": "UnmarshalRead must not depend on where the reader splits: one byte per Read has to give the same result as one whole read, and the call has to consume the trailing whitespace but reject a second top-level value",
+      "input_hex": "7b226e616d65223a22615c7530306539222c22636f756e74223a332c226974656d73223a5b2278222c2279225d7d",
+      "operation": "tsc/internal/json/json.go:UnmarshalRead",
+      "order_sensitive": true,
+      "subject": "json.UnmarshalRead",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "chunk": 0,
+          "op": "new_decoder"
+        },
+        {
+          "op": "peek_kind"
+        },
+        {
+          "op": "read_token"
+        },
+        {
+          "op": "stack_depth"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "stack_pointer"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "skip_value"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "peek_kind"
+        },
+        {
+          "op": "read_token"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "stack_depth"
+        },
+        {
+          "op": "peek_kind"
+        }
+      ],
+      "case": "leaves/json/decoder-raw-name-token-walk",
+      "discriminates": "the token walk lsproto's jsonObjectRawField performs: ReadValue returns the raw, still-escaped name bytes, so \\u0063 does not read as c; the input offset and stack pointer after each step are the rest of the contract a streaming reader has to reproduce",
+      "input_hex": "7b2262223a312c2261223a7b226e223a5b312c325d7d2c225c7530303633223a337d",
+      "operation": "tsc/internal/json/json.go:NewDecoder",
+      "order_sensitive": true,
+      "subject": "json.NewDecoder"
+    },
+    {
+      "actions": [
+        {
+          "chunk": 0,
+          "op": "new_decoder"
+        },
+        {
+          "op": "unmarshal_decode"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "unmarshal_decode"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "unmarshal_decode"
+        },
+        {
+          "op": "input_offset"
+        }
+      ],
+      "case": "leaves/json/decoder-unmarshal-decode-stream",
+      "discriminates": "UnmarshalDecode consumes exactly one value and leaves the decoder on the next, with no separator required between concatenated top-level objects; the third call has nothing left and must report EOF, not a syntax error",
+      "input_hex": "7b226e616d65223a2261227d7b226e616d65223a2262227d200a",
+      "operation": "tsc/internal/json/json.go:UnmarshalDecode",
+      "order_sensitive": true,
+      "subject": "json.UnmarshalDecode",
+      "target": "sample"
+    },
+    {
+      "actions": [
+        {
+          "chunk": 0,
+          "op": "new_decoder"
+        },
+        {
+          "op": "read_token"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "read_value"
+        },
+        {
+          "op": "input_offset"
+        },
+        {
+          "op": "stack_pointer"
+        },
+        {
+          "op": "unread_buffer"
+        }
+      ],
+      "case": "leaves/json/decoder-truncated-stream-position",
+      "discriminates": "where a streaming reader stops on a truncated document: the decoder reports the tokens it did consume, then fails on the missing one, and the input offset and unread buffer say how much of the input it had taken",
+      "input_hex": "7b2261223a312c",
+      "operation": "tsc/internal/json/json.go:NewDecoder",
+      "order_sensitive": true,
+      "subject": "json.NewDecoder"
+    }
+  ],
+  "version": 1
+}
