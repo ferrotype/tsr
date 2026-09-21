@@ -98,7 +98,7 @@ fn owned_snapshots_isolate_writes_but_keep_value_identity() {
     let value = Arc::new(AtomicUsize::new(1));
     let mut parent = CopyOnWriteMap::<_, _>::default();
     parent.insert("a", value.clone());
-    let mut child = parent.clone();
+    let mut child = parent.snapshot();
     child.insert("b", Arc::new(AtomicUsize::new(2)));
     child.get("a").unwrap().store(3, Ordering::Relaxed);
     assert!(!parent.contains_key("b"));

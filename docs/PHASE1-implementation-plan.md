@@ -573,6 +573,41 @@ parity may still fail. Do not port production code to make this step look green.
 ordering and cache behavior; locale/library assets reproduce; dependencies are
 acyclic and affected real consumers use the tested implementation.
 
+##### Ordered storage and JSON integration decision — 2026-09-21
+
+The first F1b review identified private vector maps in existing consumers. The
+shared collection is production storage, not a second implementation used only
+by leaf probes. Apply these dispositions:
+
+| Consumer | Disposition and required witness |
+| --- | --- |
+| `tsr_tsoptions::file_names_from_specs` | Migrate its three maps now. Preserve literal/wildcard/JSON group order, case-canonical keys and extension priority. Use the direct `config/specs/file-names-*` cases and source-config parsing comparisons. The 142 matchFiles outputs exercise directory matching, not this aggregation by themselves. |
+| `ConfigValue::Object` | Migrate to `OrderedMap<JsString, ConfigValue>` with the F1b JSON batch. Keep first insertion position on overwrite and source-order traversal. Preserve the current value-cloning contract; mutable shallow sharing is a separate, still-unapproved difference. Exercise duplicate source properties, config diagnostics, and the F3 config rendering path. |
+| `CompilerOptions::paths` / `PathMappings` | Migrate to `OrderedMap<JsString, Option<Vec<JsString>>>` with the same JSON batch. Retain the outer `Option`, nil versus allocated-empty target lists, source order and pattern tie-breaking. Test actual config/options serialization and module resolution as well as the five ordered-map JSON leaf cases. Do not convert through a sorted map. |
+| `package_json::Object<'a>` | Keep the ordered raw-member sequence. It is a decode stream, not a key/value map: duplicate document fields can partially update prior typed values, while nested typed objects can reject duplicates. Inserting into `OrderedMap` first would erase that information. Existing native witnesses include `duplicate-string-invalid`, `duplicate-deps-merge`, `deps-duplicate-prior` and `exports-order` in `data/s07/packagejson-observations.json`. The post-decode semantic objects currently use `serde_json::Map` with `preserve_order`; audit their migration separately with the JSON decoder, preserving the raw stream and typed-field failure state. |
+
+The planned `tsr_json` layer owns the streaming encode/decode traits and their
+ordered-map implementations, and depends on `tsr_core`; core storage must not
+depend on the JSON layer. `tsr_tsoptions` implements those traits for its config
+values and uses the same writer for actual options/config output. Select the
+underlying JSON dependency against the frozen F1a contracts before implementing
+that layer. The dependency choice is still open; the storage and dependency
+direction are settled. This permits one ordered encoding implementation without
+a core/JSON cycle or conversions between private containers at every call.
+
+The JSON batch must reach those real callers before claiming completion. Five
+passing collection rows alone do not certify the 309 config/options baselines;
+compare the prepared native-renderer bytes through the F3 adapter, with remaining
+F3b gaps still explicit. No `equivalent_rust` disposition is added just from a
+similar type name or this architectural decision.
+
+Phase 2 follow-up: when implementing generic qualified-name serialization
+(`qualified_type_parameter_nodes` / pinned `lookupTypeParameterNodes`), add Go's
+fourth scoped `typeParameterSymbolList` as a `CopyOnWriteSet<SymbolId, ...>`.
+Include both repeated-symbol suppression sites and nested success/error scope
+restoration. `TypeParameterNames::snapshot` explicitly initializes each scoped
+field; do not replace that with a derived clone over unreviewed new storage.
+
 ### F2 — filesystems, paths and the two kinds of matching
 
 Keep immutable program snapshots separate from live mutable filesystems.

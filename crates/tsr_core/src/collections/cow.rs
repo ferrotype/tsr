@@ -37,6 +37,13 @@ impl<K, V, S> Clone for CopyOnWriteMap<K, V, S> {
 }
 
 impl<K, V, S> CopyOnWriteMap<K, V, S> {
+    /// Retain this backing in O(1). The first write to either shared version
+    /// clones its entries; this does not deep-copy the map at the call site.
+    #[must_use]
+    pub fn snapshot(&self) -> Self {
+        self.clone()
+    }
+
     /// Save this map until the returned scope is dropped. Mutate through the
     /// scope; the exclusive borrow prevents out-of-order restoration or use
     /// of the parent while a child is active. Nested scopes restore one level
@@ -44,7 +51,7 @@ impl<K, V, S> CopyOnWriteMap<K, V, S> {
     ///
     /// port: tsc/internal/collections/cow.go:CopyOnWriteMap.EnterScope
     pub fn enter_scope(&mut self) -> CopyOnWriteMapScope<'_, K, V, S> {
-        let saved = self.clone();
+        let saved = self.snapshot();
         CopyOnWriteMapScope {
             current: self,
             saved,
@@ -136,9 +143,15 @@ impl<K, S> Clone for CopyOnWriteSet<K, S> {
 }
 
 impl<K, S> CopyOnWriteSet<K, S> {
+    /// Retain the inherited backing in O(1), with independent later writes.
+    #[must_use]
+    pub fn snapshot(&self) -> Self {
+        self.clone()
+    }
+
     /// port: tsc/internal/collections/cow.go:CopyOnWriteSet.EnterScope
     pub fn enter_scope(&mut self) -> CopyOnWriteSetScope<'_, K, S> {
-        let saved = self.clone();
+        let saved = self.snapshot();
         CopyOnWriteSetScope {
             current: self,
             saved,

@@ -113,3 +113,35 @@ fn ordered_set_live_iteration_and_early_stop_share_map_semantics() {
     });
     assert_eq!(seen, ["a"]);
 }
+
+#[test]
+fn live_keys_borrow_mutate_and_move_nonclone_values_in_order() {
+    // No Clone implementation: both live traversal and consuming collection
+    // must work without copying the values.
+    struct Value(usize);
+    let mut map: OrderedMap<String, Value> = [("a".into(), Value(1)), ("b".into(), Value(2))]
+        .into_iter()
+        .collect();
+    assert!(map.get_mut("missing").is_none());
+    let mut seen = Vec::new();
+    map.visit_keys_mut(|map, key| {
+        seen.push(key.clone());
+        map.get_mut(key.as_str()).unwrap().0 += 10;
+        if key == "a" {
+            map.remove("b");
+            map.insert("c".into(), Value(3));
+        }
+        true
+    });
+    assert_eq!(seen, ["a", "c"]);
+    map.visit_keys_mut(|map, key| {
+        map.get_mut(key.as_str()).unwrap().0 += 100;
+        false
+    });
+    assert_eq!(
+        map.keys().map(String::as_str).collect::<Vec<_>>(),
+        ["a", "c"]
+    );
+    let values = map.into_values().map(|v| v.0).collect::<Vec<_>>();
+    assert_eq!(values, [111, 13]);
+}

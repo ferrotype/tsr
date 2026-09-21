@@ -82,6 +82,14 @@ impl<K: Eq + Hash, V, S: BuildHasher> OrderedMap<K, V, S> {
         self.values.get(key)
     }
 
+    /// Mutate a value without changing its key or insertion position.
+    pub fn get_mut<Q: Eq + Hash + ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    where
+        K: Borrow<Q>,
+    {
+        self.values.get_mut(key)
+    }
+
     /// port: tsc/internal/collections/ordered_map.go:OrderedMap.Has
     pub fn contains_key<Q: Eq + Hash + ?Sized>(&self, key: &Q) -> bool
     where
@@ -106,6 +114,16 @@ impl<K: Eq + Hash, V, S: BuildHasher> OrderedMap<K, V, S> {
     /// port: tsc/internal/collections/ordered_map.go:OrderedMap.Values
     pub fn values(&self) -> impl ExactSizeIterator<Item = &V> {
         self.entries().map(|(_, value)| value)
+    }
+
+    /// Move values out in insertion order, without cloning their contents.
+    pub fn into_values(self) -> impl ExactSizeIterator<Item = V> {
+        let mut values = self.values;
+        self.keys.into_iter().map(move |key| {
+            values
+                .remove(&key)
+                .expect("every ordered key has one value")
+        })
     }
 
     /// port: tsc/internal/collections/ordered_map.go:OrderedMap.Delete
@@ -169,24 +187,32 @@ impl<K: Eq + Hash + Clone, V, S: BuildHasher> OrderedMap<K, V, S> {
         }
     }
 
-    /// Re-read the current length and entry after every callback, including
+    /// Re-read the current length and key after every callback, including
     /// entries appended by the callback. Deletion shifts subsequent indices
     /// exactly as in the pinned indexed loop; it may skip the shifted key.
-    /// Returning false stops iteration. Unlike the borrowed iterators, this
-    /// method shallow-clones the current key and value to release the borrow
-    /// before calling a body that can mutate this map.
-    pub fn visit_entries_mut(&mut self, mut visit: impl FnMut(&mut Self, K, V) -> bool)
-    where
-        V: Clone,
-    {
+    /// Returning false stops iteration. Only the current key is cloned; the
+    /// callback can borrow its value with `get` or mutate it with `get_mut`.
+    pub fn visit_keys_mut(&mut self, mut visit: impl FnMut(&mut Self, K) -> bool) {
         let mut index = 0;
         while let Some(key) = self.keys.get(index).cloned() {
-            let value = self.values[&key].clone();
-            if !visit(self, key, value) {
+            if !visit(self, key) {
                 break;
             }
             index += 1;
         }
+    }
+
+    /// Live iteration with an owned key/value pair for each callback. This
+    /// clones each visited value; use `visit_keys_mut` to avoid that cost or to
+    /// visit values that do not implement `Clone`.
+    pub fn visit_entries_mut(&mut self, mut visit: impl FnMut(&mut Self, K, V) -> bool)
+    where
+        V: Clone,
+    {
+        self.visit_keys_mut(|map, key| {
+            let value = map.values[&key].clone();
+            visit(map, key, value)
+        });
     }
 }
 

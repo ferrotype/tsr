@@ -137159,7 +137159,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137196,7 +137196,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137231,7 +137231,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137268,7 +137268,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137303,7 +137303,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137338,7 +137338,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137373,7 +137373,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137408,7 +137408,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137768,7 +137768,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137804,7 +137804,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137839,7 +137839,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137874,7 +137874,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137910,7 +137910,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137948,7 +137948,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -137985,7 +137985,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138030,7 +138030,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138065,7 +138065,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138103,7 +138103,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138138,7 +138138,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138173,7 +138173,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138210,7 +138210,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138287,7 +138287,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138325,7 +138325,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138396,7 +138396,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138431,7 +138431,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138467,7 +138467,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138595,7 +138595,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138634,7 +138634,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138670,7 +138670,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138706,7 +138706,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138743,7 +138743,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138779,7 +138779,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138818,7 +138818,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {
@@ -138857,7 +138857,7 @@
       "ledger_phase": 1,
       "ledger_status": "in-progress",
       "ledger_verification": [],
-      "mapped_in_ledger": false,
+      "mapped_in_ledger": true,
       "membership": "full",
       "membership_reason": "ordered maps/sets and copy-on-write scopes",
       "roster": {

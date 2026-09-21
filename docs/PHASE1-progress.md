@@ -1257,3 +1257,64 @@ the shared JSON layer, locale matching and generated translations, diagnostic
 formatting, bundled access, and the explicit options-clone disposition. The
 case manifest retains the exact outstanding IDs; this batch does not claim
 F1b's full-family or consumer-integration exit.
+
+### F1b consumer review — 2026-09-21
+
+The review's file-collection finding is addressed: `file_names_from_specs` now
+uses the shared `OrderedMap` for literal, wildcard and JSON files. Lookup,
+overwrite, insertion and unsuccessful removal use hashing instead of scanning
+the complete vector. Successful middle removal is still linear, as in Go; this
+is not a claim that every workload is linear or a measured compiler speedup.
+Final collection consumes map values in insertion order without cloning them.
+
+The API also supplies borrowed `get_mut` and live `visit_keys_mut`, so callers
+can update values without requiring `V: Clone`. `visit_entries_mut` delegates
+to the same traversal and explicitly retains its per-value clone cost. A test
+with a non-Clone payload exercises mutation, append, delete, early stopping and
+ordered consumption. An ordered `values_mut` iterator is not needed by these
+callers; key visitation plus `get_mut` provides safe mutation without collecting
+references or introducing unsafe code.
+
+Scoped maps/sets expose an explicitly named O(1) `snapshot`. The checker now
+uses `TypeParameterNames::snapshot`, with an explicit field initializer instead
+of `derive(Clone)`. Adding a field requires changing that initializer, and each
+current table calls its copy-on-write snapshot method. The struct documents the
+cost invariant; the plan records the fourth Go table on the Phase 2 queue.
+
+The [ordered-storage decision](PHASE1-implementation-plan.md#ordered-storage-and-json-integration-decision--2026-09-21)
+requires migrating config objects and `PathMappings` with the JSON batch and
+places encoding traits in the JSON layer above core storage. One review claim
+needed narrowing: package.json's raw `Object` is a duplicate-preserving decode
+sequence, not a private ordered-map implementation. It remains a sequence so
+duplicate/partial-failure behavior survives; native witnesses and the separate
+semantic-object audit are recorded in the plan. No equivalence exemption is
+granted by this decision.
+
+Both prepared families were recaptured on the final Rust sources:
+
+| Family | Match | Missing | Different | Harness/unavailability/unrun |
+| --- | ---: | ---: | ---: | ---: |
+| Leaves | 100 | 124 | 1 | 0 |
+| Config | 176 | 299 | 9 | 0 |
+
+Every case retains its previous result classification. Leaf Rust observations
+are byte-identical after decoding to the first batch. All 56 implemented config
+cases attributed to file aggregation match native Go, including the three
+direct file-name cases; six other attributed cases still stop at named missing
+operations. The 142 matchFiles outputs alone would not test this aggregation.
+
+The new combined archive is `data/phase1/captures/f1b-consumer-review.tar.gz`:
+46 JSON files, 490,968 compressed bytes, with no binaries or upstream tree.
+Its `leaves/` provenance SHA-256 is
+`a818ef69cee442086ef08195812d914e299b49ecffbe2880cfa7725843a5754f`;
+`config/` is
+`e852d16316e7f14b6dbf45ccfa48a9e64294528f3543d3f4d7b58bb1264891b9`.
+The starting and first-batch archives remain historical observations; no hashes
+were relabeled as current.
+
+Validation also passes for the 18 core tests and two tsoptions tests in debug
+and release, the checker scope-restoration regression, all 208 frozen display
+queries, targeted clippy with warnings denied, and 161 Phase 1 Python tests plus
+17 subtests. No benchmark or full compiler corpus was run. The regenerated S07
+inventory changes only 11 marker anchors; replay preserves the selected cases
+and checker-obligation bytes, without refreshing historical producer evidence.

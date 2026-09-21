@@ -7,11 +7,25 @@ use tsr_ast::{FactoryMethods, JsString, SymbolTable, SymbolTableId, SyntaxKind a
 use tsr_core::collections::{CopyOnWriteMap, CopyOnWriteSet};
 use tsr_nodebuilder::flags as nf;
 
-#[derive(Clone, Default)]
+// Scope entry must remain O(1): every table here is copy-on-write. When Phase 2
+// adds Go's typeParameterSymbolList for generic qualified names, it must use a
+// CopyOnWriteSet too. An explicit snapshot lists every field so a new plain
+// collection cannot silently inherit a deep copy through derive(Clone).
+#[derive(Default)]
 pub(super) struct TypeParameterNames {
     names: CopyOnWriteMap<TypeId, NodeId, crate::types::FastState>,
     text: CopyOnWriteSet<JsString, crate::types::FastState>,
     next: CopyOnWriteMap<JsString, usize, crate::types::FastState>,
+}
+
+impl TypeParameterNames {
+    fn snapshot(&self) -> Self {
+        Self {
+            names: self.names.snapshot(),
+            text: self.text.snapshot(),
+            next: self.next.snapshot(),
+        }
+    }
 }
 
 struct ScopeUndo {
@@ -69,7 +83,7 @@ impl NodeBuilder<'_> {
         // The callback needs the whole builder, so retain an owned snapshot
         // instead of holding guards that borrow its fields. Restoring it below
         // matches Go's cloneNodeBuilderContext; each table copies only on write.
-        let names = self.type_parameter_names.clone();
+        let names = self.type_parameter_names.snapshot();
         let mut undos = Vec::new();
         if mapper.is_some() {
             self.mapper = mapper;
