@@ -33077,10 +33077,6 @@
       "mapping_status": "source_marker_present",
       "rust_mappings": [
         {
-          "file": "crates/tsr_compiler/examples/p2/diagnostics.rs",
-          "line": 24
-        },
-        {
           "file": "crates/tsr_compiler/src/program_diagnostics.rs",
           "line": 211
         }

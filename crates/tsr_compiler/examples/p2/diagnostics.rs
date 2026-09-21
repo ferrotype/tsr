@@ -23,11 +23,11 @@ pub fn payload(program: &Program, d: &Diagnostic) -> Result<Value> {
 }
 // Program owns program.go:SortAndDeduplicateDiagnostics, including merging
 // related information. This adapter only validates the JSON payload boundary.
-pub fn sorted(program: &Program, values: Vec<Diagnostic>) -> Result<Vec<Diagnostic>> {
-    for d in &values {
+pub fn sorted(program: &Program, values: &[Diagnostic]) -> Result<Vec<Diagnostic>> {
+    for d in values {
         let _ = payload(program, d)?;
     }
-    Ok(program.sort_and_deduplicate_diagnostics(&values)?)
+    Ok(program.sort_and_deduplicate_diagnostics(values)?)
 }
 pub fn all(program: &Program, op: &mut Operation<'_>) -> Result<Value> {
     all_mode(program, op, false)
@@ -89,7 +89,7 @@ pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -
     let mut output = json!({"state":"executed"});
     let mut combined = Vec::new();
     for (phase, values) in phases {
-        let values = sorted(program, values)?;
+        let values = sorted(program, &values)?;
         output[phase] = json!(values
             .iter()
             .map(|d| payload(program, d))
@@ -114,7 +114,7 @@ pub fn all_mode(program: &Program, op: &mut Operation<'_>, program_mode: bool) -
             "error_baseline",
         );
     } else {
-        let combined = sorted(program, combined)?;
+        let combined = sorted(program, &combined)?;
         output["combined"] = json!(combined
             .iter()
             .map(|d| payload(program, d))
