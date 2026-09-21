@@ -1329,6 +1329,53 @@ class RecordedResultTests(unittest.TestCase):
         self.assertIn("declared but", message)
         self.assertIn("run but not declared", message)
 
+    def test_record_refuses_a_partial_capture(self):
+        """A partial capture reports unselected cases as `not_run`.
+
+        That satisfies the case-set check while carrying no result for them, so
+        recording one would replace every unselected case's result with
+        `not_run` and silently unprepare it.
+        """
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        leaves = [c for c in cases if c.get("family") == "leaves"]
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[1:] = [{"case": r["case"], "result": "not_run"} for r in rows[1:]]
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "partial": True, "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), True)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertIn("partial capture", str(caught.exception))
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before)
+
+    def test_record_refuses_an_unrun_case_even_in_a_whole_family_capture(self):
+        """The `partial` flag is not the only way an unrun row can arrive."""
+        cases = json.loads((ROOT / "data/phase1/cases.json").read_text())["cases"]
+        leaves = [c for c in cases if c.get("family") == "leaves"]
+        rows = [{"case": c["id"], "result": c["last_result"]} for c in leaves]
+        rows[0] = {"case": rows[0]["case"], "result": "not_run"}
+
+        def fake_compare(directory, require):
+            return {"family": "leaves", "partial": False, "rows": rows}
+
+        original = phase1.capture_module.compare
+        before = (ROOT / "data/phase1/cases.json").read_bytes()
+        phase1.capture_module.compare = fake_compare
+        try:
+            with self.assertRaises(ValueError) as caught:
+                phase1.record_results(Path("/nowhere"), True)
+        finally:
+            phase1.capture_module.compare = original
+        self.assertIn("were not run", str(caught.exception))
+        self.assertEqual((ROOT / "data/phase1/cases.json").read_bytes(), before)
+
     def test_record_reports_what_it_would_change_without_writing(self):
         cases = json.loads((ROOT / "data/phase1/cases.json").read_text())
         leaves = [c for c in cases["cases"] if c.get("family") == "leaves"]
@@ -1440,7 +1487,35 @@ class RosterLedgerTests(unittest.TestCase):
             "operation": covered, "category": "equivalent_rust",
             "owner": "Iterator::filter", "evidence": "upstream/... :1",
         }])
-        self.assertTrue(any("but also linked to prepared case" in p for p in problems))
+        self.assertTrue(any("but also prepared by" in p for p in problems))
+
+    def test_a_not_implemented_case_still_blocks_an_exemption(self):
+        """Preparation is not coverage, and the contradiction check must use preparation.
+
+        A case reporting `not_implemented` runs and classifies the gap, so it
+        prepares its operation while covering nothing. Asking only for covering
+        links let an operation be prepared and exempted at the same time, which
+        is how two committed exemptions survived a validating ledger.
+        """
+        prepared = scope.prepared_links(self.cases)
+        covering = scope.cases_by_operation()
+        gap_only = sorted(set(prepared) - set(covering))
+        self.assertTrue(gap_only, "expected operations prepared only by a recorded gap")
+        problems = self.forge([{
+            "operation": gap_only[0], "category": "later_step",
+            "owner": "some other step", "evidence": "upstream/... :1",
+        }])
+        self.assertTrue(any("but also prepared by" in p for p in problems), problems)
+
+    def test_prepared_links_and_the_gate_agree(self):
+        report = scope.leaf_preparation(self.scope, self.cases)
+        links = scope.prepared_links(self.cases)
+        leaf = {row["id"] for row in self.scope["operations"]
+                if row["go_package"] in scope.LEAF_PACKAGES}
+        self.assertEqual(
+            report["prepared_operations"] + report["witnessed_operations"],
+            len(leaf & set(links)),
+        )
 
     def test_an_equivalent_rust_exemption_must_agree_with_the_scope_row(self):
         problems = self.forge([{

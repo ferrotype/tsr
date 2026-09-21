@@ -73,18 +73,6 @@
       "owner": "no step: this port produces no unembedded build"
     },
     {
-      "category": "later_step",
-      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/api, internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/collections/ordered_map.go:295-299 defines `func DiffOrderedMaps[K comparable, V comparable](m1 *OrderedMap[K, V], m2 *OrderedMap[K, V], onAdded func(key K, value V), onRemoved func(key K, value V), onModified func(key K, oldValue V, newValue V))` whose whole body is a delegation `DiffOrderedMapsFunc(m1, m2, func(a, b V) bool { return a == b }, onAdded, onRemoved, onModified)`. The observable shape is fixed by the callee: :302 `for k, v2 := range m2.Entries()` with :303 `if",
-      "operation": "tsc/internal/collections/ordered_map.go:DiffOrderedMaps",
-      "owner": "phase 5, phase 6 (packages: internal/api, internal/project)"
-    },
-    {
-      "category": "later_step",
-      "evidence": "Every non-test caller at the pin is outside this step's roster: internal/project. This step cannot choose the operation's Rust contract without a caller that fixes it, which is what the plan's instruction to read a generic helper's callers first requires. || upstream/tsc/internal/collections/ordered_map.go:198-213. Clone: \"// Clone returns a shallow copy of the map.\" over `func (m *OrderedMap[K, V]) Clone() *OrderedMap[K, V] { if m == nil { return nil }; m2 := m.clone(); return &m2 }`. clone itself: `func (m *OrderedMap[K, V]) clone() OrderedMap[K, V] { return OrderedMap[K, V]{ keys: slices.Clone(m.keys), mp: maps.Clone(m.mp) } }`. It is unexported and has exactly one caller, Clone at :204; `grep -rn \"\\.clone()\" upstream/tsc/internal/collections/` f",
-      "operation": "tsc/internal/collections/ordered_map.go:OrderedMap.clone",
-      "owner": "phase 5 (packages: internal/project)"
-    },
-    {
       "category": "go_runtime",
       "evidence": "upstream/tsc/internal/collections/ordered_map.go defines `func (*noCopy) Lock() {}` with an empty body, above the comment \"Lock is a no-op used by -copylocks checker from `go vet`\". The methods exist so a vet analyser can see a lock-shaped field; they are never called and observe nothing.",
       "operation": "tsc/internal/collections/ordered_map.go:noCopy.Lock",

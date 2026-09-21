@@ -1963,6 +1963,44 @@
       "operation": "tsc/internal/core/compileroptions.go:GetNewLineKind",
       "order_sensitive": true,
       "subject": "options.NewLineFromText"
+    },
+    {
+      "actions": [
+        {
+          "mutate_checkers": 7,
+          "mutate_type": "rewritten",
+          "op": "clone_then_mutate_source",
+          "options": {
+            "checkers": 2,
+            "types": [
+              "alpha",
+              "beta"
+            ]
+          }
+        },
+        {
+          "mutate_checkers": -1,
+          "mutate_type": "",
+          "op": "clone_then_mutate_source",
+          "options": {
+            "checkers": 0,
+            "types": [
+              "only"
+            ]
+          }
+        },
+        {
+          "mutate_checkers": 7,
+          "mutate_type": "rewritten",
+          "op": "clone_then_mutate_source",
+          "options": {}
+        }
+      ],
+      "case": "leaves/options/clone-shares-pointer-backed-fields",
+      "discriminates": "Clone is a field-by-field reflective Set, so a pointer-backed field is copied as the pointer and a slice as its header: writing through the source AFTER the clone is visible in the clone. The sibling field-roster case cannot see this, because at the instant of the clone the two agree. A port whose clone owns its data reads the pre-mutation value instead, which is the difference this case exists to record",
+      "operation": "tsc/internal/core/compileroptions.go:CompilerOptions.Clone",
+      "order_sensitive": true,
+      "subject": "options.Clone"
     }
   ],
   "version": 1

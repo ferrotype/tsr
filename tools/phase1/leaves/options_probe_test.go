@@ -60,6 +60,10 @@ type phase1OptionsAction struct {
 	// the newline literal GetNewLineKind classifies.
 	FileName string `json:"file_name"`
 	Text     string `json:"text"`
+	// The values written through the source after a clone, for the action whose
+	// subject is whether the clone saw them.
+	MutateCheckers int64  `json:"mutate_checkers"`
+	MutateType     string `json:"mutate_type"`
 }
 
 type phase1OptionsRequest struct {
@@ -399,6 +403,32 @@ func phase1OptionClone(t *testing.T, trace []phase1OptionsAction) []any {
 			row["applied"] = applied
 			row["field_count"] = len(fields)
 			row["fields"] = fields
+		case "clone_then_mutate_source":
+			// Clone is a field-by-field reflect Set, so a pointer-backed field
+			// is copied as the pointer and a slice as its header. Writing
+			// through the source afterwards is therefore visible in the clone.
+			// The immediate field comparison above cannot see that, because at
+			// that instant the two agree.
+			source, applied := phase1BuildOptions(t, a)
+			copied := source.Clone()
+			mutated := []any{}
+			if source.Checkers != nil {
+				*source.Checkers = int(a.MutateCheckers)
+			}
+			if len(source.Types) > 0 {
+				source.Types[0] = a.MutateType
+			}
+			readBack := func(o *CompilerOptions) []any {
+				checkers := any(nil)
+				if o.Checkers != nil {
+					checkers = int64(*o.Checkers)
+				}
+				return []any{checkers, phase1OptionStrings(o.Types)}
+			}
+			mutated = append(mutated, []any{"source", readBack(source)})
+			mutated = append(mutated, []any{"clone", readBack(copied)})
+			row["applied"] = applied
+			row["after_mutation"] = mutated
 		default:
 			panic("phase1: unsupported action: " + a.Op)
 		}

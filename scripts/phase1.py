@@ -198,6 +198,22 @@ def record_results(capture: Path, write: bool) -> dict:
     """
     report = capture_module.compare(capture, False)
     observed = {row["case"]: row["result"] for row in report["rows"]}
+    # A partial capture answers for the cases it selected and reports every
+    # other declared case as `not_run`, which satisfies the case-set check
+    # below while carrying no result for them. Recording it would replace every
+    # unselected case's result with `not_run` and silently unprepare them, so a
+    # partial capture is refused before anything is written.
+    if report.get("partial"):
+        raise ValueError(
+            "a partial capture cannot record results: it reports every unselected case as "
+            "`not_run`, which would overwrite their recorded results. Capture the whole family."
+        )
+    unrun = sorted(case for case, result in observed.items() if result == "not_run")
+    if unrun:
+        raise ValueError(
+            f"{len(unrun)} case(s) were not run by this capture ({', '.join(unrun[:3])}); "
+            "a result can only be recorded from a case that actually ran"
+        )
     document = load(CASES)
     family = report["family"]
     declared = {case["id"] for case in document["cases"] if case.get("family") == family}

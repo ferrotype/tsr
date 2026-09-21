@@ -464,6 +464,31 @@ def roster_exemptions() -> dict[str, dict]:
     return {entry["operation"]: entry for entry in leaf_roster().get("exemptions", [])}
 
 
+PREPARING_RESULTS = ("match", "different", "not_implemented")
+
+
+def prepared_links(cases: dict) -> dict[str, list[str]]:
+    """Every leaf operation a case or gated witness has actually run for.
+
+    Preparation is not coverage: a case reporting `not_implemented` prepares its
+    operation -- it runs and classifies the gap -- while covering nothing. The
+    gate and the exemption validator must agree on that set, so both read it
+    from here. Asking cases_by_operation() instead, which answers only for
+    recorded matches, let an operation be prepared and exempted at once.
+    """
+    links: dict[str, list[str]] = {}
+    for case in cases.get("cases", []):
+        if case.get("family") != "leaves" or case.get("last_result") not in PREPARING_RESULTS:
+            continue
+        for operation in case.get("operations", []):
+            links.setdefault(operation, []).append(case["id"])
+    for witness in cases.get("witnesses", []):
+        if witness.get("kind") in COVERING_WITNESS_KINDS:
+            for operation in witness.get("operations", []):
+                links.setdefault(operation, []).append(witness["id"])
+    return {k: sorted(v) for k, v in links.items()}
+
+
 def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
     """Validate the exemption ledger against the scope it claims to subtract from."""
     document = leaf_roster()
@@ -476,10 +501,10 @@ def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
             f"leaf-roster.json records pin {document.get('pin')!r}, not {pin!r}"
         )
     known = {row["id"]: row for row in scope.get("operations", [])}
-    prepared = cases_by_operation() if cases is None else {
-        operation: ids
-        for operation, ids in cases_by_operation().items()
-    }
+    if cases is None:
+        path = ROOT / "data/phase1/cases.json"
+        cases = json.loads(path.read_text()) if path.is_file() else {}
+    prepared = prepared_links(cases)
     seen: set[str] = set()
     for entry in document.get("exemptions", []):
         identity = entry.get("operation", "<unnamed>")
@@ -505,7 +530,7 @@ def roster_problems(scope: dict, cases: dict | None = None) -> list[str]:
         # letting the ledger suppress work that was actually done.
         if identity in prepared:
             problems.append(
-                f"leaf-roster: {identity} is exempted but also linked to prepared case(s) "
+                f"leaf-roster: {identity} is exempted but also prepared by "
                 + ", ".join(prepared[identity][:3])
             )
         if category == "equivalent_rust" and row.get("disposition") != "equivalent_rust":
@@ -525,15 +550,13 @@ def leaf_preparation(scope: dict, cases: dict) -> dict:
     """
     prepared: dict[str, list[str]] = {}
     for case in cases.get("cases", []):
-        if case.get("family") != "leaves" or case.get("last_result") not in (
-            "match", "different", "not_implemented"
-        ):
+        if case.get("family") != "leaves" or case.get("last_result") not in PREPARING_RESULTS:
             continue
         for operation in case.get("operations", []):
             prepared.setdefault(operation, []).append(case["id"])
     witnessed: dict[str, list[str]] = {}
     for witness in cases.get("witnesses", []):
-        if witness.get("kind") == "rust_gated":
+        if witness.get("kind") in COVERING_WITNESS_KINDS:
             for operation in witness.get("operations", []):
                 witnessed.setdefault(operation, []).append(witness["id"])
     exempt = roster_exemptions()

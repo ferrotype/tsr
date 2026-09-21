@@ -11,7 +11,7 @@ moved pin invalidates it.
 | Step | State |
 | --- | --- |
 | F0 — inventory, manifests and executable setup | **incomplete**: implementing and verifying the approved matchFiles test renderer, and connecting existing evidence to operation ids |
-| F1a — foundation leaf tests | **incomplete**: 150 leaf cases frozen; 222 of 460 inventoried leaf operations have preparation links |
+| F1a — foundation leaf tests | **complete**: `leaves_prepared: true`; 225 leaf cases frozen, and all 460 inventoried leaf operations are prepared, witnessed or exempted by the reviewed ledger |
 | F2a — filesystem, path and matching tests | not started |
 | F3a — config, command-line and resolution tests | not started |
 | F4a — syntax, binder and utility coverage | not started |
@@ -29,7 +29,7 @@ linked to a runnable prepared case, a verified rust-gated witness, or a reviewed
 exemption in `data/phase1/leaf-roster.json`, and the ledger itself validates.
 `python3 scripts/phase1.py inventory --check` publishes the result.
 
-224 leaf cases are frozen, every one with a native observation from the pinned
+225 leaf cases are frozen, every one with a native observation from the pinned
 packages and a classified Rust result.
 
 | Group | Cases | match | not_implemented | different |
@@ -37,16 +37,16 @@ packages and a classified Rust result.
 | core/collections | 42 | 0 | 42 | 0 |
 | core | 21 | 13 | 8 | 0 |
 | core helpers | 20 | 1 | 19 | 0 |
-| compiler options | 31 | 26 | 4 | 1 |
+| compiler options | 32 | 26 | 4 | 2 |
 | JSON | 30 | 0 | 30 | 0 |
 | text/number/semver | 31 | 20 | 11 | 0 |
 | locale | 12 | 0 | 12 | 0 |
 | diagnostics | 27 | 6 | 21 | 0 |
 | bundled | 10 | 7 | 3 | 0 |
-| **total** | **224** | **73** | **150** | **1** |
+| **total** | **225** | **73** | **150** | **2** |
 
 Zero `native_unavailable`, zero `harness_failed`, zero `not_run`: every case
-runs on both sides. The single `different` is a real port defect this step
+runs on both sides. Both `different` rows are real port divergences this step
 found, recorded below rather than fixed here. The 150 `not_implemented` rows are
 the honest preparation-time result — no `tsr_core::collections`, `tsr_json` or
 `tsr_locale` exists, and neither do most of the generic helpers — and each names
@@ -201,6 +201,28 @@ fixing: `path::ancestors` has six other call sites
 `tsr_testhost/src/filesystem.rs`), and each needs checking for whether its
 input can be relative.
 
+### A second divergence: `Clone` shares what it copies
+
+`CompilerOptions.Clone` is a field-by-field reflective `Set`
+(`upstream/tsc/internal/core/compileroptions.go:180-192`), so a pointer-backed
+field is copied as the pointer and a slice as its header. Writing through the
+source *after* the clone is therefore read back by the clone: with
+`Checkers` (`*int`) set to 2 and `Types` to `["alpha", "beta"]`, mutating the
+source to 7 and `"rewritten"` leaves the Go clone reading 7 and `"rewritten"`.
+`tsr_core::CompilerOptions` derives `Clone` over owned fields
+(`checkers: Option<isize>`), so the port's clone reads 2 and `"alpha"`.
+
+The original field-roster case could not see this: at the instant of the clone
+the two sides agree, which is exactly why the mutation case exists.
+`leaves/options/clone-shares-pointer-backed-fields` records it as `different`.
+Its third action sets neither field, so the mutation is a no-op there and both
+sides agree — which keeps the difference attributable to the sharing rather
+than to the action.
+
+F1b owns the decision: whether the port represents a shared option field at
+all, or whether the callers that rely on writing through a cloned
+`CompilerOptions` are themselves ported differently.
+
 ### F1b queue
 
 The 150 `not_implemented` rows group into coherent ports: the ordered and
@@ -249,13 +271,11 @@ more than one that does not.
   value the parse produces, so no input in the corpus separates them from doing
   nothing. They are linked because the corpus calls them, not because it pins
   them.
-- `CompilerOptions.Clone` cannot be failed by any wrong Rust clone:
-  `tsr_core::CompilerOptions` derives `Clone`, which copies every field by
-  construction. On the Rust side the case catches a *roster* that has drifted
-  from the pinned struct; the field-by-field claim applies to the Go side.
-- Go's `Clone` is a shallow copy, so a cloned `Paths` shares backing storage
-  with its source. That is not observable through this harness and no case
-  attempts it.
+- `leaves/options/clone-field-roster` compares fields at the instant of the
+  clone, where the two sides agree by construction, so on the Rust side it
+  catches a *roster* that has drifted from the pinned struct rather than a
+  wrong clone. The sharing it cannot see is covered by
+  `leaves/options/clone-shares-pointer-backed-fields` instead.
 - The bundled walk has no Rust counterpart to compare against —
   `tsr_vfs::FileSystem` declares no walk method — so that case is Go-side native
   authority. It witnesses the pinned branches but cannot catch a wrong port

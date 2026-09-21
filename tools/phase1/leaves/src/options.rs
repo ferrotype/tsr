@@ -519,6 +519,46 @@ fn clone_roster(trace: &[Value]) -> Result<Vec<Value>, String> {
                     "fields": fields,
                 })
             }
+            "clone_then_mutate_source" => {
+                // The pinned Clone copies a pointer-backed field as the pointer
+                // and a slice as its header, so a write through the source
+                // afterwards is visible in the clone. The derived Clone here
+                // owns its data, so it is not. The field comparison above
+                // cannot see the difference, because at the instant of the
+                // clone the two agree.
+                let (mut source, applied) = build(action)?;
+                let copy = source.clone();
+                if source.checkers.is_some() {
+                    source.checkers = Some(action_i64(action, "mutate_checkers") as isize);
+                }
+                if let Some(types) = source.types.as_mut() {
+                    if let Some(first) = types.first_mut() {
+                        *first = JsString::from_bytes(
+                            action_str(action, "mutate_type").as_bytes().to_vec(),
+                        );
+                    }
+                }
+                let read_back = |options: &CompilerOptions| {
+                    json!([
+                        options.checkers.map_or(Value::Null, |value| json!(value)),
+                        options.types.as_ref().map_or_else(
+                            || json!([]),
+                            |values| json!(values
+                                .iter()
+                                .map(|value| String::from_utf8_lossy(value.as_bytes()).into_owned())
+                                .collect::<Vec<_>>()),
+                        ),
+                    ])
+                };
+                json!({
+                    "op": op,
+                    "applied": applied,
+                    "after_mutation": [
+                        ["source", read_back(&source)],
+                        ["clone", read_back(&copy)],
+                    ],
+                })
+            }
             _ => unsupported(op),
         });
     }

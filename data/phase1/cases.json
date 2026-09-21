@@ -3641,6 +3641,22 @@
       ]
     },
     {
+      "expected_contract": "Pins that the pinned Clone is shallow where the field is pointer backed or a slice: after cloning, a write through the source's *int and through the first element of its []string is read back by the clone. The port's derived Clone owns its data and does not see either write, so this case is expected to report `different` until F1b decides how the port represents a shared option field. The third action sets neither field, so the mutation is a no-op there and both sides agree, which keeps the difference attributable to the sharing rather than to the action.",
+      "family": "leaves",
+      "host_applicability": "any",
+      "id": "leaves/options/clone-shares-pointer-backed-fields",
+      "last_result": "different",
+      "native_authority": "tools/phase1/leaves probes against the pinned packages",
+      "operation_actions": {
+        "clone_then_mutate_source": [
+          "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+        ]
+      },
+      "operations": [
+        "tsc/internal/core/compileroptions.go:CompilerOptions.Clone"
+      ]
+    },
+    {
       "expected_contract": "Declaration maps need both declarationMap == TSTrue and declaration emit, in that order: the second conjunct is reached only when the first holds, and either failing answers false.",
       "family": "leaves",
       "host_applicability": "any",
