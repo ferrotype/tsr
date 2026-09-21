@@ -1,15 +1,31 @@
 //! Byte-preserving compiler paths, independent of the host operating system.
 use std::borrow::Cow;
 mod comparison;
+mod components;
+mod extension;
+mod roots;
+mod typed;
 pub use comparison::{
-    compare_paths, contains_path, equal_fold, is_relative, normalized_components,
+    compare_paths, compare_paths_case_insensitive, compare_paths_case_sensitive, contains_path,
+    equal_fold, is_relative, normalized_components, path_comparer, path_equality_comparer,
     path_from_components, relative_from_directory, relative_from_file,
     relative_to_directory_or_url, trim_file_path_prefix,
 };
+pub use components::{
+    common_parents, common_parents_worker, has_relative_path_segment,
+    normalized_components_from_combined, path_components, path_components_relative_to,
+    reduce_path_components, simple_normalize_path, split_path_components, trim_rune_count,
+};
+pub use extension::*;
+pub use roots::*;
 pub use tsr_core::path::{
     encoded_root_length, is_declaration_file_name, normalize, remove_file_extension, root_length,
 };
 use tsr_jsstring::JsString;
+pub use typed::{
+    for_each_ancestor_directory, for_each_ancestor_directory_path,
+    for_each_ancestor_directory_stopping_at_global_cache, Path,
+};
 
 /// port: tsc/internal/tspath/path.go:NormalizeSlashes
 pub fn normalize_slashes(path: &[u8]) -> Cow<'_, [u8]> {
@@ -108,13 +124,23 @@ pub fn canonical(path: &[u8], case_sensitive: bool) -> Cow<'_, [u8]> {
         file_name_lower_case(path)
     }
 }
+/// A rooted disk path is only normalised, so a bare root keeps its spelling
+/// (`c:` stays `c:`); everything else is made absolute against the base.
 /// port: tsc/internal/tspath/path.go:ToPath
 pub fn to_path(file: &[u8], base: &[u8], case_sensitive: bool) -> JsString {
-    JsString::from_bytes(canonical(&absolute(file, base), case_sensitive).into_owned())
+    let path = if is_rooted_disk_path(file) {
+        normalize(file).into_owned()
+    } else {
+        absolute(file, base)
+    };
+    JsString::from_bytes(canonical(&path, case_sensitive).into_owned())
 }
+/// The root is measured after normalising separators, so `//server\\share`
+/// has the base name `share`. Normalising preserves every offset, which lets
+/// the result borrow from the caller's bytes.
 /// port: tsc/internal/tspath/path.go:GetBaseFileName
 pub fn base_name(path: &[u8]) -> &[u8] {
-    let root = root_length(path);
+    let root = root_length(&normalize_slashes(path));
     if root == path.len() {
         return b"";
     }
@@ -128,6 +154,7 @@ pub fn base_name(path: &[u8]) -> &[u8] {
         .rposition(|&b| b == b'/' || b == b'\\')
         .map_or(root, |n| n + 1)..]
 }
+/// port: tsc/internal/tspath/path.go:HasExtension
 pub fn has_extension(path: &[u8]) -> bool {
     base_name(path).contains(&b'.')
 }

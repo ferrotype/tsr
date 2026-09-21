@@ -146,6 +146,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_glob",
+      "manifest": "crates/tsr_glob/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
       "name": "tsr_jsnum",
       "manifest": "crates/tsr_jsnum/Cargo.toml",
       "publish": true,

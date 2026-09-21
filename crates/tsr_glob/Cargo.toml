@@ -1,0 +1,19 @@
+[package]
+name = "tsr_glob"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "The pinned TypeScript language-server glob grammar: parse, render and match"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[dependencies]
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+
+[lints]
+workspace = true

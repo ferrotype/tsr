@@ -22,7 +22,7 @@
       "rust_home": []
     },
     {
-      "disposition": "implemented_untested",
+      "disposition": "missing",
       "operation": "tsc/internal/nativepath/realpath_linux.go:Realpath",
       "rust_home": []
     }

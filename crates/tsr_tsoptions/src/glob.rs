@@ -11,6 +11,25 @@ pub enum Usage {
     Directories,
     Exclude,
 }
+impl Usage {
+    /// The pinned type is an open int8, so values outside the three names still
+    /// have a spelling. The Rust enum is closed; this keeps the open domain.
+    /// Source operation: tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String
+    /// port: tsc/internal/vfs/vfsmatch/stringer_generated.go
+    pub fn string_raw(value: i8) -> String {
+        match value {
+            0 => "Files".into(),
+            1 => "Directories".into(),
+            2 => "Exclude".into(),
+            _ => format!("Usage({value})"),
+        }
+    }
+}
+impl std::fmt::Display for Usage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&Self::string_raw(*self as i8))
+    }
+}
 pub const UNLIMITED_DEPTH: isize = isize::MAX;
 
 /// port: tsc/internal/vfs/vfsmatch/vfsmatch.go:IsImplicitGlob
@@ -401,7 +420,10 @@ fn base_paths(path: &[u8], includes: &[JsString], case_sensitive: bool) -> Vec<V
             include_base_path(&absolute)
         })
         .collect();
-    bases.sort_by(|a, b| tsr_tspath::compare_paths(a, b, path, case_sensitive));
+    // A plain string comparer, not a path comparison: `/out/./z` sorts before
+    // `/out/z`, and the containment test below then keeps only the first.
+    let compare = tsr_tspath::path_comparer(case_sensitive);
+    bases.sort_by(|a, b| compare(a, b));
     for base in bases {
         if result
             .iter()

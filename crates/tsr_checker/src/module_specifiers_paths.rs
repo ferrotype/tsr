@@ -12,9 +12,7 @@ pub(super) enum Ending {
 }
 
 pub(super) fn has_extension(file: &[u8], extensions: &[&[u8]]) -> bool {
-    extensions
-        .iter()
-        .any(|ext| file.len() > ext.len() && file.ends_with(ext))
+    path::file_extension_is_one_of(file, extensions)
 }
 const TS: &[&[u8]] = &[b".ts", b".tsx", b".mts", b".cts"];
 const JS: &[&[u8]] = &[b".js", b".jsx", b".mjs", b".cjs"];

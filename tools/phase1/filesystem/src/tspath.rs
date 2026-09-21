@@ -1,298 +1,23 @@
 //! The `internal/tspath` group: path algebra, roots, separators, components,
 //! comparison and extension handling.
 //!
-//! Seventeen of this group's eighty operations have a public entry point in
-//! `tsr_tspath` (directly or through its re-exports of `tsr_core::path`), so
-//! those cases drive the production code and compare real values. The rest
-//! have no entry point this harness can reach -- several exist as private
-//! helpers inside consumer crates, which is not the same thing -- and each of
-//! those cases is a recorded gap naming the pinned authority, the signature
-//! the port is expected to carry and the file that does not have it. Nothing
-//! here emulates a missing operation to make a comparison run, and nothing
-//! here reads an expected value.
+//! Every action drives the production `tsr_tspath` entry point and reports the
+//! value it returned. Nothing here emulates an operation, and nothing here reads
+//! an expected value. A pinned operation that panics by design is observed
+//! through `guarded`, which records the panic class the native probe records.
 //!
 //! Byte payloads travel as hex in both directions: an argument is UTF-8 text
 //! under its own key or hex under `<key>_hex`, exactly one of the two, and a
 //! byte result is always hex. A missing argument is a harness failure rather
-//! than a defaulted observation, because a row both sides could agree on
-//! without executing anything would be worse than no row at all.
+//! than a defaulted observation.
 
 use serde_json::{json, Value};
 
 use crate::api::{action_op, actions, ordered, subject, Outcome};
 
-/// Operations with no entry point the harness can reach, keyed by the primary
-/// operation of the case that drives them. Each names the pinned Go authority,
-/// the signature a port would have to carry, and where it is not.
-const MISSING: &[(&str, &str, &str, &str)] = &[
-    ("tsc/internal/tspath/path.go:PathIsAbsolute",
-     "tsc/internal/tspath/path.go:PathIsAbsolute, :IsRootedDiskPath, :IsUrl, :IsDiskPathRoot and \
-      :IsDynamicFileName",
-     "five predicates over the encoded root length, each with its own rule: path_is_absolute is \
-      `encoded_root_length(p) != 0`, is_rooted_disk_path is `> 0`, is_url is `< 0`, \
-      is_disk_path_root is `> 0 && root_length(p) == p.len()`, and is_dynamic_file_name is the \
-      literal prefix test `p.starts_with(b\"^/\")`",
-     "crates/tsr_tspath/src/lib.rs re-exports encoded_root_length and root_length and stops \
-      there; no crate names any of the five, and the one inlined use \
-      (crates/tsr_tspath/src/comparison.rs:116 `encoded_root_length(&to[0]) > 0`) is a private \
-      expression inside relative_to_directory_or_url"),
-    ("tsc/internal/tspath/path.go:IsVolumeCharacter",
-     "tsc/internal/tspath/path.go:IsVolumeCharacter and :isAnyDirectorySeparator",
-     "two byte predicates: is_volume_character(byte) -> bool over the two ASCII letter ranges, \
-      and is_any_directory_separator(byte) -> bool accepting b'/' and b'\\\\' and nothing else. \
-      Both take a BYTE and not a decoded character",
-     "crates/tsr_core/src/path.rs:6 has `fn separator(byte: u8)`, private and unexported, whose \
-      own callers bypass it (crates/tsr_tspath/src/lib.rs:52 tests only b\"/\"); the volume \
-      predicate exists only as the inlined `first.is_ascii_alphabetic()` at \
-      crates/tsr_core/src/path.rs:25"),
-    ("tsc/internal/tspath/path.go:getFileUrlVolumeSeparatorEnd",
-     "tsc/internal/tspath/path.go:getFileUrlVolumeSeparatorEnd",
-     "fn file_url_volume_separator_end(url: &[u8], start: usize) -> Option<usize>, answering None \
-      when start is at or past the end, Some(start + 1) for a literal ':' and Some(start + 3) \
-      for `%3a` or `%3A` with the length guard `url.len() > start + 2`",
-     "crates/tsr_core/src/path.rs:47-56 inlines the scan inside encoded_root_length and exposes \
-      nothing; the harness cannot call it independently of root detection"),
-    ("tsc/internal/tspath/path.go:SplitVolumePath",
-     "tsc/internal/tspath/path.go:SplitVolumePath",
-     "fn split_volume_path(path: &[u8]) -> (Vec<u8>, &[u8], bool) returning the LOWERCASED \
-      two-byte volume, the untouched remainder and whether a volume was found; it accepts `c:d`, \
-      which has no root length at all",
-     "absent: no crate lowercases a two-byte drive prefix, and a repository-wide search for \
-      split_volume across crates/, tools/ and xtask/ finds nothing"),
-    ("tsc/internal/tspath/path.go:HasTrailingDirectorySeparator",
-     "tsc/internal/tspath/path.go:HasTrailingDirectorySeparator, :RemoveTrailingDirectorySeparator, \
-      :RemoveTrailingDirectorySeparators, :EnsureTrailingDirectorySeparator, \
-      :Path.RemoveTrailingDirectorySeparator and :Path.EnsureTrailingDirectorySeparator",
-     "the separator quartet plus its two Path-typed wrappers, every one of them testing BOTH \
-      separators through isAnyDirectorySeparator: has_trailing_separator, the singular strip, the \
-      plural strip that loops, and ensure, which appends b'/' only when the last byte is neither \
-      separator",
-     "absent as entry points. crates/tsr_tspath/src/lib.rs:71-73 pops at most one byte and tests \
-      only b\"/\", inside absolute(); crates/tsr_compiler/src/checker_module_specifiers.rs:13 \
-      `fn trailing` is private to that crate and appends after testing only b'/', so it turns \
-      `a\\` into `a\\/`"),
-    ("tsc/internal/tspath/path.go:GetPathComponents",
-     "tsc/internal/tspath/path.go:GetPathComponents and :pathComponents",
-     "the UNREDUCED splitter: get_path_components(path, cwd) -> Vec<Vec<u8>>, keeping `.` and \
-      interior empty components, plus path_components(path, root_length) taking an explicit root \
-      so the split can be driven on its own. Exactly one trailing empty component is removed",
-     "absent. crates/tsr_tspath/src/comparison.rs:45 normalized_components is the REDUCED walk \
-      and a different operation (it is the one the gated go_observations witness covers); no \
-      crate exposes the unreduced split"),
-    ("tsc/internal/tspath/path.go:reducePathComponents",
-     "tsc/internal/tspath/path.go:reducePathComponents and \
-      :getNormalizedPathComponentsFromCombined",
-     "reduce_path_components(components: &[Vec<u8>]) -> Vec<Vec<u8>> over a caller's list, and \
-      normalized_components_from_combined(path: &[u8]) -> Vec<Vec<u8>> over an already-combined \
-      path. Both keep `..` when the root component is empty and drop it when it is not",
-     "absent as callable operations: the reduction is fused into \
-      crates/tsr_tspath/src/comparison.rs:45-65, which always splits a path itself and so cannot \
-      be handed a component list no splitter produces"),
-    ("tsc/internal/tspath/path.go:simpleNormalizePath",
-     "tsc/internal/tspath/path.go:simpleNormalizePath and :hasRelativePathSegment",
-     "simple_normalize_path(path: &[u8]) -> Option<Cow<'_, [u8]>>, declining rather than \
-      answering when the cheap cleanup would change the meaning of the path, and \
-      has_relative_path_segment(path: &[u8]) -> bool, which counts dots per segment and requires \
-      a segment of exactly one or two",
-     "absent as callable operations. The fast path is inlined into \
-      crates/tsr_core/src/path.rs:99-121 inside normalize, and the guard exists only as the \
-      private crates/tsr_core/src/path.rs:82 `fn has_relative_segment`, which is a different \
-      algorithm (a window scan plus a split) and carries no port marker"),
-    ("tsc/internal/tspath/path.go:trimRuneCount",
-     "tsc/internal/tspath/path.go:trimRuneCount",
-     "fn trim_rune_count(s: &[u8], rune_count: usize) -> &[u8], skipping up to that many decoded \
-      runes and CLAMPING to the end rather than failing when there are fewer",
-     "absent as a callable operation: the clamp is inlined into \
-      crates/tsr_tspath/src/comparison.rs:34-42 inside trim_file_path_prefix, so no rune count \
-      the prefix path does not itself produce can be driven"),
-    ("tsc/internal/tspath/path.go:ComparePathsCaseSensitive",
-     "tsc/internal/tspath/path.go:ComparePathsCaseSensitive, :ComparePathsCaseInsensitive, \
-      :ComparePathsOptions.GetComparer and :ComparePathsOptions.getEqualityComparer",
-     "the two named wrappers -- compare_paths_case_sensitive(a, b, cwd) and its insensitive twin \
-      -- and the two selectors the options type returns: an ordering comparer and an equality \
-      comparer, each handed the COMPLEMENT of use_case_sensitive_file_names, with the equality \
-      one being Go's simple EqualFold rather than full Unicode folding",
-     "absent as named entry points. crates/tsr_tspath/src/comparison.rs:142 compare_paths takes \
-      the flag as a parameter and has no wrapper pair (and is the gated go_observations \
-      witness's operation, not these); the selectors are inlined at each call site, for example \
-      crates/tsr_tspath/src/comparison.rs:206-211"),
-    ("tsc/internal/tspath/path.go:CompareNumberOfDirectorySeparators",
-     "tsc/internal/tspath/path.go:CompareNumberOfDirectorySeparators",
-     "fn compare_number_of_directory_separators(left: &[u8], right: &[u8]) -> Ordering, counting \
-      b'/' only and normalising NOTHING first",
-     "absent: no crate counts separators to order two paths, and no neighbouring helper can be \
-      reused, because every one of them normalises slashes first"),
-    ("tsc/internal/tspath/path.go:GetPathComponentsRelativeTo",
-     "tsc/internal/tspath/path.go:GetPathComponentsRelativeTo",
-     "fn path_components_relative_to(from, to, cwd, case_sensitive) -> Vec<Vec<u8>>, comparing \
-      component 0 case-insensitively ALWAYS and later components by the requested comparer, and \
-      returning the `to` components untouched when nothing is shared",
-     "absent as an entry point: the walk exists only inside \
-      crates/tsr_tspath/src/comparison.rs:101-129 relative_to_directory_or_url, which returns a \
-      joined path and never the component list"),
-    ("tsc/internal/tspath/path.go:ConvertToRelativePath",
-     "tsc/internal/tspath/path.go:ConvertToRelativePath",
-     "fn convert_to_relative_path(path, cwd, use_case_sensitive_file_names) -> Vec<u8>, which \
-      converts only a ROOTED DISK path (encoded root length > 0) and returns everything else, \
-      URLs included, byte for byte",
-     "absent: no crate gates a relative conversion on the sign of the encoded root length"),
-    ("tsc/internal/tspath/path.go:EnsurePathIsNonModuleName",
-     "tsc/internal/tspath/path.go:EnsurePathIsNonModuleName and :IsExternalModuleNameRelative",
-     "ensure_path_is_non_module_name(path) -> Cow<'_, [u8]>, prefixing `./` unless the path is \
-      absolute (encoded root length != 0) or dot-relative, and is_external_module_name_relative \
-      (name) -> bool, which is dot-relative OR rooted disk path (> 0) and therefore rejects URLs",
-     "the first exists only inlined at crates/tsr_tspath/src/comparison.rs:134-138 inside \
-      relative_from_file; the second is crates/tsr_parser/src/references.rs:563, private to \
-      tsr_parser and unreachable from any other crate"),
-    ("tsc/internal/tspath/path.go:ResolveTripleslashReference",
-     "tsc/internal/tspath/path.go:ResolveTripleslashReference",
-     "fn resolve_tripleslash_reference(module_name: &[u8], containing_file: &[u8]) -> Vec<u8>, \
-      normalising a rooted disk path directly and otherwise combining it onto the containing \
-      file's directory before normalising",
-     "absent: crates/tsr_parser/src/references.rs collects triple-slash directives but resolves \
-      none of them, and no crate composes directory + combine + normalize under this name"),
-    ("tsc/internal/tspath/path.go:StartsWithDirectory",
-     "tsc/internal/tspath/path.go:StartsWithDirectory",
-     "fn starts_with_directory(file, directory, case_sensitive) -> bool, canonicalising both, \
-      trimming ONE trailing b'/' and then ONE trailing b'\\\\', and accepting either separator \
-      after the prefix",
-     "crates/tsr_compiler/src/checker_module_specifiers.rs:31 has the same name but is private \
-      to tsr_compiler, so no harness and no other crate can call it"),
-    ("tsc/internal/tspath/ignoredpaths.go:ContainsIgnoredPath",
-     "tsc/internal/tspath/ignoredpaths.go:ContainsIgnoredPath",
-     "fn contains_ignored_path(path: &[u8]) -> bool, a raw substring search for the three \
-      patterns `/node_modules/.`, `/.git` and `.#` with no normalisation and no case folding",
-     "crates/tsr_compiler/src/checker_module_specifiers.rs:24-28 `fn ignored` carries the same \
-      three patterns but is private to tsr_compiler and has no public entry point in any crate"),
-    ("tsc/internal/tspath/path.go:Path.ContainsPath",
-     "tsc/internal/tspath/path.go:Path.ContainsPath",
-     "the Path-TYPED containment test: a plain byte prefix check with a separator boundary, over \
-      a Path newtype that is already rooted, reduced and case-folded, with no current directory \
-      and no comparer",
-     "absent: there is no Path newtype at all -- crates/tsr_tspath/src/lib.rs:112 to_path returns \
-      a bare JsString -- so the typed adapter has nowhere to live, and \
-      crates/tsr_tspath/src/comparison.rs:194 contains_path is the free function, a different \
-      operation with a different answer"),
-    ("tsc/internal/tspath/path.go:Path.GetDirectoryPath",
-     "tsc/internal/tspath/path.go:Path.GetDirectoryPath",
-     "the Path-TYPED directory accessor: the free operation applied to a Path and returning a \
-      Path, adding no canonicalisation of its own",
-     "absent for want of the Path newtype; crates/tsr_tspath/src/lib.rs:46 directory is the free \
-      form and is compared in its own case"),
-    ("tsc/internal/tspath/path.go:ForEachAncestorDirectoryStoppingAtGlobalCache",
-     "tsc/internal/tspath/path.go:ForEachAncestorDirectoryStoppingAtGlobalCache and the \
-      early-stop half of :ForEachAncestorDirectory",
-     "a callback-driven walk: for_each_ancestor_directory(directory, callback) -> (T, bool) where \
-      the callback answers (value, stop), the walk returns that value with true when it stops \
-      and the ZERO value with false when it runs out; and the wrapper that also stops at a \
-      global cache location, AFTER calling the callback there, returning only T",
-     "crates/tsr_tspath/src/lib.rs:147 `ancestors` returns the visited sequence and nothing else: \
-      no callback, no stop flag, no carried value and no terminating location. Its sequence is \
-      compared in filesystem/tspath/ancestor-walk-sequence; this half has no entry point"),
-    ("tsc/internal/tspath/path.go:ForEachAncestorDirectoryPath",
-     "tsc/internal/tspath/path.go:ForEachAncestorDirectoryPath",
-     "the Path-typed ancestor walk, which converts the Path to a string, walks, and hands each \
-      ancestor back as a Path WITHOUT re-canonicalising it, so the separators of a non-canonical \
-      input change mid-walk",
-     "absent for want of both the Path newtype and the callback-shaped walk; \
-      crates/tsr_tspath/src/lib.rs:147 ancestors is string-typed and unstoppable"),
-    ("tsc/internal/tspath/extension.go:ExtensionIsTs",
-     "tsc/internal/tspath/extension.go:ExtensionIsTs and :ExtensionIsOneOf",
-     "two predicates over an EXTENSION rather than a path: extension_is_ts, which accepts the \
-      seven literal extensions plus any `.d.<x>.ts` of at least seven bytes, and \
-      extension_is_one_of, which is whole-string equality against a caller's list",
-     "absent. crates/tsr_checker/src/external_resolution.rs:680 has the TS_EXTENSIONS list but no \
-      predicate over an extension, and the only membership helpers in the tree are suffix tests \
-      over a PATH, which is the other operation"),
-    ("tsc/internal/tspath/path.go:FileExtensionIs",
-     "tsc/internal/tspath/path.go:FileExtensionIs and \
-      tsc/internal/tspath/extension.go:FileExtensionIsOneOf",
-     "file_extension_is(path, extension) -> bool: a raw suffix test with the STRICT guard \
-      `path.len() > extension.len()` and no dot boundary, plus the list form that loops over it \
-      and answers false for an empty or absent list",
-     "absent as named entry points. The faithful predicate exists only inlined in the private \
-      crates/tsr_checker/src/module_specifiers_paths.rs:14-18, and the tree's other reading, \
-      crates/tsr_checker/src/external_resolution.rs:1080, is a bare ends_with that loses the \
-      strict guard"),
-    ("tsc/internal/tspath/extension.go:HasTSFileExtension",
-     "tsc/internal/tspath/extension.go:HasTSFileExtension, :HasJSFileExtension, \
-      :HasJSONFileExtension and :HasImplementationTSFileExtension",
-     "four list-membership predicates over a path, each FileExtensionIs against its own list, \
-      with the implementation one additionally requiring NOT is_declaration_file_name so that \
-      an arbitrary `.d.<x>.ts` is rejected",
-     "absent as entry points: crates/tsr_checker/src/module_specifiers_packages.rs:114 \
-      `fn implementation_ts` and crates/tsr_checker/src/external_resolution.rs:1080 \
-      `fn has_ts_file_extension` are private to tsr_checker, and no crate names the JS or JSON \
-      predicate at all"),
-    ("tsc/internal/tspath/path.go:GetAnyExtensionFromPath",
-     "tsc/internal/tspath/path.go:GetAnyExtensionFromPath, :GetLongestExtensionFromPath, \
-      :getAnyExtensionFromPathWorker and :tryGetExtensionFromPath",
-     "the four selectors that take a caller's extension list and a case rule: the FIRST-match \
-      worker, the public wrapper that falls back to the base name when the list is empty, the \
-      LONGEST-match selector, and the single-extension helper that requires the byte before the \
-      extension to be a '.' and returns the PATH's bytes rather than the list's",
-     "absent. crates/tsr_checker/src/external_resolution.rs:1087 `fn any_extension` is private, \
-      takes no list and implements only the base-name arm; nothing in the workspace selects the \
-      longest matching extension"),
-    ("tsc/internal/tspath/extension.go:TryGetExtensionFromPath",
-     "tsc/internal/tspath/extension.go:TryGetExtensionFromPath, :TryExtractTSExtension, \
-      :GetDeclarationFileExtension, :GetDeclarationEmitExtensionForPath and \
-      :GetPossibleOriginalInputExtensionForExtension",
-     "five table-driven extractors: the flat removal list, the TypeScript-only list, the \
-      declaration extractor that tries the three fixed suffixes BEFORE the first `.d.` index of \
-      the base name, the emit extension built from the switch plus a `.d<ext>.ts` default, and \
-      the ordered candidate list, whose ORDER is part of the contract",
-     "absent. crates/tsr_checker/src/external_resolution.rs:963 try_get_extension_from_path is \
-      private and answers Some for a path equal to its own extension; \
-      crates/tsr_core/src/path.rs:159 is_declaration_file_name answers a bool and never the \
-      extension; nothing returns a candidate list"),
-    ("tsc/internal/tspath/extension.go:ChangeExtension",
-     "tsc/internal/tspath/extension.go:ChangeExtension, :ChangeAnyExtension and \
-      :ChangeFullExtension",
-     "the three rewrites, each prepending the '.' when the new extension lacks one, slicing the \
-      matched extension off the UNTRIMMED path, and deleting rather than truncating when the new \
-      extension is empty; the full form replaces a declaration extension from its `.d` onwards",
-     "crates/tsr_checker/src/module_specifiers_packages.rs:117 and :126 carry the first and the \
-      third under the same names, private to tsr_checker and reachable from nowhere else; the \
-      list-taking form has no counterpart at all"),
-    ("tsc/internal/tspath/extension.go:RemoveExtension",
-     "tsc/internal/tspath/extension.go:RemoveExtension and :RemoveAnyFileExtension",
-     "the UNCHECKED slice remove_extension(path, extension), which does not verify that the \
-      extension is a suffix and panics when it is longer than the path, and the two-stage \
-      remove_any_file_extension built on it",
-     "absent. crates/tsr_core/src/path.rs:187 remove_file_extension is the FIRST stage only and \
-      chooses the extension itself; no crate exposes an extension-taking remover, and none \
-      reproduces the fallback that measures on the trimmed path and slices the untrimmed one"),
-    ("tsc/internal/tspath/path.go:GetCommonParents",
-     "tsc/internal/tspath/path.go:GetCommonParents and :getCommonParentsWorker",
-     "the minimal covering set of parent directories: get_common_parents(paths, min_components, \
-      get_path_components, options) -> (Vec<Vec<u8>>, BTreeSet<Vec<u8>>) which PANICS when \
-      min_components < 1 before it looks at the paths, and the recursive worker that fans out on \
-      a divergence shallower than min_components, grouping by the canonicalised Path of the \
-      diverging component and emitting the groups in SORTED key order",
-     "absent: no crate computes a minimal covering set of parent directories, and no crate has \
-      the recursive fan-out or its ordering rule"),
-    ("tsc/internal/tspath/path.go:GetNormalizedAbsolutePathWithoutRoot",
-     "tsc/internal/tspath/path.go:GetNormalizedAbsolutePathWithoutRoot",
-     "fn normalized_absolute_path_without_root(file: &[u8], cwd: &[u8]) -> &[u8], the normalised \
-      absolute path with GetRootLength (the COMPLEMENT FOLDED AWAY, so a URL loses its whole \
-      scheme and authority) sliced off the front",
-     "absent: the composition would be `&absolute(file, cwd)[root_length(..)..]` but no crate \
-      performs it, and the operation is not a re-export of either half"),
-];
-
 pub fn observe(request: &Value) -> Option<Outcome> {
     if subject(request) != "tspath" {
         return None;
-    }
-    let operation = request
-        .get("operation")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    if let Some((identity, authority, signature, home)) =
-        MISSING.iter().find(|(name, ..)| *name == operation)
-    {
-        return Some(Outcome::missing(*identity, authority, signature, home));
     }
     Some(match replay(actions(request)) {
         Ok(rows) => Outcome::Observed(ordered(rows)),
@@ -375,6 +100,358 @@ fn row(action: &Value) -> Result<Value, String> {
                 .collect();
             json!({ "op": op, "visited": visited })
         }
+
+        "normalized_absolute_path_without_root" => {
+            let (path, cwd) = (bytes(action, "path")?, bytes(action, "cwd")?);
+            text(
+                op,
+                &tsr_tspath::normalized_absolute_path_without_root(&path, &cwd),
+            )
+        }
+        "resolve_tripleslash_reference" => {
+            let (name, file) = (
+                bytes(action, "module_name")?,
+                bytes(action, "containing_file")?,
+            );
+            text(op, &tsr_tspath::resolve_tripleslash_reference(&name, &file))
+        }
+        "convert_to_relative_path" => {
+            let (path, cwd) = (bytes(action, "path")?, bytes(action, "cwd")?);
+            let sensitive = flag(action, "use_case_sensitive_file_names")?;
+            text(
+                op,
+                &tsr_tspath::convert_to_relative_path(&path, &cwd, sensitive),
+            )
+        }
+        "root_predicates" => {
+            let path = bytes(action, "path")?;
+            json!({
+                "op": op,
+                "path_is_absolute": tsr_tspath::path_is_absolute(&path),
+                "is_rooted_disk_path": tsr_tspath::is_rooted_disk_path(&path),
+                "is_url": tsr_tspath::is_url(&path),
+                "is_disk_path_root": tsr_tspath::is_disk_path_root(&path),
+                "is_dynamic_file_name": tsr_tspath::is_dynamic_file_name(&path),
+            })
+        }
+        "byte_predicates" => {
+            let byte = u8::try_from(number(action, "byte")?)
+                .map_err(|_| "byte argument out of range".to_string())?;
+            json!({
+                "op": op,
+                "is_volume_character": tsr_tspath::is_volume_character(byte),
+                "is_any_directory_separator": tsr_tspath::is_any_directory_separator(byte),
+            })
+        }
+        "file_url_volume_separator_end" => {
+            let url = bytes(action, "url")?;
+            let start = usize::try_from(number(action, "start")?)
+                .map_err(|_| "negative start".to_string())?;
+            let end =
+                tsr_tspath::file_url_volume_separator_end(&url, start).map_or(-1, |end| end as i64);
+            json!({ "op": op, "result": end })
+        }
+        "split_volume_path" => {
+            let path = bytes(action, "path")?;
+            let (volume, rest, ok) = tsr_tspath::split_volume_path(&path);
+            json!({ "op": op, "result": [hex(&volume), hex(rest), ok] })
+        }
+        "module_name_shape" => {
+            let path = bytes(action, "path")?;
+            json!({
+                "op": op,
+                "ensure_non_module_name": hex(&tsr_tspath::ensure_path_is_non_module_name(&path)),
+                "is_external_module_name_relative":
+                    tsr_tspath::is_external_module_name_relative(&path),
+            })
+        }
+        "trailing_separator_family" => {
+            let path = bytes(action, "path")?;
+            let typed = tsr_tspath::Path::from_bytes(path.clone());
+            json!({
+                "op": op,
+                "has": tsr_tspath::has_trailing_directory_separator(&path),
+                "remove": hex(tsr_tspath::remove_trailing_directory_separator(&path)),
+                "remove_all": hex(tsr_tspath::remove_trailing_directory_separators(&path)),
+                "ensure": hex(&tsr_tspath::ensure_trailing_directory_separator(&path)),
+                "path_remove": hex(typed.remove_trailing_directory_separator().as_bytes()),
+                "path_ensure": hex(typed.ensure_trailing_directory_separator().as_bytes()),
+            })
+        }
+        "contains_ignored_path" => {
+            json!({ "op": op, "result": tsr_tspath::contains_ignored_path(&bytes(action, "path")?) })
+        }
+        "starts_with_directory" => {
+            let (file, directory) = (bytes(action, "file")?, bytes(action, "directory")?);
+            let sensitive = flag(action, "case_sensitive")?;
+            json!({ "op": op, "result": tsr_tspath::starts_with_directory(&file, &directory, sensitive) })
+        }
+        "path_components" => {
+            let (path, cwd) = (bytes(action, "path")?, bytes(action, "cwd")?);
+            json!({ "op": op, "components": hex_all(&tsr_tspath::path_components(&path, &cwd)), "panic": "" })
+        }
+        "path_components_split" => {
+            let path = bytes(action, "path")?;
+            let root = usize::try_from(number(action, "root_length")?)
+                .map_err(|_| "negative root length".to_string())?;
+            let (value, panicked) =
+                guarded(|| hex_all(&tsr_tspath::split_path_components(&path, root)));
+            json!({ "op": op, "components": value, "panic": panicked })
+        }
+        "reduce_path_components" => {
+            let components = list(action, "components")?;
+            json!({ "op": op, "components": hex_all(&tsr_tspath::reduce_path_components(&components)) })
+        }
+        "normalized_components_from_combined" => {
+            let path = bytes(action, "path")?;
+            json!({ "op": op, "components": hex_all(&tsr_tspath::normalized_components_from_combined(&path)) })
+        }
+        "path_components_relative_to" => {
+            let (from, to, cwd) = (
+                bytes(action, "from")?,
+                bytes(action, "to")?,
+                bytes(action, "cwd")?,
+            );
+            let sensitive = flag(action, "case_sensitive")?;
+            let components = tsr_tspath::path_components_relative_to(&from, &to, &cwd, sensitive);
+            json!({ "op": op, "components": hex_all(&components) })
+        }
+        "simple_normalize_path" => {
+            let path = bytes(action, "path")?;
+            let result = tsr_tspath::simple_normalize_path(&path);
+            json!({ "op": op, "ok": result.is_some(), "result": hex(&result.unwrap_or_default()) })
+        }
+        "has_relative_path_segment" => {
+            json!({ "op": op, "result": tsr_tspath::has_relative_path_segment(&bytes(action, "path")?) })
+        }
+        "trim_rune_count" => {
+            let text_bytes = bytes(action, "s")?;
+            let count = isize::try_from(number(action, "rune_count")?)
+                .map_err(|_| "rune count out of range".to_string())?;
+            text(op, tsr_tspath::trim_rune_count(&text_bytes, count))
+        }
+        "common_parents" => {
+            let paths = list(action, "paths")?;
+            let (cwd, min) = (
+                bytes(action, "cwd")?,
+                number(action, "min_components")? as isize,
+            );
+            let sensitive = flag(action, "use_case_sensitive_file_names")?;
+            let (value, panicked) = guarded(|| {
+                let (parents, ignored) = tsr_tspath::common_parents(
+                    &borrow(&paths),
+                    min,
+                    tsr_tspath::path_components,
+                    &cwd,
+                    sensitive,
+                );
+                let ignored: Vec<Vec<u8>> = ignored.into_iter().collect();
+                json!([hex_all(&parents), hex_all(&ignored)])
+            });
+            if panicked.is_empty() {
+                json!({ "op": op, "parents": value[0], "ignored": value[1], "panic": "" })
+            } else {
+                json!({ "op": op, "parents": null, "ignored": null, "panic": panicked })
+            }
+        }
+        "common_parents_worker" => {
+            let groups = lists(action, "groups")?;
+            let (cwd, min) = (
+                bytes(action, "cwd")?,
+                number(action, "min_components")? as isize,
+            );
+            let sensitive = flag(action, "use_case_sensitive_file_names")?;
+            let rendered: Vec<Value> =
+                tsr_tspath::common_parents_worker(&groups, min, &cwd, sensitive)
+                    .iter()
+                    .map(|group| hex_all(group))
+                    .collect();
+            json!({ "op": op, "groups": rendered })
+        }
+        "compare_paths_wrappers" => {
+            let (a, b, cwd) = (
+                bytes(action, "a")?,
+                bytes(action, "b")?,
+                bytes(action, "cwd")?,
+            );
+            json!({
+                "op": op,
+                "sensitive": tsr_tspath::compare_paths_case_sensitive(&a, &b, &cwd) as i8,
+                "insensitive": tsr_tspath::compare_paths_case_insensitive(&a, &b, &cwd) as i8,
+            })
+        }
+        "path_comparer" => {
+            let compare = tsr_tspath::path_comparer(flag(action, "use_case_sensitive_file_names")?);
+            json!({ "op": op, "result": compare(&bytes(action, "left")?, &bytes(action, "right")?) as i8 })
+        }
+        "path_equality_comparer" => {
+            let equal =
+                tsr_tspath::path_equality_comparer(flag(action, "use_case_sensitive_file_names")?);
+            json!({ "op": op, "result": equal(&bytes(action, "left")?, &bytes(action, "right")?) })
+        }
+        "path_comparer_sort" => {
+            let compare = tsr_tspath::path_comparer(flag(action, "use_case_sensitive_file_names")?);
+            let mut items = list(action, "items")?;
+            items.sort_by(|a, b| compare(a, b));
+            json!({ "op": op, "items": hex_all(&items) })
+        }
+        "compare_number_of_directory_separators" => {
+            let (left, right) = (bytes(action, "left")?, bytes(action, "right")?);
+            json!({ "op": op, "result": tsr_tspath::compare_number_of_directory_separators(&left, &right) as i8 })
+        }
+        "typed_path_contains" => {
+            let (parent, child) = (bytes(action, "parent")?, bytes(action, "child")?);
+            let typed = tsr_tspath::Path::from_bytes(parent.clone())
+                .contains_path(&tsr_tspath::Path::from_bytes(child.clone()));
+            json!({
+                "op": op,
+                "typed": typed,
+                "free_case_sensitive": tsr_tspath::contains_path(&parent, &child, b"", true),
+                "free_case_insensitive": tsr_tspath::contains_path(&parent, &child, b"", false),
+            })
+        }
+        "typed_path_directory" => {
+            let path = bytes(action, "path")?;
+            let typed = tsr_tspath::Path::from_bytes(path.clone()).directory_path();
+            json!({ "op": op, "typed": hex(typed.as_bytes()), "free": hex(&tsr_tspath::directory(&path)) })
+        }
+        "ancestor_walk_stop_at" => {
+            let (path, stop) = (bytes(action, "path")?, optional(action, "stop_at")?);
+            let mut visited = Vec::new();
+            let returned = tsr_tspath::for_each_ancestor_directory(&path, |directory| {
+                visited.push(Value::String(hex(directory)));
+                (carried(directory), stop.as_deref() == Some(directory))
+            });
+            json!({ "op": op, "visited": visited, "ok": returned.is_some(),
+                    "returned": hex(&returned.unwrap_or_default()) })
+        }
+        "ancestor_walk_path" => {
+            if bytes(action, "dialect")? != b"path" {
+                return Err("the Path-typed walk refuses another dialect".into());
+            }
+            let (path, stop) = (bytes(action, "path")?, optional(action, "stop_at")?);
+            let mut visited = Vec::new();
+            let start = tsr_tspath::Path::from_bytes(path);
+            let returned = tsr_tspath::for_each_ancestor_directory_path(&start, |directory| {
+                visited.push(Value::String(hex(directory.as_bytes())));
+                (
+                    carried(directory.as_bytes()),
+                    stop.as_deref() == Some(directory.as_bytes()),
+                )
+            });
+            json!({ "op": op, "visited": visited, "ok": returned.is_some(),
+                    "returned": hex(&returned.unwrap_or_default()) })
+        }
+        "ancestor_walk_stopping_at_global_cache" => {
+            let (cache, path) = (bytes(action, "global_cache")?, bytes(action, "path")?);
+            let stop = optional(action, "stop_at")?;
+            let mut visited = Vec::new();
+            let returned = tsr_tspath::for_each_ancestor_directory_stopping_at_global_cache(
+                &cache,
+                &path,
+                |directory| {
+                    visited.push(Value::String(hex(directory)));
+                    (carried(directory), stop.as_deref() == Some(directory))
+                },
+            );
+            json!({ "op": op, "visited": visited, "returned": hex(&returned.unwrap_or_default()) })
+        }
+        "extension_is_ts" => {
+            json!({ "op": op, "result": tsr_tspath::extension_is_ts(&bytes(action, "ext")?) })
+        }
+        "extension_is_one_of" => {
+            let extensions = list(action, "extensions")?;
+            json!({ "op": op, "result": tsr_tspath::extension_is_one_of(&bytes(action, "ext")?, &extensions) })
+        }
+        "file_extension_is" => {
+            let (path, extension) = (bytes(action, "path")?, bytes(action, "extension")?);
+            json!({ "op": op, "result": tsr_tspath::file_extension_is(&path, &extension) })
+        }
+        "file_extension_is_one_of" => {
+            let extensions = list(action, "extensions")?;
+            json!({ "op": op, "result": tsr_tspath::file_extension_is_one_of(&bytes(action, "path")?, &extensions) })
+        }
+        "extension_family_predicates" => {
+            let path = bytes(action, "path")?;
+            json!({
+                "op": op,
+                "ts": tsr_tspath::has_ts_file_extension(&path),
+                "js": tsr_tspath::has_js_file_extension(&path),
+                "json": tsr_tspath::has_json_file_extension(&path),
+                "implementation_ts": tsr_tspath::has_implementation_ts_file_extension(&path),
+            })
+        }
+        "extension_extract_tables" => {
+            let path = bytes(action, "path")?;
+            json!({
+                "op": op,
+                "try_get_extension_from_path": hex(tsr_tspath::try_get_extension_from_path(&path)),
+                "try_extract_ts_extension": hex(tsr_tspath::try_extract_ts_extension(&path)),
+                "declaration_file_extension": hex(tsr_tspath::declaration_file_extension(&path)),
+                "declaration_emit_extension": hex(&tsr_tspath::declaration_emit_extension_for_path(&path)),
+                "possible_original_input_extensions":
+                    hex_all(&tsr_tspath::possible_original_input_extensions(&path)),
+            })
+        }
+        "any_extension_from_path" => {
+            let (path, extensions) = (bytes(action, "path")?, list(action, "extensions")?);
+            let ignore = flag(action, "ignore_case")?;
+            text(
+                op,
+                tsr_tspath::any_extension_from_path(&path, &extensions, ignore),
+            )
+        }
+        "longest_extension_from_path" => {
+            let (path, extensions) = (bytes(action, "path")?, list(action, "extensions")?);
+            let ignore = flag(action, "ignore_case")?;
+            text(
+                op,
+                tsr_tspath::longest_extension_from_path(&path, &extensions, ignore),
+            )
+        }
+        "any_extension_worker" => {
+            let (path, extensions) = (bytes(action, "path")?, list(action, "extensions")?);
+            let equal = tsr_jsstring::compare::equality_comparer(flag(action, "ignore_case")?);
+            text(
+                op,
+                tsr_tspath::any_extension_from_path_worker(&path, &extensions, equal),
+            )
+        }
+        "try_get_extension_from_path" => {
+            let (path, extension) = (bytes(action, "path")?, bytes(action, "extension")?);
+            let equal = tsr_jsstring::compare::equality_comparer(flag(action, "ignore_case")?);
+            text(
+                op,
+                tsr_tspath::try_get_extension_from_path_with(&path, &extension, equal),
+            )
+        }
+        "change_extension" => {
+            let (path, ext) = (bytes(action, "path")?, bytes(action, "ext")?);
+            text(op, &tsr_tspath::change_extension(&path, &ext))
+        }
+        "change_any_extension" => {
+            let (path, ext) = (bytes(action, "path")?, bytes(action, "ext")?);
+            let extensions = list(action, "extensions")?;
+            let ignore = flag(action, "ignore_case")?;
+            text(
+                op,
+                &tsr_tspath::change_any_extension(&path, &ext, &extensions, ignore),
+            )
+        }
+        "change_full_extension" => {
+            let (path, ext) = (bytes(action, "path")?, bytes(action, "ext")?);
+            text(op, &tsr_tspath::change_full_extension(&path, &ext))
+        }
+        "remove_extension" => {
+            let (path, extension) = (bytes(action, "path")?, bytes(action, "extension")?);
+            let (value, panicked) =
+                guarded(|| Value::String(hex(tsr_tspath::remove_extension(&path, &extension))));
+            json!({ "op": op, "result": value, "panic": panicked })
+        }
+        "remove_any_file_extension" => text(
+            op,
+            tsr_tspath::remove_any_file_extension(&bytes(action, "path")?),
+        ),
         _ => {
             return Err(format!(
                 "unsupported action {op:?}: an unknown action is a harness failure, never an \
@@ -383,6 +460,89 @@ fn row(action: &Value) -> Result<Value, String> {
         }
     };
     Ok(observed)
+}
+
+/// The value every walk callback carries out, so a stopped walk and an
+/// exhausted one are told apart by more than the stop flag.
+fn carried(directory: &[u8]) -> Vec<u8> {
+    [b"v:".as_slice(), directory].concat()
+}
+
+fn hex_all<T: AsRef<[u8]>>(values: &[T]) -> Value {
+    Value::Array(
+        values
+            .iter()
+            .map(|value| Value::String(hex(value.as_ref())))
+            .collect(),
+    )
+}
+
+/// Runs an operation whose pinned form panics by design and records the class
+/// of panic the native probe records. The default hook is silenced for the call
+/// so an expected panic does not write to the driver's diagnostics.
+fn guarded(operation: impl FnOnce() -> Value + std::panic::UnwindSafe) -> (Value, String) {
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+    let outcome = std::panic::catch_unwind(operation);
+    std::panic::set_hook(hook);
+    match outcome {
+        Ok(value) => (value, String::new()),
+        Err(payload) => {
+            let message = payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| {
+                    payload
+                        .downcast_ref::<&str>()
+                        .map(|text| (*text).to_string())
+                })
+                .unwrap_or_default();
+            let class = if message.contains("out of range") {
+                "index_out_of_range".to_string()
+            } else {
+                format!("other:{message}")
+            };
+            (Value::Null, class)
+        }
+    }
+}
+
+fn number(action: &Value, key: &str) -> Result<i64, String> {
+    action
+        .get(key)
+        .and_then(Value::as_i64)
+        .ok_or_else(|| format!("action key {key:?} is missing or is not an integer"))
+}
+
+/// A byte argument whose key must be present but whose value may be null.
+fn optional(action: &Value, key: &str) -> Result<Option<Vec<u8>>, String> {
+    match action.get(key) {
+        None => Err(format!("action key {key:?} is missing")),
+        Some(Value::Null) => Ok(None),
+        Some(Value::String(value)) => Ok(Some(value.as_bytes().to_vec())),
+        Some(_) => Err(format!("action key {key:?} is not a string or null")),
+    }
+}
+
+fn lists(action: &Value, key: &str) -> Result<Vec<Vec<Vec<u8>>>, String> {
+    action
+        .get(key)
+        .and_then(Value::as_array)
+        .ok_or_else(|| format!("action key {key:?} is not an array"))?
+        .iter()
+        .map(|group| {
+            group
+                .as_array()
+                .ok_or_else(|| format!("action key {key:?} holds a non-array entry"))?
+                .iter()
+                .map(|item| {
+                    item.as_str()
+                        .map(|item| item.as_bytes().to_vec())
+                        .ok_or_else(|| format!("action key {key:?} holds a non-string entry"))
+                })
+                .collect()
+        })
+        .collect()
 }
 
 /// One byte result, hex encoded under the same key both sides use.

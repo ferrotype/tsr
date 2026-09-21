@@ -88,7 +88,7 @@ def expected_assets(rows):
             directory = Path(row['manifest']).parent
             for name in ('LICENSE', 'NOTICE'):
                 expected[str(directory / name)] = (ROOT / name).read_bytes()
-    for package in ('tsr_core', 'tsr_json', 'tsr_locale'):
+    for package in ('tsr_core', 'tsr_glob', 'tsr_json', 'tsr_locale'):
         expected[f'crates/{package}/licenses/GO-BSD-3-Clause.txt'] = (ROOT / 'licenses/GO-BSD-3-Clause.txt').read_bytes()
     return expected
 

@@ -11,6 +11,7 @@ pub use resolver::{
 mod diagnostic;
 pub use diagnostic::resolution_diagnostic;
 mod paths;
+pub mod symlinks;
 mod type_references;
 pub use type_references::{
     effective_type_roots, ResolvedTypeReferenceDirective, INFERRED_TYPES_CONTAINING_FILE,

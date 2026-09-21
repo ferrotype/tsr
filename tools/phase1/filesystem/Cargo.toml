@@ -13,7 +13,10 @@ description = "Phase 1 F2a: answers the filesystem, path and matching request sc
 [dependencies]
 phase1_harness = { version = "0.1.0", path = "../harness" }
 serde_json = { version = "1", features = ["preserve_order"] }
+tsr_glob = { version = "0.1.0", path = "../../../crates/tsr_glob" }
 tsr_jsstring = { version = "0.1.0", path = "../../../crates/tsr_jsstring" }
+tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
+tsr_core = { version = "0.1.0", path = "../../../crates/tsr_core" }
 tsr_tsoptions = { version = "0.1.0", path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { version = "0.1.0", path = "../../../crates/tsr_tspath" }
 tsr_vfs = { version = "0.1.0", path = "../../../crates/tsr_vfs" }

@@ -13,8 +13,7 @@ use tsr_tspath as path;
 
 pub struct ProgramCheckerHost {
     program: Arc<Program>,
-    pub(crate) known_symlinks:
-        OnceLock<Result<crate::checker_module_specifiers::KnownSymlinks, Error>>,
+    pub(crate) known_symlinks: OnceLock<Result<tsr_module::symlinks::KnownSymlinks, Error>>,
     common_source_directory: OnceLock<Result<Vec<u8>, tsr_arena::Error>>,
 }
 

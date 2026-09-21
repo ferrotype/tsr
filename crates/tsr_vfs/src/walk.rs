@@ -44,12 +44,13 @@ pub(crate) fn walk<F: FileSystem + ?Sized>(
         let info = fs
             .stat(&path)
             .and_then(|entry| entry.ok_or(Error::Io(std::io::ErrorKind::NotFound)));
+        let failure = info.as_ref().err().copied();
         let entry = info.ok().map(|info| WalkEntry {
             name: JsString::from_bytes(path.rsplit(|&byte| byte == b'/').next().unwrap_or(&path)),
             info,
             symlink,
         });
-        let control = visit(&path, entry.as_ref(), info.err())?;
+        let control = visit(&path, entry.as_ref(), failure)?;
         match control {
             WalkControl::SkipAll => return Ok(()),
             WalkControl::SkipDir => {

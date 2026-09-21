@@ -147,7 +147,11 @@ pub(super) fn wrapper() -> Outcome {
                 "WriteFile" => fs.write_file(b"bundled:///libs/lib.d.ts", b"x"),
                 "AppendFile" => fs.append_file(b"bundled:///libs/lib.d.ts", b"x"),
                 "Remove" => fs.remove(b"bundled:///libs/lib.d.ts"),
-                "Chtimes" => fs.change_times(b"bundled:///libs/lib.d.ts"),
+                "Chtimes" => fs.change_times(
+                    b"bundled:///libs/lib.d.ts",
+                    tsr_vfs::iofs::Time::ZERO,
+                    tsr_vfs::iofs::Time::ZERO,
+                ),
                 "Remove-an-absent-asset" => fs.remove(b"bundled:///libs/nope.d.ts"),
                 _ => fs.write_file(b"bundled:///", b"x"),
             }));

@@ -44,30 +44,16 @@ use crate::api::{action_op, actions, ordered, subject, Outcome};
 /// never reaches the `depth == 0` stop.
 const UNLIMITED_DEPTH_SENTINEL: i64 = -1;
 
-/// The one subject with no Rust home. The port declares `glob::Usage` with a
-/// derived `Debug` whose output happens to spell the three trimmed names, but
-/// nothing renders it as a production value, `Debug` is not the operation, and
-/// no Rust enum can hold the out-of-range discriminant the pinned stringer
-/// formats. Preparation records the gap; it renders no name here.
-const USAGE_MISSING: (&str, &str, &str) = (
-    "tsc/internal/vfs/vfsmatch/stringer_generated.go:Usage.String",
-    "a Display impl or an as_str on tsr_tsoptions::glob::Usage rendering the trimmed \
-     Files/Directories/Exclude for 0..=2 and Usage(n) for every other int8, including \
-     negatives -- which needs a representation for an out-of-domain Usage that the Rust \
-     enum does not have",
-    "crates/tsr_tsoptions/src/glob.rs:8-13 (Usage derives Clone, Copy, Debug, PartialEq and \
-     Eq and nothing else; a repo-wide search across crates/ for a Display or as_str on it, \
-     and for the rendered form Usage(, finds nothing)",
-);
-
 pub fn observe(request: &Value) -> Option<Outcome> {
     if request.get("dialect").and_then(Value::as_str) != Some("vfsmatch") {
         return None;
     }
     let subject = subject(request);
     if subject == "vfsmatch.Usage" {
-        let (authority, signature, home) = USAGE_MISSING;
-        return Some(Outcome::missing(authority, authority, signature, home));
+        return Some(match usage_names(actions(request)) {
+            Ok(rows) => Outcome::Observed(ordered(rows)),
+            Err(error) => Outcome::Failed(error),
+        });
     }
     if !matches!(
         subject,
@@ -178,6 +164,22 @@ fn depth(action: &Value) -> Result<isize, String> {
         .ok()
         .filter(|depth| *depth >= 0)
         .ok_or_else(|| format!("action {} has an out-of-domain depth", action_op(action)))
+}
+
+/// The open int8 domain of the pinned stringer, rendered by the production name table.
+fn usage_names(trace: &[Value]) -> Result<Vec<Value>, String> {
+    trace
+        .iter()
+        .map(|action| {
+            let value = required_i64(action, "value")?;
+            let narrow =
+                i8::try_from(value).map_err(|_| "usage value is not an int8".to_string())?;
+            Ok(
+                json!({ "op": action_op(action), "value": value, "panic": "",
+                       "result": Usage::string_raw(narrow) }),
+            )
+        })
+        .collect()
 }
 
 /// Only the three named discriminants are a legal matcher request. An

@@ -960,14 +960,9 @@ pub(crate) fn is_import_call(
 }
 
 // port: tsc/internal/tspath/extension.go:TryGetExtensionFromPath
-fn try_get_extension_from_path(path: &[u8]) -> Option<&'static [u8]> {
-    const EXTENSIONS_TO_REMOVE: [&[u8]; 12] = [
-        b".d.ts", b".d.mts", b".d.cts", b".mjs", b".mts", b".cjs", b".cts", b".ts", b".js",
-        b".tsx", b".jsx", b".json",
-    ];
-    EXTENSIONS_TO_REMOVE
-        .into_iter()
-        .find(|extension| path.ends_with(extension))
+/// port: tsc/internal/tspath/extension.go:TryGetExtensionFromPath
+fn try_get_extension_from_path(file: &[u8]) -> Option<&'static [u8]> {
+    Some(path::try_get_extension_from_path(file)).filter(|extension| !extension.is_empty())
 }
 
 impl CheckerState {
@@ -1077,17 +1072,11 @@ fn specifier_is_relative(path: &[u8]) -> bool {
 }
 
 // port: tsc/internal/tspath/extension.go:HasTSFileExtension
-fn has_ts_file_extension(path: &[u8]) -> bool {
-    TS_EXTENSIONS
-        .iter()
-        .any(|extension| path.ends_with(extension))
+fn has_ts_file_extension(file: &[u8]) -> bool {
+    path::has_ts_file_extension(file)
 }
 
 // port: tsc/internal/tspath/path.go:GetAnyExtensionFromPath
-fn any_extension(path: &[u8]) -> &[u8] {
-    let base = path::base_name(path);
-    match base.iter().rposition(|&byte| byte == b'.') {
-        Some(index) => &base[index..],
-        None => b"",
-    }
+fn any_extension(file: &[u8]) -> &[u8] {
+    path::any_extension_from_path::<&[u8]>(file, &[], false)
 }

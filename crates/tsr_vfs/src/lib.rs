@@ -6,6 +6,9 @@ use std::{
         Arc,
     },
 };
+pub mod iofs;
+pub mod iovfs;
+pub mod vfstest;
 mod walk;
 use tsr_jsstring::{JsString, SourceText};
 use tsr_tspath as path;
@@ -62,10 +65,32 @@ pub struct Entries {
     pub directories: Vec<JsString>,
     pub symlinks: Option<BTreeSet<JsString>>,
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// What `stat` answers. Hosts that have no name, time or mode to report leave
+/// them at their defaults; `basic` builds that form.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FileInfo {
     pub directory: bool,
     pub size: u64,
+    /// The base name the host reports.
+    pub name: JsString,
+    pub mod_time: iofs::Time,
+    pub mode: iofs::FileMode,
+}
+impl FileInfo {
+    pub fn basic(directory: bool, size: u64) -> Self {
+        let mode = if directory {
+            iofs::FileMode::DIR
+        } else {
+            iofs::FileMode::default()
+        };
+        Self {
+            directory,
+            size,
+            name: JsString::default(),
+            mod_time: iofs::Time::ZERO,
+            mode,
+        }
+    }
 }
 /// Reads never consult a fallback host. None means missing, including the Go
 /// ReadFile failure case; unsupported operations remain explicit errors.
@@ -101,7 +126,13 @@ pub trait FileSystem: Send + Sync {
     fn remove(&self, _path: &[u8]) -> Result<(), Error> {
         Err(Error::Unsupported("immutable filesystem remove"))
     }
-    fn change_times(&self, _path: &[u8]) -> Result<(), Error> {
+    /// Both instants travel, as the pinned `Chtimes` carries them.
+    fn change_times(
+        &self,
+        _path: &[u8],
+        _a_time: iofs::Time,
+        _m_time: iofs::Time,
+    ) -> Result<(), Error> {
         Err(Error::Unsupported("immutable filesystem timestamps"))
     }
 }
@@ -245,17 +276,11 @@ impl FileSystem for MemorySnapshot {
             Some(NamedEntry {
                 value: Entry::File(content),
                 ..
-            }) => Some(FileInfo {
-                directory: false,
-                size: content.raw.len() as u64,
-            }),
+            }) => Some(FileInfo::basic(false, content.raw.len() as u64)),
             Some(NamedEntry {
                 value: Entry::Directory,
                 ..
-            }) => Some(FileInfo {
-                directory: true,
-                size: 0,
-            }),
+            }) => Some(FileInfo::basic(true, 0)),
             _ => None,
         })
     }

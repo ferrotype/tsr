@@ -1639,3 +1639,123 @@ policy and Phase 1 inventory checks. The S07 mapping update moves 14 Rust
 anchors only; replay of authenticated native observations preserves identical
 selected cases and checker obligations. Historical benchmark and correctness
 evidence is not re-certified.
+
+### F2b first batch: paths, matching, glob, symlinks and the in-memory filesystems — 2026-09-21
+
+F2b was authorized after the F1b merge and is **in progress**. This batch
+implements six of the eleven filesystem groups against the F2a checks. The
+filesystem family moves from **34 match / 317 missing / 7 different** to
+**122 match / 232 missing / 4 different**, with one case still unavailable on
+this host. No native observation or expectation changed, and no previously
+matching row changed.
+
+| Group | Cases | Before | Now |
+| --- | ---: | --- | --- |
+| tspath | 46 | 13 match, 30 missing, 3 different | **46 match** |
+| vfsmatch | 22 | 20 match, 1 missing, 1 different | **22 match** |
+| glob | 10 | 10 missing | **9 match**, 1 different |
+| symlinks | 11 | 11 missing | **11 match** |
+| vfstest | 19 | 17 missing, 2 different | **17 match**, 2 different |
+| iovfs | 16 | 16 missing | **16 match** |
+| cachedvfs | 32 | unchanged | 1 match, 30 missing, 1 different |
+| wrapvfs, vfsmock, osvfs | 61 | unchanged | 60 missing, 1 unavailable |
+| matchFiles | 142 | unchanged | 142 missing |
+
+Every group that reached a full match on its first run was mutation checked:
+one production function was broken, the comparison reported `different`, and
+the function was restored.
+
+#### Implementation and representation decisions
+
+- **`tsr_tspath`** gains the root predicates and separator family, the unreduced
+  splitter and the reducer, the cheap normaliser, the comparer wrappers, a typed
+  `Path`, callback-shaped ancestor walks, common parents and the extension
+  tables. Two defects the comparison found are fixed: `base_name` measured the
+  root before normalising separators, and `to_path` made every input absolute
+  where the pin only normalises a rooted disk path.
+- **`vfsmatch`**: `getBasePaths` sorts include base paths with the plain string
+  comparer, not a path comparison, so `/out/./z` sorts before `/out/z` and
+  containment keeps only the first. `Usage` carries the open `int8` name table.
+- **`tsr_glob`** is a new crate for the language-server glob grammar. It keeps the
+  pin's behaviours: a negated range stores its flag and ignores it, a star cannot
+  meet the separator that follows it, and a separator run that reaches the end
+  of the input panics. It joins the package policy, release order and BSD notice.
+- **`tsr_module::symlinks`** is the known-symlinks cache. The ledger places it in
+  `tsr_core`, which cannot depend on `tsr_tspath`, so it lives in `tsr_module`.
+  The compiler's private copy had no file half and returned before recording
+  one; it is deleted in favour of the shared cache. The checker's private path
+  helpers now call `tsr_tspath`.
+- **`tsr_vfs::iofs`** ports the parts of Go's `io/fs` the adapters are written
+  against, and `fstest.MapFS`. **`tsr_vfs::vfstest`** ports the test filesystem,
+  and **`tsr_vfs::iovfs`** the root dispatcher and the `io/fs` adapter. Where Go
+  type-asserts a backing for optional resolve and write capabilities, a backing
+  states them up front.
+- `FileInfo` gains the name, modification time and mode the pinned `Stat`
+  reports, and `change_times` carries both instants.
+
+#### Differences left visible, for owner review
+
+1. `filesystem/glob/match-group-branch-buffer`, one row: the probe builds an
+   element of a foreign Go type to reach the matcher's defensive panic. A closed
+   Rust enum cannot represent that element, so the row reports
+   `unrepresentable_element`.
+2. `filesystem/vfstest/from-map-rejects-malformed-maps`, one row: an input whose
+   Go value has a foreign dynamic type. A typed input enum cannot carry it, so
+   the row reports `unrepresentable_input`.
+3. `filesystem/vfstest/snapshot-mutation-leak-control`: the pin assigns a
+   modification time through its stored pointer, so a held entry changes under
+   its holder. Stored entries are immutable here, consistent with the
+   compiler-options ownership decision, and the leak is not reproduced.
+4. `filesystem/cachedvfs/root-length-rejects-non-absolute` is unchanged from F2a
+   and belongs to the cached group, which is not implemented yet.
+
+None of these is waived. The comparator reports them and `--require-parity`
+rejects them.
+
+#### Remaining F2b work
+
+The cached, wrapping, tracking and mock filesystems sit directly on the adapter
+and test filesystem delivered here. The live operating-system filesystem is its
+own group. The 142 `config/matchFiles` outputs need the `json` configuration
+entry point, `ParsedCommandLine::wildcard_directories` and the carried test
+renderer, which overlaps F3b.
+
+The S07 operation mapping is regenerated: the new port markers move Rust
+anchors and flip 38 functions from `no_source_marker` to
+`source_marker_present`. That goes beyond the standing mapping-only approval, so
+the owner approved the subset re-freeze on 2026-09-21. `subset.json` and
+`checker-obligations.json` are byte-identical; only the rule's operation matrix
+digest changes (finding `PHASE1-F2b-2026-09-21-first-batch`).
+
+The archive is `data/phase1/captures/f2b-first-batch.tar.gz`: the 47 JSON
+request, overlay, observation and provenance files of the filesystem family
+(1,368,570 bytes), no binaries or exported upstream tree. Its capture
+provenance SHA-256 is
+`d786b1d0546c5234498f57abc6a388be2878a1b07459a9ee3ecc543080190cac`, and
+comparing the extracted archive reproduces 122 match, 232 not_implemented,
+4 different and 1 native_unavailable.
+
+#### PR #47 review corrections — 2026-09-21
+
+The review fixed the new timestamp's zero semantics: Go's zero time is the
+year-one instant, not an absent value. Parsing that instant, comparison,
+clock advancement and conversion to `SystemTime` now agree. `Time::unix`
+returns its seconds/nanoseconds pair directly, including for zero, and
+`from_unix` normalizes excess nanoseconds.
+
+RFC3339 parsing now rejects malformed separators, invalid dates and out-of-range
+time fields. It retains the pinned parser's permissive cases (one-digit hours,
+comma fractions, truncation beyond nanoseconds and inclusive 24/60 offset
+components). A Go 1.27.1 probe supplied the timestamp expectations; all three
+new timestamp tests failed before the fix. Broken-symlink classification also
+unwraps path errors, as the pin's `errors.AsType` does, with a regression for
+a nested message/path wrapper.
+
+The focused VFS suite passes (five unit tests and three integration tests),
+and VFS clippy with warnings denied is clean. A fresh filesystem capture was
+recorded and archived as `data/phase1/captures/f2b-review.tar.gz` (47 JSON
+files, 1,359,496 compressed bytes; provenance SHA-256
+`ac92576946f9145db306be11225d45dded3648bb48bc0631197518fdd9a8a001`).
+Every native and Rust observation is identical to the first-batch archive;
+the counts and four unwaived differences above are unchanged. The original
+archive is preserved. Tracker views are regenerated for the reviewed sources.

@@ -1,113 +1,32 @@
 //! Module-specifier host data derived from the retained program and snapshot.
 use crate::checker_host::ProgramCheckerHost;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use tsr_checker::{CheckerHost, Error, ModuleSpecifierPath};
 use tsr_core::ModuleKind;
 use tsr_jsstring::JsString;
-use tsr_tspath as path;
+use tsr_module::symlinks::KnownSymlinks;
+use tsr_tspath::{self as path, contains_ignored_path as ignored, starts_with_directory};
 
-#[derive(Default)]
-pub(crate) struct KnownSymlinks {
-    directories: BTreeSet<JsString>,
-    by_realpath: BTreeMap<JsString, BTreeSet<JsString>>,
-}
-fn trailing(bytes: &[u8]) -> Vec<u8> {
-    if bytes.ends_with(b"/") {
-        bytes.to_vec()
-    } else {
-        [bytes, b"/"].concat()
-    }
-}
 fn contains(bytes: &[u8], part: &[u8]) -> bool {
     bytes.windows(part.len()).any(|window| window == part)
 }
-// port: tsc/internal/tspath/ignoredpaths.go:ContainsIgnoredPath
-fn ignored(bytes: &[u8]) -> bool {
-    [b"/node_modules/.".as_slice(), b"/.git", b".#"]
-        .iter()
-        .any(|part| contains(bytes, part))
-}
-// port: tsc/internal/tspath/path.go:StartsWithDirectory
-fn starts_with_directory(file: &[u8], directory: &[u8], case_sensitive: bool) -> bool {
-    if directory.is_empty() {
-        return false;
-    }
-    let file = path::canonical(file, case_sensitive);
-    let directory = path::canonical(directory, case_sensitive);
-    let directory = directory.strip_suffix(b"/").unwrap_or(&directory);
-    let directory = directory.strip_suffix(b"\\").unwrap_or(directory);
-    file.starts_with(&[directory, b"/"].concat()) || file.starts_with(&[directory, b"\\"].concat())
-}
-impl KnownSymlinks {
-    // port: tsc/internal/symlinks/knownsymlinks.go:KnownSymlinks.ProcessResolution
-    fn process(&mut self, original: &[u8], resolved: &[u8], cwd: &[u8], case_sensitive: bool) {
-        if original.is_empty() || resolved.is_empty() {
-            return;
-        }
-        let mut real = path::normalized_components(resolved, cwd);
-        let mut link = path::normalized_components(original, cwd);
-        let is_package = |part: &[u8]| {
-            path::canonical(part, case_sensitive).as_ref() == b"node_modules"
-                || part.starts_with(b"@")
-        };
-        let mut directory = false;
-        while real.len() >= 2
-            && link.len() >= 2
-            && !is_package(&real[real.len() - 2])
-            && !is_package(&link[link.len() - 2])
-            && path::canonical(real.last().expect("two components"), case_sensitive)
-                == path::canonical(link.last().expect("two components"), case_sensitive)
-        {
-            real.pop();
-            link.pop();
-            directory = true;
-        }
-        if !directory {
-            return;
-        }
-        let real = path::path_from_components(&real);
-        let link = path::path_from_components(&link);
-        let key = path::to_path(&link, cwd, case_sensitive);
-        if ignored(key.as_bytes()) {
-            return;
-        }
-        let key = JsString::from_bytes(trailing(key.as_bytes()));
-        if self.directories.insert(key) {
-            let real_key = path::to_path(&real, cwd, case_sensitive);
-            self.by_realpath
-                .entry(JsString::from_bytes(trailing(real_key.as_bytes())))
-                .or_default()
-                .insert(JsString::from_bytes(link));
-        }
-    }
-    fn has_directory(&self, directory: &[u8], cwd: &[u8], case_sensitive: bool) -> bool {
-        let key = path::to_path(directory, cwd, case_sensitive);
-        self.directories
-            .contains(trailing(key.as_bytes()).as_slice())
-    }
-}
-
 impl ProgramCheckerHost {
     // port: tsc/internal/compiler/program.go:Program.GetSymlinkCache
     fn compute_known_symlinks(&self) -> Result<KnownSymlinks, Error> {
         let program = self.program();
         let cwd = program.current_directory();
         let case_sensitive = self.use_case_sensitive_file_names();
-        let mut result = KnownSymlinks::default();
+        let result = KnownSymlinks::new(cwd, case_sensitive);
         for resolution in program.resolutions() {
-            result.process(
+            result.process_resolution(
                 resolution.result.original_path.as_bytes(),
                 resolution.result.resolved_file_name.as_bytes(),
-                cwd,
-                case_sensitive,
             );
         }
         for resolution in program.type_resolutions() {
-            result.process(
+            result.process_resolution(
                 resolution.result.original_path.as_bytes(),
                 resolution.result.resolved_file_name.as_bytes(),
-                cwd,
-                case_sensitive,
             );
         }
         let mut seen = BTreeSet::new();
@@ -138,13 +57,15 @@ impl ProgramCheckerHost {
             }
             for dependency in dependencies {
                 let possible = path::combine(directory, &[b"node_modules", dependency]);
-                if result.has_directory(&possible, cwd, case_sensitive) {
+                if result.has_directory(&path::to_path(&possible, cwd, case_sensitive).into()) {
                     continue;
                 }
                 if !dependency.starts_with(b"@types") {
                     let types_name = tsr_module::get_types_package_name(dependency);
                     let possible_types = path::combine(directory, &[b"node_modules", &types_name]);
-                    if result.has_directory(&possible_types, cwd, case_sensitive) {
+                    if result
+                        .has_directory(&path::to_path(&possible_types, cwd, case_sensitive).into())
+                    {
                         continue;
                     }
                 }
@@ -169,14 +90,12 @@ impl ProgramCheckerHost {
                 if let Some(resolution) =
                     resolution.filter(|r| r.is_resolved() && !r.original_path.is_empty())
                 {
-                    result.process(
+                    result.process_resolution(
                         &path::combine(resolution.original_path.as_bytes(), &[b"package.json"]),
                         &path::combine(
                             resolution.resolved_file_name.as_bytes(),
                             &[b"package.json"],
                         ),
-                        cwd,
-                        case_sensitive,
                     );
                 }
             }
@@ -217,12 +136,13 @@ impl ProgramCheckerHost {
         let mut result = vec![];
         for directory in path::ancestors(&path::directory(&path::absolute(target, cwd))) {
             let key = path::to_path(&directory, cwd, case_sensitive);
-            let Some(links) = symlinks
-                .by_realpath
-                .get(trailing(key.as_bytes()).as_slice())
-            else {
+            let key = path::Path::from(key).ensure_trailing_directory_separator();
+            let Some(links) = symlinks.directories_by_realpath().load(&key) else {
                 continue;
             };
+            // The pinned set is unordered; sorting keeps the result deterministic.
+            let mut links = links.to_vec();
+            links.sort();
             if starts_with_directory(importer, &directory, case_sensitive) {
                 break;
             }
@@ -232,8 +152,8 @@ impl ProgramCheckerHost {
                 }
                 let relative =
                     path::relative_from_directory(&directory, target, cwd, case_sensitive);
-                for link in links {
-                    let option = path::resolve(link.as_bytes(), &[&relative]);
+                for link in &links {
+                    let option = path::resolve(link, &[&relative]);
                     result.push(ModuleSpecifierPath {
                         is_in_node_modules: contains(&option, b"/node_modules/"),
                         file_name: JsString::from_bytes(option),
